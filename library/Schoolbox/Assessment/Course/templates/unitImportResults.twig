@@ -337,10 +337,10 @@
                                             {% set assessmentImpl = subPair.implementation %}
                                             {% set assessment = assessmentImpl ?: assessmentSpec %}
 
-                                            {% set inputPrefix = inputPrefix ~ '[a][' ~ assessment.id ~ ']' %}
+                                            {% set subInputPrefix = inputPrefix ~ '[a][' ~ assessment.id ~ ']' %}
 
-                                            <input type="hidden" name="{{ inputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
-                                            <input type="hidden" name="{{ inputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
+                                            <input type="hidden" name="{{ subInputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
+                                            <input type="hidden" name="{{ subInputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
 
                                             {% if assessable.duration is not empty %}
 
@@ -384,7 +384,7 @@
                                                            id="a_import-{{ assessable.id}}"
                                                             {% if isChecked %} checked="checked"{% endif %}
                                                            data-assessment="{{ assessable.id }}"
-                                                           name="{{ inputPrefix }}[checked]"
+                                                           name="{{ subInputPrefix }}[checked]"
                                                            value="1"
                                                     />
                                                     <label style="margin-left:25px" for="a_import-{{ assessable.id}}" class="checkbox-label">
@@ -401,7 +401,7 @@
                                                     {% include '@course/import/date.twig' with {
                                                     assessmentDate: assessable.publishAt,
                                                     unitDate: unitImpl.openDate,
-                                                    inputPrefix: inputPrefix,
+                                                    inputPrefix: subInputPrefix,
                                                     dateProperty: 'publish',
                                                     dateSyncProperty: publishDateSync,
                                                     assessmentId: assessable.id
@@ -411,7 +411,7 @@
                                                         {% include '@course/import/date.twig' with {
                                                         assessmentDate: assessable.openAt,
                                                         unitDate: displayStartDate,
-                                                        inputPrefix: inputPrefix,
+                                                        inputPrefix: subInputPrefix,
                                                         dateProperty: 'open',
                                                         dateSyncProperty: 'due',
                                                         assessmentId: assessable.id
@@ -423,7 +423,7 @@
                                                     {% include '@course/import/date.twig' with {
                                                     assessmentDate: assessable.dueAt,
                                                     unitDate: displayEndDate,
-                                                    inputPrefix: inputPrefix,
+                                                    inputPrefix: subInputPrefix,
                                                     dateProperty: 'due',
                                                     dateSyncProperty: 'late',
                                                     assessmentId: assessable.id
@@ -434,7 +434,7 @@
                                                         {% include '@course/import/date.twig' with {
                                                         assessmentDate: assessable.closeAt,
                                                         unitDate: displayEndDate,
-                                                        inputPrefix: inputPrefix,
+                                                        inputPrefix: subInputPrefix,
                                                         dateProperty: 'close',
                                                         dateLabel: 'Late',
                                                         assessmentId: assessable.id
