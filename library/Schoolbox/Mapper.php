@@ -1347,14 +1347,15 @@ abstract class Mapper implements IMapper, Serializable
 
         } else {
             // Building the query is hard - all I can do is compare against each property of each model.
-            foreach ($collection as $model) {
-                $subPb = $this->getPredicateBuilder();
+            $orPb = $this->getPredicateBuilder();
+            foreach ($collection as $i => $model) {
+                $modelPb = $this->getPredicateBuilder();
                 foreach ($this->map as $column) {
-
+                    $modelPb->equals($column['column'], $this->getModelProperty($model, $column['property']));
                 }
-                $pb->all($subPb);
+                $orPb->all($modelPb);
             }
-
+            $pb->any($orPb);
         }
 
         // Update property on each model
@@ -1368,7 +1369,7 @@ abstract class Mapper implements IMapper, Serializable
         $query     = "
             UPDATE `{$this->getTable()}`
             SET `$field` = :value
-            WHERE {$pb->getWhere()}
+            WHERE {$pb->getWhere()[0]}
         ";
         $statement = $this->database->prepare($query);
         $statement->bindValue('value', $value);
