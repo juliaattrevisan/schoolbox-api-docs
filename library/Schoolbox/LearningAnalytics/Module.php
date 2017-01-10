@@ -115,7 +115,7 @@ class Module extends BaseModule
         $accessor = new Access();
 
         if ($accessor->getFolderAccess($_SESSION['user'], [$params['courseId']]) < UserAccess::ACCESS_WRITE) {
-            error(6);
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(6);
         }
 
         /* Load folders
@@ -128,7 +128,7 @@ class Module extends BaseModule
             $courseFolder = $this->getFolderMapper()->findById($params['courseId']);
         }
         catch (\Exception $e) {
-            error(148);
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(148);
         }
 
         /* Try to find all the folders which used $courseFolder as a source
@@ -179,7 +179,7 @@ class Module extends BaseModule
                 $allUnitInstances = $this->getUnitInstanceMapper()->findForFolderDueBetween($allCategoryIds, $from, $to);
             }
             catch (Exception $e) {
-                error(159);
+                throw \Schoolbox\Error\Mapper::getInstance()->generateException(159);
             }
         }
         else {
@@ -214,12 +214,8 @@ class Module extends BaseModule
         $accessor = new Access();
 
         if ($accessor->getFolderAccess($_SESSION['user'], [$params['folderId']]) < UserAccess::ACCESS_WRITE) {
-            error(6);
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(6);
         }
-
-        /* Load folders
-         */
-        $allUnitInstances = new Collection();
 
         /* Try to find the parent course folder which spawned minions
          */
@@ -227,7 +223,7 @@ class Module extends BaseModule
             $courseFolder = $this->getFolderMapper()->findById($params['courseId']);
         }
         catch (\Exception $e) {
-            error(148);
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(148);
         }
 
         /* Try to find all the folders which used $courseFolder as a source
@@ -265,7 +261,7 @@ class Module extends BaseModule
             $allUnitInstances = $this->getUnitInstanceMapper()->findForFolderDueBetween([$params['folderId']], $from, $to);
         }
         catch (Exception $e) {
-            error(159);
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(159);
         }
 
         /* Inject (this is used in twig)
