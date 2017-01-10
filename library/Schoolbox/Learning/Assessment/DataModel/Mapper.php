@@ -177,6 +177,7 @@ class Mapper extends BaseMapper
 
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCurriculumNodes']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
@@ -204,6 +205,18 @@ class Mapper extends BaseMapper
             $options['order']['sequence'] = 'asc';
         }
         return parent::findByColumnList($columnList, $options);
+    }
+
+    /**
+     * Update any associated curriculum nodes when saving an assessment
+     *
+     * @param Model $assessment
+     */
+    protected function updateCurriculumNodes(Model $assessment)
+    {
+        $this->getJoinMapper('curriculum_node_for_assessment')
+            ->deleteRelations($assessment->getId())
+            ->insertRelations($assessment->getCurriculumNodes(), $assessment->getId());
     }
 
     /**

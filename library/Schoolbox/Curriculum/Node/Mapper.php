@@ -10,6 +10,7 @@
 namespace Schoolbox\Curriculum\Node;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper implements BaseMapper\Searchable
@@ -268,5 +269,52 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             );
         }
         return $curriculumNode;
+    }
+
+    /**
+     * Delete curriculum nodes associated with $assessment
+     *
+     * @param int $assessmentId
+     * @return $this
+     */
+    public function deleteRelations($assessmentId)
+    {
+        $query = "
+            DELETE FROM curriculum_node_for_assessment
+            WHERE assessment_id = :assessmentId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'assessmentId' => $assessmentId
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Insert curriculum nodes associated with $assessment
+     *
+     * @param Collection $curriculumNodes
+     * @param $assessmentId
+     * @return $this
+     */
+    public function insertRelations(Collection $curriculumNodes, $assessmentId)
+    {
+        $query = "
+            INSERT INTO curriculum_node_for_assessment (curriculum_node_id, assessment_id)
+            VALUES (:curriculumNodeId, :assessmentId)
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+
+        foreach ($curriculumNodes as $currentNode) {
+            $statement->execute([
+                'curriculumNodeId' => $currentNode->getId(),
+                'assessmentId' => $assessmentId
+            ]);
+        }
+
+        return $this;
     }
 }
