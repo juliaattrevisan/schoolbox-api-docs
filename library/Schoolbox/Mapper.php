@@ -1344,7 +1344,7 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
 
-        // Run update PRs
+        // Run update queries
         $this->database->beginTransaction();
         foreach ($pbs as $pb) {
             // Build query
@@ -1357,7 +1357,7 @@ abstract class Mapper implements IMapper, Serializable
 
             // Run query
             try {
-                if (!($result = $statement->execute())) {
+                if (!$statement->execute()) {
                     $this->database->rollBack();
                     return false;
                 }
