@@ -1308,7 +1308,7 @@ abstract class Mapper implements IMapper, Serializable
     public function updateAll($object, $field, $value, $pre_trigger = null, $post_trigger = null)
     {
         $collection = $this->getModelAsCollection($object);
-        if (empty($collection)) {
+        if (count($collection) === 0) {
             // Nothing to update
             return false;
         }
