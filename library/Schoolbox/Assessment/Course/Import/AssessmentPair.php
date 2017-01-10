@@ -66,7 +66,39 @@ class AssessmentPair
 
         $this->specification = $spec;
         $this->implementation = $impl;
-        $this->assessmentPairs = $subPairs;
+        $this->assessmentPairs = $subPairs ?: new GenericCollection(AssessmentPair::class) ;
+    }
+
+    /**
+     * Gets the count of assessments in this assessment and its sub-assessments.
+     *
+     * For non-projects, this returns 1. For Projects it returns 1(this) + recursive sub-assessment count
+     *
+     * @return int
+     */
+    public function getAssessmentCount()
+    {
+        $count = 1;
+        foreach($this->assessmentPairs as $subPair){
+            $count += $subPair->getAssessmentCount();
+        }
+        return $count;
+    }
+
+    /**
+     * Gets the count of assessments implementation in this assessment and its sub-assessments.
+     *
+     * A pair counts towards count only if it contains an AssessmentImpl
+     *
+     * @return int
+     */
+    public function getAssessmentImplCount()
+    {
+        $count = $this->implementation ? 1 : 0;
+        foreach($this->assessmentPairs as $subPair){
+            $count += $subPair->getAssessmentImplCount();
+        }
+        return $count;
     }
 
     /**

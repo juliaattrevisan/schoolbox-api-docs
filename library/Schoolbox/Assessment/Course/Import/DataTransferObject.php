@@ -228,13 +228,23 @@ class DataTransferObject
     {
         $this->availableAssessmentCounts = [];
         foreach($this->unitSpecAssessments as $unitSpecId => $assessmentPairs){
-            $this->availableAssessmentCounts[$unitSpecId] = count($assessmentPairs);
+            $count = 0;
+            /** @var AssessmentPair[] $assessmentPairs */
+            foreach($assessmentPairs as $assessmentPair){
+                $count += $assessmentPair->getAssessmentCount();
+            }
+            $this->availableAssessmentCounts[$unitSpecId] = $count;
         }
         return true;
     }
 
     /**
      * Calculate how many Assessments are selected for each UnitSpec
+     *
+     * Assessments are selected if:
+     * * UnitImpl not exists (ie a new unit import), or
+     * * AssessmentImpl exists (ie assessment already imported)
+     *
      * @return bool
      */
     protected function calculateSelectedAssessmentCounts()
@@ -242,13 +252,23 @@ class DataTransferObject
         $this->selectedAssessmentCounts = [];
         /** @var AssessmentPair[] $assessmentPairs */
         foreach($this->unitSpecAssessments as $unitSpecId => $assessmentPairs){
-            $count = 0;
-            foreach($assessmentPairs as $pair){
-                if($pair->getImplementation() instanceof IAssessable){
-                    $count++;
-                }
+
+            // Is this a fresh unit import?
+            if(!$this->unitImplementations[$unitSpecId]->getId()){
+                $this->selectedAssessmentCounts[$unitSpecId] = $this->availableAssessmentCounts[$unitSpecId];
             }
-            $this->selectedAssessmentCounts[$unitSpecId] = $count;
+
+            // Else modification of existing unit import.
+            else {
+                $count = 0;
+                /** @var AssessmentPair[] $assessmentPairs */
+                foreach($assessmentPairs as $assessmentPair){
+                    $count += $assessmentPair->getAssessmentImplCount();
+                }
+                $this->selectedAssessmentCounts[$unitSpecId] = $count;
+            }
+
+
         }
         return true;
     }
