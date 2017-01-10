@@ -446,6 +446,25 @@ class Controller extends Base
             }
         }
 
+        // Keep a collection of all folders student has an assessment in for use in the dropdown
+
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
+
+        $foldersFound = [];
+        $folders = new Collection();
+
+        /** @var IAssessable $assessment */
+        foreach ($assessments as $assessment) {
+            $folder = $assessment->getContext()->getFolder();
+
+            if ($folder instanceof Folder) {
+                if (!isset($foldersFound[$folder->getId()])) {
+                    $foldersFound[$folder->getId()] = $folder;
+                    $folders->add($folder);
+                }
+            }
+        }
+
         // Grab the students conversation history
 
         $conversation = new Conversation($viewee, $subject);
@@ -458,7 +477,7 @@ class Controller extends Base
             'student'           => $viewee,
             'term'              => $term,
             'terms'             => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'           => $this->getFolderMapper()->findFoldersWithResponses($viewee, $term),
+            'folders'           => $folders,
             'subject'           => $subject,
             'markbook'          => $markbook,
             'graphInfo'         => json_encode($graphInfo),
