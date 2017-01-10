@@ -1000,8 +1000,10 @@ class External_Synergetic_User implements External_UserInterface
                     StaffDepartmentDescription,
                     uStaffPosition.JobTitle AS JobPositionDescription,
                     JobPositions.StaffJobPositionStartDate,
-                    JobPositions.StaffJobPositionEndDate
+                    JobPositions.StaffJobPositionEndDate,
+                    Community.OccupDesc AS JobPositionDescriptionAlternate                
                 FROM SynergyOne.dbo.vStaff vStaff
+            JOIN SynergyOne.dbo.Community ON Community.ID = vStaff.StaffID
                 LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
                 LEFT JOIN SynergyOne.dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID
                 WHERE vStaff.ActiveFlag = 1
@@ -1034,8 +1036,10 @@ class External_Synergetic_User implements External_UserInterface
                 StaffDepartmentDescription,
                 JobPositions.JobPositionDescription,
                 JobPositions.StaffJobPositionStartDate,
-                JobPositions.StaffJobPositionEndDate
+                JobPositions.StaffJobPositionEndDate,
+                Community.OccupDesc AS JobPositionDescriptionAlternate                
             FROM SynergyOne.dbo.vStaff vStaff
+            JOIN SynergyOne.dbo.Community ON Community.ID = vStaff.StaffID
             LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
             WHERE vStaff.ActiveFlag = 1
             AND StaffCategoryDescription != 'Staff on leave'
