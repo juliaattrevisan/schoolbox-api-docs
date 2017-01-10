@@ -14,7 +14,6 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
@@ -925,7 +924,9 @@ class Controller extends Base\Base
         }
 
         // Re-order UnitImpls alphabetically
-        $courseImpl->setUnits($courseImpl->getUnits()->sortBy('title', 'ASC'));
+        /** @var GenericCollection|UnitImplementation[] $orderedUnits */
+        $orderedUnits = $courseImpl->getUnits()->sortBy('title', 'ASC');
+        $courseImpl->setUnits($orderedUnits);
 
 
         // Find the owner of any Assessment so we can display, even though it is disabled
