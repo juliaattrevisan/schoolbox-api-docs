@@ -52,7 +52,7 @@ if ($authenticator->canModify()) {
             error(2);
         }
 
-		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+		$now = \Alaress_Date_Format::now();
 
 
 
