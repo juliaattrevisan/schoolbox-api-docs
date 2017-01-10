@@ -83,6 +83,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
+        /* Curriculum Codes prefilled from those associated with context folder
+         */
+        $data['curriculumNodes'] = $context->getFolder()->getCurriculumNodes();
+
         // Did the caller request a returnUrl?
         $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
@@ -114,6 +118,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
         $data['returnUrlName'] = Redirect::RETURN_URL;
         $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
+
+        /* Curriculum Codes prefilled from those associated with the assessment itself
+         */
+        $data['curriculumNodes'] = $assessment->getCurriculumNodes();
 
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
@@ -269,7 +277,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'breadcrumbs'     => $this->getBakery()->produceFromContext($context, $assessment),
             'assessment'      => $assessment,
             'folder'          => $context->getFolder(),
-//            'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
             'assessmentType'  => AssessmentType::objectToString($assessment),
             'visibility'      => $assessment->getMarkVisibility(),
         ];

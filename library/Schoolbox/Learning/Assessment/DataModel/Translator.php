@@ -186,6 +186,7 @@ class Translator
             ->setCreatedAt($dataModel->getAssessmentModel()->getCreatedAt())
             ->setUpdatedAt($dataModel->getAssessmentModel()->getUpdatedAt())
             ->setDeletedAt($dataModel->getAssessmentModel()->getDeletedAt())
+            ->setCurriculumNodes($dataModel->getAssessmentModel()->getCurriculumNodes())
         ;
 
         // Translate specification assessment if there is one
