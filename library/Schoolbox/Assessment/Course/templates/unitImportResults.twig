@@ -128,6 +128,7 @@
     {% set assessmentPairs = dto.assessmentPairs[unitSpec.id] %}
     {% set unitAssessmentCount = dto.availableAssessmentCounts[unitSpec.id] %}
     {% set unitAssessmentCountSelected = dto.selectedAssessmentCounts[unitSpec.id] %}
+    {% set unitAction = unitImpl.id ? 'modify' : 'import' %}
 
     {# Have to clone the date, otherwise incrementing one updates both #}
 
@@ -150,7 +151,7 @@
                     <div class="list-item">
                         <div class="card small-12">
                             <h3><span class="icon-unit"></span>{{ unitSpec.folder.name }}</h3>
-                            {% set countSelected = 'import' == action ? unitAssessmentCount : unitAssessmentCountSelected %}
+                            {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
                             <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
                         </div>
                     </div>
@@ -174,7 +175,7 @@
                                     {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
                                     {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
                                     {% set inputPrefix %}unit[{{ unitSpec.id }}][a][{{ assessment.id }}]{% endset %}
-                                    {% set isChecked = assessmentImpl or 'import' == action %}
+                                    {% set isChecked = assessmentImpl or 'import' == unitAction %}
 
                                     {% if assessment.duration is not empty %}
 
@@ -346,8 +347,8 @@
                                             {% set assessmentSpec = subPair.specification %}
                                             {% set assessmentImpl = subPair.implementation %}
                                             {% set assessment = assessmentImpl ?: assessmentSpec %}
-
                                             {% set subInputPrefix = inputPrefix ~ '[a][' ~ assessment.id ~ ']' %}
+                                            {% set isChecked = assessmentImpl or 'import' == unitAction %}
 
                                             <input type="hidden" name="{{ subInputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
                                             <input type="hidden" name="{{ subInputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
