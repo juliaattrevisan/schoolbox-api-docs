@@ -462,20 +462,18 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Limits the collection by offset and count. @see array_slice()
+     * Return the first N items from the Collection
      *
-     * DOES mutate the collection you call this on.
-     * Does NOT preserve keys.
+     * Does NOT mutate the collection you call this on.
      *
-     * @param int $offset
      * @param int $count
+     * @param bool $preserveKeys
      *
-     * @return $this
+     * @return static
      */
-    public function limit($offset = 0, $count = null)
+    public function limit($count = null, $preserveKeys = false)
     {
-        $this->setStack(array_slice($this->getStack(), $offset, $count));
-        return $this;
+        return $this->slice(0, $count, $preserveKeys);
     }
 
 

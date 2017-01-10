@@ -61,7 +61,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             $blogs = $this->getBlogMapper()
                 ->findByColumn("folder_id", $this->getSource()->getId())
                 ->sortBy('createdAt', 'desc')
-                ->limit(0, $limit);
+                ->limit($limit);
 
             // Grab comments and image gallery items for each blog post
 

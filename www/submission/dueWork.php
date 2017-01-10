@@ -657,8 +657,8 @@ function getActivities($user, $limit, $categories, $visibilities, $is_restricted
     if (!$is_restricted) {
         $activities = $activities->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities));
     }
-    $activities
+    $activities = $activities
         ->sortBy('date', 'desc')
-        ->limit(0, 15);
+        ->limit(15);
     return $activities;
 }

@@ -165,25 +165,24 @@ class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Limit SHOULD mutate the collection
+     * Limit should NOT mutate the collection
      *
      * @dataProvider provider_limit
      * @param Collection $input
      * @param Collection $expected
-     * @param int        $offset
      * @param int        $count
      */
-    public function test_limit(Collection $input, Collection $expected, $offset, $count)
+    public function test_limit(Collection $input, Collection $expected, $count)
     {
         $beforeLimit = $input->getAll();
 
-        $actual = $input->limit($offset, $count);
+        $actual = $input->limit($count);
 
-        $message = "Failed asserting that two arrays are equal. \$offset: $offset, \$count: $count";
+        $message = "Failed asserting that two arrays are equal. \$count: $count";
 
         $this->assertEquals($expected->getAll(), $actual->getAll(), $message);
 
-        $this->assertNotEquals($beforeLimit, $input->getAll());
+        $this->assertEquals($beforeLimit, $input->getAll());
     }
 
     // ============= Data Providers =============
@@ -194,9 +193,7 @@ class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
         $data = [];
 
         for($i = 0; $i < 9; $i++){
-            for($j = 0; $j < count($array) - $i; $j++ ){
-                $data[] = [new Collection($array), new Collection(array_slice($array, $i, $j)), $i, $j];
-            }
+            $data[] = [new Collection($array), new Collection(array_slice($array, 0, $i)), $i];
         }
 
         return $data;
