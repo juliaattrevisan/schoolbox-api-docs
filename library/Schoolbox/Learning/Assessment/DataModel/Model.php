@@ -96,7 +96,7 @@ class Model implements ISoftDeletable
     /**
      * @var int
      */
-    protected $duration = 0;
+    private $defaultOpenSpan;
 
     /**
      * The task which may or may not be associated with this assessment.
@@ -528,18 +528,18 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getDuration()
+    public function getDefaultOpenSpan()
     {
-        return $this->duration;
+        return $this->defaultOpenSpan;
     }
 
     /**
-     * @param int $duration
+     * @param int $defaultOpenSpan
      * @return static
      */
-    public function setDuration($duration)
+    public function setDefaultOpenSpan($defaultOpenSpan)
     {
-        $this->duration = $duration;
+        $this->defaultOpenSpan = $defaultOpenSpan;
         return $this;
     }
 

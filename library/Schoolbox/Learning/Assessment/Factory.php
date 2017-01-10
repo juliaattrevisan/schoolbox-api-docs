@@ -84,7 +84,7 @@ class Factory
     /**
      * @var int
      */
-    protected $duration;
+    protected $defaultOpenSpan;
 
     /**
      * @var string
@@ -128,8 +128,8 @@ class Factory
         $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
         $this->setWeight(intval($post['weight']));
-        $this->setDuration(empty($post['duration']) ? null : intval($post['duration']));
         $this->setCurriculumNodes($post['curriculumCodes']);
+        $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
         $this->setPublishAt(trim($post['publishDate'] . ' ' . $post['publishTime']));
         $this->setOpenAt(trim($post['openDate'] . ' ' . $post['openTime']));
         $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
@@ -279,7 +279,7 @@ class Factory
             ->setDescription($this->getDescription())
             ->setCreator($this->getCreator())
             ->setWeight($this->getWeight())
-            ->setDuration($this->getDuration())
+            ->setDefaultOpenSpan($this->getDefaultOpenSpan())
             ->setMarkVisibility($this->getMarkVisibility())
             ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
             ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
@@ -427,18 +427,18 @@ class Factory
     /**
      * @return float|int
      */
-    protected function getDuration()
+    protected function getDefaultOpenSpan()
     {
-        return $this->duration;
+        return $this->defaultOpenSpan;
     }
 
     /**
-     * @param float|int $duration
+     * @param float|int $defaultOpenSpan
      * @return $this
      */
-    protected function setDuration($duration)
+    protected function setDefaultOpenSpan($defaultOpenSpan)
     {
-        $this->duration = $duration;
+        $this->defaultOpenSpan = $defaultOpenSpan;
         return $this;
     }
 

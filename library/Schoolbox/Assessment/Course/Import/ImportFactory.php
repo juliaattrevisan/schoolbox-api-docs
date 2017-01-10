@@ -91,7 +91,7 @@ class ImportFactory
                 usf.name AS 'usf.name',
                 sa.id AS 'sa.id',
                 sa.title AS 'sa.title',
-                sa.duration AS 'sa.duration',
+                sa.default_open_span AS 'sa.default_open_span',
                 sdw.assessment_id AS 'sdw.id',
                 sdw.accept_submission as 'sdw.accept_submission',
                 sdw.multi_submission as 'sdw.multi_submission',
@@ -678,7 +678,7 @@ class ImportFactory
 
         $assessmentSpec->setId($row['sa.id']);
         $assessmentSpec->setTitle($row['sa.title']);
-        $assessmentSpec->setDuration($row['sa.duration']);
+        $assessmentSpec->setDefaultOpenSpan($row['sa.default_open_span']);
         if(is_null($row['sa.deleted_at'])){
             $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
         } else {

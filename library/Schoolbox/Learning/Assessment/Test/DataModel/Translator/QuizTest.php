@@ -67,7 +67,6 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setId(105)
-                    ->setDuration(Quiz::DURATION_UNLIMITED)
                     ->setAssessmentContext((new Folder())->setId(1))
             )
             ->setCompletionMessage('you done a quiz')

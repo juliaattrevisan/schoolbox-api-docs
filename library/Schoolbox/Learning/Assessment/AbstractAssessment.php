@@ -75,7 +75,7 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @var int
      */
-    protected $duration;
+    private $defaultOpenSpan;
 
     /**
      * A Collection of Participant instances
@@ -698,18 +698,18 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @return int
      */
-    public function getDuration()
+    public function getDefaultOpenSpan()
     {
-        return $this->duration;
+        return $this->defaultOpenSpan;
     }
 
     /**
-     * @param int $duration
+     * @param int $defaultOpenSpan
      * @return $this
      */
-    public function setDuration($duration)
+    public function setDefaultOpenSpan($defaultOpenSpan)
     {
-        $this->duration = $duration;
+        $this->defaultOpenSpan = $defaultOpenSpan;
         return $this;
     }
 
