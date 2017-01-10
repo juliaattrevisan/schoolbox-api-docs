@@ -11,6 +11,7 @@
  */
 
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 
@@ -124,6 +125,7 @@ $this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_descript
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 $this->setVar(array(
+    'RETURN_URL_SUFFIX' => isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "",
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
@@ -170,6 +172,15 @@ $trail = new Breadcrumbs();
 $term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate(
     new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT)
 );
+
+
+if (isset($_GET["returnUrl"])) {
+    $url = Redirect::decode($_GET["returnUrl"]);
+} else {
+    $url = sprintf('/homepage/%d', $folder->getId());
+}
+
+
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text'  => 'Learning',
@@ -178,7 +189,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text'  => $folder->getName(),
-        'href'  => sprintf('/learning/grades/%d/%s/%d', $_SESSION['id'], $term->getCode(), $folder->getId()),
+        'href'  => $url,
         'class' => ''
     ],
     [

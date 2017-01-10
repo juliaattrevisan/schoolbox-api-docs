@@ -12,6 +12,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
@@ -178,7 +179,10 @@ if (is_array($allAttempts) && count($allAttempts)) {
             }
         }
 
+        $returnUrlSuffix = isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "";
+
         $this->setVar(array(
+            'RETURN_URL_SUFFIX' => $returnUrlSuffix,
             'ATTEMPT_START' => $startDate->getShort(),
             'ATTEMPT_FINISH' => $finishDateValue,
             'ATTEMPT_REVIEWED_AT' => $reviewed,
@@ -237,7 +241,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text'  => $assess['title'],
-        'href'  => '/assess/summary/' . $assess['assess_id'],
+        'href'  => Redirect::decode($_GET["returnUrl"]),
         'class' => ''
     ],
     [

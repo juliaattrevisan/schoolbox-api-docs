@@ -127,8 +127,12 @@ $openDate      = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::
 $dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+
+$returnUrlSuffix = isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "";
+
 $this->setVar(
     array(
+        'RETURN_URL_SUFFIX'             => $returnUrlSuffix,
         'ASSESS_ASSESS_ID'              => $assess['assess_id'],
         'ASSESS_TITLE'                  => Scrub::text($assess['title']),
         'ASSESS_START'                  => $openDate->getShort(),
@@ -259,6 +263,13 @@ else {
     }
 }
 
+if (isset($_GET["returnUrl"])) {
+    $returnUrl = \Schoolbox\Learning\Assessment\Redirect::decode($_GET["returnUrl"]);
+} else {
+    $returnUrl = '/assess/summary/' . $assess['assess_id'];
+}
+
+
 // Breadcrumbs
 $trail = new \Schoolbox\Breadcrumbs();
 $trail->renderIntoSitePage(
@@ -272,12 +283,12 @@ $trail->renderIntoSitePage(
         ],
         [
             'text'  => $assess['title'],
-            'href'  => '/assess/summary/' . $assess['assess_id'],
+            'href'  => $returnUrl,
             'class' => ''
         ],
         [
             'text'  => $user->formatName(),
-            'href'  => '/assess/attempts/' . $assess['assess_id'] . '/' . $user->getId(),
+            'href'  => '/assess/attempts/' . $assess['assess_id'] . '/' . $user->getId().$returnUrlSuffix,
             'class' => ''
         ],
         [

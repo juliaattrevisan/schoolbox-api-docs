@@ -136,6 +136,7 @@ $attemptEndDate = new Alaress_Date_Format($attemptEndTime, 'U');
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
+    'RETURN_URL_SUFFIX' => isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "",
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_ID' => $attempt['attempt_id'],

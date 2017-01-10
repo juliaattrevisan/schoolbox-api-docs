@@ -15,7 +15,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizModel;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -369,7 +369,7 @@ class Controller extends Base
 
             // If this is a quiz we need to find out if the student has made any attempts so we can display a link to view them
 
-            if ($assessment instanceof QuizModel)
+            if ($assessment instanceof Quiz)
             {
                 try {
                     $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
@@ -452,6 +452,8 @@ class Controller extends Base
 
         // Squeeze it on out
 
+        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER["REQUEST_URI"]);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
             'student'           => $viewee,
             'term'              => $term,
@@ -468,6 +470,7 @@ class Controller extends Base
             'comments'          => $conversation->getVisibleComments($this->getUser()),
             'currentUser'       => $this->getUser(),
             'quizzes'           => $quizzes,
+            'returnUrlSuffix'   => $returnUrlSuffix,
             'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term)
         ]));
     }
