@@ -1150,37 +1150,46 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hardDelete($object)
     {
-        $identifierName     = $this->getIdentifierColumn();
-        $identifierProperty = $this->getIdentifierProperty();
-        $collection         = $this->getModelAsCollection($object);
-        $statement          = $this->database->prepare(
-            "
-			DELETE FROM  `{$this->table}`
-			WHERE `{$identifierName}` = :identifierValue
-		"
-        );
+        $collection = $this->getModelAsCollection($object);
+        if (count($collection) === 0) {
+            return false;
+        }
+
+        // Pre-delete callbacks
         foreach ($collection as $model) {
             if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
                 return false;
             }
         }
+
+        // Run update queries
         $this->database->beginTransaction();
-        try {
-            foreach ($collection as $model) {
-                $statement->bindValue(':identifierValue', $this->getModelProperty($model, $identifierProperty));
+        foreach ($this->buildPredicateBuildersForCollection($collection) as $pb) {
+            // Build query
+            $query     = "DELETE FROM `{$this->getTable()}` WHERE ".implode(' AND ', $pb->getWhere());
+            $statement = $this->database->prepare($query);
+            foreach ($pb->getParams() as $key => $id) {
+                $statement->bindValue($key, $id);
+            }
+
+            // Run query
+            try {
                 if (!$statement->execute()) {
                     $this->database->rollBack();
                     return false;
                 }
+            } catch (PDOException $e) {
+                $this->database->rollBack();
+                throw $e;
             }
-        } catch (PDOException $e) {
-            $this->database->rollBack();
-            throw $e;
         }
         $this->database->commit();
+
+        // Post-delete callbacks
         foreach ($collection as $model) {
             $this->triggerCallbacks(self::CALLBACK_POSTDELETE, $model);
         }
+
         // raise delete notification
         foreach ($collection as $model) {
             $this->raiseNotification($model, self::METHOD_DELETE);
