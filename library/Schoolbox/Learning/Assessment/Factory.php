@@ -111,6 +111,10 @@ class Factory
      */
     private $markVisibility;
 
+    /**
+     * @var
+     */
+    protected $curriculumNodes;
 
     /**
      * Factory constructor.
@@ -125,6 +129,7 @@ class Factory
         $this->setCreator($creator);
         $this->setWeight(intval($post['weight']));
         $this->setDuration(empty($post['duration']) ? null : intval($post['duration']));
+        $this->setCurriculumNodes($post['curriculumCodes']);
         $this->setPublishAt(trim($post['publishDate'] . ' ' . $post['publishTime']));
         $this->setOpenAt(trim($post['openDate'] . ' ' . $post['openTime']));
         $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
@@ -285,6 +290,16 @@ class Factory
 
         // find out if the dates are all g - if not, a mage-friendly exception will be thrown
         $assessment->assertValidDates();
+
+        /* Assemble curriculum nodes
+         */
+        $selectedNodesCsv = $this->getCurriculumNodes();
+
+        if (isset($selectedNodesCsv[0])) {
+            $selectedNodes = explode(',', $selectedNodesCsv[0]);
+
+            $assessment->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->findByColumn('id', $selectedNodes));
+        }
 
         /* Decorate with Assessable-specific data
          */
@@ -532,6 +547,24 @@ class Factory
     protected function setMarkVisibility($markVisibility)
     {
         $this->markVisibility = $markVisibility;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCurriculumNodes()
+    {
+        return $this->curriculumNodes;
+    }
+
+    /**
+     * @param array $curriculumNodes
+     * @return $this
+     */
+    protected function setCurriculumNodes($curriculumNodes)
+    {
+        $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
 }
