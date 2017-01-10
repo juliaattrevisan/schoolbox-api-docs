@@ -18,3 +18,7 @@ SELECT
 FROM `assess`
 INNER JOIN `curriculum_node_for_assess`
 ON `assess`.`assess_id` = `curriculum_node_for_assess`.`assess_id`
+
+-- Brutally deprecate old tables
+RENAME TABLE `curriculum_node_for_assess` TO `schoolbox`.`curriculum_node_for_assess_deprecated`;
+RENAME TABLE `curriculum_node_for_submission_box` TO `schoolbox`.`curriculum_node_for_submission_box_deprecated`;
