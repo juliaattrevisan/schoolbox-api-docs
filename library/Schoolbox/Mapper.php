@@ -1308,7 +1308,11 @@ abstract class Mapper implements IMapper, Serializable
     public function updateAll($object, $field, $value, $pre_trigger = null, $post_trigger = null)
     {
         $collection = $this->getModelAsCollection($object);
-        //
+        if (empty($collection)) {
+            // Nothing to update
+            return false;
+        }
+
         // Trigger the pre-trigger, if there is one.
         if (isset($pre_trigger)) {
             foreach ($collection as $model) {
@@ -1317,7 +1321,7 @@ abstract class Mapper implements IMapper, Serializable
                 }
             }
         }
-        //
+
         // Get the property to update on each model, if there is one.
         $property_map = null;
         foreach ($this->map as $map) {
@@ -1326,28 +1330,49 @@ abstract class Mapper implements IMapper, Serializable
                 break;
             }
         }
-        //
-        // Get list of IDs to update, and update property on each model
-        $id_values = array();
+        if (!isset($property_map)) {
+            // Nothing to update
+            return false;
+        }
+
+        // Build a WHERE part using the predicate builder.
+        $pb = $this->getPredicateBuilder();
+        if ($this->hasIdentifier()) {
+            // Building the query is easy, just set where any
+            $idValues = [];
+            foreach ($collection as $model) {
+                $idValues[] = $this->getModelProperty($model, $this->getIdentifierProperty());
+            }
+            $pb->equals($this->getIdentifierColumn(), $idValues);
+
+        } else {
+            // Building the query is hard - all I can do is compare against each property of each model.
+            foreach ($collection as $model) {
+                $subPb = $this->getPredicateBuilder();
+                foreach ($this->map as $column) {
+
+                }
+                $pb->all($subPb);
+            }
+
+        }
+
+        // Update property on each model
         foreach ($collection as $model) {
             if (isset($property_map)) {
                 $this->setModelProperty($model, $property_map['property'], $value);
             }
-            $id_values[] = $this->getModelProperty($model, $this->getIdentifierProperty());
         }
-        if (empty($id_values)) {
-            return false;
-        }
-        //
+
         // Run update query
         $query     = "
-			UPDATE `{$this->getTable()}`
-			SET `$field` = :value
-			WHERE `{$this->getIdentifierColumn()}` IN {$this->getArrayPlaceholders($id_values, 'id')}
-		";
+            UPDATE `{$this->getTable()}`
+            SET `$field` = :value
+            WHERE {$pb->getWhere()}
+        ";
         $statement = $this->database->prepare($query);
         $statement->bindValue('value', $value);
-        foreach ($this->getArrayParameters($id_values, 'id') as $key => $id) {
+        foreach ($pb->getParams() as $key => $id) {
             $statement->bindValue($key, $id);
         }
         $this->database->beginTransaction();
@@ -1361,7 +1386,7 @@ abstract class Mapper implements IMapper, Serializable
             throw $e;
         }
         $this->database->commit();
-        //
+
         // Trigger the post-trigger, if there is one.
         if (isset($post_trigger)) {
             foreach ($collection as $model) {
