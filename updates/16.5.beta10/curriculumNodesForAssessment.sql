@@ -1,0 +1,1 @@
+CREATE TABLE `curriculum_node_for_assessment`( `curriculum_node_id` INT(11) NOT NULL, `assessment_id` INT(11) NOT NULL, UNIQUE INDEX `curriculum_node_for_assessment_unique` (`curriculum_node_id`, `assessment_id`), INDEX `curriculum_node_for_assessment_node_id` (`curriculum_node_id`), INDEX `curriculum_node_for_assessment_assessment_id` (`assessment_id`) );
