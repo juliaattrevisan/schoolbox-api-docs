@@ -45,8 +45,9 @@ class Mapper extends BaseMapper
      */
     protected function softDeleteAssessables(Model $project)
     {
-        $this->getJoinMapper('assessment')->deleteByColumn('v_pa.project_id', $project->getId());
-        return true;
+        $assessmentMapper = $this->getJoinMapper('assessment');
+        $assessments = $assessmentMapper->findByColumn('v_pa.project_id', $project->getId(), ['deleted' => true]);
+        return $assessmentMapper->delete($assessments);
     }
 
     /**
