@@ -53,14 +53,22 @@ class External_Tass_User implements External_UserInterface
             return array();
         }
         // TODO 1 add commrules support for sending email to guardian with relation defined in commrules
-        // TODO 2 change hardcoded pa.add_num values below to use config option
+
+        $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
+        $addnum = '';
+        foreach ($addnum_array as $value) {
+            $addnum = $addnum . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+        }
+        if (strlen($addnum) > 0 ) {
+            $addnum = substr($addnum,1);
+        }
         $query = "
             SELECT pa.par_code, pa.e_mail, pa.add_num
             FROM paraddress pa
             INNER JOIN parent p ON pa.par_code=p.par_code AND pa.cmpy_code=p.cmpy_code
             INNER JOIN student s ON p.par_code=s.par_code AND p.cmpy_code=s.cmpy_code
             WHERE s.stud_code IN ($idList)
-            AND pa.add_num IN (1, 4, 5)
+            AND pa.add_num IN ($addnum)
         ";
         $this->getDatabase()->query($query);
         while ($row = $this->getDatabase()->getNextArray()) {
