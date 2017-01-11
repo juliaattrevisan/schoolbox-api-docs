@@ -86,7 +86,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 'empty_custom_block' => '',
             ]);
 
-            $emptyStateMessage = $this->getConfig('emptyStateMessage');
+            $emptyStateMessage = trim($this->getConfig('emptyStateMessage'));
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 /**
@@ -98,7 +98,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 /**
                  * There's a custom empty state message from the config to show
                  */
-                $this->setVar('EMPTY_STATE_MESSAGE', $emptyStateMessage);
+                $this->setVar('EMPTY_STATE_MESSAGE', Scrub::text($emptyStateMessage));
                 $this->parse('empty_custom_block', 'empty_custom');
 
             } elseif ($this->getTextbox()->getId()) {
