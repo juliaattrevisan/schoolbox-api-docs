@@ -81,7 +81,7 @@
                 });
             </script>
 
-            {% if assessment.markType.id != constant('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\MarkType::TYPE_NONE') %}
+            {% if assessment.markType.id != MARK_TYPE_NONE %}
                 <p><button id="use-rubric-value" class="full-width">Assign Grade from Rubric</button></p>
             {% endif %}
             {% endif %}
