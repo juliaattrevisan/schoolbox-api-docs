@@ -403,7 +403,7 @@ class External_Tass_User implements External_UserInterface
                 LEFT JOIN parent p
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
-                WHERE s.par_code = {$this->getDatabase()->smartaQuote($id)}
+                WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
             ";
             if ($commrules) {
                 $query = $query . "
