@@ -14,6 +14,7 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
