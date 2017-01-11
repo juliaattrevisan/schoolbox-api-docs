@@ -45,6 +45,7 @@
                        name="{{ inputPrefix }}[{{ assessment.id }}][checked]"
                        value="1"
                 />
+                {# TODO - replace the inline-style with SASS #}
                 <label {% if depth %}style="margin-left: {{ depth * 25 }}px;"{% endif %} for="a_import-{{ assessment.id}}" class="checkbox-label">
                     <span class="{{ icon.renderClass(assessment) }}"></span>
                     <span>{{ assessment.title }}</span>
