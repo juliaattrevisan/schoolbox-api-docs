@@ -343,7 +343,12 @@ if (is_array($items)) {
              */
             $fullname = $userHandler->formatName($article);
 
-            $url = new Url($previous['topicName']);
+            try {
+                $url = new Url($previous['topicName']);
+            }
+            catch (InvalideArgumentException $e) {
+                $url = new Url($article['topicName']);
+            }
 
             $formatter = new TextFormatter();
             
