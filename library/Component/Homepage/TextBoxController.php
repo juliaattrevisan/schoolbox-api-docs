@@ -73,29 +73,45 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             (empty($this->getTextbox()->getId()) or empty($textBoxContent))
         ) {
 
-            $this->setVar('textbox_form_block', '');
-
+            $this->setBlock('empty_state', 'empty_custom', 'empty_custom_block');
             $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
             $this->setBlock('empty_state', 'empty_id', 'empty_id_block');
             $this->setBlock('empty_state', 'empty_content', 'empty_content_block');
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar('empty_id_block', '');
-                $this->setVar('empty_content_block', '');
-                $this->parse('empty_read_only_block', 'empty_read_only');
-            } else {
-                $this->setVar('empty_read_only_block', '');
+            $this->setVar([
+                'textbox_form_block' => '',
+                'empty_id_block' => '',
+                'empty_content_block' => '',
+                'empty_read_only_block' => '',
+                'empty_custom_block' => '',
+            ]);
 
-                if ($this->getTextbox()->getId()) {
-                    /**
-                     * They submitted the form with nothing or just a heading
-                     */
-                    $this->setVar('empty_id_block', '');
-                    $this->parse('empty_content_block', 'empty_content');
-                } else {
-                    $this->setVar('empty_content_block', '');
-                    $this->parse('empty_id_block', 'empty_id');
-                }
+            $emptyStateMessage = $this->getConfig('emptyStateMessage');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                /**
+                 * Read only gets a generic message
+                 */
+                $this->parse('empty_read_only_block', 'empty_read_only');
+
+            } elseif ($emptyStateMessage != '') {
+                /**
+                 * There's a custom empty state message from the config to show
+                 */
+                $this->setVar('EMPTY_STATE_MESSAGE', $emptyStateMessage);
+                $this->parse('empty_custom_block', 'empty_custom');
+
+            } elseif ($this->getTextbox()->getId()) {
+                /**
+                 * They submitted the form with nothing or just a heading
+                 */
+                $this->parse('empty_content_block', 'empty_content');
+
+            } else {
+                /**
+                 * There's nothing
+                 */
+                $this->parse('empty_id_block', 'empty_id');
             }
 
             $this->parse('empty_state_block', 'empty_state');
