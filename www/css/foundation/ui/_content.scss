@@ -1281,8 +1281,7 @@ tr:hover{
 	}
 
 	.component-action {
-		$neg-margin: $reveal-modal-padding * -1;
-		margin: 0 $neg-margin $neg-margin;
+		margin: 0 -0.75rem -0.75rem;
 		section {
 			border-bottom-width: 0;
 			margin-top: 2rem;
