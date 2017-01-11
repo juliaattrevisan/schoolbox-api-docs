@@ -75,7 +75,7 @@ class Module extends BaseModule
         }
 
         return [
-            'assessment' => $assessment
+            'assessmentSpec' => $assessment
         ];
     }
 

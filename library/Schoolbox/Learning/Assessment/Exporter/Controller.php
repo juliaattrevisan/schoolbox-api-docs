@@ -11,6 +11,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -78,15 +79,15 @@ class Controller extends BaseController
      *
      * @api GET /learning/export/assessment/:assessmentId
      * @level 165
-     * @param IAssessable $assessment
+     * @param IAssessable $assessmentSpec
      */
-    public function getExportForm(IAssessable $assessment)
+    public function getExportForm(IAssessable $assessmentSpec)
     {
         $data = [
-            'assessment'      => $assessment,
+            'assessment'      => $assessmentSpec,
             'returnUrl'       => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
             'returnUrlName'   => Redirect::RETURN_URL,
-            'implementations' => $this->retrieveUnitImplementationsForSpecification($assessment),
+            'implementations' => $this->retrieveUnitImplementationsForSpecification($assessmentSpec),
         ];
 
         $template = "@learningAssessmentExporter/export.twig";
@@ -126,16 +127,7 @@ class Controller extends BaseController
                     return;
                 }
 
-                // clone $assessment for this unitImplData
-                $assessmentSpec
-                    // Set sensible defaults for dates
-                    ->setPublishAt($unitImpl->getOpenDate())
-                    ->setOpenAt($unitImpl->getOpenDate())
-                    ->setDueAt($unitImpl->getDueDate())
-                    ->setCloseAt($unitImpl->getDueDate())
-                ;
-                $this->replicator->replicateInNewContext($assessmentSpec, $unitImpl);
-
+                $this->exportToNewContext($assessmentSpec, $unitImpl);
             }
         }
 
@@ -158,6 +150,47 @@ class Controller extends BaseController
         } else {
             $this->getResponse()->redirect->afterPost($returnUrl);
         }
+    }
+
+    /**
+     * Recursively export an AssessmentSpec to a new context
+     *
+     * @param IAssessable $assessmentSpec
+     * @param AssessmentContext $context
+     * @return IAssessable
+     */
+    protected function exportToNewContext(IAssessable $assessmentSpec, AssessmentContext $context)
+    {
+        if($context instanceof UnitImplementation){
+            $start = $context->getOpenDate();
+            $end   = $context->getDueDate();
+        } elseif($context instanceof Project){
+            $start = $context->getPublishAt();
+            $end   = $context->getDueAt();
+        } else {
+            throw new \DomainException('Invalid context: ' . get_class($context));
+        }
+
+        // Set sensible defaults for dates
+        $assessmentSpec
+            ->setPublishAt($start)
+            ->setOpenAt($start)
+            ->setDueAt($end)
+            ->setCloseAt($end);
+
+        // Replicate !
+        $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context);
+
+        // Recursive case
+        if($assessmentSpec instanceof Project){
+            /** @var Project $assessmentImpl */
+            foreach($assessmentSpec->getAssessables() as $subAssessmentSpec){
+                $subAssessmentImpl = $this->exportToNewContext($subAssessmentSpec, $assessmentImpl);
+                $assessmentImpl->getAssessables()->add($subAssessmentImpl);
+            }
+        }
+
+        return $assessmentImpl;
     }
 
     /**
