@@ -52,7 +52,6 @@ class External_Tass_User implements External_UserInterface
         if (empty($idList)) {
             return array();
         }
-        // TODO 1 add commrules support for sending email to guardian with relation defined in commrules
 
         $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
         $addnum = '';
@@ -62,6 +61,9 @@ class External_Tass_User implements External_UserInterface
         if (strlen($addnum) > 0 ) {
             $addnum = substr($addnum,1);
         }
+
+        $companyCode = $this->database->smartQuote($this->companyCode);
+
         $query = "
             SELECT pa.par_code, pa.e_mail, pa.add_num
             FROM paraddress pa
@@ -69,7 +71,42 @@ class External_Tass_User implements External_UserInterface
             INNER JOIN student s ON p.par_code=s.par_code AND p.cmpy_code=s.cmpy_code
             WHERE s.stud_code IN ($idList)
             AND pa.add_num IN ($addnum)
+            AND pa.cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
         ";
+
+        /* If Tass Comm rules are enabled then locate the guardian relationship
+         * from there as well
+         */
+        if (Config::get('external_tass_commrules')
+            && strlen(trim(str_replace(',','',Config::get('external_tass_addnum'))))>0
+            && strlen(trim(str_replace(',','',Config::get('external_tass_commrules_typecode'))))>0
+        ) {
+            /* Expand out the typecodes from CSV
+             */
+            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
+            $typecode = '';
+            foreach ($typecode_array as $value) {
+                $typecode = $typecode . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+            }
+            if (strlen($typecode) > 0 ) {
+                $typecode = substr($typecode,1);
+            }
+            $query = $query . "
+                UNION ALL
+                SELECT DISTINCT pa.par_code, pa.e_mail, pa.add_num
+                FROM paraddress pa
+                INNER JOIN studcommrules scr ON pa.par_code=scr.par_code
+                    AND pa.cmpy_code = scr.cmpy_code
+                    AND scr.cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+                    AND pa.add_num = scr.add_num
+                    AND scr.commtype_code IN ({$typecode})
+                INNER JOIN student s ON scr.par_code=s.par_code AND scr.cmpy_code=s.cmpy_code
+                WHERE s.stud_code IN ($idList)
+                AND pa.add_num IN ($addnum)
+                AND pa.cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+            ";
+        }
+
         $this->getDatabase()->query($query);
         while ($row = $this->getDatabase()->getNextArray()) {
             if(stristr($row['e_mail'],';')) {
