@@ -80,7 +80,10 @@
                     refreshAssignFromRubricButton();
                 });
             </script>
-            <p><button id="use-rubric-value" class="full-width">Assign Grade from Rubric</button></p>
+
+            {% if assessment.markType.id != MARK_TYPE_NONE %}
+                <p><button id="use-rubric-value" class="full-width">Assign Grade from Rubric</button></p>
+            {% endif %}
             {% endif %}
         </div>
         <div class="small-12 medium-9 column">
