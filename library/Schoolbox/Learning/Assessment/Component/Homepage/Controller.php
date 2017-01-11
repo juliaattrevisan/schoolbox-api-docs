@@ -14,6 +14,7 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -102,6 +103,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             'assessables'  => $this->assessments,
             'termCode'     => $this->getTermMapper()->findForToday()->getCode(),
             'readOnly'     => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
+            'returnUrl'    => (new Redirect())->queryString("/homepage?{$this->getSource()->getId()}")
         ];
     }
 

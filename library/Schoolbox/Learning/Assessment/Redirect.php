@@ -39,4 +39,16 @@ class Redirect
     {
         return base64_decode(urldecode($encoded));
     }
+
+    /**
+     * Fabricate a querystring param representation so we don't have to
+     * concatenate all day, every day in controllers
+     *
+     * @param $url
+     * @return string
+     */
+    public function queryString($url)
+    {
+        return '?' . self::RETURN_URL . '=' . $this->encode($url);
+    }
 }
