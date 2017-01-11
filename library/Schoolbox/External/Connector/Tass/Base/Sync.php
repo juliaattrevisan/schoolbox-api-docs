@@ -83,12 +83,12 @@ class Sync implements SyncInterface
          * from there as well
          */
         if (Config::get('external_tass_commrules')
-            && strlen(trim(str_replace(',','',Config::get('external_tass_commrules_addnum'))))>0
+            && strlen(trim(str_replace(',','',Config::get('external_tass_addnum'))))>0
             && strlen(trim(str_replace(',','',Config::get('external_tass_commrules_typecode'))))>0
         ) {
             /* Expand out the addnum and typecodes from CSV
              */
-            $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_addnum'))));
+            $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
             $addnum = '';
             foreach ($addnum_array as $value) {
                 $addnum = $addnum . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
@@ -96,7 +96,7 @@ class Sync implements SyncInterface
             if (strlen($addnum) > 0 ) {
                 $addnum = substr($addnum,1);
             }
-            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_addnum'))));
+            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
             $typecode = '';
             foreach ($typecode_array as $value) {
                 $typecode = $typecode . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';

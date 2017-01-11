@@ -13,9 +13,9 @@ VALUES (
 );
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`)
 VALUES (
-	'external_tass_commrules_addnum',
+	'external_tass_addnum',
 	'1,4,5',
-	'TASS Communication Rules Address Number Filter',
+	'TASS Address Number Filter',
 	'Address Number (add_num) block IDs to use for guardian relationships with students as a comma separated list. E.g. 1,4,5',
 	'1',
 	'',
