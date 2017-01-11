@@ -203,6 +203,8 @@ class Model implements ISoftDeletable
         $this->createdAt   = new Alaress_Date_NullDate();
         $this->updatedAt   = new Alaress_Date_NullDate();
         $this->deletedAt   = new Alaress_Date_NullDate();
+
+        $this->setCurriculumNodes(new Collection());
     }
 
     function __clone()
