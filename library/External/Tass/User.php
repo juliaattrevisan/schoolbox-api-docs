@@ -530,8 +530,6 @@ class External_Tass_User implements External_UserInterface
         // pia_sfaccess: only join the relevant paraddress
         // no pia_sfaccess: get all paraddress
         
-        // TODO add commrules support
-
         $database = $this->getDatabase();
         $query = "
             SELECT
