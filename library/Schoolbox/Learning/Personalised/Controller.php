@@ -173,7 +173,7 @@ class Controller extends Base
             'student_id'    => $student->getId(),
         ]);
 
-        $resultSet = $eventFactory->buildFromAssessmentCollection($assessments, $participation);
+        $resultSet = $eventFactory->buildFromAssessmentCollection($assessments, $student, $participation);
 
         // Filter out non-unique values
         $newResultSet = new Collection();
