@@ -93,7 +93,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             $data = [
                 'unitSpec'         => $unitSpec,
                 'returnUrlName'    => Assessment\Redirect::RETURN_URL,
-                'encodedReturnUrl' => Assessment\Redirect::encode($_GET["page"]),
+                'encodedReturnUrl' => Assessment\Redirect::encode('/homepage/'.$folder->getId()),
             ];
         } catch (MapperException $e) {
             // noop
