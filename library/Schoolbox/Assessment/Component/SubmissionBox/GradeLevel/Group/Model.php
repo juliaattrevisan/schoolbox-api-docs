@@ -103,7 +103,8 @@ class Model
      */
     public function addGradeLevel(GradeLevelModel $level)
     {
-        $this->getGradeLevels()->add($level);
+        // Don't add more than once
+        $this->getGradeLevels()->setOffset($level->getId(), $level);
         return $this;
     }
 }
