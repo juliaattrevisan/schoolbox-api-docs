@@ -252,6 +252,8 @@ class ImportFactory
                 ia.close_date         AS 'ia.close_date',
                 ia.sequence           AS 'ia.sequence',
                 idw.assessment_id     AS 'idw.id',
+                idw.accept_submission AS 'idw.accept_submission',
+                idw.multi_submission  AS 'idw.multi_submission',
                 iqz.assessment_id     AS 'iqz.id',
                 itk.assessment_id     AS 'itk.id',
                 ipr.assessment_id     AS 'ipr.id'
@@ -286,8 +288,8 @@ class ImportFactory
                 null              AS 'sa.sequence',
                 null              AS 'sa.default_open_span',
                 null              AS 'sdw.id',
-                idw.accept_submission AS 'sdw.accept_submission',
-                idw.multi_submission  AS 'sdw.multi_submission',
+                null              AS 'sdw.accept_submission',
+                null              AS 'sdw.multi_submission',
                 null              AS 'sqz.id',
                 null              AS 'stk.id',
                 null              AS 'spr.id',
@@ -299,6 +301,8 @@ class ImportFactory
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
                 idw.assessment_id AS 'idw.id',
+                idw.accept_submission AS 'idw.accept_submission',
+                idw.multi_submission  AS 'idw.multi_submission',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id',
                 ipr.assessment_id AS 'ipr.id'
