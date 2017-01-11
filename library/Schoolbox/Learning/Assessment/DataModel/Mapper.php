@@ -354,10 +354,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework', 'd')},
                 {$this->getJoinColumnString('duework.work_type', 'dt')},
                 {$this->getJoinColumnString('duework.mark_type', 'mt')},
-                {$this->getJoinColumnString('duework.grade_group', 'gg')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('project', 'p')},
-                {$this->getJoinColumnString('project.grade_group', 'pgg')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
                 {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
@@ -374,10 +372,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
             LEFT JOIN {$this->getJoinSql('duework.work_type', 'd', 'dt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
-            LEFT JOIN {$this->getJoinSql('duework.grade_group', 'd', 'gg')}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
-            LEFT JOIN {$this->getJoinSql('project.grade_group', 'p', 'pgg')}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
@@ -472,14 +468,6 @@ class Mapper extends BaseMapper
                         ->setWorkType($this->hydrateJoin($row, 'duework.work_type', 'dt'))
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
                 );
-
-                // apply grade group
-                $model->getDueWork()->setGradeGroup(
-                    $this->hydrateJoin($row, 'duework.grade_group', 'gg')
-                         ->setGradeLevels(
-                             (new SubmissionBox\GradeLevel\ListFactory())->buildGradeList($model->getDueWork())
-                         )
-                );
                 $dueWorkIds[] = $row['d.id'];
             } else {
                 $model->setDueWork(null);
@@ -494,13 +482,6 @@ class Mapper extends BaseMapper
             // Project?
             if ($row['p.id']) {
                 $model->setProject($this->hydrateJoin($row, 'project', 'p'));
-
-                $model->getProject()->setGradeGroup(
-                    $this->hydrateJoin($row, 'project.grade_group', 'pgg')
-                        ->setGradeLevels(
-                            (new SubmissionBox\GradeLevel\ListFactory())->buildGradeList($model->getProject())
-                        )
-                );
             } else {
                 $model->setProject(null);
             }
@@ -557,6 +538,8 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
         $modelList = $this->augmentListWithSpecifications($modelList);
+        // Grade groups
+        $modelList = $this->augmentListWithGradeGroups($modelList);
 
         return $modelList;
     }
@@ -752,6 +735,34 @@ class Mapper extends BaseMapper
                 if (isset($specifications[$specificationId])) {
                     $model->setSpecificationAssessment($specifications[$specificationId]);
                 }
+            }
+        }
+
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with their grade groups.
+     *
+     * @param Collection|Model[] $modelList
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithGradeGroups($modelList)
+    {
+        // Just load grade groups one by one - let the model cache do its thing
+        /** @var SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper */
+        $gradeGroupMapper = $this->getJoinMapper('duework.grade_group');
+        foreach ($modelList as $model) {
+            try {
+                $submodel = $model->getSubObject();
+            } catch (\UnexpectedValueException $e) {
+                // Broken assessment - not much I can do besides ignore
+                continue;
+            }
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Project) {
+                $submodel->setGradeGroup(
+                    $gradeGroupMapper->findById($submodel->getGradeGroup()->getId())
+                );
             }
         }
 
