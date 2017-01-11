@@ -103,9 +103,11 @@ $alert-default-background: darken($body-bg, 10%);
     left: $off-canvas-width;
     right: 0;
     z-index: 100;
+    display: none;
     @include transition(bottom, .3s, ease-in-out, 0s);
     &.pop{
         bottom: 0;
+        display: block !important;
     }
     .close {
         @include alert-close();
