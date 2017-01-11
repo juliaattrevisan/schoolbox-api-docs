@@ -478,11 +478,18 @@ class Controller extends Base\Base
             return;
         }
 
+        // How many Units are already imported? (cf. new import)
+        $countImportedUnits = 0;
 
-        $importFactory = $this->getImportFactory();
         $unitImpls = $this->getUnitImplementationMapper()->createCollection();
         foreach ($units as $unit) {
             if (isset($unit['import'])) {
+
+                // Are we modifying an already imported Unit?
+                if($unit['unit_impl_id']){
+                    $countImportedUnits++;
+                }
+
                 $unitImpl = new UnitImplementation();
                 $unitImpl->setId($unit['unit_impl_id']); // ID will be null if UnitSpec not yet imported
                 $unitSpec = new UnitSpecification();
@@ -494,7 +501,10 @@ class Controller extends Base\Base
             }
         }
 
-        if ('import' == $action) {
+        $importFactory = $this->getImportFactory();
+
+        // If not modifying any already imported Units, we can treat this modification merely as a fresh import.
+        if ('import' == $action || !$countImportedUnits) {
             $dto = $importFactory->buildForNewImport($unitImpls);
         } elseif ('modify' == $action) {
             $dto = $importFactory->buildForImportModify($unitImpls);
