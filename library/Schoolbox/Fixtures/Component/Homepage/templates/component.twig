@@ -15,9 +15,7 @@
                                 <h3>{{ matchHeading.generateWithStatusLink(match) }}</h3>
                             {% endif %}
 
-                            <p class="meta">
-                                <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span>
-                            </p>
+                            <p class="meta">{{ match.startAt.getLong }}</p>
 
                         </div>
                     </div>

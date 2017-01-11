@@ -14,9 +14,7 @@
                                 <h3>{{ matchHeading.generateWithResultLink(match) }}</h3>
                             {% endif %}
 
-                            <p class="meta">
-                                <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span>
-                            </p>
+                            <p class="meta">{{ match.startAt.getLong }}</p>
 
                             {% if user.role.type == 'parent' %}
                                 {% if match.homeTeam.players | length %}
