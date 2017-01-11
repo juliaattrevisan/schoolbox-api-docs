@@ -52,6 +52,8 @@ class External_Tass_User implements External_UserInterface
         if (empty($idList)) {
             return array();
         }
+        // TODO 1 add commrules support for sending email to guardian with relation defined in commrules
+        // TODO 2 change hardcoded pa.add_num values below to use config option
         $query = "
             SELECT pa.par_code, pa.e_mail, pa.add_num
             FROM paraddress pa
