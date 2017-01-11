@@ -68,7 +68,8 @@ class Controller extends Base
                     'id' => $id,
                     'value' => $value->getLocal(),
                     'type' => $type,
-//                    'displayFormat' => urldecode($display),
+                    'displayFormat' => 'd/m/Y h:iK',
+                    'displayFormatDate' => 'd/m/Y',
 //                    'databaseFormat' => urldecode($database),
                     'timetable' => $timetable,
                     'terms' => $terms,
@@ -157,7 +158,7 @@ class Controller extends Base
      * Return a a list of events for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
      */
     public function getByTimetableDay($campusId, $termId, $cycle, $day) {
-
+new \Alaress_Probe($day);
         $user = $this->getUser();
 
         //Get Campus object
@@ -198,7 +199,7 @@ class Controller extends Base
     public function getTimetableDay(\Alaress_Date_Format $date) {
 
 //        $date = new \Alaress_Date_Format($date, 'Y-m-d H:i:S');
-
+//new \Alaress_Probe($date);
         //Get term for given date
         $term = $this->getTermMapper()->findForDate($date);
         $term->getStart();
@@ -226,10 +227,9 @@ class Controller extends Base
 
             // Get start/end of the date
 
-            $timezoneUTC = new \DateTimeZone('UTC');
+            $start = \Alaress_Date_Format::newLocalShort($date);
+            $end = \Alaress_Date_Format::newLocalShort($date)->addDays(1);
 
-            $start = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC);
-            $end = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC)->addHours(23)->addMinutes(59)->addSeconds(59);
             $user = $this->getUser();
             $api = new  \Calendar_Api_EventType_Event_Schoolbox_Default($user, array());
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());

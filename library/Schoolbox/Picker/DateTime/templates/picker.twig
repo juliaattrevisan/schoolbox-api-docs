@@ -283,7 +283,7 @@
     });
 
     {# Loading events on timetable picker click #}
-    var timetableDate = moment().format(convertFormat('{{ databaseFormat }}')); //today
+    var timetableDate = moment().format(convertFormat('{{ displayFormat }}')); //today
     $('.has-period').click(function(){
 
         var day = $(this).attr('data-day');
@@ -306,7 +306,7 @@
                 .done(function (data) {
 
                     {# Ajax returned date #}
-                    timetableDate = moment(data.date, convertFormat('{{ databaseFormat }}'));
+                    timetableDate = moment(data.date, convertFormat('{{ displayFormat }}'));
 
                     {# Clear out any old appointments #}
                     timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y h:iK'))+'</h3>');
@@ -337,7 +337,7 @@
                 .done(function (data) {
 
                     {# Ajax returned date #}
-                    timetableDate = moment(data.date, convertFormat('{{ databaseFormat }}'));
+                    timetableDate = moment(data.date, convertFormat('{{ displayFormat }}'));
 
                     {# Clear out any old appointments #}
                     timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y h:iK'))+'</h3>');
@@ -369,24 +369,26 @@
     $('.timetable-submit').click(function() {
         var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
         var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'HH:mmA');
-        var newDate = (timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0)).format(convertFormat('{{ databaseFormat }}'));
+        var newDate = (timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0)).format(convertFormat('{{ displayFormat }}'));
         window.pickerInstance[{{ id }}].setDate(newDate);
 
     });
 
     {# Setup calendar #}
     var newDate, latestDate;
-
+    alert(newDate);
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
         defaultDate: '{{ value }}',
-        dateFormat: '{{ displayFormat }}',
+        dateFormat: 'd/m/Y h:iK',
         inline: true,
         altInput: false,
-        altFormat: '{{ databaseFormat }}',
+        altFormat: '{{ displayFormat }}',
         enableTime: true,
         allowInput: true,
         disableMobile: true,
         onReady: function(selectedDates, dateStr, instance) {
+            //Wrong format, swaps day with month
+            alert('onready: '+dateStr);
             var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
             var calendarDiv = $('#picker{{ id }}').find('.flatpickr-calendar');
             var presetObj = new Date('{{ value }}');
@@ -416,12 +418,13 @@
                     calendarDiv.addClass('allDay');
                     calendarDiv.removeClass('hasTime');
                     $('#allday').val(1);
-                    {# Set time to 00:00:00#}
-                    var allDay = moment(instance.input.value, convertFormat('{{ databaseFormat }}')).hours(0).minutes(0).format(convertFormat('{{ databaseFormat }}'));
+                    {# Get rid of time #}
+                    var allDay = moment(instance.input.value, convertFormat('{{ displayFormat }}')).format(convertFormat('{{ displayFormatDate }}'));
+                    console.log(instance.input.value);
+                    console.log('{{ value }}');
                     instance.setDate(allDay);
-                    allDay = moment(allDay).format('DD/MM/YYYY');
                     $('*[data-pickerid="{{ id }}"]').val(allDay);
-                    console.log(allDay);
+
 
                 }
                 else {
@@ -434,16 +437,17 @@
 
         },
         onChange: function(selectedDates, dateString, instance) {
-
+            alert('onchange: '+dateString);
             {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
 
-            $('#pickerCalendar{{ id }}').data('dateDisplay', dateString);
+            var dateSplit = dateString.split(' ');
+            $('#pickerCalendar{{ id }}').attr('data-date', dateSplit[0]);
+            $('#pickerCalendar{{ id }}').attr('data-time', dateSplit[1]);
 
 
             {# Check if selected date has changed and don't send an ajax on time change #}
             var selectedObj = new Date(selectedDates);
-            newDate = selectedObj.getFullYear()+' '+selectedObj.getMonth()+' '+selectedObj.getDate();
-
+            newDate = selectedObj.getDate()+'/'+(selectedObj.getMonth()+1)+'/'+selectedObj.getFullYear();
             if(newDate !== latestDate) {
 
                 {% if type == 'duework'  %}
@@ -451,7 +455,7 @@
                 var pickerClassList = $('#pickerClassList{{ id }}');
 
                 pickerClassList.html('Loading Student List');
-                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, 'CH123').replace(/{date}/g,  encodeURIComponent(instance.input.value)))
+                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, 'CH123').replace(/{date}/g,  encodeURIComponent(dateSplit[0])))
 
                         .done(function (data) {
 
@@ -489,9 +493,8 @@
 
                 pickerAppointments.html('Loading events');
 
-                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(instance.input.value)))
+                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
                         .done(function (data) {
-
                             if (data.appointments.length == 0) {
 
                                 {# There we no appointment on the selected date #}

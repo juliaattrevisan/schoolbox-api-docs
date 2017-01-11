@@ -46,7 +46,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
     // Default options
     // Default picker type: event
     var options = {
-        databaseFormat: 'Y-m-d H:i:S',
         displayFormat: 'd/m/Y h:iK',
         displayFormatDate: 'd/m/Y',
         type: event
@@ -72,23 +71,14 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
         var element = $(element);
 
+        var originalValue = element.val();
+        if($('#allday').val() == 1) {
+            originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat))
+        }
+
         element.attr('data-pickerId', window.pickerCount);
 
-        var originalId = element.attr('id');
-        var originalName = element.attr('name');
-        var originalValue = element.val();
-
-        // We need to do a bit of shuffling of the DOM. We move the original element over to a hidden form input
-        // that will hold the date in a DB friendly format for form submission, and we put a readonly textbox in its place for
-        // displaying a friendlier date format to the end users
-        var format = options.displayFormat;
-        if($('#allday').val() == 1) {
-            var format = options.displayFormatDate;
-        }
-        // element.after('Hidden<input type="text" id="' + originalId + '" name="' + originalName + '" value="' + originalValue + ' ">');
-        // element.after('Copy<input data-original-id="' + originalId + '" style="cursor:pointer;" type="text" id="pickerDisplay' + window.pickerCount + '" name=pickerDisplay"' + window.pickerCount + '" value="' + moment(originalValue, convertFormat(options.databaseFormat)).format(convertFormat(format)) + '">');
         element.after('<div data-reveal id="picker' + window.pickerCount + '" class="reveal-modal"></div>');
-        // element.remove();
 
         // element = $('#pickerDisplay' + window.pickerCount);
 
@@ -99,7 +89,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         // Create click event to open the modal for the element
 
         element.click(function () {
-
             var elementClicked = $(this);
             var pickerId = + elementClicked.attr('data-pickerId');
             var picker = $('#picker' + pickerId);
@@ -122,17 +111,19 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                     $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
 
-                        console.log(window.pickerInstance[pickerId].input.value);
-
-                        element.val(window.pickerInstance[pickerId].input.value);
+                        // console.log(window.pickerInstance[pickerId].input.value);
+                        // element.val(window.pickerInstance[pickerId].input.value);
 
 
 
                     // Update the elements value with the selected date
                         if($('#allday').val() == 1) {
-                            var format = options.displayFormatDate;
                             element.val(moment(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat)).format(convertFormat(options.displayFormatDate)));
                         }
+                        // else {
+                        //     element.val()
+                        // }
+
                         // element.val(moment(window.pickerInstance[pickerId].altInput.value, convertFormat(options.displayFormatDate)).format(convertFormat(format)));
                         // var pickerDisplay = $('#pickerDisplay' + pickerId);
                         // pickerDisplay.val(moment(window.pickerInstance[pickerId].altInput.value, convertFormat(options.databaseFormat)).format(convertFormat(format)));
@@ -156,7 +147,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 // var pickerDisplay = $('#pickerDisplay' + pickerId);
                 // var originalField = $('#' + pickerDisplay.data('originalId'));
-alert(element.val());
                 window.pickerInstance[pickerId].setDate(element.val());
 
                 $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
