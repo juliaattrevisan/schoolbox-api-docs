@@ -62,7 +62,7 @@ $modifyRouteArgs = [ 'assessmentId' => $assess['assessment_id']];
 $modifyUrl = $this->getDi()->get('router')->generate('learningAssessment.getUpdateAssessmentForm', $modifyRouteArgs);
 
 $this->setVar(array(
-    'RETURN_URL'           => $returnUrl,
+    'RETURN_URL'           => $returnUrl ? : (new Redirect())->queryString("/homepage/{$folder->getId()}"),
     'RETURN_URL_DECODED'   => $returnUrl == '' ? "/homepage/{$folder->getId()}" : Redirect::decode($_GET[Redirect::RETURN_URL]),
     'ASSESS_ASSESS_ID'     => $this->arg[0],
     'ASSESS_KIND_LC'       => 'assess',
