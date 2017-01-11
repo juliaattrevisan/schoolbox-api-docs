@@ -54,9 +54,11 @@
                  # Others: see due date
                  #}
                 {% if readOnly == false %}
-                <p class="meta">
-                    <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
-                </p>
+                    {% if task is not project %}
+                    <p class="meta">
+                        <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
+                    </p>
+                    {% endif %}
                 {% else %}
                 <p class="meta spaced">
                     <span class="unit-task-due-date">Due {{ task.dueAt.relativeTime }} on {{ task.dueAt.localShort }}</span>
