@@ -183,12 +183,6 @@ class Controller extends Base
         // Build a markbook
         $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
 
-        // And what is required for a context selector
-        $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
-
-        // Also show the courses/units that are on this homepage
-        $courses = $this->getCourseImplementationMapper()->findByFolderId($class->getId());
-
         /** @var IAssessable $assessment */
 
         $export = [];
