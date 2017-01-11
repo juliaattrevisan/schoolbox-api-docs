@@ -721,19 +721,19 @@ class Controller extends Base\Base
      *
      * @param AssessmentContext $context
      * @param array $data
-     * @var int|null      $data['spec_id']    Will be null if not imported from a Spec
-     * @var int|null      $data['impl_id']    Will be null if not yet imported
-     * @var 1|null        $data['checked']    Did user check the item?
-     * @var string[]|null $data['dates']
-     * @var mixed[]|null  $data['a']          If this assessment is a Project, the data for its sub-assessables
+     * @var null|int      $data['spec_id']    Will be null if not imported from a Spec
+     * @var null|int      $data['impl_id']    Will be null if not yet imported
+     * @var null|1        $data['checked']    Did user check the item?
+     * @var null|string[] $data['dates']
+     * @var null|mixed[]  $data['a']          If this assessment is a Project, the data for its sub-assessables
      */
     protected function parseAssessmentForm(AssessmentContext $context, array $data)
     {
         $specId    = isset($data['spec_id']) ? $data['spec_id'] : null;
         $implId    = isset($data['impl_id']) ? $data['impl_id'] : null;
         $isChecked = isset($data['checked']);
-        $dateData  = isset($data['dates']) ? $data['dates'] : null;
-        $subData   = isset($data['a']) ? $data['a'] : null;
+        $dateData  = isset($data['dates'])   ? $data['dates']   : null;
+        $subData   = isset($data['a'])       ? $data['a']       : null;
 
         // Base Case #1 - Is item unchecked, and un-imported?
         if(!$isChecked && !$implId){
@@ -773,7 +773,7 @@ class Controller extends Base\Base
             $this->getAssessmentMapperProxy()->save($assessment);
         }
 
-        // Recursive.
+        // Recursive case
         if($subData){
             foreach($subData as $subDatum){
                 /** @var Project $project */
@@ -785,8 +785,10 @@ class Controller extends Base\Base
 
 
     /**
+     * Apply date strings from an array to the specified Assessment
+     *
      * @param IAssessable $assessment
-     * @param array $dates
+     * @param string[] $dates
      * @return IAssessable
      */
     protected function applyDates(IAssessable $assessment, array $dates)

@@ -120,7 +120,7 @@ class DataTransferObject
         $this->addAssessmentImpls($assessmentImpls);
         $this->addAssessmentPairs($assessmentPairs);
 
-        // Sort Assessment Pairs
+        // Sort Assessment Pairs for Display
         $this->sortAssessmentPairsDriver();
 
         // Add Suggested Dates to Assessment Specs

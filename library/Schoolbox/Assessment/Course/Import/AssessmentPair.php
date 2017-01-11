@@ -35,7 +35,7 @@ class AssessmentPair
     private $assessmentPairs;
 
     /**
-     * If this pair is a sub-pair (ie inside a Project, this points to parent Project pair.
+     * If this pair is a sub-pair (ie inside a Project) this points to parent Project pair.
      *
      * @var AssessmentPair|null
      */
@@ -89,16 +89,31 @@ class AssessmentPair
         return $this->parentPair;
     }
 
+    /**
+     * Is this Assessment un-imported?
+     *
+     * @return bool
+     */
     public function isSpecOnly()
     {
         return $this->specification && !$this->implementation;
     }
 
+    /**
+     * Was this Assessment created directly in a Unit Implementation ?
+     *
+     * @return bool
+     */
     public function isImplOnly()
     {
         return !$this->specification && $this->implementation;
     }
 
+    /**
+     * Has this Assessment been imported from Unit Spec into Unit Impl ?
+     *
+     * @return bool
+     */
     public function isPair()
     {
         return $this->specification && $this->implementation;

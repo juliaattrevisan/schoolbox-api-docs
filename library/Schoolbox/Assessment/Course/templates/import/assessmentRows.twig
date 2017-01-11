@@ -56,7 +56,6 @@
             </div>
             <div data-assessment-dates="{{ assessment.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
 
-
                 {#publish date is always relevant #}
                 {% include '@course/import/date.twig' with {
                     assessmentDate: assessment.publishAt,
@@ -104,7 +103,6 @@
                 {% else %}
                     <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
                 {% endif %}
-
             </div>
 
             {#Recurse #}
@@ -122,7 +120,6 @@
                 } only %}
             {% endif %}
         </li>
-
 
     {% endfor %}
 </ul>
