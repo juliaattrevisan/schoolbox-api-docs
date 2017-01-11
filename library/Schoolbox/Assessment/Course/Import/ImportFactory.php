@@ -159,7 +159,7 @@ class ImportFactory
         /**
          * Not imported to the specified $unitImpls
          *
-         * @var GenericCollection $assessmentSpecs
+         * @var GenericCollection|GenericCollection[]|IAssessable[][] $assessmentSpecs
          */
         $assessmentSpecs = new GenericCollection(GenericCollection::class);
 
