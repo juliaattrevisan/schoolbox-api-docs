@@ -198,6 +198,7 @@ class Healthcheck
 	$list[] = 'ttparms';
 	$list[] = 'family';
 	$list[] = 'persondefs';
+	$list[] = 'studcommrules'; // Optional
         sort($list);
 
         foreach ($list as $table) {
