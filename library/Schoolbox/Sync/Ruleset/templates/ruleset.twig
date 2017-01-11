@@ -98,7 +98,7 @@ set upsConfig = {
             <ul class="information-list sortable" data-sortable>
             
                 {% for currentRule in ruleset.getRules() %}
-                <li class="row" id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
+                <li class="actions-small-2" id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
 
                     {# Ensure rule[] gets POSTed, even when it has no Conditions or Effects
                       # We do that so the Rule can be sequenced prior to creation of Conditions
@@ -111,29 +111,24 @@ set upsConfig = {
                     {% endif %}
 
                     <div class="grip"></div>
-                    <div class="small-11 columns no-pad">
-                        <div class="actions-small-2">
-                            <div class="list-item">
-                                <h3 class="subheader">
-                                    {% if currentRule.name|length %}
-                                        {{ currentRule.name }}
-                                    {% else %}
-                                        Rule {{ currentRule.id }}
-                                    {% endif %}
-    
-                                    {% if currentRule.description|length %}
-                                        <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                                    {% endif %}
-                                </h3>
-                            </div>
-                            <nav>
-                                <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Expand/Collapse Content"></a>
-                                <a class="icon-more" title="Actions" data-dropdown="rule-{{ currentRule.id }}-options"></a>
-                            </nav>
-                        </div>
+                    <div class="list-item">
+                        <h3 class="subheader">
+                            {% if currentRule.name|length %}
+                                {{ currentRule.name }}
+                            {% else %}
+                                Rule {{ currentRule.id }}
+                            {% endif %}
 
+                            {% if currentRule.description|length %}
+                                <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                            {% endif %}
+                        </h3>
                         <span id='rule-{{ currentRule.id }}-status' class="label highlight full-width hide"></span>
                     </div>
+                    <nav>
+                        <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Expand/Collapse Content"></a>
+                        <a class="icon-more" title="Actions" data-dropdown="rule-{{ currentRule.id }}-options"></a>
+                    </nav>
 
                     <div class="small-12 columns no-pad">
                         <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
