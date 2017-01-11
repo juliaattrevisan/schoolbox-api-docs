@@ -340,3 +340,9 @@ ul.tileList {
     margin-bottom: $inline-list-default-float-list-margin;
 }
 
+/**
+ * Hide empty state message configs on components, these are only for use in templates
+ */
+.component-container .emptystatemessage {
+    display: none;
+}
