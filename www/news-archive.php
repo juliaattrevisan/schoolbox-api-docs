@@ -346,7 +346,7 @@ if (is_array($items)) {
             try {
                 $url = new Url($previous['topicName']);
             }
-            catch (InvalideArgumentException $e) {
+            catch (InvalidArgumentException $e) {
                 $url = new Url($article['topicName']);
             }
 
