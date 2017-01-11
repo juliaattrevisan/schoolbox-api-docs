@@ -105,19 +105,19 @@ class Sync implements SyncInterface
                 $typecode = substr($typecode,1);
             }
             $studentjoin = "
-				LEFT JOIN studcommrules as scr
-					ON (p.par_code = scr.par_code
-						AND scr.cmpy_code = s.cmpy_code
-						AND scr.add_num IN ({$addnum})
-						AND scr.commtype_code IN ({$typecode})
-				LEFT JOIN student as s
-					ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-					OR (scr.par_code = scr.par_code AND scr.cmpy_code = s.cmpy_code)
+                LEFT JOIN studcommrules as scr
+                    ON (p.par_code = scr.par_code
+                        AND scr.cmpy_code = s.cmpy_code
+                        AND scr.add_num IN ({$addnum})
+                        AND scr.commtype_code IN ({$typecode})
+                LEFT JOIN student as s
+                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
+                    OR (scr.par_code = scr.par_code AND scr.cmpy_code = s.cmpy_code)
             ";
         } else {
             $studentjoin = "
-				LEFT JOIN student as s
-					ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
+                LEFT JOIN student as s
+                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
             ";
         }
 

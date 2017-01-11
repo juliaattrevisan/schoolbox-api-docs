@@ -140,7 +140,10 @@ class External_Tass_User implements External_UserInterface
 
     function getStudentContactList($tassID)
     {
-
+        /* commrules support not added here
+         * based on the ?good/?bad assumption that the contacts to show on a
+         * students profile should only be the primary ones from the parent table
+         */
         $query = "SELECT  'P' + student.par_code as StudentContactID,
                           parent.f_name StudentContactPreferred,
                           addr1 StudentContactAddress1,
