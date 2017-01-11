@@ -263,6 +263,39 @@ class External_Tass_User implements External_UserInterface
 
         // remove the P|S prefix
         $id = substr($tassID, 1);
+
+        $companyCode = $this->database->smartQuote($this->companyCode);
+
+        /* If Tass Comm rules are enabled then locate the guardian relationship
+         * from there as well
+         */
+        if (Config::get('external_tass_commrules')
+            && strlen(trim(str_replace(',','',Config::get('external_tass_commrules_addnum'))))>0
+            && strlen(trim(str_replace(',','',Config::get('external_tass_commrules_typecode'))))>0
+        ) {
+            $commrules = true;
+            /* Expand out the addnum and typecodes from CSV
+             */
+            $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_addnum'))));
+            $addnum = '';
+            foreach ($addnum_array as $value) {
+                $addnum = $addnum . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+            }
+            if (strlen($addnum) > 0 ) {
+                $addnum = substr($addnum,1);
+            }
+            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_addnum'))));
+            $typecode = '';
+            foreach ($typecode_array as $value) {
+                $typecode = $typecode . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+            }
+            if (strlen($typecode) > 0 ) {
+                $typecode = substr($typecode,1);
+            }
+        } else {
+            $commrules = false;
+        }
+
         $splitParentLength = Config::get('external_tass_parent_id_length') + 1;
         if (strlen($id) == $splitParentLength) {
             // This is a split family parent, deal with them differently
@@ -270,7 +303,7 @@ class External_Tass_User implements External_UserInterface
             $parentNum = $id[$splitParentLength-1];
 
             $query = "
-                SELECT
+                SELECT DISTINCT
                     sf.stud_codes AS RelatedID
                 FROM parent AS p
                 INNER JOIN paraddress as pa
@@ -284,8 +317,20 @@ class External_Tass_User implements External_UserInterface
                     AND p.cmpy_code = s.cmpy_code
                 WHERE sf.par_code = {$this->getDatabase()->smartQuote($parentCode)}
                 AND   sf.sfa_num  = {$this->getDatabase()->smartQuote($parentNum)}
-                ORDER BY p.par_code ASC
             ";
+            if ($commrules) {
+                $query = $query . "
+                    UNION ALL
+
+                    SELECT DISTINCT
+                        scr.stud_code AS RelatedID
+                    FROM studcommrules
+                    WHERE cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+                    AND par_code = {$this->getDatabase()->smartQuote($parentCode)}
+                    AND add_num IN ({$addnum})
+                    AND commtype_code IN ({$typecode})
+                ";
+            }
 
             $return = array();
             $result = $this->getDatabase()->getAll($query);
@@ -302,13 +347,27 @@ class External_Tass_User implements External_UserInterface
             }
         } else {
             $query = "
-				SELECT s.stud_code AS RelatedID
-				FROM student s
+                SELECT DISTINCT
+                    s.stud_code AS RelatedID
+                FROM student s
                 LEFT JOIN parent p
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
-				WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
-			";
+                WHERE s.par_code = {$this->getDatabase()->smartaQuote($id)}
+            ";
+            if ($commrules) {
+                $query = $query . "
+                    UNION ALL
+
+                    SELECT DISTINCT
+                        scr.stud_code AS RelatedID
+                    FROM studcommrules
+                    WHERE cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+                    AND par_code = {$this->getDatabase()->smartQuote($id)}
+                    AND add_num IN ({$addnum})
+                    AND commtype_code IN ({$typecode})
+                ";
+            }
             $return = $this->getDatabase()->getAll($query);
         }
 
