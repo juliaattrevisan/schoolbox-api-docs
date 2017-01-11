@@ -120,7 +120,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $posts = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($posts as $post) {
-            $c->merge(
+            $c = $c->merge(
                 new Collection(
                     $this->notifyFollowed(
                         $roletype,

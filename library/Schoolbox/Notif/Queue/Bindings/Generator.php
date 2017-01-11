@@ -269,27 +269,6 @@ class Generator implements GeneratorInterface
         // Higher access levels get lower level bindings as well.
         $bindings['service'] = array();
 
-        try {
-            // retrieve all homepages the user has access to; pull homepage service access from synergy as well
-            $catIds = $this->getCategoryMapper()
-                           ->findForUser($user)
-                           ->getColumnValues('id');
-
-            /** @var UserAccess $access */
-            $accessList = $this->getUserAccessMapper()->findByColumnList(
-                array(
-                    'uid'     => $user->getId(),
-                    'service' => UserAccess::SERVICE_HOMEPAGE,
-                    'sid'     => $catIds
-                )
-            );
-        } catch (Mapper\Exception $e) {
-            $accessList = new Collection();
-        }
-
-        // combine with all other services user has access to
-        $accessList->mergeUnique($user->getAccessList());
-
         foreach ($user->getAccessList() as $access) {
             $baseBinding = $access->getService() . '.' . $access->getServiceIdentifier();
             $accessLevel = $access->getAccessLevel();

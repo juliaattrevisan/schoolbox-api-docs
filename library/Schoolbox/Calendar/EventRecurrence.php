@@ -68,7 +68,7 @@ class EventRecurrence {
 	/**
 	 * Possible efficacy values
 	 *
-	 * @var string
+	 * @var string[]
 	 */
 	private $efficacyValues = [ EventRecurrenceMapper::EFFICACY_SERIES, EventRecurrenceMapper::EFFICACY_SELF ];
 
@@ -311,7 +311,7 @@ class EventRecurrence {
 	/**
 	 * Get efficacy values
 	 *
-	 * @return string
+	 * @return string[]
 	 */
 	private function getEfficacyValues() {
 		return $this->efficacyValues;

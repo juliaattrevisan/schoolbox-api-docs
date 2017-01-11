@@ -167,7 +167,7 @@ class RoleAccessMapper extends Mapper
             if ($children->count()) {
                 foreach ($children as $subCategory) {
                     // recursive call
-                    $c->merge($this->generatePermissions($subCategory, $perms, $recursive));
+                    $c = $c->merge($this->generatePermissions($subCategory, $perms, $recursive));
                 }
             }
         }

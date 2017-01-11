@@ -105,7 +105,7 @@ class Threads
 
             /* And merge it all together
              */
-            $tree->merge($allPosts);
+            $tree = $tree->merge($allPosts);
         } else {
             $tree = new \Schoolbox\Collection();
         }

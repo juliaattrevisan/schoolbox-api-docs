@@ -14,6 +14,9 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use \Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Resource\Storage\Model as Storage;
@@ -89,7 +92,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testUnweightedAverage1()
     {
         $project = $this->spawnProject(new SummatorAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -99,10 +102,12 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
+            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
+                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
+            );
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->getAllFeedback()->slice(0,0);
+                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }
         }
 
@@ -279,10 +284,12 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
+            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
+                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
+            );
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->getAllFeedback()->slice(0,0);
+                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }
         }
 
@@ -637,10 +644,12 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
+            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
+                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
+            );
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->getAllFeedback()->slice(0,0);
+                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }
         }
 
@@ -1172,10 +1181,12 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
+            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
+                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
+            );
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->getAllFeedback()->slice(0,0);
+                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }
         }
 

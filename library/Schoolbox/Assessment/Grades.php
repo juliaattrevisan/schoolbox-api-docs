@@ -115,8 +115,7 @@ class Grades
             $oaCollection = new Collection();
         }
 
-        $assessments = new Collection();
-        $assessments->merge($sbCollection)->merge($oaCollection);
+        $assessments = (new Collection())->merge($sbCollection)->merge($oaCollection);
 
         // flatten the weight array
         $assessmentWeights = array();

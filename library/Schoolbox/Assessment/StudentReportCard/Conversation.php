@@ -67,11 +67,9 @@ class Conversation {
 		 * merely acting as observers of the dialog, so they are excluded from this
 		 * list of participants
 		 */
-		$this->participants = new Collection();
-		$this->participants->add($student);
-		$this->participants
-			->merge($student->getParents())
-			->merge($category->getTeachers());
+        $this->participants = (new Collection([$student]))
+            ->merge($student->getParents())
+            ->merge($category->getTeachers());
 
 		// retrieve the comments in this conversation
 		$this->comments = CommentMapper::getInstance()->findByStudentAndCategory($student->getId(), $category->getId());

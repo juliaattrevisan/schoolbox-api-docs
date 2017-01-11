@@ -149,7 +149,7 @@ class UserAccessMapper extends Mapper
             return $ua->setUser($user);
         });
 
-        $access->mergeUnique($internal);
+        $access = $access->mergeUnique($internal);
 
         // we can bug out early if no external sources need to be considered
         if (!$includeSynergy) {
@@ -185,7 +185,7 @@ class UserAccessMapper extends Mapper
             }
         }
 
-        $access->mergeUnique($external);
+        $access = $access->mergeUnique($external);
 
         return $access;
     }
@@ -223,7 +223,7 @@ class UserAccessMapper extends Mapper
             return $ua->setUser($user);
         });
 
-        $access->mergeUnique($internal);
+        $access = $access->mergeUnique($internal);
 
         return $access;
     }
@@ -366,7 +366,7 @@ class UserAccessMapper extends Mapper
         ));
 
         // merge the two collections
-        $extUserCollection->mergeUnique($userCollection, 'id');
+        $extUserCollection = $extUserCollection->mergeUnique($userCollection, 'id');
         return $extUserCollection;
 	}
 

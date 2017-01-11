@@ -278,12 +278,12 @@ class DataSource
             // Class members: convert to list of users
             $classCodes = $this->externalDb->getStudents($folder->getCodeString());
             if (!empty($classCodes)) {
-                $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
+                $students = $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
             }
 
             // I want to search for ALL read-level users, not just students
             // Deliberately don't search external DB, I have already done that
-            $students->mergeUnique(
+            $students = $students->mergeUnique(
                 $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
                 'id'
             );

@@ -156,10 +156,11 @@ class Marksheet
         if ($this->category->getCodes()->count() && $this->conf->get('external_enable')) {
             $externalList = $this->synergyHandler->getStudents($this->category->getCodeString());
             if (is_array($externalList)) {
+                $extIds = [];
                 foreach ($externalList as $studentData) {
                     $extIds[] = $studentData['synergy_id'];
                 }
-                $studentCollection->merge($this->userMapper->findByColumn('synergy_id', $extIds));
+                $studentCollection = $studentCollection->merge($this->userMapper->findByColumn('synergy_id', $extIds));
             }
         }
 
@@ -201,7 +202,7 @@ class Marksheet
         foreach ($studentList as $studentData) {
             $extIds[] = $studentData['uid'];
         }
-        $studentCollection->merge($this->userMapper->findByColumn('id', $extIds));
+        $studentCollection = $studentCollection->merge($this->userMapper->findByColumn('id', $extIds));
 
         // Remove duplicates from $studentCollection
         $newCollection = new Collection();

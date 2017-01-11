@@ -1262,7 +1262,7 @@ class StudentReportCard
         );
 
         // Merge in subjects with attempted quizzes
-        $this->categoriesInTerm->mergeUnique($attemptedSubjects, 'id');
+        $this->categoriesInTerm = $this->categoriesInTerm->mergeUnique($attemptedSubjects, 'id');
 
         // Ensure folder codes are populated
         FolderCodeMapper::getInstance()->applyCodesToCategories($this->categoriesInTerm);

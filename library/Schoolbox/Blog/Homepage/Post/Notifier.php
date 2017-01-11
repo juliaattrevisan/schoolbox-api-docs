@@ -78,7 +78,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		$blogs = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($blogs as $blog) {
-			$c->merge(new Collection($this->notifyPosted($roletype, $blog, $blog->getOwner())->getAll($blog->getCreatedAt()->getUnixTimeStamp())));
+            $c = $c->merge(new Collection($this->notifyPosted($roletype, $blog, $blog->getOwner())->getAll($blog->getCreatedAt()->getUnixTimeStamp())));
 		}
 		return $c;
 	}

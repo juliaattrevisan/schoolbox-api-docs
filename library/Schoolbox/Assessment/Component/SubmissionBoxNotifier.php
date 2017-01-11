@@ -254,8 +254,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $boxes = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($boxes as $box) {
-            $c->merge(new Collection($this->notifyStudentOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimeStamp())));
-            $c->merge(new Collection($this->notifyFeedClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimeStamp())));
+            $c = $c
+                ->merge(new Collection($this->notifyStudentOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimeStamp())))
+                ->merge(new Collection($this->notifyFeedClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimeStamp())));
         }
 
         return $c;

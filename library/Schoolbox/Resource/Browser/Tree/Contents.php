@@ -138,9 +138,13 @@ class Contents
 
         /* Combined nodes
          */
-        $this->getAllNodes()->merge($this->getLinkNodes());
-        $this->getAllNodes()->merge($this->getFileNodes());
-        $this->getAllNodes()->sortBy('name', 'asc');
+        $this->setAllNodes($this->getAllNodes()
+            ->merge($this->getLinkNodes())
+            ->merge($this->getFileNodes())
+            ->sortBy('name', 'asc')
+        );
+
+        return $this->getAllNodes();
     }
 
     /**

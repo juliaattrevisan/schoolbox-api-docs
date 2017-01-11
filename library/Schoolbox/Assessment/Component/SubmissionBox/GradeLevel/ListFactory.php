@@ -65,7 +65,7 @@ class ListFactory
              * with the submissionBox, via its gradeGroup id. That wasn't being
              * updated, it was always the first one that was chosen regardless
              */
-            $collection->merge($this->gradeLevelMapper->findByColumnList(
+            $collection = $collection->merge($this->gradeLevelMapper->findByColumnList(
                 array(
                     'submission_grade_group_id' => $thing->getGradeGroup()->getId()
                 ),

@@ -207,7 +207,7 @@ $submission_history = $submissionMapper->getHistory($userID, $this->arg[0]);
 if ($is_mark_shown) {
     // Filter out items with a mark, instead of showing this way?
     // Returns probably should not show at all if marks aren't shown?
-    $submission_history->merge($return_mapper->getHistory($userID, $this->arg[0]));
+    $submission_history = $submission_history->merge($return_mapper->getHistory($userID, $this->arg[0]));
 }
 $submission_history->sortBy('date', 'desc');
 

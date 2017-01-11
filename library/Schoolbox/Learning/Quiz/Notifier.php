@@ -193,8 +193,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		$quizzes = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($quizzes as $quiz) {
-			$c->merge(new Collection($this->notifyStudentOpen($quiz, $quiz->getUser())->getAll($quiz->getStart()->getUnixTimeStamp())));
-			$c->merge(new Collection($this->notifyFeedClosed($quiz, $quiz->getUser())->getAll($quiz->getFinish()->getUnixTimeStamp())));
+            $c = $c->merge(new Collection($this->notifyStudentOpen($quiz, $quiz->getUser())->getAll($quiz->getStart()->getUnixTimeStamp())));
+            $c = $c->merge(new Collection($this->notifyFeedClosed($quiz, $quiz->getUser())->getAll($quiz->getFinish()->getUnixTimeStamp())));
 		}
 
 		return $c;
