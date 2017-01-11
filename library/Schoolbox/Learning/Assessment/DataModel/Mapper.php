@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 use PDOStatement;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
@@ -165,7 +166,7 @@ class Mapper extends BaseMapper
          */
         $this->joinsVia(
             'curriculum_node_for_assessment',
-            \Schoolbox\Curriculum\Node\Mapper::class,
+            CurriculumNodeMapper::class,
             'id',
             'curriculum_node_id',
             'assessment_id',
@@ -376,6 +377,7 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
+        // This select string should not be used to fetch 1-M relations to assessments.
         return "
             SELECT
                 {$this->getColumnString()},
@@ -394,12 +396,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('project_assessment', 'pa')},
-                {$this->getJoinColumnString('assessment_specification_implementation', 'spec')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment', 'cn')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment.level', 'cnl')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment.level.source', 'cnls')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment.area.source', 'cnas')}
+                {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
 
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             -- Allow join onto deleted sub-objects
@@ -419,11 +416,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
             LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa')}
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment', '', 'cn')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment.level', 'cn', 'cnl')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment.level.source', 'cnl', 'cnls')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment.area', 'cn', 'cna')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment.area.source', 'cna', 'cnas')}
         ";
     }
 
@@ -492,7 +484,6 @@ class Mapper extends BaseMapper
         $dueWorkIds        = [];
         $quizIds           = [];
         $contextProjectIds = [];
-        $curriculumNodes   = [];
 
         foreach ($statement as $row) {
             /** @var Model $model */
@@ -564,17 +555,6 @@ class Mapper extends BaseMapper
                 $contextProjectIds[] = $row['pa.assessment_id'];
             }
 
-            /* Remember this list so we can augment with curriculum codes later
-             */
-            /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
-            if (isset($row['cn.id']) && empty($curriculumNodes[$model->getId()][$row['cn.id']])) {
-                $curriculumNode = $this->getJoinMapper('curriculum_node_for_assessment')->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-
-                if ($curriculumNode->getId()) {
-                    $curriculumNodes[$model->getId()][$curriculumNode->getId()] = $curriculumNode;
-                }
-            }
-
             $model->setAssessmentContext($context);
             $modelList->add($model);
         }
@@ -597,7 +577,7 @@ class Mapper extends BaseMapper
 
         /* Curriculum Nodes
          */
-        $modelList = $this->augmentListWithCurriculumNodes($modelList, $curriculumNodes);
+        $modelList = $this->augmentListWithCurriculumNodes($modelList);
 
         return $modelList;
     }
@@ -605,20 +585,57 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with Curriculum Nodes
      *
-     * @param $modelList
-     * @param $curriculumNodes
+     * @param Collection|Model[] $modelList
+     * @return Collection|Model[]
      */
-    protected function augmentListWithCurriculumNodes($modelList, $curriculumNodes)
+    protected function augmentListWithCurriculumNodes($modelList)
     {
-        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $currentModel */
-        foreach ($modelList as $currentModel) {
-            if (isset($curriculumNodes[$currentModel->getId()])) {
-                $nodes = new Collection(array_values($curriculumNodes[$currentModel->getId()]));
-
-                $currentModel->setCurriculumNodes($nodes);
-            }
+        if (count($modelList) === 0) {
+            return $modelList;
         }
 
+        // Fetch all curriculum nodes + supplementary fields
+        $predicate = $this->getPredicateBuilder()->equals('id', $modelList->getColumnValues('id'));
+        $where     = implode(' AND ', $predicate->getWhere());
+        $query     = "
+            SELECT
+                {$this->getTable()}.id,
+                {$this->getJoinColumnString('curriculum_node_for_assessment', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment.area.source', 'cnas')}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('curriculum_node_for_assessment', '', 'cn')}
+            LEFT  JOIN {$this->getJoinSql('curriculum_node_for_assessment.level', 'cn', 'cnl')}
+            LEFT  JOIN {$this->getJoinSql('curriculum_node_for_assessment.level.source', 'cnl', 'cnls')}
+            LEFT  JOIN {$this->getJoinSql('curriculum_node_for_assessment.area', 'cn', 'cna')}
+            LEFT  JOIN {$this->getJoinSql('curriculum_node_for_assessment.area.source', 'cna', 'cnas')}
+            WHERE {$where}
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($predicate->getParams());
+
+        // Group nodes by their assessment
+        /** @var CurriculumNodeMapper $curriculumNodeMapper */
+        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_assessment');
+        $curriculumNodes      = [];
+        foreach ($statement as $row) {
+            $assessmentId = $row['id'];
+            if (!isset($curriculumNodes[$assessmentId])) {
+                $curriculumNodes[$assessmentId] = $curriculumNodeMapper->createCollection();
+            }
+            $curriculumNodes[$assessmentId]->add(
+                $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls')
+            );
+        }
+
+        // Set each assessment's curriculum nodes
+        foreach ($modelList as $model) {
+            if (isset($curriculumNodes[$model->getId()])) {
+                $model->setCurriculumNodes($curriculumNodes[$model->getId()]);
+            }
+        }
         return $modelList;
     }
 
