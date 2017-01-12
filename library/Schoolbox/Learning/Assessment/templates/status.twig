@@ -79,6 +79,7 @@
                 {% set pStatusText      = '' %}
                 {% set pStatusClass     = '' %}
                 {% set pTooltip         = '' %}
+                {% set pSobo            = '' %}
 
                 {% block config %}
                 <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
@@ -105,8 +106,9 @@
                                     {% if pActionSummary %}
                                         <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">Submission History</a></li>
                                     {% endif %}
-
+                                    {% if pSobo %}
                                     <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
+                                    {% endif %}
                                 {% endspaceless -%}
                             </ul>
                             {% endif %}

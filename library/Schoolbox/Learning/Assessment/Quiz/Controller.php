@@ -96,7 +96,7 @@ class Controller extends Assessment\Controller
     public function getStatus(IAssessable $assessment)
     {
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
-        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
+        $returnUrlSuffix = (new Redirect())->queryString($baseUrl);
 
         $twigData = [
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
@@ -154,9 +154,12 @@ class Controller extends Assessment\Controller
         $latestAttempt  = $this->quizAttemptMapper->findById($latestResponse->getId());
         $finishDate     = $latestAttempt->getFinish();
 
-        // Is the attempt in progress ?
-        if (is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate) {
-
+        /* Is the attempt in progress ?
+         *
+         * If the current user is a student, then redirect to a place
+         * where they can continue the attempt
+         */
+        if ($this->getUser()->getRole()->isStudent() && (is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate)) {
             $quiz     = $this->getQuizForAssessmentId($assessment->getId());
             $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
 
@@ -173,7 +176,8 @@ class Controller extends Assessment\Controller
             return;
         }
 
-        // Not in progress
+        // Not in progress (or you're a teacher - this redirect eventually
+        // shunts you off to the Attempts List for a particular student)
         $this->redirectToSummaryOrIntro($this->getUser(), $participant->getUser(), $assessment);
     }
 
