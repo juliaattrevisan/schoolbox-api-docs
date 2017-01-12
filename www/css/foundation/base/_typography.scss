@@ -46,7 +46,7 @@ $small-font-size: rem-calc(($base-font-size - 4));
 // $paragraph-font-weight: $font-weight-normal;
 $paragraph-font-size: rem-calc(($base-font-size - 3));
 $paragraph-line-height: 1.6;
-$paragraph-margin-bottom: $base-font-size;
+$paragraph-margin-bottom: rem-calc(($base-font-size - 4));
 $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 // $paragraph-aside-line-height: 1.35;
 // $paragraph-aside-font-style: italic;
@@ -136,9 +136,6 @@ h1{
 p{
 	@media #{$small-only} {
 		margin-bottom: rem-calc(($base-font-size - 8));
-	}
-	@media #{$medium-only} {
-		margin-bottom: rem-calc(($base-font-size - 4));
 	}
 }
 
