@@ -44,7 +44,7 @@ $this->setBlock(TEMPLATE_content, 'crumb_year', 'crumb_year_block');
 $this->setBlock(TEMPLATE_content, 'crumb_month', 'crumb_month_block');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'topic_header', 'topic_header_block');
-$this->setBlock(TEMPLATE_content, 'topic', 'topic_block');
+$this->setBlock(TEMPLATE_content, 'news', 'news_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
@@ -53,7 +53,6 @@ $this->setBlock(TEMPLATE_content, 'year_filter', 'year_filter_block');
 $this->setBlock(TEMPLATE_content, 'month_filter', 'month_filter_block');
 $this->setBlock(TEMPLATE_content, 'year', 'year_block');
 $this->setBlock('year', 'month', 'month_block');
-$this->setBlock('topic', 'news', 'news_block');
 $this->setBlock('news', 'has_modify_button', 'has_modify_button_block');
 $this->setBlock('news', 'has_publish_date', 'has_publish_date_block');
 $this->setBlock('news', 'has_expiry', 'has_expiry_block');
@@ -343,13 +342,6 @@ if (is_array($items)) {
              */
             $fullname = $userHandler->formatName($article);
 
-            try {
-                $url = new Url($previous['topicName']);
-            }
-            catch (InvalidArgumentException $e) {
-                $url = new Url($article['topicName']);
-            }
-
             $formatter = new TextFormatter();
             
             $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
@@ -362,51 +354,15 @@ if (is_array($items)) {
                 'POSTER_EXTERNAL_ID' => $article['synid'],
                 'DATETIME' => $postDate->getLong(),
                 'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
-                'TOPIC_NAME' => Scrub::text($previous['topicName']),
-                'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
                 'ON_OFF' => ++$j % 2 ? 'dark' : ''
             );
 
             $this->setVar($output);
             $topicList[$article['topicName']] = 1;
 
-            $url = new Url($article['topicName']);
-
-            if ($article['topicName'] != $previous['topicName'] && $i > 1) {
-
-                /* End topic
-                    */
-                $this->parse('topic_block', 'topic', true);
-                $this->setVar("news_block", "");
-                $this->parse("news_block", "news", true);
-
-                /* Last rotation
-                    */
-                if ($total == $i) {
-                    $this->setVar('TOPIC_NAME', Scrub::text($article['topicName']));
-                    $this->setVar('TOPIC_CLEAN', $filter['archive'] . strtolower($url->getSlug()));
-                    $this->parse('topic_block', 'topic', true);
-                }
-            } else {
-                if ($total == $i) {
-                    /* Last rotation
-                         */
-                    $this->parse("news_block", "news", true);
-                    $this->setVar('TOPIC_NAME', Scrub::text($article['topicName']));
-                    $this->setVar('TOPIC_CLEAN', $filter['archive'] . strtolower($url->getSlug()));
-
-                    $this->parse('topic_block', 'topic', true);
-                } else {
-                    /* normal rotation
-                         */
-                    $this->parse("news_block", "news", true);
-                }
-            }
-
-            $previous = $article;
+            $this->parse("news_block", "news", true);
         }
     } else {
-        $this->setVar('topic_block', '');
         $this->setVar('year_block', 'No news items found.');
     }
 
@@ -423,10 +379,10 @@ if (is_array($items)) {
             $this->parse('topic_header_block', 'topic_header', true);
         }
     } else {
-        $this->setVar('topic_block', '');
+        $this->setVar('topic_header_block', '');
     }
 } else {
-    $this->setVar('topic_block', '');
     $this->setVar('year_block', 'No news items found.');
+    $this->setVar('news_block', '');
 }
 
