@@ -214,6 +214,7 @@ ul.tileList {
                 top: 0;
             }
             &.text-middle {
+                @include transform(translateY(-50%));
                 top: 50%;
             }
             &.text-bottom {
