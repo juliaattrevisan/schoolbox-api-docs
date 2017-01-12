@@ -5,7 +5,8 @@
 -- Because marks belong to a descriptor, and descriptors belong to a level, and a level belongs to a SubBox,
 -- we cannot enforce foreign keys unless all are soft-deletable.
 ALTER TABLE `rubric_level`
-  ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+  ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL,
+  ADD INDEX  `deleted_at` (`deleted_at`);
 
 -- Set levels belonging to soft-deleted assessments to be soft-deleted at the time the assessment was deleted
 UPDATE rubric_level rl
