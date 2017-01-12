@@ -185,6 +185,27 @@
         };
 
         /**
+         * Retrieves the duration unit from the type of the custom view.
+         *
+         * @param view
+         * @returns {String}
+         * @throws Error if view type not recognized
+         */
+        var getViewAlias = function(view) {
+            switch (view.type) {
+                case 'timelineTerm':
+                    return 'term';
+
+                case 'timelineTwoMonth':
+                    return 'month';
+
+                case 'timelineTwoDay':
+                    return 'day';
+            }
+            throw new Error('Unrecognised view type "'+String(view.type)+'"');
+        };
+
+        /**
          * Update assessment method.
          *
          * * Gives event a "loading" style
@@ -225,7 +246,7 @@
          */
         var pushCurrentCalendarState = function() {
             try {
-                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                var unit = getViewAlias(calendar.fullCalendar('getView'));
                 var date = calendar.fullCalendar('getDate');
                 window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.momentJs)));
             } catch (e) {
