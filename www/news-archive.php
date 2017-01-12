@@ -259,119 +259,116 @@ if (is_array($items)) {
     $total = count($items);
     $userHandler = new User();
 
-    if ($items) {
+    foreach ($items as $article) {
 
-        foreach ($items as $article) {
+        /* Find out if admin-specific kind of information should be displayed with the
+         * news article
+         */
+        $hasAdminAccess = ($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS;
 
-            /* Find out if admin-specific kind of information should be displayed with the
-             * news article
-             */
-            $hasAdminAccess = ($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS;
+        /* Offer a Modify button if you are allowed to alter this new item's contents
+         */
+        if ($hasAdminAccess) {
+            $this->setVar(
+                array(
+                    'HAS_MODIFY_BUTTON_ITEM_ID' => $article['item_id'],
+                )
+            );
 
-            /* Offer a Modify button if you are allowed to alter this new item's contents
-             */
-            if ($hasAdminAccess) {
+            $this->parse('has_modify_button_block', 'has_modify_button');
+        } else {
+            $this->setVar('has_modify_button_block', '');
+        }
+
+        /* Show publish date to administrators if it's in the future
+         */
+        if ($hasAdminAccess) {
+            $publishDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
+
+            if ($publishDate->getUnixTimeStamp() > time()) {
                 $this->setVar(
                     array(
-                        'HAS_MODIFY_BUTTON_ITEM_ID' => $article['item_id'],
+                        'PUBLISH_DATE' => $publishDate->getDateOnly(),
                     )
                 );
 
-                $this->parse('has_modify_button_block', 'has_modify_button');
-            } else {
-                $this->setVar('has_modify_button_block', '');
-            }
-
-            /* Show publish date to administrators if it's in the future
-             */
-            if ($hasAdminAccess) {
-                $publishDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
-
-                if ($publishDate->getUnixTimeStamp() > time()) {
-                    $this->setVar(
-                        array(
-                            'PUBLISH_DATE' => $publishDate->getDateOnly(),
-                        )
-                    );
-
-                    $this->parse('has_publish_date_block', 'has_publish_date');
-                } else {
-                    $this->setVar('has_publish_date_block', '');
-                }
+                $this->parse('has_publish_date_block', 'has_publish_date');
             } else {
                 $this->setVar('has_publish_date_block', '');
             }
+        } else {
+            $this->setVar('has_publish_date_block', '');
+        }
 
-            /* Expiry settings
-             */
-            if ($hasAdminAccess) {
-                if ($archive) {
-                    $expiryVerb = 'Expired';
-                } else {
-                    $expiryVerb = 'Expires';
-                }
-
-                $expireDate = new Alaress_Date_Format($article['expire_datetime'], 'U');
-                
-                $this->setVar(
-                    array(
-                        'EXPIRY_VERB' => $expiryVerb,
-                        'EXPIRY_DATE' => $expireDate->getLongDateOnly(),
-                    )
-                );
-
-                $this->parse('has_expiry_block', 'has_expiry');
+        /* Expiry settings
+         */
+        if ($hasAdminAccess) {
+            if ($archive) {
+                $expiryVerb = 'Expired';
             } else {
-                $this->setVar('has_expiry_block', '');
+                $expiryVerb = 'Expires';
             }
 
-            if ($article['item_image']) {
-                $this->setVar('NEWS_IMAGE', $article['item_image']);
-                $this->parse('news_image_block', 'news_image');
-            } else {
-                $this->setVar('news_image_block','');
-            }
+            $expireDate = new Alaress_Date_Format($article['expire_datetime'], 'U');
 
-
-            /* The usual stuff
-             */
-            $fullname = $userHandler->formatName($article);
-            $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
-
-            $output = array(
-                'NEWS_ID' => $article['item_id'],
-                'NEWS_TITLE' => $article['item_heading'],
-                'POSTER' => $fullname,
-                'POSTER_ID' => $article['uid'],
-                'POSTER_EXTERNAL_ID' => $article['synid'],
-                'DATETIME' => $postDate->getLong(),
-                'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
+            $this->setVar(
+                array(
+                    'EXPIRY_VERB' => $expiryVerb,
+                    'EXPIRY_DATE' => $expireDate->getLongDateOnly(),
+                )
             );
 
-            $this->setVar($output);
-            $this->parse("news_block", "news", true);
+            $this->parse('has_expiry_block', 'has_expiry');
+        } else {
+            $this->setVar('has_expiry_block', '');
         }
-    } else {
-        $this->setVar('year_block', 'No news items found.');
-    }
 
-    // output tabs
-    if (is_array($topicSlugList)) {
-        foreach ($topicSlugList as $slug => $topic) {
-            $output = array(
-                'TOPIC_CLASS' => strtolower($topic) == strtolower($filter['topic']) ? 'class="current"' : '',
-                'NEWS_TOPIC' => Scrub::text(ucwords($topic)),
-                'TOPIC_CLEAN' => $filter['archive'] . $slug
-            );
-
-            $this->setVar($output);
-            $this->parse('topic_header_block', 'topic_header', true);
+        if ($article['item_image']) {
+            $this->setVar('NEWS_IMAGE', $article['item_image']);
+            $this->parse('news_image_block', 'news_image');
+        } else {
+            $this->setVar('news_image_block','');
         }
-    } else {
-        $this->setVar('topic_header_block', '');
+
+
+        /* The usual stuff
+         */
+        $fullname = $userHandler->formatName($article);
+        $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
+
+        $output = array(
+            'NEWS_ID' => $article['item_id'],
+            'NEWS_TITLE' => $article['item_heading'],
+            'POSTER' => $fullname,
+            'POSTER_ID' => $article['uid'],
+            'POSTER_EXTERNAL_ID' => $article['synid'],
+            'DATETIME' => $postDate->getLong(),
+            'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
+        );
+
+        $this->setVar($output);
+        $this->parse("news_block", "news", true);
     }
 } else {
     $this->setVar('year_block', 'No news items found.');
     $this->setVar('news_block', '');
+
 }
+
+// output tabs
+if (is_array($topicSlugList)) {
+    foreach ($topicSlugList as $slug => $topic) {
+        $output = array(
+            'TOPIC_CLASS' => strtolower($topic) == strtolower($filter['topic']) ? 'class="current"' : '',
+            'NEWS_TOPIC' => Scrub::text(ucwords($topic)),
+            'TOPIC_CLEAN' => $filter['archive'] . $slug
+        );
+
+        $this->setVar($output);
+        $this->parse('topic_header_block', 'topic_header', true);
+    }
+} else {
+    $this->setVar('topic_header_block', '');
+}
+
 
