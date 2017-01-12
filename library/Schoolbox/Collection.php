@@ -466,8 +466,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * Does NOT mutate the collection you call this on.
      *
-     * @param int $count
-     * @param bool $preserveKeys
+     * @param int|null $count           If null, returns ALL items.
+     * @param bool     $preserveKeys
      *
      * @return static
      */
