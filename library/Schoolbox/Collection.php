@@ -516,8 +516,9 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function mergeUnique(Collection $other, $column = null)
     {
-        if ($this->count() == 0)
+        if ($this->count() == 0) {
             return $other;
+        }
 
         $merged = clone $this;
         if ($column) {
