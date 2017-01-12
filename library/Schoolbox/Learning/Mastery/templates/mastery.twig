@@ -123,10 +123,16 @@
 
                                     {% if not upcomingFound %}
 
-                                        {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
+                                        {# Check if there is one pending #}
 
-                                        {% set upcomingFound = true %}
-                                        {% set value = '<i class="icon-eye" title="Next Assessment">' %}
+                                        {% if participant is not empty %}
+                                            {% if not participant.isMarked and participant.isResponded %}
+                                            {% else %}
+                                                {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
+                                                {% set upcomingFound = true %}
+                                                {% set value = '<i class="icon-eye" title="Next Assessment">' %}
+                                            {% endif %}
+                                        {% endif %}
 
                                     {% else %}
 
@@ -147,6 +153,7 @@
 
                                 {% if participant is not empty %}
                                     {% if not participant.isMarked and participant.isResponded %}
+                                        {% set value='<i class="icon-pause" title="Awaiting Assessment">' %}
                                         {% set className = 'notmarked' %}
                                     {% endif %}
                                 {% endif %}
@@ -154,11 +161,11 @@
                                 {# If mastery not achieved and past due date, show clock icon #}
 
                                 {% if className != 'mastered' and assessment.dueAt.isPast and humanMark is not empty %}
-                                    {% set value = '<i class="icon-clock" title="Due Date Passed - \n' ~ normalisedMark ~ '%">' %}
+                                    {% set value = '<i class="icon-clock" title="Due Date Passed - \n' ~ normalisedMark | round ~ '%">' %}
                                 {% endif %}
 
                                 <td class="text-center {{ className }}">
-                                    <a href="{{ url }}" title="{{ normalisedMark }}">{{ value | purify }}</a>
+                                    <a href="{{ url }}" title="{{ normalisedMark | round }}%">{{ value | purify }}</a>
                                 </td>
 
                             {% endfor %}
