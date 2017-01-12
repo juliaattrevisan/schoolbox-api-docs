@@ -45,7 +45,7 @@ class Descriptor implements Calculable, Twiggable
      * @param int    $id
      * @param bool   $selected
      */
-    public function __construct($text = '', $value = null, $id = 0, $selected = false)
+    public function __construct($text = '', $value = null, $id = null, $selected = false)
     {
         $this->setId($id);
         $this->setText($text);
