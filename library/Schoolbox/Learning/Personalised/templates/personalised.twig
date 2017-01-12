@@ -5,12 +5,22 @@
  #}
 <style type="text/css">
     {# Base colors #}
-    .fc-event.unit,
     .fc-event.contentArea,
-    .fc-event.project,
     .fc-event.activity {
         border-color: #EEEEEE;
         background-color: #EEEEEE;
+    }
+
+    {# Read-only colors #}
+    .fc-event.unit,
+    .fc-event.project {
+        border-color: #111111;
+        background-color: #111111;
+        color: #EEEEEE;
+    }
+    .fc-event.unit:hover,
+    .fc-event.project:hover {
+        color: #EEEEEE;
     }
 
     {# Assessment status colors #}
