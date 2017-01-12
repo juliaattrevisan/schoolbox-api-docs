@@ -41,11 +41,21 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             // didn't find it or it's been deleted: create a blank template box instead
             $this->textbox = new \Schoolbox\Resource\Textbox\Model();
             $this->textbox
-                ->setHeading('Text Box')
                 ->setCategory(FolderMapper::getInstance()->createModel()->setId($this->getSource()->getId()));
+            $this->setComponentName('Text Box');
         }
 
-        $this->setComponentName(Scrub::text($this->getTextbox()->getHeading()));
+        $textBoxHeading = Scrub::text($this->getTextbox()->getHeading());
+
+        /**
+         * If there's content and the heading isn't empty - use that as the component name
+         * Otherwise use the one set in config
+         */
+        if (strlen($textBoxHeading)) {
+            $this->setComponentName($textBoxHeading);
+        } else {
+            $this->setComponentName($this->getConfig('textBoxComponentName'));
+        }
 
         return true;
     }
