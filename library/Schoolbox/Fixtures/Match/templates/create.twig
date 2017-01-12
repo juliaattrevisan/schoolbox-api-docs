@@ -20,11 +20,13 @@
                 },
                 startAtDate: {
                     required: true,
-                    minlength: 1
+                    minlength: 1,
+                    datepickerDate: true
                 },
                 startAtTime: {
                     required: true,
-                    minlength: 1
+                    minlength: 1,
+                    timepickerTime: true
                 },
                 homeTeamId: {
                     required: true,
@@ -39,8 +41,12 @@
                 'venueId': 'Please choose a Venue.',
                 'name': 'Please enter a Match name.',
                 'seasonId': 'Please choose a Season',
-                'startAtDate': 'Please choose a date.',
-                'startAtTime': 'Please choose a time.'
+                'startAtDate': {
+                    required: 'Please choose a date.'
+                },
+                'startAtTime': {
+                    required: 'Please choose a time.'
+                }
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
