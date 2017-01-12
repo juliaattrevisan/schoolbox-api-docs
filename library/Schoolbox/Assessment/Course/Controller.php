@@ -819,9 +819,9 @@ class Controller extends Base\Base
             'search'           => $search,
             'folder'           => [ 'id' => $folder ],
             'component'        => [ 'id' => $query->get('component') ],
-            'hasAdd'           => 'true' === $query->get('hasAdd'),
-            'hasTot'           => 'true' === $query->get('hasTot'),
-            'linkToUnits'      => 'true' === $query->get('linkToUnits'),
+            'hasAdd'           => $query->get('hasAdd', 0),
+            'hasTot'           => $query->get('hasTot', 0),
+            'linkToUnits'      => $query->get('linkToUnits', 0),
             'returnUrlKey'     => Redirect::RETURN_URL,
             'encodedReturnUrl' => $query->get('encodedReturnUrl'),
         ];
