@@ -116,6 +116,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getUpdateAssessmentForm(IAssessable $assessment)
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+        $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment,$this->getUser())->add([$assessment->getTitle()]);
         $data['returnUrlName'] = Redirect::RETURN_URL;
         $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
 

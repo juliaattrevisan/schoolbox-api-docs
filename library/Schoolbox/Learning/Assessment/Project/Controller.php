@@ -140,7 +140,7 @@ class Controller extends Assessment\Controller
         $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
 
         $twigData = [
-            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'       => $assessment->getBaseContext(),
             'assessment'        => $assessment,
             'participantCounts' => $participantCounts,

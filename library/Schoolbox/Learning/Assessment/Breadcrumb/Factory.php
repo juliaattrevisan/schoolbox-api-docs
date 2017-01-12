@@ -62,7 +62,10 @@ class Factory
         if ($context instanceof Project) {
             $path = $this->router->generate('learningAssessment.getAssessment', ['assessmentId' => $context->getId()]);
 
+            $trail = $this->produceFromAssessment($context, $user);
+
         } elseif ($context instanceof UnitSpecification) {
+
             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
 
         } elseif ($context instanceof UnitImplementation) {
@@ -85,14 +88,6 @@ class Factory
 
         $trail->add([$context->getTitle(), $path]);
 
-        /* Additional project node, if you're creating within a project
-         */
-        if ($assessment instanceof Project) {
-            $params = ['assessmentId' => $assessment->getId()];
-            $route = $this->router->generate('learningAssessment.getAssessment', $params);
-            $trail->add([$assessment->getTitle(), $route]);
-        }
-
         return $trail;
     }
 
@@ -109,7 +104,7 @@ class Factory
     public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null)
     {
         $trail = new Collection();
-        $trail->add(['Learning'], $this->router->generate('learning.getClasses'));
+        $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
 
         if ($context instanceof Folder) {
             $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
