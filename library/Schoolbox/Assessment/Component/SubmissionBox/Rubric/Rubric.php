@@ -269,7 +269,7 @@ class Rubric extends Core\Rubric
                 ->setDescription($descriptor->getText())
                 ->setValue($descriptor->getValue())
                 ->setLevel($lvlModel)
-                ->setValid(true);
+                ->setDeletedAt(new \Alaress_Date_NullDate());
 
             $this->dCache->attach($descriptor, $model);
         }

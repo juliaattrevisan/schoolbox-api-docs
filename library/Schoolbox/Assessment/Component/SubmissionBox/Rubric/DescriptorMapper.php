@@ -30,17 +30,11 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $this->hasTable('rubric_descriptor');
         $this->hasModel(Descriptor::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-
         $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('level_id', LevelMapper::class, 'id', null, null, 'level', 'level');
-
         $this->uses('value', self::TYPE_DECIMAL);
         $this->uses('description', self::TYPE_STRING);
-
-        // this is your soft-delete column
-        $this->uses('valid', self::TYPE_BOOLEAN);
-        $this->hasSoftDeleteField('valid', false, true);
-
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
 

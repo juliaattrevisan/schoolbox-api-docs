@@ -10,11 +10,13 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 class Descriptor implements ISoftDeletable
 {
     use Id;
+    use DeletedAtDate;
 
     /**
      * @var Criterion
@@ -35,13 +37,6 @@ class Descriptor implements ISoftDeletable
      * @var string
      */
     private $description;
-
-    /**
-     * Soft-delete column
-     *
-     * @var bool
-     */
-    private $valid;
 
     /**
      * @param  Criterion $criterion
@@ -79,7 +74,6 @@ class Descriptor implements ISoftDeletable
         return $this->description;
     }
 
-
     /**
      * @return Level
      */
@@ -87,7 +81,6 @@ class Descriptor implements ISoftDeletable
     {
         return $this->level;
     }
-
 
     /**
      * @param Level $level
@@ -97,25 +90,6 @@ class Descriptor implements ISoftDeletable
     {
         $this->level = $level;
         return $this;
-    }
-
-
-    /**
-     * @param  boolean $valid
-     * @return $this
-     */
-    public function setValid($valid)
-    {
-        $this->valid = $valid;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getValid()
-    {
-        return $this->valid;
     }
 
     /**
@@ -134,13 +108,5 @@ class Descriptor implements ISoftDeletable
     public function getValue()
     {
         return $this->value;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return !$this->getValid();
     }
 }
