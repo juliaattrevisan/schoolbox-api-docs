@@ -34,13 +34,24 @@ class Replicator
     private $quizMapper;
 
     /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
+    /**
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param QuizMapper $quizMapper
+     * @param RubricMapper $rubricMapper
      */
-    public function __construct(AssessmentMapperProxy $assessmentMapperProxy, QuizMapper $quizMapper)
+    public function __construct(
+        AssessmentMapperProxy $assessmentMapperProxy,
+        QuizMapper $quizMapper,
+        RubricMapper $rubricMapper
+    )
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->quizMapper = $quizMapper;
+        $this->rubricMapper = $rubricMapper;
     }
 
     /**
@@ -103,9 +114,8 @@ class Replicator
             return;
         }
 
-        // TODO inject via DI
         $specId = $assessable->getSpecificationAssessment()->getId();
         $implId = $assessable->getId();
-        RubricMapper::getInstance()->copyRubric($specId, $implId);
+        $this->rubricMapper->copyRubric($specId, $implId);
     }
 }
