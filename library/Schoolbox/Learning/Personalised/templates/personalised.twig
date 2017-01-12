@@ -400,7 +400,7 @@
                                 case 'end':
                                     // Output in our configured format
                                     var date = calEvent[valueTag],
-                                        format = 'dddd, Do MMMM YYYY'
+                                        format = 'dddd, Do MMMM YYYY';
 
                                     if (!calEvent.allDay) {
                                         format = format+', h:mm a'
@@ -514,6 +514,11 @@
                         el.find('.fc-cell-text').empty().text(resource.title);
                     }
                 }],
+
+                eventRender: function(event, element, view) {
+                    // Set a title
+                    element.attr('title', event.title + ' ('+$.fullCalendar.formatRange(event.start, event.end, 'Do MMMM YYYY')+')');
+                },
 
                 eventAfterAllRender: function(view) {
                     // Any resource whose children contain no events should be collapsed
