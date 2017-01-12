@@ -1,3 +1,33 @@
+{##
+ # CSS
+ # TODO put this in a stylesheet
+ # TODO base colors off config
+ #}
+<style type="text/css">
+    {# Base colors #}
+    .fc-event.unit,
+    .fc-event.contentArea,
+    .fc-event.project,
+    .fc-event.activity {
+        border-color: #EEEEEE;
+        background-color: #EEEEEE;
+    }
+
+    {# Assessment status colors #}
+    .fc-event.fail {
+        border-color: rgb(247, 206, 204);
+        background-color: rgb(247, 206, 204);
+    }
+    .fc-event.mastered {
+        border-color: rgb(213, 231, 212);
+        background-color: rgb(213, 231, 212);
+    }
+    .fc-event.notmarked {
+        border-color: rgb(255, 242, 205);
+        background-color: rgb(255, 242, 205);
+    }
+</style>
+
 {# Header #}
 <div class="row">
     <div class="small-12 columns">

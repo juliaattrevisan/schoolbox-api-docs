@@ -11,6 +11,7 @@ use Aura\Router\Router;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
@@ -87,6 +88,7 @@ class Factory
                 'end'        => $context->getDueDate()->getDatabase(),
                 'allDay'     => true,
                 'resourceId' => $folder->getId().'-unit',
+                'className'  => ['unit'],
                 'meta'       => [
                     'type'        => 'unit',
                     'description' => '',
@@ -101,12 +103,12 @@ class Factory
                 $result->add($this->buildAssessableEventBackground($assessable, $folder, 'contentArea'));
 
                 // A foreground event for the actual quiz/duework
-                $result->add($this->buildAssessableEvent($assessable, $folder, 'contentArea', $participation));
+                $result->add($this->buildAssessableEvent($assessable, $folder, 'contentArea', $student, $participation));
 
             } elseif ($assessable instanceof Project) {
                 // If this is a project - get it and its constituents
                 $result->add(
-                    $this->buildAssessableEvent($assessable, $folder, 'project', $participation)
+                    $this->buildAssessableEvent($assessable, $folder, 'project', $student, $participation)
                     + ['editable' => false,]
                 );
 
@@ -115,7 +117,7 @@ class Factory
                     $result->add($this->buildAssessableEventBackground($activity, $folder, 'activity'));
 
                     // A foreground event for the actual activity
-                    $result->add($this->buildAssessableEvent($activity, $folder, 'activity', $participation));
+                    $result->add($this->buildAssessableEvent($activity, $folder, 'activity', $student, $participation));
                 }
             }
         }
@@ -151,6 +153,7 @@ class Factory
      * @param IAssessable $assessable
      * @param Folder      $folder
      * @param string      $resourceType
+     * @param User        $student
      * @param Collection  $participation
      * @return array
      */
@@ -158,6 +161,7 @@ class Factory
         IAssessable $assessable,
         Folder $folder,
         $resourceType,
+        User $student,
         Collection $participation
     ) {
         // Find participation
@@ -176,6 +180,28 @@ class Factory
             }
         }
 
+        // Has this student mastered the assessment?
+        $className = [$resourceType];
+        if ($assessable->isParticipant($student)) {
+            $participantObject = $assessable->getParticipant($student);
+            $feedback          = $participantObject->findMostRecentPublishedFeedback();
+
+            if ($feedback instanceof IFeedback) {
+                $mark = $feedback->getNormalisedMark();
+                if (isset($mark)) {
+                    // > mastery threshold (hardcode to 70 for now)
+                    $className[] = ($mark >= 70 ? 'mastered' : 'fail');
+                }
+
+            } else {
+                // No feedback yet. Is there a response?
+                if (!$participantObject->isMarked() && $participantObject->isResponded()) {
+                    $className[] = 'notmarked';
+                }
+
+            }
+        }
+
         return [
             'id'         => $resourceType.'-'.$assessable->getId(),
             'title'      => $assessable->getTitle(),
@@ -185,6 +211,7 @@ class Factory
             'allDay'     => false,
             'resourceId' => $folder->getId().'-'.$resourceType,
             'constraint' => $resourceType.'-'.$assessable->getId().'-bounds',
+            'className'  => $className,
             'meta'       => [
                 'type'         => $assessable->getFamilyName(),
                 'assessmentId' => $assessable->getId(),
