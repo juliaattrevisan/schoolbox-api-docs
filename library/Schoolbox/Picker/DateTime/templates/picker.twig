@@ -88,19 +88,16 @@
 <div class="row">
     <div class="tabs-content">
         <div class='content active' id="byDate-{{ id }}">
-
                 <div class="small-12 medium-4 columns">
 
                     {# Placeholder for calendar ot be rendered in #}
                     <div id="pickerCalendar{{ id }}"></div>
 
-
                 </div>
                 <div class="small-12 medium-8 columns">
 
                     {# Placeholder for appointments to be rendered in #}
-
-                    <div id="pickerAppointments{{ id }}"></div>
+                    <div id="pickerAppointments{{ id }}" class="card small-12 medium-8"></div>
 
                 </div>
         </div>
@@ -379,7 +376,7 @@
     alert(newDate);
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
         defaultDate: '{{ value }}',
-        dateFormat: 'd/m/Y h:iK',
+        dateFormat: '{{ displayFormat }}',
         inline: true,
         altInput: false,
         altFormat: '{{ displayFormat }}',
@@ -475,8 +472,8 @@
 
                                 for (var i = 0; i < data.students.length; i++) {
                                     pickerClassList.append(
-                                            data.students[i].title + '<br>' +
-                                            data.students[i].startDateTime + '<br>'
+                                            data.students[i].title + '<br/>' +
+                                            data.students[i].startDateTime + '<br/>'
                                     )
                                 }
                             }
@@ -508,13 +505,16 @@
                                 pickerAppointments.html('');
 
                                 {# Populate with appointments for the selected date #}
-
+                                var html = '';
                                 for (var i = 0; i < data.appointments.length; i++) {
-                                    pickerAppointments.append(
-                                            data.appointments[i].title + '<br>' +
-                                            data.appointments[i].startDateTime + '<br>'
-                                    )
+                                    html += '<h3>' + data.appointments[i].title + '</h3>';
+                                    html += '<p class="meta")>' + data.appointments[i].startDateTime;
+                                    if(data.appointments[i].startDateTime !== data.appointments[i].endDateTime) {
+                                        html += ' - ' + data.appointments[i].endDateTime;
+                                    }
+                                    html += '</p>';
                                 }
+                                pickerAppointments.append(html);
                             }
                         })
                         .fail(function () {

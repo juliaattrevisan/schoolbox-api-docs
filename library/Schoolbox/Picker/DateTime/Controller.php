@@ -66,7 +66,8 @@ class Controller extends Base
                 'format' => 'nochrome',
                 'data' => [
                     'id' => $id,
-                    'value' => $value->getLocal(),
+                    //Pass unix timestamp to flatpicker, it misinterprets day and month in d/m/Y format
+                    'value' => $value->getUnixTimeStamp(),
                     'type' => $type,
                     'displayFormat' => 'd/m/Y h:iK',
                     'displayFormatDate' => 'd/m/Y',
@@ -235,8 +236,8 @@ new \Alaress_Probe($day);
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
             foreach ($events as $event) {
                 $appointments[] = [
-                    'startDateTime' => $event->getStartTime()->getDatabase(),
-                    'endDateTime' => $event->getEndTime()->getDatabase(),
+                    'startDateTime' => $event->getStartTime()->getLocal(),
+                    'endDateTime' => $event->getEndTime()->getLocal(),
                     'title' => $event->getTitle()
                 ];
             }
