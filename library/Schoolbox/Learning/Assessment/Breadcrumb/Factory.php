@@ -118,7 +118,7 @@ class Factory
         } elseif ($context instanceof UnitSpecification) {
             $trail->add([$context->getTitle(), "/homepage/{$context->getFolder()->getId()}"]);
         } elseif ($context instanceof Project) {
-            $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId(), 'studentId' => 'status'])]);
+            $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
         }
 
         $assessmentType = $assessment instanceof IAssessable ? $assessment->getTypeName() : 'Activity';
