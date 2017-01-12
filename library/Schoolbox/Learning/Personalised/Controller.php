@@ -106,6 +106,11 @@ class Controller extends Base
 
         foreach ($this->folderMapper->findForUser($student) as $folder) {
 
+            // Ignore non-classes
+            if (strlen($folder->getCodeString()) === 0) {
+                continue;
+            }
+
             // Resource for folder
             $resultSet[] = [
                 'id'          => $folder->getId(),
