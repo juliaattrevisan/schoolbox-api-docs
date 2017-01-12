@@ -154,10 +154,28 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         }
     }
 
-    $log->info(sprintf('%d rubric_levels created (%d warnings), %d failures',
-        $successRubricLevelCount, $warningRubricLevelCount, $failureRubricLevelCount));
-    $log->info(sprintf('%d rubric_descriptors updated (%d warnings), %d failures',
-        $successRubricDescriptorCount, $warningRubricDescriptorCount, $failureRubricDescriptorCount));
+    // Log RubricLevel results at appropriate level
+    $rubricLevelMessage = sprintf('%d rubric_levels created (%d warnings), %d failures',
+        $successRubricLevelCount, $warningRubricLevelCount, $failureRubricLevelCount);
+    if($failureRubricLevelCount){
+        $log->error($rubricLevelMessage);
+    } elseif($warningRubricLevelCount){
+        $log->warning($rubricLevelMessage);
+    } else {
+        $log->info($rubricLevelMessage);
+    }
+
+
+    // Log RubricDescriptor results at appropriate level
+    $rubricDescriptorMessage = sprintf('%d rubric_descriptors updated (%d warnings), %d failures',
+        $successRubricDescriptorCount, $warningRubricDescriptorCount, $failureRubricDescriptorCount);
+    if($failureRubricDescriptorCount){
+        $log->error($rubricDescriptorMessage);
+    } elseif($warningRubricDescriptorCount){
+        $log->warning($rubricDescriptorMessage);
+    } else {
+        $log->info($rubricDescriptorMessage);
+    }
 
     exit(($failureRubricLevelCount + $failureRubricDescriptorCount) > 0 ? 1 : 0);
 });
