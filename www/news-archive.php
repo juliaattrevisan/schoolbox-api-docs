@@ -44,7 +44,7 @@ $this->setBlock(TEMPLATE_content, 'crumb_year', 'crumb_year_block');
 $this->setBlock(TEMPLATE_content, 'crumb_month', 'crumb_month_block');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'topic_header', 'topic_header_block');
-$this->setBlock(TEMPLATE_content, 'topic', 'topic_block');
+$this->setBlock(TEMPLATE_content, 'news', 'news_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
@@ -53,7 +53,6 @@ $this->setBlock(TEMPLATE_content, 'year_filter', 'year_filter_block');
 $this->setBlock(TEMPLATE_content, 'month_filter', 'month_filter_block');
 $this->setBlock(TEMPLATE_content, 'year', 'year_block');
 $this->setBlock('year', 'month', 'month_block');
-$this->setBlock('topic', 'news', 'news_block');
 $this->setBlock('news', 'has_modify_button', 'has_modify_button_block');
 $this->setBlock('news', 'has_publish_date', 'has_publish_date_block');
 $this->setBlock('news', 'has_expiry', 'has_expiry_block');
@@ -257,171 +256,119 @@ $items = $newsHandler->getNewsListing(
 );
 
 if (is_array($items)) {
-    $i = 0;
     $total = count($items);
     $userHandler = new User();
 
-    $topicList['All'] = 1;
+    foreach ($items as $article) {
 
-    if ($items) {
-        $j = 0;
+        /* Find out if admin-specific kind of information should be displayed with the
+         * news article
+         */
+        $hasAdminAccess = ($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS;
 
-        foreach ($items as $article) {
-            $i++;
+        /* Offer a Modify button if you are allowed to alter this new item's contents
+         */
+        if ($hasAdminAccess) {
+            $this->setVar(
+                array(
+                    'HAS_MODIFY_BUTTON_ITEM_ID' => $article['item_id'],
+                )
+            );
 
-            /* Find out if admin-specific kind of information should be displayed with the
-             * news article
-             */
-            $hasAdminAccess = ($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS;
+            $this->parse('has_modify_button_block', 'has_modify_button');
+        } else {
+            $this->setVar('has_modify_button_block', '');
+        }
 
-            /* Offer a Modify button if you are allowed to alter this new item's contents
-             */
-            if ($hasAdminAccess) {
+        /* Show publish date to administrators if it's in the future
+         */
+        if ($hasAdminAccess) {
+            $publishDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
+
+            if ($publishDate->getUnixTimeStamp() > time()) {
                 $this->setVar(
                     array(
-                        'HAS_MODIFY_BUTTON_ITEM_ID' => $article['item_id'],
+                        'PUBLISH_DATE' => $publishDate->getDateOnly(),
                     )
                 );
 
-                $this->parse('has_modify_button_block', 'has_modify_button');
-            } else {
-                $this->setVar('has_modify_button_block', '');
-            }
-
-            /* Show publish date to administrators if it's in the future
-             */
-            if ($hasAdminAccess) {
-                $publishDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
-
-                if ($publishDate->getUnixTimestamp() > time()) {
-                    $this->setVar(
-                        array(
-                            'PUBLISH_DATE' => $publishDate->getDateOnly(),
-                        )
-                    );
-
-                    $this->parse('has_publish_date_block', 'has_publish_date');
-                } else {
-                    $this->setVar('has_publish_date_block', '');
-                }
+                $this->parse('has_publish_date_block', 'has_publish_date');
             } else {
                 $this->setVar('has_publish_date_block', '');
             }
+        } else {
+            $this->setVar('has_publish_date_block', '');
+        }
 
-            /* Expiry settings
-             */
-            if ($hasAdminAccess) {
-                if ($archive) {
-                    $expiryVerb = 'Expired';
-                } else {
-                    $expiryVerb = 'Expires';
-                }
-
-                $expireDate = new Alaress_Date_Format($article['expire_datetime'], 'U');
-                
-                $this->setVar(
-                    array(
-                        'EXPIRY_VERB' => $expiryVerb,
-                        'EXPIRY_DATE' => $expireDate->getLongDateOnly(),
-                    )
-                );
-
-                $this->parse('has_expiry_block', 'has_expiry');
+        /* Expiry settings
+         */
+        if ($hasAdminAccess) {
+            if ($archive) {
+                $expiryVerb = 'Expired';
             } else {
-                $this->setVar('has_expiry_block', '');
+                $expiryVerb = 'Expires';
             }
 
-            if ($article['item_image']) {
-                $this->setVar('NEWS_IMAGE', $article['item_image']);
-                $this->parse('news_image_block', 'news_image');
-            } else {
-                $this->setVar('news_image_block','');
-            }
+            $expireDate = new Alaress_Date_Format($article['expire_datetime'], 'U');
 
-
-            /* The usual stuff
-             */
-            $fullname = $userHandler->formatName($article);
-
-            $url = new Url($previous['topicName']);
-
-            $formatter = new TextFormatter();
-            
-            $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
-
-            $output = array(
-                'NEWS_ID' => $article['item_id'],
-                'NEWS_TITLE' => $article['item_heading'],
-                'POSTER' => $fullname,
-                'POSTER_ID' => $article['uid'],
-                'POSTER_EXTERNAL_ID' => $article['synid'],
-                'DATETIME' => $postDate->getLong(),
-                'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
-                'TOPIC_NAME' => Scrub::text($previous['topicName']),
-                'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
-                'ON_OFF' => ++$j % 2 ? 'dark' : ''
+            $this->setVar(
+                array(
+                    'EXPIRY_VERB' => $expiryVerb,
+                    'EXPIRY_DATE' => $expireDate->getLongDateOnly(),
+                )
             );
 
-            $this->setVar($output);
-            $topicList[$article['topicName']] = 1;
-
-            $url = new Url($article['topicName']);
-
-            if ($article['topicName'] != $previous['topicName'] && $i > 1) {
-
-                /* End topic
-                    */
-                $this->parse('topic_block', 'topic', true);
-                $this->setVar("news_block", "");
-                $this->parse("news_block", "news", true);
-
-                /* Last rotation
-                    */
-                if ($total == $i) {
-                    $this->setVar('TOPIC_NAME', Scrub::text($article['topicName']));
-                    $this->setVar('TOPIC_CLEAN', $filter['archive'] . strtolower($url->getSlug()));
-                    $this->parse('topic_block', 'topic', true);
-                }
-            } else {
-                if ($total == $i) {
-                    /* Last rotation
-                         */
-                    $this->parse("news_block", "news", true);
-                    $this->setVar('TOPIC_NAME', Scrub::text($article['topicName']));
-                    $this->setVar('TOPIC_CLEAN', $filter['archive'] . strtolower($url->getSlug()));
-
-                    $this->parse('topic_block', 'topic', true);
-                } else {
-                    /* normal rotation
-                         */
-                    $this->parse("news_block", "news", true);
-                }
-            }
-
-            $previous = $article;
+            $this->parse('has_expiry_block', 'has_expiry');
+        } else {
+            $this->setVar('has_expiry_block', '');
         }
-    } else {
-        $this->setVar('topic_block', '');
-        $this->setVar('year_block', 'No news items found.');
-    }
 
-    // output tabs
-    if (is_array($topicSlugList)) {
-        foreach ($topicSlugList as $slug => $topic) {
-            $output = array(
-                'TOPIC_CLASS' => strtolower($topic) == strtolower($filter['topic']) ? 'class="current"' : '',
-                'NEWS_TOPIC' => Scrub::text(ucwords($topic)),
-                'TOPIC_CLEAN' => $filter['archive'] . $slug
-            );
-
-            $this->setVar($output);
-            $this->parse('topic_header_block', 'topic_header', true);
+        if ($article['item_image']) {
+            $this->setVar('NEWS_IMAGE', $article['item_image']);
+            $this->parse('news_image_block', 'news_image');
+        } else {
+            $this->setVar('news_image_block','');
         }
-    } else {
-        $this->setVar('topic_block', '');
+
+
+        /* The usual stuff
+         */
+        $fullname = $userHandler->formatName($article);
+        $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
+
+        $output = array(
+            'NEWS_ID' => $article['item_id'],
+            'NEWS_TITLE' => $article['item_heading'],
+            'POSTER' => $fullname,
+            'POSTER_ID' => $article['uid'],
+            'POSTER_EXTERNAL_ID' => $article['synid'],
+            'DATETIME' => $postDate->getLong(),
+            'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
+        );
+
+        $this->setVar($output);
+        $this->parse("news_block", "news", true);
     }
 } else {
-    $this->setVar('topic_block', '');
     $this->setVar('year_block', 'No news items found.');
+    $this->setVar('news_block', '');
+
 }
+
+// output tabs
+if (is_array($topicSlugList)) {
+    foreach ($topicSlugList as $slug => $topic) {
+        $output = array(
+            'TOPIC_CLASS' => strtolower($topic) == strtolower($filter['topic']) ? 'class="current"' : '',
+            'NEWS_TOPIC' => Scrub::text(ucwords($topic)),
+            'TOPIC_CLEAN' => $filter['archive'] . $slug
+        );
+
+        $this->setVar($output);
+        $this->parse('topic_header_block', 'topic_header', true);
+    }
+} else {
+    $this->setVar('topic_header_block', '');
+}
+
 
