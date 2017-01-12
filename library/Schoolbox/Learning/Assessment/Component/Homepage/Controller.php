@@ -79,7 +79,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                         return $this->filterAssessment($assessment) && $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
                     }
                 )
-                ->limit($this->getConfig('size'));
+                ->limit($this->getConfig('size') ?: null);
 
         } catch (\DomainException $e) {
             // if something goes wrong, this component will not be displayed
