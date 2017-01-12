@@ -1,0 +1,1 @@
+UPDATE config SET title = 'Enable EOTC Module' WHERE `name` = 'eotc_enabled'
