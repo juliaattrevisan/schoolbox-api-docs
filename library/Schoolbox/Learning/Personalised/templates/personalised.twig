@@ -92,7 +92,12 @@
     {# Metadata #}
     <ul class="meta">
         <li class="icon-calendar date">
-            <time data-value="start"></time>&ndash;<time data-value="end"></time>
+            {# Assessment's open/close date #}
+            Open between: <time data-value="assessmentStart"></time>&ndash;<time data-value="assessmentEnd"></time>
+        </li>
+        <li class="icon-staff-students date" data-personalised-date>
+            {# My open/close date #}
+            My timeframe: <time data-value="start"></time>&ndash;<time data-value="end"></time>
         </li>
     </ul>
 
@@ -394,6 +399,16 @@
 
                                 case 'description':
                                     $this.html(calEvent.meta.description);
+                                    break;
+
+                                case 'assessmentStart':
+                                case 'assessmentEnd':
+                                    // Output in our configured format
+                                    var assessmentDate = moment(calEvent.meta[valueTag]);
+
+                                    $this
+                                        .text(assessmentDate.format('dddd, Do MMMM YYYY'))
+                                        .attr('datetime', assessmentDate.toISOString());
                                     break;
 
                                 case 'start':
