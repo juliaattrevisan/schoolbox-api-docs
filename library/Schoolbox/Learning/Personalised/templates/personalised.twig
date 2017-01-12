@@ -169,17 +169,28 @@
          * Retrieves the duration unit from the type of the custom view.
          *
          * @param view
-         * @returns {String}
+         * @returns {Object}
          * @throws Error if view type not recognized
          */
-        var getDurationUnitFromView = function(view) {
+        var getDurationFromView = function(view) {
             switch (view.type) {
                 case 'timelineTerm':
+                    return {
+                        unit:    'months',
+                        quantity: 6
+                    };
+
                 case 'timelineTwoMonth':
-                    return 'month';
+                    return {
+                        unit:    'months',
+                        quantity: 1
+                    };
 
                 case 'timelineTwoDay':
-                    return 'day';
+                    return {
+                        unit:    'days',
+                        quantity: 1
+                    };
             }
             throw new Error('Unrecognised view type "'+String(view.type)+'"');
         };
@@ -411,9 +422,9 @@
                         click: function() {
                             try {
                                 // Step back one window from now
-                                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
-                                var date = calendar.fullCalendar('getDate').clone();
-                                calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                                var duration = getDurationFromView(calendar.fullCalendar('getView'));
+                                var date     = calendar.fullCalendar('getDate').clone();
+                                calendar.fullCalendar('gotoDate', date.subtract(duration.quantity, duration.unit));
                                 pushCurrentCalendarState();
                             } catch (e) {
                                 // Just go to previous step
@@ -427,12 +438,12 @@
                             try {
                                 // Step forward two windows from now, then back one window from that.
                                 // This ensures that events that are in the next window but not this one get loaded.
-                                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
-                                var date = calendar.fullCalendar('getDate').clone();
+                                var duration = getDurationFromView(calendar.fullCalendar('getView'));
+                                var date     = calendar.fullCalendar('getDate').clone();
                                 // Handle pushstate here because this triggers a second viewRender event.
                                 // I don't want to pushstate twice.
-                                calendar.fullCalendar('gotoDate', date.add(2, unit));
-                                calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                                calendar.fullCalendar('gotoDate', date.add(duration.quantity*2, duration.unit));
+                                calendar.fullCalendar('gotoDate', date.subtract(duration.quantity, duration.unit));
                                 pushCurrentCalendarState();
                             } catch (e) {
                                 // Just go to next step
