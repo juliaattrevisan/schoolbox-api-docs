@@ -207,6 +207,8 @@ class Controller extends Base
 
             $titlesFound[$title] = true;
             $data[$title] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
+            $data[$title . " (Normalized)"] = '';
+            $data[$title . " (Comment)"] = '';
         }
 
         $export[] = $data;
@@ -233,6 +235,13 @@ class Controller extends Base
                 if ($assessment->isParticipant($student)) {
 
                     $participant = $assessment->getParticipant($student);
+                    $mostRecentFeedback = $participant->findMostRecentFeedback();
+
+                    if ($mostRecentFeedback != null) {
+                        $comment = $mostRecentFeedback->getComment();
+                    } else {
+                        $comment = '';
+                    }
 
                     if ($assessment instanceof Task) {
 
@@ -260,13 +269,19 @@ class Controller extends Base
                         }
 
                         $data[$title] = $result;
+                        $data[$title . " (Normalized)"] = '';
+                        $data[$title . " (Comment)"] = $comment;
                     } else {
                         $data[$title] = $assessment->getHumanReadableMark($student, true);
+                        $data[$title . " (Normalized)"] = $assessment->getNormalisedMark($student, true);
+                        $data[$title . " (Comment)"] = $comment;
                     }
                 }
                 else
                 {
                     $data[$title] = '';
+                    $data[$title . " (Normalized)"] = '';
+                    $data[$title . " (Comment)"] = '';
                 }
 
             }
