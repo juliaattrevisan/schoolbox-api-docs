@@ -464,6 +464,18 @@
                     // Only if the calendar view has changed
                     var currentView = calendar.fullCalendar('getView');
                     if (previousView.type != currentView.type) {
+                        // Timeline term view: skip back to the first day of the 6-month cycle
+                        if (currentView.type == 'timelineTerm') {
+                            var date = calendar.fullCalendar('getDate').clone().date(1);
+                            if (date.month() <= 6) {
+                                // Moment months start at 0 :/
+                                date = date.month(0);
+                            } else {
+                                date = date.month(6);
+                            }
+                            calendar.fullCalendar('gotoDate', date);
+                        }
+
                         pushCurrentCalendarState();
                     }
                     previousView = currentView;
