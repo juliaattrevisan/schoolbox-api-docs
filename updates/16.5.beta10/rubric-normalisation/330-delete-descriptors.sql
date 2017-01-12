@@ -7,6 +7,7 @@ WHERE id IN (
     SELECT rd.id FROM rubric_descriptor rd
     LEFT JOIN rubric_level rl ON rl.id = rd.level_id
     WHERE rl.id IS NULL
+    ORDER BY rd.id
   ) t
 );
 
@@ -15,9 +16,11 @@ WHERE id IN (
 DELETE FROM rubric_descriptor
 WHERE id IN (
   SELECT * FROM (
-    SELECT rd.id FROM rubric_descriptor rd
+    SELECT rd.id
+    FROM rubric_descriptor rd
     LEFT JOIN rubric_criterion rc ON rc.id = rd.criterion_id
     WHERE rc.id IS NULL
+    ORDER BY rd.id
   ) t
 );
 
