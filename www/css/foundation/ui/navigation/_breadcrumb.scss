@@ -37,7 +37,7 @@ $breadcrumb-active-bg-color: $content-ui-selected;
 *  These sit at the top of the page
 */
 .breadcrumb {
-	margin: 0 0 rem-calc(($base-font-size)) 0;
+	margin: 0;
 	list-style: none;
 	overflow: hidden;
 	li{

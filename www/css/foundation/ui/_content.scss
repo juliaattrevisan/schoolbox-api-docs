@@ -626,15 +626,14 @@ $rotate-th-width: $square-grid-td-size;
 
 %container {
 	background-color: $container-bg;
-	margin-bottom: rem-calc(($base-font-size));
+	margin-bottom: $base-font-size;
 }
 
 %content {
-	@media #{$small-up} {
-		padding: rem-calc(($base-font-size - 4));
-	}
-	@media #{$large-up} {
-		padding: rem-calc(($base-font-size));
+	padding: rem-calc(($base-font-size - 4));
+
+	p:last-child{
+		margin: 0;
 	}
 }
 
