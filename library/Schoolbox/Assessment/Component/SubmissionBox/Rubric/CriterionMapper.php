@@ -16,6 +16,7 @@ use Schoolbox;
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Criterion createModel($idValue = null)
  * @method Criterion findById($id)
+ * @method Criterion[] findByColumnList($columnList, $options = array())
  * @method Criterion findOneByColumnList($columnList, $order = array())
  */
 class CriterionMapper extends Schoolbox\Mapper {

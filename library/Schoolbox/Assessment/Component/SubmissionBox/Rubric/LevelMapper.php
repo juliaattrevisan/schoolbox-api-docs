@@ -67,7 +67,7 @@ class LevelMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = new Collection();
+        $c = $this->createCollection();
 
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $model = $this->hydrate($r);

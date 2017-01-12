@@ -15,12 +15,14 @@ use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 
 /**
  * Class DescriptorMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Descriptor createModel($idValue = null)
+ * @method Descriptor[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  * @method Descriptor findOneByColumnList($columnList, $order = [])
  * @method Descriptor hydrate(array $row, $alias = '', $callback = null)
  */

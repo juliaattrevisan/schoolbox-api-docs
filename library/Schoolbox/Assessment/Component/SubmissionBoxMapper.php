@@ -24,14 +24,17 @@ use Schoolbox\User;
 use External_Markbook;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\GenericCollection;
 
 /**
  * Class SubmissionBoxMapper
  *
  * @package Schoolbox\Assessment\Component
+ * @method SubmissionBox[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  * @method SubmissionBox createModel($id=null)
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
+ * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = array())
  */
 class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInterface
 {

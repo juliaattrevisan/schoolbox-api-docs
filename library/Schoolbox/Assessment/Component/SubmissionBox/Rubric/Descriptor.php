@@ -42,7 +42,7 @@ class Descriptor implements ISoftDeletable
      * @param  Criterion $criterion
      * @return $this
      */
-    public function setCriterion($criterion)
+    public function setCriterion(Criterion $criterion)
     {
         $this->criterion = $criterion;
         return $this;
@@ -86,7 +86,7 @@ class Descriptor implements ISoftDeletable
      * @param Level $level
      * @return static
      */
-    public function setLevel($level)
+    public function setLevel(Level $level)
     {
         $this->level = $level;
         return $this;
