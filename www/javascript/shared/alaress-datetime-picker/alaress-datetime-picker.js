@@ -48,6 +48,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
     var options = {
         displayFormat: 'd/m/Y h:iK',
         displayFormatDate: 'd/m/Y',
+        databaseFormat: 'Y-m-d h:i:s',
         type: event
     };
 
@@ -111,8 +112,8 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                     $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
 
-                        // console.log(window.pickerInstance[pickerId].input.value);
-                        // element.val(window.pickerInstance[pickerId].input.value);
+                        console.log(window.pickerInstance[pickerId].input.value);
+                        element.val(window.pickerInstance[pickerId].input.value);
 
 
 
@@ -143,11 +144,9 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
             } else if (picker.data('status') == 'loaded') {
 
-                // Put the elements current value back in to the modal just in case it had changed somehow
-
-                // var pickerDisplay = $('#pickerDisplay' + pickerId);
-                // var originalField = $('#' + pickerDisplay.data('originalId'));
-                window.pickerInstance[pickerId].setDate(element.val());
+                // Use Y-m-d to avoid mis interpreting d/m/Y
+                var formatDate = moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat));
+                window.pickerInstance[pickerId].setDate(formatDate);
 
                 $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
 

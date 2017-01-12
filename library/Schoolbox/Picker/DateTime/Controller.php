@@ -59,7 +59,7 @@ class Controller extends Base
         $terms = $this->getTerms();
         $value = \Alaress_Date_Format::newLocal(urldecode($value));
         $timetableDayNumber = $this->getTimetableDay($value);
-
+new \Alaress_Probe($value->geJSDate());
         $this->getResponse()->content->set(
             array(
                 'template' => '@pickerDatetime/picker.twig',
@@ -67,7 +67,7 @@ class Controller extends Base
                 'data' => [
                     'id' => $id,
                     //Pass unix timestamp to flatpicker, it misinterprets day and month in d/m/Y format
-                    'value' => $value->getUnixTimeStamp(),
+                    'value' => $value->geJSDate(),
                     'type' => $type,
                     'displayFormat' => 'd/m/Y h:iK',
                     'displayFormatDate' => 'd/m/Y',

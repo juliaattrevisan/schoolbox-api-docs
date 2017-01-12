@@ -373,13 +373,13 @@
 
     {# Setup calendar #}
     var newDate, latestDate;
-    alert(newDate);
+
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
-        defaultDate: '{{ value }}',
+        defaultDate: new Date({{ value }}),
         dateFormat: '{{ displayFormat }}',
         inline: true,
         altInput: false,
-        altFormat: '{{ displayFormat }}',
+        {#altFormat: '{{ displayFormat }}',#}
         enableTime: true,
         allowInput: true,
         disableMobile: true,
@@ -415,14 +415,10 @@
                     calendarDiv.addClass('allDay');
                     calendarDiv.removeClass('hasTime');
                     $('#allday').val(1);
-                    {# Get rid of time #}
-                    var allDay = moment(instance.input.value, convertFormat('{{ displayFormat }}')).format(convertFormat('{{ displayFormatDate }}'));
-                    console.log(instance.input.value);
-                    console.log('{{ value }}');
+                    // Get rid of time
+                    var allDay = moment(instance.input.value, convertFormat('{{ displayFormat }}')).format(convertFormat('Y-m-d'));
                     instance.setDate(allDay);
                     $('*[data-pickerid="{{ id }}"]').val(allDay);
-
-
                 }
                 else {
                     $('#allday').val(0);
@@ -431,7 +427,6 @@
                     calendarDiv.removeClass('allDay');
                 }
             });
-
         },
         onChange: function(selectedDates, dateString, instance) {
             alert('onchange: '+dateString);
@@ -523,6 +518,12 @@
                 {% endif %}
             }
             latestDate = newDate;
+        },
+        onValueUpdate: function (selectedDates, dateStr, instance) {
+          alert('onupdate '+dateStr);
+        },
+        onClose: function(selectedDates, dateStr, instance){
+            alert('onclose '+dateStr);
         }
     });
 </script>
