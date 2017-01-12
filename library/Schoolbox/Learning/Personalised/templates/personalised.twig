@@ -121,11 +121,11 @@
          */
         var convertDurationUnitToViewType = function(durationUnit, defaultView) {
             switch (durationUnit) {
+                case 'term':
+                    return 'timelineTerm';
+
                 case 'week':
                     return 'timelineTwoWeek';
-
-                case 'day':
-                    return 'timelineTwoDay';
 
                 case 'month':
                     return 'timelineTwoMonth';
@@ -174,11 +174,9 @@
          */
         var getDurationUnitFromView = function(view) {
             switch (view.type) {
+                case 'timelineTerm':
                 case 'timelineTwoMonth':
                     return 'month';
-
-                case 'timelineTwoWeek':
-                    return 'week';
 
                 case 'timelineTwoDay':
                     return 'day';
@@ -254,18 +252,18 @@
                 allDaySlot: false,
                 defaultDate: calendarParams.date,
                 views: {
+                    timelineTerm: {
+                        type: 'timeline',
+                        duration: { months: 6 },
+                        slotDuration: { days: 1 },
+                        slotLabelFormat: { weeks: 1 },
+                        slotLabelInterval: { weeks: 1 },
+                        buttonText: 'Term'
+                    },
                     timelineTwoMonth: {
                         type: 'timeline',
                         duration: { months: 2 },
                         buttonText: 'Month'
-                    },
-                    timelineTwoWeek: {
-                        type: 'timeline',
-                        duration: { weeks: 2 },
-                        buttonText: 'Week',
-                        slotLabelInterval: {
-                            hours: 6
-                        }
                     },
                     timelineTwoDay: {
                         type: 'timeline',
@@ -284,7 +282,7 @@
                 header: {
                     left: 'prevWindow,today,nextWindow',
                     center: 'title',
-                    right: 'timelineTwoMonth,timelineTwoWeek,timelineTwoDay'
+                    right: 'timelineTerm,timelineTwoMonth,timelineTwoDay'
                 },
                 events: function(start, end, timezone, callback) {
                     $.ajax({
