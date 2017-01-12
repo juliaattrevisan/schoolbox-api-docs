@@ -138,7 +138,7 @@ class Factory
         return [
             'id'         => $resourceType.'-'.$assessable->getId().'-bounds',
             'editable'   => false,
-            'start'      => $assessable->getPublishAt()->getDatabase(),
+            'start'      => $assessable->getOpenAt()->getDatabase(),
             'end'        => $assessable->getDueAt()->getDatabase(),
             'allDay'     => true,
             'resourceId' => $folder->getId().'-'.$resourceType,
@@ -166,7 +166,7 @@ class Factory
         Collection $participation
     ) {
         // Find participation
-        $start = $assessable->getPublishAt();
+        $start = $assessable->getOpenAt();
         $end   = $assessable->getDueAt();
         foreach ($participation as $participant) {
             /** @var Participant\Model $participant */
