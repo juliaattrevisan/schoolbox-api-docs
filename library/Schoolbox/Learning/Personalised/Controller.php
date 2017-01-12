@@ -213,12 +213,7 @@ class Controller extends Base
             }
 
             // Validate this assessment can even be moved.
-            // Special case: due works with no online submission have no open date.
-            // Use their publish date instead.
             $assessmentOpenDate = $assessment->getOpenAt();
-            if ($assessmentOpenDate->isNull()) {
-                $assessmentOpenDate = $assessment->getPublishAt();
-            }
             if ($assessmentOpenDate->isNull()) {
                 $this->buildJsonResponse('This assessment does not have an open date', 403);
                 return;
