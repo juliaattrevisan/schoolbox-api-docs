@@ -166,18 +166,19 @@ class Factory
         Collection $participation
     ) {
         // Find participation
-        $start = $assessable->getOpenAt();
-        $end   = $assessable->getDueAt();
+        $assessmentStart = $studentStart = $assessable->getOpenAt();
+        $assessmentEnd   = $studentEnd   = $assessable->getDueAt();
         foreach ($participation as $participant) {
             /** @var Participant\Model $participant */
             if ($assessable->getId() == $participant->getAssessment()->getId()) {
                 // Set times from participation
                 if (!$participant->getOpenDate()->isNull()) {
-                    $start = $participant->getOpenDate();
+                    $studentStart = $participant->getOpenDate();
                 }
                 if (!$participant->getDueDate()->isNull()) {
-                    $end = $participant->getDueDate();
+                    $studentEnd = $participant->getDueDate();
                 }
+                break;
             }
         }
 
@@ -207,17 +208,19 @@ class Factory
             'id'         => $resourceType.'-'.$assessable->getId(),
             'title'      => $assessable->getTitle(),
             'editable'   => true,
-            'start'      => $start->getDatabase(),
-            'end'        => $end->getDatabase(),
+            'start'      => $studentStart->getDatabase(),
+            'end'        => $studentEnd->getDatabase(),
             'allDay'     => true,
             'resourceId' => $folder->getId().'-'.$resourceType,
             'constraint' => $resourceType.'-'.$assessable->getId().'-bounds',
             'className'  => $className,
             'meta'       => [
-                'type'         => $assessable->getFamilyName(),
-                'assessmentId' => $assessable->getId(),
-                'description'  => \Scrub::html($assessable->getDescription()),
-                'link'         => $this->generateLink($assessable),
+                'type'            => $assessable->getFamilyName(),
+                'assessmentId'    => $assessable->getId(),
+                'description'     => \Scrub::html($assessable->getDescription()),
+                'link'            => $this->generateLink($assessable),
+                'assessmentStart' => $assessmentStart->getDatabase(),
+                'assessmentEnd'   => $assessmentEnd->getDatabase(),
             ],
         ];
     }
