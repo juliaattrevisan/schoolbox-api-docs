@@ -432,6 +432,13 @@
                             }
                         }
                     },
+                    today: {
+                        text: 'Today',
+                        click: function() {
+                            calendar.fullCalendar('today');
+                            pushCurrentCalendarState();
+                        }
+                    },
                     nextWindow: {
                         icon: 'right-single-arrow',
                         click: function() {
