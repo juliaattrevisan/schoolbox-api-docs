@@ -368,10 +368,13 @@ class ImportFactory
     /**
      * Load all Assessments inside Project Specs
      *
+     * Normally we are un-interested in deleted specs. The exception is when we are adding as part of a pair.
+     *
      * @param GenericCollection|GenericCollection[] $assessmentSpecs   - Sets of AssessmentSpecs, indexed by UnitSpec.id
+     * @param bool $includeDeleted                                     - If true, also get deleted items
      * @return GenericCollection
      */
-    protected function loadProjectSpecAssessables(GenericCollection $assessmentSpecs)
+    protected function loadProjectSpecAssessables(GenericCollection $assessmentSpecs, $includeDeleted = false)
     {
         /** @var Project[] $projectSpecs */
         $projectSpecs = new GenericCollection(Project::class);
@@ -407,6 +410,9 @@ class ImportFactory
             LEFT JOIN task stk           ON stk.assessment_id = sa.id";
         $pb = new PredicateBuilder($this->database, '');
         $pb->equals('p.assessment_id', $projectSpecs->keys());
+        if(!$includeDeleted){
+            $pb->isNull('sa.deleted_at');
+        }
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
 
         $statement = $this->database->prepare($query);
@@ -562,7 +568,7 @@ class ImportFactory
         }
 
         // Build the AssessmentSpecs inside the ProjectSpecs
-        $this->loadProjectSpecAssessables($unitProjectSpecs);
+        $this->loadProjectSpecAssessables($unitProjectSpecs, true);
 
         // Build the AssessmentImpls inside the ProjectImpls
         $this->loadProjectImplAssessables($unitProjectImpls, $assessmentImplToSpecMap);
