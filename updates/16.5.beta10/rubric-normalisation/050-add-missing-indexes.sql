@@ -1,0 +1,3 @@
+-- We're gonna need this ...
+ALTER TABLE `rubric_descriptor`
+  ADD INDEX `level_id` (`level_id`);

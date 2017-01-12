@@ -11,10 +11,6 @@ WHERE id IN (
  ) t
 );
 
--- We're gonna need this ...
-ALTER TABLE `rubric_descriptor`
-  ADD INDEX `level_id` (`level_id`);
-
 -- If a Level has no Descriptors, delete the Level
 DELETE FROM rubric_level
 WHERE id IN (
