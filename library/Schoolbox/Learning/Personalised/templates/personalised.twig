@@ -517,7 +517,9 @@
 
                 eventRender: function(event, element, view) {
                     // Set a title
-                    element.attr('title', event.title + ' ('+$.fullCalendar.formatRange(event.start, event.end, 'Do MMMM YYYY')+')');
+                    if ('title' in event) {
+                        element.attr('title', event.title + ' ('+$.fullCalendar.formatRange(event.start, event.end, 'Do MMMM YYYY')+')');
+                    }
                 },
 
                 eventAfterAllRender: function(view) {
