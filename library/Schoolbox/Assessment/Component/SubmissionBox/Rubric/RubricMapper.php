@@ -28,7 +28,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Rubric\Rubric as BaseRubric;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
@@ -384,11 +383,8 @@ class RubricMapper
     {
         $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $box->getId());
 
-        /** @var Collection|SubmissionBox\Rubric\Descriptor[] $descriptorCollection */
-        $descriptorCollection = SubmissionBox\Rubric\DescriptorMapper::getInstance()->findByColumnList([
-            'level_id' => $levelIds,
-            'valid'    => true
-        ]);
+        /** @var Collection|Descriptor[] $descriptorCollection */
+        $descriptorCollection = DescriptorMapper::getInstance()->findByColumnList(['level_id' => $levelIds]);
 
         $descriptors = [];
 
@@ -433,6 +429,7 @@ class RubricMapper
             // I don't think it's possible to have a resultSet set for a subBox, without having an attached rubric.
             // Instead, the resultSet can be used when creating the rubric, it's never stored against the subBox.
             // If this is correct, the whole IF construct can get deleted.
+            // TODO need to migrate data first, then delete
 
             if ($resultSetId > 0) {
                 // got a resultSet - we're going to fake that into a descriptor grid
@@ -861,8 +858,8 @@ class RubricMapper
             JOIN rubric_usage ru ON rc.id = ru.criterion_id
             JOIN submission_box sb ON ru.submission_box_id = sb.id
             JOIN assessment a ON sb.assessment_id = a.id
-            JOIN rubric_level rl ON sb.id = rl.box_id
-            JOIN rubric_descriptor rd ON rd.level_id = rl.id AND rd.criterion_id = rc.id AND rd.valid IS TRUE
+            JOIN rubric_level rl ON sb.id = rl.box_id AND rl.deleted_at IS TRUE
+            JOIN rubric_descriptor rd ON rd.level_id = rl.id AND rd.criterion_id = rc.id AND rd.deleted_at IS TRUE
             JOIN rubric_mark rm ON rm.descriptor_id = rd.id AND rm.valid IS TRUE
             WHERE {$where}
             ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC, rm.tstamp
