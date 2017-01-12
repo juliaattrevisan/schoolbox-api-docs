@@ -18,13 +18,27 @@
         border-color: rgb(247, 206, 204);
         background-color: rgb(247, 206, 204);
     }
+    .fc-event.fail .fc-title:before {
+        /* cross */
+        content: "\e60d ";
+    }
+
     .fc-event.mastered {
         border-color: rgb(213, 231, 212);
         background-color: rgb(213, 231, 212);
     }
+    .fc-event.mastered .fc-title:before {
+        /* tick */
+        content: "\e604 ";
+    }
+
     .fc-event.notmarked {
         border-color: rgb(255, 242, 205);
         background-color: rgb(255, 242, 205);
+    }
+    .fc-event.notmarked .fc-title:before {
+        /* clock */
+        content: "\e66e ";
     }
 </style>
 
