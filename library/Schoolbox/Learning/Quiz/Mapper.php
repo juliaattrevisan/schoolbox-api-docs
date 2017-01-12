@@ -57,8 +57,6 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
-        $this->joinsVia('curriculum_node_for_assess', Node\Mapper::class, 'id', 'curriculum_node_id', 'assess_id', null,
-            null, null, 'curriculumNodes');
 
         $this->hasJoin('sections', array(
             'mapper'    => QuizSectionMapper::class,
@@ -552,23 +550,13 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
                 {$this->getJoinColumnString('category', 'c')},
                 {$this->getJoinColumnString('work_type', 't')},
                 {$this->getJoinColumnString('user', 'u')},
-                {$this->getJoinColumnString('curriculum_node_for_assess', 'cn')},
-                {$this->getJoinColumnString('curriculum_node_for_assess.level', 'cnl')},
-                {$this->getJoinColumnString('curriculum_node_for_assess.level.source', 'cnls')},
-                {$this->getJoinColumnString('curriculum_node_for_assess.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_assess.area.source', 'cnas')},
                 {$this->getJoinColumnString('am', 'am')}
             FROM
                 `{$this->getTable()}` `a`
                 LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
                 LEFT JOIN {$this->getJoinSql('work_type', 'a', 't')}
                 LEFT JOIN {$this->getJoinSql('user', 'a', 'u')}
-                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess', 'a', 'cn')}
-                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.level', 'cn', 'cnl')}
-                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.level.source', 'cnl', 'cnls')}
-                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.area', 'cn', 'cna')}
-                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.area.source', 'cna', 'cnas')}
-				LEFT JOIN {$this->getJoinSql('am', 'a', 'am')}
+                LEFT JOIN {$this->getJoinSql('am', 'a', 'am')}
             WHERE
                 `a`.assess_id = :id
         ");
@@ -584,13 +572,6 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
                 $quiz->setWorkType($this->hydrateJoin($row, 'work_type', 't'));
                 $quiz->setUser($this->hydrateJoin($row, 'user', 'u'));
                 $quiz->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'));
-            }
-            // Hydrate curriculum nodes
-            /** @var Node\Model $curriculumNode */
-            $curriculumNode = $this->getJoinMapper('curriculum_node_for_assess')
-                ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-            if ($curriculumNode->getId()) {
-                $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
             }
         }
 

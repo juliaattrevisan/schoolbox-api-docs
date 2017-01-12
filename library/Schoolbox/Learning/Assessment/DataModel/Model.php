@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Course\Task;
@@ -184,6 +185,13 @@ class Model implements ISoftDeletable
     protected $specificationAssessment;
 
     /**
+     * A collection of Curriculum Nodes
+     *
+     * @var Collection
+     */
+    private $curriculumNodes;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -195,6 +203,8 @@ class Model implements ISoftDeletable
         $this->createdAt   = new Alaress_Date_NullDate();
         $this->updatedAt   = new Alaress_Date_NullDate();
         $this->deletedAt   = new Alaress_Date_NullDate();
+
+        $this->setCurriculumNodes(new Collection());
     }
 
     function __clone()
@@ -692,6 +702,25 @@ class Model implements ISoftDeletable
     public function setSpecificationAssessment(Model $specificationAssessment = null)
     {
         $this->specificationAssessment = $specificationAssessment;
+        return $this;
+    }
+
+
+    /**
+     * @return Collection
+     */
+    public function getCurriculumNodes()
+    {
+        return $this->curriculumNodes;
+    }
+
+    /**
+     * @param Collection $curriculumNodes
+     * @return $this
+     */
+    public function setCurriculumNodes(Collection $curriculumNodes)
+    {
+        $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
 }
