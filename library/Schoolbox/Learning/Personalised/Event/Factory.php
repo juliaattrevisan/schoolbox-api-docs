@@ -88,7 +88,7 @@ class Factory
                 'end'        => $context->getDueDate()->getDatabase(),
                 'allDay'     => true,
                 'resourceId' => $folder->getId().'-unit',
-                'className'  => ['unit'],
+                'className'  => ['unit', 'readonly'],
                 'meta'       => [
                     'type'        => 'unit',
                     'description' => '',
@@ -107,10 +107,10 @@ class Factory
 
             } elseif ($assessable instanceof Project) {
                 // If this is a project - get it and its constituents
-                $result->add(
-                    $this->buildAssessableEvent($assessable, $folder, 'project', $student, $participation)
-                    + ['editable' => false,]
-                );
+                $projectRender = $this->buildAssessableEvent($assessable, $folder, 'project', $student, $participation);
+                $projectRender['editable']    = false;
+                $projectRender['className'][] = 'readonly';
+                $result->add($projectRender);
 
                 foreach ($assessable->getAssessables() as $activity) {
                     // Background for the bounds
@@ -143,6 +143,7 @@ class Factory
             'allDay'     => true,
             'resourceId' => $folder->getId().'-'.$resourceType,
             'rendering'  => 'background',
+            'className'  => [$resourceType],
             'meta'       => [],
         ];
     }
