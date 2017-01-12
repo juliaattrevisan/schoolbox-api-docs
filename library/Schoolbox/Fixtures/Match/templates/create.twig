@@ -9,6 +9,7 @@
 <script type="text/javascript">
     $(function() {
         $('#matchForm').alaressValidate({
+            ignore: ':hidden',
             rules: {
                 venueId: {
                     required: true,
@@ -35,6 +36,12 @@
                 awayTeamId: {
                     required: true,
                     minlength: 1
+                },
+                'itinerary[date][]': {
+                    datepickerDate: true
+                },
+                'itinerary[time][]': {
+                    timepickerTime: true
                 }
             },
             messages: {
