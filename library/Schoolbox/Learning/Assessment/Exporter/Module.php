@@ -21,6 +21,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Assessment\Replicator;
 
 /**
  * Module for assessment export options.
@@ -73,7 +75,7 @@ class Module extends BaseModule
         }
 
         return [
-            'assessment' => $assessment
+            'assessmentSpec' => $assessment
         ];
     }
 
@@ -97,7 +99,11 @@ class Module extends BaseModule
                 [
                     'access'                   => Access::getInstance(),
                     'assessmentDataSource'     => $this->getAssessmentMapperProxy(),
-                    'unitImplementationMapper' => $this->getUnitImplementationMapper()
+                    'unitImplementationMapper' => $this->getUnitImplementationMapper(),
+                    'replicator'               => $injector->lazyNew(Replicator::class, [
+                        'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+                        'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
+                    ]),
                 ]
             )
         );
@@ -112,6 +118,16 @@ class Module extends BaseModule
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return QuizMapper
+     */
+    protected function getQuizMapper()
+    {
+        /** @var QuizMapper $quizMapper */
+        $quizMapper = $this->getMapperFactory()->get(QuizMapper::class);
+        return $quizMapper;
     }
 
     /**

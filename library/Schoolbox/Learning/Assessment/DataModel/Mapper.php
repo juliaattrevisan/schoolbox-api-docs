@@ -54,7 +54,7 @@ class Mapper extends BaseMapper
         $this->uses('close_date', self::TYPE_DATETIME);
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->uses('duration', self::TYPE_INTEGER);
+        $this->uses('default_open_span', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

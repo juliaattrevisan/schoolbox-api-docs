@@ -14,9 +14,9 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -42,13 +42,7 @@ use \Component_InstanceMapper;
 use \Component_ConfigDefinition;
 use \Component_ConfigDefinitionMapper;
 use \Component_ConfigMapper;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
-use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
+use Schoolbox\Learning\Assessment\Replicator;
 
 class Controller extends Base\Base
 {
@@ -103,17 +97,8 @@ class Controller extends Base\Base
     /** @var ErrorMapper */
     private $errorMapper;
 
-    /** @var QuizMapper */
-    private $quizMapper;
-
-    /** @var QuizSectionMapper */
-    private $quizSectionMapper;
-
-    /** @var QuizQuestionMapper */
-    private $quizQuestionMapper;
-
-    /** @var QuizSolutionMapper */
-    private $quizSolutionMapper;
+    /** @var Replicator */
+    private $replicator;
 
     /**
      * @var ImportFactory
@@ -325,7 +310,7 @@ class Controller extends Base\Base
 
         // build implementation objects from the specs
         $unitSpecs = $this->getUnitSpecificationMapper()->findAllByCourseId($courseSpecId);
-        $unitImpls = new Collection();
+        $unitImpls = $this->getUnitImplementationMapper()->createCollection();
         foreach ($unitSpecs as $spec) {
             $unitImpls->add((new UnitImplementation())
                 ->setTitle($spec->getFolder()->getName())
@@ -493,11 +478,18 @@ class Controller extends Base\Base
             return;
         }
 
+        // How many Units are already imported? (cf. new import)
+        $countImportedUnits = 0;
 
-        $importFactory = $this->getImportFactory();
         $unitImpls = $this->getUnitImplementationMapper()->createCollection();
         foreach ($units as $unit) {
             if (isset($unit['import'])) {
+
+                // Are we modifying an already imported Unit?
+                if($unit['unit_impl_id']){
+                    $countImportedUnits++;
+                }
+
                 $unitImpl = new UnitImplementation();
                 $unitImpl->setId($unit['unit_impl_id']); // ID will be null if UnitSpec not yet imported
                 $unitSpec = new UnitSpecification();
@@ -509,36 +501,13 @@ class Controller extends Base\Base
             }
         }
 
-        if ('import' == $action) {
+        $importFactory = $this->getImportFactory();
+
+        // If not modifying any already imported Units, we can treat this modification merely as a fresh import.
+        if ('import' == $action || !$countImportedUnits) {
             $dto = $importFactory->buildForNewImport($unitImpls);
-            $assessmentPairs = $dto->getAssessmentPairs();
-
-            foreach ($assessmentPairs as $assessmentPair) {
-                foreach ($assessmentPair as $pair) {
-                    $specification = $pair->getSpecification();
-                    if ($specification instanceof Project) {
-                        $specification->setAssessables(
-                            $this->getAssessmentMapperProxy()->findAllByProjectId($specification->getId())
-                        );
-                    }
-                }
-            }
-
         } elseif ('modify' == $action) {
             $dto = $importFactory->buildForImportModify($unitImpls);
-            $assessmentPairs = $dto->getAssessmentPairs();
-
-            foreach ($assessmentPairs as $assessmentPair) {
-                foreach ($assessmentPair as $pair) {
-                    $implementation = $pair->getImplementation();
-                    if ($implementation instanceof Project) {
-
-                        $implementation->setAssessables(
-                            $this->getAssessmentMapperProxy()->findAllByProjectId($implementation->getId())
-                        );
-                    }
-                }
-            }
         } else {
             throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
         }
@@ -606,7 +575,9 @@ class Controller extends Base\Base
         // 4. Traverse POST-graph
         //   4.1 if(entity not in DB-graph)
         //       4.1.1 create entity
-        //       4.1.2 save entity
+        //   4.2 else(entity in DB-graph)
+        //       4.2.1 update entity
+        //   4.3 save entity
 
 
         // On new-import, we may be creating multiple courseImpls.
@@ -655,20 +626,6 @@ class Controller extends Base\Base
                 if (!array_key_exists($unitSpec->getId(), $unitImplData)) {
                     // Delete the unitImpl. Cascading the delete to subsidiary IAssessables
                     $this->getUnitImplementationMapper()->delete($unitImpl);
-                } // Else UnitImpl still selected
-                else {
-                    // Delete any Assessments in the UnitImpl if de-selected by user
-                    foreach ($unitImpl->getAssessables() as $assessableImpl) {
-
-                        $assessmentImplData = $unitImplData[$unitSpec->getId()]['a'][$assessableImpl->getId()];
-                        // Is this Assessment a impl or spec? (we ignore specs, nothing to delete)
-                        if ($assessmentImplData['impl_id']) {
-                            // Did user de-select this Assessment ?
-                            if (!isset($assessmentImplData['checked'])) {
-                                $this->getAssessmentMapperProxy()->delete($assessableImpl);
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -723,114 +680,10 @@ class Controller extends Base\Base
 
                     if (is_array($unitPair['a'])) {
                         // Create/Update AssessmentImpls
-                        foreach ($unitPair['a'] as $assessmentId => $aData) {
-                            // Ignore unchecked items. ( If they were already imported, they were deleted above.)
-                            if (!isset($aData['checked'])) {
-                                continue;
-                            }
+                        foreach ($unitPair['a'] as $aData) {
 
-                            $assessmentMapperProxy = $this->getAssessmentMapperProxy();
+                            $this->parseAssessmentForm($unitImpl, $aData);
 
-                            // Get Spec if cloned, or null if AssessmentImpl created in UnitImpl
-                            try {
-                                $assessmentSpec = $aData['spec_id'] ? $assessmentMapperProxy->findById($aData['spec_id']) : null;
-                            } catch (MapperException\Deleted $e) {
-                                $assessmentSpec = $e->getDeletedObject();
-                            }
-
-                            // Is this a creation from the spec ?
-                            if (!$aData['impl_id']) {
-                                $assessmentImpl = $assessmentSpec->cloneForCopy();
-                                // TODO need to implement __clone() on DueWork to clone Rubric correctly
-                                $assessmentImpl->setContext($unitImpl);
-                                $unitImpl->getAssessables()->add($assessmentImpl);
-                            } // Else we have been passed the Assessment Impl
-                            else {
-                                // Retrieve AssessmentImpl from UnitImpl
-                                $filter = function ($impl) use ($assessmentId) {
-                                    /** @var IAssessable $impl */
-                                    return $impl->getId() == $assessmentId;
-                                };
-                                $assessmentImpl = $unitImpl->getAssessables()->filter($filter)->first();
-                            }
-
-                            // Don't forget to set the spec assessment on the impl
-                            $assessmentImpl->setSpecificationAssessment($assessmentSpec);
-
-                            // Set/Update Dates
-                            foreach ($aData['dates'] as $property => $localShort) {
-                                $method = "set{$property}At";
-                                if (!method_exists($assessmentImpl, $method)) {
-                                    $this->sendError("Invalid date property: $property");
-                                    return;
-                                }
-                                $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
-                            }
-                            $assessmentMapperProxy->save($assessmentImpl);
-
-                        // Did we just clone a Project? If so we need to store the dates for each assessment inside it
-                        if ($assessmentImpl instanceof Project){
-                            $projectAssessables = $assessmentImpl->getAssessables();
-                            if(is_array($unitImplData[$unitSpec->getId()]['p'][$assessmentImpl->getId()]['a'])) {
-                                $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentImpl->getId()]['a'];
-                            }
-                            else {
-                                $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentSpec->getId()]['a'];
-                            }
-
-                            foreach ($projectAssessables as $assessableCurrent) {
-
-                                $apData = isset($pData[$assessableCurrent->getId()]) ? $pData[$assessableCurrent->getId()] : $pData[$assessableCurrent->getSpecificationAssessment()->getId()];
-
-                                // Did user de-select this Assessment ?
-                                if (!is_array($apData) ) {
-                                    $this->getAssessmentMapperProxy()->delete($assessableCurrent);
-                                } else {
-                                    // Set/Update Dates
-                                    foreach ($apData['dates'] as $property => $localShort) {
-                                        $method = "set{$property}At";
-                                        if (!method_exists($assessmentImpl, $method)) {
-                                            $this->sendError("Invalid date property: $property");
-                                            return;
-                                        }
-                                        $assessableCurrent->$method(\Alaress_Date_Format::newLocalShort($localShort));
-                                    }
-                                    $assessmentMapperProxy->save($assessableCurrent);
-                                }
-                            }
-                        }
-
-                        // Did we just clone a Quiz?
-                        if(!$aData['impl_id'] && $assessmentImpl instanceof QuizAssessable){
-                            /** @var Quiz $quizSpec */
-                            $quizSpec = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentSpec->getId())->first();
-                            $quizSpec->setSections($this->getQuizSectionMapper()->findByColumn('assess_id', $quizSpec->getId()));
-
-                                foreach ($quizSpec->getSections() as $section) {
-                                    $questions = $this->getQuizQuestionMapper()->findByColumn('section_id', $section->getId());
-                                    $section->setQuestions($questions);
-                                }
-
-                                // Copy to our implementation
-                                /** @var Quiz $quizImpl */
-                                $quizImpl = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentImpl->getId())->first();
-                                $clone = clone $quizSpec;
-                                $quizImpl->setSections($clone->getSections());
-
-                                // Save
-                                foreach ($quizImpl->getSections() as $section) {
-                                    $section->setQuiz($quizImpl);
-                                    $this->getQuizSectionMapper()->save($section);
-
-                                    foreach ($section->getQuestions() as $question) {
-                                        $this->getQuizQuestionMapper()->save($question);
-                                        if ($question->getSolution() instanceof QuizSolution) {
-                                            $this->getQuizSolutionMapper()->save($question->getSolution());
-                                        }
-
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -872,6 +725,96 @@ class Controller extends Base\Base
         }
         $this->getResponse()->content->set($this->buildJsonOutput(['redirect' => $redirect]));
     }
+
+    /**
+     * Recursive method to create/update assessments using form data
+     *
+     * @param AssessmentContext $context
+     * @param array $data
+     * @var null|int      $data['spec_id']    Will be null if not imported from a Spec
+     * @var null|int      $data['impl_id']    Will be null if not yet imported
+     * @var null|1        $data['checked']    Did user check the item?
+     * @var null|string[] $data['dates']
+     * @var null|mixed[]  $data['a']          If this assessment is a Project, the data for its sub-assessables
+     */
+    protected function parseAssessmentForm(AssessmentContext $context, array $data)
+    {
+        $specId    = isset($data['spec_id']) ? $data['spec_id'] : null;
+        $implId    = isset($data['impl_id']) ? $data['impl_id'] : null;
+        $isChecked = isset($data['checked']);
+        $dateData  = isset($data['dates'])   ? $data['dates']   : null;
+        $subData   = isset($data['a'])       ? $data['a']       : null;
+
+        // Base Case #1 - Is item unchecked, and un-imported?
+        if(!$isChecked && !$implId){
+            return;
+        }
+
+        // Is this a creation from the spec ?
+        if (!$implId) {
+            $assessment = $this->getAssessmentMapperProxy()->findById($specId);
+        } // Else we have been passed the Assessment Impl
+        else {
+            // Retrieve AssessmentImpl from UnitImpl
+            $filter = function ($impl) use ($implId) {
+                /** @var IAssessable $impl */
+                return $impl->getId() == $implId;
+            };
+            $assessment = $context->getAssessables()->filter($filter)->first();
+        }
+
+        // Base Case #2 - Is item unselected ? (and already imported)
+        if (!$isChecked) {
+            $this->getAssessmentMapperProxy()->delete($assessment);
+            return;
+        }
+
+        // Item is checked.
+
+        // Apply dates regardless of whether it is a Spec or Impl. (If Spec, they will be cloned to the Impl)
+        $assessment = $this->applyDates($assessment, $dateData);
+
+        if(!$implId){
+            // INSERT - Create Impl from Spec
+            $newAssessment = $this->replicator->replicateInNewContext($assessment, $context);
+        } else {
+            // UPDATE
+            $newAssessment = null;
+            $this->getAssessmentMapperProxy()->save($assessment);
+        }
+
+        // Recursive case
+        if($subData){
+            foreach($subData as $subDatum){
+                /** @var Project $project */
+                $project = $newAssessment ?: $assessment;
+                $this->parseAssessmentForm($project, $subDatum);
+            }
+        }
+    }
+
+
+    /**
+     * Apply date strings from an array to the specified Assessment
+     *
+     * @param IAssessable $assessment
+     * @param string[] $dates
+     * @return IAssessable
+     */
+    protected function applyDates(IAssessable $assessment, array $dates)
+    {
+        // Set/Update Dates
+        foreach ($dates as $property => $localShort) {
+            $method = "set{$property}At";
+            if (!method_exists($assessment, $method)) {
+                throw new \DomainException("Invalid date property: $property");
+            }
+            $assessment->$method(\Alaress_Date_Format::newLocalShort($localShort));
+        }
+        return $assessment;
+    }
+
+
 
     /**
      * Attempts to find a Course Outline ComponentInstance on the specifed page
@@ -993,7 +936,9 @@ class Controller extends Base\Base
         }
 
         // Re-order UnitImpls alphabetically
-        $courseImpl->setUnits($courseImpl->getUnits()->sortBy('title', 'ASC'));
+        /** @var GenericCollection|UnitImplementation[] $orderedUnits */
+        $orderedUnits = $courseImpl->getUnits()->sortBy('title', 'ASC');
+        $courseImpl->setUnits($orderedUnits);
 
 
         // Find the owner of any Assessment so we can display, even though it is disabled
@@ -1493,74 +1438,20 @@ class Controller extends Base\Base
     }
 
     /**
-     * @return QuizMapper
+     * @return Replicator
      */
-    public function getQuizMapper()
+    public function getReplicator()
     {
-        return $this->quizMapper;
+        return $this->replicator;
     }
 
     /**
-     * @param QuizMapper $quizMapper
+     * @param Replicator $replicator
      * @return static
      */
-    public function setQuizMapper(QuizMapper $quizMapper)
+    public function setReplicator(Replicator $replicator)
     {
-        $this->quizMapper = $quizMapper;
-        return $this;
-    }
-
-    /**
-     * @return QuizSectionMapper
-     */
-    public function getQuizSectionMapper()
-    {
-        return $this->quizSectionMapper;
-    }
-
-    /**
-     * @param QuizSectionMapper $quizSectionMapper
-     * @return static
-     */
-    public function setQuizSectionMapper(QuizSectionMapper $quizSectionMapper)
-    {
-        $this->quizSectionMapper = $quizSectionMapper;
-        return $this;
-    }
-
-    /**
-     * @return QuizQuestionMapper
-     */
-    public function getQuizQuestionMapper()
-    {
-        return $this->quizQuestionMapper;
-    }
-
-    /**
-     * @param QuizQuestionMapper $quizQuestionMapper
-     * @return static
-     */
-    public function setQuizQuestionMapper(QuizQuestionMapper $quizQuestionMapper)
-    {
-        $this->quizQuestionMapper = $quizQuestionMapper;
-        return $this;
-    }
-
-    /**
-     * @return QuizSolutionMapper
-     */
-    public function getQuizSolutionMapper()
-    {
-        return $this->quizSolutionMapper;
-    }
-
-    /**
-     * @param QuizSolutionMapper $quizSolutionMapper
-     * @return static
-     */
-    public function setQuizSolutionMapper(QuizSolutionMapper $quizSolutionMapper)
-    {
-        $this->quizSolutionMapper = $quizSolutionMapper;
+        $this->replicator = $replicator;
         return $this;
     }
 }

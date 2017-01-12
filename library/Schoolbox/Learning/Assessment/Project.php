@@ -30,7 +30,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 class Project extends AbstractAssessment implements AssessmentContext
 {
     /**
-     * @var Collection|IAssessable[]
+     * @var GenericCollection|IAssessable[]
      */
     protected $assessables;
 
@@ -59,7 +59,7 @@ class Project extends AbstractAssessment implements AssessmentContext
          */
         parent::__construct();
 
-        $this->setAssessables(new Collection());
+        $this->assessables = new GenericCollection(IAssessable::class);
         $this->setSummator($summator);
     }
 
@@ -243,11 +243,7 @@ class Project extends AbstractAssessment implements AssessmentContext
     {
         /** @var Project $clone */
         $clone = parent::cloneForCopy();
-        $clonedAssessables = new GenericCollection(IAssessable::class);
-        foreach($clone->getAssessables() as $assessable){
-            $clonedAssessables->add($assessable->cloneForCopy());
-        }
-        $clone->setAssessables($clonedAssessables);
+        $clone->assessables = new GenericCollection(IAssessable::class);
         return $clone;
     }
 
@@ -255,7 +251,7 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
 
     /**
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      */
     public function getAssessables()
     {
@@ -263,12 +259,12 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
-     * @param Collection|IAssessable[] $assessables
+     * @param GenericCollection|IAssessable[] $assessables
      * @return self
      */
-    public function setAssessables($assessables)
+    public function setAssessables(GenericCollection $assessables)
     {
-        $this->assessables = $assessables;
+        $this->assessables->replaceWith($assessables);
         return $this;
     }
 

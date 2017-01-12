@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Assessment\Course\Import;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
@@ -27,10 +28,25 @@ class AssessmentPair
     private $implementation;
 
     /**
+     * Recursive to permit any level of Project nesting
+     *
+     * @var AssessmentPair[]|GenericCollection|null
+     */
+    private $assessmentPairs;
+
+    /**
+     * If this pair is a sub-pair (ie inside a Project) this points to parent Project pair.
+     *
+     * @var AssessmentPair|null
+     */
+    private $parentPair;
+
+    /**
      * @param IAssessable|null $spec
      * @param IAssessable|null $impl
+     * @param GenericCollection|AssessmentPair[]|null $subPairs
      */
-    public function __construct(IAssessable $spec = null, IAssessable $impl = null)
+    public function __construct(IAssessable $spec = null, IAssessable $impl = null, GenericCollection $subPairs = null)
     {
         // Ensure at least one is present
         if (is_null($spec) && is_null($impl)) {
@@ -57,6 +73,82 @@ class AssessmentPair
 
         $this->specification = $spec;
         $this->implementation = $impl;
+        $this->assessmentPairs = $subPairs ?: new GenericCollection(AssessmentPair::class);
+        foreach($this->assessmentPairs as $subPair){
+            $subPair->parentPair = $this;
+        }
+    }
+
+    /**
+     * If this pair is a sub-pair of a Project-pair, return the Project-pair.
+     *
+     * @return AssessmentPair|null
+     */
+    public function getParentPair()
+    {
+        return $this->parentPair;
+    }
+
+    /**
+     * Is this Assessment un-imported?
+     *
+     * @return bool
+     */
+    public function isSpecOnly()
+    {
+        return $this->specification && !$this->implementation;
+    }
+
+    /**
+     * Was this Assessment created directly in a Unit Implementation ?
+     *
+     * @return bool
+     */
+    public function isImplOnly()
+    {
+        return !$this->specification && $this->implementation;
+    }
+
+    /**
+     * Has this Assessment been imported from Unit Spec into Unit Impl ?
+     *
+     * @return bool
+     */
+    public function isPair()
+    {
+        return $this->specification && $this->implementation;
+    }
+
+    /**
+     * Gets the count of assessments in this assessment and its sub-assessments.
+     *
+     * For non-projects, this returns 1. For Projects it returns 1(this) + recursive sub-assessment count
+     *
+     * @return int
+     */
+    public function getAssessmentCount()
+    {
+        $count = 1;
+        foreach($this->assessmentPairs as $subPair){
+            $count += $subPair->getAssessmentCount();
+        }
+        return $count;
+    }
+
+    /**
+     * Gets the count of assessments implementation in this assessment and its sub-assessments.
+     *
+     * A pair counts towards count only if it contains an AssessmentImpl
+     *
+     * @return int
+     */
+    public function getAssessmentImplCount()
+    {
+        $count = $this->implementation ? 1 : 0;
+        foreach($this->assessmentPairs as $subPair){
+            $count += $subPair->getAssessmentImplCount();
+        }
+        return $count;
     }
 
     /**
@@ -73,5 +165,13 @@ class AssessmentPair
     public function getImplementation()
     {
         return $this->implementation;
+    }
+
+    /**
+     * @return GenericCollection|static[]
+     */
+    public function getSubPairs()
+    {
+        return $this->assessmentPairs;
     }
 }

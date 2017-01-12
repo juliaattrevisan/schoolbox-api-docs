@@ -58,7 +58,6 @@ class MapperProxy
      */
     protected $participantDataSource;
 
-
     /**
      * Class name of the model to associate with this mapper.
      *

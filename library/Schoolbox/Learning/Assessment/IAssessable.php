@@ -399,15 +399,19 @@ interface IAssessable extends ISoftDeletable
     public function setCloseAt(\Alaress_Date_Format $closeAt);
 
     /**
+     * Period in days to schedule an Assessment for during Course Import
+     *
      * @return int
      */
-    public function getDuration();
+    public function getDefaultOpenSpan();
 
     /**
-     * @param int $duration
+     * Period in days to schedule an Assessment for during Course Import
+     *
+     * @param int $defaultOpenSpan
      * @return $this
      */
-    public function setDuration($duration);
+    public function setDefaultOpenSpan($defaultOpenSpan);
 
     /**
      * Get the weight

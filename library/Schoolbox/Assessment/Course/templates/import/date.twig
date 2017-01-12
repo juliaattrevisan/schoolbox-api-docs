@@ -6,6 +6,7 @@
     dateProperty:     string - the name of the property on the object, eg 'publish'
     dateLabel:        string - (optional) the human-readable label to use
     dateSyncProperty: string - the end-date to sync to
+    disabled:         bool   - whether the input should be disabled
 #}
 
 {% if not inputPrefix %}{% set inputPrefix = 'a['~assessmentId~']' %}{% endif %}
@@ -23,9 +24,10 @@
            data-role="{{ dateProperty }}_date"
            data-datepicker
            data-assessment-id="{{ assessmentId }}"
-            {% if dateSyncProperty %}
+           {% if dateSyncProperty %}
            data-datepicker-sync
            data-datepicker-sync-enddate="#{{ id }}_{{ dateSyncProperty }}_date"
            {% endif %}
+           {% if disabled %}disabled{% endif %}
     />
 </div>

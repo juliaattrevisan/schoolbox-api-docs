@@ -12,6 +12,8 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use \Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use \Schoolbox\User;
 use \Schoolbox\Resource\Storage\Model as Storage;
 
@@ -145,7 +147,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
         $dueWork = $this->spawnDueWork();
         $quiz = $this->spawnQuiz();
 
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($task)
             ->add($dueWork)
             ->add($quiz));

@@ -1,0 +1,126 @@
+{#
+    Recursive template to render assessment rows in the final stage of the Course import/modify screen.
+    Recursive so we can render assessments inside projects.
+
+    Data:
+        assessmentPairs: AssessmentPair[]    - The assessments to render
+        inputPrefix:     string              - Recursively build form data
+        depth:           int                 - Level of recursion
+        unitAction:      ['import'|'modify'] - Whether we are importing from UnitSpec, or modifying existing UnitImpl
+        startDate:       ADF
+        endDate:         ADF
+        maximumDate:     ADF
+        project:         Project|null        - If called recusively, the parent Project of the AssessmentPairs
+        hideRows:        bool                - If true, hide the list of Assessments. (eg Project is un-checked)
+#}
+{% import "@learningAssessment/fragments/project/macro/icon.twig" as icon %}
+
+<ul class="information-list {% if depth %}no-pad{% endif %}" {% if project %}data-project="{{ project.id }}"{% endif %} style="{% if hideRows %}display: none;{% endif %}">
+    {% for assessmentPair in assessmentPairs %}
+
+        {# decide some things about this assessment #}
+        {% set assessmentSpec       = assessmentPair.specification %}
+        {% set assessmentImpl       = assessmentPair.implementation %}
+        {% set assessment           = assessmentImpl ?: assessmentSpec %}
+        {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
+        {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
+
+        {# Check the checkbox if any of following is true:
+         # * Assessment already imported
+         # * New import of this unit
+         # * depth >= 1 && parent not not imported (ie inside a non-imported project)
+         #}
+        {% set isChecked = (assessmentImpl) or ('import' == unitAction) or (depth > 0 and not assessmentPair.parentPair.implementation) %}
+
+        <li data-assessment="{{ assessment.id }}" {% if project %}data-parent-project="{{ project.id }}"{% endif %}>
+            <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][spec_id]" value="{{ assessmentSpec.id }}" />
+            <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][impl_id]" value="{{ assessmentImpl.id }}" />
+
+            <div class="compact card small-12 large-4">
+                <input type="checkbox"
+                       id="a_import-{{ assessment.id}}"
+                        {% if isChecked %} checked="checked"{% endif %}
+                       data-assessment-import="{{ assessment.id }}"
+                       data-checkbox-group="lesson"
+                       name="{{ inputPrefix }}[{{ assessment.id }}][checked]"
+                       value="1"
+                />
+                {# TODO - replace the inline-style with SASS #}
+                <label {% if depth %}style="margin-left: {{ depth * 25 }}px;"{% endif %} for="a_import-{{ assessment.id}}" class="checkbox-label">
+                    <span class="{{ icon.renderClass(assessment) }}"></span>
+                    <span>{{ assessment.title }}</span>
+                    {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
+                        <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
+                    {% endif %}
+                </label>
+
+            </div>
+            <div data-assessment-dates="{{ assessment.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
+
+                {#publish date is always relevant #}
+                {% include '@course/import/date.twig' with {
+                    assessmentDate: assessment.publishAt,
+                    unitDate: unitImpl.openDate,
+                    inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                    dateProperty: 'publish',
+                    dateSyncProperty: publishDateSync,
+                    assessmentId: assessmentSpec.id
+                } only %}
+
+                {#open date is relevant when accepting responses#}
+                {% if acceptingResponses %}
+                    {% include '@course/import/date.twig' with {
+                    assessmentDate: assessment.openAt,
+                    unitDate: displayStartDate,
+                    inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                    dateProperty: 'open',
+                    dateSyncProperty: 'due',
+                    assessmentId: assessmentSpec.id
+                    } only %}
+                {% else %}
+                    <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
+                {% endif %}
+
+                {#due date is always relevant#}
+                {% include '@course/import/date.twig' with {
+                    assessmentDate: assessment.dueAt,
+                    unitDate: displayEndDate,
+                    inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                    dateProperty: 'due',
+                    dateSyncProperty: 'close',
+                    assessmentId: assessmentSpec.id
+                } only %}
+
+                {#close (late) date is relevant when accepting responses#}
+                {% if acceptingResponses %}
+                    {% include '@course/import/date.twig' with {
+                        assessmentDate: assessment.closeAt,
+                        unitDate: displayEndDate,
+                        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                        dateProperty: 'close',
+                        dateLabel: 'Late',
+                        assessmentId: assessmentSpec.id
+                    } only %}
+                {% else %}
+                    <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
+                {% endif %}
+            </div>
+
+            {#Recurse #}
+            {% if assessmentPair.subPairs|length %}
+                {% include '@course/import/assessmentRows.twig' with {
+                assessmentPairs: assessmentPair.subPairs,
+                inputPrefix:     inputPrefix ~ '[' ~ assessment.id ~ '][a]',
+                depth:           depth + 1,
+                unitAction:      unitAction,
+                startDate:       startDate,
+                endDate:         endDate,
+                maximumDate:     maximumDate,
+                project:         assessment,
+                hideRows:        not isChecked
+                } only %}
+            {% endif %}
+        </li>
+
+    {% endfor %}
+</ul>

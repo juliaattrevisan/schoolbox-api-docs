@@ -11,11 +11,15 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Replicator;
 
 /**
  * Controller for assessment export actions.
@@ -37,21 +41,28 @@ class Controller extends BaseController
      */
     private $unitImplementationMapper;
 
+
+    /** @var Replicator */
+    private $replicator;
+
     /**
      * Constructor
      *
      * @param Access                   $access
      * @param AssessmentDataSource     $assessmentDataSource
      * @param UnitImplementationMapper $unitImplementationMapper
+     * @param Replicator               $replicator
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
-        UnitImplementationMapper $unitImplementationMapper
+        UnitImplementationMapper $unitImplementationMapper,
+        Replicator $replicator
     ) {
         $this->access                   = $access;
         $this->assessmentDataSource     = $assessmentDataSource;
         $this->unitImplementationMapper = $unitImplementationMapper;
+        $this->replicator               = $replicator;
     }
 
     /**
@@ -68,15 +79,15 @@ class Controller extends BaseController
      *
      * @api GET /learning/export/assessment/:assessmentId
      * @level 165
-     * @param IAssessable $assessment
+     * @param IAssessable $assessmentSpec
      */
-    public function getExportForm(IAssessable $assessment)
+    public function getExportForm(IAssessable $assessmentSpec)
     {
         $data = [
-            'assessment'      => $assessment,
+            'assessment'      => $assessmentSpec,
             'returnUrl'       => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
             'returnUrlName'   => Redirect::RETURN_URL,
-            'implementations' => $this->retrieveUnitImplementationsForSpecification($assessment),
+            'implementations' => $this->retrieveUnitImplementationsForSpecification($assessmentSpec),
         ];
 
         $template = "@learningAssessmentExporter/export.twig";
@@ -86,68 +97,41 @@ class Controller extends BaseController
     /**
      * Processes the export assessment request.
      *
-     * GET vars:
-     * * returnUrl: a URL to return to once done
-     *
-     * POST vars:
-     * * unitImplementation: unit implementations to push this into.
-     *                       key:   unit implementation id
-     *                       value: true/false
-     *
-     *
      * @api POST /learning/export/assessment/:assessmentId
      * @level 165
-     * @param IAssessable $assessment
+     * @param IAssessable $assessmentSpec
+     * @var string $_GET['returnUrl']            a URL to return to once done
+     * @var int[] $_POST['unitImplementation']   unit implementations to push this into.
+     *                                           key:   unit implementation id
+     *                                           value: true/false
      */
-    public function postExport(IAssessable $assessment)
+    public function postExport(IAssessable $assessmentSpec)
     {
         $importedImplementations = $this->getRequest()->post->get('unitImplementation', []);
-        $newImplementations      = $this->assessmentDataSource->createCollection();
-        $sequences               = [];
 
-        foreach ($this->retrieveUnitImplementationsForSpecification($assessment) as $implementation) {
-            /** @var UnitImplementation $unit */
-            $unit = $implementation['unit'];
+        foreach ($this->retrieveUnitImplementationsForSpecification($assessmentSpec) as $unitImplData) {
+            /** @var UnitImplementation $unitImpl */
+            $unitImpl = $unitImplData['unit'];
 
-            if (!empty($importedImplementations[$unit->getId()])) {
-                // This is being imported, so do stuff
-                $sequences[$unit->getId()] = $unit->getAssessables()->count() + 1;
+            if (!empty($importedImplementations[$unitImpl->getId()])) {
 
-                if ($implementation['imported']) {
+                if ($unitImplData['imported']) {
                     // This has already been exported between now and when the request was made.
                     // That is probably fine to ignore
                     continue;
                 }
 
-                if (!$implementation['allowed']) {
+                if (!$unitImplData['allowed']) {
                     // banhammer
-                    $this->sendError(
-                        'You do not have permission to write to the selected class',
-                        [],
-                        403
-                    );
+                    $this->sendError('You do not have permission to write to the selected class', [], 403);
                     return;
                 }
 
-                // clone $assessment for this implementation
-                $newImplementation = $assessment->cloneForCopy();
-                $newImplementation
-                    ->setContext($unit)
-                    ->setSpecificationAssessment($assessment)
-                    // Set sensible defaults for dates
-                    ->setPublishAt($unit->getOpenDate())
-                    ->setOpenAt($unit->getOpenDate())
-                    ->setDueAt($unit->getDueDate())
-                    ->setCloseAt($unit->getDueDate())
-                ;
-                $newImplementations->setOffset($unit->getId(), $newImplementation);
+                $this->exportToNewContext($assessmentSpec, $unitImpl);
             }
         }
 
-        // Save the newly created implementations (at the end of the unit)
-        foreach ($newImplementations as $unitId => $newImplementation) {
-            $this->assessmentDataSource->save($newImplementation);
-        }
+
 
         // Decode the return URL, if it was set
         $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
@@ -156,7 +140,7 @@ class Controller extends BaseController
         } else {
             $returnUrl = $this->getRouter()->generate(
                 'course.modifyCourse',
-                ['id' => $assessment->getContext()->getId(),]
+                ['id' => $assessmentSpec->getContext()->getId(),]
             );
         }
 
@@ -166,6 +150,47 @@ class Controller extends BaseController
         } else {
             $this->getResponse()->redirect->afterPost($returnUrl);
         }
+    }
+
+    /**
+     * Recursively export an AssessmentSpec to a new context
+     *
+     * @param IAssessable $assessmentSpec
+     * @param AssessmentContext $context
+     * @return IAssessable
+     */
+    protected function exportToNewContext(IAssessable $assessmentSpec, AssessmentContext $context)
+    {
+        if($context instanceof UnitImplementation){
+            $start = $context->getOpenDate();
+            $end   = $context->getDueDate();
+        } elseif($context instanceof Project){
+            $start = $context->getPublishAt();
+            $end   = $context->getDueAt();
+        } else {
+            throw new \DomainException('Invalid context: ' . get_class($context));
+        }
+
+        // Set sensible defaults for dates
+        $assessmentSpec
+            ->setPublishAt($start)
+            ->setOpenAt($start)
+            ->setDueAt($end)
+            ->setCloseAt($end);
+
+        // Replicate !
+        $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context);
+
+        // Recursive case
+        if($assessmentSpec instanceof Project){
+            /** @var Project $assessmentImpl */
+            foreach($assessmentSpec->getAssessables() as $subAssessmentSpec){
+                $subAssessmentImpl = $this->exportToNewContext($subAssessmentSpec, $assessmentImpl);
+                $assessmentImpl->getAssessables()->add($subAssessmentImpl);
+            }
+        }
+
+        return $assessmentImpl;
     }
 
     /**

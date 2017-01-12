@@ -54,7 +54,7 @@ class Model extends AbstractAssessment
      *
      * @var int
      */
-    protected $duration = 0;
+    private $duration = 0;
 
     /**
      * A (HTML) message that is displayed to a participant once they have completed the quiz.
@@ -62,6 +62,17 @@ class Model extends AbstractAssessment
      * @var string
      */
     protected $completionMessage;
+
+    /**
+     * @return int
+     */
+    public function getDefaultOpenSpan()
+    {
+        // TODO. This should be added to the UserInterface for Quizzes.
+        // I haven't done in this branch as it requires some thought to disambiguate it from quiz.duration.
+        // At the moment, both concepts are presented in the UI as 'duration'.
+        return 1;
+    }
 
     /**
      * @param GradeGroup|null $gradeGroup

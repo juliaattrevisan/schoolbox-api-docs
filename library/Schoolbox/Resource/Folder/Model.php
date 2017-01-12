@@ -13,8 +13,10 @@ namespace Schoolbox\Resource\Folder;
 use Alaress\Color\Color;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -88,6 +90,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private $unitSpecification;
 
     /**
+     * @var IAssessable[]|GenericCollection<IAssessable>
+     */
+    private $assessables;
+
+    /**
      * Constructor
      *
      */
@@ -95,6 +102,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         $this->setCodes(new Collection(array()));
         $this->setCurriculumNodes(new Collection());
+        $this->assessables = new GenericCollection(IAssessable::class);
     }
 
     /**
@@ -514,4 +522,21 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return $this;
     }
 
+    /**
+     * @return IAssessable[]|GenericCollection<IAssessable>
+     */
+    public function getAssessables()
+    {
+        return $this->assessables;
+    }
+
+    /**
+     * @param GenericCollection|IAssessable[] $assessables
+     * @return static
+     */
+    public function setAssessables(GenericCollection $assessables)
+    {
+        $this->assessables->replaceWith($assessables);
+        return $this;
+    }
 }
