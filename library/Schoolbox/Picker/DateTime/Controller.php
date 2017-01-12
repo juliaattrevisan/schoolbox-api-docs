@@ -280,11 +280,8 @@ new \Alaress_Probe($day);
 
         // Get start/end of the date
 
-        $timezoneUTC = new \DateTimeZone('UTC');
-
-        $start = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC);
+        $start = \Alaress_Date_Format::newLocalShort($date);
         $end = $start->addHours(23)->addMinutes(59)->addSeconds(59);
-
         // Find out the term this date falls in (needed to locate assessments)
 
         $term = $this->getTermMapper()->findForDate($start);

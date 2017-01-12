@@ -385,7 +385,7 @@
         disableMobile: true,
         onReady: function(selectedDates, dateStr, instance) {
             //Wrong format, swaps day with month
-            alert('onready: '+dateStr);
+//            alert('onready: '+dateStr);
             var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
             var calendarDiv = $('#picker{{ id }}').find('.flatpickr-calendar');
             var presetObj = new Date('{{ value }}');
@@ -429,7 +429,7 @@
             });
         },
         onChange: function(selectedDates, dateString, instance) {
-            alert('onchange: '+dateString);
+//            alert('onchange: '+dateString);
             {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
 
             var dateSplit = dateString.split(' ');
@@ -444,9 +444,9 @@
 
                 {% if type == 'duework'  %}
 
-                var pickerClassList = $('#pickerClassList{{ id }}');
+                var pickerResponce = $('#pickerAppointments{{ id }}');
 
-                pickerClassList.html('Loading Student List');
+                pickerResponce.html('Loading results');
                 $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, 'CH123').replace(/{date}/g,  encodeURIComponent(dateSplit[0])))
 
                         .done(function (data) {
@@ -455,20 +455,21 @@
 
                                 {# There we no appointment on the selected date #}
 
-                                pickerClassList.html('No events found');
+                                pickerResponce.html('No events found');
 
                             } else {
 
                                 {# Clear out any old appointments #}
 
-                                pickerClassList.html('');
+                                pickerResponce.html('');
 
                                 {# Populate with appointments for the selected date #}
 
                                 for (var i = 0; i < data.students.length; i++) {
-                                    pickerClassList.append(
-                                            data.students[i].title + '<br/>' +
-                                            data.students[i].startDateTime + '<br/>'
+                                    pickerResponce.append(
+                                            data.students[i].firstname + ' ' +
+                                            data.students[i].lastname + ': ' +
+                                            data.students[i].assessments + '<br/>'
                                     )
                                 }
                             }
@@ -481,9 +482,9 @@
 
                 {# AJAX in appointments for the selected date #}
 
-                var pickerAppointments = $('#pickerAppointments{{ id }}');
+                var pickerResponce = $('#pickerAppointments{{ id }}');
 
-                pickerAppointments.html('Loading events');
+                pickerResponce.html('Loading events');
 
                 $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
                         .done(function (data) {
@@ -491,13 +492,13 @@
 
                                 {# There we no appointment on the selected date #}
 
-                                pickerAppointments.html('No events found');
+                                pickerResponce.html('No events found');
 
                             } else {
 
                                 {# Clear out any old appointments #}
 
-                                pickerAppointments.html('');
+                                pickerResponce.html('');
 
                                 {# Populate with appointments for the selected date #}
                                 var html = '';
@@ -509,7 +510,7 @@
                                     }
                                     html += '</p>';
                                 }
-                                pickerAppointments.append(html);
+                                pickerResponce.append(html);
                             }
                         })
                         .fail(function () {
@@ -518,12 +519,6 @@
                 {% endif %}
             }
             latestDate = newDate;
-        },
-        onValueUpdate: function (selectedDates, dateStr, instance) {
-          alert('onupdate '+dateStr);
-        },
-        onClose: function(selectedDates, dateStr, instance){
-            alert('onclose '+dateStr);
         }
     });
 </script>

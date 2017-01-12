@@ -112,10 +112,8 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                     $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
 
-                        console.log(window.pickerInstance[pickerId].input.value);
-                        element.val(window.pickerInstance[pickerId].input.value);
-
-
+                        // console.log(window.pickerInstance[pickerId].input.value);
+                        // element.val(window.pickerInstance[pickerId].input.value);
 
                     // Update the elements value with the selected date
                         if($('#allday').val() == 1) {
