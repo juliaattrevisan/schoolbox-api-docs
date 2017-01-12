@@ -443,10 +443,6 @@ class Controller extends BaseController
 
         $this->outputTest($this->getFactory()->buildFromPostData($postdata, true));
     }
-    public function testEmpty()
-    {
-        $this->outputTest($this->getFactory()->buildEmpty());
-    }
     public function testBox($boxId)
     {
         $this->outputTest($this->getMapper()->findBySubmissionBox(SubmissionBoxMapper::getInstance()->findById($boxId)));
