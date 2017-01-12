@@ -256,17 +256,12 @@ $items = $newsHandler->getNewsListing(
 );
 
 if (is_array($items)) {
-    $i = 0;
     $total = count($items);
     $userHandler = new User();
 
-    $topicList['All'] = 1;
-
     if ($items) {
-        $j = 0;
 
         foreach ($items as $article) {
-            $i++;
 
             /* Find out if admin-specific kind of information should be displayed with the
              * news article
@@ -292,7 +287,7 @@ if (is_array($items)) {
             if ($hasAdminAccess) {
                 $publishDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
 
-                if ($publishDate->getUnixTimestamp() > time()) {
+                if ($publishDate->getUnixTimeStamp() > time()) {
                     $this->setVar(
                         array(
                             'PUBLISH_DATE' => $publishDate->getDateOnly(),
@@ -341,9 +336,6 @@ if (is_array($items)) {
             /* The usual stuff
              */
             $fullname = $userHandler->formatName($article);
-
-            $formatter = new TextFormatter();
-            
             $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
 
             $output = array(
@@ -354,12 +346,9 @@ if (is_array($items)) {
                 'POSTER_EXTERNAL_ID' => $article['synid'],
                 'DATETIME' => $postDate->getLong(),
                 'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
-                'ON_OFF' => ++$j % 2 ? 'dark' : ''
             );
 
             $this->setVar($output);
-            $topicList[$article['topicName']] = 1;
-
             $this->parse("news_block", "news", true);
         }
     } else {
