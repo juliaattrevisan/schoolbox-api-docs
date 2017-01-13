@@ -41,17 +41,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function renderTemplate($templateHandle)
     {
-        // All units on this page - get their component and related course
-        $componentList = [];
-        $units         = \Schoolbox\Assessment\Course\UnitInstanceMapper::getInstance()->findByColumn(
-            'category_id',
-            $this->getContext()->getId()
-        );
-        foreach ($units as $unit) {
-            // Only one unit per course
-            $componentList[$unit->getComponent()->getId()] = $unit;
-        }
-
         if (!parent::loadTemplate($templateHandle, 'manageClass')) {
             return false;
         }
