@@ -360,7 +360,7 @@ abstract class Mapper implements IMapper, Serializable
 
             $key = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
 
-            if (array_key_exists($key, $row)) {
+            if (array_key_exists($key, $row) && $this->localBodyCacheBypass == false) {
                 $id = $row[$key];
                 $model = $mapper->createModel($id);
             } else {
