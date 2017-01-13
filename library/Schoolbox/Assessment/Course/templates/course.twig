@@ -17,7 +17,20 @@ Usage:
     $(function () {
 
         $('[data-collapser]').collapsable();
+
+        /**
+         * Validation for the final save course form
+         * (the other validation is done in each mage step below)
+         */
         $("#update-course-form").alaressValidate();
+        $('[data-unit-name]').each(function() {
+            $(this).rules('add', {
+                required: true,
+                messages: {
+                    required: "Please enter a name for this unit"
+                }
+            });
+        });
 
         // Mage Buttons
         var $mageNextButton = $('[data-mage-next="unit-info"]');
