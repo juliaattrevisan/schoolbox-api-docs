@@ -62,23 +62,50 @@ class DescriptorMapper extends Schoolbox\Mapper {
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = $this->createCollection();
+        $levelMapper     = $this->getJoinMapper('level');
+        $criterionMapper = $this->getJoinMapper('criterion');
+
+        /* All indexed by primary key */
+        $descriptors     = $this->createCollection();
+        $levels          = $levelMapper->createCollection();
+        $criteria        = $criterionMapper->createCollection();
+
+        // Row keys for de-duplication
+        $levelKey        = "l.{$levelMapper->getIdentifierColumn()}";
+        $criterionKey    = "c.{$criterionMapper->getIdentifierColumn()}";
+
+        /** @var Level $level */
+        $level = null;
+
+        /** @var Criterion $criterion */
+        $criterion = null;
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $model = $this->hydrate($r);
 
-            /** @var Level $level */
-            $level = $this->hydrateJoin($r, 'level', 'l');
-            $model->setLevel($level);
+            // First time we've encountered this Level ?
+            if(!$levels->getOffset($levelKey)){
+                $levels->setOffset($levelKey, $this->hydrateJoin($r, 'level', 'l'));
+            }
+            $level = $levels->getOffset($levelKey);
 
-            /** @var Criterion $criterion */
-            $criterion = $this->hydrateJoin($r, 'criterion', 'c');
-            $model->setCriterion($criterion);
+            // First time we've encountered this Criterion ?
+            if(!$criteria->getOffset($criterionKey)){
+                $criteria->setOffset($criterionKey, $this->hydrateJoin($r, 'criterion', 'c'));
+            }
+            $criterion = $criteria->getOffset($criterionKey);
 
-            $c->add($model);
+            $descriptor = $this->hydrate($r);
+            $descriptors->setOffset($descriptor->getId(), $descriptor);
+
+            // Link to Level
+            $descriptor->setLevel($level);
+            $level->getDescriptors()->setOffset($descriptor->getId(), $descriptor);
+
+            // Link to Criterion
+            $descriptor->setCriterion($criterion);
         }
 
-        return $c;
+        return $descriptors;
     }
 
 
