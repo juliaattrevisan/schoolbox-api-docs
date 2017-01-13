@@ -497,7 +497,7 @@ class RubricMapper
             AND rm.tstamp = (
               SELECT MAX(tstamp)
               FROM rubric_mark rm
-              JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.valid IS TRUE
+              JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
               JOIN rubric_level rl ON rl.id = rd.level_id
               WHERE rl.box_id = :boxId
               AND rm.student_id = :userId
