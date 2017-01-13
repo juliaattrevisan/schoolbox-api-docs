@@ -624,11 +624,17 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * If not accepting submissions, open is aliased to publish
+     * @return \Alaress_Date_Format
      */
     public function getOpenAt()
     {
-        return $this->openAt;
+        if ($this->openAt instanceof \Alaress_Date_NullDate) {
+            return $this->getPublishAt();
+        }
+        else {
+            return $this->openAt;
+        }
     }
 
     /**
@@ -660,11 +666,17 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * If not accepting submissions, close is aliased to due
+     * @return \Alaress_Date_Format
      */
     public function getCloseAt()
     {
-        return $this->closeAt;
+        if($this->closeAt instanceof \Alaress_Date_NullDate) {
+            return $this->getDueAt();
+        }
+        else {
+            return $this->closeAt;
+        }
     }
 
     /**

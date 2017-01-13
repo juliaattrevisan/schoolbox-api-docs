@@ -249,14 +249,6 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @return \Alaress_Date_Format
-     */
-    public function getOpenAt()
-    {
-        return $this->getPublishAt();
-    }
-
-    /**
      * @param \Alaress_Date_Format $openAt
      * @return static
      */
@@ -264,14 +256,6 @@ class Model extends AbstractAssessment
     {
         //noop
         return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getCloseAt()
-    {
-        return $this->getDueAt();
     }
 
     /**

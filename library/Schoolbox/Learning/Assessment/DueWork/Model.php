@@ -203,34 +203,6 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * If not accepting submissions, open is aliased to publish
-     * @return \Alaress_Date_Format
-     */
-    public function getOpenAt()
-    {
-        if ($this->openAt instanceof \Alaress_Date_NullDate) {
-            return $this->getPublishAt();
-        }
-        else {
-            return $this->openAt;
-        }
-    }
-
-    /**
-     * If not accepting submissions, close is aliased to due
-     * @return \Alaress_Date_Format
-     */
-    public function getCloseAt() {
-        if($this->closeAt instanceof \Alaress_Date_NullDate) {
-            return $this->getDueAt();
-        }
-        else {
-            return $this->closeAt;
-        }
-    }
-
-
-    /**
      * @inheritdoc
      *
      * @return string

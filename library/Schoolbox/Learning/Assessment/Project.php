@@ -328,14 +328,4 @@ class Project extends AbstractAssessment implements AssessmentContext
     {
         return $this->getContext();
     }
-
-    /**
-     * If alias close to due as these are not seperate
-     * @return \Alaress_Date_Format
-     */
-    public function getCloseAt() {
-        return $this->getDueAt();
-    }
-
-
 }
