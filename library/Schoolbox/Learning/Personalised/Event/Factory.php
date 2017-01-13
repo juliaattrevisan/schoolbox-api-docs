@@ -97,15 +97,7 @@ class Factory
             ]);
 
 
-            // If this is a quiz or due work - it's a content area
-            if ($assessable instanceof Quiz || $assessable instanceof DueWork) {
-                // A background event for the bounds
-                $result->add($this->buildAssessableEventBackground($assessable, $folder, 'contentArea'));
-
-                // A foreground event for the actual quiz/duework
-                $result->add($this->buildAssessableEvent($assessable, $folder, 'contentArea', $student, $participation));
-
-            } elseif ($assessable instanceof Project) {
+            if ($assessable instanceof Project) {
                 // If this is a project - get it and its constituents
                 $projectRender = $this->buildAssessableEvent($assessable, $folder, 'project', $student, $participation);
                 $projectRender['editable']    = false;
@@ -119,6 +111,15 @@ class Factory
                     // A foreground event for the actual activity
                     $result->add($this->buildAssessableEvent($activity, $folder, 'activity', $student, $participation));
                 }
+
+            } else {
+                // It's a content area
+
+                // A background event for the bounds
+                $result->add($this->buildAssessableEventBackground($assessable, $folder, 'contentArea'));
+
+                // A foreground event for the actual quiz/duework
+                $result->add($this->buildAssessableEvent($assessable, $folder, 'contentArea', $student, $participation));
             }
         }
 
