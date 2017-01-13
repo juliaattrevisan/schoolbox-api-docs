@@ -60,6 +60,8 @@ class External_Tass_User implements External_UserInterface
         }
         if (strlen($addnum) > 0 ) {
             $addnum = substr($addnum,1);
+        } else {
+            $addnum = "'1','4','5'"; // default matching previous hardcodes
         }
 
         $companyCode = $this->database->smartQuote($this->companyCode);
