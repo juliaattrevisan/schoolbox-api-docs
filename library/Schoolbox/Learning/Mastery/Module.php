@@ -10,6 +10,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -110,6 +111,16 @@ class Module extends BaseModule
             ])
         );
     }
+
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $this->addRoutePermission($authorizer, ".*",
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\HasRole(\Schoolbox\Role::STAFF)
+            ));
+    }
+
 
     /* Getters / Setters
      */
