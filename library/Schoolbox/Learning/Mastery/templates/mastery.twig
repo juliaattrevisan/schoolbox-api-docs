@@ -82,6 +82,16 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <tr>
+                        <td></td>
+                        {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+                            <td class="text-center">
+                                {% if assessment.dueAt.isPast %}
+                                    <i class="icon-clock" title="Past Due Date {{ assessment.dueAt.localShort }}"></i>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
                     {% for student in markbook.students %}
                         <tr data-id="{{ student.id }}">
                             <th class="no-pad">
@@ -153,15 +163,9 @@
 
                                 {% if participant is not empty %}
                                     {% if not participant.isMarked and participant.isResponded %}
-                                        {% set value='<i class="icon-pause" title="Awaiting Assessment">' %}
+                                        {% set value='<i class="icon-pause" title="Awaiting Teacher Assessment">' %}
                                         {% set className = 'notmarked' %}
                                     {% endif %}
-                                {% endif %}
-
-                                {# If mastery not achieved and past due date, show clock icon #}
-
-                                {% if className != 'mastered' and assessment.dueAt.isPast and humanMark is not empty %}
-                                    {% set value = '<i class="icon-clock" title="Due Date Passed - \n' ~ normalisedMark | round ~ '%">' %}
                                 {% endif %}
 
                                 <td class="text-center {{ className }}">
