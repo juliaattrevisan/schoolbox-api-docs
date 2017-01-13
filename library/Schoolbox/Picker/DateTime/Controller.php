@@ -20,6 +20,7 @@ use \Group;
 use \External_Timetable;
 use \Schoolbox\CampusMapper;
 use \External_Synergetic_Timetable;
+use Schoolbox\Learning\Upcoming;
 
 class Controller extends Base
 {
@@ -59,7 +60,6 @@ class Controller extends Base
         $terms = $this->getTerms();
         $value = \Alaress_Date_Format::newLocal(urldecode($value));
         $timetableDayNumber = $this->getTimetableDay($value);
-new \Alaress_Probe($value->geJSDate());
         $this->getResponse()->content->set(
             array(
                 'template' => '@pickerDatetime/picker.twig',
@@ -159,7 +159,6 @@ new \Alaress_Probe($value->geJSDate());
      * Return a a list of events for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
      */
     public function getByTimetableDay($campusId, $termId, $cycle, $day) {
-new \Alaress_Probe($day);
         $user = $this->getUser();
 
         //Get Campus object
@@ -199,8 +198,6 @@ new \Alaress_Probe($day);
 
     public function getTimetableDay(\Alaress_Date_Format $date) {
 
-//        $date = new \Alaress_Date_Format($date, 'Y-m-d H:i:S');
-//new \Alaress_Probe($date);
         //Get term for given date
         $term = $this->getTermMapper()->findForDate($date);
         $term->getStart();
@@ -293,38 +290,42 @@ new \Alaress_Probe($day);
         foreach ($externalStudents as $studentCurrent) {
             $externalIds[] = $studentCurrent['synergy_id'];
         }
-        $userIdLookup = $this->getUserMapper()->findCheaplyByExternalIds($externalIds);
 
+        $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
+//        $userIdLookup = $this->getUserMapper()->findCheaplyByExternalIds($externalIds);
         // Iterate each student in the class
 
-        foreach ($externalStudents as $studentCurrent) {
+        foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
 
-            $student = new User();
-            $student->setId($userIdLookup[$studentCurrent['synergy_id']]);
 
-            $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($student, $term);
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($studentCurrent, $term);
 
             // TODO: AssessmentMapperProxy needs a function to find all by due date rather than term
 
             // Count how many assessments are due on the specified date
 
             $assessmentsDue = 0;
-
+            $assessmentList = Array();
             foreach ($assessments as $assessment) {
                 if ($assessment->getDueAt()->between($start, $end)) {
                     $assessmentsDue++;
+                    $assessmentList[] = [
+                        'id' => $assessment->getId(),
+                        'title' => $assessment->getTitle()
+                        ];
                 }
             }
 
 //            if ($assessmentsDue > 0) {
                 $students[] = [
-                    'id' => $student->getId(),                          // Required for link to student profile
-                    'externalId' => $studentCurrent['synergy_id'],      // Required for rendering student photo
-                    'firstname' => $studentCurrent['firstname'],
-                    'lastname' => $studentCurrent['lastname'],
-                    'assessments' => $assessmentsDue                    // Number of assessments they have due on the date
+                    'id' => $studentCurrent->getId(),                          // Required for link to student profile
+                    'externalId' => $studentCurrent->getExternalId(),      // Required for rendering student photo
+                    'firstname' => $studentCurrent->getFirstname(),
+                    'lastname' => $studentCurrent->getLastname(),
+                    'assessmentList' => $assessmentList,
+                    'assessmentsDue' => $assessmentsDue                    // Number of assessments they have due on the date
                 ];
 //            }
         }
@@ -334,10 +335,11 @@ new \Alaress_Probe($day);
         $assessmentsDue = [];
 
         foreach ($students as $key => $row) {
-            $assessmentsDue[$key] = $row['assessments'];
+            $assessmentsDue[$key] = $row['assessmentsDue'];
         }
 
         array_multisort($assessmentsDue, SORT_DESC, $students);
+        $students = array_slice($students, 0, 5);
 
         // Spit this out in a JSON array
 

@@ -336,7 +336,7 @@ class Factory
 
         try {
             // attempt to parse the date
-            return Alaress_Date_Format::newDatabaseDate($dateString);
+            return Alaress_Date_Format::newLocal($dateString);
 
         } catch (InvalidArgumentException $e) {
             // unparseable - safely return null

@@ -446,8 +446,11 @@
 
                 var pickerResponce = $('#pickerAppointments{{ id }}');
 
+                // Can the assessment form have dates and be called outside the class page?
+                var classCode = $('*[name = "classCode"]').val();
+
                 pickerResponce.html('Loading results');
-                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, 'CH123').replace(/{date}/g,  encodeURIComponent(dateSplit[0])))
+                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, classCode).replace(/{date}/g,  encodeURIComponent(dateSplit[0])))
 
                         .done(function (data) {
 
@@ -465,13 +468,22 @@
 
                                 {# Populate with appointments for the selected date #}
 
+                                pickerResponce.html('');
+
+                                {# Populate with appointments for the selected date #}
+                                var html = '';
                                 for (var i = 0; i < data.students.length; i++) {
-                                    pickerResponce.append(
-                                            data.students[i].firstname + ' ' +
-                                            data.students[i].lastname + ': ' +
-                                            data.students[i].assessments + '<br/>'
-                                    )
+                                    html += '<div class="card small-12">';
+                                    html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64" alt="View Profile">';
+                                    html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
+                                    html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
+                                    console.log(data.students[i].assessmentList);
+                                    for(var k=0; k < data.students[i].assessmentList.length; k++) {
+                                      html += k+': '+data.students[i].assessmentList[k]['title']+'<br/>';
+                                    }
+                                    html += '</div>';
                                 }
+                                pickerResponce.append(html);
                             }
                         })
                         .fail(function () {

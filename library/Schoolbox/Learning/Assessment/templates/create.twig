@@ -122,6 +122,9 @@
                     {% endif %}
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
                     <input type="hidden" name="contextId" value="{{ context.id }}" />
+                    {% if assessment.baseContext.folder.codeString|length %}
+                        <input type="hidden" name="classCode" value="{{ assessment.baseContext.folder.codeString }}" />
+                    {% endif %}
 
                     {% if assessmentType|length %}
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
