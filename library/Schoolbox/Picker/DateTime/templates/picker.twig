@@ -79,7 +79,7 @@
         line-height: inherit;
     }
 </style>
-<div class="row">{{ value }}
+<div class="row">
     <dl class="tabs" data-tab>
         <dd class=""><a href="#" id="tab-1-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
         <dd class=""><a href="#" id="tab-2-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>Timetable</a></dd>
@@ -307,7 +307,6 @@
 
                     {# Clear out any old appointments #}
                     timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y h:iK'))+'</h3>');
-
                     if (data.appointments.length == 0) {
 
                         timetableAppointments.append('No events found');
@@ -366,9 +365,10 @@
     $('.timetable-submit').click(function() {
         var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
         var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'HH:mmA');
-        var newDate = (timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0)).format(convertFormat('{{ displayFormat }}'));
+        var newDate = (timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0)).format(convertFormat('Y-m-d H:i:s'));
+        {# Turn AllDay off #}
+        $('#allday').val(0);
         window.pickerInstance[{{ id }}].setDate(newDate);
-
     });
 
     {# Setup calendar #}
@@ -379,13 +379,11 @@
         dateFormat: '{{ displayFormat }}',
         inline: true,
         altInput: false,
-        {#altFormat: '{{ displayFormat }}',#}
         enableTime: true,
         allowInput: true,
         disableMobile: true,
         onReady: function(selectedDates, dateStr, instance) {
             //Wrong format, swaps day with month
-//            alert('onready: '+dateStr);
             var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
             var calendarDiv = $('#picker{{ id }}').find('.flatpickr-calendar');
             var presetObj = new Date('{{ value }}');
@@ -399,8 +397,7 @@
                 '</div></div>'
             );
             
-            {# Hide time picker if enableTime option set equals false or no event time set #}
-//          if(calendarDiv.hasClass('hasTime') && (presetObj.getHours()+presetObj.getMinutes()) === 0) {
+            {# Hide time picker if allday hidden field is set to 1 #}
             if($('#allday').val() == 1) {
                 timeDiv.css('display', 'none');
                 calendarDiv.addClass('allDay');
@@ -429,7 +426,6 @@
             });
         },
         onChange: function(selectedDates, dateString, instance) {
-//            alert('onchange: '+dateString);
             {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
 
             var dateSplit = dateString.split(' ');
@@ -477,7 +473,6 @@
                                     html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64" alt="View Profile">';
                                     html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
                                     html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
-                                    console.log(data.students[i].assessmentList);
                                     for(var k=0; k < data.students[i].assessmentList.length; k++) {
                                       html += k+': '+data.students[i].assessmentList[k]['title']+'<br/>';
                                     }
@@ -503,13 +498,11 @@
                             if (data.appointments.length == 0) {
 
                                 {# There we no appointment on the selected date #}
-
                                 pickerResponce.html('No events found');
 
                             } else {
 
                                 {# Clear out any old appointments #}
-
                                 pickerResponce.html('');
 
                                 {# Populate with appointments for the selected date #}

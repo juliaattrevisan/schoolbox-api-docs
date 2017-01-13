@@ -160,7 +160,6 @@ class Controller extends Base
      */
     public function getByTimetableDay($campusId, $termId, $cycle, $day) {
         $user = $this->getUser();
-
         //Get Campus object
         $campus = $user->getCampusCollection()->getBy('id', $campusId);
 
@@ -187,12 +186,11 @@ class Controller extends Base
      */
     public function getDateForTimetableDay($termStartDate, $termFirstDay, $daysInCycle, $cycle, $day) {
 
-        $termStartDate = new \Alaress_Date_Format($termStartDate, 'd/m/Y h:iA');
+        $termStartDate = \Alaress_Date_Format::newLocal($termStartDate);
 
         //Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
         $shiftTimetableDays = $daysInCycle*($cycle-1)+$day-$termFirstDay;
-        $date = $termStartDate->addWeekdays($shiftTimetableDays)->getDatabase();
-
+        $date = $termStartDate->addWeekdays($shiftTimetableDays)->getLocalShort();
         return $date;
     }
 
@@ -220,7 +218,6 @@ class Controller extends Base
     public function getByDate($date)
     {
         $appointments = [];
-
         try {
 
             // Get start/end of the date
