@@ -64,14 +64,26 @@ class Model extends AbstractAssessment
     protected $completionMessage;
 
     /**
+     * @var int
+     */
+    protected $defaultOpenSpan;
+
+    /**
      * @return int
      */
     public function getDefaultOpenSpan()
     {
-        // TODO. This should be added to the UserInterface for Quizzes.
-        // I haven't done in this branch as it requires some thought to disambiguate it from quiz.duration.
-        // At the moment, both concepts are presented in the UI as 'duration'.
-        return 1;
+        return $this->defaultOpenSpan;
+    }
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setDefaultOpenSpan($value)
+    {
+        $this->defaultOpenSpan = $value;
+        return $this;
     }
 
     /**
