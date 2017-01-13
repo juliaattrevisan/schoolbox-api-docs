@@ -1,3 +1,76 @@
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
+
+{##
+ # CSS
+ # TODO put this in a stylesheet
+ # TODO base colors off config
+ #}
+<style type="text/css">
+    .fc-time-area .fc-event-container {
+        padding-bottom: 2px;
+        top: 1px;
+    }
+    .fc-timeline-event .fc-content {
+        padding: 5px 1px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    {# Base colors #}
+    .fc-event.contentArea,
+    .fc-event.activity {
+        border-color: #EEEEEE;
+        background-color: #EEEEEE;
+    }
+
+    {# Read-only colors #}
+    .fc-event.unit,
+    .fc-event.project {
+        border-color: #111111;
+        background-color: #111111;
+        color: #EEEEEE;
+    }
+    .fc-event.unit:hover,
+    .fc-event.project:hover {
+        color: #EEEEEE;
+    }
+
+    {# Assessment status colors #}
+    .fc-event.fail {
+        border-color: rgb(247, 206, 204);
+        background-color: rgb(247, 206, 204);
+    }
+    .fc-event.fail .fc-title:before {
+        /* cross */
+        content: "\e60d ";
+    }
+
+    .fc-event.mastered {
+        border-color: rgb(213, 231, 212);
+        background-color: rgb(213, 231, 212);
+    }
+    .fc-event.mastered .fc-title:before {
+        /* tick */
+        content: "\e604 ";
+    }
+
+    .fc-event.notmarked {
+        border-color: rgb(255, 242, 205);
+        background-color: rgb(255, 242, 205);
+    }
+    .fc-event.notmarked .fc-title:before {
+        /* clock */
+        content: "\e66e ";
+    }
+</style>
+
 {# Header #}
 <div class="row">
     <div class="small-12 columns">
@@ -38,7 +111,12 @@
     {# Metadata #}
     <ul class="meta">
         <li class="icon-calendar date">
-            <time data-value="start"></time>&ndash;<time data-value="end"></time>
+            {# Assessment's open/close date #}
+            Open between: <time data-value="assessmentStart"></time>&ndash;<time data-value="assessmentEnd"></time>
+        </li>
+        <li class="icon-staff-students date" data-personalised-date>
+            {# My open/close date #}
+            My timeframe: <time data-value="start"></time>&ndash;<time data-value="end"></time>
         </li>
     </ul>
 
@@ -55,14 +133,7 @@
 </div>
 
 {# FullCalendar setup #}
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
-<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
-<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
+
 <script type="text/javascript">
     // Do stuff here
     $(function() {
@@ -77,11 +148,11 @@
          */
         var convertDurationUnitToViewType = function(durationUnit, defaultView) {
             switch (durationUnit) {
+                case 'term':
+                    return 'timelineTerm';
+
                 case 'week':
                     return 'timelineTwoWeek';
-
-                case 'day':
-                    return 'timelineTwoDay';
 
                 case 'month':
                     return 'timelineTwoMonth';
@@ -125,16 +196,46 @@
          * Retrieves the duration unit from the type of the custom view.
          *
          * @param view
+         * @returns {Object}
+         * @throws Error if view type not recognized
+         */
+        var getDurationFromView = function(view) {
+            switch (view.type) {
+                case 'timelineTerm':
+                    return {
+                        unit:    'months',
+                        quantity: 6
+                    };
+
+                case 'timelineTwoMonth':
+                    return {
+                        unit:    'months',
+                        quantity: 1
+                    };
+
+                case 'timelineTwoDay':
+                    return {
+                        unit:    'days',
+                        quantity: 1
+                    };
+            }
+            throw new Error('Unrecognised view type "'+String(view.type)+'"');
+        };
+
+        /**
+         * Retrieves the duration unit from the type of the custom view.
+         *
+         * @param view
          * @returns {String}
          * @throws Error if view type not recognized
          */
-        var getDurationUnitFromView = function(view) {
+        var getViewAlias = function(view) {
             switch (view.type) {
+                case 'timelineTerm':
+                    return 'term';
+
                 case 'timelineTwoMonth':
                     return 'month';
-
-                case 'timelineTwoWeek':
-                    return 'week';
 
                 case 'timelineTwoDay':
                     return 'day';
@@ -183,7 +284,7 @@
          */
         var pushCurrentCalendarState = function() {
             try {
-                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                var unit = getViewAlias(calendar.fullCalendar('getView'));
                 var date = calendar.fullCalendar('getDate');
                 window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.momentJs)));
             } catch (e) {
@@ -210,18 +311,18 @@
                 allDaySlot: false,
                 defaultDate: calendarParams.date,
                 views: {
+                    timelineTerm: {
+                        type: 'timeline',
+                        duration: { months: 6 },
+                        slotDuration: { days: 1 },
+                        slotLabelFormat: { weeks: 1 },
+                        slotLabelInterval: { weeks: 1 },
+                        buttonText: 'Term'
+                    },
                     timelineTwoMonth: {
                         type: 'timeline',
                         duration: { months: 2 },
                         buttonText: 'Month'
-                    },
-                    timelineTwoWeek: {
-                        type: 'timeline',
-                        duration: { weeks: 2 },
-                        buttonText: 'Week',
-                        slotLabelInterval: {
-                            hours: 6
-                        }
                     },
                     timelineTwoDay: {
                         type: 'timeline',
@@ -240,7 +341,7 @@
                 header: {
                     left: 'prevWindow,today,nextWindow',
                     center: 'title',
-                    right: 'timelineTwoMonth,timelineTwoWeek,timelineTwoDay'
+                    right: 'timelineTerm,timelineTwoMonth,timelineTwoDay'
                 },
                 events: function(start, end, timezone, callback) {
                     $.ajax({
@@ -312,11 +413,21 @@
                                     $this.html(calEvent.meta.description);
                                     break;
 
+                                case 'assessmentStart':
+                                case 'assessmentEnd':
+                                    // Output in our configured format
+                                    var assessmentDate = moment(calEvent.meta[valueTag]);
+
+                                    $this
+                                        .text(assessmentDate.format('dddd, Do MMMM YYYY'))
+                                        .attr('datetime', assessmentDate.toISOString());
+                                    break;
+
                                 case 'start':
                                 case 'end':
                                     // Output in our configured format
                                     var date = calEvent[valueTag],
-                                        format = 'dddd, Do MMMM YYYY'
+                                        format = 'dddd, Do MMMM YYYY';
 
                                     if (!calEvent.allDay) {
                                         format = format+', h:mm a'
@@ -348,14 +459,21 @@
                         click: function() {
                             try {
                                 // Step back one window from now
-                                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
-                                var date = calendar.fullCalendar('getDate').clone();
-                                calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                                var duration = getDurationFromView(calendar.fullCalendar('getView'));
+                                var date     = calendar.fullCalendar('getDate').clone();
+                                calendar.fullCalendar('gotoDate', date.subtract(duration.quantity, duration.unit));
                                 pushCurrentCalendarState();
                             } catch (e) {
                                 // Just go to previous step
                                 calendar.fullCalendar('prev');
                             }
+                        }
+                    },
+                    today: {
+                        text: 'Today',
+                        click: function() {
+                            calendar.fullCalendar('today');
+                            pushCurrentCalendarState();
                         }
                     },
                     nextWindow: {
@@ -364,12 +482,12 @@
                             try {
                                 // Step forward two windows from now, then back one window from that.
                                 // This ensures that events that are in the next window but not this one get loaded.
-                                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
-                                var date = calendar.fullCalendar('getDate').clone();
+                                var duration = getDurationFromView(calendar.fullCalendar('getView'));
+                                var date     = calendar.fullCalendar('getDate').clone();
                                 // Handle pushstate here because this triggers a second viewRender event.
                                 // I don't want to pushstate twice.
-                                calendar.fullCalendar('gotoDate', date.add(2, unit));
-                                calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                                calendar.fullCalendar('gotoDate', date.add(duration.quantity*2, duration.unit));
+                                calendar.fullCalendar('gotoDate', date.subtract(duration.quantity, duration.unit));
                                 pushCurrentCalendarState();
                             } catch (e) {
                                 // Just go to next step
@@ -383,6 +501,18 @@
                     // Only if the calendar view has changed
                     var currentView = calendar.fullCalendar('getView');
                     if (previousView.type != currentView.type) {
+                        // Timeline term view: skip back to the first day of the 6-month cycle
+                        if (currentView.type == 'timelineTerm') {
+                            var date = calendar.fullCalendar('getDate').clone().date(1);
+                            if (date.month() <= 6) {
+                                // Moment months start at 0 :/
+                                date = date.month(0);
+                            } else {
+                                date = date.month(6);
+                            }
+                            calendar.fullCalendar('gotoDate', date);
+                        }
+
                         pushCurrentCalendarState();
                     }
                     previousView = currentView;
@@ -411,6 +541,13 @@
                         el.find('.fc-cell-text').empty().text(resource.title);
                     }
                 }],
+
+                eventRender: function(event, element, view) {
+                    // Set a title
+                    if ('title' in event) {
+                        element.attr('title', event.title + ' ('+$.fullCalendar.formatRange(event.start, event.end, 'Do MMMM YYYY')+')');
+                    }
+                },
 
                 eventAfterAllRender: function(view) {
                     // Any resource whose children contain no events should be collapsed

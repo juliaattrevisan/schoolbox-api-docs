@@ -106,6 +106,11 @@ class Controller extends Base
 
         foreach ($this->folderMapper->findForUser($student) as $folder) {
 
+            // Ignore non-classes
+            if (strlen($folder->getCodeString()) === 0) {
+                continue;
+            }
+
             // Resource for folder
             $resultSet[] = [
                 'id'          => $folder->getId(),
@@ -173,7 +178,7 @@ class Controller extends Base
             'student_id'    => $student->getId(),
         ]);
 
-        $resultSet = $eventFactory->buildFromAssessmentCollection($assessments, $participation);
+        $resultSet = $eventFactory->buildFromAssessmentCollection($assessments, $student, $participation);
 
         // Filter out non-unique values
         $newResultSet = new Collection();
@@ -208,12 +213,7 @@ class Controller extends Base
             }
 
             // Validate this assessment can even be moved.
-            // Special case: due works with no online submission have no open date.
-            // Use their publish date instead.
             $assessmentOpenDate = $assessment->getOpenAt();
-            if ($assessmentOpenDate->isNull()) {
-                $assessmentOpenDate = $assessment->getPublishAt();
-            }
             if ($assessmentOpenDate->isNull()) {
                 $this->buildJsonResponse('This assessment does not have an open date', 403);
                 return;
