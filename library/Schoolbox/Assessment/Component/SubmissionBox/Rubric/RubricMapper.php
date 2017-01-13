@@ -533,7 +533,7 @@ class RubricMapper
     }
 
     /**
-     * Normalizes spaces.
+     * Normalises spaces.
      *
      * Trims trailing/leading space, and replaces multiple spaces/newlines/etc.
      * with a single space.
@@ -545,6 +545,23 @@ class RubricMapper
     {
         return trim(preg_replace('`\s+`', ' ', $string));
     }
+
+
+    /**
+     * Converts a Criterion name for comparison. Do NOT use for mutation before storage.
+     *
+     * * converts to lowercase
+     * * Replaces multiple whitespace with single space character
+     * * trims whitespace
+     *
+     * @param $string
+     * @return string
+     */
+    protected function normaliseForComparison($string)
+    {
+        return strtolower($this->normalizeSpace($string));
+    }
+
 
     protected function getcsv($fp, $limit = 13)
     {
@@ -928,7 +945,8 @@ class RubricMapper
 
         $dstBox = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
 
-        // Cannot mutate anything return from mappers :(
+        // Cannot mutate identity of objects returned from mappers.
+        // Index all these collections by source version ID, even though the object will be destination version.
         /** @var Level[]|GenericCollection $dstLevels */
         $dstLevels      = $levelMapper->createCollection();
         /** @var Descriptor[]|GenericCollection $dstDescriptors */
@@ -939,89 +957,109 @@ class RubricMapper
         $dstUsages      = $usageMapper->createCollection();
 
         // Copy Levels
-        foreach($srcLevels as $level){
-            $dstLevel = clone $level;
+        foreach($srcLevels as $srcLevel){
+            $dstLevel = clone $srcLevel;
+            $dstLevel->setId(null);
             $dstLevel->setSubmissionBox($dstBox);
             $dstLevel->setDescriptors($descriptorMapper->createCollection());
-            $dstLevels->setOffset($dstLevel->getId(), $dstLevel);
+            $dstLevels->setOffset($srcLevel->getId(), $dstLevel);
         }
 
         // Get Source Descriptors
         /** @var Descriptor[]|GenericCollection $srcDescriptors */
         $srcDescriptors = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
+        $srcCriteria = $criterionMapper->createCollection();
 
-        // Copy Criterion + Descriptors
-        foreach($srcDescriptors as $descriptor){
-            // Criterion
-            $criterionId = $descriptor->getCriterion()->getId();
-            if(!$dstCriteria->getOffset($criterionId)){
-                $dstCriterion = clone $descriptor->getCriterion();
-                $dstCriterion->setParentId($dstBox->getCategory()->getId());
-                $dstCriteria->setOffset($dstCriterion->getId(), $dstCriterion);
+        /* Get existing destination criteria.
+         *
+         * If during destination object graph build, we detect that a source descriptor
+         * already exists on destination, use the destination version instead of creating a new criterion
+         *
+         * Need to by-pass cache, as we may have inserted criteria during previous call to this function.
+         */
+        /** @var Descriptor $firstSrcDescriptor */
+        $firstSrcDescriptor = $srcDescriptors->first();
+        $existingCriteria = $criterionMapper->findByColumnList([
+            'parent_id'   => $dstBox->getCategory()->getId(),
+            'parent_type' => $firstSrcDescriptor->getCriterion()->getParentType(),
+        ], ['cache' => false]);
+        // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
+        /** @var Criterion[][] $existingGroupMap */
+        $existingGroupMap = [];
+        foreach($existingCriteria as $existingCriterion){
+            $group = $this->normaliseForComparison($existingCriterion->getGrouping());
+            $name  = $this->normaliseForComparison($existingCriterion->getName());
+            $existingGroupMap[$group][$name] = $existingCriterion;
+        }
+
+
+        // Build new Rubric for destination box
+        foreach($srcDescriptors as $srcDescriptor){
+
+            // Copy source Criterion or re-use existing Criterion
+            $srcCriterionId = $srcDescriptor->getCriterion()->getId();
+
+            // First time we've traversed this Criterion ?
+            if(!$srcCriteria->getOffset($srcCriterionId)){
+
+                $srcCriterion = $srcDescriptor->getCriterion();
+                $srcCriteria->setOffset($srcCriterionId, $srcCriterion);
+
+                // Does this Criterion already exist on destination folder ?
+
+                $duplicate = false;
+                $group = $this->normaliseForComparison($srcCriterion->getGrouping());
+                $name  = null;
+                if(array_key_exists($group, $existingGroupMap)){
+                    $name = $this->normaliseForComparison($srcCriterion->getName());
+                    if(array_key_exists($name, $existingGroupMap[$group])){
+                        $duplicate = true;
+                    }
+                }
+
+                // Did we find an existing Criterion with the same name?
+                if($duplicate){
+                    $dstCriterion = $existingGroupMap[$group][$name];
+                } else {
+                    $dstCriterion = clone $srcDescriptor->getCriterion();
+                    $dstCriterion->setId(null);
+                    $dstCriterion->setParentId($dstBox->getCategory()->getId());
+                }
+                $dstCriteria->setOffset($srcCriterionId, $dstCriterion);
             }
 
             // Descriptor
-            $dstDescriptor = clone $descriptor;
-            $dstDescriptors->setOffset($dstDescriptor->getId(), $dstDescriptor);
+            $dstDescriptor = clone $srcDescriptor;
+            $dstDescriptor->setId(null);
+            $dstDescriptors->setOffset($srcDescriptor->getId(), $dstDescriptor);
 
             // Link Descriptor + Level
             /** @var Level $dstLevel */
-            $dstLevel = $dstLevels->getOffset($descriptor->getLevel()->getId());
+            $dstLevel = $dstLevels->getOffset($srcDescriptor->getLevel()->getId());
             $dstDescriptor->setLevel($dstLevel);
-            $dstLevel->getDescriptors()->setOffset($dstDescriptor->getId(), $dstDescriptor);
+            $dstLevel->getDescriptors()->setOffset($srcDescriptor->getId(), $dstDescriptor);
 
             // Link Descriptor + Criterion
-            $dstCriterion = $dstCriteria->getOffset($descriptor->getCriterion()->getId());
-            $dstDescriptor->setCriterion($dstCriterion);
+            $dstDescriptor->setCriterion($dstCriteria->getOffset($srcCriterionId));
         }
 
         // Get Source Usages
         /** @var Usage[]|GenericCollection $srcUsages */
         $srcUsages = $usageMapper->findByColumnList([
-            'criterion_id'      => $dstCriteria->getColumnValues('id'),
+            'criterion_id'      => $srcCriteria->getColumnValues('id'),
             'submission_box_id' => $sourceBox->getId(),
         ]);
 
         // Copy Usages
-        foreach($srcUsages as $usage){
-            $dstUsage = clone $usage;
+        foreach($srcUsages as $srcUsage){
+            $dstUsage = clone $srcUsage;
 
             /** @var Criterion $dstCriterion */
-            $dstCriterion = $dstCriteria->getOffset($usage->getCriterion()->getId());
+            $dstCriterion = $dstCriteria->getOffset($srcUsage->getCriterion()->getId());
 
             $dstUsage->setCriterion($dstCriterion);
             $dstUsage->setSubmissionBox($dstBox);
             $dstUsages->add($dstUsage);
-        }
-
-        // Now that we have an object graph, blow away all IDs
-        foreach($dstLevels as $dstLevel){
-            $dstLevel->setId(null);
-            foreach($dstLevel->getDescriptors() as $dstDescriptor){
-                $dstDescriptor->setId(null);
-                $dstDescriptor->getCriterion()->setId(null);
-            }
-        }
-
-        /* Compare existing destination criteria against copied criteria.
-         * If it already exists, use existing ID to prevent duplicates.
-         *
-         * By-pass cache as each execution of this function alters this query.
-         */
-        $existingCriteria = $criterionMapper->findByColumnList([
-            'parent_id'   => $dstBox->getCategory()->getId(),
-            'parent_type' => $dstCriteria->first()->getParentType(),
-        ], ['cache' => false]);
-
-        // Horrible order-n^2, but small data set so worth simplicity
-        foreach($existingCriteria as $existingCriterion){
-            foreach($dstCriteria as $dstCriterion){
-                if($dstCriterion->getGrouping() == $existingCriterion->getGrouping() &&
-                    $dstCriterion->getName() == $existingCriterion->getName()
-                ){
-                    $dstCriterion->setId($existingCriterion->getId());
-                }
-            }
         }
 
         // Save (order is important to ensure IDs are assigned to parents b4 saving children)
