@@ -213,9 +213,9 @@
                         quantity: 1
                     };
 
-                case 'timelineTwoDay':
+                case 'timelineTwoWeek':
                     return {
-                        unit:    'days',
+                        unit:    'weeks',
                         quantity: 1
                     };
             }
@@ -237,8 +237,8 @@
                 case 'timelineTwoMonth':
                     return 'month';
 
-                case 'timelineTwoDay':
-                    return 'day';
+                case 'timelineTwoWeek':
+                    return 'week';
             }
             throw new Error('Unrecognised view type "'+String(view.type)+'"');
         };
@@ -317,20 +317,18 @@
                         slotDuration: { days: 1 },
                         slotLabelFormat: { weeks: 1 },
                         slotLabelInterval: { weeks: 1 },
-                        buttonText: 'Term'
+                        buttonText: 'Semester'
                     },
                     timelineTwoMonth: {
                         type: 'timeline',
                         duration: { months: 2 },
                         buttonText: 'Month'
                     },
-                    timelineTwoDay: {
+                    timelineTwoWeek: {
                         type: 'timeline',
-                        duration: { days: 2 },
-                        buttonText: 'Day',
-                        slotLabelInterval: {
-                            hours: 3
-                        }
+                        duration: { weeks: 2 },
+                        slotLabelInterval: { days: 1 },
+                        buttonText: 'Week'
                     }
                 },
                 height: 'auto',
@@ -341,7 +339,7 @@
                 header: {
                     left: 'prevWindow,today,nextWindow',
                     center: 'title',
-                    right: 'timelineTerm,timelineTwoMonth,timelineTwoDay'
+                    right: 'timelineTerm,timelineTwoMonth,timelineTwoWeek'
                 },
                 events: function(start, end, timezone, callback) {
                     $.ajax({
