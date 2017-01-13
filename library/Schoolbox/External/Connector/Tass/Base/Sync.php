@@ -91,34 +91,29 @@ class Sync implements SyncInterface
             $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
             $addnum = '';
             foreach ($addnum_array as $value) {
-                $addnum = $addnum . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+                $addnum = $addnum . ',' . $this->database->smartQuote(trim($value));
             }
             if (strlen($addnum) > 0 ) {
                 $addnum = substr($addnum,1);
             }
-            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
+            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_typecode'))));
             $typecode = '';
             foreach ($typecode_array as $value) {
-                $typecode = $typecode . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+                $typecode = $typecode . ',' . $this->database->smartQuote(trim($value));
             }
             if (strlen($typecode) > 0 ) {
                 $typecode = substr($typecode,1);
             }
-            $studentjoin = "
-                LEFT JOIN studcommrules as scr
-                    ON (p.par_code = scr.par_code
-                        AND scr.cmpy_code = s.cmpy_code
-                        AND scr.add_num IN ({$addnum})
-                        AND scr.commtype_code IN ({$typecode})
+            $studentjoin = "LEFT JOIN studcommrules as scr
+                    ON p.par_code = scr.par_code
+                    AND scr.add_num IN ({$addnum})
+                    AND scr.commtype_code IN ({$typecode})
                 LEFT JOIN student as s
                     ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-                    OR (scr.par_code = scr.par_code AND scr.cmpy_code = s.cmpy_code)
-            ";
+                    OR (scr.par_code = scr.par_code AND scr.cmpy_code = s.cmpy_code)";
         } else {
-            $studentjoin = "
-                LEFT JOIN student as s
-                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-            ";
+            $studentjoin = "LEFT JOIN student as s
+                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
         }
 
         // Single Tuple contains data for [P]arent and [S]pouse

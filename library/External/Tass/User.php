@@ -56,7 +56,7 @@ class External_Tass_User implements External_UserInterface
         $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
         $addnum = '';
         foreach ($addnum_array as $value) {
-            $addnum = $addnum . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+            $addnum = $addnum . ',' . $this->getDatabase()->smartQuote(trim($value));
         }
         if (strlen($addnum) > 0 ) {
             $addnum = substr($addnum,1);
@@ -71,7 +71,7 @@ class External_Tass_User implements External_UserInterface
             INNER JOIN student s ON p.par_code=s.par_code AND p.cmpy_code=s.cmpy_code
             WHERE s.stud_code IN ($idList)
             AND pa.add_num IN ($addnum)
-            AND pa.cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+            AND pa.cmpy_code = {$companyCode}
         ";
 
         /* If Tass Comm rules are enabled then locate the guardian relationship
@@ -83,27 +83,27 @@ class External_Tass_User implements External_UserInterface
         ) {
             /* Expand out the typecodes from CSV
              */
-            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
+            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_typecode'))));
             $typecode = '';
             foreach ($typecode_array as $value) {
-                $typecode = $typecode . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+                $typecode = $typecode . ',' . $this->getDatabase()->smartQuote(trim($value));
             }
             if (strlen($typecode) > 0 ) {
                 $typecode = substr($typecode,1);
             }
             $query = $query . "
-                UNION ALL
+                UNION
                 SELECT DISTINCT pa.par_code, pa.e_mail, pa.add_num
                 FROM paraddress pa
                 INNER JOIN studcommrules scr ON pa.par_code=scr.par_code
                     AND pa.cmpy_code = scr.cmpy_code
-                    AND scr.cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+                    AND scr.cmpy_code = {$companyCode}
                     AND pa.add_num = scr.add_num
                     AND scr.commtype_code IN ({$typecode})
                 INNER JOIN student s ON scr.par_code=s.par_code AND scr.cmpy_code=s.cmpy_code
                 WHERE s.stud_code IN ($idList)
                 AND pa.add_num IN ($addnum)
-                AND pa.cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+                AND pa.cmpy_code = {$companyCode}
             ";
         }
 
@@ -329,15 +329,15 @@ class External_Tass_User implements External_UserInterface
             $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
             $addnum = '';
             foreach ($addnum_array as $value) {
-                $addnum = $addnum . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+                $addnum = $addnum . ',' . $this->getDatabase()->smartQuote(trim($value));
             }
             if (strlen($addnum) > 0 ) {
                 $addnum = substr($addnum,1);
             }
-            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
+            $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_typecode'))));
             $typecode = '';
             foreach ($typecode_array as $value) {
-                $typecode = $typecode . ',\'' . $this->getDatabase()->smartQuote(trim($value)) .'\'';
+                $typecode = $typecode . ',' . $this->getDatabase()->smartQuote(trim($value));
             }
             if (strlen($typecode) > 0 ) {
                 $typecode = substr($typecode,1);
@@ -370,12 +370,12 @@ class External_Tass_User implements External_UserInterface
             ";
             if ($commrules) {
                 $query = $query . "
-                    UNION ALL
+                    UNION
 
                     SELECT DISTINCT
                         scr.stud_code AS RelatedID
-                    FROM studcommrules
-                    WHERE cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+                    FROM studcommrules as scr
+                    WHERE cmpy_code = {$companyCode}
                     AND par_code = {$this->getDatabase()->smartQuote($parentCode)}
                     AND add_num IN ({$addnum})
                     AND commtype_code IN ({$typecode})
@@ -407,12 +407,12 @@ class External_Tass_User implements External_UserInterface
             ";
             if ($commrules) {
                 $query = $query . "
-                    UNION ALL
+                    UNION
 
                     SELECT DISTINCT
                         scr.stud_code AS RelatedID
-                    FROM studcommrules
-                    WHERE cmpy_code = {$this->getDatabase()->smartQuote($companyCode)}
+                    FROM studcommrules as scr
+                    WHERE cmpy_code = {$companyCode}
                     AND par_code = {$this->getDatabase()->smartQuote($id)}
                     AND add_num IN ({$addnum})
                     AND commtype_code IN ({$typecode})
