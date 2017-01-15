@@ -69,24 +69,6 @@ class Model extends AbstractAssessment
     protected $defaultOpenSpan;
 
     /**
-     * @return int
-     */
-    public function getDefaultOpenSpan()
-    {
-        return $this->defaultOpenSpan;
-    }
-
-    /**
-     * @param int $value
-     * @return $this
-     */
-    public function setDefaultOpenSpan($value)
-    {
-        $this->defaultOpenSpan = $value;
-        return $this;
-    }
-
-    /**
      * @param GradeGroup|null $gradeGroup
      * @return static
      */
