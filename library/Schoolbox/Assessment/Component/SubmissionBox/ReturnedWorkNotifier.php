@@ -91,10 +91,16 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 			return;
 		}
 
+        $publishDate = $mark->getPublishedAt();
+        if ((!$publishDate instanceof \Alaress_Date_Format) || $publishDate->isNull()) {
+            // Not published: don't even bother here either
+            return;
+        }
+
 		switch($bundle->getMethod()) {
 			case Mapper::METHOD_CREATE: // when returned work is generated
 			case Mapper::METHOD_UPDATE: // when returned work is updated:
-				$bundle->attach(self::TRIGGER_RETURNED, self::IMMEDIATELY);
+				$bundle->attach(self::TRIGGER_RETURNED, $publishDate->getUnixTimeStamp());
 				break;
 
 			case Mapper::METHOD_READ:
