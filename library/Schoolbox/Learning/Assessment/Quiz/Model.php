@@ -64,11 +64,6 @@ class Model extends AbstractAssessment
     protected $completionMessage;
 
     /**
-     * @var int
-     */
-    protected $defaultOpenSpan;
-
-    /**
      * @param GradeGroup|null $gradeGroup
      * @return static
      */
