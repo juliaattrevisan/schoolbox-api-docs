@@ -3,6 +3,6 @@
 
 -- Now we soft-delete such descriptors.
 UPDATE rubric_descriptor
-SET deleted_at = NOW()
+SET valid = false
 WHERE `value` IS NULL
 AND `description` = '';
