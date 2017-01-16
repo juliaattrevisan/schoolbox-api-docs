@@ -60,7 +60,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
          * + it isn't soft-deleted
          */
         $submissionsQuery = $database->prepare("
-            SELECT id, owner, uuid, submitted_at
+            SELECT 'submission' AS type, id, owner, uuid, submitted_at AS timestamp
             FROM student_submission
             WHERE box_id = :boxId
             AND owner = :owner
@@ -86,7 +86,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
          * + it isn't soft-deleted
          */
         $returnsQuery = $database->prepare("
-            SELECT id, owner, published_at
+            SELECT 'return' AS type, id, owner, published_at AS timestamp
             FROM submission_return
             WHERE box_id = :boxId
             AND owner = :owner
@@ -106,7 +106,16 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
         /* Sequence everything based on time so that we can infer uuid assignations
          */
-        $timeline = new \Schoolbox\Collection();
+        $timeline = new \Schoolbox\Collection(array_merge($submissions, $returns));
+        $timeline->sortByCallback(function($a, $b) {
+            $dateA = new \Alaress_Date_Format($a['timestamp'], \Alaress_Date_Format::DATABASE_FORMAT);
+            $dateB = new \Alaress_Date_Format($b['timestamp'], \Alaress_Date_Format::DATABASE_FORMAT);
+
+            return $dateA->gt($dateB);
+        });
+
+
+            print_r($timeline);
     }
 
     exit(1);
