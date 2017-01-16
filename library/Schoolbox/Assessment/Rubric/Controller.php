@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -90,14 +91,45 @@ class Controller extends BaseController
             ],
         ];
 
+        $folderId = $post->get('folderId');
+        if(!$folderId){
+            $this->getResponse()->status->set(400);
+            $this->getResponse()->content->set($this->buildJsonOutput('Must supply a folder Id'));
+            return;
+        }
 
         if ($post->get('type') == 'criterion') {
+
+            $group = $post->get('groupName');
+            $name  = $post->get('name');
+            if(!$group){
+                $this->getResponse()->status->set(400);
+                $this->getResponse()->content->set($this->buildJsonOutput('Must supply a Group for new Criterion'));
+                return;
+            }
+
+            $columnList = [
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                'parent_id'   => $folderId,
+            ];
+            $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
+            $proposedGroup = RubricMapper::getInstance()->normaliseForComparison($group);
+            $proposedName  = RubricMapper::getInstance()->normaliseForComparison($name);
+            foreach ($criteria as $criterion){
+                $normGroup = RubricMapper::getInstance()->normaliseForComparison($criterion->getGrouping());
+                $normName = RubricMapper::getInstance()->normaliseForComparison($criterion->getName());
+                if($normGroup == $proposedGroup && $normName == $proposedName){
+                    $this->getResponse()->status->set(400);
+                    $this->getResponse()->content->set($this->buildJsonOutput("Indicator already exists in this Group"));
+                    return;
+                }
+            }
 
             $context['rowspan'] = null;
             $context['group'] = [
                 'id' => $post->get('groupId')
             ];
-            $context['crit'] = $this->saveNewCriterion($post->get('folderId'), $post->get('groupName'), $post->get('name'));
+            $context['crit'] = $this->saveNewCriterion($folderId, $group, $name);
 
             $template = 'group-row-editable';
 
@@ -105,9 +137,25 @@ class Controller extends BaseController
 
         elseif ($post->get('type') == 'group') {
 
+            // Ensure the proposed Group name is not already in use.
+            $columnList = [
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                'parent_id'   => $folderId,
+            ];
+            $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
+            $proposed = RubricMapper::getInstance()->normaliseForComparison($post->get('name'));
+            foreach ($criteria as $criterion){
+                $grouping = RubricMapper::getInstance()->normaliseForComparison($criterion->getGrouping());
+                if($proposed == $grouping){
+                    $this->getResponse()->status->set(400);
+                    $this->getResponse()->content->set($this->buildJsonOutput("Group name already exists in this context"));
+                    return;
+                }
+            }
+
             $context['rowspan'] = 1;
             $context['group'] = [
-                'id'   => rand(1, PHP_INT_MAX), // this is just so the inputs on the page are unique
+                'id'   => rand(1, PHP_INT_MAX), // this is just so the inputs on the page are unique -- TODO make this 100% robust
                 'name' => $post->get('name'),
                 'used' => false,
             ];

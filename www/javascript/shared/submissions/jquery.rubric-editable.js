@@ -65,6 +65,7 @@
             var $input = $(this),
                 type   = $input.data('spawn'),
                 name   = this.value ? this.value.trim() : '',
+                $toastFeedback = $('[data-relation="create-response"]'),
                 $row, groupId;
 
             // prevent blank, but also prevent double-fire from keydown to blur
@@ -82,8 +83,12 @@
                 groupId = null;
             }
 
+            var message = 'Creating "' + name + '"...';
+
             // prevent mods
-            $input.val('Creating "' + name + '"...').prop('disabled', true);
+            $input.val(message).prop('disabled', true);
+
+            $toastFeedback.toastActivate({text: message});
 
             var payload = {
                 type: type,
@@ -98,26 +103,31 @@
                 payload.groupName = $rb.find('[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
             }
 
-            $.post(opt.url, payload, function (data) {
+            $.post(opt.url, payload)
+                .done(function (data) {
+                    var $data = $(data);
 
-                var $data = $(data);
+                    // simple case: prepend the row
+                    $row.before($data);
 
-                // simple case: prepend the row
-                $row.before($data);
-
-                // clear and re-enable the input
-                $input.val('').prop('disabled', false);
-
-                if (type == 'criterion') {
-                    // just gotta extend that rowspan
-                    var $span = $row.parent().children('[data-group="'+$row.data('group')+'"][data-groupname]').children('[rowspan]');
-                    $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
+                    if (type == 'criterion') {
+                        // just gotta extend that rowspan
+                        var $span = $row.parent().children('[data-group="' + $row.data('group') + '"][data-groupname]').children('[rowspan]');
+                        $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
 
 //                    $data.find('[type=checkbox]').prop('checked', true).trigger('change');
-                }
+                    }
+                    $toastFeedback.toastTimeout({text: type.charAt(0).toUpperCase() + type.substr(1) + ' created!', css: 'success'});
 
-                $rb.sequencer('refresh');
-            });
+                    $rb.sequencer('refresh');
+                })
+                .fail(function (data){
+                    $toastFeedback.toastTimeout({text: data.responseText, css: 'alert'});
+                })
+                .always(function(){
+                    // clear and re-enable the input
+                    $input.val('').prop('disabled', false);
+                });
 
             // probability is high the user pressed return, so prevent form submission
             e.preventDefault();
