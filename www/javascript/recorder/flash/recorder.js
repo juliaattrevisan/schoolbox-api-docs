@@ -182,8 +182,7 @@ var Recorder = {
 
   _defaultOnHideFlash: function(){
     var flashContainer = Recorder.options.flashContainer;
-    flashContainer.style.left = "-9999px";
-    flashContainer.style.top  = "-9999px";
+      flashContainer.style.display = "none";
   },
 
   _checkForFlashBlock: function(){
