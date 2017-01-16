@@ -15,6 +15,7 @@ use Scrub;
 use TextFormatter;
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 
 class Renderer extends Handler
@@ -54,29 +55,34 @@ class Renderer extends Handler
 
             foreach ($result as $wiki) {
 
-                //TODO remove when folder is properly hydrate with blog
-                $folder = $folderMapper->findCheaplyById($wiki['categoryID']);
+                try {
+                    $folder = $folderMapper->findCheaplyById($wiki['categoryID']);
 
-                foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
-                    $wiki['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">". Scrub::text( $breadcrumb->getName() ) ."</a>";
+                    foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
+                        $wiki['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
+                    }
+
+                    $createdTime = new Alaress_Date_Format($wiki['created'], 'Y-m-d H:i:s');
+
+                    $this->getPage()->setVar(
+                        array(
+                            'WIKI_ID'         => $wiki['wikiID'],
+                            'WIKI_CID'        => $wiki['categoryID'],
+                            'WIKI_HEADING'    => Scrub::text($wiki['heading']),
+                            'WIKI_BODY'       => TextFormatter::cutSentence(Scrub::html2text($wiki['body']), 150),
+                            'WIKI_OWNER'      => $wiki['userID'],
+                            'WIKI_OWNER_NAME' => $userHandler->formatName($wiki),
+                            'WIKI_CREATED'    => $createdTime->getRelativeTime(),
+                            'WIKI_BREADCRUMB' => $wiki['breadcrumb'],
+                            'WIKI_COUNT'      => $this->getCount($this->getType()),
+                            'WIKI_SLUG'       => $wiki['slug'],
+                        )
+                    );
+
+                    $this->getPage()->parse('wiki_block', 'wiki', true);
+                } catch (MapperException $e) {
+                    //noop
                 }
-
-                $createdTime = new Alaress_Date_Format($wiki['created'], 'Y-m-d H:i:s');
-
-                $this->getPage()->setVar(array(
-                    'WIKI_ID' => $wiki['wikiID'],
-                    'WIKI_CID' => $wiki['categoryID'],
-                    'WIKI_HEADING' => Scrub::text($wiki['heading']),
-                    'WIKI_BODY' => TextFormatter::cutSentence(Scrub::html2text($wiki['body']), 150),
-                    'WIKI_OWNER' => $wiki['userID'],
-                    'WIKI_OWNER_NAME' => $userHandler->formatName($wiki),
-                    'WIKI_CREATED' => $createdTime->getRelativeTime(),
-                    'WIKI_BREADCRUMB' => $wiki['breadcrumb'],
-                    'WIKI_COUNT' => $this->getCount($this->getType()),
-                    'WIKI_SLUG' => $wiki['slug'],
-                ));
-
-                $this->getPage()->parse('wiki_block', 'wiki', true);
             }
 
             $this->outputSeeMore();

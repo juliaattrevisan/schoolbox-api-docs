@@ -15,6 +15,7 @@ use Scrub;
 use TextFormatter;
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 
 class Renderer extends Handler
@@ -54,27 +55,32 @@ class Renderer extends Handler
 
             foreach ($result as $forum) {
 
-                //TODO remove when folder is properly hydrate with blog
-                $folder = $folderMapper->findCheaplyById($forum['categoryID']);
+                try {
+                    $folder = $folderMapper->findCheaplyById($forum['categoryID']);
 
-                foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
-                    $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">". Scrub::text( $breadcrumb->getName() ) ."</a>";
+                    foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
+                        $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
+                    }
+
+                    $createdTime = new Alaress_Date_Format($forum['date'], 'Y-m-d H:i:s');
+
+                    $this->getPage()->setVar(
+                        array(
+                            'FORUM_CID'        => $forum['categoryID'],
+                            'FORUM_THREADID'   => $forum['threadID'],
+                            'FORUM_TITLE'      => Scrub::text($forum['threadTitle']),
+                            'FORUM_BODY'       => TextFormatter::cutSentence(Scrub::html2text($forum['body']), 150),
+                            'FORUM_OWNER'      => $forum['uid'],
+                            'FORUM_OWNER_NAME' => $userHandler->formatName($forum),
+                            'FORUM_CREATED'    => $createdTime->getRelativeTime(),
+                            'FORUM_BREADCRUMB' => $forum['breadcrumb'],
+                        )
+                    );
+
+                    $this->getPage()->parse('forum_block', 'forum', true);
+                } catch (MapperException $e) {
+                    //noop
                 }
-
-                $createdTime = new Alaress_Date_Format($forum['date'], 'Y-m-d H:i:s');
-
-                $this->getPage()->setVar(array(
-                    'FORUM_CID' => $forum['categoryID'],
-                    'FORUM_THREADID' => $forum['threadID'],
-                    'FORUM_TITLE' => Scrub::text($forum['threadTitle']),
-                    'FORUM_BODY' => TextFormatter::cutSentence(Scrub::html2text($forum['body']), 150),
-                    'FORUM_OWNER' => $forum['uid'],
-                    'FORUM_OWNER_NAME' => $userHandler->formatName($forum),
-                    'FORUM_CREATED' => $createdTime->getRelativeTime(),
-                    'FORUM_BREADCRUMB' => $forum['breadcrumb'],
-                ));
-
-                $this->getPage()->parse('forum_block', 'forum', true);
             }
 
             $this->outputSeeMore();
