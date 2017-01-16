@@ -132,6 +132,17 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
              */
             if (($event['type'] == 'return') && $submissionId) {
                 $log->debug(sprintf('Box %d, owner %d: assigning submission_id %d to return %d', $currentBox['box_id'], $currentBox['owner'], $submissionId, $event['id']));
+
+                $updateQuery = $database->prepare("
+                    UPDATE submission_return
+                    SET student_submission_id = :submissionId
+                    WHERE id = :id
+                ");
+
+                $updateQuery->execute([
+                    'id' => $event['id'],
+                    'submissionId' => $submissionId,
+                ]);
             }
         }
     }
