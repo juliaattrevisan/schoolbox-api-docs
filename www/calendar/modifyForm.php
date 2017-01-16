@@ -68,23 +68,23 @@ switch ($_REQUEST['action']) {
         // Ghetto validation
         try {
             if (strlen($_POST['publishDate'])) {
-                $pubDateObject = Alaress_Date_Format::newDatabaseDate($_POST['publishDate']);
+                $pubDateObject = Alaress_Date_Format::newLocalShort($_POST['publishDate']);
             }
             /* Events recur until this time
              */
             if (strlen($_POST['repeat_until'])) {
-                $until = Alaress_Date_Format::newDabaseDate($_POST['repeat_until'])->endOfDay();
+                $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until'])->endOfDay();
             }
             /* Start and end dates
              */
-            $startDate = Alaress_Date_Format::newLocal($_POST['startDate']);
-//                ->set12Hour($_POST['startHour'], $_POST['startPeriod'])
-//                ->setMinute($_POST['startMinute'])
-//            ;
-            $endDate = Alaress_Date_Format::newLocal($_POST['endDate']);
-//                ->set12Hour($_POST['endHour'], $_POST['endPeriod'])
-//                ->setMinute($_POST['endMinute'])
-//            ;
+            if($_POST['allday'] == 1) {
+                $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])->startOfDay();
+                $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])->endOfDay();
+            }
+            else {
+                $startDate = Alaress_Date_Format::newLocal($_POST['startDate']);
+                $endDate = Alaress_Date_Format::newLocal($_POST['endDate']);
+            }
         } catch (RuntimeException $e) {
             error(15);
             exit;
