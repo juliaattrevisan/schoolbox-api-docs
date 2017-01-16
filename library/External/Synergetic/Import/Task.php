@@ -149,7 +149,6 @@ class External_Synergetic_Import_Task {
 					continue;
 				}
 
-				$submissionBox->setRubricResultSet(0);
 				$submissionBox->setWeight($synergeticTask->getWeighting());
 				$submissionBox->setMaxMark($synergeticTask->getTotalMark());
 				$submissionBox->setMarkVisibility(IAssessable::MARK_VISIBILITY_PRIVATE);

@@ -138,11 +138,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     protected $mark_type;
 
-    /**
-     * @var int
-     */
-    protected $rubric_result_set;
-
     /** @var bool */
     protected $useRubric;
 
@@ -601,25 +596,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     {
         return $this->owner;
     }
-
-    /**
-     * @param  int $rubric_result_set
-     * @return $this
-     */
-    public function setRubricResultSet($rubric_result_set)
-    {
-        $this->rubric_result_set = $rubric_result_set;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getRubricResultSet()
-    {
-        return $this->rubric_result_set;
-    }
-
 
     /**
      * @deprecated mapper method

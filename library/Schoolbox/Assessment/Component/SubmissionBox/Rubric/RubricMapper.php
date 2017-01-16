@@ -213,7 +213,7 @@ class RubricMapper
     {
         list ($groups, $criteria) = $this->findCriteria($box, $getParentCriteria);
         $descriptors = $this->findDescriptors($box);
-        $levelList   = $this->generateLevelList($box, $descriptors, $criteria);
+        $levelList   = $this->generateLevelList($box);
 
         // setup the data structure to match what the factory expects
         $postdata = [$box->getId() => [
@@ -404,11 +404,9 @@ class RubricMapper
 
     /**
      * @param SubmissionBox $box
-     * @param array         $descriptors
-     * @param array         $criteria
      * @return array
      */
-    protected function generateLevelList(SubmissionBox $box, array $descriptors, array $criteria)
+    protected function generateLevelList(SubmissionBox $box)
     {
         $levelList = [];
 
@@ -419,36 +417,6 @@ class RubricMapper
                 'id'   => $level->getId(),
                 'name' => $level->getName()
             ];
-        }
-
-        // mokay. so if at this point you've got no descriptors, check to see if there should be a resultSet we should use
-        if (count($descriptors) == 0) {
-            // misnomer much
-            $resultSetId = $box->getRubricResultSet();
-
-            // TODO. Is this still valid in a post 16.5 world?
-            // I don't think it's possible to have a resultSet set for a subBox, without having an attached rubric.
-            // Instead, the resultSet can be used when creating the rubric, it's never stored against the subBox.
-            // If this is correct, the whole IF construct can get deleted.
-            // TODO need to migrate data first, then delete
-
-            if ($resultSetId > 0) {
-                // got a resultSet - we're going to fake that into a descriptor grid
-
-                /** @var Collection|Result[] $results */
-                $results = SubmissionBox\Rubric\ResultMapper::getInstance()->findByColumn('resultset_id', $resultSetId, [ 'order' => [ 'value' => 'desc' ] ]);
-
-                foreach ($results as $result) {
-                    foreach ($criteria as $id => $crit) {
-                        $descriptors[$id][] = [
-                            'text' => $result->getLabel(),
-                            'points' => $result->getValue()
-                        ];
-                        // for legacy support, we leave the name blank
-                        $levelList[$result->getValue()] = [ 'name' => '' ];
-                    }
-                }
-            }
         }
 
         // ensure there are ALWAYS at least 2 levels
