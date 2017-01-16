@@ -68,15 +68,12 @@ class Controller extends Base
         $fixed  = [];
         $nulls  = [];
         $radios = [];
-        $colors = [];
 
         // Get the data into some sort of usable format
 
         foreach ($this->getRequest()->post as $field => $value) {
 
-            if (substr($field, 6, 5) == "color") {
-                $colors[substr($field, 6)] = $value;
-            } else if (substr($field, 0, 6) == "value-") {
+            if (substr($field, 0, 6) == "value-") {
                 $values[substr($field, 6)] = $value;
             } else if (substr($field, 0, 6) == "fixed-") {
                 $fixed[substr($field, 6)] = $value;
@@ -110,44 +107,6 @@ class Controller extends Base
                 // Update values
 
                 $setter = "set" . $this->underscoreToCamelCase($field);
-                $model->$setter($value[$currentIndex]);
-
-                // Override nullable fields where appropriate
-
-                if (isset($nulls[$field])) {
-                    foreach ($nulls[$field] as $nullableField => $index) {
-                        if ($currentIndex == $index) {
-                            $model->$setter(null);
-                        }
-                    }
-                }
-            }
-
-
-            foreach ($colors as $field => $value)
-            {
-                // Update values
-
-                $setter = "set" . $this->underscoreToCamelCase($field);
-
-                $value[$currentIndex] = strtolower($value[$currentIndex]);
-
-                // Need to convert strings in format "rgb(123,123,123)" to a hexcode
-
-                if (substr($value[$currentIndex], 0, 3) == 'rgb') {
-                    preg_match("/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/", $value[$currentIndex], $matches);
-
-                    $value[$currentIndex] = '#';
-
-                    for ($i=1; $i<=3; $i++) {
-                        $tuple = dechex($matches[$i]);
-                        if (strlen($tuple) < 2) {
-                            $tuple = "0{$tuple}";
-                        }
-                        $value[$currentIndex] .= $tuple;
-                    }
-                }
-
                 $model->$setter($value[$currentIndex]);
 
                 // Override nullable fields where appropriate
