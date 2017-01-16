@@ -116,22 +116,22 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
         /* Infer and assign a uuid to a return
          */
-        $uuid = false;
+        $submissionId = false;
 
         foreach ($timeline as $event) {
 
-            /* Remember the most recently encountered uuid and assign it to all returns that follow,
-             * until another submission is encountered
+            /* Remember the most recently encountered uuid and assign its submission to all returns
+             * that follow, until another submission is encountered
              */
             if ($event['type'] == 'submission') {
-                $uuid = $event['uuid'];
+                $submissionId = $event['id'];
                 continue;
             }
 
-            /* Apply uuid to returns, inferring that they are associated
+            /* Apply submission_id to returns, inferring that they are associated
              */
-            if (($event['type'] == 'return') && $uuid) {
-                $log->debug(sprintf('Box %d, owner %d: assigning %s to return %d ', $currentBox['box_id'], $currentBox['owner'], $uuid, $event['id']));
+            if (($event['type'] == 'return') && $submissionId) {
+                $log->debug(sprintf('Box %d, owner %d: assigning submission_id %d to return %d', $currentBox['box_id'], $currentBox['owner'], $submissionId, $event['id']));
             }
         }
     }
