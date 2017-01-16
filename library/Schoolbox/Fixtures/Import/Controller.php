@@ -95,6 +95,9 @@ class Controller extends Base
     const RESULT_SUCCESS = 'success';
     const RESULT_ERROR = 'error';
 
+    /** @var array */
+    private $disableCache = ['cache' => false];
+
     /** @var Import $import */
     private $import;
 
@@ -1314,7 +1317,7 @@ class Controller extends Base
                     // Find the sport associated with the division, and create if doesn't exist
 
                     try {
-                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], [], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
                         $sport = new Sport();
@@ -1329,7 +1332,7 @@ class Controller extends Base
                             'name' => $row[3],
                             'sport_id' => $sport->getId(),
                             'season_id' => $season->getId()
-                        ]);
+                        ], [], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
                         $division = new Division();
@@ -1344,7 +1347,7 @@ class Controller extends Base
                     try {
                         $venue = $this->getVenueMapper()->findOneByColumnList([
                             'name' => $row[7]
-                        ]);
+                        ], [], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Venue '{$row[7]}'");
                         $venue = new Venue();
@@ -1358,7 +1361,7 @@ class Controller extends Base
                         $teamHome = $this->getTeamMapper()->findOneByColumnList([
                             'name' => $row[8],
                             'division_id' => $division->getId()
-                        ]);
+                        ], [], $this->disableCache);
                     } catch (MapperException $e) {
                         /** @var Team $teamHome */
                         $teamHome = null;
@@ -1368,7 +1371,7 @@ class Controller extends Base
                         $teamAway = $this->getTeamMapper()->findOneByColumnList([
                             'name' => $row[9],
                             'division_id' => $division->getId()
-                        ]);
+                        ], [], $this->disableCache);
                     } catch (MapperException $e) {
                         /** @var Team $teamAway */
                         $teamAway = null;
@@ -1379,7 +1382,7 @@ class Controller extends Base
                     try {
                         $schoolHome = $this->getSchoolMapper()->findOneByColumnList([
                             'name' => $row[8]
-                        ]);
+                        ], [], $this->disableCache);
                     } catch (MapperException $e) {
                         /** @var School $schoolHome */
                         $schoolHome = null;
@@ -1388,7 +1391,7 @@ class Controller extends Base
                     try {
                         $schoolAway = $this->getSchoolMapper()->findOneByColumnList([
                             'name' => $row[9]
-                        ]);
+                        ], [], $this->disableCache);
                     } catch (MapperException $e) {
                         /** @var School $schoolAway */
                         $schoolAway = null;
@@ -1433,7 +1436,7 @@ class Controller extends Base
                                 'away_team_id' => $teamAway == null ? null : $teamAway->getId(),
                                 'home_school_id' => $schoolHome == null ? null : $schoolHome->getId(),
                                 'away_school_id' => $schoolAway == null ? null : $schoolAway->getId()
-                            ]);
+                            ], [], $this->disableCache);
                             $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                         } catch (MapperException $e) {
                             $match = new Match();
