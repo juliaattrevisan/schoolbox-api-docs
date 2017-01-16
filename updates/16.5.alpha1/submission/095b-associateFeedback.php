@@ -102,7 +102,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
         $returns = $returnsQuery->fetchAll(\PDO::FETCH_ASSOC);
 
-        $log->debug(sprintf('Box %d, owner %d: chronologically resequencing %d submissions, %d returns ', $currentBox['box_id'], $currentBox['owner'], $submissionsQuery->rowCount(), $returnsQuery->rowCount()));
+        $log->info(sprintf('Box %d, owner %d: chronologically resequencing %d submissions, %d returns ', $currentBox['box_id'], $currentBox['owner'], $submissionsQuery->rowCount(), $returnsQuery->rowCount()));
 
         /* Sequence everything based on time so that we can infer uuid assignations
          */
@@ -114,8 +114,26 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             return $dateA->gt($dateB);
         });
 
+        /* Infer and assign a uuid to a return
+         */
+        $uuid = false;
 
-            print_r($timeline);
+        foreach ($timeline as $event) {
+
+            /* Remember the most recently encountered uuid and assign it to all returns that follow,
+             * until another submission is encountered
+             */
+            if ($event['type'] == 'submission') {
+                $uuid = $event['uuid'];
+                continue;
+            }
+
+            /* Apply uuid to returns, inferring that they are associated
+             */
+            if (($event['type'] == 'return') && $uuid) {
+                $log->debug(sprintf('Box %d, owner %d: assigning %s to return %d ', $currentBox['box_id'], $currentBox['owner'], $uuid, $event['id']));
+            }
+        }
     }
 
     exit(1);
