@@ -25,15 +25,17 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     /* Find all the boxes that contain returns that don't have student_submission_id values and
      * no uuid values - need to determine whether they should, depending on a timeline of events
      */
-    $boxes = $database->prepare("
-        SELECT box_id, marker, owner
+    $boxesQuery = $database->prepare("
+        SELECT DISTINCT box_id, marker, owner
         FROM submission_return
         WHERE student_submission_id IS NULL
         AND uuid IS NULL
         ORDER BY box_id
     ");
 
-    $boxes->execute();
+    $boxesQuery->execute();
+
+    $boxes = $boxesQuery->fetchAll();
 
     $allBoxIds = [];
 
@@ -41,7 +43,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $allBoxIds[] = $currentBox['box_id'];
     }
 
-    $log->debug(sprintf('%d submission_box records exist which contain submission_returns missing uuid values', $boxes->rowCount()));
+    $log->debug(sprintf('%d submission_box records exist which contain submission_returns missing uuid values', $boxesQuery->rowCount()));
     $log->debug(sprintf('(%s)', implode(', ', array_unique($allBoxIds))));
 
     /* Find all the student_submissions and submission_return records
@@ -57,7 +59,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
          * + it has a submitted_at date,
          * + it isn't soft-deleted
          */
-        $submissions = $database->prepare("
+        $submissionsQuery = $database->prepare("
             SELECT id, owner, uuid, submitted_at
             FROM student_submission
             WHERE box_id = :boxId
@@ -68,6 +70,11 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             AND deleted_at IS NULL
         ");
 
+        $submissionsQuery->execute([
+            'boxId' => $currentBox['box_id'],
+            'owner' => $currentBox['owner'],
+        ]);
+
         /* Only obtain returns for the current (box_id, owner) tuple
          *
          * We only care if:
@@ -76,7 +83,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
          * + it has a published_at date,
          * + it isn't soft-deleted
          */
-        $returns = $database->prepare("
+        $returnsQuery = $database->prepare("
             SELECT id, owner, published_at
             FROM submission_return
             WHERE box_id = :boxId
@@ -85,6 +92,16 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             AND is_confirmation_of_submission = 0
             AND deleted_at IS NULL
         ");
+
+        $returnsQuery->execute([
+            'boxId' => $currentBox['box_id'],
+            'owner' => $currentBox['owner'],
+        ]);
+
+        $log->debug(sprintf('Box %d, owner %d: chronologically resequencing %d submissions, %d returns ', $currentBox['box_id'], $currentBox['owner'], $submissionsQuery->rowCount(), $returnsQuery->rowCount()));
+
+        /* Sequence everything based on time so that we can infer uuid assignations
+         */
     }
 
     exit(1);
