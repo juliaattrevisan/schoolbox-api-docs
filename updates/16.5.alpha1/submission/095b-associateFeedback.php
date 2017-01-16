@@ -35,7 +35,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     $boxesQuery->execute();
 
-    $boxes = $boxesQuery->fetchAll();
+    $boxes = $boxesQuery->fetchAll(\PDO::FETCH_ASSOC);
 
     $allBoxIds = [];
 
@@ -75,6 +75,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             'owner' => $currentBox['owner'],
         ]);
 
+        $submissions = $submissionsQuery->fetchAll(\PDO::FETCH_ASSOC);
+
         /* Only obtain returns for the current (box_id, owner) tuple
          *
          * We only care if:
@@ -98,10 +100,13 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             'owner' => $currentBox['owner'],
         ]);
 
+        $returns = $returnsQuery->fetchAll(\PDO::FETCH_ASSOC);
+
         $log->debug(sprintf('Box %d, owner %d: chronologically resequencing %d submissions, %d returns ', $currentBox['box_id'], $currentBox['owner'], $submissionsQuery->rowCount(), $returnsQuery->rowCount()));
 
         /* Sequence everything based on time so that we can infer uuid assignations
          */
+        $timeline = new \Schoolbox\Collection();
     }
 
     exit(1);
