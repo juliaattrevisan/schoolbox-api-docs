@@ -49,6 +49,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     /* Find all the student_submissions and submission_return records
      * that require deeper inspection
      */
+    $returnTransactions = 0;
+
     foreach ($boxes as $currentBox) {
 
         /* Only obtain submissions for the current (box_id, owner) tuple
@@ -143,9 +145,13 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     'id' => $event['id'],
                     'submissionId' => $submissionId,
                 ]);
+
+                $returnTransactions++;
             }
         }
     }
+
+    $log->notice(sprintf('%d returns updated with inferred submission_id values.', $returnTransactions));
 
     exit(1);
 });
