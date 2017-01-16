@@ -9,23 +9,22 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
-
-class Result {
+class Result
+{
 
     /**
      * @var int
      */
-    protected $resultSetId;
+    private $resultSetId;
 
     /**
      * @var string
      */
-    protected $label;
+    private $label;
     /**
      * @var int
      */
-    protected $value;
+    private $value;
 
     /**
      * @return int
@@ -48,31 +47,33 @@ class Result {
     /**
      * @param $label
      */
-    public function setLabel($label) {
+    public function setLabel($label)
+    {
         $this->label = $label;
     }
 
     /**
      * @return int
      */
-    public function getLabel() {
+    public function getLabel()
+    {
         return $this->label;
     }
 
     /**
      * @param $value
      */
-    public function setValue($value) {
+    public function setValue($value)
+    {
         $this->value = $value;
     }
 
     /**
      * @return string
      */
-    public function getValue() {
+    public function getValue()
+    {
         return $this->value;
     }
-
-
 }
 

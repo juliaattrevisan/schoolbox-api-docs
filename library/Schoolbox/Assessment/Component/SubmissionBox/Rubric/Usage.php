@@ -11,28 +11,32 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 
-class Usage {
+class Usage
+{
 
     /**
      * @var Criterion
      */
-    protected $criterion;
+    private $criterion;
 
     /**
      * @var SubmissionBox
      */
-    protected $submission_box;
+    private $submission_box;
 
     /**
+     * 0-based
+     *
      * @var int
      */
-    protected $sequence = 0;
+    private $sequence = 0;
 
     /**
      * @param  Criterion $criterion
      * @return $this
      */
-    public function setCriterion($criterion) {
+    public function setCriterion(Criterion $criterion)
+    {
         $this->criterion = $criterion;
         return $this;
     }
@@ -40,7 +44,8 @@ class Usage {
     /**
      * @return Criterion
      */
-    public function getCriterion() {
+    public function getCriterion()
+    {
         return $this->criterion;
     }
 
@@ -48,7 +53,8 @@ class Usage {
      * @param  SubmissionBox $submission_box
      * @return $this
      */
-    public function setSubmissionBox($submission_box) {
+    public function setSubmissionBox(SubmissionBox $submission_box)
+    {
         $this->submission_box = $submission_box;
         return $this;
     }
@@ -56,7 +62,8 @@ class Usage {
     /**
      * @return SubmissionBox
      */
-    public function getSubmissionBox() {
+    public function getSubmissionBox()
+    {
         return $this->submission_box;
     }
 

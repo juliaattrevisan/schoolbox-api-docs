@@ -11,48 +11,45 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 
-class Criterion implements ISoftDeletable {
+class Criterion implements ISoftDeletable
+{
+    use Id;
+    use DeletedAtDate;
 
-    const PARENT_TYPE_CATEGORY   = 'category';
+    const PARENT_TYPE_CATEGORY = 'category';
     const PARENT_TYPE_SUBMISSION = 'submission';
     const PARENT_TYPE_CURRICULUM = 'curriculum';
 
     /**
-     * @var int
+     * @var string
      */
-    protected $id;
+    private $grouping;
 
     /**
      * @var string
      */
-    protected $grouping;
-
-    /**
-     * @var string
-     */
-    protected $name;
+    private $name;
 
     /**
      * @var int
      */
-    protected $parent_id;
+    private $parent_id;
 
     /**
      * @var string
      */
-    protected $parent_type = self::PARENT_TYPE_CATEGORY;
+    private $parent_type = self::PARENT_TYPE_CATEGORY;
 
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $deletedAt;
 
     /**
      * @param  string $grouping
      * @return $this
      */
-    public function setGrouping($grouping) {
+    public function setGrouping($grouping)
+    {
         $this->grouping = $grouping;
         return $this;
     }
@@ -60,31 +57,17 @@ class Criterion implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getGrouping() {
+    public function getGrouping()
+    {
         return $this->grouping;
-    }
-
-    /**
-     * @param  int   $id
-     * @return $this
-     */
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() {
-        return $this->id;
     }
 
     /**
      * @param  string $name
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -92,15 +75,17 @@ class Criterion implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
-     * @param  int   $parent_id
+     * @param  int $parent_id
      * @return $this
      */
-    public function setParentId($parent_id) {
+    public function setParentId($parent_id)
+    {
         $this->parent_id = $parent_id;
         return $this;
     }
@@ -108,7 +93,8 @@ class Criterion implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getParentId() {
+    public function getParentId()
+    {
         return $this->parent_id;
     }
 
@@ -116,7 +102,8 @@ class Criterion implements ISoftDeletable {
      * @param  string $parent_type
      * @return $this
      */
-    public function setParentType($parent_type) {
+    public function setParentType($parent_type)
+    {
         $this->parent_type = $parent_type;
         return $this;
     }
@@ -124,31 +111,8 @@ class Criterion implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getParentType() {
+    public function getParentType()
+    {
         return $this->parent_type;
     }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDeleted() {
-        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
-    }
-
 }

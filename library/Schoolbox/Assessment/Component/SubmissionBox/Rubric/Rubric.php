@@ -20,7 +20,7 @@ class Rubric extends Core\Rubric
 {
 
     /** @var SubmissionBox */
-    protected $box;
+    private $box;
 
 
     /**
