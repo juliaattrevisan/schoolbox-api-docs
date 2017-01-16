@@ -525,7 +525,7 @@ class RubricMapper
      * @param $string
      * @return string
      */
-    protected function normaliseForComparison($string)
+    public function normaliseForComparison($string)
     {
         return strtolower($this->normalizeSpace($string));
     }
