@@ -7,6 +7,27 @@
         var hasLoaded{COMPONENT_INSTANCE_ID} = false;
 
         $(function() {
+
+            /**
+             * Validation
+             */
+            $('form[data-add-post-form]').each(function() {
+                $(this).alaressValidate({
+                    rules: {
+                        body: {
+                            required: {
+                                depends: function (element) {
+                                    return !$(element).parents('form').find('input[name="attachment[]"]').length;
+                                }
+                            }
+                        }
+                    },
+                    messages: {
+                        body: "Please enter a message or attach a file."
+                    }
+                });
+            });
+
             if (hasLoaded{COMPONENT_INSTANCE_ID} !== true) {
                 $('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
                     instanceId: '{COMPONENT_INSTANCE_ID}',
