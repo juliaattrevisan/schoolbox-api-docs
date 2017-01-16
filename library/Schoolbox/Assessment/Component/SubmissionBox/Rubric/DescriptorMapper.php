@@ -82,17 +82,20 @@ class DescriptorMapper extends Schoolbox\Mapper {
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
+            $levelId = $r[$levelKey];
+            $criterionId = $r[$criterionKey];
+
             // First time we've encountered this Level ?
-            if(!$levels->getOffset($levelKey)){
-                $levels->setOffset($levelKey, $this->hydrateJoin($r, 'level', 'l'));
+            if(!$levels->getOffset($levelId)){
+                $levels->setOffset($levelId, $this->hydrateJoin($r, 'level', 'l'));
             }
-            $level = $levels->getOffset($levelKey);
+            $level = $levels->getOffset($levelId);
 
             // First time we've encountered this Criterion ?
-            if(!$criteria->getOffset($criterionKey)){
-                $criteria->setOffset($criterionKey, $this->hydrateJoin($r, 'criterion', 'c'));
+            if(!$criteria->getOffset($criterionId)){
+                $criteria->setOffset($criterionId, $this->hydrateJoin($r, 'criterion', 'c'));
             }
-            $criterion = $criteria->getOffset($criterionKey);
+            $criterion = $criteria->getOffset($criterionId);
 
             $descriptor = $this->hydrate($r);
             $descriptors->setOffset($descriptor->getId(), $descriptor);
