@@ -299,10 +299,10 @@ class Controller extends Base
             foreach ($assessments as $assessment) {
                     $assessmentList[] = [
                         'id' => $assessment->getId(),
-                        'title' => $assessment->getTitle()
+                        'title' => $assessment->getTitle(),
+                        'duetime' => $assessment->getDueAt()->getTimeOnly()
                         ];
             }
-
             if ($assessmentsDue > 0) {
                 $students[] = [
                     'id' => $studentCurrent->getId(),                      // Required for link to student profile

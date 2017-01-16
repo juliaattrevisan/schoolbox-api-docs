@@ -49,7 +49,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         displayFormat: 'd/m/Y h:iK',
         displayFormatDate: 'd/m/Y',
         databaseFormat: 'Y-m-d H:i:s',
-        type: event
+        type: 'event'
     };
 
     // Override with user any options

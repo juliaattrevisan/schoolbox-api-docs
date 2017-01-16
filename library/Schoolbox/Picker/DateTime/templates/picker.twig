@@ -78,6 +78,12 @@
         top: inherit;
         line-height: inherit;
     }
+    .reveal-link {
+        cursor: pointer;
+    }
+    .expand-list {
+        display: none;
+    }
 </style>
 <div class="row">
     <dl class="tabs" data-tab>
@@ -97,7 +103,7 @@
                 <div class="small-12 medium-8 columns">
 
                     {# Placeholder for appointments to be rendered in #}
-                    <div id="pickerAppointments{{ id }}" class="card small-12 medium-8"></div>
+                    <div id="pickerResponse{{ id }}"></div>
 
                 </div>
         </div>
@@ -205,7 +211,6 @@
         $('select[name*="cycle"]').empty().append(optionsHtml);
     }
 
-
     {# Highlight day and period #}
     function showPeriod() {
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
@@ -306,7 +311,7 @@
                     timetableDate = moment(data.date, convertFormat('{{ displayFormat }}'));
 
                     {# Clear out any old appointments #}
-                    timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y h:iK'))+'</h3>');
+                    timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y'))+'</h3>');
                     if (data.appointments.length == 0) {
 
                         timetableAppointments.append('No events found');
@@ -336,7 +341,7 @@
                     timetableDate = moment(data.date, convertFormat('{{ displayFormat }}'));
 
                     {# Clear out any old appointments #}
-                    timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y h:iK'))+'</h3>');
+                    timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y'))+'</h3>');
 
                     if (data.appointments.length == 0) {
 
@@ -382,6 +387,7 @@
         enableTime: true,
         allowInput: true,
         disableMobile: true,
+        minuteIncrement: 1,
         onReady: function(selectedDates, dateStr, instance) {
             //Wrong format, swaps day with month
             var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
@@ -440,12 +446,12 @@
 
                 {% if type == 'duework'  %}
 
-                var pickerResponce = $('#pickerAppointments{{ id }}');
+                var pickerResponse = $('#pickerResponse{{ id }}');
 
                 // Can the assessment form have dates and be called outside the class page?
                 var classCode = $('*[name = "classCode"]').val();
 
-                pickerResponce.html('Loading results');
+                pickerResponse.html('Loading results');
                 $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, classCode).replace(/{date}/g,  encodeURIComponent(dateSplit[0])))
 
                         .done(function (data) {
@@ -454,31 +460,59 @@
 
                                 {# There we no appointment on the selected date #}
 
-                                pickerResponce.html('No events found');
+                                pickerResponse.html('No events found');
 
                             } else {
 
                                 {# Clear out any old appointments #}
 
-                                pickerResponce.html('');
+                                pickerResponse.html('');
 
                                 {# Populate with appointments for the selected date #}
-
-                                pickerResponce.html('');
-
-                                {# Populate with appointments for the selected date #}
-                                var html = '';
+                                var html = '<div class="row">';
+                                html += '<div class="small-12 medium-6 columns">';
+                                html += '<ul class="information-list">';
+                                var htmlEx = '';
                                 for (var i = 0; i < data.students.length; i++) {
+                                    html += '<li class="actions-small-1">';
+                                    html += '<div class="list-item">';
                                     html += '<div class="card small-12">';
                                     html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64" alt="View Profile">';
                                     html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
                                     html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
-                                    for(var k=0; k < data.students[i].assessmentList.length; k++) {
-                                      html += k+': '+data.students[i].assessmentList[k]['title']+'<br/>';
-                                    }
                                     html += '</div>';
+                                    html += '</div>';
+                                    html += '<nav><div data-reveal-list="' + data.students[i].id + '" class="icon-next reveal-link"></div></nav>';
+                                    html += '</li>';
+
+                                    htmlEx += '<div id="expand' + data.students[i].id + '" class="expand-list">';
+                                    htmlEx += '<h4>Work due for ' + data.students[i].firstname + ' ' +data.students[i].lastname + '</h4>';
+                                    htmlEx += '<ul>';
+                                    for (var k=0; k < data.students[i].assessmentList.length; k++) {
+                                        htmlEx += '<li><span>';
+                                        if(data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
+                                            htmlEx += data.students[i].assessmentList[k]['duetime'];
+                                        }
+                                        htmlEx += '</span>' + data.students[i].assessmentList[k]['title'] + '</li>';
+                                    }
+                                    htmlEx += '</ul>';
+                                    htmlEx += '</div>';
+
                                 }
-                                pickerResponce.append(html);
+                                html += '</ul>';
+                                html += '</div>';
+                                html += '<div class="small-12 medium-6 columns">';
+                                html += htmlEx;
+                                html += '<div>';
+                                html += '<div>';
+
+                                pickerResponse.append(html);
+
+                                $('.reveal-link').click(function () {
+                                    $('.expand-list').css('display', 'none');
+                                    var s = $(this).attr('data-reveal-list');
+                                    $('#expand'+s).css('display', 'block');
+                                });
                             }
                         })
                         .fail(function () {
@@ -489,21 +523,21 @@
 
                 {# AJAX in appointments for the selected date #}
 
-                var pickerResponce = $('#pickerAppointments{{ id }}');
+                var pickerResponse = $('#pickerResponse{{ id }}');
 
-                pickerResponce.html('Loading events');
+                pickerResponse.html('Loading events');
 
                 $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
                         .done(function (data) {
                             if (data.appointments.length == 0) {
 
                                 {# There we no appointment on the selected date #}
-                                pickerResponce.html('No events found');
+                                pickerResponse.html('No events found');
 
                             } else {
 
                                 {# Clear out any old appointments #}
-                                pickerResponce.html('');
+                                pickerResponse.html('');
 
                                 {# Populate with appointments for the selected date #}
                                 var html = '';
@@ -515,7 +549,7 @@
                                     }
                                     html += '</p>';
                                 }
-                                pickerResponce.append(html);
+                                pickerResponse.append(html);
                             }
                         })
                         .fail(function () {
