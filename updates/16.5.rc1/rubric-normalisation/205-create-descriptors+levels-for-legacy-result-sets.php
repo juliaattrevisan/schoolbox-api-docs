@@ -34,7 +34,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
     // Find Boxes which have a RubricResultSet, Usages but no Descriptors
-    // TODO - note the ORDER BY value DESC. This puts higher levels first. Is this still canonical?
+    // Note the ORDER BY value DESC. This puts higher levels first, preserving existing implementation logic.
     $selectQuery = $db->prepare("
         SELECT
           sb.id           AS 'sb.id',

@@ -8,14 +8,14 @@
  * The second item is when the Assessment Spec has been deleted, and therefore the Level Specs were also deleted.
  *
  * A complication for the second case is that we don't have level.name and level.sequence available.
- * We CANNOT assume LTR or RTL using descriptor.value. Will just have to leave as NULL.
+ * Insert these as soft-deleted with a sequence of 0.
  *
  * The resolution is to:
  * * clone such levels,
  * * link the level to the right box, and
  * * link each descriptor to the new level
  *
- * Need to check for following scenario:
+ * Need to prevent following scenario:
  * * Descriptor X points to Level Y, but Level Y does not exist.
  * * This script create a new Level with ID = Y
  * * Descriptor X now points to Level Y, but shouldn't.
@@ -27,6 +27,7 @@
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
+use Monolog\Logger;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -42,17 +43,20 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     // This is because the code may change between updates
     $db = Database::getInstance();
 
+    // ALTER TABLE rubric_level CHANGE COLUMN sequence sequence INT(11) SIGNED
+
     // Group descriptors by box and level where `descriptor.level.box` != `descriptor.box`
+    // Ensure descriptor is in use on descriptor.box
     // Also get count to enable sanity check.
-    // Sequence = 0 indicates 'Unknown' (rl.sequence is 1-based)
+    // Sequence = NULL indicates 'Unknown' (rl.sequence is 1-based, but appears to be 0-based at some past point)
     // Don't create levels pointing to missing subBoxes.
     $selectDescriptorsByBoxLevel = $db->prepare("
         SELECT
-          count(*)                 'count',
-          rd.submission_box_id     'rd.box_id',
-          rd.level_id              'rl.id',
-          COALESCE(rl.name, '')    'rl.name',
-          COALESCE(rl.sequence, 0) 'rl.sequence'
+          count(*)                  'count',
+          rd.submission_box_id      'rd.box_id',
+          rd.level_id               'rl.id',
+          COALESCE(rl.name, '')     'rl.name',
+          COALESCE(rl.sequence, -1) 'rl.sequence'
         FROM rubric_descriptor rd
         LEFT JOIN rubric_level rl ON rl.id = rd.level_id
         JOIN submission_box sb ON sb.id = rd.submission_box_id
@@ -155,27 +159,16 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     }
 
     // Log RubricLevel results at appropriate level
-    $rubricLevelMessage = sprintf('%d rubric_levels created (%d warnings), %d failures',
-        $successRubricLevelCount, $warningRubricLevelCount, $failureRubricLevelCount);
-    if($failureRubricLevelCount){
-        $log->error($rubricLevelMessage);
-    } elseif($warningRubricLevelCount){
-        $log->warning($rubricLevelMessage);
-    } else {
-        $log->info($rubricLevelMessage);
-    }
+    $rubricLevelMessage = sprintf('%d rubric_levels created (%d warnings), %d failures', $successRubricLevelCount, $warningRubricLevelCount, $failureRubricLevelCount);
+    $levelLevel = $failureRubricLevelCount ? Logger::ERROR : ($warningRubricLevelCount ? Logger::WARNING : Logger::INFO);
+    $log->log($levelLevel, $rubricLevelMessage);
 
 
     // Log RubricDescriptor results at appropriate level
-    $rubricDescriptorMessage = sprintf('%d rubric_descriptors updated (%d warnings), %d failures',
-        $successRubricDescriptorCount, $warningRubricDescriptorCount, $failureRubricDescriptorCount);
-    if($failureRubricDescriptorCount){
-        $log->error($rubricDescriptorMessage);
-    } elseif($warningRubricDescriptorCount){
-        $log->warning($rubricDescriptorMessage);
-    } else {
-        $log->info($rubricDescriptorMessage);
-    }
+    $rubricDescriptorMessage = sprintf('%d rubric_descriptors updated (%d warnings), %d failures', $successRubricDescriptorCount, $warningRubricDescriptorCount, $failureRubricDescriptorCount);
+    $descLevel = $failureRubricDescriptorCount ? Logger::ERROR : ($warningRubricDescriptorCount ? Logger::WARNING : Logger::INFO);
+    $log->log($descLevel, $rubricDescriptorMessage);
+
 
     exit(($failureRubricLevelCount + $failureRubricDescriptorCount) > 0 ? 1 : 0);
 });
