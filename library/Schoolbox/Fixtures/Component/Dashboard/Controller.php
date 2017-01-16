@@ -63,9 +63,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 $playerIds[] = $child['id'];
             }
         } else {
-            if ($this->getUser()->getRole()->isStudent()) {
-                $playerIds[] = $this->getUser()->getId();
-            }
+            $playerIds[] = $this->getUser()->getId();
         }
 
         $matches = $this->getDelegate()->getMatchesForUsers($playerIds, $getHistorical);
