@@ -82,6 +82,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         /* Only obtain returns for the current (box_id, owner) tuple
          *
          * We only care if:
+         * + it's not already associated with a submission
          * + it's missing a crocodoc uuid
          * + it is not a confirmation of submission,
          * + it has a published_at date,
@@ -92,6 +93,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             FROM submission_return
             WHERE box_id = :boxId
             AND owner = :owner
+            AND student_submission_id IS NULL
             AND uuid IS NULL
             AND is_confirmation_of_submission = 0
             AND deleted_at IS NULL
