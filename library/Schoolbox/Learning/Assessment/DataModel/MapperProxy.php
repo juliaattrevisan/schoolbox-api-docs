@@ -525,6 +525,45 @@ class MapperProxy
     }
 
     /**
+     * Finds all assessables for student that are due on particular date.
+     *
+     * This method loads participation for $student only.
+     *
+     * @param User $student
+     * @param dueDate
+     * @param Term $term to pass to findUniqueAssessmentIdsForStudent
+     * @return Collection|IAssessable[]
+     */
+
+    public function findByDueDateForStudent(User $student, $dueDate, Term $term)
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
+
+        // Find this user's folders from folder mapper
+        $classFolderIds = $folderMapper->findForUser(
+            $student,
+            // Only actual students have classes
+            $student->getRole()->isStudent(),
+            UserAccess::ACCESS_READ,
+            true
+        )->getColumnValues('id');
+
+        // Build a list of parameters to pass to findAllForFolderId
+        $extraParams = $this->convertOptionsToColumnList(['due_date' => $dueDate,]);
+
+        // Find assessments which this student is no longer in the class for,
+        // but has created a response or feedback for.
+        $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection(
+                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+            ),
+            $student
+        );
+    }
+
+    /**
      * Finds all assessables for a staff member.
      *
      * This method does not loads participation.
@@ -809,6 +848,10 @@ class MapperProxy
         }
         if(array_key_exists('due_after', $options) && array_key_exists('closed_after', $options) ){
             throw new \InvalidArgumentException('Cannot filter to after both due and close dates.');
+        }
+        elseif ($options['due_date']) {
+            $options['from'] =  \Alaress_Date_Format::newLocalShort($options['due_date'])->startOfDay()->getDatabase();
+            $options['to']= \Alaress_Date_Format::newLocalShort($options['due_date'])->endOfDay()->getDatabase();
         }
 
         // Due before / after filter (an ADF)

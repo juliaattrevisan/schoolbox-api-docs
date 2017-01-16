@@ -34,6 +34,9 @@
                     <div class="small-12 columns">
                         <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                         <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
+                        {% if assessment.baseContext.folder.codeString|length %}
+                            <input type="hidden" name="classCode" value="{{ assessment.baseContext.folder.codeString }}" />
+                        {% endif %}
                         {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' with { markVisibility: assessment.markVisibility, actionLabel: 'Update' } %}
                     </div>
                 </fieldset>

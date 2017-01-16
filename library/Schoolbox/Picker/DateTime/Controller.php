@@ -272,13 +272,8 @@ class Controller extends Base
         $externalClassHandler = new \External_Class();
         $externalStudents = $externalClassHandler->getStudents($classCode);
 
-        // Get start/end of the date
-
-        $start = \Alaress_Date_Format::newLocalShort($date);
-        $end = $start->addHours(23)->addMinutes(59)->addSeconds(59);
         // Find out the term this date falls in (needed to locate assessments)
-
-        $term = $this->getTermMapper()->findForDate($start);
+        $term = $this->getTermMapper()->findForDate( \Alaress_Date_Format::newLocalShort($date) );
 
         // Get a lookup array of external IDs for the students in this class
 
@@ -289,42 +284,35 @@ class Controller extends Base
         }
 
         $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
-//        $userIdLookup = $this->getUserMapper()->findCheaplyByExternalIds($externalIds);
         // Iterate each student in the class
 
         foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
 
-
-            $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($studentCurrent, $term);
-
-            // TODO: AssessmentMapperProxy needs a function to find all by due date rather than term
+            $assessments = $this->getAssessmentMapperProxy()->findByDueDateForStudent($studentCurrent, $date, $term);
 
             // Count how many assessments are due on the specified date
 
-            $assessmentsDue = 0;
+            $assessmentsDue = count($assessments);
             $assessmentList = Array();
             foreach ($assessments as $assessment) {
-                if ($assessment->getDueAt()->between($start, $end)) {
-                    $assessmentsDue++;
                     $assessmentList[] = [
                         'id' => $assessment->getId(),
                         'title' => $assessment->getTitle()
                         ];
-                }
             }
 
-//            if ($assessmentsDue > 0) {
+            if ($assessmentsDue > 0) {
                 $students[] = [
-                    'id' => $studentCurrent->getId(),                          // Required for link to student profile
+                    'id' => $studentCurrent->getId(),                      // Required for link to student profile
                     'externalId' => $studentCurrent->getExternalId(),      // Required for rendering student photo
                     'firstname' => $studentCurrent->getFirstname(),
                     'lastname' => $studentCurrent->getLastname(),
                     'assessmentList' => $assessmentList,
                     'assessmentsDue' => $assessmentsDue                    // Number of assessments they have due on the date
                 ];
-//            }
+            }
         }
 
         // Sort by the number of assignments due
