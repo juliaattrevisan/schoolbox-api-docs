@@ -120,6 +120,8 @@ class DescriptorMapper extends Schoolbox\Mapper {
      * @param bool $createCriterion If true, create missing criteria
      *
      * @return int[] A list of new rubric descriptors
+     * @deprecated
+     * @see RubricMapper::copyRubric()
      */
     public function copyFromCopiedSubmissionBox($from_id, $to_id, $createCriterion = false) {
 

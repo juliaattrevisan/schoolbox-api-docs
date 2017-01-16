@@ -45,6 +45,8 @@ class CriterionMapper extends Schoolbox\Mapper {
      * @param int $to_id   The category to copy to.
      *
      * @return int[] A list of new rubric IDs
+     * @deprecated
+     * @see RubricMapper::copyRubric()
      */
     public function copyFromCategory($from_id, $to_id) {
         /** @var Criterion[] $from_rubric_list */

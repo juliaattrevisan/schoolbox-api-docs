@@ -89,6 +89,8 @@ class LevelMapper extends Mapper
      * @param int $toId   The ID of the submission box to copy to.
      *
      * @return int[] A list of new rubric levels
+     * @deprecated
+     * @see RubricMapper::copyRubric()
      */
     public function copyFromCopiedSubmissionBox($fromId, $toId)
     {

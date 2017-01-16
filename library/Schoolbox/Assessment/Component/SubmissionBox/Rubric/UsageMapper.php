@@ -36,6 +36,8 @@ class UsageMapper extends Schoolbox\Mapper {
      * @param int $to_id   The ID of the submission box to copy to.
      *
      * @return int[] A list of new rubric usages
+     * @deprecated
+     * @see RubricMapper::copyRubric()
      */
     public function copyFromCopiedSubmissionBox($from_id, $to_id) {
 
