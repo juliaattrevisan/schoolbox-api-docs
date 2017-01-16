@@ -791,7 +791,7 @@ class RubricMapper
      * @param array $exclude
      * @return bool
      */
-    protected function tidyUp($mapper, $search, $exclude)
+    protected function tidyUp(IMapper $mapper, array $search, array $exclude)
     {
         return $mapper->delete(
             $mapper->findByColumnList($search)->filter(
