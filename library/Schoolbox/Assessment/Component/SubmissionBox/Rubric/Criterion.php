@@ -19,7 +19,7 @@ class Criterion implements ISoftDeletable
     use Id;
     use DeletedAtDate;
 
-    const PARENT_TYPE_CATEGORY = 'category';
+    const PARENT_TYPE_CATEGORY   = 'category';
     const PARENT_TYPE_SUBMISSION = 'submission';
     const PARENT_TYPE_CURRICULUM = 'curriculum';
 

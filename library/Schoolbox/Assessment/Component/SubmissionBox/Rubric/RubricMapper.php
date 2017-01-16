@@ -943,7 +943,8 @@ class RubricMapper
          * If during destination object graph build, we detect that a source descriptor
          * already exists on destination, use the destination version instead of creating a new criterion
          *
-         * Need to by-pass cache, as we may have inserted criteria during previous call to this function.
+         * For now, need to by-pass cache, as we may have inserted criteria during previous call to this function.
+         * //TODO - the mappers should be invalidating the SELECT cache on INSERT/UPDATE @see SA-1951
          */
         /** @var Descriptor $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();

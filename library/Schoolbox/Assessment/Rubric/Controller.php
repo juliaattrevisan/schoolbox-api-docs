@@ -25,10 +25,10 @@ class Controller extends BaseController
 {
 
     /** @var Factory */
-    protected $factory;
+    private $factory;
 
     /** @var RubricMapper */
-    protected $mapper;
+    private $mapper;
 
 
     /**
@@ -92,8 +92,7 @@ class Controller extends BaseController
 
         $folderId = $post->get('folderId');
         if(!$folderId){
-            $this->getResponse()->status->set(400);
-            $this->getResponse()->content->set($this->buildJsonOutput('Must supply a folder Id'));
+            $this->sendJSONError('Must supply a folder Id');
             return;
         }
 
@@ -111,11 +110,11 @@ class Controller extends BaseController
                 'parent_id'   => $folderId,
             ];
             $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
-            $proposedGroup = RubricMapper::getInstance()->normaliseForComparison($group);
-            $proposedName  = RubricMapper::getInstance()->normaliseForComparison($name);
+            $proposedGroup = $this->mapper->normaliseForComparison($group);
+            $proposedName  = $this->mapper->normaliseForComparison($name);
             foreach ($criteria as $criterion){
-                $normGroup = RubricMapper::getInstance()->normaliseForComparison($criterion->getGrouping());
-                $normName = RubricMapper::getInstance()->normaliseForComparison($criterion->getName());
+                $normGroup = $this->mapper->normaliseForComparison($criterion->getGrouping());
+                $normName = $this->mapper->normaliseForComparison($criterion->getName());
                 if($normGroup == $proposedGroup && $normName == $proposedName){
                     $this->sendJSONError("Indicator already exists in this Group");
                     return;
@@ -140,9 +139,9 @@ class Controller extends BaseController
                 'parent_id'   => $folderId,
             ];
             $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
-            $proposed = RubricMapper::getInstance()->normaliseForComparison($post->get('name'));
+            $proposed = $this->mapper->normaliseForComparison($post->get('name'));
             foreach ($criteria as $criterion){
-                $grouping = RubricMapper::getInstance()->normaliseForComparison($criterion->getGrouping());
+                $grouping = $this->mapper->normaliseForComparison($criterion->getGrouping());
                 if($proposed == $grouping){
                     $this->sendJSONError("Group name already exists in this context");
                     return;
