@@ -1037,15 +1037,4 @@ class RubricMapper
         $usageMapper->save($dstUsages);
         return true;
     }
-
-    /**
-     * @param IMapper    $mapper
-     * @param Collection $collection
-     * @return array
-     */
-    protected function foo($mapper, $collection)
-    {
-        return $mapper->save($collection);
-    }
-
 }
