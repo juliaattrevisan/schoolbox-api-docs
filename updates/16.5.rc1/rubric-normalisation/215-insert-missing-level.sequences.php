@@ -185,10 +185,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         if($selectBoxLevels->rowCount() > 1){
             // Use this box's other levels
             $gradient = $getGradientFromResults($selectBoxLevels->fetchAll(PDO::FETCH_ASSOC));
-            $log->info(sprintf('Box (id: "d") has 2+ other levels with known sequences, gradient: "%.3df"', $boxId, $gradient));
+            $log->info(sprintf('Box (id: "%d") has 2+ other levels with known sequences, gradient: "%.3f"', $boxId, $gradient));
         } else {
             // No adjacent Levels on box. Fall back to class
-            $log->debug(sprintf('Box (id: "d") has 1- other levels with known sequences, falling back to class average ...', $boxId));
+            $log->debug(sprintf('Box (id: "%d") has 1- other levels with known sequences, falling back to class average ...', $boxId));
 
             // Have we tried to get the gradient for this class yet?
             if(!array_key_exists($folderId, $folderGradients)){
@@ -199,7 +199,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 // Did we find levels for this class ?
                 if($selectClassLevels->rowCount() > 1){
                     $folderGradients[$folderId] = $getGradientFromResults($selectClassLevels->fetchAll(PDO::FETCH_ASSOC));
-                    $log->info(sprintf('Folder (id: "%d") gradient calculated as: ".3f" ', $folderId, $folderGradients[$folderId]));
+                    $log->info(sprintf('Folder (id: "%d") gradient calculated as: "%.3f" ', $folderId, $folderGradients[$folderId]));
                 } else {
                     $folderGradients[$folderId] = null;
                     $log->warning(sprintf('Folder (id: "%d") gradient unable to be determined', $folderId));
@@ -210,7 +210,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             if(!is_null($folderGradients[$folderId])){
                 // Yes, use this folder's average gradient.
                 $gradient = $folderGradients[$folderId];
-                $log->info(sprintf('Using folder (id: "%d") gradient calculated as: ".3f" ', $folderId, $folderGradients[$folderId]));
+                $log->info(sprintf('Using folder (id: "%d") gradient calculated as: "%.3f" ', $folderId, $folderGradients[$folderId]));
             } else {
                 // No, fall back to school average
                 $log->warning(sprintf('No gradient available for class folder (id: "%d"), falling back to school average', $folderId));
@@ -219,11 +219,12 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 if(!$schoolQueryExecuted) {
                     $log->debug(sprintf('Retrieving known-sequenced levels for whole school. Be patient ... :) '));
                     $selectSchoolLevels->execute();
+                    $schoolQueryExecuted = true;
 
                     // Were we unable to get a gradient for the school?
                     if($selectSchoolLevels->rowCount() > 1) {
                         $schoolGradient = $getGradientFromResults($selectSchoolLevels->fetchAll(PDO::FETCH_ASSOC));
-                        $log->info(sprintf('School gradient calculated as: ".3f" ', $schoolGradient));
+                        $log->info(sprintf('School gradient calculated as: "%.3f" ', $schoolGradient));
                     } else {
                         $log->warning(sprintf('School gradient unable to be determined'));
                     }
@@ -232,17 +233,16 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 // Do we have a school average to fall back to?
                 if(!is_null($schoolGradient)) {
                     $gradient = $schoolGradient;
-                    $log->info(sprintf('Using school gradient calculated as: ".3f" ', $schoolGradient));
+                    $log->info(sprintf('Using school gradient calculated as: "%.3f" ', $schoolGradient));
                 } else {
                     // Log error and continue to next box
                     $log->error(sprintf('No school gradient to fall back to, skipping box...'));
                     continue;
                 }
-
             }
         }
 
-        // Very unlikely, but theoretically possible, consider [2,3,2] which has m = 0
+        // Unlikely, but theoretically possible, consider [2,3,2] which has m == 0
         if($gradient == 0){
             // Gradient cannot be 0,
             $log->error(sprintf('Gradient cannot be 0, skipping box...'));
@@ -277,10 +277,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     'sequence' => $newSequence,
                     'level_id' => $levelId,
                 ]);
-                $log->info(sprintf('Level updated. Id: "%d", Old Sequence: "%d", New Sequence: "%d", Name: "%s", Avg. Desc. Val: "%.2f"',  $levelId, $oldSequence, $newSequence, $levelName, $avgDescValue));
+                $log->info(sprintf('Level updated. Id: "%d", Avg. Desc. Val: "%.3f", Old Sequence: "%d", New Sequence: "%d", Name: "%s"',  $levelId, $avgDescValue, $oldSequence, $newSequence, $levelName));
                 $successLevelCount++;
             } catch (PDOException $e) {
-                $log->error(sprintf('Unable to update level. Id: "%d", Old Sequence: "%d", New Sequence: "%d", Name: "%s", Avg. Desc. Val: "%.2f"',  $levelId, $oldSequence, $newSequence, $levelName, $avgDescValue), [$e]);
+                $log->error(sprintf('Unable to update level. Id: "%d", Avg. Desc. Val: "%.3f", Old Sequence: "%d", New Sequence: "%d", Name: "%s"',  $levelId, $avgDescValue, $oldSequence, $newSequence, $levelName), [$e]);
                 $log->warning($e->getMessage());
                 $failureLevelCount++;
                 $isBoxFailed = true;

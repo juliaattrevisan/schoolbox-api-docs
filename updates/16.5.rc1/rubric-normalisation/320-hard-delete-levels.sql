@@ -12,7 +12,10 @@ WHERE id IN (
 );
 
 -- If a Level has no Descriptors, delete the Level
--- On SEDA, this deletes 12313 of 132555 levels. TODO figure out why this number so high
+-- On SEDA, this deletes 12313 of 132555 levels.
+-- I think this number is high because we have inserted new levels, rather than trying to link
+-- to existing levels. Eg, when re-sequencing levels for boxes, I noted that the boxes often had an alternate set
+-- of levels, often fully-sequenced, but they had no descriptors.
 DELETE FROM rubric_level
 WHERE id IN (
   SELECT * FROM (
