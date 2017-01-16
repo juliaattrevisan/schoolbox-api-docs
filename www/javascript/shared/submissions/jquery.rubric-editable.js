@@ -90,12 +90,12 @@
                 rubricId: opt.rubricId,
                 groupId: groupId,
                 name: name,
-                levelCount: $rb.children('thead').find('input').length
+                levelCount: $rb.children('thead').find('input').length,
+                folderId: $('input[name=folderId]').val()
             };
 
             if (type == 'criterion') {
                 payload.groupName = $rb.find('[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
-                payload.folderId  = $('input[name=folderId]').val();
             }
 
             $.post(opt.url, payload, function (data) {
