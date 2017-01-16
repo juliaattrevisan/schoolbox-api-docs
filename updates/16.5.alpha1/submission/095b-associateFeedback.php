@@ -25,15 +25,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     /* Find all the boxes that contain returns that don't have student_submission_id values and
      * no uuid values - need to determine whether they should, depending on a timeline of events
      */
-    $query = "
+    $boxes = $database->prepare("
         SELECT box_id, marker, owner
         FROM submission_return
         WHERE student_submission_id IS NULL
         AND uuid IS NULL
         ORDER BY box_id
-    ";
+    ");
 
-    $boxes = $database->prepare($query);
     $boxes->execute();
 
     $allBoxIds = [];
@@ -48,12 +47,44 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     /* Find all the student_submissions and submission_return records
      * that require deeper inspection
      */
-    foreach ($allBoxIds as $currentBoxId) {
-        $submissionsQuery = "
-            SELECT id, owner, uuid, submitted_at, created_at, updated_at, deleted_at
+    foreach ($boxes as $currentBox) {
+
+        /* Only obtain submissions for the current (box_id, owner) tuple
+         *
+         * We only care if:
+         * + it has a crocodoc uuid
+         * + it is not a draft,
+         * + it has a submitted_at date,
+         * + it isn't soft-deleted
+         */
+        $submissions = $database->prepare("
+            SELECT id, owner, uuid, submitted_at
             FROM student_submission
             WHERE box_id = :boxId
-        ";
+            AND owner = :owner
+            AND uuid IS NOT NULL
+            AND draft = 0
+            AND submitted_at IS NOT NULL
+            AND deleted_at IS NULL
+        ");
+
+        /* Only obtain returns for the current (box_id, owner) tuple
+         *
+         * We only care if:
+         * + it's missing a crocodoc uuid
+         * + it is not a confirmation of submission,
+         * + it has a published_at date,
+         * + it isn't soft-deleted
+         */
+        $returns = $database->prepare("
+            SELECT id, owner, published_at
+            FROM submission_return
+            WHERE box_id = :boxId
+            AND owner = :owner
+            AND uuid IS NULL
+            AND is_confirmation_of_submission = 0
+            AND deleted_at IS NULL
+        ");
     }
 
     exit(1);
