@@ -8,6 +8,8 @@ use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\UserMapper;
+
 class Session
 {
     /**
@@ -69,6 +71,7 @@ class Session
     public function create($username, $remember = false)
     {
         $userHandler = new User;
+        $userMapper = new UserMapper;
         $groupHandler = new Group;
 
         //Clear all remnants of past sessions
@@ -129,9 +132,8 @@ class Session
 
 
             if (Cfg::get('external_enable')) {
-                $this->setSynergyInfo($userHandler);
+                $this->setSynergyInfo($userMapper);
             }
-
 
 
             if ($this->getUseLoginLog()) {
@@ -179,7 +181,7 @@ class Session
         $ip    = Session::getIP();
         $notif = Notifactory::create(Notif::TOPIC_AUTH);
 
-        $userMapper = \Schoolbox\UserMapper::getInstance();
+        $userMapper = UserMapper::getInstance();
 
         // Cannot use findOneByColumn() as that returns deleted users which may mask extant user.
         $user = $userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
@@ -426,9 +428,9 @@ class Session
     }
 
     /**
-     * @param User $userHandler
+     * @param UserMapper $userMapper
      */
-    function setSynergyInfo($userHandler)
+    function setSynergyInfo(UserMapper $userMapper)
     {
         $synUser = new External_User;
         $groupHandler = new Group();
@@ -450,59 +452,64 @@ class Session
                 /* Get subject list for each student */
                 if (is_array($children)) {
                     foreach ($children as $child) {
-                        $portal = $userHandler->getBySynergyAndGroup($child['RelatedID'], $groupHandler->getStudentGroupTypeIds());
+
+                        try {
+                            $childObject = $userMapper->findByExternalId($child['RelatedID']);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            continue;
+                        }
+
                         $subjects = array();
                         $subjectIDList = array();
+                        $subjectList = $synUser->getSubjectList($childObject);
 
-                        if ($portal['uid']) {
-                            $subjectList = $synUser->getSubjectList($_SESSION['user']);
+                        if (is_array($subjectList)) {
+                            foreach ($subjectList as $subject) {
+                                //check subject exists.. we cant link to subjects that dont exist its ugly
+                                $cat = false;
 
-                            if (is_array($subjectList)) {
-                                foreach ($subjectList as $subject) {
-                                    //check subject exists.. we cant link to subjects that dont exist its ugly
-                                    $cat = false;
-
-                                    if ($subject['campusCode']) {
-                                        //Check for subject with campus code
-                                        try {
-                                            $cat = $folderMapper->findByCode($subject['campusCode'].'/'.$subject['code']);
-                                        } catch (\Exception $e) {
-                                            //Try to fetch witout campus code
-                                            try {
-                                                $cat = $folderMapper->findByCode($subject['code']);
-                                            } catch (\Exception $e) {
-                                            }
-                                        }
-                                    }
-                                    else {
+                                if ($subject['campusCode']) {
+                                    //Check for subject with campus code
+                                    try {
+                                        $cat = $folderMapper->findByCode($subject['campusCode'] . '/' . $subject['code']);
+                                    } catch (\Exception $e) {
+                                        //Try to fetch witout campus code
                                         try {
                                             $cat = $folderMapper->findByCode($subject['code']);
                                         } catch (\Exception $e) {
                                         }
                                     }
+                                } else {
+                                    try {
+                                        $cat = $folderMapper->findByCode($subject['code']);
+                                    } catch (\Exception $e) {
+                                    }
+                                }
 
-                                    if ($cat instanceof Folder) {
-                                        if (Access::getInstance()->getFolderAccess($_SESSION['user'], [$cat->getId()]) >= UserAccess::ACCESS_READ) {
-                                            if (!in_array($cat->getId(), $subjectIDList)) {
-                                                $subject['id'] = $cat->getId();
-                                                $subject['name'] = $cat->getName();
-                                                $subjects[] = $subject;
-                                                $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
-                                            }
+                                if ($cat instanceof Folder) {
+                                    if (Access::getInstance()->getFolderAccess($_SESSION['user'],
+                                            [$cat->getId()]) >= UserAccess::ACCESS_READ
+                                    ) {
+                                        if (!in_array($cat->getId(), $subjectIDList)) {
+                                            $subject['id'] = $cat->getId();
+                                            $subject['name'] = $cat->getName();
+                                            $subjects[] = $subject;
+                                            $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
                                         }
                                     }
                                 }
                             }
-
-                            $_SESSION['children'][] = array(
-                                'id' => $portal['uid'],
-                                'sid' => $child['RelatedID'],
-                                'gid' => $portal['group_id'],
-                                'year' => $portal['year'],
-                                'name' => $userHandler->formatName($portal),
-                                'subjects' => $subjects
-                            );
                         }
+
+                        $_SESSION['children'][] = array(
+                            'id' => $childObject->getId(),
+                            'sid' => $childObject->getExternalId(),
+                            'gid' => $childObject->getRole()->getId(),
+                            'year' => $childObject->getYear(),
+                            'name' => $childObject->getFullName(),
+                            'subjects' => $subjects
+                        );
+
                     }
                 }
             } else {
