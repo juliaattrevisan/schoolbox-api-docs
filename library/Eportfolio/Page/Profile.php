@@ -392,7 +392,13 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     private function renderSubjects()
     {
         $groupHandler = new Group();
-        $allSubjects = $this->getGroupHandler()->involvedInSubjects($this->getUserId());
+
+        if(!$this->getUser()->getHideTimetable()) {
+            $allSubjects = $this->getGroupHandler()->involvedInSubjects($this->getUserId());
+        }
+        else {
+            $allSubjects = false;
+        }
 
         if (is_array($allSubjects) && count($allSubjects)) {
             $j = 0;

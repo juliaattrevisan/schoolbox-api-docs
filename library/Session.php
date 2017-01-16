@@ -455,13 +455,18 @@ class Session
 
                         try {
                             $childObject = $userMapper->findByExternalId($child['RelatedID']);
+                            if(!$childObject->getHideTimetable()) {
+                                $subjectList = $synUser->getSubjectList($childObject);
+                            }
+                            else {
+                                $subjectList = false;
+                            }
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             continue;
                         }
 
                         $subjects = array();
                         $subjectIDList = array();
-                        $subjectList = $synUser->getSubjectList($childObject);
 
                         if (is_array($subjectList)) {
                             foreach ($subjectList as $subject) {
@@ -514,7 +519,12 @@ class Session
                 }
             } else {
                 //user is not parent so get timetable information
-                $subjectList = $synUser->getSubjectList($_SESSION['user']);
+                if(!$_SESSION['user']->getHideTimetable()) {
+                    $subjectList = $synUser->getSubjectList($_SESSION['user']);
+                }
+                else {
+                    $subjectList = false;
+                }
                 $catList = array();
                 if (is_array($subjectList)) {
                     foreach ($subjectList as $subject) {
