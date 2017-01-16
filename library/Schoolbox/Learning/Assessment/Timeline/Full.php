@@ -166,6 +166,8 @@ class Full
     {
         $processedFeedback = [];
 
+        $isFeedbackVisible = $this->getParticipant()->getAssessable()->isFeedbackVisibleToUser($this->getParticipant()->getUser());
+
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
 
             /* Only show Submitted submissions (ignore drafts)
@@ -178,15 +180,16 @@ class Full
                  * Otherwise just use the stack that was given to us
                  * which has the unpublished feedbacks in there already
                  */
-                if ($includeUnpublishedFeedback) {
-                    $includedFeedback = $currentResponse->getAllFeedback();
-                }
-                else {
-                    $includedFeedback = new Collection();
+                $includedFeedback = new Collection();
+                if ($isFeedbackVisible) {
+                    if ($includeUnpublishedFeedback) {
+                        $includedFeedback = $currentResponse->getAllFeedback();
 
-                    foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                        if ($currentFeedback->isPublished()) {
-                            $includedFeedback->add($currentFeedback);
+                    } else {
+                        foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                            if ($currentFeedback->isPublished()) {
+                                $includedFeedback->add($currentFeedback);
+                            }
                         }
                     }
                 }
@@ -234,15 +237,17 @@ class Full
 
         /* Only grab unique Floating Feedbacks
          */
-        foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
-            if (!in_array($currentFeedback->getId(), $processedFeedback)) {
+        if ($isFeedbackVisible) {
+            foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
+                if (!in_array($currentFeedback->getId(), $processedFeedback)) {
 
-                /* Only show Published feedbacks
-                 */
-                if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
-                    $this->getRecombined()->add($currentFeedback);
+                    /* Only show Published feedbacks
+                     */
+                    if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
+                        $this->getRecombined()->add($currentFeedback);
 
-                    $processedFeedback[] = $currentFeedback->getId();
+                        $processedFeedback[] = $currentFeedback->getId();
+                    }
                 }
             }
         }
