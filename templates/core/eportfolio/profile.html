@@ -108,35 +108,37 @@
                     <ul class="information-list">
                         <!-- BEGIN showcased_work -->
                         <li class="row">
-                            <!-- BEGIN has_submission -->
-                            <div class="small-9 column">
-                                <div class="card small-12">
-                                    <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" data-plugin="preview" title="View Profile">
-                                        <img src="/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="mime" height="60" width="60"/>
-                                        <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
-                                    </a>
-                                    <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
-                                    <p class="meta">{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</p>
-
-                                </div>
-                            </div>
-                            <!-- END has_submission -->
-
-                            <!-- BEGIN no_submission -->
-                            <div class="small-9 column">
-                                <div class="card small-12">
+                            <div class="list-item">
+                                <div class="card small-9">
                                     <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
                                     <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
                                 </div>
+                                <div class="small-3 columns text-center">
+                                    <p class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">
+                                        <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
+                                    </p>
+                                </div>
                             </div>
-                            <!-- END no_submission -->
-
-                            <div class="small-3 column grade text-center">
-                                <span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
+                            <!-- BEGIN submission_file_list -->
+                            <div class="card small-12 compact">
+                                <a href="/storage/fetch.php?hash={SHOWCASED_WORK_FILE_HASH}" title="{SHOWCASED_WORK_FILE_NAME}" rel="external" data-plugin="preview">
+                                    <img src="/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="Preview" class="mime">
+                                    <p>{SHOWCASED_WORK_FILE_NAME}</p>
+                                    <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
+                                </a>
                             </div>
+                            <!-- END submission_file_list -->
                         </li>
                         <!-- END showcased_work -->
                     </ul>
+                    <div class="component-action">
+                        <section>
+                            <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="button">View All</a>
+                            <!-- BEGIN edit_showcase_work -->
+                            <a href="/learning/grades/{EPORTFOLIO_PAGE_USER_ID}" class="button">Add</a>
+                            <!-- END edit_showcase_work -->
+                        </section>
+                    </div>
                 </section>
             </div>
         </div>

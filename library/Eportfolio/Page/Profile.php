@@ -76,8 +76,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
         $this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
-        $this->getPage()->setBlock('showcased_work', 'has_submission', 'has_submission_block');
-        $this->getPage()->setBlock('showcased_work', 'no_submission', 'no_submission_block');
+        $this->getPage()->setBlock('has_showcased_work', 'edit_showcase_work','edit_showcase_work_block');
+        $this->getPage()->setBlock('showcased_work', 'submission_file_list', 'submission_file_list_block');
+
 
         $this->getPage()->setBlock(TEMPLATE_content, 'no_recent_blog', 'no_recent_blog_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_recent_blog', 'has_recent_blog_block');
@@ -202,18 +203,21 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 /* Show submitted work information (if available)
                  */
-                if ($latestSubmission && $latestSubmission->getFiles()->first()) {
-                    /** @var \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model $firstFile */
-                    $firstFile = $latestSubmission->getFiles()->first();
-                    $this->getPage()->setVar(array(
-                        'SHOWCASED_WORK_SUBMISSION_ID' => $latestSubmission->getId(),
-                        'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($firstFile->getSize()),
-                        'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $firstFile->getCreatedAt()->getShort(),
-                        'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $firstFile->getMimetype()->getIconFile(),
-                    ));
+                if ($latestSubmission && $latestSubmission->getFiles()->count()) {
+                    foreach($latestSubmission->getFiles() as $currentFile) {
+                        $this->getPage()->setVar(
+                            array(
+                                'SHOWCASED_WORK_SUBMISSION_ID'        => $currentFile->getId(),
+                                'SHOWCASED_WORK_FILE_NAME'            => $currentFile->getFilename(),
+                                'SHOWCASED_WORK_FILE_HASH'            => $currentFile->getHash(),
+                                'SHOWCASED_WORK_SUBMISSION_FILESIZE'  => Alaress_Byte_Format::bytesToString($currentFile->getSize()),
+                                'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentFile->getCreatedAt()->getShort(),
+                                'SHOWCASED_WORK_MIMETYPE_ICONFILE'    => $currentFile->getMimetype()->getIconFile(),
+                            )
+                        );
 
-                    $this->getPage()->parse('has_submission_block', 'has_submission');
-                    $this->getPage()->setVar('no_submission_block', '');
+                        $this->getPage()->parse('submission_file_list_block', 'submission_file_list',true);
+                    }
                 } else {
                     $this->getPage()->setVar(array(
                         'SHOWCASED_WORK_SUBMISSION_FILESIZE' => '',
@@ -243,9 +247,15 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 /* Clear children after parsing out the parent
                  */
-                $this->getPage()->setVar('has_modify_form_block', '');
-                $this->getPage()->setVar('has_submission_block', '');
-                $this->getPage()->setVar('no_submission_block', '');
+                $this->getPage()->setVar('submission_file_list_block','');
+
+            }
+
+            if($this->getUser()->getId() == $this->getCurrentUser()->getId()) {
+                $this->getPage()->parse('edit_showcase_work_block', 'edit_showcase_work');
+            }
+            else {
+                $this->getPage()->setVar('edit_showcase_work_block');
             }
 
             $this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
