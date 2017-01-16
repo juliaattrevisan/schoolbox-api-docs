@@ -63,17 +63,13 @@
                     <thead>
                     <tr class="rotate-headers">
                         <th></th>
-                        {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+                        {% for assessment in assessments %}
                             <th>
                                 <div>
                                     <span>
                                         <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
                                         <span class="meta">
-                                            {% if assessment is quiz %}
-                                                Quiz
-                                            {% elseif assessment is dueWork %}
-                                                Due Work
-                                            {% endif %}
+                                            {{ assessment.typeName }}
                                         </span>
                                     </span>
                                 </div>
@@ -84,7 +80,7 @@
                     <tbody>
                     <tr>
                         <td></td>
-                        {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+                        {% for assessment in assessments %}
                             <td class="text-center">
                                 {% if assessment.dueAt.isPast %}
                                     <i class="icon-clock" title="Past Due Date {{ assessment.dueAt.localShort }}"></i>
@@ -104,7 +100,7 @@
                             </th>
                             {% set upcomingFound = false %}
 
-                            {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+                            {% for assessment in assessments %}
 
                                 {% set className = '' %}
                                 {% set url = '#' %}
