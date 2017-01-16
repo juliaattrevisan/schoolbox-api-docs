@@ -2,7 +2,7 @@
 /**
  * Fixes the rubric_descriptor to rubric_level foreign key for two problems:
  * 1. `descriptor`.`box_id` != `descriptor`.`level`.`box_id`, and
- * 2. `descriptor`.`level` points to missing Level.
+ * 2. `descriptor`.`level` points to missing Level (but not null)
  *
  * These are both thought to be caused by levels not being cloned during course import.
  * The second item is when the Assessment Spec has been deleted, and therefore the Level Specs were also deleted.

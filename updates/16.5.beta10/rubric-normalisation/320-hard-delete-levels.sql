@@ -1,4 +1,4 @@
--- Delete orphan levels to enable foreign keys
+-- Hard-delete orphan levels to enable foreign keys
 
 -- If level belongs to a box that has been hard-deleted, hard-delete the level too
 DELETE FROM rubric_level
@@ -12,6 +12,7 @@ WHERE id IN (
 );
 
 -- If a Level has no Descriptors, delete the Level
+-- On SEDA, this deletes 12313 of 132555 levels. TODO figure out why this number so high
 DELETE FROM rubric_level
 WHERE id IN (
   SELECT * FROM (

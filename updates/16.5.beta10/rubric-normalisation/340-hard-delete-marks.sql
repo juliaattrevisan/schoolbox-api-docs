@@ -2,6 +2,8 @@
 -- * mark.descriptor does not exist, or
 -- * mark.student does not exist
 -- Without a descriptor or student the record is useless
+
+-- On SEDA, this deletes 381 marks, all where mark.descriptor does not exist
 DELETE FROM rubric_mark WHERE id IN (
     SELECT * FROM (
       SELECT rm.id

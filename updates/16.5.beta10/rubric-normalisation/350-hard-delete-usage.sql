@@ -1,7 +1,8 @@
--- Delete usage if:
+-- Hard-delete usage if:
 -- * usage.criterion does not exist, or
 -- * usage.submission_box does not exist
 -- Without a criterion or submission_box the record is useless
+-- On SEDA this deletes 3 rows.
 DELETE FROM rubric_usage WHERE (criterion_id, submission_box_id) IN (
   SELECT criterion_id, submission_box_id FROM (
       SELECT ru.criterion_id, ru.submission_box_id
