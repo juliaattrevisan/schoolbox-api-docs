@@ -70,7 +70,6 @@ class Controller extends BaseController
         return $this;
     }
 
-
     /**
      * AJAX method for creating a new group or criterion
      *
@@ -103,8 +102,7 @@ class Controller extends BaseController
             $group = $post->get('groupName');
             $name  = $post->get('name');
             if(!$group){
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput('Must supply a Group for new Criterion'));
+                $this->sendJSONError('Must supply a Group for new Criterion');
                 return;
             }
 
@@ -119,8 +117,7 @@ class Controller extends BaseController
                 $normGroup = RubricMapper::getInstance()->normaliseForComparison($criterion->getGrouping());
                 $normName = RubricMapper::getInstance()->normaliseForComparison($criterion->getName());
                 if($normGroup == $proposedGroup && $normName == $proposedName){
-                    $this->getResponse()->status->set(400);
-                    $this->getResponse()->content->set($this->buildJsonOutput("Indicator already exists in this Group"));
+                    $this->sendJSONError("Indicator already exists in this Group");
                     return;
                 }
             }
@@ -147,15 +144,14 @@ class Controller extends BaseController
             foreach ($criteria as $criterion){
                 $grouping = RubricMapper::getInstance()->normaliseForComparison($criterion->getGrouping());
                 if($proposed == $grouping){
-                    $this->getResponse()->status->set(400);
-                    $this->getResponse()->content->set($this->buildJsonOutput("Group name already exists in this context"));
+                    $this->sendJSONError("Group name already exists in this context");
                     return;
                 }
             }
 
             $context['rowspan'] = 1;
             $context['group'] = [
-                'id'   => rand(1, PHP_INT_MAX), // this is just so the inputs on the page are unique -- TODO make this 100% robust
+                'id'   => rand(1, PHP_INT_MAX), // this is just so the inputs on the page are unique
                 'name' => $post->get('name'),
                 'used' => false,
             ];
@@ -173,6 +169,21 @@ class Controller extends BaseController
             'template' => "@rubric/$template.twig"
         ]);
 
+    }
+
+    /**
+     * Sends a JSON error.
+     *
+     * @param mixed $data
+     * @param int $statusCode
+     */
+    protected function sendJSONError($data, $statusCode = 400)
+    {
+        $this->getResponse()->status->set($statusCode);
+        $this->getResponse()->content->set([
+            'data'     => $data,
+            'format'   => 'json',
+        ]);
     }
 
 
