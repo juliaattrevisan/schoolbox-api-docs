@@ -56,7 +56,7 @@
                 event.preventDefault();
 
                 $(config.label).toastActivate({
-                    text: 'Preparing Showcase'
+                    text: 'Sending to showcase'
                 });
 
                 /* Ajax the Publish action
@@ -67,7 +67,7 @@
                     data: config.element.serialize(), // serializes the form's elements.
                     success: function(data) {
                         $(config.label).toastTimeout({
-                            text: 'Showcase Updated'
+                            text: 'Activity showcased'
                         });
                     }
                 });

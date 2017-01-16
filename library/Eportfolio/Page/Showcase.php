@@ -38,8 +38,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock('has_showcased_work', 'showcased_work_subject', 'showcased_work_subject_block');
         $this->getPage()->setBlock('showcased_work_subject', 'showcased_work', 'showcased_work_block');
         $this->getPage()->setBlock('showcased_work', 'has_modify_form', 'has_modify_form_block');
-        $this->getPage()->setBlock('showcased_work', 'has_submission', 'has_submission_block');
-        $this->getPage()->setBlock('showcased_work', 'no_submission', 'no_submission_block');
+        $this->getPage()->setBlock('showcased_work', 'submission_file_list', 'submission_file_list_block');
 
         /* User details
          */
@@ -151,36 +150,28 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                                 'SHOWCASED_WORK_ITEM_USER_ID' => $showcase->getUid(),
                                 'SHOWCASED_WORK_BOX_NAME' => $box->getName(),
                                 'SHOWCASED_WORK_BOX_TYPE' => $box->getWorkType()->getName(),
-                                'ON_OFF' => ++$j % 2 ? '' : 'dark'
                             )
                         );
 
                         /* Show submitted work information (if available)
                          */
-                        if ($submission && $submission->getFiles()->first()) {
-                            $firstFile = $submission->getFiles()->first();
-                            $this->getPage()->setVar(
-                                array(
-                                    'SHOWCASED_WORK_SUBMISSION_ID' => $submission->getId(),
-                                    'SHOWCASED_WORK_SUBMISSION_FILESIZE' =>
-                                        Alaress_Byte_Format::bytesToString($firstFile->getSize()),
-                                    'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $submission->getCreatedAt()->getShort(),
-                                    'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $firstFile->getMimetype()->getIconFile(),
-                                )
-                            );
+                        if ($submission && $submission->getFiles()->count()) {
+                            foreach($submission->getFiles() as $currentFile) {
+                                $this->getPage()->setVar(
+                                    array(
+                                        'SHOWCASED_WORK_SUBMISSION_ID'        => $submission->getId(),
+                                        'SHOWCASED_WORK_FILE_NAME'        => $currentFile->getFilename(),
+                                        'SHOWCASED_WORK_FILE_HASH'            => $currentFile->getHash(),
+                                        'SHOWCASED_WORK_SUBMISSION_FILESIZE'  =>
+                                            Alaress_Byte_Format::bytesToString($currentFile->getSize()),
+                                        'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $submission->getCreatedAt()->getShort(),
+                                        'SHOWCASED_WORK_MIMETYPE_ICONFILE'    => $currentFile->getMimetype()->getIconFile(),
+                                    )
+                                );
 
-                            $this->getPage()->parse('has_submission_block', 'has_submission');
-                            $this->getPage()->setVar('no_submission_block', '');
-                        } else {
-                            $this->getPage()->setVar(
-                                array(
-                                    'SHOWCASED_WORK_SUBMISSION_FILESIZE' => '',
-                                    'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => '',
-                                )
-                            );
+                                $this->getPage()->parse('submission_file_list_block', 'submission_file_list',true);
+                            }
 
-                            $this->getPage()->parse('no_submission_block', 'no_submission');
-                            $this->getPage()->setVar('has_submission_block', '');
                         }
 
                         /* Show returned work information (if available)
@@ -214,6 +205,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                         /* Clear children after parsing out the parent
                          */
                         $this->getPage()->setVar('has_modify_form_block', '');
+                        $this->getPage()->setVar('submission_file_list_block','');
+
                     }
                 }
 
