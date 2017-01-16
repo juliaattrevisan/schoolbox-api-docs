@@ -3,7 +3,8 @@
  * column. Typically this will look like .actions-small-12.row
  */
 @mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
-	@for $i from 1 through $total-columns {
+	// We shoudln't use more than 4 action buttons in a row
+	@for $i from 1 through 4 {
 		.actions-#{$size}-#{$i} {
 			position: relative;
 			min-width: $button-size * $i;
@@ -11,6 +12,9 @@
 
 			> .list-item {
 				padding-right: 0.5 + ($i * $button-size) !important;
+				// https://css-tricks.com/flexbox-truncated-text/
+				min-width: 0;
+				flex: 1;
 			}
 
 			> nav {
@@ -20,20 +24,12 @@
 				padding: 0;
 				position: absolute;
 				top: 0;
+				right: 0;
 				height: $button-size;
 				white-space: nowrap;
 
-				@media #{$small-only} {
-					right: 0;
-				}
-				@media #{$medium-only} {
-					right: 1.5rem;
-				}
-				@media #{$large-up} {
-					right: 1rem;
-				}
-
-				a[class*="icon-"] {
+				a[class*="icon-"],
+				a[class^="icon-"]{
 					padding: 0;
 					display: inline-block;
 					text-align: center;
@@ -76,16 +72,17 @@
 			}
 		}
 
-		.island, .column, .columns, .card-new {
-			/* Inside a containing column, but not an action-
-			 * or information-list construct (e.g. h2 actions)
-			 *
-			 * These attributes also happen apply to the usage
-			 * as action- and information-list nav actions which
-			 * always appear inside islands or columns
-			 */
-			.actions-#{$size}-#{$i} {
-				nav {
+		/* Inside a containing column, but not an action-
+		 * or information-list construct (e.g. h2 actions)
+		 *
+		 * These attributes also happen apply to the usage
+		 * as action- and information-list nav actions which
+		 * always appear inside islands or columns
+		 */
+		.row.actions-#{$size}-#{$i} {
+			nav {
+				right: 1rem;
+				@media #{$small-only} {
 					right: 0;
 				}
 			}

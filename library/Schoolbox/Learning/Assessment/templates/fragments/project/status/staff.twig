@@ -72,7 +72,7 @@
                                 <div class="grip"></div>
                                 <div class="list-item">
                                     <div class="card small-12">
-                                        <div class="{{ icon.renderClass(assessable) }} icon-64" title="{{ assessable.getTypeName }}"></div>
+                                        <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
                                         <a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessable.id}) }}">
                                             <h3>
                                                 {{ assessable.title }}
@@ -154,11 +154,6 @@
                                                     {{ participant.user.formatName }}
                                                 </h3>
                                             </a>
-                                            <p class="meta">
-                                                {% if participant.user.year and participant.user.role.isStudent %}
-                                                    Year {{ participant.user.year }}
-                                                {% endif %}
-                                            </p>
                                             <p class="meta">
                                                 {{ participantCounts.completed[participant.user.id] }}/{{ participantCounts.totalAssessments }} activities completed
                                             </p>

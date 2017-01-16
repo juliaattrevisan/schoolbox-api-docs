@@ -773,18 +773,16 @@ nav {
  * Uses .expander, .selector or .grip
  * Use %placeholders to prevent the same CSS getting spat out over and over again.
  */
+$selector-width: 2.25rem;
+
 %interaction-li{
-	display: table;
-	width: calc(100% + 2rem);
+	display: flex;
+	align-items: center;
 }
 %interaction-selector{
 	padding: 0 0.75rem;
-	display: table-cell;
-	vertical-align: middle;
-	width: 2rem;
+	width: $selector-width;
 	&:before {
-		display: table-cell;
-		vertical-align: middle;
 		padding: 0;
 	}
 }
@@ -801,8 +799,13 @@ nav {
 				color: $color;
 			}
 		}
-		> div:nth-child(2){
-			width: 100%;
+		> nav {
+			@media #{$small-only} {
+				right: 1rem;
+			}
+			@media #{$medium-only} {
+				right: 0.5rem;
+			}
 		}
 	}
 }
@@ -837,6 +840,9 @@ nav {
 	&.expandable,
 	&.expandable-card{
 		@include list-interaction(expander, pointer);
+		li .expander{
+			width: 2.5rem;
+		}
 	}
 	&.card-selectable {
 		@include list-interaction(selector, pointer);
