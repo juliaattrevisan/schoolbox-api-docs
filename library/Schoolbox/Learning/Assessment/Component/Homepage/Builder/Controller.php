@@ -144,6 +144,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'folder'            => $folder,
             'folderHasClass'    => $folderHasClass,
             'folderHasCourse'   => $folderHasCourse,
+            'folderHasParent'   => $folder->getParent()->getId(),
             'parentHasCourse'   => $parentHasCourse,
             'parentHasUnit'     => $parentHasUnit,
         ];

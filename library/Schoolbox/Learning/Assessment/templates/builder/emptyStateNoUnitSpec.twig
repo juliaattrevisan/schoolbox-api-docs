@@ -36,6 +36,19 @@ Usage:
             var $updateForm = $component.find("[data-component-panel='settings'] form");
             $updateForm.trigger('submit');
         }
+
+        /**
+         * Removing this component with a link
+         */
+        var $component = $('#component{{ componentInstance.id }}');
+        var $deleteIcon = $component.find('[data-target=delete]');
+
+        $component.on('click', '[data-action="delete-component"]', function(event){
+            event.preventDefault();
+            if('closed' == $deleteIcon.attr('data-state')){
+                $deleteIcon.trigger('click');
+            }
+        });
     });
 
 </script>
@@ -56,6 +69,10 @@ Usage:
 
         <p>This component works on unit pages to create activities to import to your class. This page is a class page so the component doesn't work here.</p>
         <p><a href="{{ routeLookup('course.courseList') }}">Go to the course list</a> to create a course with units to import into your class.</p>
+
+    {% elseif not parentHasCourse and not folderHasParent %}
+
+        <p>This component works on unit pages within courses to create activities to import to your class. This page has no parent folder to use as a course. <a href="#" data-action="delete-component">Remove this component</a>.</p>
 
     {% elseif not parentHasCourse %}
 
