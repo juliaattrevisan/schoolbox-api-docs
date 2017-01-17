@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Menu\Side;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Side\Mapper as MenuSideMapper;
 use Schoolbox\Menu\Side\Model as MenuSide;
@@ -117,11 +118,15 @@ class Renderer
             $nodes = [];
         }
 
+        // Order the nodes by their parent ID
+
+        $renderNodes = $this->buildTree($nodes, 0);
+
         // Render this thing out
 
         return $twig->render('@menuSide/renderer.twig', array(
             'isStaff' => $user->getRole()->isStaff(),
-            'nodes' => $nodes,
+            'nodes' => $renderNodes,
             'subjects' => $subjects,
             'sections' => $sections,
             'pageCurrent' => $pageCurrent,
@@ -131,6 +136,28 @@ class Renderer
             // TODO eradicate this session dependency
             'children' => is_array($_SESSION['children']) ? $_SESSION['children'] : []
         ));
+    }
+
+    /**
+     * @param Collection $elements
+     * @param int $parentId
+     * @return Collection
+     */
+    function buildTree(Collection $elements, $parentId = 0) {
+        $branch = new Collection();
+
+        /** @var MenuSide $element */
+        foreach ($elements as $element) {
+            if ($element->getParentId() == $parentId) {
+                $children = $this->buildTree($elements, $element->getId());
+                if ($children) {
+                    $element->setChildren($children);
+                }
+                $branch[] = $element;
+            }
+        }
+
+        return $branch;
     }
 
     /**
