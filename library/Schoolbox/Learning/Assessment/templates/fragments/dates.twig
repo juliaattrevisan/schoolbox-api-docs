@@ -22,14 +22,14 @@
     {% set dueEndSelector = '' %}
 {% endif %}
 
-{{ dateForm.dateField('publish', assessment.publishAt, publishEndSelector) }}
+{{ dateForm.dateField('Publish', 'publish', assessment.publishAt, publishEndSelector) }}
 
 {% if acceptingResponses %}
-{{ dateForm.dateField('open', assessment.openAt, 'input[name="dueDate"]') }}
+{{ dateForm.dateField('Open', 'open', assessment.openAt, 'input[name="dueDate"]') }}
 {% endif %}
 
-{{ dateForm.dateField('due', assessment.dueAt, dueEndSelector) }}
+{{ dateForm.dateField('Due', 'due', assessment.dueAt, dueEndSelector) }}
 
 {% if acceptingResponses %}
-{{ dateForm.dateField('close', assessment.closeAt) }}
+{{ dateForm.dateField('Late', 'close', assessment.closeAt) }}
 {% endif %}
