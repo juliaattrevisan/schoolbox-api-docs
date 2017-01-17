@@ -448,21 +448,12 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
-        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
-
-        $foldersFound = [];
-        $folders = new Collection();
-
-        /** @var IAssessable $assessment */
-        foreach ($assessments as $assessment) {
-            $folder = $assessment->getContext()->getFolder();
-
-            if ($folder instanceof Folder) {
-                if (!isset($foldersFound[$folder->getId()])) {
-                    $foldersFound[$folder->getId()] = $folder;
-                    $folders->add($folder);
-                }
-            }
+        if ($term->getId() == $this->termMapper->findForToday()->getId()) {
+            $folders = $this->folderMapper->findForUser($viewee);
+            $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithFeedbacks($viewee, $term));
+            $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term));
+        } else {
+            $folders = [];
         }
 
         // Grab the students conversation history
