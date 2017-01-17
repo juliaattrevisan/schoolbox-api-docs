@@ -10,10 +10,10 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper;
+use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Message\NS;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Serializable;
 
@@ -29,6 +29,14 @@ interface ModuleNotifierInterface extends Serializable {
 	 */
 	public function __construct($configLoader);
 
+    /**
+     * Switch logging on
+     *
+     * @param NotifInterface  $notif
+     * @param LoggerInterface $log
+     * @return void
+     */
+    public function enableLogging(NotifInterface $notif, LoggerInterface $log);
 
 	/**
 	 * Instantiate all your dependencies within yourself.
