@@ -7,7 +7,7 @@
      * Show and hide a label indicating status
      */
     $.fn.eportfolio_publish = function(options) {
-        options = options || {}
+        options = options || {};
 
         var config = init(options, $(this));
 
@@ -34,14 +34,12 @@
                 /* The label to hide/show when publishing
                  */
                 label: '#publish-to-eportfolio-status'
-            }
+            };
 
             var derived = {
-            }
+            };
 
-            var merged = $.extend(defaults, derived, options);
-
-            return merged;
+            return $.extend(defaults, derived, options);
         }
 
         /**
@@ -55,22 +53,38 @@
             $(config.activator).click(function(event) {
                 event.preventDefault();
 
-                $(config.label).toastActivate({
-                    text: 'Sending to showcase'
-                });
-
-                /* Ajax the Publish action
+                /* If it's not already publishing, allow transaction
+                 * Otherwise just ignore the click
+                 *
+                 * This prevents mass apm spam
                  */
-                $.ajax({
-                    type: "POST",
-                    url: config.element.attr('action'),
-                    data: config.element.serialize(), // serializes the form's elements.
-                    success: function(data) {
-                        $(config.label).toastTimeout({
-                            text: 'Activity showcased'
-                        });
-                    }
-                });
+                if ($(config.activator).attr('data-publish-status') == 0) {
+
+                    /* Indicate that we're currently publishing this
+                     */
+                    $(config.activator).attr('data-publish-status', 1);
+
+                    $(config.label).toastActivate({
+                        text: 'Sending to showcase'
+                    });
+
+                    /* Ajax the Publish action
+                     */
+                    $.ajax({
+                        type: "POST",
+                        url: config.element.attr('action'),
+                        data: config.element.serialize(), // serializes the form's elements.
+                        success: function (data) {
+                            $(config.label).toastTimeout({
+                                text: 'Activity showcased'
+                            });
+
+                            /* Re-enable button
+                             */
+                            $(config.activator).attr('data-publish-status', 0);
+                        }
+                    });
+                }
             });
         }
     }
