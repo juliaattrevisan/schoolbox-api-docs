@@ -12,6 +12,7 @@
         maximumDate:     ADF
         project:         Project|null        - If called recusively, the parent Project of the AssessmentPairs
         hideRows:        bool                - If true, hide the list of Assessments. (eg Project is un-checked)
+        unitSpec:        UnitSpecification   - The unitSpec we are currently in
 #}
 {% import "@learningAssessment/fragments/project/macro/icon.twig" as icon %}
 
@@ -39,9 +40,9 @@
             <div class="compact card small-12 large-4">
                 <input type="checkbox"
                        id="a_import-{{ assessment.id}}"
-                        {% if isChecked %} checked="checked"{% endif %}
+                       {% if isChecked %} checked="checked"{% endif %}
                        data-assessment-import="{{ assessment.id }}"
-                       data-checkbox-group="lesson"
+                       data-checkbox-group="unit-spec-{{ unitSpec.id }}"
                        name="{{ inputPrefix }}[{{ assessment.id }}][checked]"
                        value="1"
                 />
@@ -117,7 +118,8 @@
                 endDate:         endDate,
                 maximumDate:     maximumDate,
                 project:         assessment,
-                hideRows:        not isChecked
+                hideRows:        not isChecked,
+                unitSpec:        unitSpec
                 } only %}
             {% endif %}
         </li>
