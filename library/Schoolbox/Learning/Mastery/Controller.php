@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -96,7 +97,10 @@ class Controller extends Base
 
         // Generate data: assessments and their Participants
         /** @var Collection|IAssessable[] $assessments */
-        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview($class->getId(), null, ['term' => $term]);
+        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview($class->getId(), null, ['term' => $term])
+                                                        ->filter(function (IAssessable $assessable) {
+                                                            return !$assessable instanceof Project;
+                                                        });
 
         // Build a markbook
         $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());

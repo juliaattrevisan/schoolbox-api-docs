@@ -63,17 +63,13 @@
                     <thead>
                     <tr class="rotate-headers">
                         <th></th>
-                        {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+                        {% for assessment in assessments %}
                             <th>
                                 <div>
                                     <span>
                                         <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
                                         <span class="meta">
-                                            {% if assessment is quiz %}
-                                                Quiz
-                                            {% elseif assessment is dueWork %}
-                                                Due Work
-                                            {% endif %}
+                                            {{ assessment.typeName }}
                                         </span>
                                     </span>
                                 </div>
@@ -84,7 +80,7 @@
                     <tbody>
                     <tr>
                         <td></td>
-                        {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+                        {% for assessment in assessments %}
                             <td class="text-center">
                                 {% if assessment.dueAt.isPast %}
                                     <i class="icon-clock" title="Past Due Date {{ assessment.dueAt.localShort }}"></i>
@@ -104,7 +100,7 @@
                             </th>
                             {% set upcomingFound = false %}
 
-                            {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+                            {% for assessment in assessments %}
 
                                 {% set className = '' %}
                                 {% set url = '#' %}
@@ -127,17 +123,27 @@
 
                                 {% endif %}
 
-                                {% if humanMark is empty %}
+                                {% set isAttempted = normalisedMark is not null %}
+                                {% if assessment is task %}
+                                    {% set mostRecentResponse = participant.findMostRecentResponse %}
+                                    {% set isAwaiting = mostRecentResponse.isMarkedAsSelfAssessed %}
+                                    {% set isMastered = mostRecentResponse.isMarkedAsCompleted %}
+                                {% else %}
+                                    {% set mostRecentResponse = null %}
+                                    {% set isAwaiting = not participant.isMarked and participant.isResponded %}
+                                    {% set isMastered = normalisedMark >= 70 %}
+                                {% endif %}
 
-                                    {# No mark available #}
+                                {% if not isAttempted %}
+
+                                    {# No mark available. Maybe they've done it but not been marked yet? #}
 
                                     {% if not upcomingFound %}
 
                                         {# Check if there is one pending #}
 
                                         {% if participant is not empty %}
-                                            {% if not participant.isMarked and participant.isResponded %}
-                                            {% else %}
+                                            {% if not isAwaiting %}
                                                 {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
                                                 {% set upcomingFound = true %}
                                                 {% set value = '<i class="icon-eye" title="Next Assessment">' %}
@@ -153,7 +159,7 @@
 
                                     {% endif %}
 
-                                {% elseif normalisedMark >= 70 %}
+                                {% elseif isMastered %}
                                     {% set className = 'mastered' %}
                                 {% else %}
                                     {% set className = 'fail' %}
@@ -162,7 +168,7 @@
                                 {# If student has submitted work but has not received a mark, style the cell appropriately #}
 
                                 {% if participant is not empty %}
-                                    {% if not participant.isMarked and participant.isResponded %}
+                                    {% if isAwaiting %}
                                         {% set value='<i class="icon-pause" title="Awaiting Teacher Assessment">' %}
                                         {% set className = 'notmarked' %}
                                     {% endif %}
