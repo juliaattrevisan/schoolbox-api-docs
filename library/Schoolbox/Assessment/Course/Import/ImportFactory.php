@@ -358,7 +358,7 @@ class ImportFactory
         }
 
         $assessmentImplToSpecMap = $this->getAssessmentImplToSpecMap($unitImplIds);
-        $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs);
+        $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, $assessmentImplToSpecMap);
         $assessmentImpls = $this->loadProjectImplAssessables($assessmentImpls, $assessmentImplToSpecMap);
         $assessmentPairs = $this->loadProjectPairAssessables($assessmentPairs, $assessmentImplToSpecMap);
         $dto = new DataTransferObject($assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
@@ -371,11 +371,14 @@ class ImportFactory
      * Normally we are un-interested in deleted specs. The exception is when we are adding as part of a pair.
      *
      * @param GenericCollection|GenericCollection[] $assessmentSpecs   - Sets of AssessmentSpecs, indexed by UnitSpec.id
-     * @param bool $includeDeleted                                     - If true, also get deleted items
+     * @param int[] $assessmentImplToSpecMap
      * @return GenericCollection
      */
-    protected function loadProjectSpecAssessables(GenericCollection $assessmentSpecs, $includeDeleted = false)
+    protected function loadProjectSpecAssessables(GenericCollection $assessmentSpecs, array $assessmentImplToSpecMap)
     {
+        // Put the specIds in the keys for O(1) lookup. Suppress warnings regarding null values.
+        $specToImplMap = @array_flip($assessmentImplToSpecMap);
+
         /** @var Project[] $projectSpecs */
         $projectSpecs = new GenericCollection(Project::class);
         foreach($assessmentSpecs as $unitSpecId => $unitAssessmentSpecs){
@@ -410,9 +413,6 @@ class ImportFactory
             LEFT JOIN task stk           ON stk.assessment_id = sa.id";
         $pb = new PredicateBuilder($this->database, '');
         $pb->equals('p.assessment_id', $projectSpecs->keys());
-        if(!$includeDeleted){
-            $pb->isNull('sa.deleted_at');
-        }
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
 
         $statement = $this->database->prepare($query);
@@ -420,11 +420,17 @@ class ImportFactory
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $projectAssessmentId = $row['p.assessment_id'];
-            $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
-            /** @var Project $projectSpec */
-            $projectSpec = $projectSpecs->getOffset($projectAssessmentId);
-            $projectSpec->getAssessables()->setOffset($assessmentSpec->getId(), $assessmentSpec);
-            $assessmentSpec->setContext($projectSpec);
+            $assessmentId        = $row['sa.id'];
+            $deletedAt           = $row['sa.deleted_at'];
+
+            // Only add deleted specs if they are linked to from a current Impl
+            if(is_null($deletedAt) || array_key_exists($assessmentId, $specToImplMap)){
+                $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
+                /** @var Project $projectSpec */
+                $projectSpec = $projectSpecs->getOffset($projectAssessmentId);
+                $projectSpec->getAssessables()->setOffset($assessmentSpec->getId(), $assessmentSpec);
+                $assessmentSpec->setContext($projectSpec);
+            }
         }
 
         return $assessmentSpecs;
@@ -568,7 +574,7 @@ class ImportFactory
         }
 
         // Build the AssessmentSpecs inside the ProjectSpecs
-        $this->loadProjectSpecAssessables($unitProjectSpecs, true);
+        $this->loadProjectSpecAssessables($unitProjectSpecs, $assessmentImplToSpecMap);
 
         // Build the AssessmentImpls inside the ProjectImpls
         $this->loadProjectImplAssessables($unitProjectImpls, $assessmentImplToSpecMap);
