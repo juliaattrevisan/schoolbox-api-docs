@@ -352,6 +352,7 @@ class External_Doublefirst_User implements External_UserInterface
             SELECT TOP 1
             
                 p.PupilID                                           AS StudentID,
+                p.AdmissionNo                                       AS AdmissionNo,
                 ForeName                                            AS StudentGiven1,
                 Surname                                             AS StudentSurname,
                 BirthDate                                           AS StudentBirthDate,                
@@ -387,8 +388,15 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS StudentStudiesCode,
                 UrgentNotes                                         AS AlertMessage,
                 ''                                                  AS StudentBoarder
+                
+                ''                                                  AS StudentBoarder,
+                pca.CustodyAlert                                    AS CustodyAlert,
+                pca.CustodyNotes                                    AS CustodyNotes,
+                pcad.Description                                    AS CustodyResponsiblePerson
             FROM V_PupilBasicInformation                            p
-            LEFT JOIN PupilMedicalInformation                       m ON m.PupilID = p.PupilID
+            LEFT JOIN PupilCareAuthority pca                        ON pca.PupilID = p.PupilID
+            LEFT JOIN LookupDetails pcad                            ON pcad.LookupID = 3025 AND LookupDetailsID = pca.ResponsibleForCustody
+            LEFT JOIN PupilMedicalInformation m                     ON m.PupilID = p.PupilID                
             LEFT JOIN PupilContacts ec                              ON ec.RelationshipToPupil IN ('{$assignation}') AND ec.PupilID = p.PupilID
             LEFT JOIN ContactMaster ecm                             ON ecm.ContactID = ec.ContactID
             LEFT JOIN ContactTelephoneInformation ecmPhoneMobile    ON ecmPhoneMobile.ContactID = ecm.ContactID AND ecmPhoneMobile.TelephoneType = 'M'
@@ -685,7 +693,7 @@ class External_Doublefirst_User implements External_UserInterface
                       c.Title AS StudentContactTitle,
                       cm.Greeting AS StudentContactPreferred,
                       c.Surname StudentContactSurname,
-                      '' AS StudentContactDefaultEmail,
+                      ce.HomeEmailAddress AS StudentContactDefaultEmail,
                       1 AS ValidAddressFlag,
                       a.SubDwelling AS StudentContactAddress1,
                       a.Street AS StudentContactAddress2,

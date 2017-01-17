@@ -1,8 +1,24 @@
 {% extends '@core/user/student.twig' %}
 
+{% block details_studentId %}
+    <dt class="no-margin small-6 medium-3">Admission ID</dt>
+    <dd class="no-margin small-6 medium-9">{{ externalUser.AdmissionNo }}</dd>
+    <dt class="no-margin small-6 medium-3">Engage ID</dt>
+    <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
+{% endblock details_studentId %}
+
 {% block contacts %}
     <h2 class="subheader">Contact Information</h2>
-
+    {% if showContactsAlert %}
+        {% if externalUser.CustodyAlert == 1 %}
+            <div class="alert-box alert icon-alert no-margin">
+                Custodian: {{ externalUser.CustodyResponsiblePerson }}
+            </div>
+            <div class="alert-box alert icon-alert no-margin">
+                {{ externalUser.CustodyNotes }}
+            </div>
+        {% endif %}
+    {% endif %}
     {% for message in externalUser.AlertMessages %}
         {% block contacts_alert %}
             {# Only staff may view contact alerts #}
