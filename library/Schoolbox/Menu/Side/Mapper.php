@@ -23,7 +23,7 @@ class Mapper extends BaseMapper
         $this->hasTable('menu_side');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('parent_id', self::TYPE_INTEGER);
+        $this->joins('parent_id', self::class, 'id', null, null, 'parent', 'parent');
         $this->uses('sort_order', self::TYPE_INTEGER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);

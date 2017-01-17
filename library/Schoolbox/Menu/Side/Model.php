@@ -22,6 +22,9 @@ class Model implements ISoftDeletable
     /** @var int */
     protected $sortOrder;
 
+    /** @var Model */
+    protected $parent;
+
     /** @var string */
     protected $title;
 
@@ -189,5 +192,23 @@ class Model implements ISoftDeletable
     public function isDeleted()
     {
         return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
+    }
+
+    /**
+     * @param Model $parent
+     * @return self
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getParent()
+    {
+        return $this->parent;
     }
 }

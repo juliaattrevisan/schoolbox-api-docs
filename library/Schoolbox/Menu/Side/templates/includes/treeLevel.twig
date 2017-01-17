@@ -1,11 +1,10 @@
 {# This is a flag used to indicate if we should open the <ul> tag #}
 
-{% set submenu = false %}
 {% set first = true %}
 
 {# Iterate all child nodes #}
 {% spaceless %}
-{% for node in nodes if node.parentId == parent.id %}
+{% for node in nodes %}
 
     {% if first == true %}
         {% set first = false %}
@@ -16,18 +15,13 @@
             <li class="back"><a href="#">Back</a></li>
     {% endif %}
 
-    <li
-        {% for subnode in nodes if subnode.parentId == node.id %}
-            {% if submenu == false %}
-                {% set submenu = true %}
-                class="has-submenu"
-            {% endif %}
-        {% endfor %}
-    >
+    <li {% if node.children | length %}class="has-submenu"{% endif %}>
         <a href="{{ node.url }}">
             <span>{{ node.title }}</span>
         </a>
-        {% include "@menuSide/includes/treeLevel.twig" with {'parent': node} %}
+        {% if node.children | length %}
+            {% include "@menuSide/includes/treeLevel.twig" with {'nodes': node.children } %}
+        {% endif %}
     </li>
 
 {% endfor %}

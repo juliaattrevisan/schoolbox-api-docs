@@ -117,6 +117,9 @@ class Renderer
             $nodes = [];
         }
 
+        // Order the nodes by their parent ID
+        $nodes = $this->menuSideMapper->getCollectionAsTree($nodes);
+
         // Render this thing out
 
         return $twig->render('@menuSide/renderer.twig', array(
