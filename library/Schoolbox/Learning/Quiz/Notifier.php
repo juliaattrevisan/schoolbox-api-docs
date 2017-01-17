@@ -10,7 +10,9 @@
 namespace Schoolbox\Learning\Quiz;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
@@ -21,8 +23,10 @@ use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -245,17 +249,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffClosed($quiz, $owner, $diff = null) {
-		$msgr = new Messenger();
+        $envelope = new Envelope();
 
 		$quiz = $this->fullyHydrateQuiz($quiz);
 		$totalUnattempted = $this->getStudentsUnattemptedList($quiz)->count();
 
 		// everyone submitted! woohoo!
 		if($totalUnattempted == 0) {
-			return $msgr;
+			return $envelope;
 		}
 
 		$quizId   = $quiz->getId();
@@ -264,14 +268,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/results/$quizId";
 
-		$msg = new Message(":quizname has closed and :number did not submit work", $icon, $href);
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $bob->addTopic("assess.$quizId.closed")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::ERROR)
+            ->setTitle(":quizname has closed and :number did not submit work")
+            ->setHref($href)
+            ->setIcon($icon)
+            ->setParam('quizname', new Param($quizName, $href))
+            ->setParam('number', new Param(sprintf("%s student%s", $totalUnattempted, $totalUnattempted == 1 ? '' : 's')));
 
-		$msgr->targetToUser($owner->getId(), $msg, "assess.$quizId.closed", Logger::ERROR, array(
-			'quizname' => array($quizName, "/assess/results/$quizId"),
-			'number'  => sprintf("%s student%s", $totalUnattempted, $totalUnattempted == 1 ? '' : 's')
-		));
-
-		return $msgr;
+        $envelope->broadcastToCategory($quiz->getCategory(), UserAccess::ACCESS_WRITE, $bob->build());
+        return $envelope;
 	}
 
 
