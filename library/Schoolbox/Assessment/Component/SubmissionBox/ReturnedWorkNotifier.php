@@ -16,11 +16,8 @@ use Monolog\Logger;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -30,6 +27,7 @@ use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -138,7 +136,6 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 */
 	protected function generateMessage($target, $returnedWork, $user, $diff = null) {
         $envelope = new Envelope();
-//		$msgr = new Messenger();
 
 		/** @var User $student */
 		$student = $this->userMapper->findById($returnedWork->getOwner()->getId());
@@ -149,12 +146,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		/** @var Folder $cat */
 		$cat = $this->catMapper->findById($box->getCategory()->getId());
 
-		$teacherId = $teacher->getId();
 		$teacherExtId = $teacher->getExternalId();
-		$teacherName = $teacher->formatName();
 
 		$studentId = $student->getId();
-		$studentName = $student->getFirstname();
 
 		$boxId = $box->getId();
 		$boxName = $box->getName();
@@ -176,18 +170,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
                 ->setHref($href)
                 ->setParam('teacher', new UserParam($teacher))
                 ->setParam('boxname', new Param($boxName, "/submission/submissionHistory/$boxId"))
-                ->setParam('catname', new CategoryParam($cat));
+                ->setParam('catname', new CategoryParam($cat))
+                ->addFilter('roletype', [Role::STUDENT]);
             $envelope->targetToUser($studentId, $bob->build());
-
-//			$msg = new Message(":teacher has marked your work for :boxname in :catname", $icon, $href);
-//
-//			$params = array(
-//				'teacher' => array($teacherName, "/search/user/$teacherId"),
-//				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-//				'catname' => array($catName, "/homepage/$catId")
-//			);
-//
-//			$msgr->targetToUser($studentId, $msg, "duework.$boxId.returned", Logger::NOTICE, $params);
 		}
 
 		// if parent, 3rd-person language
@@ -208,26 +193,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
                 ->setParam('teacher', new UserParam($teacher))
                 ->setParam('student', new UserParam($student))
                 ->setParam('boxname', new Param($boxName, "/submission/submissionHistory/$boxId/$studentId"))
-                ->setParam('catname', new Param($catName, "/submission/allWork/$studentId/{$term->getCode()}/$catId"));
+                ->setParam('catname', new Param($catName, "/submission/allWork/$studentId/{$term->getCode()}/$catId"))
+                ->addFilter('roletype', [Role::PARENT]);
             $envelope->targetToParent($studentId, $bob->build());
-
-//			// If parent can't view results for this grade:
-//			// target to student's grades page
-//			if (!$box->isMarkShownToParents()) {
-//				$href = "/submission/allWork/$studentId";
-//			}
-//			$msg = new Message(":teacher has marked :student's work for :boxname in :catname", $icon, $href);
-//
-//			$term = $this->termMapper->findForDate($box->getDueDate());
-//
-//			$params = array(
-//				'teacher' => array($teacherName, "/search/user/$teacherId"),
-//				'student' => array($studentName, "/search/user/$studentId"),
-//				'boxname' => array($boxName, "/submission/submissionHistory/$boxId/$studentId"),
-//				'catname' => array($catName, "/submission/allWork/$studentId/{$term->getCode()}/$catId")
-//			);
-//
-//			$msgr->targetToParent($studentId, $msg, "duework.$boxId.returned", Logger::NOTICE, $params);
 		}
 
 		return $envelope;
