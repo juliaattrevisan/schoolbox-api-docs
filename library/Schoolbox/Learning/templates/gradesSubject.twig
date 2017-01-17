@@ -274,8 +274,8 @@
                             </div>
                             <nav>
                                 {% if assessment.getFamilyName == 'dueWork' and feedback %}
-                                    <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="publish-boxId-{{ assessment.id }}" data-publish-status="0"></a>
-                                    <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="publish-boxId-{{ assessment.id }}">
+                                    <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
+                                    <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
                                         <input type="hidden" name="action" value="publish">
                                         <input type="hidden" name="userId" value="{{ student.id }}">
                                         <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
@@ -283,18 +283,17 @@
                                     <script type="text/javascript">
                                         $(function() {
                                             {# Publish to ePortfolio #}
-                                            $('[data-publish-to-eportfolio-form="publish-boxId-{{ assessment.id }}"]').eportfolio_publish({
-                                                activator: '[data-publish-to-eportfolio="publish-boxId-{{ assessment.id }}"]',
-                                                label: '[data-publish-to-eportfolio-label="publish-boxId-{{ assessment.id }}"]'
+                                            $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
+                                                activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
                                             });
                                         });
                                     </script>
                                 {% endif %}
                             </nav>
-                            <div class="toast" data-alert="" data-publish-to-eportfolio-label="publish-boxId-{{ assessment.id }}">Activity showcased</div>
                         </li>
                     {% endfor %}
                 </ul>
+                <div class="toast" data-alert="" id="publish-to-eportfolio-label">Activity showcased</div>
             </section>
         </div>
     </div>

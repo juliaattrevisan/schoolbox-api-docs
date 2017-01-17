@@ -33,7 +33,7 @@
 
                 /* The label to hide/show when publishing
                  */
-                label: '#publish-to-eportfolio-status'
+                label: '#publish-to-eportfolio-label'
             };
 
             var derived = {
