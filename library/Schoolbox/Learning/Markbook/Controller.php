@@ -288,6 +288,8 @@ class Controller extends Base
             $export[] = $data;
         }
 
+
+        //TODO This could probably be rewritten with a resource stream output object and using fputcsv to wrap up this code
         $file = tmpfile();
         $writer = new CsvWriter($file, $export);
         $writer->write();
