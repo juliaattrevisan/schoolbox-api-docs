@@ -37,10 +37,10 @@
         <!-- BEGIN has_showcased_work -->
 
         <!-- BEGIN has_intro -->
-        <div class="alert-box content">
-            <p>Visit your grades page to publish items to your showcase.</p>
-            <p><a href='/learning/grades/{USER_ID}' class="button icon-due-work">View Grades</a></p>
-        </div>
+        <section class=" content">
+            <p>Visit your <a href="/learning/grades/{USER_ID}">grades page</a> to publish items to your showcase.</p>
+        </section>
+
         <!-- END has_intro -->
 
         <!-- BEGIN showcased_work_subject -->
@@ -50,31 +50,26 @@
                 <!-- BEGIN showcased_work -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <!-- BEGIN has_submission -->
                         <div class="card small-9">
-                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" data-plugin="preview" title="View Showcased Work">
-                                <img src="/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" title="{SHOWCASED_WORK_BOX_NAME}" class="mime" />
-                                <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
-                            </a>
+                            <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
                             <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
-                            <p class="meta">{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</p>
                         </div>
-                        <!-- END has_submission -->
-
-                        <!-- BEGIN no_submission -->
-                        <div class="small-9 columns">
-                            <div class="card small-12">
-                                <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
-                                <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
-                            </div>
-                        </div>
-                        <!-- END no_submission -->
                         <div class="small-3 columns text-center">
                             <p class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">
                                 <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
                             </p>
                         </div>
                     </div>
+                    <!-- BEGIN submission_file_list -->
+                    <div class="card small-12 compact">
+                        <a href="/storage/fetch.php?hash={SHOWCASED_WORK_FILE_HASH}" title="{SHOWCASED_WORK_FILE_NAME}" rel="external" data-plugin="preview">
+                            <img src="/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="Preview" class="mime">
+                            <p>{SHOWCASED_WORK_FILE_NAME}</p>
+                            <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
+
+                        </a>
+                    </div>
+                    <!-- END submission_file_list -->
                     <nav>
                         <!-- BEGIN has_modify_form -->
                         <form action='/eportfolio/showcase/modifyForm.php' method='post' id="remove-showcase-{SHOWCASED_WORK_ITEM_ID}">

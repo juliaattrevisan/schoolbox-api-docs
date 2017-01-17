@@ -1,4 +1,5 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/breadcrumbs.twig' as bread %}
 
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
@@ -14,6 +15,8 @@
         });
     });
 </script>
+
+{{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], ['Grades', routeLookup('learning.getGrades', {userId: student.id}) ], [subject.name, '#']) }}
 
 <div class="row">
     <div class="small-12 columns">
@@ -270,28 +273,27 @@
                                 </div>
                             </div>
                             <nav>
-                                {% if (showcase[assessment.id] | length) == 0 and feedback %}
-                                    <a class="icon-showcase" data-publish-to-eportfolio="publish-boxId-{{ assessment.id }}" title="Publish to ePortfolio"></a>
-                                    <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="publish-boxId-{{ assessment.id }}">
+                                {% if assessment.getFamilyName == 'dueWork' and feedback %}
+                                    <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
+                                    <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
                                         <input type="hidden" name="action" value="publish">
                                         <input type="hidden" name="userId" value="{{ student.id }}">
-                                        <input type="hidden" name="boxId" value="{{ assessment.id }}">
+                                        <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
                                     </form>
                                     <script type="text/javascript">
                                         $(function() {
                                             {# Publish to ePortfolio #}
-                                            $('[data-publish-to-eportfolio-form="publish-boxId-{{ assessment.id }}"]').eportfolio_publish({
-                                                activator: '[data-publish-to-eportfolio="publish-boxId-{{ assessment.id }}"]',
-                                                label: '[data-publish-to-eportfolio-label="publish-boxId-{{ assessment.id }}"]'
+                                            $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
+                                                activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
                                             });
                                         });
                                     </script>
                                 {% endif %}
                             </nav>
-                            <div class="toast" data-alert="" data-publish-to-eportfolio-label="publish-boxId-{{ assessment.id }}">Showcase Updated</div>
                         </li>
                     {% endfor %}
                 </ul>
+                <div class="toast" data-alert="" id="publish-to-eportfolio-label">Activity showcased</div>
             </section>
         </div>
     </div>

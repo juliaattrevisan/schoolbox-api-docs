@@ -76,8 +76,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
         $this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
-        $this->getPage()->setBlock('showcased_work', 'has_submission', 'has_submission_block');
-        $this->getPage()->setBlock('showcased_work', 'no_submission', 'no_submission_block');
+        $this->getPage()->setBlock('has_showcased_work', 'edit_showcase_work','edit_showcase_work_block');
+        $this->getPage()->setBlock('showcased_work', 'submission_file_list', 'submission_file_list_block');
 
         $this->getPage()->setBlock(TEMPLATE_content, 'no_recent_blog', 'no_recent_blog_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_recent_blog', 'has_recent_blog_block');
@@ -112,7 +112,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function renderPersonal()
     {
-
         $house = $this->getUserHouse();
 
         $this->getPage()->setVar(array(
@@ -178,18 +177,17 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         if ($allShowcasedItems->count()) {
             $previousCategory = null;
-            $j = 0;
 
             $currentUser = $this->getCurrentUser();
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
 
-                $latestSubmission = $this->getLatestSubmission($this->getUser(), $currentBox);
-                $latestReturn = $this->getLatestReturn($this->getUser(), $currentBox);
-
                 if (!($currentBox instanceof Schoolbox\Assessment\Component\SubmissionBox)) {
                     continue;
                 }
+
+                $latestSubmission = $this->getLatestSubmission($this->getUser(), $currentBox);
+                $latestReturn = $this->getLatestReturn($this->getUser(), $currentBox);
 
                 $this->getPage()->setVar(array(
                     'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
@@ -197,30 +195,29 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     'SHOWCASED_WORK_BOX_CATEGORY_ID' => $currentBox->getCategory()->getId(),
                     'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
                     'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getWorkType()->getName(),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark'
                 ));
 
                 /* Show submitted work information (if available)
                  */
-                if ($latestSubmission && $latestSubmission->getFiles()->first()) {
-                    /** @var \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model $firstFile */
-                    $firstFile = $latestSubmission->getFiles()->first();
-                    $this->getPage()->setVar(array(
-                        'SHOWCASED_WORK_SUBMISSION_ID' => $latestSubmission->getId(),
-                        'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($firstFile->getSize()),
-                        'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $firstFile->getCreatedAt()->getShort(),
-                        'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $firstFile->getMimetype()->getIconFile(),
-                    ));
+                if ($latestSubmission && $latestSubmission->getFiles()->count()) {
+                    foreach($latestSubmission->getFiles() as $currentFile) {
+                        $this->getPage()->setVar([
+                            'SHOWCASED_WORK_SUBMISSION_ID'        => $currentFile->getId(),
+                            'SHOWCASED_WORK_FILE_NAME'            => $currentFile->getFilename(),
+                            'SHOWCASED_WORK_FILE_HASH'            => $currentFile->getHash(),
+                            'SHOWCASED_WORK_SUBMISSION_FILESIZE'  => Alaress_Byte_Format::bytesToString($currentFile->getSize()),
+                            'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentFile->getCreatedAt()->getShort(),
+                            'SHOWCASED_WORK_MIMETYPE_ICONFILE'    => $currentFile->getMimetype()->getIconFile(),
+                        ]);
 
-                    $this->getPage()->parse('has_submission_block', 'has_submission');
-                    $this->getPage()->setVar('no_submission_block', '');
+                        $this->getPage()->parse('submission_file_list_block', 'submission_file_list',true);
+                    }
                 } else {
                     $this->getPage()->setVar(array(
                         'SHOWCASED_WORK_SUBMISSION_FILESIZE' => '',
                         'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => '',
                     ));
 
-                    $this->getPage()->parse('no_submission_block', 'no_submission');
                     $this->getPage()->setVar('has_submission_block', '');
                 }
 
@@ -243,9 +240,14 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 /* Clear children after parsing out the parent
                  */
-                $this->getPage()->setVar('has_modify_form_block', '');
-                $this->getPage()->setVar('has_submission_block', '');
-                $this->getPage()->setVar('no_submission_block', '');
+                $this->getPage()->setVar('submission_file_list_block','');
+            }
+
+            if($this->getUser()->getId() == $this->getCurrentUser()->getId()) {
+                $this->getPage()->parse('edit_showcase_work_block', 'edit_showcase_work');
+            }
+            else {
+                $this->getPage()->setVar('edit_showcase_work_block');
             }
 
             $this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
@@ -307,7 +309,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         });
 
         if ($allBlogs->count()) {
-            $j = 0;
 
             /** @var Schoolbox\Blog\Eportfolio\Post\Model[] $allBlogs */
             foreach ($allBlogs as $currentBlog) {
@@ -316,7 +317,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     'RECENT_BLOG_TITLE' => $currentBlog->getHeading(),
                     'RECENT_BLOG_CREATED_AT' => $currentBlog->getCreatedAt()->getRelativeTime(),
                     'RECENT_BLOG_PAGE_ID' => $currentBlog->getPageId(),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 ));
 
                 $this->getPage()->parse('recent_blog_block', 'recent_blog', true);
@@ -350,13 +350,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
 
         if (is_array($allGroups) && count($allGroups)) {
-            $j = 0;
-
             foreach ($allGroups as $currentGroup) {
                 $this->getPage()->setVar(array(
                     'GROUP_ID' => $currentGroup['id'],
                     'GROUP_NAME' => $currentGroup['name'],
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 ));
 
                 /* Check permissions on whether you can view this subject's
@@ -401,13 +398,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         }
 
         if (is_array($allSubjects) && count($allSubjects)) {
-            $j = 0;
-
             foreach ($allSubjects as $currentSubject) {
                 $this->getPage()->setVar(array(
                     'SUBJECT_ID' => $currentSubject['id'],
                     'SUBJECT_NAME' => $currentSubject['name'],
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 ));
 
                 /* Check permissions on whether you can view this subject's

@@ -341,20 +341,9 @@ class Controller extends Base
         $graphData = [];
         $graphScatter = [];
         $graphFeedback = [];
-        $showcase = [];
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
-
-            // Showcase if used to determine if the option to publish to the eportfolio should appear
-
-            $showcase[$assessment->getId()] = $this->getShowcaseMapper()->findByColumnList(
-                array(
-                    'uid'               => $viewee->getId(),
-                    'submission_box_id' => $assessment->getId()
-                )
-            );
-
             $graphAssessments[] = $assessment->getTitle();
 
             $feedback = $assessment->getParticipant($viewee)->findMostRecentVisibleFeedback($this->getUser());
@@ -436,7 +425,6 @@ class Controller extends Base
             'graphFeedback'     => $graphFeedback,
             'canComment'        => $conversation->canComment($this->getUser()),
             'comments'          => $conversation->getVisibleComments($this->getUser()),
-            'showcase'          => $showcase,
             'currentUser'       => $this->getUser(),
             'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term)
         ]));

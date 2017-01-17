@@ -26,17 +26,35 @@ if ($authenticator->canModify()) {
 		\Eportfolio\ShowcaseMapper::getInstance()->delete($showcasedItem);
 	}
 	else if ($action == 'publish') {
-		$boxId = $_POST['boxId'];
-		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-        // Find the submission box
-        try {
-            $box = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findById($boxId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // "submission box does not exist"
-            error(17);
-            exit;
+        if(isset($_POST['boxId'])) {
+            $boxId = $_POST['boxId'];
+
+            // Find the submission box
+            try {
+                $box = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findById($boxId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // "submission box does not exist"
+                error(17);
+                exit;
+            }
         }
+        else if(isset($_POST['assessmentId'])) {
+            try {
+                $box = Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $_POST['assessmentId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // "submission box does not exist"
+                error(17);
+                exit;
+            }
+        }
+        else {
+            error(2);
+        }
+
+		$now = \Alaress_Date_Format::now();
+
+
 
 		/* Check if the submission box is already being showcased; if so, ignore request
 		 */
