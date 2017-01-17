@@ -289,44 +289,41 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentOpen($quiz, $owner, $diff = null) {
-		$msgr = new Messenger();
 
-		$quizId = $quiz->getId();
-		$quiz   = $this->fullyHydrateQuiz($quiz);
+        $envelope = new Envelope();
 
-		$quizType = $quiz->getWorkType()->getName();
-		$quizName = $quiz->getTitle();
+        if($this->conf->get('restrict_parent_duework_access')) {
+            return $envelope;
+        }
 
-		$ownerId    = $owner->getId();
-		$ownerName  = $owner->formatName();
-		$ownerExtId = $owner->getExternalId();
+        $quizId = $quiz->getId();
+        $quiz   = $this->fullyHydrateQuiz($quiz);
 
-		$cat     = $quiz->getCategory();
-		$catId   = $cat->getId();
-		$catName = $cat->getName();
+        $quizType = $quiz->getWorkType()->getName();
+        $quizName = $quiz->getTitle();
 
-		$indefArticle = in_array(strtolower($quizType[0]), array('a','e','i','o','u')) ? 'an' : 'a';
+        $icon = "/portrait?userId={$owner->getExternalId()}&size={$this->iconSize}";
+        $href = "/assess/intro/$quizId";
 
+        $indefArticle = in_array(strtolower($quizType[0]), array('a','e','i','o','u')) ? 'an' : 'a';
 
-		$msg = new Message(
-			":username opened $indefArticle $quizType, :quizname, in :catname",
-			"/portrait?userId=$ownerExtId&size={$this->iconSize}", "/assess/intro/$quizId"
-		);
+        $bob = new Builder();
+        $bob->addTopic("assess.$quizId.upcoming")
+            ->addFilter('roleType', [Role::STUDENT])
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::WARNING)
+            ->setTitle(":username opened $indefArticle $quizType, :quizname, in :catname")
+            ->setHref($href)
+            ->setIcon($icon)
+            ->setParam('username', new UserParam($owner))
+            ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
+            ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
-		$params = array(
-			'username' => array($ownerName, "/search/user/$ownerId"),
-			'quizname' => array($quizName, "/assess/intro/$quizId"),
-			'catname'  => array($catName, "/homepage/$catId")
-		);
-
-		$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.open", Logger::NOTICE, $params,
-			array('roletype' => Role::STUDENT)
-		);
-
-		return $msgr;
+        $envelope->broadcastToCategory($quiz->getCategory(), UserAccess::ACCESS_READ, $bob->build());
+        return $envelope;
 	}
 
 
