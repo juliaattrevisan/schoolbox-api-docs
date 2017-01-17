@@ -776,7 +776,7 @@ nav {
 $selector-width: 2.25rem;
 
 %interaction-li{
-	display: flex;
+	@include flex;
 	align-items: center;
 }
 %interaction-selector{
@@ -797,14 +797,6 @@ $selector-width: 2.25rem;
 			cursor: $cursor;
 			&:before {
 				color: $color;
-			}
-		}
-		> nav {
-			@media #{$small-only} {
-				right: 1rem;
-			}
-			@media #{$medium-only} {
-				right: 0.5rem;
 			}
 		}
 	}
