@@ -591,9 +591,14 @@ class External_Doublefirst_User implements External_UserInterface
         // Search for a student name
 
         if (strlen($name)) {
-            $name = $this->getDatabase()->quote($name);
-            $query .= " {$whereAnd} (StudentSurname LIKE '%{$name}%' OR StudentGiven1 LIKE '%{$name}%') ";
-            $whereAnd = " AND ";
+
+            $splitNames = explode(' ', $name);
+
+            foreach ($splitNames as $splitName) {
+                $splitName = $this->getDatabase()->quote($splitName);
+                $query .= " {$whereAnd} (StudentSurname LIKE '%{$splitName}%' OR StudentGiven1 LIKE '%{$splitName}%') ";
+                $whereAnd = " AND ";
+            }
         }
 
         // Search for a particular boarding status
