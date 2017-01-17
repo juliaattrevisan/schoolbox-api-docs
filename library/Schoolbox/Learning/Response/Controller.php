@@ -168,7 +168,11 @@ class Controller extends Base
             if($assessment instanceof DueWork){
                 /* Rubrics data
                 */
-                $data['rubricContext'] = (new RubricContext(RubricMapper::getInstance()))->generateMarkable($assessment, $participant->getUser());
+                $rubricMapper = RubricMapper::getInstance();
+                if($assessment->getUseRubric()){
+                    $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+                }
+                $data['rubricContext'] = (new RubricContext($rubricMapper))->generateMarkable($assessment, $participant->getUser());
             }
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
