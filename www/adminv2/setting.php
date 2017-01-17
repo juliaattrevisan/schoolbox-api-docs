@@ -31,11 +31,22 @@ $nav->parse($this, 'setting');
 
 $this->setVar('setting_block', '');
 
+/**
+ * If no settings page has been set - set to Site
+ */
 if ($this->arg[0]) {
 	$selectedType = urldecode($this->arg[0]);
-}
-else {
+} else {
 	$selectedType = 'Site';
+}
+
+$optionList = Cfg::getAllOfType('configID', $selectedType);
+
+/**
+ * 404 if there's nothing found with the settings page requested
+ */
+if (!$optionList) {
+    $this->pageNotFound();
 }
 
 $typeList = Cfg::getTypeList();
@@ -58,7 +69,6 @@ if (is_array($typeList)) {
 	}
 }
 
-$optionList = Cfg::getAllOfType('configID', $selectedType);
 $editable = false;
 
 if(is_array($optionList)) {
