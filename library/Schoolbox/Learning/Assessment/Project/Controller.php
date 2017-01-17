@@ -14,9 +14,12 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\AssessmentContext;
 
 class Controller extends Assessment\Controller
 {
+
+    protected $importantRedirect = true;
 
     /**
      * @param Assessment\Project|IAssessable $assessment
@@ -238,12 +241,23 @@ class Controller extends Assessment\Controller
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
+     * @param string      $explicitReturnUrl
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl, $defaultReturnUrl = '')
     {
-        // at the end of a mutation, a project will redirect back to its status screen
-        return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]);
+        /**
+         * Always go to the status screen when a project has been created,
+         * but send the return url with it
+         */
+        $redirect = $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]);
+
+        if ($explicitReturnUrl) {
+            $redirect .= '?' . Redirect::RETURN_URL . "=$explicitReturnUrl";
+        }
+
+        return $redirect;
     }
+
 }
