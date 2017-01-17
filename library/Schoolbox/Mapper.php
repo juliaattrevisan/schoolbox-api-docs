@@ -771,7 +771,7 @@ abstract class Mapper implements IMapper, Serializable
                 return $map['property'];
             }
         }
-        throw new \InvalidArgumentException("Column not found: $column");
+        throw new InvalidArgumentException("Column not found: $column");
     }
 
     /**
@@ -1562,10 +1562,12 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findOneByColumnList($columnList, $order = array(), $options = array())
     {
-        $options = array_merge($options, [
+        $defaults = [
             'deleted' => true,
             'order'   => $order,
-        ]);
+        ];
+        $options = array_merge($defaults, $options);
+
         $result_collection = $this->findByColumnList(
             $columnList,
             $options
