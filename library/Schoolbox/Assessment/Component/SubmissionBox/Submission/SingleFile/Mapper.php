@@ -103,8 +103,20 @@ class Mapper extends BaseMapper
     {
         /** @var Collection|Model[] $resultSet */
         $resultSet = $this->createCollection();
+        $seen = [];
 
         foreach ($statement as $row) {
+
+            /* Sometimes multiple plagscan results per submission file causes dupes
+             * Not sure if it continues to happen normally, but have seen it in demo data
+             *
+             * Also unsure how plagscan results spawn multiple times for the same file
+             * as new records, instead of overwriting the old one (if exists)
+             */
+            if (in_array($row['ps.student_submission_file_id'], $seen)) {
+                continue;
+            }
+
             /** @var Mimetype $mimetype */
             $mimetype = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'm');
 
@@ -122,7 +134,10 @@ class Mapper extends BaseMapper
                 ->setSubmission($this->hydrateJoin($row, 'submission', 's'));
 
             $resultSet->add($submissionFile);
+
+            $seen[] = $submissionFile->getId();
         }
+
         return $resultSet;
     }
 }
