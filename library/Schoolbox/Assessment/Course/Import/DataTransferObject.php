@@ -228,8 +228,9 @@ class DataTransferObject
             /** @var UnitImplementation $unitImpl */
             $unitImpl = $this->unitImplementations->getOffset($unitSpecId);
             $nextAvailable = clone $unitImpl->getOpenDate();
+            $unitOpen = clone $unitImpl->getOpenDate();;
             $limit = clone $unitImpl->getDueDate();
-            $this->addAssessmentSpecDates($unitImpl, $assessmentPairs, $nextAvailable, $limit);
+            $this->addAssessmentSpecDates($unitImpl, $assessmentPairs, $nextAvailable, $limit, $unitOpen);
         }
     }
 
@@ -247,13 +248,15 @@ class DataTransferObject
      * @param AssessmentPair[]|GenericCollection           $assessmentPairs - Already sorted by assessment.sequence
      * @param Alaress_Date_Format                          $limit           - Cannot assign dates past this point
      * @param Alaress_Date_Format                          $nextAvailable   - Next available date to assign to specs
+     * @param Alaress_Date_Format                          $unitOpen        - Unit open date, used for items with no span
      * @return Alaress_Date_Format                         $nextAvailable   - The next available date after adding dates
      */
     protected function addAssessmentSpecDates(
         AssessmentContext   $context,
         GenericCollection   $assessmentPairs,
         Alaress_Date_Format $nextAvailable,
-        Alaress_Date_Format $limit
+        Alaress_Date_Format $limit,
+        Alaress_Date_Format $unitOpen
     )
     {
         /* Shallow clone collection of pairs to ensure we only start to assign specs from end of latest impl due date
@@ -284,7 +287,7 @@ class DataTransferObject
                     $spec = $pair->getSpecification();
                     $spec->setPublishAt(clone $projectOpen);
                     $spec->setDueAt(clone $projectDue);
-                    $this->addAssessmentSpecDates($spec, $pair->getSubPairs(), $projectOpen, $projectDue);
+                    $this->addAssessmentSpecDates($spec, $pair->getSubPairs(), $projectOpen, $projectDue, $unitOpen);
                 }
             }
 
@@ -305,26 +308,36 @@ class DataTransferObject
                     // align start to projectImpl start
                     $start = clone $context->getPublishAt();
                 }
-                $spec->setPublishAt($start);
-                $spec->setOpenAt($start);
 
                 // Determine open_span
                 if($insideProjectImpl){
                     // Ignore default_open_span and set end date to projectImpl end date
                     $nextAvailable = clone $context->getDueAt();
+                    $end = clone $nextAvailable;
                 } else {
                     if(!$spec instanceof Project){
                         // Base Case
-                        $nextAvailable->addDays($spec->getDefaultOpenSpan());
-                        if($nextAvailable->gt($limit)){
-                            $nextAvailable = $limit;
+                        if (empty($spec->getDefaultOpenSpan())) {
+                            // If the assessable has no default open span then its dates are taken out of the calcuation
+                            // and defaut back to the units open/due dates
+                            $start = clone $unitOpen;
+                            $end = clone $limit;
+                        } else {
+                            $nextAvailable->addDays($spec->getDefaultOpenSpan());
+                            if($nextAvailable->gt($limit)){
+                                $nextAvailable = $limit;
+                            }
+                            $end = clone $nextAvailable;
                         }
                     } else {
                         // Recursive Case
-                        $nextAvailable = $this->addAssessmentSpecDates($spec, $pair->getSubPairs(), $nextAvailable, $limit);
+                        $nextAvailable = $this->addAssessmentSpecDates($spec, $pair->getSubPairs(), $nextAvailable, $limit, $unitOpen);
+                        $end = clone $nextAvailable;
                     }
                 }
-                $end = clone $nextAvailable;
+
+                $spec->setPublishAt($start);
+                $spec->setOpenAt($start);
                 $spec->setDueAt($end);
                 $spec->setCloseAt($end);
 
