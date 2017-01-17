@@ -16,6 +16,23 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
         error(19);
     }
 
+    if (strlen($_POST['textBoxHeading']) == 0 && strlen($_POST['textBoxBody']) == 0) {
+
+        if (is_numeric($_POST['textBoxID'])) {
+            /**
+             * Updated an existing text box with nothing - delete the textbox
+             */
+            $textbox = \Schoolbox\Resource\Textbox\Mapper::getInstance()->findById($_POST['textBoxID']);
+            \Schoolbox\Resource\Textbox\Mapper::getInstance()->delete($textbox);
+        } else {
+            /**
+             * Trying to create a textbox with nothing - nope.jpg
+             */
+        }
+
+        SitePage::localRedir('/homepage/' . $_POST['originID']);
+    }
+
     $textbox = new \Schoolbox\Resource\Textbox\Model();
 
     $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');

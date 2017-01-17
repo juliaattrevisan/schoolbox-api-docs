@@ -217,4 +217,20 @@
         return $('input[data-checkbox-group="' + checkboxGroup + '"]:checked').length > 0;
     }, 'You must select at least one option below');
 
+    /**
+     * CKEditor doesn't update the textarea until after the form is checked
+     * so getData() on the instance and check that
+     */
+    $.validator.addMethod('ckeRequired', function(value, element) {
+
+        var textboxId = $(element).attr('id');
+
+        if (CKEDITOR.instances[textboxId].getData().length > 0) {
+            return true;
+        }
+
+        return false;
+
+    }, 'This field is required');
+
 }(jQuery));
