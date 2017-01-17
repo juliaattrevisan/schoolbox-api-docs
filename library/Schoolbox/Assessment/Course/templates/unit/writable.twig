@@ -36,6 +36,10 @@ Usage:
         <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unitSpec.id}) }}" class="icon-delete" data-action="delete-unit">Delete Unit</a></li>
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unitSpec.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
+        <div class="empty-state{% if unitSpec.assessables|length %} hide{% endif %}" data-empty-state>
+            <i class="icon-course"></i>
+            <p>No activities in this unit yet.</p>
+        </div>
         <ul class="information-list sortable"
             data-sortable
             data-assessment-list
@@ -47,14 +51,6 @@ Usage:
                     _writable:        true
                 } only %}
             {% endfor %}
-
-            <li>
-                <div class="empty-state{% if unitSpec.assessables|length %} hide{% endif %}" data-empty-state>
-                    <i class="icon-course"></i>
-                    <p>No activities in this unit yet.</p>
-                </div>
-            </li>
-
         </ul>
         <ul class="flex-list buttons">
             <li>
