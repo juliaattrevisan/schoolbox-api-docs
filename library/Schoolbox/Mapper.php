@@ -1358,7 +1358,7 @@ abstract class Mapper implements IMapper, Serializable
         foreach ($pbs as $pb) {
             // Build query
 
-            $query     = "UPDATE `{$this->getTable()}` SET `{$this->database->quoteIdentifier($field)}` = :value WHERE ".implode(' AND ', $pb->getWhere());
+            $query     = "UPDATE `{$this->getTable()}` SET {$this->database->quoteIdentifier($field)} = :value WHERE ".implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
             $statement->bindValue('value', $value);
             foreach ($pb->getParams() as $key => $id) {
