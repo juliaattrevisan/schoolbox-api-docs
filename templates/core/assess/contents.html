@@ -38,7 +38,7 @@
 <!-- END custom_head -->
 
 <!-- BEGIN section -->
-<div class="actions-small-1 row">
+<div class="actions-small-1">
     <div class="list-item">
         <div class="small-12 columns">
             <h2 class="subheader"><a name="section-{SECTION_SECTION_ID}"></a>{SECTION_TITLE}</h2>
@@ -79,6 +79,7 @@
                         <span class="meta">({QUESTION_MARKS} marks)</span>
                         <!-- END has_mark -->
                     </h4>
+                    {QUESTION_QUESTION}
                 </div>
             </div>
             <nav>
@@ -86,7 +87,6 @@
                 <a class="icon-modify" href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}{RETURN_URL}" title="Modify"></a>
                 <a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/addQuestion/{QUESTION_QUESTION_ID}{RETURN_URL}" data-reveal-id="question-bank" data-reveal-ajax="true" title="Import into Question Bank"></a>
             </nav>
-            <article>{QUESTION_QUESTION}</article>
         </li>
         <!-- END question -->
     </ul>
