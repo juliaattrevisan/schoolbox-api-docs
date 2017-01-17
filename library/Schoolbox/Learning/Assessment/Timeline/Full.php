@@ -16,6 +16,7 @@ namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Alaress_Date_Format;
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -56,13 +57,14 @@ class Full
 
     /**
      * Get the timeline, as seen by a teacher on their child's summary page
-     * As a parent, you cannot see draft submissions or unpublished feedback
+     * As a parent, you cannot see draft submissions or unpublished feedback,
+     * and can only see feedback if the assessment allows parents to see it.
      *
      * @return Collection
      */
     public function getForParent()
     {
-        return $this->getTimeline(false, false);
+        return $this->getTimeline(false, false, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT);
     }
 
     /**
@@ -73,19 +75,20 @@ class Full
      */
     public function getForTeacher()
     {
-        return $this->getTimeline(true, false);
+        return $this->getTimeline(true, false, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
     /**
      * Get the timeline, as seen by a student on their summary page
-     * As a student, you cannot see feedback the teacher has drafted but not yet published
+     * As a student, you cannot see feedback the teacher has drafted but not yet published,
+     * and can only see feedback if the assessment allows students to see it.
      *
      * @return Collection
      */
     public function getForStudent()
     {
-        return $this->getTimeline(false, true);
+        return $this->getTimeline(false, true, AbstractAssessment::MARK_VISIBILITY_STUDENT);
     }
 
 
@@ -97,7 +100,7 @@ class Full
      */
     public function getForAdmin()
     {
-        return $this->getTimeline(true, true);
+        return $this->getTimeline(true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
@@ -143,13 +146,14 @@ class Full
      *
      * @param bool $includeUnpublishedFeedback
      * @param bool $includeDraftResponses
+     * @param int  $minimumVisibility          Assessment mark's visibility must be at least this
      * @return Collection
      */
-    protected function getTimeline($includeUnpublishedFeedback, $includeDraftResponses)
+    protected function getTimeline($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
     {
         // TODO evaluate the appropriateness of caching here
 //        if (!$this->getHasRecombined()) {
-        $this->recombine($includeUnpublishedFeedback, $includeDraftResponses);
+        $this->recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility);
 //            $this->setHasRecombined(true);
 //        }
 
@@ -164,12 +168,13 @@ class Full
      *
      * @param bool $includeUnpublishedFeedback
      * @param bool $includeDraftResponses
+     * @param int  $minimumVisibility
      */
-    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses)
+    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
     {
         $processedFeedback = [];
 
-        $isFeedbackVisible = $this->getParticipant()->getAssessable()->isFeedbackVisibleToUser($this->getParticipant()->getUser());
+        $isFeedbackVisible = $this->getParticipant()->getAssessable()->getMarkVisibility() >= $minimumVisibility;
 
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
 
