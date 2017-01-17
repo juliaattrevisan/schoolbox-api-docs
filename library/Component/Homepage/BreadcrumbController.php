@@ -48,7 +48,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
             $this->setBlock('source_folder_exists', 'category_breadcrumb', 'category_breadcrumb_block');
             $this->setVar('category_breadcrumb_block', '');
 
-            foreach ($this->getFolderMapper()->findParents($this->getSource()) as $parent) {
+            foreach ($this->getFolderMapper()->findParents($this->getSource(), null, true) as $parent) {
                 /** @var Folder $parent */
                 $this->setVar('BREADCRUMB_CATEGORY_ID', $parent->getId());
                 $this->setVar('BREADCRUMB_CATEGORY_NAME', $parent->getName());

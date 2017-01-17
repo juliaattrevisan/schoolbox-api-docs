@@ -1387,9 +1387,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
         if ($row) {
-            $folder = $this->hydrate($row);
-
-            $parent = $this->createModel($folder->getParent()->getId());
+            // This done by hand to ensure no caches are harmed
+            $folder = new $this->model;
+            $folder->setId($row['id']);
+            $folder->setName($row['name']);
+            $folder->setInherit($row['inherit']);
+            $parent = new $this->model;
+            $parent->setId($row['parent']);
             $folder->setParent($parent);
 
             return $folder;
