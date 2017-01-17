@@ -236,6 +236,9 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
     {
         $assessment = new DueWork();
 
+        // Allow feedbacks to show for parents
+        $assessment->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT);
+
         $response1 = new Submission();
         $response1
             ->setId(1)
