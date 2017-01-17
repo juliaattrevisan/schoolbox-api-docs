@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Menu\Side;
 
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Side\Mapper as MenuSideMapper;
 use Schoolbox\Menu\Side\Model as MenuSide;
