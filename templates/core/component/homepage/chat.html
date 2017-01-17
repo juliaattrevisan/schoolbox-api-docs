@@ -12,7 +12,7 @@
                 user_name: '{CHAT_USER_NAME}',
                 user_perm: '{CHAT_USER_PERM}',
                 log_el: 'ul[data-chat-log]',
-                send_el: 'a[data-interaction-send]',
+                send_el: 'input[data-chat-send]',
                 users_el: 'ul[data-chat-users]'
             });
 
@@ -76,16 +76,12 @@
                 <div class="content">
                     <form action="#" method="post" class="chat-send" id="chatSend">
                         <div class="chat-message-container">
-                            <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box"></textarea>
+                            <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box" rows="2" placeholder="Type a message..."></textarea>
                         </div>
+                        <input type="submit" value="Send Message" data-chat-send>
                     </form>
 
                     <div class="chat-error hide"></div>
-                </div>
-                <div class="component-action">
-                    <section>
-                        <a href="#" class="button" data-interaction-send>Send Message</a>
-                    </section>
                 </div>
 
             </section>
