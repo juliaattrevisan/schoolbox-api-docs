@@ -1160,37 +1160,46 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hardDelete($object)
     {
-        $identifierName     = $this->getIdentifierColumn();
-        $identifierProperty = $this->getIdentifierProperty();
-        $collection         = $this->getModelAsCollection($object);
-        $statement          = $this->database->prepare(
-            "
-			DELETE FROM  `{$this->table}`
-			WHERE `{$identifierName}` = :identifierValue
-		"
-        );
+        $collection = $this->getModelAsCollection($object);
+        if (count($collection) === 0) {
+            return false;
+        }
+
+        // Pre-delete callbacks
         foreach ($collection as $model) {
             if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
                 return false;
             }
         }
+
+        // Run update queries
         $this->database->beginTransaction();
-        try {
-            foreach ($collection as $model) {
-                $statement->bindValue(':identifierValue', $this->getModelProperty($model, $identifierProperty));
+        foreach ($this->buildPredicateBuildersForCollection($collection) as $pb) {
+            // Build query
+            $query     = "DELETE FROM `{$this->getTable()}` WHERE ".implode(' AND ', $pb->getWhere());
+            $statement = $this->database->prepare($query);
+            foreach ($pb->getParams() as $key => $id) {
+                $statement->bindValue($key, $id);
+            }
+
+            // Run query
+            try {
                 if (!$statement->execute()) {
                     $this->database->rollBack();
                     return false;
                 }
+            } catch (PDOException $e) {
+                $this->database->rollBack();
+                throw $e;
             }
-        } catch (PDOException $e) {
-            $this->database->rollBack();
-            throw $e;
         }
         $this->database->commit();
+
+        // Post-delete callbacks
         foreach ($collection as $model) {
             $this->triggerCallbacks(self::CALLBACK_POSTDELETE, $model);
         }
+
         // raise delete notification
         foreach ($collection as $model) {
             $this->raiseNotification($model, self::METHOD_DELETE);
@@ -1318,7 +1327,11 @@ abstract class Mapper implements IMapper, Serializable
     public function updateAll($object, $field, $value, $pre_trigger = null, $post_trigger = null)
     {
         $collection = $this->getModelAsCollection($object);
-        //
+        if (count($collection) === 0) {
+            // Nothing to update
+            return false;
+        }
+
         // Trigger the pre-trigger, if there is one.
         if (isset($pre_trigger)) {
             foreach ($collection as $model) {
@@ -1327,7 +1340,7 @@ abstract class Mapper implements IMapper, Serializable
                 }
             }
         }
-        //
+
         // Get the property to update on each model, if there is one.
         $property_map = null;
         foreach ($this->map as $map) {
@@ -1336,49 +1349,89 @@ abstract class Mapper implements IMapper, Serializable
                 break;
             }
         }
-        //
-        // Get list of IDs to update, and update property on each model
-        $id_values = array();
+        if (!isset($property_map)) {
+            // Nothing to update
+            return false;
+        }
+
+        $pbs = $this->buildPredicateBuildersForCollection($collection);
+
+        // Update property on each model
         foreach ($collection as $model) {
             if (isset($property_map)) {
                 $this->setModelProperty($model, $property_map['property'], $value);
             }
-            $id_values[] = $this->getModelProperty($model, $this->getIdentifierProperty());
         }
-        if (empty($id_values)) {
-            return false;
-        }
-        //
-        // Run update query
-        $query     = "
-			UPDATE `{$this->getTable()}`
-			SET `$field` = :value
-			WHERE `{$this->getIdentifierColumn()}` IN {$this->getArrayPlaceholders($id_values, 'id')}
-		";
-        $statement = $this->database->prepare($query);
-        $statement->bindValue('value', $value);
-        foreach ($this->getArrayParameters($id_values, 'id') as $key => $id) {
-            $statement->bindValue($key, $id);
-        }
+
+        // Run update queries
         $this->database->beginTransaction();
-        try {
-            if (!($result = $statement->execute())) {
-                $this->database->rollBack();
-                return $result;
+        foreach ($pbs as $pb) {
+            // Build query
+
+            $query     = "UPDATE `{$this->getTable()}` SET {$this->database->quoteIdentifier($field)} = :value WHERE ".implode(' AND ', $pb->getWhere());
+            $statement = $this->database->prepare($query);
+            $statement->bindValue('value', $value);
+            foreach ($pb->getParams() as $key => $id) {
+                $statement->bindValue($key, $id);
             }
-        } catch (PDOException $e) {
-            $this->database->rollBack();
-            throw $e;
+
+            // Run query
+            try {
+                if (!$statement->execute()) {
+                    $this->database->rollBack();
+                    return false;
+                }
+            } catch (PDOException $e) {
+                $this->database->rollBack();
+                throw $e;
+            }
         }
         $this->database->commit();
-        //
+
         // Trigger the post-trigger, if there is one.
         if (isset($post_trigger)) {
             foreach ($collection as $model) {
                 $this->triggerCallbacks($post_trigger, $model);
             }
         }
-        return $result;
+        return true;
+    }
+
+    /**
+     * Creates a set of predicate builders - between them, they will match all
+     * objects in $collection.
+     *
+     * This is used in `updateAll` and `hardDelete`.
+     *
+     * @param Collection $collection A collection of models
+     * @return PredicateBuilder[]
+     */
+    protected function buildPredicateBuildersForCollection(Collection $collection)
+    {
+        // Build a WHERE part using the predicate builder.
+        /** @var PredicateBuilder[] $pbs */
+        $pbs = [];
+        if ($this->hasIdentifier()) {
+            // Building the query is easy, just set where any identifier matches
+            $idValues = [];
+            foreach ($collection as $model) {
+                $idValues[] = $this->getModelProperty($model, $this->getIdentifierProperty());
+            }
+            $pbs[] = $this->getPredicateBuilder()->equals($this->getIdentifierColumn(), $idValues);
+
+        } else {
+            // Building the query is hard - all I can do is compare against each property of each model.
+            foreach ($collection as $i => $model) {
+                // Need a separate PB for each model.
+                // This is because joining them together doesn't know how to re-alias params.
+                $pb = $this->getPredicateBuilder();
+                foreach ($this->map as $column) {
+                    $pb->equals($column['column'], $this->getModelProperty($model, $column['property']));
+                }
+                $pbs[] = $pb;
+            }
+        }
+        return $pbs;
     }
 
     /**
