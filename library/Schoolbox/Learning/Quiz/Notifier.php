@@ -28,6 +28,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -369,13 +370,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentOverdue($quiz, $owner, $diff = null) {
-		$msgr = new Messenger();
+//		$msgr = new Messenger();
+		$envelope = new Envelope();
 
 		if($this->conf->get('restrict_parent_duework_access')) {
-			return $msgr;
+//			return $msgr;
+			return $envelope;
 		}
 
 		$quizId = $quiz->getId();
@@ -383,31 +386,44 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$quizName = $quiz->getTitle();
 
-		$cat     = $quiz->getCategory();
-		$catId   = $cat->getId();
-		$catName = $cat->getName();
+//		$cat     = $quiz->getCategory();
+//		$catId   = $cat->getId();
+//		$catName = $cat->getName();
 
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
 
-		$msg = new Message(":child did not attempt :quizname in :catname", $icon, $href);
+		$bob = new Builder();
+        $bob->addTopic("assess.$quizId.overdue")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::ERROR)
+            ->setTitle(":child did not attempt :quizname in :catname")
+            ->setHref($href)
+            ->setIcon($icon)
+            ->setParam('quizname', new Param($quizName, $href))
+            ->setParam('catname', new CategoryParam($quiz->getCategory()));
+
+//		$msg = new Message(":child did not attempt :quizname in :catname", $icon, $href);
 
 		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
 		foreach($unattemptedStudents as $student) {
+            $bob->setParam('child', new UserParam($student));
+            $envelope->targetToParent($student->getId(), $bob->build());
 
-			$childName = $student->getFirstname();
-			$childId = $student->getId();
-
-			$msgr->targetToParent($childId, $msg, "assess.$quizId.overdue", Logger::ERROR, array(
-				'child'    => array($childName, "/search/user/$childId"),
-				'quizname' => array($quizName, $href),
-				'catname'  => array($catName, "/homepage/$catId"),
-			));
+//			$childName = $student->getFirstname();
+//			$childId = $student->getId();
+//
+//			$msgr->targetToParent($childId, $msg, "assess.$quizId.overdue", Logger::ERROR, array(
+//				'child'    => array($childName, "/search/user/$childId"),
+//				'quizname' => array($quizName, $href),
+//				'catname'  => array($catName, "/homepage/$catId"),
+//			));
 		}
 
 
-		return $msgr;
+//		return $msgr;
+        return $envelope;
 	}
 
 
