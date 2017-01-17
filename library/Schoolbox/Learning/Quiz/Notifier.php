@@ -334,35 +334,68 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentOverdue($quiz, $owner, $diff = null) {
-		$msgr = new Messenger();
+        $envelope = new Envelope();
 
-		$quizId = $quiz->getId();
-		$quiz   = $this->fullyHydrateQuiz($quiz);
+        if ($this->conf->get('restrict_parent_duework_access')) {
+            return $envelope;
+        }
 
-		$quizName = $quiz->getTitle();
+        $quizId = $quiz->getId();
+        $quiz   = $this->fullyHydrateQuiz($quiz);
 
-		$cat     = $quiz->getCategory();
-		$catId   = $cat->getId();
-		$catName = $cat->getName();
+        $quizName = $quiz->getTitle();
 
-		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
-		$href = "/assess/intro/$quizId";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $href = "/assess/intro/$quizId";
 
-		$msg = new Message(":quizname has closed in :catname", $icon, $href);
+        $bob = new Builder();
+        $bob->addTopic("assess.$quizId.overdue")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::ERROR)
+            ->setTitle(":quizname has closed in :catname")
+            ->setHref($href)
+            ->setIcon($icon)
+            ->setParam('quizname', new Param($quizName, $href))
+            ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
-		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
+        $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
-		foreach($unattemptedStudents as $user) {
-			$msgr->targetToUser($user->getId(), $msg, "assess.$quizId.overdue", Logger::ERROR, array(
-				'quizname' => array($quizName, $href),
-				'catname'  => array($catName, "/homepage/$catId"),
-			));
-		}
+        foreach($unattemptedStudents as $student) {
+            $bob->setParam('child', new UserParam($student));
+            $envelope->targetToUser($student->getId(), $bob->build());
+        }
 
-		return $msgr;
+        return $envelope;
+
+//		$msgr = new Messenger();
+//
+//		$quizId = $quiz->getId();
+//		$quiz   = $this->fullyHydrateQuiz($quiz);
+//
+//		$quizName = $quiz->getTitle();
+//
+//		$cat     = $quiz->getCategory();
+//		$catId   = $cat->getId();
+//		$catName = $cat->getName();
+//
+//		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+//		$href = "/assess/intro/$quizId";
+//
+//		$msg = new Message(":quizname has closed in :catname", $icon, $href);
+//
+//		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
+//
+//		foreach($unattemptedStudents as $user) {
+//			$msgr->targetToUser($user->getId(), $msg, "assess.$quizId.overdue", Logger::ERROR, array(
+//				'quizname' => array($quizName, $href),
+//				'catname'  => array($catName, "/homepage/$catId"),
+//			));
+//		}
+//
+//		return $msgr;
 	}
 
 
