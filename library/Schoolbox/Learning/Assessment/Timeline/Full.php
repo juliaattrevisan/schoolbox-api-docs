@@ -16,6 +16,7 @@ namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Alaress_Date_Format;
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -56,13 +57,14 @@ class Full
 
     /**
      * Get the timeline, as seen by a teacher on their child's summary page
-     * As a parent, you cannot see draft submissions or unpublished feedback
+     * As a parent, you cannot see draft submissions or unpublished feedback,
+     * and can only see feedback if the assessment allows parents to see it.
      *
      * @return Collection
      */
     public function getForParent()
     {
-        return $this->getTimeline(false, false);
+        return $this->getTimeline(false, false, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT);
     }
 
     /**
@@ -73,19 +75,20 @@ class Full
      */
     public function getForTeacher()
     {
-        return $this->getTimeline(true, false);
+        return $this->getTimeline(true, false, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
     /**
      * Get the timeline, as seen by a student on their summary page
-     * As a student, you cannot see feedback the teacher has drafted but not yet published
+     * As a student, you cannot see feedback the teacher has drafted but not yet published,
+     * and can only see feedback if the assessment allows students to see it.
      *
      * @return Collection
      */
     public function getForStudent()
     {
-        return $this->getTimeline(false, true);
+        return $this->getTimeline(false, true, AbstractAssessment::MARK_VISIBILITY_STUDENT);
     }
 
 
@@ -97,7 +100,7 @@ class Full
      */
     public function getForAdmin()
     {
-        return $this->getTimeline(true, true);
+        return $this->getTimeline(true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
@@ -105,25 +108,28 @@ class Full
      * Get the timeline appropriate to the given user.
      * Is probably a *bit* heavy-handed in its permission checking...
      *
-     * @param User $u
+     * @param User $user
      * @return Collection
      */
-    public function getForUser(User $u)
+    public function getForUser(User $user)
     {
-        $r = $u->getRole();
-        $p = $this->getParticipant()->getUser();
+        $role        = $user->getRole();
+        $participant = $this->getParticipant()->getUser();
 
-        if ($u->isSuperuser() || ($u->getId() == $p->getId() && $r->isStaff())) {
+        if ($user->isSuperuser() || ($user->getId() == $participant->getId() && $role->isStaff())) {
             return $this->getForAdmin();
-        } elseif ($r->isStudent()) {
-            if ($u->getId() == $p->getId()) {
+
+        } elseif ($role->isStudent()) {
+            if ($user->getId() == $participant->getId()) {
                 return $this->getForStudent();
             }
-        } elseif ($r->isStaff()) {
+
+        } elseif ($role->isStaff()) {
             return $this->getForTeacher();
-        } elseif ($r->isParent()) {
-            $p->loadParents();
-            if ($p->isChildOf($u)) {
+
+        } elseif ($role->isParent()) {
+            $participant->loadParents();
+            if ($participant->isChildOf($user)) {
                 return $this->getForParent();
             }
         }
@@ -140,13 +146,14 @@ class Full
      *
      * @param bool $includeUnpublishedFeedback
      * @param bool $includeDraftResponses
+     * @param int  $minimumVisibility          Assessment mark's visibility must be at least this
      * @return Collection
      */
-    protected function getTimeline($includeUnpublishedFeedback, $includeDraftResponses)
+    protected function getTimeline($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
     {
         // TODO evaluate the appropriateness of caching here
 //        if (!$this->getHasRecombined()) {
-        $this->recombine($includeUnpublishedFeedback, $includeDraftResponses);
+        $this->recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility);
 //            $this->setHasRecombined(true);
 //        }
 
@@ -161,10 +168,13 @@ class Full
      *
      * @param bool $includeUnpublishedFeedback
      * @param bool $includeDraftResponses
+     * @param int  $minimumVisibility
      */
-    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses)
+    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
     {
         $processedFeedback = [];
+
+        $isFeedbackVisible = $this->getParticipant()->getAssessable()->getMarkVisibility() >= $minimumVisibility;
 
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
 
@@ -178,15 +188,16 @@ class Full
                  * Otherwise just use the stack that was given to us
                  * which has the unpublished feedbacks in there already
                  */
-                if ($includeUnpublishedFeedback) {
-                    $includedFeedback = $currentResponse->getAllFeedback();
-                }
-                else {
-                    $includedFeedback = new Collection();
+                $includedFeedback = new Collection();
+                if ($isFeedbackVisible) {
+                    if ($includeUnpublishedFeedback) {
+                        $includedFeedback = $currentResponse->getAllFeedback();
 
-                    foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                        if ($currentFeedback->isPublished()) {
-                            $includedFeedback->add($currentFeedback);
+                    } else {
+                        foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                            if ($currentFeedback->isPublished()) {
+                                $includedFeedback->add($currentFeedback);
+                            }
                         }
                     }
                 }
@@ -234,15 +245,17 @@ class Full
 
         /* Only grab unique Floating Feedbacks
          */
-        foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
-            if (!in_array($currentFeedback->getId(), $processedFeedback)) {
+        if ($isFeedbackVisible) {
+            foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
+                if (!in_array($currentFeedback->getId(), $processedFeedback)) {
 
-                /* Only show Published feedbacks
-                 */
-                if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
-                    $this->getRecombined()->add($currentFeedback);
+                    /* Only show Published feedbacks
+                     */
+                    if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
+                        $this->getRecombined()->add($currentFeedback);
 
-                    $processedFeedback[] = $currentFeedback->getId();
+                        $processedFeedback[] = $currentFeedback->getId();
+                    }
                 }
             }
         }
