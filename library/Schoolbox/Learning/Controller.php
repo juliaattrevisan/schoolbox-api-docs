@@ -448,12 +448,14 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
+        $folders = new Collection();
         if ($term->getId() == $this->termMapper->findForToday()->getId()) {
             $folders = $this->folderMapper->findForUser($viewee);
             $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithFeedbacks($viewee, $term));
             $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term));
         } else {
-            $folders = [];
+            $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithFeedbacks($viewee, $term));
+            $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term));
         }
 
         // Grab the students conversation history
