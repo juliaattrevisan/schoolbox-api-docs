@@ -79,7 +79,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock('has_showcased_work', 'edit_showcase_work','edit_showcase_work_block');
         $this->getPage()->setBlock('showcased_work', 'submission_file_list', 'submission_file_list_block');
 
-
         $this->getPage()->setBlock(TEMPLATE_content, 'no_recent_blog', 'no_recent_blog_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_recent_blog', 'has_recent_blog_block');
         $this->getPage()->setBlock('has_recent_blog', 'recent_blog', 'recent_blog_block');
@@ -113,7 +112,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function renderPersonal()
     {
-
         $house = $this->getUserHouse();
 
         $this->getPage()->setVar(array(
@@ -179,18 +177,17 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         if ($allShowcasedItems->count()) {
             $previousCategory = null;
-            $j = 0;
 
             $currentUser = $this->getCurrentUser();
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
 
-                $latestSubmission = $this->getLatestSubmission($this->getUser(), $currentBox);
-                $latestReturn = $this->getLatestReturn($this->getUser(), $currentBox);
-
                 if (!($currentBox instanceof Schoolbox\Assessment\Component\SubmissionBox)) {
                     continue;
                 }
+
+                $latestSubmission = $this->getLatestSubmission($this->getUser(), $currentBox);
+                $latestReturn = $this->getLatestReturn($this->getUser(), $currentBox);
 
                 $this->getPage()->setVar(array(
                     'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
@@ -204,16 +201,14 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                  */
                 if ($latestSubmission && $latestSubmission->getFiles()->count()) {
                     foreach($latestSubmission->getFiles() as $currentFile) {
-                        $this->getPage()->setVar(
-                            array(
-                                'SHOWCASED_WORK_SUBMISSION_ID'        => $currentFile->getId(),
-                                'SHOWCASED_WORK_FILE_NAME'            => $currentFile->getFilename(),
-                                'SHOWCASED_WORK_FILE_HASH'            => $currentFile->getHash(),
-                                'SHOWCASED_WORK_SUBMISSION_FILESIZE'  => Alaress_Byte_Format::bytesToString($currentFile->getSize()),
-                                'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentFile->getCreatedAt()->getShort(),
-                                'SHOWCASED_WORK_MIMETYPE_ICONFILE'    => $currentFile->getMimetype()->getIconFile(),
-                            )
-                        );
+                        $this->getPage()->setVar([
+                            'SHOWCASED_WORK_SUBMISSION_ID'        => $currentFile->getId(),
+                            'SHOWCASED_WORK_FILE_NAME'            => $currentFile->getFilename(),
+                            'SHOWCASED_WORK_FILE_HASH'            => $currentFile->getHash(),
+                            'SHOWCASED_WORK_SUBMISSION_FILESIZE'  => Alaress_Byte_Format::bytesToString($currentFile->getSize()),
+                            'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentFile->getCreatedAt()->getShort(),
+                            'SHOWCASED_WORK_MIMETYPE_ICONFILE'    => $currentFile->getMimetype()->getIconFile(),
+                        ]);
 
                         $this->getPage()->parse('submission_file_list_block', 'submission_file_list',true);
                     }
@@ -314,7 +309,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         });
 
         if ($allBlogs->count()) {
-            $j = 0;
 
             /** @var Schoolbox\Blog\Eportfolio\Post\Model[] $allBlogs */
             foreach ($allBlogs as $currentBlog) {
@@ -323,7 +317,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     'RECENT_BLOG_TITLE' => $currentBlog->getHeading(),
                     'RECENT_BLOG_CREATED_AT' => $currentBlog->getCreatedAt()->getRelativeTime(),
                     'RECENT_BLOG_PAGE_ID' => $currentBlog->getPageId(),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 ));
 
                 $this->getPage()->parse('recent_blog_block', 'recent_blog', true);
