@@ -350,13 +350,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
 
         if (is_array($allGroups) && count($allGroups)) {
-            $j = 0;
-
             foreach ($allGroups as $currentGroup) {
                 $this->getPage()->setVar(array(
                     'GROUP_ID' => $currentGroup['id'],
                     'GROUP_NAME' => $currentGroup['name'],
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 ));
 
                 /* Check permissions on whether you can view this subject's
@@ -395,13 +392,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $allSubjects = $this->getGroupHandler()->involvedInSubjects($this->getUserId());
 
         if (is_array($allSubjects) && count($allSubjects)) {
-            $j = 0;
-
             foreach ($allSubjects as $currentSubject) {
                 $this->getPage()->setVar(array(
                     'SUBJECT_ID' => $currentSubject['id'],
                     'SUBJECT_NAME' => $currentSubject['name'],
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 ));
 
                 /* Check permissions on whether you can view this subject's
