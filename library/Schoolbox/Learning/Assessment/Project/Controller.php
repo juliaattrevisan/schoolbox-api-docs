@@ -18,9 +18,7 @@ use Schoolbox\Learning\AssessmentContext;
 
 class Controller extends Assessment\Controller
 {
-
-    protected $importantRedirect = true;
-
+    
     /**
      * @param Assessment\Project|IAssessable $assessment
      * @return array
