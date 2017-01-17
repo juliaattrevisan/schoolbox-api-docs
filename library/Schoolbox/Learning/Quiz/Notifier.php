@@ -463,37 +463,45 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	/**
 	 * @param Model $quiz
 	 * @param User $owner
-	 * @return Messenger
+	 * @return Envelope
 	 * @param array $diff
 	 */
 	public function notifyStudentUpcoming($quiz, $owner, $diff = null) {
-		$msgr = new Messenger();
 
-		$quizId = $quiz->getId();
-		$quiz   = $this->fullyHydrateQuiz($quiz);
+        $envelope = new Envelope();
 
-		$quizName = $quiz->getTitle();
+        if($this->conf->get('restrict_parent_duework_access')) {
+            return $envelope;
+        }
 
-		$cat     = $quiz->getCategory();
-		$catId   = $cat->getId();
-		$catName = $cat->getName();
+        $quizId = $quiz->getId();
+        $quiz   = $this->fullyHydrateQuiz($quiz);
 
-		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
-		$href = "/assess/intro/$quizId";
+        $quizName = $quiz->getTitle();
 
-		$when = self::UPCOMING_WINDOW . " hour" . ( self::UPCOMING_WINDOW == 1 ? '' : 's' );
-		$msg = new Message(":quizname is due in $when in :catname", $icon, $href);
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $href = "/assess/intro/$quizId";
 
-		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
+        $when = self::UPCOMING_WINDOW . " hour" . ( self::UPCOMING_WINDOW == 1 ? '' : 's' );
 
-		foreach($unattemptedStudents->getColumnValues('id') as $id) {
-			$msgr->targetToUser($id, $msg, "assess.$quizId.upcoming", Logger::WARNING, array(
-				'quizname' => array($quizName, $href),
-				'catname' => array($catName, "/homepage/$catId"),
-			));
-		}
+        $bob = new Builder();
+        $bob->addTopic("assess.$quizId.upcoming")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::WARNING)
+            ->setTitle(":quizname is due in $when in :catname")
+            ->setHref($href)
+            ->setIcon($icon)
+            ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
+            ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
-		return $msgr;
+        $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
+
+        foreach($unattemptedStudents as $student) {
+            $bob->setParam('child', new UserParam($student));
+            $envelope->targetToUser($student->getId(), $bob->build());
+        }
+
+        return $envelope;
 	}
 
 
