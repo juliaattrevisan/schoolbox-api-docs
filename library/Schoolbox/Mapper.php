@@ -2582,6 +2582,16 @@ abstract class Mapper implements IMapper, Serializable
         return $this->performHydration($this->localBodyCache, $this, $row, $alias, $callback);
     }
 
+    /**
+     * Invalidates the hydrate cache for this row and alias.
+     *
+     * @param array  $row
+     * @param string $alias
+     */
+    public function invalidateHydrateCache(array $row, $alias = '')
+    {
+        $this->localBodyCache->invalidate($this->getLocalObjectCacheKey($this, $row, $alias));
+    }
 
     /**
      * Helper method for hydrating a row through a join that has been set up
