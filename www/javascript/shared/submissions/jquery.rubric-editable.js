@@ -84,11 +84,28 @@
             }
 
             var message = 'Creating "' + name + '"...';
+            $toastFeedback.toastActivate({text: message});
+
+            /*
+             * Ensure user is not trying to add a duplicate group. The server-side validation will prevent
+             * duplicate criterion, but cannot prevent duplicate groups as they are not persisted until a indicator
+             * name is entered.
+             */
+            if('group' == type){
+                var normalisedNewGroup = normaliseForComparison(name);
+                var $groups =  $('[data-groupname]');
+                for (var i = 0; i < $groups.length; i++) {
+                    var existingGroup = $($groups.get(i)).data('groupname');
+                    if(normalisedNewGroup === normaliseForComparison(existingGroup)){
+                        $toastFeedback.toastTimeout({text: 'Group name already exists!', css: 'alert'});
+                        $input.val('');
+                        return false;
+                    }
+                }
+            }
 
             // prevent mods
             $input.val(message).prop('disabled', true);
-
-            $toastFeedback.toastActivate({text: message});
 
             var payload = {
                 type: type,
@@ -552,6 +569,19 @@
 
         // and apply the merged set
         this.options = $.extend(true, {}, merge, opts);
+    }
+
+    /**
+     * Returns the normalised string for comparison to avoid duplicates.
+     *
+     * MUST use same logic as RubricMapper->normaliseForComparison()
+     *
+     * @param {string} string
+     * @return string
+     */
+    function normaliseForComparison(string)
+    {
+        return string.replace(/\s+/g, ' ').trim().toLowerCase();
     }
 
 })(jQuery, window, document);

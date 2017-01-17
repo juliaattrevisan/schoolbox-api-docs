@@ -128,7 +128,6 @@ class Controller extends BaseController
             $context['crit'] = $this->saveNewCriterion($folderId, $group, $name);
 
             $template = 'group-row-editable';
-
         }
 
         elseif ($post->get('type') == 'group') {
