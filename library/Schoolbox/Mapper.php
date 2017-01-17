@@ -771,7 +771,7 @@ abstract class Mapper implements IMapper, Serializable
                 return $map['property'];
             }
         }
-        throw new \InvalidArgumentException("Column not found: $column");
+        throw new InvalidArgumentException("Column not found: $column");
     }
 
     /**
@@ -1522,6 +1522,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param String       $columnName
      * @param String|array $columnValue
      * @param array        $options @see findByColumnList() $options param
+     * @param  array $options
      *
      * @return GenericCollection
      */
@@ -1539,12 +1540,13 @@ abstract class Mapper implements IMapper, Serializable
      * @param  String $columnName
      * @param  String $columnValue
      * @param  array  $order Fields to order by (@see findByColumnList() $options param)
+     * @param  array $options
      *
      * @return object
      */
-    public function findOneByColumn($columnName, $columnValue, $order = array())
+    public function findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
     {
-        return $this->findOneByColumnList(array($columnName => $columnValue), $order);
+        return $this->findOneByColumnList(array($columnName => $columnValue), $order, $options);
     }
 
     /**
@@ -1555,17 +1557,20 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param  array $columnList
      * @param  array $order Fields to order by (@see findByColumnList() $options param)
-     *
+     * @param  array $options
      * @return object
      */
-    public function findOneByColumnList($columnList, $order = array())
+    public function findOneByColumnList($columnList, $order = array(), $options = array())
     {
+        $defaults = [
+            'deleted' => true,
+            'order'   => $order,
+        ];
+        $options = array_merge($defaults, $options);
+
         $result_collection = $this->findByColumnList(
             $columnList,
-            array(
-                'deleted' => true,
-                'order'   => $order,
-            )
+            $options
         );
         if ($result_collection->count() === 0) {
             throw new Exception('Instance of object not found');
