@@ -126,6 +126,8 @@ class Controller extends Assessment\Controller
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
+        $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
