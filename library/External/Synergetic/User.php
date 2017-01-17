@@ -498,14 +498,19 @@ class External_Synergetic_User implements External_UserInterface
         /* Search for a student name
          */
         if (strlen($name)) {
-            $name = $this->getDatabase()->quote($name);
-            $query .= "
-                AND (
-                    (StudentSurname LIKE '%{$name}%')
-                    OR
-                    (StudentGiven1 LIKE '%{$name}%')
-                )
-            ";
+
+            $splitNames = explode(' ', $name);
+
+            foreach ($splitNames as $splitName) {
+                $splitName = $this->getDatabase()->quote($splitName);
+                $query .= "
+                    AND (
+                        (StudentSurname LIKE '%{$splitName}%')
+                        OR
+                        (StudentGiven1 LIKE '%{$splitName}%')
+                    )
+                ";
+            }
         }
         /* Search for a particular boarding status
          *

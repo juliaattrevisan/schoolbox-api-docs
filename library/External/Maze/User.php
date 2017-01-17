@@ -559,14 +559,19 @@ class External_Maze_User implements External_UserInterface {
 		/* Search for a student name
 		 */
 		if (strlen($name)) {
-			$name = $this->getDb()->quote($name);
-			$query .= "
-				AND (
-					(ST.SURNAME LIKE '%{$name}%')
-					OR
-					(ST.FIRST_NAME LIKE '%{$name}%')
-				)
-			";
+
+            $splitNames = explode(' ', $name);
+
+            foreach ($splitNames as $splitName) {
+                $splitName = $this->getDb()->quote($splitName);
+                $query .= "
+                    AND (
+                        (ST.SURNAME LIKE '%{$splitName}%')
+                        OR
+                        (ST.FIRST_NAME LIKE '%{$splitName}%')
+                    )
+                ";
+            }
 		}
 
 		/* Search for a particular boarding status
