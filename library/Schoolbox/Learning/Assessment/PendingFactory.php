@@ -576,7 +576,8 @@ class PendingFactory
             LEFT JOIN folder_code fc                       ON fc.folder_id = cif.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
-            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
+            WHERE a.deleted_at IS NULL
+            AND ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
