@@ -93,6 +93,30 @@ $breadcrumb-active-bg-color: $content-ui-selected;
 	}
 }
 
+#content > .breadcrumb {
+	@media #{$small-up} {
+		margin: 0 0 1rem 0;
+		li{
+			display: none;
+
+			&:nth-last-child(-n+2) {
+				display: list-item;
+			}
+		}
+	}
+	@media #{$large-up} {
+		margin: 0 0 1rem -1rem;
+	}
+}
+
+
+
+//@media #{$large-up} {
+//	#content > .breadcrumb {
+//		margin: 0 0 1rem -1rem;
+//	}
+//}
+
 /* Basic Breadcrumbs
 *  Meta style breadcrumbs with &rsaquo; instead of styles
 */
