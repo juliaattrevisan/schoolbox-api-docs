@@ -95,6 +95,27 @@ interface IAssessable extends ISoftDeletable
     public function setSpecificationAssessment(IAssessable $specification = null);
 
     /**
+     * Gets the user role types which may view this assessment's marks and feedback.
+     *
+     * The user must still have permission to view the assessment for the given student.
+     *
+     * * self::MARK_VISIBILITY_PRIVATE: only staff may view
+     * * self::MARK_VISIBILITY_STUDENT: staff and students may view
+     * * self::MARK_VISIBILITY_PARENT_STUDENT: staff, students and parents may view
+     *
+     * @return int
+     */
+    public function getMarkVisibility();
+
+    /**
+     * Sets the mark visibility of this assessment.
+     *
+     * @param int $markVisibility
+     * @return static
+     */
+    public function setMarkVisibility($markVisibility);
+
+    /**
      * Returns a readable family name for this object.
      *
      * This will be the same for all objects of the same type.
