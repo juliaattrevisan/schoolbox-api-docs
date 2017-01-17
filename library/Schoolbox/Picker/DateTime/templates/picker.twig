@@ -469,50 +469,86 @@
                                 pickerResponse.html('');
 
                                 {# Populate with appointments for the selected date #}
+//                                var html = '<div class="row">';
+//                                html += '<div class="small-12 medium-6 columns">';
+//                                html += '<ul class="information-list">';
+//                                var htmlEx = '';
+//                                for (var i = 0; i < data.students.length; i++) {
+//                                    html += '<li class="actions-small-1">';
+//                                    html += '<div class="list-item">';
+//                                    html += '<div class="card small-12">';
+//                                    html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64">';
+//                                    html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
+//                                    html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
+//                                    html += '</div>';
+//                                    html += '</div>';
+//                                    html += '<nav><div data-reveal-list="' + data.students[i].id + '" class="icon-next reveal-link"></div></nav>';
+//                                    html += '</li>';
+//
+//                                    htmlEx += '<div id="expand' + data.students[i].id + '" class="expand-list">';
+//                                    htmlEx += '<h4>Work due for ' + data.students[i].firstname + ' ' +data.students[i].lastname + '</h4>';
+//                                    htmlEx += '<ul>';
+//                                    for (var k=0; k < data.students[i].assessmentList.length; k++) {
+//                                        htmlEx += '<li><span>';
+//                                        if(data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
+//                                            htmlEx += data.students[i].assessmentList[k]['duetime'];
+//                                        }
+//                                        htmlEx += '</span>' + data.students[i].assessmentList[k]['title'] + '</li>';
+//                                    }
+//                                    htmlEx += '</ul>';
+//                                    htmlEx += '</div>';
+//
+//                                }
+//                                html += '</ul>';
+//                                html += '</div>';
+//                                html += '<div class="small-12 medium-6 columns">';
+//                                html += htmlEx;
+//                                html += '</div>';
+//                                html += '</div>';
+
+
                                 var html = '<div class="row">';
                                 html += '<div class="small-12 medium-6 columns">';
-                                html += '<ul class="information-list">';
-                                var htmlEx = '';
+                                html += '<ul class="information-list expandable-card">';
                                 for (var i = 0; i < data.students.length; i++) {
-                                    html += '<li class="actions-small-1">';
-                                    html += '<div class="list-item">';
+                                    html += '<li>';
+                                    html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
                                     html += '<div class="card small-12">';
-                                    html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64" alt="View Profile">';
+                                    html += '<a href="/search/user/' + data.students[i].id + '">';
+                                    html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64">';
                                     html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
                                     html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
+                                    html += '</a>';
                                     html += '</div>';
-                                    html += '</div>';
-                                    html += '<nav><div data-reveal-list="' + data.students[i].id + '" class="icon-next reveal-link"></div></nav>';
-                                    html += '</li>';
-
-                                    htmlEx += '<div id="expand' + data.students[i].id + '" class="expand-list">';
-                                    htmlEx += '<h4>Work due for ' + data.students[i].firstname + ' ' +data.students[i].lastname + '</h4>';
-                                    htmlEx += '<ul>';
+                                    html += '<div class="small-12 column" data-collapse-state="collapsed" data-collapsable="collap-' + i + '" style="display: none;">';
+//                                    html += '<ul>';
                                     for (var k=0; k < data.students[i].assessmentList.length; k++) {
-                                        htmlEx += '<li><span>';
+                                        html += '<p><span>';
                                         if(data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
-                                            htmlEx += data.students[i].assessmentList[k]['duetime'];
+                                            html += data.students[i].assessmentList[k]['duetime'];
                                         }
-                                        htmlEx += '</span>' + data.students[i].assessmentList[k]['title'] + '</li>';
+                                        html += '</span>' + data.students[i].assessmentList[k]['title'] + '</p>';
                                     }
-                                    htmlEx += '</ul>';
-                                    htmlEx += '</div>';
-
+//                                    html += '</ul>';
+                                    html += '</div>';
+                                    html += '</li>';
                                 }
                                 html += '</ul>';
                                 html += '</div>';
-                                html += '<div class="small-12 medium-6 columns">';
-                                html += htmlEx;
-                                html += '<div>';
-                                html += '<div>';
+                                html += '</div>';
 
                                 pickerResponse.append(html);
 
-                                $('.reveal-link').click(function () {
-                                    $('.expand-list').css('display', 'none');
-                                    var s = $(this).attr('data-reveal-list');
-                                    $('#expand'+s).css('display', 'block');
+//                                $('.reveal-link').click(function () {
+//                                    $('.expand-list').css('display', 'none');
+//                                    var s = $(this).attr('data-reveal-list');
+//                                    $('#expand'+s).css('display', 'block');
+//                                });
+
+                                $(function () {
+                                    $('[data-collapser]').collapsable();
                                 });
+
                             }
                         })
                         .fail(function () {
