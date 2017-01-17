@@ -332,7 +332,8 @@ class Controller extends Base
             array(
                 'format' => 'json',
                 'data' => [
-                    'students' => $students
+                    'students' => $students,
+                    'date' => $date
                 ]
             )
         );

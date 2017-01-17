@@ -158,6 +158,7 @@
                     <div id="timetableAppointments{{ id }}"></div>
 
 
+
                 </div>
             </div>
             <div class="row">
@@ -185,6 +186,89 @@
         $('#byTimetable-{{ id }}').css('display', 'block');
 
     });
+
+    {# Prepare and append response HTML #}
+
+    function appendResponse(data, template) {
+
+        var pickerResponse = $('#pickerResponse{{ id }}');
+
+        {# Clear out any old response display #}
+        pickerResponse.html('');
+        var html = '';
+
+        {# Ajax returned date #}
+        timetableDate = moment(data.date, convertFormat('{{ displayFormat }}')).format(convertFormat('F d, Y'));
+
+        if (template == 'duework') {
+
+            if (data.students.length == 0) {
+                html += 'Nothing due on ' + timetableDate + '';
+            }
+            else {
+
+                {# Populate with results for the selected date #}
+
+                html += '<div class="row">';
+                html += '<div class="small-12 medium-6 columns">';
+                html += '<h3>Work due on ' + timetableDate + '</h3>';
+                html += '<ul class="information-list expandable-card">';
+                for (var i = 0; i < data.students.length; i++) {
+                    html += '<li>';
+                    html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
+                    html += '<div class="card small-12">';
+                    html += '<a href="/search/user/' + data.students[i].id + '">';
+                    html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64">';
+                    html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
+                    html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
+                    html += '</a>';
+                    html += '</div>';
+                    html += '<div class="small-12 column" data-collapse-state="collapsed" data-collapsable="collap-' + i + '" style="display: none;">';
+                    //                                    html += '<ul>';
+                    for (var k = 0; k < data.students[i].assessmentList.length; k++) {
+                        html += '<p><span>';
+                        if (data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
+                            html += data.students[i].assessmentList[k]['duetime'];
+                        }
+                        html += '</span>' + data.students[i].assessmentList[k]['title'] + '</p>';
+                    }
+                    //                                    html += '</ul>';
+                    html += '</div>';
+                    html += '</li>';
+                }
+                html += '</ul>';
+                html += '</div>';
+                html += '</div>';
+
+            }
+        }
+        else if (temlate == 'events') {
+            if (data.appointments.length == 0) {
+                html += 'No events found for ' + timetableDate;
+            }
+            else {
+                {# Populate with appointments for the selected date #}
+                for (var i = 0; i < data.appointments.length; i++) {
+                    html += '<h3>' + data.appointments[i].title + '</h3>';
+                    html += '<p class="meta")>' + data.appointments[i].startDateTime;
+                    if (data.appointments[i].startDateTime !== data.appointments[i].endDateTime) {
+                        html += ' - ' + data.appointments[i].endDateTime;
+                    }
+                    html += '</p>';
+                }
+            }
+        }
+        else {
+            {# nope #}
+            html = '';
+        }
+
+        pickerResponse.append(html);
+        if(template == 'duework' && data.students.length > 0) {
+            $('[data-collapser]').collapsable();
+        }
+    }
+
 
     {# Timtable picker #}
 
@@ -307,61 +391,26 @@
         $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
                 .done(function (data) {
 
-                    {# Ajax returned date #}
-                    timetableDate = moment(data.date, convertFormat('{{ displayFormat }}'));
+                    appendResponse(data, 'duework');
 
-                    {# Clear out any old appointments #}
-                    timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y'))+'</h3>');
-                    if (data.appointments.length == 0) {
-
-                        timetableAppointments.append('No events found');
-
-                    } else {
-
-                        {# Populate with appointments for the selected date #}
-                        for (var i = 0; i < data.appointments.length; i++) {
-                            timetableAppointments.append(
-                                    data.appointments[i].title + '<br>' +
-                                    data.appointments[i].startDateTime + '<br>'
-                            )
-                        }
-
-                    }
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified period');
                 });
 
-        {% else %}
-        {# Else fetch events #}
+        {% elseif type == 'events' %}
+        {# Or fetch events #}
         $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
                 .done(function (data) {
 
-                    {# Ajax returned date #}
-                    timetableDate = moment(data.date, convertFormat('{{ displayFormat }}'));
+                    appendResponse(data, 'events');
 
-                    {# Clear out any old appointments #}
-                    timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y'))+'</h3>');
-
-                    if (data.appointments.length == 0) {
-
-                        timetableAppointments.append('No events found');
-
-                    } else {
-
-                        {# Populate with appointments for the selected date #}
-                        for (var i = 0; i < data.appointments.length; i++) {
-                            timetableAppointments.append(
-                                    data.appointments[i].title + '<br>' +
-                                    data.appointments[i].startDateTime + '<br>'
-                            )
-                        }
-
-                    }
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified period');
                 });
+        {% else %}
+            {# Don't fetch anything#}
         {% endif %}
     });
 
@@ -456,100 +505,8 @@
 
                         .done(function (data) {
 
-                            if (data.students.length == 0) {
+                            appendResponse(data, 'duework')
 
-                                {# There we no appointment on the selected date #}
-
-                                pickerResponse.html('Nothing due on this date');
-
-                            } else {
-
-                                {# Clear out any old appointments #}
-
-                                pickerResponse.html('');
-
-                                {# Populate with appointments for the selected date #}
-//                                var html = '<div class="row">';
-//                                html += '<div class="small-12 medium-6 columns">';
-//                                html += '<ul class="information-list">';
-//                                var htmlEx = '';
-//                                for (var i = 0; i < data.students.length; i++) {
-//                                    html += '<li class="actions-small-1">';
-//                                    html += '<div class="list-item">';
-//                                    html += '<div class="card small-12">';
-//                                    html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64">';
-//                                    html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
-//                                    html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
-//                                    html += '</div>';
-//                                    html += '</div>';
-//                                    html += '<nav><div data-reveal-list="' + data.students[i].id + '" class="icon-next reveal-link"></div></nav>';
-//                                    html += '</li>';
-//
-//                                    htmlEx += '<div id="expand' + data.students[i].id + '" class="expand-list">';
-//                                    htmlEx += '<h4>Work due for ' + data.students[i].firstname + ' ' +data.students[i].lastname + '</h4>';
-//                                    htmlEx += '<ul>';
-//                                    for (var k=0; k < data.students[i].assessmentList.length; k++) {
-//                                        htmlEx += '<li><span>';
-//                                        if(data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
-//                                            htmlEx += data.students[i].assessmentList[k]['duetime'];
-//                                        }
-//                                        htmlEx += '</span>' + data.students[i].assessmentList[k]['title'] + '</li>';
-//                                    }
-//                                    htmlEx += '</ul>';
-//                                    htmlEx += '</div>';
-//
-//                                }
-//                                html += '</ul>';
-//                                html += '</div>';
-//                                html += '<div class="small-12 medium-6 columns">';
-//                                html += htmlEx;
-//                                html += '</div>';
-//                                html += '</div>';
-
-
-                                var html = '<div class="row">';
-                                html += '<div class="small-12 medium-6 columns">';
-                                html += '<ul class="information-list expandable-card">';
-                                for (var i = 0; i < data.students.length; i++) {
-                                    html += '<li>';
-                                    html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
-                                    html += '<div class="card small-12">';
-                                    html += '<a href="/search/user/' + data.students[i].id + '">';
-                                    html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64">';
-                                    html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
-                                    html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
-                                    html += '</a>';
-                                    html += '</div>';
-                                    html += '<div class="small-12 column" data-collapse-state="collapsed" data-collapsable="collap-' + i + '" style="display: none;">';
-//                                    html += '<ul>';
-                                    for (var k=0; k < data.students[i].assessmentList.length; k++) {
-                                        html += '<p><span>';
-                                        if(data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
-                                            html += data.students[i].assessmentList[k]['duetime'];
-                                        }
-                                        html += '</span>' + data.students[i].assessmentList[k]['title'] + '</p>';
-                                    }
-//                                    html += '</ul>';
-                                    html += '</div>';
-                                    html += '</li>';
-                                }
-                                html += '</ul>';
-                                html += '</div>';
-                                html += '</div>';
-
-                                pickerResponse.append(html);
-
-//                                $('.reveal-link').click(function () {
-//                                    $('.expand-list').css('display', 'none');
-//                                    var s = $(this).attr('data-reveal-list');
-//                                    $('#expand'+s).css('display', 'block');
-//                                });
-
-                                $(function () {
-                                    $('[data-collapser]').collapsable();
-                                });
-
-                            }
                         })
                         .fail(function () {
                             console.log('Failed to retrieve appointments for specified date');
@@ -565,28 +522,9 @@
 
                 $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
                         .done(function (data) {
-                            if (data.appointments.length == 0) {
 
-                                {# There we no appointment on the selected date #}
-                                pickerResponse.html('No events found');
+                            appendResponse(data, 'events')
 
-                            } else {
-
-                                {# Clear out any old appointments #}
-                                pickerResponse.html('');
-
-                                {# Populate with appointments for the selected date #}
-                                var html = '';
-                                for (var i = 0; i < data.appointments.length; i++) {
-                                    html += '<h3>' + data.appointments[i].title + '</h3>';
-                                    html += '<p class="meta")>' + data.appointments[i].startDateTime;
-                                    if(data.appointments[i].startDateTime !== data.appointments[i].endDateTime) {
-                                        html += ' - ' + data.appointments[i].endDateTime;
-                                    }
-                                    html += '</p>';
-                                }
-                                pickerResponse.append(html);
-                            }
                         })
                         .fail(function () {
                             console.log('Failed to retrieve appointments for specified date');
