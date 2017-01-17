@@ -27,6 +27,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -268,8 +269,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/results/$quizId";
 
-        $envelope = new Envelope();
-        $bob      = new Builder();
+        $bob = new Builder();
         $bob->addTopic("assess.$quizId.closed")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
@@ -754,13 +754,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyFeedClosed($quiz, $owner, $diff = null) {
-		$msgr = new Messenger();
+       $envelope = new Envelope();
+//		$msgr = new Messenger();
 
 		if($quiz->getFinish()->getUnixTimeStamp() > time()) {
-			return $msgr;
+			return $envelope;
 		}
 
 		$quizId = $quiz->getId();
@@ -768,21 +769,34 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$quizName = $quiz->getTitle();
 
-		$cat     = $quiz->getCategory();
-		$catId   = $cat->getId();
-		$catName = $cat->getName();
+//		$cat     = $quiz->getCategory();
+//		$catId   = $cat->getId();
+//		$catName = $cat->getName();
 
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=cross";
 		$href = "/intro/assess/$quizId";
 
-		$msg = new Message(":quizname has closed in :catname", $icon, $href);
+        $bob = new Builder();
+        $bob->addTopic("assess.$quizId.closed")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::NOTICE)
+            ->setTitle(":quizname has closed in :catname")
+            ->setHref($href)
+            ->setIcon($icon)
+            ->setParam('quizname', new Param($quizName, $href))
+            ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
-		$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.closed", Logger::NOTICE, array(
-			'quizname' => array($quizName, $href),
-			'catname' => array($catName, "/homepage/$catId"),
-		));
+        $envelope->broadcastToCategory($quiz->getCategory(), UserAccess::ACCESS_READ, $bob->build());
+        return $envelope;
 
-		return $msgr;
+//		$msg = new Message(":quizname has closed in :catname", $icon, $href);
+//
+//		$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.closed", Logger::NOTICE, array(
+//			'quizname' => array($quizName, $href),
+//			'catname' => array($catName, "/homepage/$catId"),
+//		));
+//
+//		return $msgr;
 	}
 
 
