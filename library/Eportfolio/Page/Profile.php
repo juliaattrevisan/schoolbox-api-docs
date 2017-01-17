@@ -198,7 +198,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     'SHOWCASED_WORK_BOX_CATEGORY_ID' => $currentBox->getCategory()->getId(),
                     'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
                     'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getWorkType()->getName(),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark'
                 ));
 
                 /* Show submitted work information (if available)
@@ -224,7 +223,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                         'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => '',
                     ));
 
-                    $this->getPage()->parse('no_submission_block', 'no_submission');
                     $this->getPage()->setVar('has_submission_block', '');
                 }
 
@@ -248,7 +246,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 /* Clear children after parsing out the parent
                  */
                 $this->getPage()->setVar('submission_file_list_block','');
-
             }
 
             if($this->getUser()->getId() == $this->getCurrentUser()->getId()) {
