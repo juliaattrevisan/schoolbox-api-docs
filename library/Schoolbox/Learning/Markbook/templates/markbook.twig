@@ -46,7 +46,7 @@
             <li><a href="{{ baseRoute }}?type=project" class='icon-project'>Project</a></li>
         {% endif %}
         <li class="separator">Report</li>
-        <li><a href='#' class='icon-download'>TODO: Download Spreadsheet</a>
+        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {classId: class.id, termCode: currentTerm.code}) }}' class='icon-download'>Download Spreadsheet</a>
     </ul>
 </div>
 

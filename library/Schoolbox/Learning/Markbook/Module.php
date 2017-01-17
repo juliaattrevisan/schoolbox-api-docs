@@ -60,6 +60,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/{classId}', 'getMarkbook', $access, $preload);
         $this->register('GET', '/{classId}/term/{termCode}', 'getMarkbookForTerm', $access, $preload);
+        $this->register('GET', '/{classId}/term/{termCode}/export', 'getMarkbookExport', $access, $preload);
     }
 
     /**

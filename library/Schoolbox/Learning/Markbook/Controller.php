@@ -12,12 +12,16 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Task\Completion\Model as Completion;
+use Schoolbox\Learning\Assessment\Task\ICompletion;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
+use Alaress\Csv\Writer AS CsvWriter;
 
 class Controller extends Base
 {
@@ -151,6 +155,153 @@ class Controller extends Base
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );
+    }
+
+    /**
+     * Return the markbook in CSV format
+     *
+     * @api   GET /learning/markbook/:classId/term/:termCode/export
+     * @param Folder $class
+     * @param Term   $term
+     */
+    public function getMarkbookExport(Folder $class, Term $term)
+    {
+        // Replaces /submission/listSubmission/{termSlug}/{folderId}
+        //       eg /submission/listSubmission/{termSlug}/{folderId}
+        // Replaces /submission/viewSubmission/{dueWorkId}
+        //       eg /submission/viewSubmission/56
+
+        // Does this class exist ?
+        if (!$class->getId()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        // Generate data: assessments and their Participants
+        /** @var Collection|IAssessable[] $assessments */
+        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview($class->getId(), null, ['term' => $term]);
+
+        // Build a markbook
+        $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
+
+        /** @var IAssessable $assessment */
+
+        $export = [];
+
+        $data['Student Id'] = 'Class Average';
+        $data['Student First Name'] = '';
+        $data['Student Last Name'] = '';
+        $data['Student Average'] = $markbook->getMarkbookStatistics()['weightedMean'];
+
+        // This is an ugly hack to get duplicate task names to appear as is the case in demo data
+        // Just prepending spaces to the end of the assessment name
+
+        $titlesFound = [];
+
+        foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
+
+            $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ")";
+
+            while (isset($titlesFound[$title])) {
+                $title .= " ";
+            }
+
+            $titlesFound[$title] = true;
+            $data[$title] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
+            $data[$title . " (Normalized)"] = '';
+            $data[$title . " (Comment)"] = '';
+        }
+
+        $export[] = $data;
+
+        foreach ($markbook->getStudents() as $student) {
+
+            $data['Student Id'] = $student->getExternalId();
+            $data['Student First Name'] = $student->getFirstname();
+            $data['Student Last Name'] = $student->getLastname();
+            $data['Student Average'] = $markbook->getStudentStatistics()[$student->getId()]['weightedMean'];
+
+            $titlesFound = [];
+
+            foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
+
+                $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ")";
+
+                while (isset($titlesFound[$title])) {
+                    $title .= " ";
+                }
+
+                $titlesFound[$title] = true;
+
+                if ($assessment->isParticipant($student)) {
+
+                    $participant = $assessment->getParticipant($student);
+                    $mostRecentFeedback = $participant->findMostRecentFeedback();
+
+                    if ($mostRecentFeedback != null) {
+                        $comment = $mostRecentFeedback->getComment();
+                    } else {
+                        $comment = '';
+                    }
+
+                    if ($assessment instanceof Task) {
+
+                        $result = '';
+
+                        $mostRecentResponse = $participant->findMostRecentResponse();
+
+                        if ($mostRecentResponse instanceof Completion) {
+                            switch ($mostRecentResponse->getCompletionStatus()) {
+                                case ICompletion::STATUS_COMPLETED:
+                                    $result = "Completed";
+                                    break;
+                                case ICompletion::STATUS_SELF_ASSESSED:
+                                    if ($participant->getAssessable()->isSelfAssessed()) {
+                                        $result = "Self Assessed";
+                                    } else {
+                                        $result = "Teacher Assessed";
+                                    }
+                                    break;
+                                case ICompletion::STATUS_NOT_ATTEMPTED:
+                                    $result = "Not Attempted";
+                                    break;
+                            }
+
+                        }
+
+                        $data[$title] = $result;
+                        $data[$title . " (Normalized)"] = '';
+                        $data[$title . " (Comment)"] = $comment;
+                    } else {
+                        $data[$title] = $assessment->getHumanReadableMark($student, true);
+                        $data[$title . " (Normalized)"] = $assessment->getNormalisedMark($student, true);
+                        $data[$title . " (Comment)"] = $comment;
+                    }
+                }
+                else
+                {
+                    $data[$title] = '';
+                    $data[$title . " (Normalized)"] = '';
+                    $data[$title . " (Comment)"] = '';
+                }
+
+            }
+            $export[] = $data;
+        }
+
+
+        //TODO This could probably be rewritten with a resource stream output object and using fputcsv to wrap up this code
+        $file = tmpfile();
+        $writer = new CsvWriter($file, $export);
+        $writer->write();
+
+        $filename = strtolower(str_replace(" ", "_", "markbookexport-" . $class->getFolder()->getNameWithCodes()));
+
+        header('Content-Disposition: attachment;filename="' . $filename . '.csv";');
+        header('Content-Type: application/csv; charset=UTF-8');
+        rewind($file);
+        echo stream_get_contents($file);
+        fclose($file);
+        exit;
     }
 
     /* Getters/Setters
