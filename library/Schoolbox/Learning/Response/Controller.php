@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -32,6 +33,7 @@ use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use DueWork_ErrorMapper;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 class Controller extends Base
 {
@@ -161,11 +163,13 @@ class Controller extends Base
                 /* Plagscan status
                  */
                 'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-
-                /* Rubrics data
-                 */
-                'rubricContext' => (new RubricContext())->generateMarkable($assessment, $participant->getUser()),
             ];
+
+            if($assessment instanceof DueWork){
+                /* Rubrics data
+                */
+                $data['rubricContext'] = (new RubricContext(RubricMapper::getInstance()))->generateMarkable($assessment, $participant->getUser());
+            }
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
         }

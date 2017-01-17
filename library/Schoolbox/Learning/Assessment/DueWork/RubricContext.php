@@ -19,21 +19,37 @@ class RubricContext
 {
 
     /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
+    /**
+     * @param RubricMapper $rubricMapper
+     */
+    public function __construct(RubricMapper $rubricMapper)
+    {
+        $this->rubricMapper = $rubricMapper;
+    }
+
+    /**
      * Get a markable grid for Rubrics marking
      *
-     * @param IAssessable $assessment
+     * @param DueWork $dueWork
      * @param User $student
      * @return array
      */
-    public function generateMarkable(IAssessable $assessment, User $student)
+    public function generateMarkable(DueWork $dueWork, User $student)
     {
-        /** @var DueWork $assessment */
-        $markTypeSlug = $assessment->getMarkType()->getSlug();
+        if(!$dueWork->getUseRubric()){
+            return ['rubric' => null];
+        }
 
-        RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
+        $markTypeSlug = $dueWork->getMarkType()->getSlug();
+
+        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student);
 
         $context = [
-            'rubric' => $assessment->getRubric()->toContext(),
+            'rubric' => $dueWork->getRubric()->toContext(),
             'markType' => [
                 'mode' => $markTypeSlug
             ]
@@ -43,7 +59,7 @@ class RubricContext
          */
         $levels = [];
 
-        foreach ($assessment->getGradeGroup()->getGradeLevels() as $level) {
+        foreach ($dueWork->getGradeGroup()->getGradeLevels() as $level) {
             $levels[$level->getLowerBound()] = $level->getCaption();
         }
 
@@ -55,19 +71,21 @@ class RubricContext
     /**
      * Get a readonly grid and the student's current rubric values
      *
-     * @param IAssessable $assessment
+     * @param DueWork $dueWork
      * @param User $student
      * @param User $currentUser
      * @return array
      */
-    public function generate(IAssessable $assessment, User $student, User $currentUser)
+    public function generate(DueWork $dueWork, User $student, User $currentUser)
     {
-        /** @var DueWork $assessment */
-        RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
+        if(!$dueWork->getUseRubric()){
+            return ['rubric' => null];
+        }
 
-        /** @var DueWork $assessment */
+        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student);
+
         $context = [
-            'rubric' => $assessment->getRubric()->toContext($currentUser),
+            'rubric' => $dueWork->getRubric()->toContext($currentUser),
         ];
 
         // Hide total mark from students and parents

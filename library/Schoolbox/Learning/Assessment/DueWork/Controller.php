@@ -126,7 +126,10 @@ class Controller extends Assessment\Controller
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
-        $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+        if($assessment->getUseRubric()){
+            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+        }
+
 
         /* Find all the records spawned by $participant
          *
@@ -148,7 +151,7 @@ class Controller extends Assessment\Controller
 
             /* Rubrics data
              */
-            'rubricContext' => (new RubricContext())->generate($assessment, $student, $this->getUser()),
+            'rubricContext' => (new RubricContext($this->rubricMapper))->generate($assessment, $student, $this->getUser()),
         ];
 
         try {
