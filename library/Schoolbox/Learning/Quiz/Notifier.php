@@ -501,50 +501,46 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentUpcoming($quiz, $owner, $diff = null) {
-		$msgr = new Messenger();
+        $envelope = new Envelope();
 
-		if($this->conf->get('restrict_parent_duework_access')) {
-			return $msgr;
-		}
+        if($this->conf->get('restrict_parent_duework_access')) {
+            return $envelope;
+        }
 
-		$quizId = $quiz->getId();
-		$quiz   = $this->fullyHydrateQuiz($quiz);
+        $quizId = $quiz->getId();
+        $quiz   = $this->fullyHydrateQuiz($quiz);
 
-		$quizName = $quiz->getTitle();
+        $quizName = $quiz->getTitle();
 
-		$cat     = $quiz->getCategory();
-		$catId   = $cat->getId();
-		$catName = $cat->getName();
+        // don't provide a link for parents to click on if it's just going to give the a 403
+        $quizParam = $this->conf->get('restrict_student_submissions')
+            ? new Param($quizName)
+            : new Param($quizName, "/submission/submissionHistory/$quizId");
 
-		$href = "/assess/intro/$quizId";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $href = "/assess/intro/$quizId";
 
-		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
+        $bob = new Builder();
+        $bob->addTopic("assess.$quizId.upcoming")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::WARNING)
+            ->setTitle(":child has not yet attempted :quizname in :catname")
+            ->setHref($href)
+            ->setIcon($icon)
+            ->setParam('quizname', $quizParam)
+            ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
-		foreach($unattemptedStudents as $student) {
-			$childName = $student->getFirstname();
-			$childId = $student->getId();
-			$childExtId = $student->getExternalId();
+        $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
-			$icon = "/portrait?userId=$childExtId&size={$this->iconSize}";
+        foreach($unattemptedStudents as $student) {
+            $bob->setParam('child', new UserParam($student));
+            $envelope->targetToParent($student->getId(), $bob->build());
+        }
 
-			$msg = new Message(":child has not yet attempted :quizname in :catname", $icon, $href);
-
-			// don't provide a link for parents to click on if it's just going to give the a 403
-			$quizdata = $this->conf->get('restrict_student_submissions')
-				? $quizName
-				: array($quizName, "/submission/submissionHistory/$quizId");
-
-			$msgr->targetToParent($childId, $msg, "assess.$quizId.upcoming", Logger::WARNING, array(
-				'child'     => array($childName, "/search/user/$childId"),
-				'quizname'  => $quizdata,
-				'catname'   => array($catName, "/homepage/$catId")
-			));
-		}
-
-		return $msgr;
+        return $envelope;
 	}
 
 
