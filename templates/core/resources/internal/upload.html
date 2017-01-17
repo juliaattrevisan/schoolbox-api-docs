@@ -4,8 +4,8 @@
         var abUpload          = $('#ab-upload'),
             abUploadForm      = abUpload.find('form.dzone'),
             abUploadControls  = abUpload.siblings('div.ctrl'),
-            abUploadSubmitBtn = abUploadControls.children('[data-submit]'),
-            abUploadCancelBtn = abUploadControls.children('[data-cancel]'),
+            abUploadSubmitBtn = abUploadControls.find('[data-submit]'),
+            abUploadCancelBtn = abUploadControls.find('[data-cancel]'),
             maxFiles           = {MAX_FILES};
 
         abUploadForm.dropzone({
@@ -237,9 +237,11 @@
     <div class="dz-default dz-message needsclick">Click or drag here to upload</div>
   </form>
 </div>
-<div class="ctrl">
-  <a role="button" data-submit class="submit button" disabled="disabled" href="#">Upload</a>
-  <a role="button" data-cancel class="cancel button" href="#">Cancel</a>
+<div class="ctrl component-action">
+    <section>
+        <a role="button" data-submit class="button" disabled="disabled" href="#">Upload</a>
+        <a role="button" data-cancel class="button cancel" href="#">Cancel</a>
+    </section>
 </div>
 <div id="ab-preview-template" class="hide">
     <div class="dz-preview dz-file-preview">

@@ -51,9 +51,9 @@
                 name: '',
                 id: ''
             },
-            swfSrc: '/javascript/recorder/flash/recorder.swf',
-            flashContainer: null,
-            onFlashSecurity: $.noop
+            recorderOptions: {
+                swfSrc: '/javascript/recorder/flash/recorder.swf'
+            }
         },
         media: {
             audioElement: null
@@ -189,11 +189,7 @@
         ;
         if (this.isFlashSupported()) {
             this.flash.recorder = Recorder;
-            this.flash.recorder.initialize({
-                swfSrc: this.options.flash.swfSrc,
-                flashContainer: this.options.flash.flashContainer,
-                onFlashSecurity: this.options.flash.onFlashSecurity
-            });
+            this.flash.recorder.initialize(this.options.flash.recorderOptions);
         }
         return this;
     };

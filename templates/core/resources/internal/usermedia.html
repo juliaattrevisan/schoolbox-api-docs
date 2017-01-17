@@ -65,10 +65,6 @@
                 url: '/storage/asyncUpload'
             },
             flash: {
-                flashContainer: $('#flashContainer')[0],
-                onFlashSecurity: function() {
-                    $('#flashContainer').removeClass('hide');
-                },
                 session: {
                     name: '{SESSION_NAME}',
                     id:   '{SESSION_ID}'
@@ -185,20 +181,19 @@
             <input data-role="recording-name" type="text" value="" placeholder="recording" />
         </label>
     </div>
-    <div class="recorderButtons">
-        <a role="button" class="submit button record" data-interaction="audio-record-start" href="#">Start Recording</a>
-        <a role="button" class="submit button recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
-        <a role="button" class="submit button disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
-        <a role="button" class="submit button play hide" data-interaction="audio-record-play" href="#">Play</a>
-        <a role="button" class="submit button stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
-    </div>
 </div>
-<div class="recorderButtons">
-    <a role="button" class="submit button upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
-    <a role="button" class="submit button uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
-    <a role="button" class="button cancel" href="#">Cancel</a>
+<div class="component-action recorderButtons">
+    <section>
+        <a role="button" class="button record" data-interaction="audio-record-start" href="#">Start Recording</a>
+        <a role="button" class="button recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
+        <a role="button" class="button disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
+        <a role="button" class="button play hide" data-interaction="audio-record-play" href="#">Play</a>
+        <a role="button" class="button stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
+        <a role="button" class="button upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
+        <a role="button" class="button uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
+        <a role="button" class="button cancel" href="#">Cancel</a>
+    </section>
 </div>
-<div id="flashContainer" class="hide"></div>
 <div data-reveal id="recorderDisabledDialog" title="Recording is not directly supported" class="reveal-modal">
     <p>Recording is not directly supported in your browser,
     but creating and uploading a recording through "Upload files" might work.</p>
