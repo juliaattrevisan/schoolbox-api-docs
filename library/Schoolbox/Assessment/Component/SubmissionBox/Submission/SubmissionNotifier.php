@@ -195,7 +195,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param Submission $submission
      * @param User $user
      * @param array|null $diff
-     * @return Messenger
+     * @return Envelope
      */
     protected function submissionNotification($type, $submission, $user, $diff = null)
     {
@@ -244,7 +244,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param Submission $submission
      * @param User $user
      * @param array|null $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffSubmitted($submission, $user, $diff = null)
     {
@@ -258,7 +258,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param Submission $submission
      * @param User $user
      * @param array|null $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffResubmitted($submission, $user, $diff = null)
     {
@@ -272,39 +272,43 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param Submission $submission
      * @param User $user
      * @param array|null $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentDeleted($submission, $user, $diff = null)
     {
-        $msgr = new Messenger();
+        $envelope = new Envelope();
 
-        $student   = $submission->getOwner();
-        $studentId = $student->getId();
+        $student      = $submission->getOwner();
+        $studentId    = $student->getId();
+        $studentExtId = $student->getExternalId();
 
-        $box   = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
-        $boxId = $box->getId();
-
+        $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
         $folder = $box->getAssessmentModel()->getAssessmentContext()->getFolder();
 
-        $ownerId    = $user->getId();
-        $ownerExtId = $user->getExternalId();
+        $boxId = $box->getId();
 
-        $icon = "/portrait?userId=$ownerExtId&size={$this->iconSize}";
-        $href = "/submission/submissionHistory/$boxId/$studentId";
+        $bob = new Builder();
 
-        $msg = new Message(":owner removed your previous submission to :boxname in :catname, you can now resubmit",
-            $icon, $href
-        );
+        $bob->setTitle(":owner removed your previous submission to :boxname in :catname, you can now resubmit")
+            ->setParams(
+                array(
+                    'owner'   => new UserParam($user),
+                    'boxname' => new Param($box->getName(), "/submission/submissionHistory/$boxId/$studentId"),
+                    'catname' => new CategoryParam($folder)
+                )
+            )
+            ->setIcon("/portrait?userId=$studentExtId&size={$this->iconSize}")
+            ->setHref("/submission/viewSubmission/$boxId")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::NOTICE)
+            ->addTopic("duework.$boxId.deleted")
+            ->setFilter([
+                'roletype' => Role::STUDENT
+            ]);
 
-        $params = array(
-            'owner'   => array($user->formatName(), "/search/user/$ownerId"),
-            'boxname' => array($box->getName(), "/submission/submissionHistory/$boxId/$studentId"),
-            'catname' => array($folder->getName(), "/homepage/{$folder->getId()}"),
-        );
+        $envelope->targetToUser($studentId, $bob->build());
 
-        $msgr->targetToUser($studentId, $msg, "duework.$boxId.unsubmitted", Logger::NOTICE, $params);
-
-        return $msgr;
+        return $envelope;
     }
 
 }
