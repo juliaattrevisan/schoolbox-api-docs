@@ -105,25 +105,28 @@ class Full
      * Get the timeline appropriate to the given user.
      * Is probably a *bit* heavy-handed in its permission checking...
      *
-     * @param User $u
+     * @param User $user
      * @return Collection
      */
-    public function getForUser(User $u)
+    public function getForUser(User $user)
     {
-        $r = $u->getRole();
-        $p = $this->getParticipant()->getUser();
+        $role        = $user->getRole();
+        $participant = $this->getParticipant()->getUser();
 
-        if ($u->isSuperuser() || ($u->getId() == $p->getId() && $r->isStaff())) {
+        if ($user->isSuperuser() || ($user->getId() == $participant->getId() && $role->isStaff())) {
             return $this->getForAdmin();
-        } elseif ($r->isStudent()) {
-            if ($u->getId() == $p->getId()) {
+
+        } elseif ($role->isStudent()) {
+            if ($user->getId() == $participant->getId()) {
                 return $this->getForStudent();
             }
-        } elseif ($r->isStaff()) {
+
+        } elseif ($role->isStaff()) {
             return $this->getForTeacher();
-        } elseif ($r->isParent()) {
-            $p->loadParents();
-            if ($p->isChildOf($u)) {
+
+        } elseif ($role->isParent()) {
+            $participant->loadParents();
+            if ($participant->isChildOf($user)) {
                 return $this->getForParent();
             }
         }
