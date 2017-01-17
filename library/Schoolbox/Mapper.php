@@ -2194,18 +2194,24 @@ abstract class Mapper implements IMapper, Serializable
                 return false;
             }
         }
+
         $id_property     = $this->getIdentifierProperty();
         $id_column       = $this->getIdentifierColumn();
+
         $existingObjects = array();
+
         if (isset($id_column)) {
             // retrieve the objects as they currently exist so we can perform a diff if we need to
-            $collectionIds = $collection->getColumnValues($id_property);
+            // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
+            $collectionIds = array_filter($collection->map(function ($model) { return $this->dehydrate($model)[$this->getIdentifierColumn()]; })->getAll());
             foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
                 // index by ID
                 $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
             }
         }
+
         $this->database->beginTransaction();
+
         try {
             foreach ($collection as $i => $model) {
                 if ($statement->execute($this->dehydrate($model))) {
