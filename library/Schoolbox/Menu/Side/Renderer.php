@@ -119,9 +119,7 @@ class Renderer
         }
 
         // Order the nodes by their parent ID
-
-        $mapper = new Mapper();
-        $nodes = $mapper->getCollectionAsTree($nodes);
+        $nodes = $this->menuSideMapper->getCollectionAsTree($nodes);
 
         // Render this thing out
 
