@@ -91,6 +91,27 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Task marks are always visible to all users which have permission to view it.
+     *
+     * @return int
+     */
+    public function getMarkVisibility()
+    {
+        return self::MARK_VISIBILITY_PARENT_STUDENT;
+    }
+
+    /**
+     * Task marks are always visible to all users which have permission to view it.
+     *
+     * @param int $markVisibility
+     * @return static
+     */
+    public function setMarkVisibility($markVisibility)
+    {
+        return $this;
+    }
+
+    /**
      * Tasks have no concept of mark visibility - marks are always visible.
      *
      * @param User $viewingUser
