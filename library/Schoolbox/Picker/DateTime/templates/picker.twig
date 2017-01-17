@@ -103,7 +103,7 @@
                 <div class="small-12 medium-8 columns">
 
                     {# Placeholder for appointments to be rendered in #}
-                    <div id="pickerResponse{{ id }}"></div>
+                    <div id="calendarResponse{{ id }}"></div>
 
                 </div>
         </div>
@@ -155,7 +155,7 @@
 
                     {# Placeholder for appointments to be rendered in #}
 
-                    <div id="timetableAppointments{{ id }}"></div>
+                    <div id="timetableResponse{{ id }}"></div>
 
 
 
@@ -187,11 +187,19 @@
 
     });
 
+    {# Show loader #}
+
+    function loadingResponse (target) {
+        var pickerResponse = $('#'+target+'Response{{ id }}');
+        pickerResponse.html('');
+        pickerResponse.append('<p>Loading...</p>');
+    }
+
     {# Prepare and append response HTML #}
 
-    function appendResponse(data, template) {
+    function appendResponse(data, template, target) {
 
-        var pickerResponse = $('#pickerResponse{{ id }}');
+        var pickerResponse = $('#'+target+'Response{{ id }}');
 
         {# Clear out any old response display #}
         pickerResponse.html('');
@@ -211,7 +219,7 @@
 
                 html += '<div class="row">';
                 html += '<div class="small-12 medium-6 columns">';
-                html += '<h3>Work due on ' + timetableDate + '</h3>';
+                html += '<h2>Work due on ' + timetableDate + '</h2>';
                 html += '<ul class="information-list expandable-card">';
                 for (var i = 0; i < data.students.length; i++) {
                     html += '<li>';
@@ -242,13 +250,18 @@
 
             }
         }
-        else if (temlate == 'events') {
+        else if (template == 'events') {
             if (data.appointments.length == 0) {
                 html += 'No events found for ' + timetableDate;
             }
             else {
+                html += '<div class="row">';
+                html += '<div class="small-12 medium-6 columns">';
+                html += '<h2>Events on ' + timetableDate + '</h2>';
+                html += '<ul class="information-list card">';
                 {# Populate with appointments for the selected date #}
                 for (var i = 0; i < data.appointments.length; i++) {
+                    html += '<li>';
                     html += '<h3>' + data.appointments[i].title + '</h3>';
                     html += '<p class="meta")>' + data.appointments[i].startDateTime;
                     if (data.appointments[i].startDateTime !== data.appointments[i].endDateTime) {
@@ -256,6 +269,9 @@
                     }
                     html += '</p>';
                 }
+                html += '</ul>';
+                html += '</div>';
+                html += '</div>';
             }
         }
         else {
@@ -388,22 +404,30 @@
         var cycle = $('select[name*="cycle"]').val();
 
         {% if type == 'duework'  %}
-        $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+
+        // Can the assessment form have dates and be called outside the class page?
+        var classCode = $('*[name = "classCode"]').val();
+
+        loadingResponse('timetable');
+
+        $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{classCode}/g, classCode))
                 .done(function (data) {
 
-                    appendResponse(data, 'duework');
+                    appendResponse(data, 'duework', 'timetable');
 
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified period');
                 });
 
-        {% elseif type == 'events' %}
+        {% elseif type == 'event' %}
         {# Or fetch events #}
-        $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+
+        loadingResponse('timetable');
+        $.get(('{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
                 .done(function (data) {
 
-                    appendResponse(data, 'events');
+                    appendResponse(data, 'events', 'timetable');
 
                 })
                 .fail(function () {
@@ -495,17 +519,15 @@
 
                 {% if type == 'duework'  %}
 
-                var pickerResponse = $('#pickerResponse{{ id }}');
+                    loadingResponse('calendar');
 
-                // Can the assessment form have dates and be called outside the class page?
-                var classCode = $('*[name = "classCode"]').val();
+                    var classCode = $('*[name = "classCode"]').val();
 
-                pickerResponse.html('Loading results');
-                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, classCode).replace(/{date}/g,  encodeURIComponent(dateSplit[0])))
+                    $.get(('{{ routeLookup('pickerDatetime.getDueByDate') }}').replace(/{classCode}/g, classCode).replace(/{date}/g,  encodeURIComponent(dateSplit[0])))
 
                         .done(function (data) {
 
-                            appendResponse(data, 'duework')
+                            appendResponse(data, 'duework', 'calendar');
 
                         })
                         .fail(function () {
@@ -514,21 +536,19 @@
 
                 {% elseif (type == 'event') %}
 
-                {# AJAX in appointments for the selected date #}
+                    {# AJAX in appointments for the selected date #}
 
-                var pickerResponse = $('#pickerResponse{{ id }}');
+                    loadingResponse('calendar');
 
-                pickerResponse.html('Loading events');
+                    $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
+                            .done(function (data) {
 
-                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
-                        .done(function (data) {
+                                appendResponse(data, 'events', 'calendar');
 
-                            appendResponse(data, 'events')
-
-                        })
-                        .fail(function () {
-                            console.log('Failed to retrieve appointments for specified date');
-                        });
+                            })
+                            .fail(function () {
+                                console.log('Failed to retrieve appointments for specified date');
+                            });
                 {% else %}
                     {#Do nothing#}
                 {% endif %}

@@ -45,8 +45,9 @@ class Module extends BaseModule
             'GET' => [
                 '/type/{type}/time/{time}/id/{id}/value/{value}' => 'getPicker',
                 '/date/{date}' => 'getByDate',
-                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}' => 'getByTimetableDay',
-                '/date/{date}/class/{classCode}' => 'getByClassCode',
+                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}' => 'getEventsByTimetableDay',
+                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}/class/{classCode}' => 'getByTimetableDay',
+                '/date/{date}/class/{classCode}' => 'getDueByDate',
             ],
             'POST' => [
             ]

@@ -156,9 +156,16 @@ class Controller extends Base
     }
 
     /**
-     * Return a a list of events for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
+     * Call getByTimetableDay to return events for timetable day
      */
-    public function getByTimetableDay($campusId, $termId, $cycle, $day) {
+    public function getEventsByTimetableDay ($campusId, $termId, $cycle, $day) {
+        return $this->getByTimetableDay($campusId, $termId, $cycle, $day);
+    }
+
+    /**
+     * Return a list of events or assessments due for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
+     */
+    public function getByTimetableDay($campusId, $termId, $cycle, $day, $classCode = '') {
         $user = $this->getUser();
         //Get Campus object
         $campus = $user->getCampusCollection()->getBy('id', $campusId);
@@ -177,6 +184,12 @@ class Controller extends Base
         $daysInCycle = $campusTimetable['dayCount'];
 
         $date = $this->getDateForTimetableDay($termStartDate, $termFirstDay, $daysInCycle, $cycle, $day);
+
+        //Return duework
+        if(strlen($classCode) > 0){
+            return $this->getDueByDate($date, $classCode);
+        }
+        //return events
         return $this->getByDate($date);
 
     }
@@ -258,7 +271,7 @@ class Controller extends Base
      * @param string $date (Date we are interested in)
      * @param string $classCode (CSV list of class codes)
      */
-    public function getByClassCode($date, $classCode)
+    public function getDueByDate($date, $classCode)
     {
         // Test URL with assignments due:
         // http://192.168.36.10/picker/datetime/date/01-07-2018/class/CH123
