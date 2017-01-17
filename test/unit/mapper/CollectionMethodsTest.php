@@ -301,7 +301,9 @@ class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
             [
                 new Collection([]),
                 new Collection([$campusOne]),
-                new Collection([$campusOne,$campusTwo,$campusThree,$campusFour])
+                new Collection([$campusOne,$campusTwo,$campusThree,$campusFour]),
+                new Collection([$campusThree,$campusFour])
+
             ],
             new Collection([$campusOne,$campusTwo,$campusThree,$campusFour]),
         ];
