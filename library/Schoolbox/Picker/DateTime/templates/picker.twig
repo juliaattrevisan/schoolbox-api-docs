@@ -17,10 +17,10 @@
         width: 100px;
         margin: 13px 10px;
     }
-    .hasTime .time-switch {
+    .has-time .time-switch {
         opacity: 0.3;
     }
-    .allDay .time-switch {
+    .all-day .time-switch {
         opacity: 1;
     }
     .flatpickr-month {
@@ -384,7 +384,7 @@
         dateFormat: '{{ displayFormat }}',
         inline: true,
         altInput: false,
-        enableTime: true,
+        enableTime: {{ enableTime }},
         allowInput: true,
         disableMobile: true,
         minuteIncrement: 1,
@@ -406,8 +406,8 @@
             {# Hide time picker if allday hidden field is set to 1 #}
             if($('#allday').val() == 1) {
                 timeDiv.css('display', 'none');
-                calendarDiv.addClass('allDay');
-                calendarDiv.removeClass('hasTime');
+                calendarDiv.addClass('all-day');
+                calendarDiv.removeClass('has-time');
             }
             else {
                 $('#hideTime{{ id }}').prop('checked', false);
@@ -415,7 +415,7 @@
             $('#hideTime{{ id }}').click(function () {
                 if ($('#hideTime{{ id }}').is(':checked')) {
                     timeDiv.css('display', 'none');
-                    calendarDiv.addClass('allDay');
+                    calendarDiv.addClass('all-day');
                     calendarDiv.removeClass('hasTime');
                     $('#allday').val(1);
                     // Get rid of time
@@ -426,8 +426,8 @@
                 else {
                     $('#allday').val(0);
                     timeDiv.css('display', 'block');
-                    calendarDiv.addClass('hasTime');
-                    calendarDiv.removeClass('allDay');
+                    calendarDiv.addClass('has-time');
+                    calendarDiv.removeClass('all-day');
                 }
             });
         },
@@ -460,7 +460,7 @@
 
                                 {# There we no appointment on the selected date #}
 
-                                pickerResponse.html('No events found');
+                                pickerResponse.html('Nothing due on this date');
 
                             } else {
 
@@ -519,7 +519,7 @@
                             console.log('Failed to retrieve appointments for specified date');
                         });
 
-                {% else %}
+                {% elseif (type == 'event') %}
 
                 {# AJAX in appointments for the selected date #}
 
@@ -555,6 +555,8 @@
                         .fail(function () {
                             console.log('Failed to retrieve appointments for specified date');
                         });
+                {% else %}
+                    {#Do nothing#}
                 {% endif %}
             }
             latestDate = newDate;

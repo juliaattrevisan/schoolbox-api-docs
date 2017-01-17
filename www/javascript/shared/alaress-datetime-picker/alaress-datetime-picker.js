@@ -39,6 +39,14 @@ convertFormat = function (format) {
         });
 };
 
+//Use global counter in case multiple alaressDateTimePicker() have been called from one page
+
+var pickerCounter = 0;
+countPickers = function () {
+    pickerCounter ++;
+    return pickerCounter;
+};
+
 // Extend jQuery with our datepicker function
 
 $.fn.alaressDateTimePicker = function(optionsOverride) {
@@ -49,18 +57,16 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         displayFormat: 'd/m/Y h:iK',
         displayFormatDate: 'd/m/Y',
         databaseFormat: 'Y-m-d H:i:s',
-        type: 'event'
+        enableTime: false
+        // type: 'event'
     };
 
     // Override with user any options
     for (var attribute in optionsOverride) {
         options[attribute] = optionsOverride[attribute];
     }
+
     // Counter for uniquely identifying these things
-
-    window.pickerCount = 0;
-
-    // Keep track of picker instances that we've created
 
     window.pickerInstance = [];
 
@@ -72,20 +78,27 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
         var element = $(element);
 
-        var originalValue = element.val();
+        if(element.val().length > 0 ) {
+            var originalValue = element.val();
+        }
+        //if no value has been passed, use today
+        else {
+            var originalValue = moment().format(convertFormat(options.displayFormat));
+        }
+
         if($('#allday').val() == 1) {
             originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat))
         }
 
-        element.attr('data-pickerId', window.pickerCount);
+        //Count this picker in
+        var pickerId = countPickers();
 
-        element.after('<div data-reveal id="picker' + window.pickerCount + '" class="reveal-modal"></div>');
+        element.after('<div data-reveal id="picker' + pickerId + '" class="reveal-modal"></div>');
 
         // Create click event to open the modal for the element
 
         element.click(function () {
             var elementClicked = $(this);
-            var pickerId = + elementClicked.attr('data-pickerId');
             var picker = $('#picker' + pickerId);
 
             // Only AJAX in the picker if we haven't already
@@ -94,10 +107,9 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 // Update picker status
                 picker.data('status', 'loading');
-
                 // if datetime, pass date only
                 // AJAX in the modal contents if they haven't already been loaded
-                picker.load('/picker/datetime/type/'+options.type+'/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
+                picker.load('/picker/datetime/type/'+options.type+'/time/' + options.enableTime + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
 
                     // $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
 
@@ -139,8 +151,5 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
         });
 
-        // Increment global counter
-
-        window.pickerCount++;
     });
 };
