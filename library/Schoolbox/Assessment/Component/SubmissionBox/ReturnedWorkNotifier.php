@@ -96,8 +96,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 			return;
 		}
 
-        $publishDate = $mark->getPublishedAt();
-        if ((!$publishDate instanceof \Alaress_Date_Format) || $publishDate->isNull()) {
+        if ($mark->isDraft()) {
             // Not published: don't even bother here either
             return;
         }

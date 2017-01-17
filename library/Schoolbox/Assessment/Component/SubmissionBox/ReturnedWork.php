@@ -294,6 +294,15 @@ class ReturnedWork implements ISoftDeletable
         return $this;
     }
 
+    /**
+     * Is this a draft?
+     *
+     * @return bool
+     */
+    public function isDraft()
+    {
+        return $this->publishedAt instanceof \Alaress_Date_NullDate;
+    }
 
     /**
      * @return \Alaress_Date_Format
