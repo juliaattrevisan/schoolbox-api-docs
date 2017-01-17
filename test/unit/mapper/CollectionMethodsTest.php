@@ -165,6 +165,33 @@ class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Ensure result is correct and operand collections not mutated
+     *
+     * @dataProvider provider_merge_empty
+     * @param Collection[] $inputs
+     * @param Collection $expected
+     */
+    public function test_merge_empty($inputs, Collection $expected)
+    {
+        $beforeMerge = [];
+        foreach($inputs as $input){
+            $beforeMerge[] = $input->getAll();
+        }
+
+        $actual = new Collection();
+        foreach($inputs as $input){
+            $actual = $actual->mergeUnique($input, 'id');
+        }
+
+        //var_dump($actual);
+        $this->assertEquals($expected->getAll(), $actual->getAll());
+
+        for($i = 0; $i < count($inputs); $i++){
+            $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
+        }
+    }
+
+    /**
      * Limit should NOT mutate the collection
      *
      * @dataProvider provider_limit
@@ -241,6 +268,44 @@ class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
                 new Collection([1,2,3,4])
             ],
             new Collection([1,2,3,4]),
+        ];
+        return $data;
+    }
+
+
+    public function provider_merge_empty()
+    {
+        $data = [];
+
+        $campusOne = new \Schoolbox\Campus();
+        $campusOne->setId(1);
+
+        $campusTwo = new \Schoolbox\Campus();
+        $campusTwo->setId(2);
+
+        $campusThree = new \Schoolbox\Campus();
+        $campusThree->setId(3);
+
+        $campusFour = new \Schoolbox\Campus();
+        $campusFour->setId(4);
+
+        $data[] = [
+            [
+                new Collection([]),
+                new Collection([$campusOne]),
+                new Collection([$campusOne])
+            ],
+            new Collection([$campusOne]),
+        ];
+        $data[] = [
+            [
+                new Collection([]),
+                new Collection([$campusOne]),
+                new Collection([$campusOne,$campusTwo,$campusThree,$campusFour]),
+                new Collection([$campusThree,$campusFour])
+
+            ],
+            new Collection([$campusOne,$campusTwo,$campusThree,$campusFour]),
         ];
         return $data;
     }

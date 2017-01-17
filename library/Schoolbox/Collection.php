@@ -518,8 +518,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     {
         $merged = clone $this;
         if ($column) {
-            $getColumn = $other->getGetMethodName($column);
-            $testValues = $other->getColumnValues($column);
+            $getColumn = $merged->getGetMethodName($column);
+            $testValues = $merged->getColumnValues($column);
             foreach ($other as $item) {
                 $value = $item->$getColumn();
                 if (!in_array($value, $testValues)) {
