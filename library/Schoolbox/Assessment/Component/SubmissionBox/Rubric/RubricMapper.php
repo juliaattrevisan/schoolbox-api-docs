@@ -138,7 +138,6 @@ class RubricMapper
         }
         $in = implode(', :', array_keys($args));
 
-        // TODO DI and mapperise
         $stmt = $this->database->query("
             SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rc.parent_id
             FROM rubric_criterion rc
@@ -157,25 +156,25 @@ class RubricMapper
         while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
 
             // Trim + collapse internal whitespace
-            $capabilityNormalisedName = preg_replace('`\s+`', ' ', trim($r['grouping']));
+            $capabilityNormalisedName = $this->normaliseForComparison($r['grouping']);
 
             // If first instance of Capability
             if (!array_key_exists($capabilityNormalisedName, $capabilityCache)) {
                 // Save the Capability
-                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($groupId++, $capabilityNormalisedName);
+                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($groupId++, $this->normalizeSpace($r['grouping']));
 
                 // Instantiate Indicator cache for the Capability
                 $indicatorCache[$capabilityNormalisedName] = [];
             }
 
-            $indicatorNormalisedName = preg_replace('`\s+`', ' ', trim($r['name']));
+            $indicatorNormalisedName = $this->normaliseForComparison($r['name']);
 
             // First time we've seen this Capability + Indicator, or Indicator
             // is from the parentFolder (higher priority) ?
             if(!isset($indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName])
             || ($parentFolderId && $parentFolderId == $r['parent_id'])
             ) {
-                $indicator = new Criteria\Criterion($r['id'], $indicatorNormalisedName);
+                $indicator = new Criteria\Criterion($r['id'], $this->normalizeSpace($r['name']));
                 $indicator->setReadOnly($r['usage_count'] > 0);
                 $indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName] = $indicator;
             }
