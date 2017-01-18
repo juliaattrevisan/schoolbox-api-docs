@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Redirect;
 
 class Controller extends Assessment\Controller
 {
