@@ -702,41 +702,27 @@ class RubricMapper
      * Save rubrics selections for a particular Participant
      *
      * @param Participant $participant
-     * @param $rubricVars
+     * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
      */
-    public function saveForParticipant(Participant $participant, $rubricVars)
+    public function saveForParticipant(Participant $participant, array $descriptors = [])
     {
-        if(!is_array($rubricVars)){
-            return;
+        $descriptorMapper = DescriptorMapper::getInstance();
+        $markMapper       = MarkMapper::getInstance();
+        $marks            = $markMapper->createCollection();
+        $tStamp           = Alaress_Date_Format::now();
+
+        foreach($descriptors as $descriptorId => $isChecked){
+            if(!$isChecked){
+                continue;
+            }
+            $marks->add($markMapper->createModel()
+                ->setStudent($participant->getUser())
+                ->setDescriptor($descriptorMapper->createModel($descriptorId))
+                ->setCreatedAt($tStamp)
+                ->setValid(true)
+            );
         }
-        /* Optional rubric
-         */
-        // If the mark gets passed at the same time as rubrics,
-        // then rubrics get clobbered. We don't want that.
-
-        /* Find the submission box instance
-         */
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $participant->getAssessable()->getId());
-
-        $descriptorIds = [];
-
-        foreach ($rubricVars as $criterionId => $levelId) {
-            // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
-            $descriptorIds[] = DescriptorMapper::getInstance()->findIdsByColumnList(
-                [
-                    'criterion_id'      => $criterionId,
-                    'level_id'          => $levelId
-                ]
-            )[0];
-        }
-
-        $grid = $this->findBySubmissionBox($submissionBox);
-        $this->applyMark($grid, $descriptorIds);
-
-        $marks = $grid->getORMMarks($participant->getUser(), \Alaress_Date_Format::now());
-        SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
-
+        $markMapper->save($marks);
     }
 
     /**

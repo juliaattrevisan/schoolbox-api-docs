@@ -130,11 +130,8 @@ class Controller extends Base
         // then rubrics get clobbered. We don't want that.
         if (is_array($postVars['rubric'])) {
 
-            /* Something is remembering descriptor values somewhere
-             * so we use new RubricMapper instead of getInstance()
-             */
-            $rubMap = new RubricMapper();
-            $rubMap->saveForParticipant($participant, $postVars['rubric']);
+            $rubMap = RubricMapper::getInstance();
+            $rubMap->saveForParticipant($participant, $postVars['rubric']['descriptors']);
         }
 
         $template = '';
