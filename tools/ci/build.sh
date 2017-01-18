@@ -66,15 +66,21 @@ then
 	exit 1;
 fi
 
-echo "Installing grunt";
-npm install grunt-cli;
-
-echo "Build and install CSS and JS using grunt/bower";
-tools/pkg-build-css-js.sh;
-if [ $? -ne 0 ];
+if [ ! -f ../bower-artifact/"$branch"-bower.tar.gz ];
 then
-	echo "Error building and install CSS and JS";
+	echo "Unable to locate bower artifact: ../bower-artifact/"$branch"-bower.tar.gz";
 	exit 1;
+fi
+
+echo "Unpacking bower build";
+tar xzf ../bower-artifact/"$branch"-bower.tar.gz;
+
+echo "Validating checksums";
+checksum=`sha1sum bower.json`;
+if [ "$checksum" != "`cat www/javascript/components/bower.checksum`" ];
+then
+        echo "Bower checksum does not match";
+        exit 1;
 fi
 
 echo "Removing undeployable files";
