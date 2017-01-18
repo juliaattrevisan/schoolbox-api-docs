@@ -10,7 +10,7 @@
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
 
-{% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id }) %}
+{% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
 
 <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
 <script type="text/javascript">
