@@ -718,7 +718,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 ->setTitle(":child's $quizType was renamed from :oldname to :newname in :catname")
                 ->setHref($href)
                 ->setIcon($icon)
-                ->setParam('author', new UserParam($owner))
                 ->setParam('oldname', new Param($diff['title'][1]))
                 ->setParam('newname', new Param($diff['title'][0], "/assess/intro/$quizId"))
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
