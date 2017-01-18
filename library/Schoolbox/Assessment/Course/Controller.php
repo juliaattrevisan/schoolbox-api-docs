@@ -756,7 +756,7 @@ class Controller extends Base\Base
     public function courseList()
     {
         $query = $this->getRequest()->query;
-        $data = $this->getCourseData('');
+        $data = $this->getCourseData();
         $data['returnUrlKey'] = Redirect::RETURN_URL;
 
         if ($this->getRequest()->isXhr()) {
@@ -843,12 +843,12 @@ class Controller extends Base\Base
      * List the courses. Returns a combined array of Folder instances
      * and information about any found Units and their task counts
      *
-     * @param string $searchParam
+     * @param string|null $searchParam   If null, filter out courses residing outside Faculty root
      * @return array $data
      * @var Folder[] $data['lineage']
      * @var CourseSpecification[] $data['courses']
      */
-    protected function getCourseData($searchParam)
+    protected function getCourseData($searchParam = null)
     {
         // Use the new mapper to get the list of courses
         $allCourses = $this->getCourseSpecificationMapper()->findAllByName($searchParam);
@@ -857,7 +857,7 @@ class Controller extends Base\Base
 
         foreach ($allCourses as $currentCourse) {
 
-            // general search ignores Courses in Faculty
+            // general search ignores Courses outside Faculty
             if (null === $searchParam) {
                 try {
                     if (!($this->getFolderMapper()->isDescendant($currentCourse->getFolder(), $this->getCourseSpecificationMapper()->getFacultyRootFolder()))) {
