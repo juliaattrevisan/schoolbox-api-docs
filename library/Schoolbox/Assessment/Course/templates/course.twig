@@ -15,14 +15,45 @@ Usage:
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript">
     $(function () {
+
         $('[data-collapser]').collapsable();
+
+        /**
+         * Validation for the final save course form
+         * (the other validation is done in each mage step below)
+         */
+        var modifyValidation = {
+            rules: {
+                name: "required",
+                parent: "required",
+                newUnitName: "oneUnit"
+            },
+            messages: {
+                name: "Please enter a name for this course.",
+                parent: "Please select a faculty or subject for this course."
+            }
+        };
+
+        $("#update-course-form").alaressValidate(modifyValidation);
+
+        $('[data-unit-name]').each(function() {
+            $(this).rules('add', {
+                required: true,
+                messages: {
+                    required: "Please enter a name for this unit."
+                }
+            });
+        });
+
+        $.validator.addMethod('oneUnit', function() {
+            return $('input[data-unit-name]').length;
+        }, 'Please create at least one unit for this course.');
+
 
         // Mage Buttons
         var $mageNextButton = $('[data-mage-next="unit-info"]');
         var $mageCreateUnitButton = $('[data-mage-next="spawn-unit"]');
         var $mageSaveCourseButton = $('[data-mage-next="main-course"]');
-
-
 
         /**
          * Deletion of Units
@@ -106,6 +137,19 @@ Usage:
 
                 // Display the 'Save Course' section
                 $mageSaveCourseButton.closest('[data-mage-collapsed]').slideDown();
+
+                // Reset validation
+                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
+            },
+            validateOptions: {
+                rules: {
+                    name: "required",
+                    parent: "required"
+                },
+                messages: {
+                    name: "Please enter a name for this course",
+                    parent: "Please select a faculty or subject for this course"
+                }
             }
         });
 
@@ -126,6 +170,18 @@ Usage:
                 noonitName.val('');
                 $(this).val($(this).data('mage-reset')).removeAttr('readonly').removeData('mage-submitted');
                 $(document).foundation();
+
+                // Reset validation
+                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
+            },
+
+            validateOptions: {
+                rules: {
+                    newUnitName: "required"
+                },
+                messages: {
+                    newUnitName: "Please enter a name for your new unit"
+                }
             }
         });
 
@@ -166,7 +222,7 @@ Usage:
 </div>
 <div class="row">
     <div class="small-12 island" id="main-course">
-        <form method="post" action="{{ routeLookup('course.updateCourse', {id: courseSpec.id}) }}">
+        <form method="post" action="{{ routeLookup('course.updateCourse', {id: courseSpec.id}) }}" id="update-course-form">
             <section>
                 <fieldset class="content" data-mage="course-info">
                     <legend>Course Information</legend>
@@ -183,12 +239,14 @@ Usage:
                     <div class="small-12 column">
                         <label>
                             Faculty / Subject
-                            <input type="hidden" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
+
                             <a data-course-parent-selector data-source="parent"
                                title="Click to change the faculty / subject this course belongs to"
                                class="source-select icon-folder"
-                               href="#" >{{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
+                               href="#" >
+                                {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
                             </a>
+                            <input type="hidden" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
                         </label>
                     </div>
 
@@ -242,7 +300,7 @@ Usage:
                                         </div>
                                         <div class="small-11 column">
                                             <label>
-                                                <input type="text" value="" placeholder="New Unit" id="noonit-name"/>
+                                                <input type="text" value="" placeholder="New Unit" id="noonit-name" name="newUnitName" />
                                             </label>
                                         </div>
                                     </div>
