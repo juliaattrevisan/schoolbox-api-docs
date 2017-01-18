@@ -706,41 +706,42 @@ class RubricMapper
      */
     public function saveForParticipant(Participant $participant, $rubricVars)
     {
+        if(!is_array($rubricVars)){
+            return;
+        }
         /* Optional rubric
          */
         // If the mark gets passed at the same time as rubrics,
         // then rubrics get clobbered. We don't want that.
-        if (is_array($rubricVars)) {
 
-            /* Find the submission box instance
+        /* Find the submission box instance
+         */
+        try {
+            /** @var SubmissionBox $submissionBox */
+            $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $participant->getAssessable()->getId());
+
+            $descriptorIds = [];
+
+            foreach ($rubricVars as $criterionId => $levelId) {
+                // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
+                $descriptorIds[] = DescriptorMapper::getInstance()->findIdsByColumnList(
+                    [
+                        'criterion_id'      => $criterionId,
+                        'level_id'          => $levelId
+                    ]
+                )[0];
+            }
+
+            $grid = $this->findBySubmissionBox($submissionBox);
+            $this->applyMark($grid, $descriptorIds);
+
+            $marks = $grid->getORMMarks($participant->getUser(), \Alaress_Date_Format::now());
+            SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+
+            /* noop (submission box not found)
              */
-            try {
-                /** @var SubmissionBox $submissionBox */
-                $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $participant->getAssessable()->getId());
-
-                $descriptorIds = [];
-
-                foreach ($rubricVars as $criterionId => $levelId) {
-                    // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
-                    $descriptorIds[] = DescriptorMapper::getInstance()->findIdsByColumnList(
-                        [
-                            'criterion_id'      => $criterionId,
-                            'level_id'          => $levelId
-                        ]
-                    )[0];
-                }
-
-                $grid = $this->findBySubmissionBox($submissionBox);
-                $this->applyMark($grid, $descriptorIds);
-
-                $marks = $grid->getORMMarks($participant->getUser(), \Alaress_Date_Format::now());
-                SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
-            }
-            catch (\Schoolbox\Mapper\Exception $e) {
-
-                /* noop (submission box not found)
-                 */
-            }
         }
     }
 
