@@ -55,15 +55,15 @@ class RubricContext
             ]
         ];
 
-        /* Ram in some levels
+        /* Inject available levels for this DueWork's GradeGroup
          */
-        $levels = [];
+        $gradeLevels = [];
 
-        foreach ($dueWork->getGradeGroup()->getGradeLevels() as $level) {
-            $levels[$level->getLowerBound()] = $level->getCaption();
+        foreach ($dueWork->getGradeGroup()->getGradeLevels() as $gradeLevel) {
+            $gradeLevels[$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
         }
 
-        $context['markType']['conf'] = $levels;
+        $context['markType']['conf'] = $gradeLevels;
 
         return $context;
     }
