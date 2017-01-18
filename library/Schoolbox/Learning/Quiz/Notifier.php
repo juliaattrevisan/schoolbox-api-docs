@@ -549,10 +549,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentUpdated($quiz, $owner, $diff = null) {
-		$msgr = new Messenger();
+        $envelope = new Envelope();
+//		$msgr = new Messenger();
 
 		$quizId = $quiz->getId();
 		$quiz   = $this->fullyHydrateQuiz($quiz);
@@ -564,23 +565,25 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 			$now = time();
 
 			if($openStamp > $now || $closeStamp < $now) {
-				return $msgr;
+                return $envelope;
+//				return $msgr;
 			}
 		}
 
 		// if there's no actual difference
 		if(!count($diff)) {
-			return $msgr;
+            return $envelope;
+//			return $msgr;
 		}
 
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
-		$catId   = $cat->getId();
-		$catName = $cat->getName();
-
-		$ownerId    = $owner->getId();
-		$ownerName  = $owner->formatName();
+//		$catId   = $cat->getId();
+//		$catName = $cat->getName();
+//
+//		$ownerId    = $owner->getId();
+//		$ownerName  = $owner->formatName();
 
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
@@ -588,21 +591,34 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 		// renamed
 		if(isset($diff['title'])) {
+            $bob = new Builder();
+            $bob->addTopic("assess.$quizId.renamed")
+                ->addFilter('roleType', [Role::STUDENT])
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::NOTICE)
+                ->setTitle(":author renamed :oldname to :newname in :catname")
+                ->setHref($href)
+                ->setIcon($icon)
+                ->setParam('author', new UserParam($owner))
+                ->setParam('oldname', new Param($diff['title'][1]))
+                ->setParam('newname', new Param($diff['title'][0], "/assess/intro/$quizId"))
+                ->setParam('catname', new CategoryParam($quiz->getCategory()));
+            $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
 
-			$msg = new Message(":author renamed :oldname to :newname in :catname", $icon, $href);
-
-			// params for this instance - oldname doesn't have an associated href
-			$params = array(
-				'author'  => array($ownerName, "/search/user/$ownerId"),
-				'oldname' => $diff['title'][1],
-				'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
-				'catname' => array($catName, "/homepage/$catId")
-			);
-
-			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.renamed", Logger::NOTICE, $params,
-				array('roletype' => Role::STUDENT)
-			);
-
+//			$msg = new Message(":author renamed :oldname to :newname in :catname", $icon, $href);
+//
+//			// params for this instance - oldname doesn't have an associated href
+//			$params = array(
+//				'author'  => array($ownerName, "/search/user/$ownerId"),
+//				'oldname' => $diff['title'][1],
+//				'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
+//				'catname' => array($catName, "/homepage/$catId")
+//			);
+//
+//			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.renamed", Logger::NOTICE, $params,
+//				array('roletype' => Role::STUDENT)
+//			);
+//
 			unset($diff['title']);
 		}
 
@@ -622,18 +638,32 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 $date = $relative->getTimeOnly() .' on '.$date;
             }
 
-			$msg = new Message(":author $verb :quizname to :date in :catname", $icon, $href);
+//			$msg = new Message(":author $verb :quizname to :date in :catname", $icon, $href);
 
-			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.datechanged", Logger::NOTICE, array(
-					'author' => array($ownerName, "/search/user/$ownerId"),
-					'quizname' => array($quizName, "/assess/intro/$quizId"),
-					'date' => $date,
-					'catname' => array($cat->getName(), "/homepage/$catId")
-				),
-				array(
-					'roletype' => Role::STUDENT
-				)
-			);
+            $bob = new Builder();
+            $bob->addTopic("assess.$quizId.datechanged")
+                ->addFilter('roleType', [Role::STUDENT])
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::NOTICE)
+                ->setTitle(":author $verb :quizname to :date in :catname")
+                ->setHref($href)
+                ->setIcon($icon)
+                ->setParam('author', new UserParam($owner))
+                ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
+                ->setParam('date', new Param($date))
+                ->setParam('catname', new CategoryParam($quiz->getCategory()));
+            $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
+
+//			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.datechanged", Logger::NOTICE, array(
+//					'author' => array($ownerName, "/search/user/$ownerId"),
+//					'quizname' => array($quizName, "/assess/intro/$quizId"),
+//					'date' => $date,
+//					'catname' => array($cat->getName(), "/homepage/$catId")
+//				),
+//				array(
+//					'roletype' => Role::STUDENT
+//				)
+//			);
 
 			unset($diff['finish']);
 		}
@@ -656,22 +686,37 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 
 		// if none of the above apply, but there are changes, just be generic
-		if(count($diff) && $msgr->isEmpty()) {
-			$msg = new Message(":author updated :quizname in :catname", $icon, $href);
+		if(count($diff) && $envelope->isEmpty()) {
 
-			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.updated", Logger::NOTICE,
-				array(
-					'author' => array($ownerName, "/search/user/$ownerId"),
-					'quizname' => array($quizName, "/assess/intro/$quizId"),
-					'catname' => array($cat->getName(), "/homepage/$catId")
-				),
-				array(
-					'roletype' => Role::STUDENT
-				)
-			);
+            $bob = new Builder();
+            $bob->addTopic("assess.$quizId.updated")
+                ->addFilter('roleType', [Role::STUDENT])
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::NOTICE)
+                ->setTitle(":author updated :quizname in :catname")
+                ->setHref($href)
+                ->setIcon($icon)
+                ->setParam('author', new UserParam($owner))
+                ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
+                ->setParam('catname', new CategoryParam($quiz->getCategory()));
+            $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
+
+//			$msg = new Message(":author updated :quizname in :catname", $icon, $href);
+//
+//			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.updated", Logger::NOTICE,
+//				array(
+//					'author' => array($ownerName, "/search/user/$ownerId"),
+//					'quizname' => array($quizName, "/assess/intro/$quizId"),
+//					'catname' => array($cat->getName(), "/homepage/$catId")
+//				),
+//				array(
+//					'roletype' => Role::STUDENT
+//				)
+//			);
 		}
 
-		return $msgr;
+		return $envelope;
+//		return $msgr;
 	}
 
     /**
