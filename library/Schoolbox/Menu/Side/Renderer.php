@@ -62,6 +62,11 @@ class Renderer
         $subjects = [];
 
         // TODO eradicate this session dependency
+
+        usort($_SESSION["subjects"], function($a, $b) {
+            return $a['name'] > $b['name'];
+        });
+
         if (is_array($_SESSION["subjects"])) {
             foreach ($_SESSION["subjects"] as $subject) {
                 if (!isset($subjects[$subject['classType']])) {
@@ -70,6 +75,8 @@ class Renderer
                 $subjects[$subject['classType']][] = $subject;
             }
         }
+
+        var_dump($subjects);exit;
 
         // Get the menu sections in their correct order
 
