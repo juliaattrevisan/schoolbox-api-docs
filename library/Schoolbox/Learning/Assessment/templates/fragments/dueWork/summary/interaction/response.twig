@@ -1,9 +1,9 @@
 {# If staff, try going to Inline Grader #}
 {% if currentUser.role.isStaff %}
-    {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id}) %}
+    {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id, response: currentInteraction}) %}
     {% set tooltip = 'View in Inline Grader' %}
 {% elseif currentUser.role.isStudent and not currentInteraction.isSubmitted%}
-    {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id}) %}
+    {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, assessment: currentInteraction.assessable}) %}
     {% set tooltip = 'Resume Submission' %}
 {% endif %}
 
