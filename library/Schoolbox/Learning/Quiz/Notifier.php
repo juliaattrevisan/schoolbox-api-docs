@@ -712,7 +712,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
         if (isset($diff['title'])) {
             $bob = new Builder();
             $bob->addTopic("assess.$quizId.updated")
-                ->addFilter('roleType', [Role::STUDENT])
+                ->addFilter('roleType', [Role::PARENT])
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
                 ->setTitle(":child's $quizType was renamed from :oldname to :newname in :catname")
@@ -759,7 +759,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
             $bob = new Builder();
             $bob->addTopic("assess.$quizId.datechanged")
-                ->addFilter('roleType', [Role::STUDENT])
+                ->addFilter('roleType', [Role::PARENT])
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
                 ->setTitle(":child's $quizType :quizname closing date was $verb to :date in :catname")
@@ -799,7 +799,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
         if (count($diff) && $envelope->isEmpty()) {
             $bob = new Builder();
             $bob->addTopic("assess.$quizId.updated")
-                ->addFilter('roleType', [Role::STUDENT])
+                ->addFilter('roleType', [Role::PARENT])
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
                 ->setTitle(":child's $quizType :quizname was updated in :catname")
