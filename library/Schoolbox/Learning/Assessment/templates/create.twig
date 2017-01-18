@@ -256,7 +256,6 @@
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                     {% endif %}
 
-                    <legend>Assessment Details</legend>
                     <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
                         {% if assessmentType|length %}
                             {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' %}
