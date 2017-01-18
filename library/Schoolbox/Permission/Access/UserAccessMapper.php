@@ -173,10 +173,18 @@ class UserAccessMapper extends Mapper
                 $catId = FolderMapper::getInstance()->findByCode($extSubj['code'])->getId();
 
                 $ua = new UserAccess();
+
                 $ua->setService(UserAccess::SERVICE_HOMEPAGE)
                    ->setServiceIdentifier($catId)
-                   ->setAccessLevel(UserAccess::ACCESS_READ)
                    ->setUser($user);
+
+                //Teachers automatically get write access to their class pages
+                if($user->getRole()->isStaff()) {
+                    $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+                }
+                else {
+                    $ua->setAccessLevel(UserAccess::ACCESS_READ);
+                }
 
                 $external->add($ua);
 
