@@ -1,5 +1,4 @@
 {% set formField = 'rubric' %}
-{% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
 {% set rubricId = 'rb-' ~ rubric.id %}
 {% set markType = markType ?: { mode: 'raw' } %}
 
@@ -43,20 +42,15 @@
 
                     {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
 
-                    {% if inputType == 'checkbox' %}
-                        {% set inputName = inputId %}
-                    {% else %}
-                        {% set inputName %}{{ formField }}[{{ crit.id }}]{% endset %}
-                    {% endif %}
-
                     <td>
                         <input id="{{ inputId }}"
-                               name="{{ inputName }}"
-                               value="{{ level.id }}"
-                               type="{{ inputType }}"
+                               name="{{ formField }}[descriptors][{{ descriptor.id }}]"
+                               value="1"
+                               type="checkbox"
                                data-value="{{ descriptor.value }}"
                                data-rubric="{{ rubric.id }}"
                                data-rubric-group="{{ group.id }}"
+                               data-rubric-descriptor="{{ descriptor.id }}"
                                {% if descriptor.selected %}checked="checked"{% endif %}
                         />
                         <label for="{{ inputId }}">
@@ -145,7 +139,7 @@
                 groupSummary.attr('data-numerator', groupSum);
 
                 if (groupSummary.length) {
-                    parseFraction(groupSummary);
+                    parseFraction(groupSummary, null);
                 }
 
                 rubricSum = getSum($rb.find('input'));
@@ -181,6 +175,24 @@
             return groupSum;
         }
 
+        // If not multi-select, simulate radio behaviour per row (simpler to do this than intercept radio checked event!)
+        {% if not rubric.multiSelect %}
+            // Can't delegate this, as auto-mark will run before it can un-check siblings
+            $('[data-rubric-descriptor]').on('change', function(event){
+
+                var $descriptorInput = $(this);
+                var $checkboxGroup   = $descriptorInput.closest('[data-group]');
+                var $descriptors     = $checkboxGroup.find('[data-rubric-descriptor]');
+
+                $descriptors.each(function(idx, elem){
+                    var $otherDescriptor = $(elem);
+                    if($otherDescriptor.data('rubric-descriptor') != $descriptorInput.data('rubric-descriptor')){
+                        $otherDescriptor.prop('checked', false);
+                    }
+                });
+            });
+        {% endif %}
+
         // Don't update initial display anymore, because the rubric mark may not be the actual mark
         // (Yes, it can be different!)
 //        $('[data-rubric]').trigger('change.preload');
@@ -189,7 +201,7 @@
         /**
          *
          * @param {jQuery} $elem
-         * @param {string} namespace
+         * @param {string|null} namespace
          */
         function parseFraction($elem, namespace)
         {
