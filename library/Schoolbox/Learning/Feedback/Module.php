@@ -6,11 +6,16 @@
  */
 namespace Schoolbox\Learning\Feedback;
 
+use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use \Twig_Loader_Chain;
 
@@ -30,7 +35,19 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // rules
-        $canGiveFeedback = $this->getAuthRule('isLoggedIn');
+        $canGiveFeedbackFromParticipant = new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+            if ($params['participant'] instanceof Participant) {
+                return $params['participant']->getAssessable()->getContext()->getFolder()->getId();
+            }
+            throw new Forbidden();
+        }, Access::getInstance());
+
+        $canGiveFeedbackFromFeedback    = new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+            if ($params['feedback'] instanceof Assessment\IFeedback) {
+                return $params['feedback']->getAssessable()->getContext()->getFolder()->getId();
+            }
+            throw new Forbidden();
+        }, Access::getInstance());
 
         // preloads
         $preloadParticipant = function ($params) {
@@ -56,9 +73,9 @@ class Module extends BaseModule
         $participantRoute = $assessmentRoute . '/{studentId:\d+}';
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
-        $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
-        $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback', $canGiveFeedback, $preloadParticipantAndResponse);
-        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
+        $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback',  $canGiveFeedbackFromParticipant, $preloadParticipant); // p
+        $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback',     $canGiveFeedbackFromParticipant, $preloadParticipantAndResponse); // p
+        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canGiveFeedbackFromFeedback,    $preloadFeedback); // f
     }
 
 
@@ -131,7 +148,7 @@ class Module extends BaseModule
             }
         }
 
-        throw new \Schoolbox\Mapper\Exception("Response '$responseId' not found for assessment '$assessmentId'.");
+        throw new Mapper\Exception("Response '$responseId' not found for assessment '$assessmentId'.");
     }
 
     /**
@@ -153,11 +170,11 @@ class Module extends BaseModule
             }
         }
 
-        throw new \Schoolbox\Mapper\Exception("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
+        throw new Mapper\Exception("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
     }
 
     /**
-     * @return UserMapper
+     * @return Mapper|UserMapper
      */
     public function getUserDataSource()
     {
@@ -165,7 +182,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Assessment\DataModel\MapperProxy
+     * @return object|Assessment\DataModel\MapperProxy
      */
     public function getAssessmentDataSource()
     {
@@ -173,7 +190,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Participant\DataSource
+     * @return object|Participant\DataSource
      */
     public function getParticipantDataSource()
     {
@@ -181,7 +198,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Assessment\Response\DataSource
+     * @return object|Assessment\Response\DataSource
      */
     public function getResponseDataSource()
     {
@@ -189,7 +206,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Assessment\Feedback\DataSource
+     * @return object|Assessment\Feedback\DataSource
      */
     public function getFeedbackDataSource()
     {

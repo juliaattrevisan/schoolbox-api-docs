@@ -12,8 +12,6 @@ namespace Alaress\Authorizer\Rule;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\RoleAccess;
-use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 
@@ -60,10 +58,11 @@ class HasHomepageAccess extends All
         $this->accessLevel        = $accessLevel;
         $this->homepageIdentifier = $categoryIdentifier;
         $this->access             = $access;
-        $this
-            ->addRule(new IsLoggedIn())
-            ->addRule(new Callback(array($this, 'authorizeMethod')))
-        ;
+
+        parent::__construct(
+            new IsLoggedIn(),
+            new Callback(array($this, 'authorizeMethod'))
+        );
     }
 
     /**

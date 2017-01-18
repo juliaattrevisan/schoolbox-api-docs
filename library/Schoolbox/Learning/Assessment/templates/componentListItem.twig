@@ -4,9 +4,9 @@
 {% if assessable is quiz %}
     {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
 {% else %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
 {% endif %}
-{% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
+{% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
 
 {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) + extraNavItemCount %}
 

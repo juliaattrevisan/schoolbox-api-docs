@@ -66,10 +66,11 @@ class HasHomepagePermissionThroughRole extends All
         $this->accessLevel        = $accessLevel;
         $this->homepageIdentifier = $categoryIdentifier;
         $this->roleAccessMapper   = $roleAccessMapper;
-        $this
-            ->addRule(new IsLoggedIn())
-            ->addRule(new Callback(array($this, 'authorizeMethod')))
-        ;
+
+        parent::__construct(
+            new IsLoggedIn(),
+            new Callback(array($this, 'authorizeMethod'))
+        );
     }
 
     /**

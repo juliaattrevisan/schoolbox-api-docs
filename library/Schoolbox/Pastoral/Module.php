@@ -18,7 +18,7 @@ use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsParentAccessAllowed;
-use Schoolbox\Pastoral\Authorizer\Rule\IsParentOfStudent;
+use Alaress\Authorizer\Rule\IsParentOfStudent;
 use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModerator;
 use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModeratorWrite;
 use Schoolbox\Role;

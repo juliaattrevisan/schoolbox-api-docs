@@ -47,10 +47,11 @@ class IsInvolvedInClass extends All
     {
         $this->externalDb      = $externalDb;
         $this->classCodeSource = $classCodeSource;
-        $this
-            ->addRule(new IsLoggedIn())
-            ->addRule(new Callback(array($this, 'authorizeMethod')))
-        ;
+
+        parent::__construct(
+            new IsLoggedIn(),
+            new Callback(array($this, 'authorizeMethod'))
+        );
     }
 
     /**

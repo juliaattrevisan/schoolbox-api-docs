@@ -7,7 +7,7 @@ $data = [
 ];
 #}
 
-{% set activityUrl = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) %}
+{% set activityUrl = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) %}
 
 {% if unitSpec.assessables | length %}
 
@@ -32,7 +32,7 @@ $data = [
         <ul class="information-list sortable"
             data-sortable
             data-assessment-list
-            data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+            data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
             {% for assessment in unitSpec.assessables %}
                 {% include '@learningAssessment/builder/assessment.twig' with {
                 '_writable': true,
@@ -43,19 +43,14 @@ $data = [
             {% endfor %}
         </ul>
     </div>
-
     <div class="component-action">
         <section>
             <a class="button" href="{{ activityUrl }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Create a new activity">Create Activity</a>
         </section>
     </div>
-
-
 {% else %}
-
     <div class="empty-state">
         <i class="icon-course"></i>
         <p><a href="{{ activityUrl }}?{{ returnUrlName }}={{ encodedReturnUrl }}">Create a task, due work, quiz, or project</a> for this unit that you can import into classes and reuse again.</p>
     </div>
-
 {% endif %}

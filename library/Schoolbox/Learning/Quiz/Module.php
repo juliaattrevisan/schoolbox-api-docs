@@ -7,7 +7,6 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;

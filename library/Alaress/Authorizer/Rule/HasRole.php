@@ -30,10 +30,11 @@ class HasRole extends All
     public function __construct($role)
     {
         $this->role = $role;
-        $this
-            ->addRule(new IsLoggedIn())
-            ->addRule(new Callback(array($this, 'authorizeMethod')))
-        ;
+
+        parent::__construct(
+            new IsLoggedIn(),
+            new Callback(array($this, 'authorizeMethod'))
+        );
     }
 
     /**

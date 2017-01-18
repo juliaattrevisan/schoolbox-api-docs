@@ -4,5 +4,5 @@
  # plagscan     a Plagscan\Model instance containing plagscan_id
  #}
 {% if plagscan.isComplete %}
-<a href="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReport', {assessmentId: assessment.id, responseId: response.id, plagscanId: plagscan.plagscanId }) }}" class="icon-report" title="Plagscan Report"></a>
+<a href="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReport', {assessmentId: assessment.id, assessment: assessment, responseId: response.id, plagscanId: plagscan.plagscanId }) }}" class="icon-report" title="Plagscan Report"></a>
 {% endif %}

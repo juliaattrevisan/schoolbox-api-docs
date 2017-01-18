@@ -10,7 +10,7 @@
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
 
-{% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id }) %}
+{% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
 
 <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
 <script type="text/javascript">
@@ -148,7 +148,7 @@
     <div class="small-12 columns">
         <select id="response-selector">
             {% for currentResponse in responseList %}
-                {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id}) %}
+                {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id, response: currentResponse}) %}
 
                 {% if viewRoute %}
                 <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.revindex }}. Submission at {{ currentResponse.submittedAt.local }}</option>
@@ -180,7 +180,7 @@
                     <li class="actions-small-1 {{ selected }}">
                         <div class="list-item">
                             <div class="card small-12 compact">
-                                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
+                                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
                                     <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                     <p>{{ currentFile.filename }}</p>
 
@@ -211,7 +211,8 @@
                 fbUrl: routeLookup('learningFeedback.postResponseFeedback', {
                     assessmentId: assessment.id,
                     studentId: participant.user.id,
-                    responseId: response.id
+                    responseId: response.id,
+                    participant: participant
                 }),
                 feedbackAttachzone: attachzone
             } %}

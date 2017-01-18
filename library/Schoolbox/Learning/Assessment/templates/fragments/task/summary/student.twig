@@ -22,7 +22,7 @@
 
 
 {# student submit form #}
-{% set participant         = assessment.getParticipant(currentUser) %}
+{% set participant         = assessment.getParticipant(student) %}
 {% set mostRecentFeedback  = participant.findMostRecentPublishedFeedback %}
 {% set isViewingOwnSummary = participant.user.id == currentUser.id %}
 

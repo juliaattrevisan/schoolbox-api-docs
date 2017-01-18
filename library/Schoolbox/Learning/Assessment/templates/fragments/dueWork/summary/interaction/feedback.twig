@@ -8,12 +8,20 @@
  #}
 {% if currentFeedback.response.id %}
     {% if not currentFeedback.isPublished %}
-        {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentFeedback.assessable.id, studentId: currentFeedback.response.submittedOnBehalfOf.id, responseId: responseId}) %}
+        {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {
+            assessmentId: currentFeedback.assessable.id,
+            studentId: currentFeedback.response.submittedOnBehalfOf.id,
+            responseId: responseId,
+            response: currentFeedback.response
+        }) %}
         {% set tooltip = 'Resume Inline Grading' %}
     {% endif %}
 {% else %}
     {% if not currentFeedback.isPublished %}
-        {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: currentFeedback.assessable.id}) %}
+        {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {
+            assessmentId: currentFeedback.assessable.id,
+            assessment: currentFeedback.assessable
+        }) %}
         {% set tooltip = 'Resume Quickmark' %}
     {% endif %}
 {% endif %}
@@ -54,7 +62,7 @@
     </div>
     {% if showLineActions %}
     <nav>
-        <a class="icon-delete" data-delete="{{ routeLookup('learningFeedback.deleteAssessmentFeedback', { assessmentId: participant.assessable.id, feedbackId: currentFeedback.id }) }}"></a>
+        <a class="icon-delete" data-delete="{{ routeLookup('learningFeedback.deleteAssessmentFeedback', { assessmentId: participant.assessable.id, feedbackId: currentFeedback.id, feedback: currentFeedback }) }}"></a>
     </nav>
     {% endif %}
 
@@ -78,7 +86,7 @@
                          # responseId comes from the twig that includes this fragment
                          #}
                         {% if currentFile.crocodocId|length %}
-                            <a href="{{ routeLookup('learningResponse.getCrocodocView', {assessmentId: currentFeedback.assessable.id, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}">
+                            <a href="{{ routeLookup('learningResponse.getCrocodocView', {assessmentId: currentFeedback.assessable.id, assessment: assessment, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}">
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                 <p>{{ currentFile.filename }}</p>
                             </a>
@@ -92,7 +100,7 @@
                 </div>
                 {% if currentFile.crocodocId|length %}
                 <nav>
-                    <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {assessmentId: currentFeedback.assessable.id, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" class="icon-download" title="Download"></a>
+                    <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {assessmentId: currentFeedback.assessable.id, assessment: assessment, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" class="icon-download" title="Download"></a>
                 </nav>
                 {% endif %}
             </li>

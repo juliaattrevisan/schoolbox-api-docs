@@ -8,7 +8,7 @@
     [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.folder.id})],
     [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
     [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-    ['Inline Grader', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id})],
+    ['Inline Grader', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
     ['Plagscan Report', null]
     ] %}
 {% else %}
@@ -16,7 +16,7 @@
     ['Learning', routeLookup('learning.getClasses')],
     [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.folder.id})],
     [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-    ['Inline Grader', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id})],
+    ['Inline Grader', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
     ['Plagscan Report', null]
     ] %}
 {% endif %}
@@ -25,6 +25,6 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReportContents', {plagscanId: plagscan.plagscanId}) }}" frameborder="0"></iframe>
+        <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReportContents', {plagscanId: plagscan.plagscanId, assessment: assessment}) }}" frameborder="0"></iframe>
     </div>
 </div>

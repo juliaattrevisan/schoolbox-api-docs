@@ -114,7 +114,8 @@ class Controller extends Base
 
         // If no staff explicitly requested, redirect to current user
         $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getPendingAssessmentsForUser', [
-            'userId' => $this->getUser()->getId()
+            'userId' => $this->getUser()->getId(),
+            'viewee' => $this->getUser(),
         ]));
     }
 

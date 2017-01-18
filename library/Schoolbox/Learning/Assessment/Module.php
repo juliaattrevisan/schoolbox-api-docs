@@ -11,14 +11,17 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Role;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Assessment;
@@ -67,8 +70,40 @@ class Module extends BaseModule
         // rules in use
         $isSuper   = $this->getAuthRule('isSuperuser');
         $loggedIn  = $this->getAuthRule('isLoggedIn');
-        $isStaff   = $this->getAuthRule('isStaffOrSuper');
-        $canSubmit = $this->getAuthRule('isStaffOrStudent');
+        $canWrite  = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
+            function (array $params)
+            {
+                if (isset($params['assessment'])) {
+                    $ctx = $params['assessment']->getContext()->getFolder()->getId();
+                } elseif (isset($params['context'])) {
+                    $ctx = $params['context']->getFolder()->getId();
+                } else {
+                    throw new NotFound("No assessment or context preloaded");
+                }
+
+                return $ctx;
+            },
+            Access::getInstance()
+        );
+
+        $participantView = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new IsParticipant()
+        );
+
+        // if parent access is NOT restricted, allow for parents also
+        if ($this->getConfig()->get('restrict_parent_duework_access') == false) {
+            $participantView->addRule(new Rule\IsParentOfStudent());
+        }
+
+        $canSubmit = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new IsParticipant()
+        );
+
 
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) { return $name.'s'; });
@@ -81,20 +116,20 @@ class Module extends BaseModule
 
         // register the routes
         $this->register('GET',  "$assListRoute",         'getAssessmentsByContext', $isSuper, $preloadContext);
-        $this->register('POST', "$assListRoute",         'postCreateAssessment',    $isStaff, $preloadContext);
-        $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments',  $isStaff, $preloadContext);
-        $this->register('GET',  "$assListRoute/new",     'getCreateAssessmentForm', $isStaff, $preloadContext);
+        $this->register('POST', "$assListRoute",         'postCreateAssessment',    $canWrite, $preloadContext); // a || c
+        $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments',  $canWrite, $preloadContext); // a || c
+        $this->register('GET',  "$assListRoute/new",     'getCreateAssessmentForm', $canWrite, $preloadContext); // a || c
 
         $this->register('GET',  "$assRoute",        'getAssessment',            $loggedIn, $preloadAssessment);
-        $this->register('POST', "$assRoute",        'postUpdateAssessment',     $isStaff,  $preloadAssessment);
-        $this->register('PATCH', "$assRoute",       'patchUpdateAssessment',    $isStaff,  $preloadAssessment);
-        $this->register('GET',  "$assRoute/modify", 'getUpdateAssessmentForm',  $isStaff,  $preloadAssessment);
-        $this->register('POST', "$assRoute/delete", 'postDeleteAssessment',     $isStaff,  $preloadAssessment);
-        $this->register('GET',  "$assRoute/status", 'getStatus',                $isStaff,  $preloadAssessment);
+        $this->register('POST', "$assRoute",        'postUpdateAssessment',     $canWrite,  $preloadAssessment); // a || c
+        $this->register('PATCH', "$assRoute",       'patchUpdateAssessment',    $canWrite,  $preloadAssessment); // a || c
+        $this->register('GET',  "$assRoute/modify", 'getUpdateAssessmentForm',  $canWrite,  $preloadAssessment); // a || c
+        $this->register('POST', "$assRoute/delete", 'postDeleteAssessment',     $canWrite,  $preloadAssessment); // a || c
+        $this->register('GET',  "$assRoute/status", 'getStatus',                $canWrite,  $preloadAssessment); // a || c
 
-        $this->register('GET',  "$assRoute/$studentParam",        'getSummary',            $canSubmit, $preloadParticipant);
-        $this->register('GET',  "$assRoute/$studentParam/submit", 'getCreateResponseForm', $canSubmit, $preloadParticipant);
-        $this->register('POST', "$assRoute/$studentParam/submit", 'postCreateResponse',    $canSubmit, $preloadParticipant);
+        $this->register('GET',  "$assRoute/$studentParam",        'getSummary',            $participantView, $preloadParticipant); // s || p
+        $this->register('GET',  "$assRoute/$studentParam/submit", 'getCreateResponseForm', $canSubmit, $preloadParticipant); // p
+        $this->register('POST', "$assRoute/$studentParam/submit", 'postCreateResponse',    $canSubmit, $preloadParticipant); // p
     }
 
     /**
@@ -144,7 +179,8 @@ class Module extends BaseModule
         }
 
         return [
-            'participant' => $participant
+            'participant' => $participant,
+            'student'     => $participant->getUser() //IsParentOfStudent accesses this
         ];
     }
 
@@ -290,7 +326,15 @@ class Module extends BaseModule
      */
 
     /**
-     * @return UserMapper
+     * @return IConfigLoader|object
+     */
+    protected function getConfig()
+    {
+        return $this->getInjector()->get('config');
+    }
+
+    /**
+     * @return Mapper|UserMapper
      */
     protected function getUserMapper()
     {
@@ -298,7 +342,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return ErrorMapper
+     * @return Mapper|ErrorMapper
      */
     protected function getErrorMapper()
     {
@@ -306,7 +350,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return AssessmentMapperProxy
+     * @return object|AssessmentMapperProxy
      */
     protected function getAssessmentMapperProxy()
     {
@@ -314,27 +358,23 @@ class Module extends BaseModule
     }
 
     /**
-     * @return UnitImplementationMapper
+     * @return Mapper|UnitImplementationMapper
      */
     protected function getUnitImplementationMapper()
     {
-        /** @var UnitImplementationMapper $unitImplMapper */
-        $unitImplMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
-        return $unitImplMapper;
+        return $this->getMapperFactory()->get(UnitImplementationMapper::class);
     }
 
     /**
-     * @return UnitSpecificationMapper
+     * @return Mapper|UnitSpecificationMapper
      */
     protected function getUnitSpecificationMapper()
     {
-        /** @var UnitSpecificationMapper $unitSpecMapper */
-        $unitSpecMapper = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
-        return $unitSpecMapper;
+        return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
     }
 
     /**
-     * @return StudentSubmissionMapper
+     * @return Mapper|StudentSubmissionMapper
      */
     protected function getStudentSubmissionMapper()
     {
@@ -342,7 +382,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return SubmissionReturnMapper
+     * @return Mapper|SubmissionReturnMapper
      */
     protected function getSubmissionReturnMapper()
     {
@@ -350,7 +390,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return StorageMapper
+     * @return Mapper|StorageMapper
      */
     protected function getStorageMapper()
     {
@@ -358,7 +398,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return FolderMapper
+     * @return Mapper|FolderMapper
      */
     protected function getFolderMapper()
     {

@@ -137,7 +137,7 @@ class Controller extends Assessment\Controller
         /* Manufacture a universal returnUrl
          * Return to summary screen with this suffix
          */
-        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
+        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment ]);
         $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
 
         $twigData = [

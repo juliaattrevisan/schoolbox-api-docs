@@ -64,7 +64,7 @@
                     <ul class="information-list sortable-card"
                         data-sortable
                         data-assessment-list
-                        data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+                        data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                         {% for assessable in assessment.assessables %}
                             {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
@@ -100,16 +100,16 @@
                                 </div>
                                 <nav>
                                     {% if assessable is quiz %}
-                                        {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+                                        {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
                                             <a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-modify no-text" title="Modify"></a>
                                         {% endif %}
                                     {% else %}
-                                        {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
+                                        {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
                                             <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-modify no-text" title="Modify"></a>
                                         {% endif %}
                                     {% endif %}
 
-                                    {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
+                                    {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
                                     <a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-delete no-text" title="Delete" data-delete="{{ assessable.id }}"></a>
                                     {% endif %}
                                 </nav>
@@ -119,7 +119,7 @@
                     </ul>
                     <div class="component-action">
                         <section>
-                            <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id }) }}{{ returnUrlSuffix }}" class="button" title="Create a new activity">Create Activity</a>
+                            <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}{{ returnUrlSuffix }}" class="button" title="Create a new activity">Create Activity</a>
                         </section>
                     </div>
                 </section>
@@ -127,7 +127,7 @@
                 {% else %}
                 <div class="empty-state">
                     <i class="icon-project"></i>
-                    <p>You project currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id }) }}{{ returnUrlSuffix }}">create an activity</a> next.</p>
+                    <p>You project currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}{{ returnUrlSuffix }}">create an activity</a> next.</p>
                 </div>
                 {% endif %}
             </div>

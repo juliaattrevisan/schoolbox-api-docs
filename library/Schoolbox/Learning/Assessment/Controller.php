@@ -15,27 +15,14 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
-use \Alaress_Date_NullDate;
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
-use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
 abstract class Controller extends ListController implements IAssessmentController

@@ -28,10 +28,10 @@
 
             {% if unit.isAfterDueDate == false %}
             <li class="separator">Create</li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=project&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-project">Project</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=dueWork&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task">Task</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=project&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-project">Project</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=dueWork&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task">Task</a></li>
             {% endif %}
             <li class="separator">Manage</li>
             <li><a href="#" data-interaction="open_delete_unit_form" class="icon-delete" title="Delete this unit">Delete</a></li>
@@ -39,7 +39,7 @@
         {% endif %}
 
             <!-- Form for reordering tasks - one per unit -->
-            <form action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'units', contextId: unit.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post" class="reorder_form">
+            <form action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'units', contextId: unit.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post" class="reorder_form">
             </form>
 
             <form action="/course/unit/delete" method="post" data-form_type="delete_unit" class="hide">

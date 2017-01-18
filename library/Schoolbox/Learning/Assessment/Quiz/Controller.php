@@ -95,7 +95,7 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
-        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
+        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment]);
         $returnUrlSuffix = (new Redirect())->queryString($baseUrl);
 
         $twigData = [

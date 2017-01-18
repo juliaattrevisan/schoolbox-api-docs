@@ -195,7 +195,7 @@
                 },
                 onXhrDone: function(data) {
                     $('#assessmentForm')
-                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) }}')
+                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) }}')
                         .find('[data-assessment-details]')
                         .html(data);
 
@@ -214,9 +214,9 @@
 </div>
 
 {% if assessmentType|length %}
-    {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) %}
+    {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) %}
 {% else %}
-    {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id }) %}
+    {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) %}
 {% endif %}
 
 <div class="row">

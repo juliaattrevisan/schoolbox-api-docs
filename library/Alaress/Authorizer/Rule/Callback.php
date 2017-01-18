@@ -21,7 +21,7 @@ class Callback implements IAuthorizationRule {
      * @param callable $callback A callback method for authorization: expected
      *                           to match IAuthorizationRule::authorize() params.
      */
-    public function __construct($callback) {
+    public function __construct(callable $callback) {
         $this->callback = $callback;
     }
 

@@ -15,6 +15,6 @@
 </div>
 {% if showLineActions %}
 <nav>
-    <a class="icon-delete" data-delete="{{ routeLookup('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: currentInteraction.id }) }}"></a>
+    <a class="icon-delete" data-delete="{{ routeLookup('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, assessment: assessment, responseId: currentInteraction.id }) }}"></a>
 </nav>
 {% endif %}
