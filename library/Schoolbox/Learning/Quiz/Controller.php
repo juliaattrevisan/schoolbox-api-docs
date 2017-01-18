@@ -325,6 +325,7 @@ class Controller extends AbstractController
      */
     public function postQuizSubmit()
     {
+        $get = $this->getRequest()->query;
         $post = $this->getRequest()->post;
 
         try {
@@ -332,10 +333,11 @@ class Controller extends AbstractController
             $attempt->setFinish(\Alaress_Date_Format::now());
             $this->quizAttemptMapper->save($attempt);
         } catch (MapperException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
         }
 
         return $this->getResponse()->redirect->to(
-            Redirect::decode($post['returnUrl'])
+            Redirect::decode($get['returnUrl'])
         );
     }
 

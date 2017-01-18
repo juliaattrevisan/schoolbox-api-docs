@@ -127,7 +127,6 @@
                                         {% if attempt and not attempt.submitted %}
                                             <form id="form-quiz-submit-{{ attempt.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit') ~ returnUrlSuffix }}">
                                                 <input type="hidden" name="attemptId" value="{{ attempt.id }}">
-                                                <input type="hidden" name="returnUrl" value="{{ returnUrl }}">
                                             </form>
                                             <li><a data-quiz-submit="{{ attempt.id }}" class="icon-tick" href="#" title="Mark As Submitted">Mark As Submitted</a></li>
                                         {% endif %}
