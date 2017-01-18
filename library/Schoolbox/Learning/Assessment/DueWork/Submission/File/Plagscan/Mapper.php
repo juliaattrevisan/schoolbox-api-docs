@@ -27,6 +27,13 @@ class Mapper extends \Schoolbox\Mapper
     private $gateway;
 
     /**
+     * A registry of allowed extension-mime tuples
+     *
+     * @var ValidFiles
+     */
+    private $validFiles;
+
+    /**
      * Mapping.
      */
     protected function mapping () {
@@ -48,6 +55,8 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function setup()
     {
+        $this->setValidFiles(new ValidFiles());
+
         $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
         $plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
 
@@ -99,19 +108,30 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveNewPlagscan(SubmissionFile $file)
     {
-        /* No existing Plagscan found for $dirtyDocument
-         * Spawn new and ship it to Plagscan Gateway
+        /* If gateway never spawned, plagscan not configured
          */
         if (!$this->getGateway()) {
             return [];
         }
 
+        /* Invalid filetype
+         */
+        if (!$this->getValidFiles()->isPlagscannable($file->getBasename())) {
+            return [];
+        }
+
+        /* Send it to plag
+         */
         $documentId = $this->getGateway()->submit($file);
 
+        /* Plagscan death
+         */
         if (empty($documentId)) {
             return [];
         }
 
+        /* Otherwise, proceed normally
+         */
         $this->getGateway()->check($documentId);
 
         /** @var Plagscan $plagscan */
@@ -143,6 +163,24 @@ class Mapper extends \Schoolbox\Mapper
     private function setGateway($gateway)
     {
         $this->gateway = $gateway;
+        return $this;
+    }
+
+    /**
+     * @return ValidFiles
+     */
+    private function getValidFiles()
+    {
+        return $this->validFiles;
+    }
+
+    /**
+     * @param ValidFiles $validFiles
+     * @return $this
+     */
+    private function setValidFiles($validFiles)
+    {
+        $this->validFiles = $validFiles;
         return $this;
     }
 }

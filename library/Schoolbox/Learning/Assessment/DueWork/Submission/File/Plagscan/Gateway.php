@@ -54,24 +54,11 @@ class Gateway
     private $response;
 
     /**
-     * A key/value array of allowable file types as specified
-     * by Plagscan themselves
+     * A registry of allowed extension-mime tuples
      *
-     * @var array
+     * @var ValidFiles
      */
-    private $validDocuments = [
-        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'doc'  => 'application/msword',
-        'pdf'  => 'application/pdf',
-        'ppt'  => 'application/vnd.ms-powerpoint',
-        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'xls'  => 'application/vnd.ms-excel',
-        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'odt'  => 'application/vnd.oasis.opendocument.text',
-        'txt'  => 'text/plain',
-        'rtf'  => 'text/richtext',
-        'html' => 'text/html',
-    ];
+    private $validFiles;
 
     /**
      * Gateway constructor.
@@ -82,6 +69,7 @@ class Gateway
     {
         $this->setUsername($username);
         $this->setApiKey($apiKey);
+        $this->setValidFiles(new ValidFiles());
     }
 
     /**
@@ -111,11 +99,7 @@ class Gateway
         /* Check valid extensions and die early if trying
          * to analyse an illegal file type
          */
-        $documentExtension = pathinfo($documentName, PATHINFO_EXTENSION);
-
-        $validDocumentExtensionList = $this->getValidDocuments();
-
-        if (!isset($validDocumentExtensionList[$documentExtension])) {
+        if (!$this->getValidFiles()->isPlagscannable($documentName)) {
             return null;
         }
 
@@ -126,7 +110,7 @@ class Gateway
         ]);
 
         $documentParameter = "Content-Disposition: form-data; name=\"DATA\"; filename=\"$documentName\"\n";
-        $documentParameter .= "Content-Type: {$validDocumentExtensionList[$documentExtension]}\n";
+        $documentParameter .= "Content-Type: {$this->getValidFiles()->getMime($documentName)}\n";
         $documentParameter .= "Content-Transfer-Encoding: binary\n\n";
         $documentParameter .= "$documentData\n";
 
@@ -441,20 +425,20 @@ class Gateway
     }
 
     /**
-     * @return array
+     * @return ValidFiles
      */
-    private function getValidDocuments()
+    private function getValidFiles()
     {
-        return $this->validDocuments;
+        return $this->validFiles;
     }
 
     /**
-     * @param array $validDocuments
+     * @param ValidFiles $validFiles
      * @return $this
      */
-    private function setValidDocuments($validDocuments)
+    private function setValidFiles($validFiles)
     {
-        $this->validDocuments = $validDocuments;
+        $this->validFiles = $validFiles;
         return $this;
     }
 }
