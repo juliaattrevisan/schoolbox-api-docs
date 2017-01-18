@@ -398,7 +398,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		}
 
 
-//		return $msgr;
         return $envelope;
 	}
 
@@ -498,7 +497,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 */
 	public function notifyStudentUpdated($quiz, $owner, $diff = null) {
         $envelope = new Envelope();
-//		$msgr = new Messenger();
 
 		$quizId = $quiz->getId();
 		$quiz   = $this->fullyHydrateQuiz($quiz);
@@ -511,24 +509,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 			if($openStamp > $now || $closeStamp < $now) {
                 return $envelope;
-//				return $msgr;
 			}
 		}
 
 		// if there's no actual difference
 		if(!count($diff)) {
             return $envelope;
-//			return $msgr;
 		}
 
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
-//		$catId   = $cat->getId();
-//		$catName = $cat->getName();
-//
-//		$ownerId    = $owner->getId();
-//		$ownerName  = $owner->formatName();
 
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
@@ -549,20 +540,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 ->setParam('newname', new Param($diff['title'][0], "/assess/intro/$quizId"))
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
             $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
-
-//			$msg = new Message(":author renamed :oldname to :newname in :catname", $icon, $href);
-//
-//			// params for this instance - oldname doesn't have an associated href
-//			$params = array(
-//				'author'  => array($ownerName, "/search/user/$ownerId"),
-//				'oldname' => $diff['title'][1],
-//				'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
-//				'catname' => array($catName, "/homepage/$catId")
-//			);
-//
-//			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.renamed", Logger::NOTICE, $params,
-//				array('roletype' => Role::STUDENT)
-//			);
 //
 			unset($diff['title']);
 		}
@@ -577,13 +554,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 			$verb = $newDate > $oldDate ? 'extended' : 'changed the closing date of';
 			$relative = new Alaress_Date_Format($newDate, 'U');
 
-
             $date = $relative->getLongDateOnly();
             if(!$relative->isAtEndOfDay()) {
                 $date = $relative->getTimeOnly() .' on '.$date;
             }
-
-//			$msg = new Message(":author $verb :quizname to :date in :catname", $icon, $href);
 
             $bob = new Builder();
             $bob->addTopic("assess.$quizId.updated")
@@ -598,17 +572,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 ->setParam('date', new Param($date))
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
             $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
-
-//			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.datechanged", Logger::NOTICE, array(
-//					'author' => array($ownerName, "/search/user/$ownerId"),
-//					'quizname' => array($quizName, "/assess/intro/$quizId"),
-//					'date' => $date,
-//					'catname' => array($cat->getName(), "/homepage/$catId")
-//				),
-//				array(
-//					'roletype' => Role::STUDENT
-//				)
-//			);
 
 			unset($diff['finish']);
 		}
@@ -645,23 +608,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
             $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
-
-//			$msg = new Message(":author updated :quizname in :catname", $icon, $href);
-//
-//			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.updated", Logger::NOTICE,
-//				array(
-//					'author' => array($ownerName, "/search/user/$ownerId"),
-//					'quizname' => array($quizName, "/assess/intro/$quizId"),
-//					'catname' => array($cat->getName(), "/homepage/$catId")
-//				),
-//				array(
-//					'roletype' => Role::STUDENT
-//				)
-//			);
 		}
 
 		return $envelope;
-//		return $msgr;
 	}
 
     /**
@@ -672,7 +621,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
      */
     public function notifyParentUpdated($quiz, $owner, $diff = null) {
         $envelope = new Envelope();
-//        $msgr = new Messenger();
 
         if ($this->conf->get('restrict_parent_duework_access')) {
             return $envelope;
@@ -698,10 +646,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
         $quizName = $quiz->getTitle();
         $quizType = $quiz->getWorkType()->getName();
 
-//        $cat     = $quiz->getCategory();
-//        $catId   = $cat->getId();
-//        $catName = $cat->getName();
-
         $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
         $href = "/assess/intro/$quizId";
 
@@ -722,22 +666,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 ->setParam('newname', new Param($diff['title'][0], "/assess/intro/$quizId"))
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
-//            $msg = new Message(":child's $quizType was renamed from :oldname to :newname in :catname", $icon, $href);
             foreach ($students as $student) {
                 $bob->setParam('child', new ChildParam($student));
                 $envelope->targetToParent($student->getId(), $bob->build());
-//                $msgr->targetToParent(
-//                    $student->getId(),
-//                    $msg,
-//                    "assess.$quizId.updated",
-//                    Logger::NOTICE,
-//                    array(
-//                        'child'   => array($student->formatName('{firstname}'), "/search/user/".$student->getId()),
-//                        'oldname' => $diff['title'][1],
-//                        'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
-//                        'catname' => array($catName, "/homepage/$catId"),
-//                    )
-//                );
             }
             unset($diff['title']);
         }
@@ -773,22 +704,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 $bob->setParam('child', new ChildParam($student));
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
-
-//            $msg = new Message(":child's $quizType :quizname closing date was $verb to :date in :catname", $icon, $href);
-//            foreach ($students as $student) {
-//                $msgr->targetToParent(
-//                    $student->getId(),
-//                    $msg,
-//                    "assess.$quizId.updated",
-//                    Logger::NOTICE,
-//                    array(
-//                        'child'   => array($student->formatName('{firstname}'), "/search/user/".$student->getId()),
-//                        'quizname' => array($quizName, "/assess/intro/$quizId"),
-//                        'date'    => $date,
-//                        'catname' => array($cat->getName(), "/homepage/$catId"),
-//                    )
-//                );
-//            }
             unset($diff['finish']);
         }
 
@@ -812,21 +727,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 $bob->setParam('child', new ChildParam($student));
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
-
-//            $msg = new Message(":child's $quizType :quizname was updated in :catname", $icon, $href);
-//            foreach ($students as $student) {
-//                $msgr->targetToParent(
-//                    $student->getId(),
-//                    $msg,
-//                    "assess.$quizId.updated",
-//                    Logger::NOTICE,
-//                    array(
-//                        'child'    => array($student->formatName(), "/search/user/".$student->getId()),
-//                        'quizname' => array($quizName, "/assess/intro/$quizId"),
-//                        'catname'  => array($cat->getName(), "/homepage/$catId"),
-//                    )
-//                );
-//            }
         }
 
         return $envelope;
