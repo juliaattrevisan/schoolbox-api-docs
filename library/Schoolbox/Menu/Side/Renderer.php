@@ -63,19 +63,6 @@ class Renderer
 
         // TODO eradicate this session dependency
 
-        if (is_array($_SESSION["subjects"])) {
-            usort($_SESSION["subjects"], function($a, $b) {
-                return strnatcmp($a['name'],$b['name']);
-            });
-
-            foreach ($_SESSION["subjects"] as $subject) {
-                if (!isset($subjects[$subject['classType']])) {
-                    $subjects[$subject["classType"]] = [];
-                }
-                $subjects[$subject['classType']][] = $subject;
-            }
-        }
-
         // Get the menu sections in their correct order
 
         $sections = $this->getMenuSideSectionMapper()->findAll()->sortBy('sortOrder', 'asc');
