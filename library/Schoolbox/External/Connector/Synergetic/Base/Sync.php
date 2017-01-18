@@ -19,7 +19,7 @@ class Sync implements SyncInterface
     /**
      * @var MSSQL
      */
-    private $database;
+    protected $database;
 
     /**
      * @var string
