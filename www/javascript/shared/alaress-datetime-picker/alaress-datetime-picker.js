@@ -57,8 +57,8 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         displayFormat: 'd/m/Y h:iK',
         displayFormatDate: 'd/m/Y',
         databaseFormat: 'Y-m-d H:i:s',
-        enableTime: false
-        // type: 'event'
+        enableTime: false,
+        type: 'default'
     };
 
     // Override with user any options
@@ -93,7 +93,8 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         //Count this picker in
         var pickerId = countPickers();
 
-        element.after('<div data-reveal id="picker' + pickerId + '" class="reveal-modal"></div>');
+        var modalSize = (options.type == 'event' || options.type == 'duework') ? '650px' : '325px';
+        element.after('<div data-reveal id="picker' + pickerId + '" class="reveal-modal" style="width: ' + modalSize + ';"></div>');
 
         // Create click event to open the modal for the element
 

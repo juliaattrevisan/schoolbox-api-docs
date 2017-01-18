@@ -85,6 +85,11 @@
         display: none;
     }
 </style>
+{% if type == 'event' or type =='duework' %}
+{% set width = 6 %}
+{% else %}
+{% set width = 12 %}
+{% endif %}
 <div class="row">
     <dl class="tabs" data-tab>
         <dd class=""><a href="#" id="tab-1-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
@@ -94,23 +99,26 @@
 <div class="row">
     <div class="tabs-content">
         <div class='content active' id="byDate-{{ id }}">
-                <div class="small-12 medium-4 columns">
+                <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for calendar ot be rendered in #}
                     <div id="pickerCalendar{{ id }}"></div>
 
                 </div>
-                <div class="small-12 medium-8 columns">
+                {# Hide second column if showing just a calendar #}
+                {% if width == 6 %}
+                <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for appointments to be rendered in #}
                     <div id="calendarResponse{{ id }}"></div>
 
                 </div>
+                {% endif %}
         </div>
     </div>
     <div class='content' id="byTimetable-{{ id }}" style="display: none;">
             <div class="row">
-                <div class="small-12 medium-4 columns">
+                <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for timetable ot be rendered in #}
                     <div id="timetable{{ id }}">
@@ -151,15 +159,15 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="small-12 medium-8 columns">
+
+                {% if width == 6 %}
+                <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for appointments to be rendered in #}
-
                     <div id="timetableResponse{{ id }}"></div>
 
-
-
                 </div>
+                {% endif %}
             </div>
             <div class="row">
                 <div class="small-4 columns"></div>
@@ -218,7 +226,7 @@
                 {# Populate with results for the selected date #}
 
                 html += '<div class="row">';
-                html += '<div class="small-12 medium-6 columns">';
+                html += '<div class="small-12 medium-12 columns">';
                 html += '<h2>Work due on ' + timetableDate + '</h2>';
                 html += '<ul class="information-list expandable-card">';
                 for (var i = 0; i < data.students.length; i++) {
@@ -256,7 +264,7 @@
             }
             else {
                 html += '<div class="row">';
-                html += '<div class="small-12 medium-6 columns">';
+                html += '<div class="small-12 medium-12 columns">';
                 html += '<h2>Events on ' + timetableDate + '</h2>';
                 html += '<ul class="information-list card">';
                 {# Populate with appointments for the selected date #}
