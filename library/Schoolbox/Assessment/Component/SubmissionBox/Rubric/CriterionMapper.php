@@ -14,50 +14,27 @@ use Schoolbox;
  * Class CriterionMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
- * @method Criterion createModel()
+ * @method Criterion createModel($idValue = null)
  * @method Criterion findById($id)
+ * @method Criterion[] findByColumnList($columnList, $options = array())
+ * @method Criterion findOneByColumnList($columnList, $order = array())
  */
 class CriterionMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('rubric_criterion');
         $this->hasModel(Criterion::class);
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'grouping',
-            'property'   => 'grouping',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'name',
-            'property'   => 'name',
-            'type'       => self::TYPE_STRING,
-        ));
+
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('grouping', self::TYPE_STRING);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('parent_type', self::TYPE_STRING);
         // Parent ID can reference any of:
         // submission, category, curriculum
         // as far as I can tell, it's never not "category"
-        $this->hasMap(array(
-            'column'     => 'parent_id',
-            'property'   => 'parentId',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column'     => 'parent_type',
-            'property'   => 'parentType',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'deleted_at',
-            'property'   => 'deletedAt',
-            'type'       => self::TYPE_DATETIME,
-        ));
+        $this->uses('parent_id', self::TYPE_INTEGER);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->hasSoftDeleteDateField('deleted_at');
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
     }
 
@@ -68,6 +45,8 @@ class CriterionMapper extends Schoolbox\Mapper {
      * @param int $to_id   The category to copy to.
      *
      * @return int[] A list of new rubric IDs
+     * @deprecated
+     * @see RubricMapper::copyRubric()
      */
     public function copyFromCategory($from_id, $to_id) {
         /** @var Criterion[] $from_rubric_list */

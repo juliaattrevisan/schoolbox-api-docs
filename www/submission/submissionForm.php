@@ -184,7 +184,6 @@ $submission->setDescription($_POST['description']);
 $submission->getWorkType()->setId($_POST['type']);
 $submission->getMarkType()->setId($markTypeID);
 $submission->getGradeGroup()->setId($_POST['gradegroup']);
-$submission->setRubricResultSet($resultSetID ?: 0);
 $submission->setUseRubric($useRubric);
 $submission->setMarkedPerRubricGroup($groupMarking);
 $submission->setMaxMark($markMax);

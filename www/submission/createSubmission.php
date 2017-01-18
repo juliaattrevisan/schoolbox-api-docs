@@ -278,11 +278,9 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
             if ($rubricHandler->marksAlreadyGiven($submission->getId())) {
                 $this->parse('existing_marks_warning_block', 'existing_marks_warning');
             }
-
-            $resultSetID = $submission->getRubricResultSet();
         }
 
-        outputResultSets($this, $resultSetID, $resultCount);
+        outputResultSets($this, $resultCount);
 
         $map = Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::getInstance();
 
@@ -448,10 +446,9 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', $crumbs);
 
 /**
  * @param SitePage  $page
- * @param int       $checkedIndex
  * @param int       $descriptorCount
  */
-function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount = 2)
+function outputResultSets(SitePage $page, $descriptorCount = 2)
 {
     $rubricHandler = new DueWork_Rubric_Handler();
     $rs            = $rubricHandler->getResultSets();
@@ -468,7 +465,6 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
                         'RS_ID'           => $i,
                         'RS_RESULT_LABEL' => $item,
                         'RS_RESULT_COMMA' => ($j++) < count($set) ? ', ' : '',
-                        'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked"' : ''
                     )
                 );
                 $page->parse('result_block', 'result', true);
@@ -482,6 +478,4 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
     for ($i = 2; $i <= 11; ++$i) {
         $desCounts[] = array('value' => $i);
     }
-
-    $page->setVar('RS_0_CHECKED', $checkedIndex == 0 ? 'checked="checked"' : '');
 }

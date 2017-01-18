@@ -11,12 +11,13 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
  * Class UsageMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
- * @method Usage createModel()
+ * @method Usage createModel($idValue = null)
  */
 class UsageMapper extends Schoolbox\Mapper {
 
@@ -24,34 +25,8 @@ class UsageMapper extends Schoolbox\Mapper {
         $this->hasTable('rubric_usage');
         $this->hasModel(Usage::class);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->hasMap(array(
-            'column'     => 'criterion_id',
-            'property'   => 'criterion',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'criterion',
-        ));
-        $this->hasMap(array(
-            'column'     => 'submission_box_id',
-            'property'   => 'submissionBox',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'submission_box',
-        ));
-        $this->hasJoin(
-            'criterion',
-            array(
-                'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\CriterionMapper',
-                'this_key'  => 'criterion_id',
-                'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'submission_box',
-            array(
-                'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
-                'this_key'  => 'submission_box_id',
-                'other_key' => 'id',
-            )
-        );
+        $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
+        $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
     }
 
     /**
@@ -61,10 +36,13 @@ class UsageMapper extends Schoolbox\Mapper {
      * @param int $to_id   The ID of the submission box to copy to.
      *
      * @return int[] A list of new rubric usages
+     * @deprecated
+     * @see RubricMapper::copyRubric()
      */
     public function copyFromCopiedSubmissionBox($from_id, $to_id) {
 
         // Load list of criteria to load from and to.
+        /** @var CriterionMapper $criterion_mapper */
         $criterion_mapper = $this->getJoinMapper('criterion');
         $query = "
             SELECT

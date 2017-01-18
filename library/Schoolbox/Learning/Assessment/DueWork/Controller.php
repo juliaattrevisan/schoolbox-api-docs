@@ -32,6 +32,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 class Controller extends Assessment\Controller
 {
@@ -125,6 +126,11 @@ class Controller extends Assessment\Controller
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
+        if($assessment->getUseRubric()){
+            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+        }
+
+
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
@@ -145,7 +151,7 @@ class Controller extends Assessment\Controller
 
             /* Rubrics data
              */
-            'rubricContext' => (new RubricContext())->generate($assessment, $student, $this->getUser()),
+            'rubricContext' => (new RubricContext($this->rubricMapper))->generate($assessment, $student, $this->getUser()),
         ];
 
         try {
@@ -449,6 +455,16 @@ class Controller extends Assessment\Controller
         ];
 
         // ...append rubric-related data...
+        if($assessment->getId()){
+            $getParentCriteria = $assessment->getContext() instanceof UnitSpecification;
+            $editMode = true;
+            $rubric = $this->rubricMapper->findByDueWork($assessment, $getParentCriteria, $editMode);
+        } else {
+            $rubric = $this->rubricMapper->createForContext($assessment->getContext());
+        }
+        $assessment->setRubric($rubric);
+
+
         $data = array_merge($data, $this->generateRubricTwigData($assessment));
 
         // ...and scene.

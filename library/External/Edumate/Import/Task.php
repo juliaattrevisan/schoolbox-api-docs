@@ -148,7 +148,6 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 					continue;
 				}
 
-				$submissionBox->setRubricResultSet(0);
 				$submissionBox->setWeight($edumateTask->getWeighting());
 				$submissionBox->setMaxMark($edumateTask->getTotalMark());
 				$submissionBox->setMarkVisibility(IAssessable::MARK_VISIBILITY_PRIVATE);

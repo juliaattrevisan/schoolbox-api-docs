@@ -10,9 +10,9 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use PDO;
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -20,7 +20,7 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Mark hydrate(array $row, $alias = '', $callback = null)
- * @method Mark createModel()
+ * @method Mark createModel($idValue = null)
  */
 class MarkMapper extends Mapper
 {
@@ -36,14 +36,12 @@ class MarkMapper extends Mapper
         $this->hasModel(Mark::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('tstamp', self::TYPE_DATETIME, null, 'createdAt'); // this cannot be self::COLUMN_CREATED_TIMESTAMP because the mapper will then ignore input values when saving
-        $this->uses('mark', self::TYPE_DECIMAL);
         $this->uses('valid', self::TYPE_BOOLEAN);
-
         $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
-        $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, null, 'box');
-        $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, null, 'criterion');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
+
+        // this cannot be self::COLUMN_CREATED_TIMESTAMP because the mapper will then ignore input values when saving
+        $this->uses('tstamp', self::TYPE_DATETIME, null, 'createdAt');
     }
 
 
@@ -55,13 +53,9 @@ class MarkMapper extends Mapper
         return "
             SELECT  {$this->getColumnString()},
                     {$this->getJoinColumnString('user')},
-                    {$this->getJoinColumnString('box')},
-                    {$this->getJoinColumnString('criterion')},
                     {$this->getJoinColumnString('descriptor')}
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('user')}
-            LEFT JOIN {$this->getJoinSql('box')}
-            LEFT JOIN {$this->getJoinSql('criterion')}
             LEFT JOIN {$this->getJoinSql('descriptor')}
         ";
     }
@@ -73,21 +67,22 @@ class MarkMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = new Collection();
+        $c = $this->createCollection();
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
             $model = $this->hydrate($r);
 
-            $model->setStudent($this->hydrateJoin($r, 'user'));
-            $model->setSubmissionBox($this->hydrateJoin($r, 'box'));
-            $model->setCriterion($this->hydrateJoin($r, 'criterion'));
-            $model->setDescriptor($this->hydrateJoin($r, 'descriptor'));
+            /** @var User $student */
+            $student = $this->hydrateJoin($r, 'user');
+            $model->setStudent($student);
+
+            /** @var Descriptor $descriptor */
+            $descriptor = $this->hydrateJoin($r, 'descriptor');
+            $model->setDescriptor($descriptor);
 
             $c->add($model);
         }
 
         return $c;
     }
-
-
 }

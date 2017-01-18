@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -24,10 +25,10 @@ class Controller extends BaseController
 {
 
     /** @var Factory */
-    protected $factory;
+    private $factory;
 
     /** @var RubricMapper */
-    protected $mapper;
+    private $mapper;
 
 
     /**
@@ -69,7 +70,6 @@ class Controller extends BaseController
         return $this;
     }
 
-
     /**
      * AJAX method for creating a new group or criterion
      *
@@ -90,20 +90,62 @@ class Controller extends BaseController
             ],
         ];
 
+        $folderId = $post->get('folderId');
+        if(!$folderId){
+            $this->sendJSONError('Must supply a folder Id');
+            return;
+        }
 
         if ($post->get('type') == 'criterion') {
+
+            $group = $post->get('groupName');
+            $name  = $post->get('name');
+            if(!$group){
+                $this->sendJSONError('Must supply a Group for new Criterion');
+                return;
+            }
+
+            $columnList = [
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                'parent_id'   => $folderId,
+            ];
+            $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
+            $proposedGroup = $this->mapper->normaliseForComparison($group);
+            $proposedName  = $this->mapper->normaliseForComparison($name);
+            foreach ($criteria as $criterion){
+                $normGroup = $this->mapper->normaliseForComparison($criterion->getGrouping());
+                $normName = $this->mapper->normaliseForComparison($criterion->getName());
+                if($normGroup == $proposedGroup && $normName == $proposedName){
+                    $this->sendJSONError("Indicator already exists in this Group");
+                    return;
+                }
+            }
 
             $context['rowspan'] = null;
             $context['group'] = [
                 'id' => $post->get('groupId')
             ];
-            $context['crit'] = $this->saveNewCriterion($post->get('folderId'), $post->get('groupName'), $post->get('name'));
+            $context['crit'] = $this->saveNewCriterion($folderId, $group, $name);
 
             $template = 'group-row-editable';
-
         }
 
         elseif ($post->get('type') == 'group') {
+
+            // Ensure the proposed Group name is not already in use.
+            $columnList = [
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                'parent_id'   => $folderId,
+            ];
+            $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
+            $proposed = $this->mapper->normaliseForComparison($post->get('name'));
+            foreach ($criteria as $criterion){
+                $grouping = $this->mapper->normaliseForComparison($criterion->getGrouping());
+                if($proposed == $grouping){
+                    $this->sendJSONError("Group name already exists in this context");
+                    return;
+                }
+            }
 
             $context['rowspan'] = 1;
             $context['group'] = [
@@ -125,6 +167,21 @@ class Controller extends BaseController
             'template' => "@rubric/$template.twig"
         ]);
 
+    }
+
+    /**
+     * Sends a JSON error.
+     *
+     * @param mixed $data
+     * @param int $statusCode
+     */
+    protected function sendJSONError($data, $statusCode = 400)
+    {
+        $this->getResponse()->status->set($statusCode);
+        $this->getResponse()->content->set([
+            'data'     => $data,
+            'format'   => 'json',
+        ]);
     }
 
 
@@ -442,10 +499,6 @@ class Controller extends BaseController
         }
 
         $this->outputTest($this->getFactory()->buildFromPostData($postdata, true));
-    }
-    public function testEmpty()
-    {
-        $this->outputTest($this->getFactory()->buildEmpty());
     }
     public function testBox($boxId)
     {

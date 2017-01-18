@@ -207,8 +207,8 @@
         var $e = $(this.element);
         var $t = $e.closest(this.options.submittable);
 
-        // enable all inputs in the section
-        $t.find(':input').removeAttr('disabled');
+        // enable all inputs in the section (that we have not explicitly declared to be excluded)
+        $t.find(':input:not([data-mage-disabled])').removeAttr('disabled');
 
         // slide out the main content wrapper
         var $content = $e.closest('[data-mage-collapsed]');

@@ -8,8 +8,8 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-use Alaress_Date_Format;
-use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 
 /**
@@ -21,50 +21,17 @@ use Schoolbox\User;
  */
 class Mark
 {
-
-    /** @var int */
-    protected $id;
+    use Id;
+    use CreatedAtDate;
 
     /** @var User */
-    protected $student;
-
-    /** @var SubmissionBox */
-    protected $submissionBox;
-
-    /** @var Criterion */
-    protected $criterion;
+    private $student;
 
     /** @var Descriptor */
-    protected $descriptor;
-
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var float */
-    protected $mark;
+    private $descriptor;
 
     /** @var bool */
-    protected $valid;
-
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-
-    /**
-     * @param int $id
-     * @return static
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
+    private $valid;
 
 
     /**
@@ -74,7 +41,6 @@ class Mark
     {
         return $this->student;
     }
-
 
     /**
      * @param User $student
@@ -86,47 +52,6 @@ class Mark
         return $this;
     }
 
-
-    /**
-     * @return SubmissionBox
-     */
-    public function getSubmissionBox()
-    {
-        return $this->submissionBox;
-    }
-
-
-    /**
-     * @param SubmissionBox $submissionBox
-     * @return static
-     */
-    public function setSubmissionBox($submissionBox)
-    {
-        $this->submissionBox = $submissionBox;
-        return $this;
-    }
-
-
-    /**
-     * @return Criterion
-     */
-    public function getCriterion()
-    {
-        return $this->criterion;
-    }
-
-
-    /**
-     * @param Criterion $criterion
-     * @return static
-     */
-    public function setCriterion($criterion)
-    {
-        $this->criterion = $criterion;
-        return $this;
-    }
-
-
     /**
      * @return Descriptor
      */
@@ -134,7 +59,6 @@ class Mark
     {
         return $this->descriptor;
     }
-
 
     /**
      * @param Descriptor $descriptor
@@ -146,47 +70,6 @@ class Mark
         return $this;
     }
 
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return static
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-
-    /**
-     * @return float
-     */
-    public function getMark()
-    {
-        return $this->mark;
-    }
-
-
-    /**
-     * @param float $mark
-     * @return static
-     */
-    public function setMark($mark)
-    {
-        $this->mark = $mark;
-        return $this;
-    }
-
-
     /**
      * @return boolean
      */
@@ -194,7 +77,6 @@ class Mark
     {
         return $this->valid;
     }
-
 
     /**
      * @deprecated Mapper method only
@@ -204,7 +86,6 @@ class Mark
     {
         return $this->isValid();
     }
-
 
     /**
      * @param boolean $valid

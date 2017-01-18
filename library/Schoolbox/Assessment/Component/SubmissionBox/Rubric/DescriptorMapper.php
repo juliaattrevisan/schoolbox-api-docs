@@ -13,14 +13,18 @@ use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 
 /**
  * Class DescriptorMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
- * @method Descriptor createModel()
+ * @method Descriptor createModel($idValue = null)
+ * @method Descriptor[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  * @method Descriptor findOneByColumnList($columnList, $order = [])
+ * @method Descriptor hydrate(array $row, $alias = '', $callback = null)
  */
 class DescriptorMapper extends Schoolbox\Mapper {
 
@@ -28,50 +32,11 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $this->hasTable('rubric_descriptor');
         $this->hasModel(Descriptor::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->hasMap(array(
-            'column'     => 'criterion_id',
-            'property'   => 'criterion',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'criterion',
-        ));
-        $this->hasMap(array(
-            'column'     => 'submission_box_id',
-            'property'   => 'submissionBox',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'submission_box',
-        ));
-        $this->joins('level_id', LevelMapper::class);
-        $this->hasMap(array(
-            'column'     => 'value',
-            'property'   => 'value',
-            'type'       => self::TYPE_DECIMAL,
-        ));
-        $this->hasMap(array(
-            'column'     => 'description',
-            'property'   => 'description',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        // this is your soft-delete column
-        $this->uses('valid', self::TYPE_BOOLEAN);
-        $this->hasSoftDeleteField('valid', false, true);
-
-        $this->hasJoin(
-            'criterion',
-            array(
-                'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\CriterionMapper',
-                'this_key'  => 'criterion_id',
-                'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'submission_box',
-            array(
-                'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
-                'this_key'  => 'submission_box_id',
-                'other_key' => 'id',
-            )
-        );
+        $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
+        $this->joins('level_id', LevelMapper::class, 'id', null, null, 'level', 'level');
+        $this->uses('value', self::TYPE_DECIMAL);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
 
@@ -82,13 +47,11 @@ class DescriptorMapper extends Schoolbox\Mapper {
     {
         return "
             SELECT  {$this->getColumnString()},
-                    {$this->getJoinColumnString('level_id', 'l')},
-                    {$this->getJoinColumnString('criterion', 'c')},
-                    {$this->getJoinColumnString('submission_box', 'b')}
+                    {$this->getJoinColumnString('level', 'l')},
+                    {$this->getJoinColumnString('criterion', 'c')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('level_id', '', 'l')}
+            LEFT JOIN {$this->getJoinSql('level', '', 'l')}
             LEFT JOIN {$this->getJoinSql('criterion', '', 'c')}
-            LEFT JOIN {$this->getJoinSql('submission_box', '', 'b')}
         ";
     }
 
@@ -99,19 +62,53 @@ class DescriptorMapper extends Schoolbox\Mapper {
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = $this->createCollection();
+        $levelMapper     = $this->getJoinMapper('level');
+        $criterionMapper = $this->getJoinMapper('criterion');
+
+        /* All indexed by primary key */
+        $descriptors     = $this->createCollection();
+        $levels          = $levelMapper->createCollection();
+        $criteria        = $criterionMapper->createCollection();
+
+        // Row keys for de-duplication
+        $levelKey        = "l.{$levelMapper->getIdentifierColumn()}";
+        $criterionKey    = "c.{$criterionMapper->getIdentifierColumn()}";
+
+        /** @var Level $level */
+        $level = null;
+
+        /** @var Criterion $criterion */
+        $criterion = null;
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $model = $this->hydrate($r);
 
-            $model->setLevel($this->hydrateJoin($r, 'level_id', 'l'));
-            $model->setCriterion($this->hydrateJoin($r, 'criterion', 'c'));
-            $model->setSubmissionBox($this->hydrateJoin($r, 'submission_box', 'b'));
+            $levelId = $r[$levelKey];
+            $criterionId = $r[$criterionKey];
 
-            $c->add($model);
+            // First time we've encountered this Level ?
+            if(!$levels->getOffset($levelId)){
+                $levels->setOffset($levelId, $this->hydrateJoin($r, 'level', 'l'));
+            }
+            $level = $levels->getOffset($levelId);
+
+            // First time we've encountered this Criterion ?
+            if(!$criteria->getOffset($criterionId)){
+                $criteria->setOffset($criterionId, $this->hydrateJoin($r, 'criterion', 'c'));
+            }
+            $criterion = $criteria->getOffset($criterionId);
+
+            $descriptor = $this->hydrate($r);
+            $descriptors->setOffset($descriptor->getId(), $descriptor);
+
+            // Link to Level
+            $descriptor->setLevel($level);
+            $level->getDescriptors()->setOffset($descriptor->getId(), $descriptor);
+
+            // Link to Criterion
+            $descriptor->setCriterion($criterion);
         }
 
-        return $c;
+        return $descriptors;
     }
 
 
@@ -123,6 +120,8 @@ class DescriptorMapper extends Schoolbox\Mapper {
      * @param bool $createCriterion If true, create missing criteria
      *
      * @return int[] A list of new rubric descriptors
+     * @deprecated
+     * @see RubricMapper::copyRubric()
      */
     public function copyFromCopiedSubmissionBox($from_id, $to_id, $createCriterion = false) {
 
@@ -131,28 +130,36 @@ class DescriptorMapper extends Schoolbox\Mapper {
             SELECT
                 {$this->getColumnString('rd')},
                 {$this->getJoinColumnString('criterion', 'rc')},
-                {$this->getJoinColumnString('level_id', 'rl')}
+                {$this->getJoinColumnString('level', 'rl')}
             FROM `{$this->getTable()}` `rd`
             INNER JOIN {$this->getJoinSql('criterion', 'rd', 'rc')}
-            INNER JOIN {$this->getJoinSql('level_id', 'rd', 'rl')}
-            WHERE `rd`.`submission_box_id` = ?
+            INNER JOIN {$this->getJoinSql('level', 'rd', 'rl')}
+            WHERE `rl`.`submission_box_id` = :box_id
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array($from_id));
+        $statement->execute(['box_id' => $from_id]);
+
         /** @var Descriptor[] $fromList */
         $fromList = $this->hydrateList($statement, 'rd', function($mapper, $model, $row) {
+            /** @var DescriptorMapper $mapper */
             /** @var Descriptor $model */
-            $model->setCriterion($mapper->getJoinMapper('criterion')->hydrate($row, 'rc'));
-            $model->setLevel($mapper->getJoinMapper('level_id')->hydrate($row, 'rl'));
+
+            /** @var Criterion $criterion */
+            $criterion = $mapper->getJoinMapper('criterion')->hydrate($row, 'rc');
+            $model->setCriterion($criterion);
+
+            /* @var Level $level */
+            $level = $mapper->getJoinMapper('level')->hydrate($row, 'rl');
+            $model->setLevel($level);
             return $model;
         });
 
         /** @var Level[]|Schoolbox\Collection $toLevels */
-        $toLevels = $this->getJoinMapper('level_id')->findByColumn('box_id', $to_id);
+        $toLevels = $this->getJoinMapper('level')->findByColumn('box_id', $to_id);
 
         // And copy each descriptor in the from box into the to box
         /** @var SubmissionBox $toBox */
-        $toBox  = $this->getJoinMapper('submission_box')->findById($to_id);
+        $toBox  = SubmissionBoxMapper::getInstance()->findById($to_id);
         $toList = new Schoolbox\Collection();
         foreach ($fromList as $fromItem) {
             // The to box descriptor's criterion:
@@ -197,14 +204,13 @@ class DescriptorMapper extends Schoolbox\Mapper {
             if (!$toLevel instanceof Level) {
                 $toLevel = clone $fromItem->getLevel();
                 $toLevel->setSubmissionBox($toBox);
-                $this->getJoinMapper('level_id')->create($toLevel);
+                $this->getJoinMapper('level')->create($toLevel);
                 $toLevels->add($toLevel);
             }
 
             $toItem = clone $fromItem;
             $toItem
                 ->setLevel($toLevel)
-                ->setSubmissionBox($toBox)
                 ->setCriterion($toCriterion);
             $toList->add($toItem);
         }

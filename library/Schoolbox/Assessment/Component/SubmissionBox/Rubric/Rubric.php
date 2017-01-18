@@ -20,7 +20,7 @@ class Rubric extends Core\Rubric
 {
 
     /** @var SubmissionBox */
-    protected $box;
+    private $box;
 
 
     /**
@@ -250,28 +250,26 @@ class Rubric extends Core\Rubric
             $critModel = $this->createORMCriterion($descriptor->getCriterion());
             $lvlModel  = $this->createORMLevel($level, $sequence);
 
-            $map = DescriptorMapper::getInstance();
+            $mapper = DescriptorMapper::getInstance();
 
             try {
                 // this is a unique index
-                $model = $map->findOneByColumnList([
+                $model = $mapper->findOneByColumnList([
                     'criterion_id'      => $critModel->getId(),
-                    'submission_box_id' => $this->getSubmissionBox()->getId(),
                     'level_id'          => $lvlModel->getId()
                 ]);
 
             } catch (Mapper\Exception $e) {
                 // that intersection doesn't exist, so we'll use a fresh model
-                $model = $map->createModel();
+                $model = $mapper->createModel();
             }
 
             $model
                 ->setCriterion($critModel)
-                ->setSubmissionBox($this->box)
                 ->setDescription($descriptor->getText())
                 ->setValue($descriptor->getValue())
                 ->setLevel($lvlModel)
-                ->setValid(true);
+                ->setDeletedAt(new \Alaress_Date_NullDate());
 
             $this->dCache->attach($descriptor, $model);
         }
@@ -331,11 +329,8 @@ class Rubric extends Core\Rubric
             $this->mCache->attach($descriptor,
                 MarkMapper::getInstance()
                  ->createModel()
-                 ->setSubmissionBox($this->getSubmissionBox())
                  ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
                  ->setValid(true)
-                 ->setMark(0)
-                 ->setCriterion($this->createORMCriterion($descriptor->getCriterion()))
             );
         }
 

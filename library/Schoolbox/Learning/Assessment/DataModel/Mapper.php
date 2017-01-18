@@ -563,9 +563,6 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
         // Due work grade levels
         $modelList = $this->augmentListWithDueWorkGradeLevels($modelList, $dueWorkIds);
-        // Due work rubric grids
-        // TODO don't auto-populate this
-        $modelList = $this->augmentListWithDueWorkRubrics($modelList);
         // Project contexts
         $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
         // Folder codes for all contexts
@@ -720,29 +717,8 @@ class Mapper extends BaseMapper
         }
         return $modelList;
     }
-    /**
-     * Augments the list from hydrateSelect() with the rubric grid (if it has one).
-     *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
-     */
-    public function augmentListWithDueWorkRubrics($modelList)
-    {
-        foreach ($modelList as $model) {
-            try {
-                $submodel = $model->getSubObject();
-            } catch (\UnexpectedValueException $e) {
-                // Broken assessment - not much I can do besides ignore
-                continue;
-            }
-            if ($submodel instanceof SubmissionBox) {
-                $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
-                $submodel->setRubric($rubricMapper->findBySubmissionBox($submodel));
-            }
-        }
 
-        return $modelList;
-    }
+
     /**
      * Augments the list from hydrateSelect() with context projects.
      *

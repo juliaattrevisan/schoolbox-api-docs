@@ -15,23 +15,12 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 
 class ResultMapper extends Schoolbox\Mapper {
 
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('rubric_result');
         $this->hasModel(Result::class);
-        $this->hasMap(array(
-                'column'     => 'resultset_id',
-                'property'   => 'resultSetId',
-                'type'       => self::TYPE_INTEGER,
-            ));
-        $this->hasMap(array(
-                'column'     => 'value',
-                'property'   => 'value',
-                'type'       => self::TYPE_INTEGER,
-            ));
-        $this->hasMap(array(
-                'column'     => 'label',
-                'property'   => 'label',
-                'type'       => self::TYPE_STRING,
-            ));
+        $this->uses('resultset_id', self::TYPE_INTEGER, null, 'resultSetId'); // This is NOT an identifier
+        $this->uses('value', self::TYPE_INTEGER);
+        $this->uses('label', self::TYPE_STRING);
     }
 }

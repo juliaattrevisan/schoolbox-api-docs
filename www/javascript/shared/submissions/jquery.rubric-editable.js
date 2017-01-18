@@ -65,6 +65,7 @@
             var $input = $(this),
                 type   = $input.data('spawn'),
                 name   = this.value ? this.value.trim() : '',
+                $toastFeedback = $('[data-relation="create-response"]'),
                 $row, groupId;
 
             // prevent blank, but also prevent double-fire from keydown to blur
@@ -82,42 +83,68 @@
                 groupId = null;
             }
 
+            var message = 'Creating "' + name + '"...';
+            $toastFeedback.toastActivate({text: message});
+
+            /*
+             * Ensure user is not trying to add a duplicate group. The server-side validation will prevent
+             * duplicate criterion, but cannot prevent duplicate groups as they are not persisted until a indicator
+             * name is entered.
+             */
+            if('group' == type){
+                var normalisedNewGroup = normaliseForComparison(name);
+                var $groups =  $('[data-groupname]');
+                for (var i = 0; i < $groups.length; i++) {
+                    var existingGroup = $($groups.get(i)).data('groupname');
+                    if(normalisedNewGroup === normaliseForComparison(existingGroup)){
+                        $toastFeedback.toastTimeout({text: 'Group name already exists!', css: 'alert'});
+                        $input.val('');
+                        return false;
+                    }
+                }
+            }
+
             // prevent mods
-            $input.val('Creating "' + name + '"...').prop('disabled', true);
+            $input.val(message).prop('disabled', true);
 
             var payload = {
                 type: type,
                 rubricId: opt.rubricId,
                 groupId: groupId,
                 name: name,
-                levelCount: $rb.children('thead').find('input').length
+                levelCount: $rb.children('thead').find('input').length,
+                folderId: $('input[name=folderId]').val()
             };
 
             if (type == 'criterion') {
                 payload.groupName = $rb.find('[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
-                payload.folderId  = $('input[name=folderId]').val();
             }
 
-            $.post(opt.url, payload, function (data) {
+            $.post(opt.url, payload)
+                .done(function (data) {
+                    var $data = $(data);
 
-                var $data = $(data);
+                    // simple case: prepend the row
+                    $row.before($data);
 
-                // simple case: prepend the row
-                $row.before($data);
-
-                // clear and re-enable the input
-                $input.val('').prop('disabled', false);
-
-                if (type == 'criterion') {
-                    // just gotta extend that rowspan
-                    var $span = $row.parent().children('[data-group="'+$row.data('group')+'"][data-groupname]').children('[rowspan]');
-                    $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
+                    if (type == 'criterion') {
+                        // just gotta extend that rowspan
+                        var $span = $row.parent().children('[data-group="' + $row.data('group') + '"][data-groupname]').children('[rowspan]');
+                        $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
 
 //                    $data.find('[type=checkbox]').prop('checked', true).trigger('change');
-                }
+                    }
+                    $toastFeedback.toastTimeout({text: type.charAt(0).toUpperCase() + type.substr(1) + ' created!', css: 'success'});
 
-                $rb.sequencer('refresh');
-            });
+                    $rb.sequencer('refresh');
+                })
+                .fail(function (data){
+                    $toastFeedback.toastTimeout({text: data.responseText, css: 'alert'});
+                })
+                .always(function(){
+                    // clear and re-enable the input
+                    $input.val('').prop('disabled', false);
+                });
 
             // probability is high the user pressed return, so prevent form submission
             e.preventDefault();
@@ -542,6 +569,19 @@
 
         // and apply the merged set
         this.options = $.extend(true, {}, merge, opts);
+    }
+
+    /**
+     * Returns the normalised string for comparison to avoid duplicates.
+     *
+     * MUST use same logic as RubricMapper->normaliseForComparison()
+     *
+     * @param {string} string
+     * @return string
+     */
+    function normaliseForComparison(string)
+    {
+        return string.replace(/\s+/g, ' ').trim().toLowerCase();
     }
 
 })(jQuery, window, document);

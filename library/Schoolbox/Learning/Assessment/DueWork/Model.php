@@ -112,6 +112,27 @@ class Model extends AbstractAssessment
         $this->setAttachedFiles(new Collection());
     }
 
+    /**
+     * Clones this object in preparation for persisting as a copy of this object.
+     *
+     * @return static
+     */
+    public function cloneForCopy()
+    {
+        /** @var static $clone */
+        $clone = parent::cloneForCopy();
+
+        /* Ensure any current rubric is NOT linked to new location.
+         *
+         * Because rubric cloning is so complex, it is handled specifically in the Replicator & Transplantor.
+         * It is extremely likely this call does nothing. This is because even if this DueWork has a rubric,
+         * it is unlikely to be hydrated at this point. This call merely protects the system in case someone
+         * alters the default hydration.
+         */
+        $clone->setRubric(null);
+        return $clone;
+    }
+
 
     /**
      * The friendly, uninformative version of assertAcceptSubmissions.

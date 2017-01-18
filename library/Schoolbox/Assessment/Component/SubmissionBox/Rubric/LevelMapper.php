@@ -9,6 +9,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
@@ -18,7 +19,7 @@ use Schoolbox\Mapper;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Level hydrate(array $row, $alias = '', $callback = null)
- * @method Level createModel()
+ * @method Level createModel($idValue = null)
  * @method Level findById($id)
  * @method Collection|Level[] findByColumn($columnName, $columnValue, $options = array())
  * @method Collection|Level[] findByColumnList($columnList, $options = array())
@@ -42,6 +43,7 @@ class LevelMapper extends Mapper
         $this->uses('sequence', self::TYPE_INTEGER);
 
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'box');
+        $this->uses('deleted_at', self::TYPE_TIMESTAMP, self::COLUMN_SOFTDELETE);
     }
 
 
@@ -65,11 +67,13 @@ class LevelMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = new Collection();
+        $c = $this->createCollection();
 
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $model = $this->hydrate($r);
-            $model->setSubmissionBox($this->hydrateJoin($r, 'box', 'b'));
+            /** @var SubmissionBox $box */
+            $box = $this->hydrateJoin($r, 'box', 'b');
+            $model->setSubmissionBox($box);
 
             $c->add($model);
         }
@@ -85,6 +89,8 @@ class LevelMapper extends Mapper
      * @param int $toId   The ID of the submission box to copy to.
      *
      * @return int[] A list of new rubric levels
+     * @deprecated
+     * @see RubricMapper::copyRubric()
      */
     public function copyFromCopiedSubmissionBox($fromId, $toId)
     {
@@ -100,6 +106,6 @@ class LevelMapper extends Mapper
                 $levels->add($level);
             }
         }
-        $this->create($levels);
+        return $this->create($levels);
     }
 }

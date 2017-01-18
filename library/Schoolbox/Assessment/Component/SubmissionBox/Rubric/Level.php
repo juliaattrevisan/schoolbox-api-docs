@@ -10,41 +10,39 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\GenericCollection;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 
-class Level
+class Level implements ISoftDeletable
 {
-    /** @var int */
-    protected $id;
+    use Id;
+    use DeletedAtDate;
 
     /** @var SubmissionBox */
-    protected $submissionBox;
+    private $submissionBox;
 
     /** @var string */
-    protected $name;
-
-    /** @var int */
-    protected $sequence;
-
+    private $name;
 
     /**
-     * @return int
+     * 1-indexed. 0 indicates unknown (most likely inserted during data-recovery but sequence unable to be derived)
+     *
+     * @var int
      */
-    public function getId()
-    {
-        return $this->id;
-    }
-
+    private $sequence;
 
     /**
-     * @param int $id
-     * @return static
+     * @var Descriptor[]|GenericCollection
      */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
+    private $descriptors;
 
+
+    public function __construct()
+    {
+        $this->descriptors = new GenericCollection(Descriptor::class);
+    }
 
     /**
      * @return SubmissionBox
@@ -105,7 +103,21 @@ class Level
         return $this;
     }
 
+    /**
+     * @return Descriptor[]|GenericCollection
+     */
+    public function getDescriptors()
+    {
+        return $this->descriptors;
+    }
 
-
-
+    /**
+     * @param Descriptor[]|GenericCollection $descriptors
+     * @return static
+     */
+    public function setDescriptors(GenericCollection $descriptors)
+    {
+        $this->descriptors->replaceWith($descriptors);
+        return $this;
+    }
 }

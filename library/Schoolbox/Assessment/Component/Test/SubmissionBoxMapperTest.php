@@ -36,7 +36,6 @@ class SubmissionBoxMapperTest extends TestCase {
 			'accept_submission' => true,
 			'multi_submission'  => false,
 			'max_mark'          => 100,
-			'rubric_result_set' => false,
 		);
 		$box = $this->object->hydrate($data);
 		$this->assertInstanceOf('Schoolbox\\Assessment\\Component\\SubmissionBox', $box);
@@ -48,7 +47,6 @@ class SubmissionBoxMapperTest extends TestCase {
 		$this->assertEquals(true,             $box->getAcceptOnline());
 		$this->assertEquals(false,            $box->getAcceptMultiple());
 		$this->assertEquals(100,              $box->getMaxMark());
-		$this->assertEquals(false,            $box->getRubricResultSet());
 	}
 
 	public function testFindById() {

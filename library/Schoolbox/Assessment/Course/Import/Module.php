@@ -9,6 +9,7 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Aura\Di\ContainerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\Unit;
 use Schoolbox\Permission\Access\Access;
@@ -118,6 +119,7 @@ class Module extends \Alaress\Module\Module
                 'setReplicator'                      => $injector->lazyNew(Replicator::class, [
                     'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                     'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
+                    'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 ]),
                 'setAssessmentMapper'                => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
                 'setAssessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),

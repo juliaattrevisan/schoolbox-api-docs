@@ -72,7 +72,7 @@ class Criterion extends DescriptorList
      * @param Group $group
      * @return self
      */
-    public function setPosition($group)
+    public function setGroup(Group $group)
     {
         $this->group = $group;
         return $this;

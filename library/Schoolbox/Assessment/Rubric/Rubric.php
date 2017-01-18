@@ -106,13 +106,13 @@ class Rubric implements Twiggable
      * @param Descriptor         $descriptor
      * @return self
      */
-    public function putDescriptor($group, $criterion, $level, $descriptor)
+    public function putDescriptor(
+        Criteria\Group     $group,
+        Criteria\Criterion $criterion,
+        Competency\Level   $level,
+        Descriptor         $descriptor
+    )
     {
-        // validation
-        if (!$descriptor instanceof Descriptor) {
-            throw new InvalidArgumentException("Invalid Descriptor given");
-        }
-
         // ensure both the group and the level exist
         $this->putGroup($group);
         $this->putLevel($level);
@@ -128,7 +128,7 @@ class Rubric implements Twiggable
         $descriptor->setPosition($level, $criterion);
 
         // back-reference the group onto the crit, we need this for DB persistence.
-        $criterion->setPosition($group);
+        $criterion->setGroup($group);
 
         return $this;
     }

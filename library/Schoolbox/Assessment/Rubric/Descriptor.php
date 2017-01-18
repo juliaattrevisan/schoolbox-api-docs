@@ -25,7 +25,11 @@ class Descriptor implements Calculable, Twiggable
     /** @var float */
     protected $value;
 
-    /** @var bool */
+    /**
+     * Is this descriptor checked? (to indicate it represents the student's attainment for the criterion)
+     *
+     * @var bool
+     */
     protected $selected;
 
     /** @var Criterion */
@@ -41,7 +45,7 @@ class Descriptor implements Calculable, Twiggable
      * @param int    $id
      * @param bool   $selected
      */
-    public function __construct($text = '', $value = null, $id = 0, $selected = false)
+    public function __construct($text = '', $value = null, $id = null, $selected = false)
     {
         $this->setId($id);
         $this->setText($text);
@@ -194,7 +198,7 @@ class Descriptor implements Calculable, Twiggable
      * @param Criterion $criterion
      * @return self
      */
-    public function setPosition($level, $criterion)
+    public function setPosition(Level $level, Criterion $criterion)
     {
         $this->level = $level;
         $this->criterion = $criterion;

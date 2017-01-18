@@ -8,6 +8,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use ICollection;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper;
@@ -32,13 +34,24 @@ class Replicator
     private $quizMapper;
 
     /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
+    /**
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param QuizMapper $quizMapper
+     * @param RubricMapper $rubricMapper
      */
-    public function __construct(AssessmentMapperProxy $assessmentMapperProxy, QuizMapper $quizMapper)
+    public function __construct(
+        AssessmentMapperProxy $assessmentMapperProxy,
+        QuizMapper $quizMapper,
+        RubricMapper $rubricMapper
+    )
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->quizMapper = $quizMapper;
+        $this->rubricMapper = $rubricMapper;
     }
 
     /**
@@ -58,14 +71,15 @@ class Replicator
         $newAssessment = $assessmentSpec->cloneForCopy();
         $newAssessment->setContext($destination);
 
-        // TODO SA-1698 need to implement __clone() on DueWork to clone Rubric correctly
-        $this->replicateDueWorkRubric($newAssessment);
-
         $this->assessmentMapperProxy->save($newAssessment);
+        $destination->getAssessables()->add($newAssessment);
+
+        // Copy DueWork Rubrics
+        $this->replicateDueWorkRubric($newAssessment);
 
         // Copy Quiz Sections/Questions/Solutions
         $this->replicateQuizConstituents($newAssessment);
-        $destination->getAssessables()->add($newAssessment);
+
         return $newAssessment;
     }
 
@@ -92,18 +106,16 @@ class Replicator
     /**
      * Correctly clone a DueWork Rubric
      *
-     * Can handle when $assessable is a DueWork, or any level of Project (via Recursion)
-     *
      * @param IAssessable $assessable
      */
     protected function replicateDueWorkRubric(IAssessable $assessable)
     {
-        // Base case #1
         if(!$assessable instanceof DueWork){
             return;
         }
 
-        // Base case #2
-        // TODO - SA-1698 clone the Rubric correctly
+        $specId = $assessable->getSpecificationAssessment()->getId();
+        $implId = $assessable->getId();
+        $this->rubricMapper->copyRubric($specId, $implId);
     }
 }
