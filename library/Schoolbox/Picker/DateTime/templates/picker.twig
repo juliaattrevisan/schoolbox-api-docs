@@ -78,11 +78,10 @@
         top: inherit;
         line-height: inherit;
     }
-    .reveal-link {
-        cursor: pointer;
-    }
-    .expand-list {
-        display: none;
+    table.assessment-list td {
+        border: 0;
+        line-height: 1em;
+        padding: 0.325rem;
     }
 </style>
 {% if type == 'event' or type =='duework' %}
@@ -200,7 +199,9 @@
     function loadingResponse (target) {
         var pickerResponse = $('#'+target+'Response{{ id }}');
         pickerResponse.html('');
-        pickerResponse.append('<p>Loading...</p>');
+//        pickerResponse.append('<img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;">');
+        pickerResponse.append('<div class="loader"></div>');
+//        pickerResponse.append('<p>Loading...</p>');
     }
 
     {# Prepare and append response HTML #}
@@ -240,15 +241,15 @@
                     html += '</a>';
                     html += '</div>';
                     html += '<div class="small-12 column" data-collapse-state="collapsed" data-collapsable="collap-' + i + '" style="display: none;">';
-                    //                                    html += '<ul>';
+                    html += '<table class="assessment-list">';
                     for (var k = 0; k < data.students[i].assessmentList.length; k++) {
-                        html += '<p><span>';
+                        html += '<tr><td>';
                         if (data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
                             html += data.students[i].assessmentList[k]['duetime'];
                         }
-                        html += '</span>' + data.students[i].assessmentList[k]['title'] + '</p>';
+                        html += '</td><td>' + data.students[i].assessmentList[k]['title'] + '</td></tr>';
                     }
-                    //                                    html += '</ul>';
+                    html += '</table>';
                     html += '</div>';
                     html += '</li>';
                 }
