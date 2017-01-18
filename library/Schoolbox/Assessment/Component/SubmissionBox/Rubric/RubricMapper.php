@@ -716,33 +716,27 @@ class RubricMapper
 
         /* Find the submission box instance
          */
-        try {
-            /** @var SubmissionBox $submissionBox */
-            $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $participant->getAssessable()->getId());
+        /** @var SubmissionBox $submissionBox */
+        $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $participant->getAssessable()->getId());
 
-            $descriptorIds = [];
+        $descriptorIds = [];
 
-            foreach ($rubricVars as $criterionId => $levelId) {
-                // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
-                $descriptorIds[] = DescriptorMapper::getInstance()->findIdsByColumnList(
-                    [
-                        'criterion_id'      => $criterionId,
-                        'level_id'          => $levelId
-                    ]
-                )[0];
-            }
-
-            $grid = $this->findBySubmissionBox($submissionBox);
-            $this->applyMark($grid, $descriptorIds);
-
-            $marks = $grid->getORMMarks($participant->getUser(), \Alaress_Date_Format::now());
-            SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
+        foreach ($rubricVars as $criterionId => $levelId) {
+            // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
+            $descriptorIds[] = DescriptorMapper::getInstance()->findIdsByColumnList(
+                [
+                    'criterion_id'      => $criterionId,
+                    'level_id'          => $levelId
+                ]
+            )[0];
         }
-        catch (\Schoolbox\Mapper\Exception $e) {
 
-            /* noop (submission box not found)
-             */
-        }
+        $grid = $this->findBySubmissionBox($submissionBox);
+        $this->applyMark($grid, $descriptorIds);
+
+        $marks = $grid->getORMMarks($participant->getUser(), \Alaress_Date_Format::now());
+        SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
+
     }
 
     /**
