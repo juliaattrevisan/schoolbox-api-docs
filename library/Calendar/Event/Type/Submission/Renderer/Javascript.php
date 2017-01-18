@@ -86,12 +86,16 @@ class Javascript extends Base
                 'custom' => array(
                     'modifyLink' => $this->getRouteIfAuthorized(
                         'learningAssessment.getUpdateAssessmentForm',
-                        ['assessmentId' => $this->getEvent()->getEventId(),]
+                        [
+                            'assessment'   => $this->getEvent()->getAssessment(),
+                            'assessmentId' => $this->getEvent()->getEventId(),
+                        ]
                     ),
                     'moreDetailsLink' => $this->getRouteIfAuthorized(
                         'learningAssessment.getAssessment',
                         [
-                            'assessmentId' => $this->getEvent()->getEventId()
+                            'assessment'   => $this->getEvent()->getAssessment(),
+                            'assessmentId' => $this->getEvent()->getEventId(),
                         ]
                     ),
                 )
