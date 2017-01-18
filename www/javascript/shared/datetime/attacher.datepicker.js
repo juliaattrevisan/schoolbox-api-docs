@@ -37,7 +37,7 @@
     };
 
     $(function(){
-        $('[data-datepicker]').datepicker({
+        /*$('[data-datepicker]').datepicker({
             constrainInput: false,
             nextText: '&raquo;',
             prevText: '&laquo;',
@@ -51,6 +51,10 @@
             // Only skip ajax Validation if explicitly set to false
             var ajaxValidate = (undefined == data || undefined == data.ajaxValidate || data.ajaxValidate);
             datepickerOnChange($(this), this.value, ajaxValidate);
-        });
+        });*/
+
+        /*$('[data-datepicker]').alaressDateTimePicker({
+
+        });*/
     });
 })(jQuery);

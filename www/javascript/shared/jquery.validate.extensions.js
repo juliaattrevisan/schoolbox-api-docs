@@ -83,7 +83,16 @@
      * Validator for a datepicker (format: dd/mm/yyyy)
      */
     $.validator.addMethod('datepickerDate', function(value, element) {
-        return getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0).isValid();
+
+        if ($(element).data('datepicker-date-only')) {
+            var datepickerMoment = moment(value, dateDisplayFormats.momentJs);
+        } else {
+            var datepickerMoment = moment(value, dateDisplayFormats.momentJs + ' h:mma');
+        }
+
+        return datepickerMoment.isValid();
+
+        //return getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0).isValid();
     }, 'Please enter a valid date');
 
 
@@ -92,12 +101,13 @@
      * than another element's date.
      */
     $.validator.addMethod('datepickerDateNotBefore', function(value, element, other_element_selector) {
-        var date       = getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0);
+       /* var date       = getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0);
         var other_date = getDateFromString(dateDisplayFormats.momentJs, other_element_selector.val(), 0, 0, 0);
         return date.isValid()
             && other_date.isValid()
             && date.valueOf() >= other_date.valueOf()
-        ;
+        ;*/
+       return true;
     }, 'Please enter a valid date');
 
 
