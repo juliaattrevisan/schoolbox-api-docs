@@ -63,11 +63,11 @@ class Renderer
 
         // TODO eradicate this session dependency
 
-        usort($_SESSION["subjects"], function($a, $b) {
-            return $a['name'] > $b['name'];
-        });
-
         if (is_array($_SESSION["subjects"])) {
+            usort($_SESSION["subjects"], function($a, $b) {
+                return $a['name'] > $b['name'];
+            });
+
             foreach ($_SESSION["subjects"] as $subject) {
                 if (!isset($subjects[$subject['classType']])) {
                     $subjects[$subject["classType"]] = [];
