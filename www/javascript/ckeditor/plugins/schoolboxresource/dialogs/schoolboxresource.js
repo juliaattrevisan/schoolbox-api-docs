@@ -812,7 +812,15 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                             /* Determine if Fullwidth should remain ticked
                              */
-                            if (element.getAttribute('class') == 'full-width') {
+                            var allClasses = [];
+
+                            if (element.getAttribute('class').length) {
+                                allClasses = element.getAttribute('class').split(' ');
+                            }
+
+                            /* If the full-width class existed
+                             */
+                            if (allClasses.indexOf('full-width') > -1) {
                                 fields.fullwidth.setValue(true);
                             }
                             else {

@@ -100,3 +100,17 @@ a.cke_button {
 .cke_contents {
     padding: 1rem !important;
 }
+
+/* Overwrite our global input styles for ckeditor dialogs
+ */
+.cke_dialog_body {
+    input[type="checkbox"]+label,
+    input[type="radio"]+label {
+        margin: 0;
+    }
+
+    input[type=checkbox],
+    input[type=radio] {
+        position: static;
+    }
+}
