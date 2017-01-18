@@ -58,8 +58,11 @@ class Module extends RestfulModule
                 '/quiz/intro/{assessmentId}'                                => 'getQuizIntro',
                 '/quiz/{assessmentId}/attempts/export'                      => 'getExportAttempts',
                 '/quiz/section/create/{assessmentId}'                       => 'getQuizSectionCreate',
+
             ],
-            'POST' => []
+            'POST' => [
+                '/quiz/submit'                                              => 'postQuizSubmit',
+            ]
         ];
 
         foreach ($routes['GET'] as $path => $alias) {

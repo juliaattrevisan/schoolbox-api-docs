@@ -319,6 +319,27 @@ class Controller extends AbstractController
         return $quiz;
     }
 
+    /**
+     * Marks an attempt as completed
+     * @param $attemptId
+     */
+    public function postQuizSubmit()
+    {
+        $get = $this->getRequest()->query;
+        $post = $this->getRequest()->post;
+
+        try {
+            $attempt = $this->quizAttemptMapper->findById($post['attemptId']);
+            $attempt->setFinish(\Alaress_Date_Format::now());
+            $this->quizAttemptMapper->save($attempt);
+        } catch (MapperException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
+        }
+
+        return $this->getResponse()->redirect->to(
+            Redirect::decode($get['returnUrl'])
+        );
+    }
 
     /**
      * Populate the Response object with a list of entities:
