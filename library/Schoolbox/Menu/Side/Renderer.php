@@ -62,6 +62,14 @@ class Renderer
         $subjects = [];
 
         // TODO eradicate this session dependency
+        if (is_array($_SESSION["subjects"])) {
+            foreach ($_SESSION["subjects"] as $subject) {
+                if (!isset($subjects[$subject['classType']])) {
+                    $subjects[$subject["classType"]] = [];
+                }
+                $subjects[$subject['classType']][] = $subject;
+            }
+        }
 
         // Get the menu sections in their correct order
 

@@ -817,6 +817,9 @@ class External_Synergetic_User implements External_UserInterface
             );
         }
         if (is_array($subjectList)) {
+            usort($subjectList, function($a, $b) {
+                return strnatcmp($a['name'],$b['name']);
+            });
             return $subjectList;
         } else {
             return [];
