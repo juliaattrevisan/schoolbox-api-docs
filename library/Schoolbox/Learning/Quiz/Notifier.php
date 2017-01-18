@@ -467,10 +467,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
         $envelope = new Envelope();
 
-        if($this->conf->get('restrict_parent_duework_access')) {
-            return $envelope;
-        }
-
         $quizId = $quiz->getId();
         $quiz   = $this->fullyHydrateQuiz($quiz);
 
