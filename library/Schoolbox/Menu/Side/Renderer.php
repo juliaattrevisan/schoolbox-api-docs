@@ -65,7 +65,7 @@ class Renderer
 
         if (is_array($_SESSION["subjects"])) {
             usort($_SESSION["subjects"], function($a, $b) {
-                return $a['name'] > $b['name'];
+                return strnatcmp($a['name'],$b['name']);
             });
 
             foreach ($_SESSION["subjects"] as $subject) {
