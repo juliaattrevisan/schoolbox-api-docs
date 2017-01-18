@@ -698,7 +698,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
         $quizName = $quiz->getTitle();
         $quizType = $quiz->getWorkType()->getName();
 
-        $cat     = $quiz->getCategory();
+//        $cat     = $quiz->getCategory();
 //        $catId   = $cat->getId();
 //        $catName = $cat->getName();
 
