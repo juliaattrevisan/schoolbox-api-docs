@@ -360,33 +360,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
         }
 
         return $envelope;
-
-//		$msgr = new Messenger();
-//
-//		$quizId = $quiz->getId();
-//		$quiz   = $this->fullyHydrateQuiz($quiz);
-//
-//		$quizName = $quiz->getTitle();
-//
-//		$cat     = $quiz->getCategory();
-//		$catId   = $cat->getId();
-//		$catName = $cat->getName();
-//
-//		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
-//		$href = "/assess/intro/$quizId";
-//
-//		$msg = new Message(":quizname has closed in :catname", $icon, $href);
-//
-//		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
-//
-//		foreach($unattemptedStudents as $user) {
-//			$msgr->targetToUser($user->getId(), $msg, "assess.$quizId.overdue", Logger::ERROR, array(
-//				'quizname' => array($quizName, $href),
-//				'catname'  => array($catName, "/homepage/$catId"),
-//			));
-//		}
-//
-//		return $msgr;
 	}
 
 
@@ -397,11 +370,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @return Envelope
 	 */
 	public function notifyParentOverdue($quiz, $owner, $diff = null) {
-//		$msgr = new Messenger();
 		$envelope = new Envelope();
 
 		if($this->conf->get('restrict_parent_duework_access')) {
-//			return $msgr;
 			return $envelope;
 		}
 
@@ -409,10 +380,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		$quiz   = $this->fullyHydrateQuiz($quiz);
 
 		$quizName = $quiz->getTitle();
-
-//		$cat     = $quiz->getCategory();
-//		$catId   = $cat->getId();
-//		$catName = $cat->getName();
 
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
@@ -427,22 +394,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
             ->setParam('quizname', new Param($quizName, $href))
             ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
-//		$msg = new Message(":child did not attempt :quizname in :catname", $icon, $href);
-
 		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
 		foreach($unattemptedStudents as $student) {
             $bob->setParam('child', new ChildParam($student));
             $envelope->targetToParent($student->getId(), $bob->build());
-
-//			$childName = $student->getFirstname();
-//			$childId = $student->getId();
-//
-//			$msgr->targetToParent($childId, $msg, "assess.$quizId.overdue", Logger::ERROR, array(
-//				'child'    => array($childName, "/search/user/$childId"),
-//				'quizname' => array($quizName, $href),
-//				'catname'  => array($catName, "/homepage/$catId"),
-//			));
 		}
 
 
@@ -891,7 +847,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 */
 	public function notifyFeedClosed($quiz, $owner, $diff = null) {
        $envelope = new Envelope();
-//		$msgr = new Messenger();
 
 		if($quiz->getFinish()->getUnixTimeStamp() > time()) {
 			return $envelope;
@@ -901,10 +856,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		$quiz   = $this->fullyHydrateQuiz($quiz);
 
 		$quizName = $quiz->getTitle();
-
-//		$cat     = $quiz->getCategory();
-//		$catId   = $cat->getId();
-//		$catName = $cat->getName();
 
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=cross";
 		$href = "/intro/assess/$quizId";
@@ -921,15 +872,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
         $envelope->broadcastToCategory($quiz->getCategory(), UserAccess::ACCESS_READ, $bob->build());
         return $envelope;
-
-//		$msg = new Message(":quizname has closed in :catname", $icon, $href);
-//
-//		$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.closed", Logger::NOTICE, array(
-//			'quizname' => array($quizName, $href),
-//			'catname' => array($catName, "/homepage/$catId"),
-//		));
-//
-//		return $msgr;
 	}
 
 
