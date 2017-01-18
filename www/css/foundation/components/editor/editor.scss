@@ -100,3 +100,9 @@ a.cke_button {
 .cke_contents {
     padding: 1rem !important;
 }
+
+/* Assign padding correctly in dialog
+ */
+.cke_dialog_ui_checkbox label {
+    padding-left: 0.75rem;
+}
