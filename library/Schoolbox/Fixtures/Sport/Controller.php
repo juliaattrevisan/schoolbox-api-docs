@@ -147,13 +147,11 @@ class Controller extends AbstractController
                 continue;
             }
 
-            $c->add($this->getPositionMapper()->hydrate([
-                'id'       => $posPost['id'][$i],
-                'sport_id' => $posPost['sportId'][$i],
-                'name'     => $posPost['name'][$i]
-            ]));
-        }
+            $position = $this->getPositionMapper()->createModel($posPost['id'][$i]);
+            $position->setName($posPost['name'][$i]);
 
+            $c->add($position);
+        }
         return $c;
     }
 
