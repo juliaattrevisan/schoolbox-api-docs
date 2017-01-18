@@ -24,18 +24,6 @@ class Module extends BaseModule
     protected $basename = 'adminLti';
 
     /**
-     * Module constructor.
-     * @param ContainerInterface $injector
-     * @param string $basename
-     */
-    public function __construct(ContainerInterface $injector, $basename = '')
-    {
-        $this->setProviderMapper(ProviderMapper::getInstance());
-
-        parent::__construct($injector, $basename);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
@@ -96,25 +84,12 @@ class Module extends BaseModule
         );
     }
 
-    /** @var ProviderMapper */
-    protected $providerMapper;
-
     /**
      * @return ProviderMapper
      */
     public function getProviderMapper()
     {
-        return $this->providerMapper;
-    }
-
-    /**
-     * @param ProviderMapper $mapper
-     * @return $this
-     */
-    public function setProviderMapper(ProviderMapper $mapper)
-    {
-        $this->providerMapper = $mapper;
-        return $this;
+        return $this->getMapperFactory()->get(ProviderMapper::class);
     }
 
 }
