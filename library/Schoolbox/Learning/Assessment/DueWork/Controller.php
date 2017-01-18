@@ -387,23 +387,31 @@ class Controller extends Assessment\Controller
          */
         $this->getDueWorkResponseMapper()->save($response);
 
-        /* Send each file in the Submission to Plagscan
+        /* Save stubble record and send each file in the Submission to Plagscan
          * if the Submission was saved successfully
          *
          * Only plagscan when actually submitting final
+         *
+         * TODO: Dirty hack because $currentFile has no primary key value atm due to swamp
+         * TODO: Rip it back out like Pacific Rim
          */
         $plagscanMapper = PlagscanMapper::getInstance();
 
+        if ($isFinal && $response->getId()) {
+            $response = $this->getDueWorkResponseMapper()->findById($response->getId());
+
+            foreach ($response->getAllFiles() as $currentFile) {
+                $plagscanMapper->saveNewPlagscanStub($currentFile);
+            }
+        }
+
+        /* Asynchronously shove it into plagscan so we don't make the user wait ages
+         * for it to read 1 byte at a time >_<
+         */
         $this->getResponse()->content->set([
             'postOutput' => [
                 function() use ($plagscanMapper, $isFinal, $response) {
                     if ($isFinal && $response->getId()) {
-
-                        /* TODO: Dirty hack because $currentFile has no primary key value atm due to swamp
-                         * TODO: Rip it back out like Pacific Rim
-                         */
-                        $response = $this->getDueWorkResponseMapper()->findById($response->getId());
-
                         foreach ($response->getAllFiles() as $currentFile) {
                             $plagscanMapper->saveNewPlagscan($currentFile);
                         }
