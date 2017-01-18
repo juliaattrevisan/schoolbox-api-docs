@@ -4,11 +4,13 @@
 
 <div class="scrollable">
 <table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
-    {% set hasLevels = '' %}
-    {% for level in rubric.levels %}
-        {% set hasLevels = hasLevels ~ level.name %}
+
+    {# Suppress level headings if none have names #}
+    {% set hasLevels = false %}
+    {% for level in rubric.levels if level.name | trim | length %}
+        {% set hasLevels = true %}
     {% endfor %}
-    {% if hasLevels | length %}
+    {% if hasLevels  %}
     <thead>
     <tr>
         <th colspan="2">&nbsp;</th>
