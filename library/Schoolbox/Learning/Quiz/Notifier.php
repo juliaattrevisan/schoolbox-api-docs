@@ -580,9 +580,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 ->setParam('author', new UserParam($owner))
                 ->setParam('oldname', new Param($diff['title'][1]))
                 ->setParam('newname', new Param($diff['title'][0], "/assess/intro/$quizId"))
-                ->setParam('catname', new CategoryParam($quiz->getCategory()));
+                ->setParam('catname', new CategoryParam($cat));
             $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
-//
+
             unset($diff['title']);
         }
 
@@ -612,7 +612,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 ->setParam('author', new UserParam($owner))
                 ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
                 ->setParam('date', new Param($date))
-                ->setParam('catname', new CategoryParam($quiz->getCategory()));
+                ->setParam('catname', new CategoryParam($cat));
             $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
 
             unset($diff['finish']);
@@ -648,7 +648,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 ->setIcon($icon)
                 ->setParam('author', new UserParam($owner))
                 ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
-                ->setParam('catname', new CategoryParam($quiz->getCategory()));
+                ->setParam('catname', new CategoryParam($cat));
             $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
         }
 
