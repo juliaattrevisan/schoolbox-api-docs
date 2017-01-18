@@ -98,8 +98,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $quizSectionMapper = $this->getJoinMapper('sections');
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
         // However this will also updated the 'deleted_at' field for already deleted items.
-        $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
-        $quizSectionMapper->delete($sections);
+        $quizSectionMapper->deleteByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         return true;
     }
 
@@ -114,8 +113,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $quizAttemptMapper = $this->getJoinMapper('attempt');
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
         // TODO - SA-1277 However this will also updated the 'deleted_at' field for already deleted items.
-        $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
-        $quizAttemptMapper->delete($attempts);
+        $quizAttemptMapper->deleteByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         return true;
     }
 
@@ -145,8 +143,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
     {
         $quizAttemptMapper = $this->getJoinMapper('attempt');
         // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
-        $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
-        $quizAttemptMapper->restoreSoftDeleted($attempts);
+        $quizAttemptMapper->deleteByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         return true;
     }
 

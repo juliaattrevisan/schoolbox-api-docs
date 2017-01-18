@@ -67,8 +67,7 @@ class Mapper extends BaseMapper
     {
         $quizAnswerMapper = $this->getJoinMapper('answers');
         // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
-        $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId());
-        $quizAnswerMapper->delete($answers);
+        $quizAnswerMapper->deleteByColumn('attempt_id', $attempt->getId());
         return true;
     }
 

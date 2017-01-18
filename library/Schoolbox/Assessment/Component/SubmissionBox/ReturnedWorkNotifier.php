@@ -10,21 +10,24 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 
+use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -91,6 +94,11 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 			return;
 		}
 
+        if ($mark->isDraft()) {
+            // Not published: don't even bother here either
+            return;
+        }
+
 		switch($bundle->getMethod()) {
 			case Mapper::METHOD_CREATE: // when returned work is generated
 			case Mapper::METHOD_UPDATE: // when returned work is updated:
@@ -124,10 +132,10 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 * @param ReturnedWork $returnedWork
 	 * @param User $user
 	 * @param array|null $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	protected function generateMessage($target, $returnedWork, $user, $diff = null) {
-		$msgr = new Messenger();
+        $envelope = new Envelope();
 
 		/** @var User $student */
 		$student = $this->userMapper->findById($returnedWork->getOwner()->getId());
@@ -138,12 +146,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		/** @var Folder $cat */
 		$cat = $this->catMapper->findById($box->getCategory()->getId());
 
-		$teacherId = $teacher->getId();
 		$teacherExtId = $teacher->getExternalId();
-		$teacherName = $teacher->formatName();
 
 		$studentId = $student->getId();
-		$studentName = $student->getFirstname();
 
 		$boxId = $box->getId();
 		$boxName = $box->getName();
@@ -156,39 +161,44 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 
 		// if student, 2nd-person language
 		if($target == 'student' && $box->getMarkVisibility() >= IAssessable::MARK_VISIBILITY_STUDENT) {
-			$msg = new Message(":teacher has marked your work for :boxname in :catname", $icon, $href);
-
-			$params = array(
-				'teacher' => array($teacherName, "/search/user/$teacherId"),
-				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-				'catname' => array($catName, "/homepage/$catId")
-			);
-
-			$msgr->targetToUser($studentId, $msg, "duework.$boxId.returned", Logger::NOTICE, $params);
+            $bob = new Builder();
+            $bob->setIcon($icon)
+                ->setNamespace($this->getSlug())
+                ->addTopic("duework.$boxId.returned")
+                ->setSeverity(Logger::NOTICE)
+                ->setTitle(":teacher has marked your work for :boxname in :catname")
+                ->setHref($href)
+                ->setParam('teacher', new UserParam($teacher))
+                ->setParam('boxname', new Param($boxName, "/submission/submissionHistory/$boxId"))
+                ->setParam('catname', new CategoryParam($cat))
+                ->addFilter('roletype', [Role::STUDENT]);
+            $envelope->targetToUser($studentId, $bob->build());
 		}
 
 		// if parent, 3rd-person language
 		elseif($target == 'parent' && $this->parentCanView($box)) {
-			// If parent can't view results for this grade:
-			// target to student's grades page
-			if (!$box->isMarkShownToParents()) {
-				$href = "/submission/allWork/$studentId";
-			}
-			$msg = new Message(":teacher has marked :student's work for :boxname in :catname", $icon, $href);
-
-			$term = $this->termMapper->findForDate($box->getDueDate());
-
-			$params = array(
-				'teacher' => array($teacherName, "/search/user/$teacherId"),
-				'student' => array($studentName, "/search/user/$studentId"),
-				'boxname' => array($boxName, "/submission/submissionHistory/$boxId/$studentId"),
-				'catname' => array($catName, "/submission/allWork/$studentId/{$term->getCode()}/$catId")
-			);
-
-			$msgr->targetToParent($studentId, $msg, "duework.$boxId.returned", Logger::NOTICE, $params);
+            // If parent can't view results for this grade:
+            // target to student's grades page
+            if (!$box->isMarkShownToParents()) {
+                $href = "/submission/allWork/$studentId";
+            }
+            $term = $this->termMapper->findForDate($box->getDueDate());
+            $bob  = new Builder();
+            $bob->setIcon($icon)
+                ->setNamespace($this->getSlug())
+                ->addTopic("duework.$boxId.returned")
+                ->setSeverity(Logger::NOTICE)
+                ->setTitle(":teacher has marked :student's work for :boxname in :catname")
+                ->setHref($href)
+                ->setParam('teacher', new UserParam($teacher))
+                ->setParam('student', new UserParam($student))
+                ->setParam('boxname', new Param($boxName, "/submission/submissionHistory/$boxId/$studentId"))
+                ->setParam('catname', new Param($catName, "/submission/allWork/$studentId/{$term->getCode()}/$catId"))
+                ->addFilter('roletype', [Role::PARENT]);
+            $envelope->targetToParent($studentId, $bob->build());
 		}
 
-		return $msgr;
+		return $envelope;
 	}
 
 
@@ -198,7 +208,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 * @param ReturnedWork $returnedWork
 	 * @param User $user
 	 * @param array|null $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentReturned($returnedWork, $user, $diff = null) {
 		return $this->generateMessage('student', $returnedWork, $user, $diff);
@@ -211,7 +221,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 * @param ReturnedWork $returnedWork
 	 * @param User $user
 	 * @param array|null $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentReturned($returnedWork, $user, $diff = null) {
 		return $this->generateMessage('parent', $returnedWork, $user, $diff);

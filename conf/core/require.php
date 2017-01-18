@@ -16,6 +16,8 @@ function kernel_load($name) {
 	// abstraction dependencies
 	require_once __DIR__ . '/../../library/Alaress/Application/Kernel.php';
 	require_once __DIR__ . '/../../library/Alaress/Application/Boot/BootstrapInterface.php';
+	require_once __DIR__ . '/../../library/Alaress/Application/Boot/BootstrapInterface.php';
+	require_once __DIR__ . '/../../library/Schoolbox/Application/AbstractBootstrap.php';
 
 	$name = trim($name, '\\');
 

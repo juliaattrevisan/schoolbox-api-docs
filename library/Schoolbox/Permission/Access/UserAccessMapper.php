@@ -11,6 +11,7 @@ namespace Schoolbox\Permission\Access;
 
 use PDO;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -24,10 +25,9 @@ use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
  * Class UserAccessMapper
  *
  * @package Schoolbox\Permission\Access
- * @method UserAccess createModel()
- * @method delete($object)
- * @method deleteByColumn($columnName, $columnValue, $options = array())
- * @method deleteByColumnList($columnList, $options = array())
+ * @method UserAccess createModel($id = null)
+ * @method UserAccess findOneByColumnList($columnList, $order = [])
+ * @method GenericCollection|UserAccess[] findByColumnList($columnList, $order = [])
  */
 class UserAccessMapper extends Mapper
 {
@@ -173,10 +173,18 @@ class UserAccessMapper extends Mapper
                 $catId = FolderMapper::getInstance()->findByCode($extSubj['code'])->getId();
 
                 $ua = new UserAccess();
+
                 $ua->setService(UserAccess::SERVICE_HOMEPAGE)
                    ->setServiceIdentifier($catId)
-                   ->setAccessLevel(UserAccess::ACCESS_READ)
                    ->setUser($user);
+
+                //Teachers automatically get write access to their class pages
+                if($user->getRole()->isStaff()) {
+                    $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+                }
+                else {
+                    $ua->setAccessLevel(UserAccess::ACCESS_READ);
+                }
 
                 $external->add($ua);
 
@@ -206,6 +214,7 @@ class UserAccessMapper extends Mapper
      * Find all UserAccess instances for a User of a given service
      *
      * @param User $user
+     * @param int  $service
      * @return Collection
      */
     public function findServiceForUser(User $user, $service)
@@ -546,7 +555,7 @@ class UserAccessMapper extends Mapper
             );
 
             return true;
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (Mapper\Exception $e) {
             return false;
         }
     }
@@ -556,6 +565,7 @@ class UserAccessMapper extends Mapper
      * @param User $user
      * @param int  $serviceIdentifier
      * @param int  $service
+     * @param bool $cache
      * @return UserAccess
      * @throws Mapper\Exception
      */

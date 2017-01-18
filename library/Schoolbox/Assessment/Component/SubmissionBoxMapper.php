@@ -22,8 +22,6 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use External_Markbook;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\GenericCollection;
 
 /**
@@ -31,7 +29,6 @@ use Schoolbox\GenericCollection;
  *
  * @package Schoolbox\Assessment\Component
  * @method SubmissionBox[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
- * @method SubmissionBox createModel($id=null)
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
  * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = array())
@@ -49,29 +46,29 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->hasModel(SubmissionBox::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('name', self::TYPE_STRING);
-        $this->uses('description', self::TYPE_STRING);
-        $this->uses('publish_date', self::TYPE_DATETIME);
-        $this->uses('open_date', self::TYPE_DATETIME);
-        $this->uses('date', self::TYPE_DATETIME, null, 'dueDate');
-        $this->uses('late_date', self::TYPE_DATETIME);
+        $this->uses('name', self::TYPE_STRING); // TODO deprecated, lives on `assessment` table now
+        $this->uses('description', self::TYPE_STRING); // TODO deprecated, lives on `assessment` table now
+        $this->uses('publish_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
+        $this->uses('open_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
+        $this->uses('date', self::TYPE_DATETIME, null, 'dueDate'); // TODO deprecated, lives on `assessment` table now
+        $this->uses('late_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
         $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
-        $this->uses('weight', self::TYPE_INTEGER);
+        $this->uses('weight', self::TYPE_INTEGER); // TODO deprecated, lives on `assessment` table now
         $this->uses('max_mark', self::TYPE_INTEGER);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
         $this->uses('rubric_group_marks', self::TYPE_BOOLEAN, null, 'markedPerRubricGroup');
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
-        $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
+        $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP); // TODO deprecated, lives on `assessment` table now
+        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE); // TODO deprecated, lives on `assessment` table now
 
-        $this->joins('category', Folder\Mapper::class);
+        $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
         $this->joins('type', SubmissionBox\WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
-        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
+        $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'assessmentModel');
 
         $this->joinsVia('submission_box_file', Storage\Mapper::class, 'hash', 'storage_id', 'box_id', 'id', null, null, 'attachments');
 
@@ -101,6 +98,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturns'));
+    }
+
+
+    /**
+     * Creates a new instance of class with name passed in $this->hasModel().
+     *
+     * @param int $idValue
+     * @throws \Schoolbox\Mapper\Exception
+     * @return object
+     */
+    public function createModel($idValue = null)
+    {
+        /** @var SubmissionBox $model */
+        return parent::createModel($idValue)->setAssessmentModel($this->getJoinMapper('assessmentModel')->createModel());
     }
 
 
@@ -217,6 +228,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
                 $submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
                 $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
+                $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
             }
             // Hydrate curriculum nodes
 

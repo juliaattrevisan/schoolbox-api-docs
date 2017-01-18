@@ -10,6 +10,12 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 
+/**
+ * Class MarkTypeMapper
+ *
+ * @package Schoolbox\Assessment\Component\SubmissionBox
+ * @method MarkType findById($identifierValue)
+ */
 class MarkTypeMapper extends Schoolbox\Mapper {
 
 	protected function mapping() {

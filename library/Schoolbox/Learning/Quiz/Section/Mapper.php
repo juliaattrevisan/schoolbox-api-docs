@@ -43,8 +43,7 @@ class Mapper extends BaseMapper
     {
         $quizQuestionMapper = QuizQuestionMapper::getInstance();
         // Force cascade. However this will also updated the 'deleted_at' field for already deleted items.
-        $questions = $quizQuestionMapper->findByColumn('section_id', $section->getId(), ['deleted' => true]);
-        $quizQuestionMapper->delete($questions);
+        $quizQuestionMapper->deleteByColumn('section_id', $section->getId(), ['deleted' => true]);
     }
 
     /**

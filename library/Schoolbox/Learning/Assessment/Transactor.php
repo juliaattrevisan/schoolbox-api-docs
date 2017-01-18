@@ -114,7 +114,7 @@ class Transactor
                     throw new \InvalidArgumentException('select a valid context');
                 }
             } catch (MapperException $e) {
-                throw new \InvalidArgumentException('select a valid context');
+                throw new \InvalidArgumentException('select a valid context', 0, $e);
             }
         }
         /* Otherwise you came from the update screen, just go back there for now

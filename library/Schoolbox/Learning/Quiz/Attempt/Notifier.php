@@ -15,6 +15,7 @@ use Monolog\Logger;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -23,6 +24,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -34,7 +36,7 @@ class Notifier extends AbstractModuleNotifier {
     const LOG_MARK_PATTERN = "Quiz %d mark visibility is %d: %s %s messages";
 
 	/** @var QuizMapper */
-	protected $assessMapper;
+	protected $quizMapper;
 
     /** @var FolderMapper */
     protected $folderMapper;
@@ -49,11 +51,11 @@ class Notifier extends AbstractModuleNotifier {
 	 * @param array $dependencies
 	 */
 	public function loadDependencies($dependencies = null) {
-		if(empty($dependencies['assessMapper'])) {
-			$dependencies['assessMapper'] = QuizMapper::getInstance();
+		if(empty($dependencies['quizMapper'])) {
+			$dependencies['quizMapper'] = QuizMapper::getInstance();
 		}
-        if (empty($dependencies['categoryMapper'])) {
-            $dependencies['categoryMapper'] = FolderMapper::getInstance();
+        if (empty($dependencies['folderMapper'])) {
+            $dependencies['folderMapper'] = FolderMapper::getInstance();
         }
         if (empty($dependencies['userAccessMapper'])) {
             $dependencies['userAccessMapper'] = UserAccessMapper::getInstance();
@@ -70,7 +72,7 @@ class Notifier extends AbstractModuleNotifier {
      * @return static
 	 */
 	protected function setQuizMapper($mapper) {
-		$this->assessMapper = $mapper;
+		$this->quizMapper = $mapper;
         return $this;
 	}
 
@@ -146,7 +148,7 @@ class Notifier extends AbstractModuleNotifier {
 
 		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
-		$assess   = $this->assessMapper->findById($assessId);
+		$assess   = $this->quizMapper->findById($assessId);
         $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
 		$href = "/assess/results/".$attempt->getQuiz()->getId();
@@ -161,11 +163,13 @@ class Notifier extends AbstractModuleNotifier {
 			->setSeverity(Logger::NOTICE)
 			->setIcon("/portrait?size={$this->iconSize}&userId=".$student->getExternalId())
 			->setHref($href)
-			->addTopic("assess.$assessId.attempted");
+			->addTopic("assess.$assessId.attempted")
+			->setFilter([
+				'roletype' => Role::STAFF
+			]);
 
-		foreach ($this->userAccessMapper->findTeachersInCategory($category) as $teacher) {
-			$envelope->targetToUser($teacher, $bob->build());
-		}
+		// send this to all staff with write access
+		$envelope->broadcastToCategory($category, UserAccess::ACCESS_WRITE, $bob->build());
 
 		return $envelope;
 	}
@@ -183,7 +187,7 @@ class Notifier extends AbstractModuleNotifier {
 
 		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
-		$assess   = $this->assessMapper->findById($assessId);
+		$assess   = $this->quizMapper->findById($assessId);
 
 		if (!$assess->isMarkShownToStudents()) {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'student'));
@@ -227,7 +231,7 @@ class Notifier extends AbstractModuleNotifier {
 
 		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
-		$assess   = $this->assessMapper->findById($assessId);
+		$assess   = $this->quizMapper->findById($assessId);
 
 		if ($this->conf->get('restrict_parent_duework_access') || !$assess->isMarkShownToParents()) {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'parent'));

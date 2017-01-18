@@ -16,13 +16,15 @@ use Alaress\Web\Router\RouterFactory;
 use Aura\Di;
 use Autoloader;
 use Database;
+use Schoolbox\Application\AbstractBootstrap;
 use Schoolbox\Config\ConfigMapper;
 use Config\Modules\ModuleConfigInterface;
+use Schoolbox\MapperFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Notif\Notif;
 
-class Bootstrap implements BootstrapInterface {
+class Bootstrap extends AbstractBootstrap {
 
 	/** @var Kernel */
 	protected $kernel;
@@ -123,80 +125,4 @@ class Bootstrap implements BootstrapInterface {
 		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'), null, INSTANCE_ID);
 	}
 
-
-	/**
-	 * Install any internal dependencies into the kernel (routing, etc.)
-	 *
-	 * @return void
-	 */
-	public function installDependencies() {
-		// Do dependency injection stuff
-		$this->kernel->setDependencyInjector(new Di\Container(new Di\Factory()));
-		$di = $this->kernel->getDependencyInjector();
-
-        // Database
-        $di->set('database', $di->lazy(function() {
-            return Database::getInstance();
-        }));
-
-		// Configuration
-		$di->set('config', $di->lazyNew(ConfigMapper::class));
-		$di->set('notif', $di->lazy(function () {
-			// replace this with $di->lazyGetCall() once we upgrade Aura.Di
-			return Notifactory::create();
-		}));
-
-        // Set correct timezone
-        date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
-
-        // Set up DB timezones here too.
-        Database::getInstance()->setTimezone($timezone);
-        \DeprecatedDatabase::getInstance()->setTimezone($timezone);
-
-        // All modules relate to web requests, not daemons.
-        // Therefore, no modules need to be set up.
-
-        $di->set('ups.logger',
-            $di->lazyNew(
-                \Schoolbox\Notif\StorefileLogger::class,
-                [
-                    'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
-                    'filename' => $di->lazy(function () {
-                        return tempnam(sys_get_temp_dir(), 'sb-storefile-');
-                    }),
-                ]
-            )
-        );
-
-        // Build a user provisioner
-        $di->set(
-            'ups.provisioner',
-            $di->lazyNew(
-                \Schoolbox\Sync\Provisioner\Provisioner::class,
-                [
-                    'rulesetFactory' => $di->lazyNew(\Schoolbox\Sync\Ruleset\Factory::class),
-                    'grammarFactory' => $di->lazyNew(
-                        \Schoolbox\Sync\Grammar\Factory::class,
-                        [
-                            'log'        => $di->lazyGet('ups.logger'),
-                            'userMapper' => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
-                            'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
-                        ]
-                    ),
-                    'externalUserSource' => $di->lazy(function() use ($di) {
-                        $source = new \Schoolbox\External\Connector\SyncFactory();
-                        return $source->build();
-                    }),
-                    'userMapper' => $di->lazy(function () {
-                        $map = new \Schoolbox\Sync\Provisioner\UserMapper();
-                        $map->setNotifier(new SilentNotif());
-                        return $map;
-                    }),
-                    'logger'         => $di->lazyGet('ups.logger'),
-                    'logMapper'      => $di->lazyNew(\Schoolbox\Sync\Log\Mapper::class),
-                ]
-            )
-        );
-	}
-
-} 
+}

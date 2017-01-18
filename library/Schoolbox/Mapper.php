@@ -1214,11 +1214,12 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param string $columnName
      * @param string $columnValue
+     * @param array  $options
      * @return int
      */
-    public function deleteByColumn($columnName, $columnValue)
+    public function deleteByColumn($columnName, $columnValue, array $options = [])
     {
-        return $this->deleteByColumnList(array($columnName => $columnValue));
+        return $this->deleteByColumnList(array($columnName => $columnValue), $options);
     }
 
 
@@ -1227,11 +1228,12 @@ abstract class Mapper implements IMapper, Serializable
      * Returns the number of records deleted.
      *
      * @param array $columnList
+     * @param array $options
      * @return int
      */
-    public function deleteByColumnList($columnList)
+    public function deleteByColumnList($columnList, array $options = [])
     {
-        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList);
+        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList,  $options);
     }
 
 
@@ -1242,9 +1244,10 @@ abstract class Mapper implements IMapper, Serializable
      * @param string           $deleteString
      * @param PredicateBuilder $predicate
      * @param array            $columnList
+     * @param array            $options
      * @return int
      */
-    protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList)
+    protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList, array $options = [])
     {
         // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
         if (empty($columnList) && empty($predicate->getWhere())) {
@@ -1267,7 +1270,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // Call pre-delete hooks
-        $deletedItems = $this->findByColumnList($columnList);
+        $deletedItems = $this->findByColumnList($columnList, $options);
         foreach ($deletedItems as $model) {
             if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
                 return 0;
@@ -2579,6 +2582,16 @@ abstract class Mapper implements IMapper, Serializable
         return $this->performHydration($this->localBodyCache, $this, $row, $alias, $callback);
     }
 
+    /**
+     * Invalidates the hydrate cache for this row and alias.
+     *
+     * @param array  $row
+     * @param string $alias
+     */
+    public function invalidateHydrateCache(array $row, $alias = '')
+    {
+        $this->localBodyCache->invalidate($this->getLocalObjectCacheKey($this, $row, $alias));
+    }
 
     /**
      * Helper method for hydrating a row through a join that has been set up
@@ -2730,10 +2743,10 @@ abstract class Mapper implements IMapper, Serializable
                 return "$column IS NULL";
             }
             if ($value === false) {
-                return "$column IS FALSE";
+                return "$column = FALSE";
             }
             if ($value === true) {
-                return "$column IS TRUE";
+                return "$column = TRUE";
             }
             return "$column = " . $this->database->quote($value);
         }

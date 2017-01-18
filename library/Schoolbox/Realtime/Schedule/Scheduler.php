@@ -37,6 +37,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 
@@ -411,6 +412,9 @@ class Scheduler extends StompScheduler
         if (!$instance instanceof ModuleNotifierInterface) {
             throw new ScheduleException("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
         }
+
+        // Enable logging on all modules
+        $instance->enableLogging(Notifactory::create(), $this->log);
 
         return $instance;
     }

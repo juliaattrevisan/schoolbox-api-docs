@@ -244,9 +244,9 @@ class Submission implements IStorage
      * @param \Alaress_Date_Format $submittedAt
      * @return static
      */
-    public function setSubmittedAt(\Alaress_Date_Format $submittedAt)
+    public function setSubmittedAt(\Alaress_Date_Format $submittedAt = null)
     {
-        $this->submittedAt = $submittedAt;
+        $this->submittedAt = $submittedAt ?: new \Alaress_Date_NullDate();
         return $this;
     }
 

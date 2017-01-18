@@ -46,7 +46,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         // Get most recent N months of DueWork Submissions
         /** @var \Schoolbox\Learning\Assessment\Response\SubSource\DueWork $studentSubmissionDataSource */
-        $studentSubmissionDataSource = $this->getSitePage()->getDi()->get('dueWorkSubmissionDataSource');
+        $studentSubmissionDataSource = $this->getSitePage()->getDi()->get('submissionDataSource');
         $pb = $studentSubmissionDataSource->getPredicateBuilder();
         $pb->equals('b.owner', $this->getUser()->getId());
         $pb->greaterThan('submitted_at', $cutoffDate->getDatabase());
@@ -54,7 +54,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         // Get most recent N months of Quiz Attempts
         /** @var \Schoolbox\Learning\Assessment\Response\SubSource\Quiz $quizAttemptDataSource */
-        $quizAttemptDataSource = $this->getSitePage()->getDi()->get('quizAttemptDataSource');
+        $quizAttemptDataSource = $this->getSitePage()->getDi()->get('attemptDataSource');
         $pb = $quizAttemptDataSource->getPredicateBuilder();
         $pb->equals('a.user_id', $this->getUser()->getId());
         $pb->equals('a.availability', Quiz::AVAILABILITY_ASSESS);

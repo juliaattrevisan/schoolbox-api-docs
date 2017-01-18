@@ -113,6 +113,20 @@ class SubmissionMapper extends BaseMapper
         return $resultSet;
     }
 
+
+    /**
+     * Creates a new instance of class with name passed in $this->hasModel().
+     *
+     * @param int $idValue
+     * @throws \Schoolbox\Mapper\Exception
+     * @return Submission
+     */
+    public function createModel($idValue = null)
+    {
+        return parent::createModel($idValue)->setSubmissionBox($this->getJoinMapper('box_id')->createModel());
+    }
+
+
     /**
      * Post-save callback.
      *

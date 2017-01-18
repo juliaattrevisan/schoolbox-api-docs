@@ -41,6 +41,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     protected $id;
 
     /**
+     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
      * @var FolderModel
      */
     protected $category;
@@ -282,6 +283,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
 
     /**
+     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
      * @param  FolderModel $category
      * @return $this
      */
@@ -292,6 +294,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
+     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
      * @return FolderModel
      */
     public function getCategory()

@@ -30,13 +30,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Notification Test Framework',
     'flags'   => $opts
 ]);
 
-$kernel->run(function($di, $loop, $log, $opts) {
-    /**
-     * @var Di\Container $di
-     * @var LoopInterface $loop
-     * @var LoggerInterface $log
-     * @var array $opts
-     */
+$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     $framework = new Framework($di, $loop, $log, $opts['flags']);
 

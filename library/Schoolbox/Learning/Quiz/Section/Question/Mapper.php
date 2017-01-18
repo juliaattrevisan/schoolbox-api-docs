@@ -93,8 +93,7 @@ class Mapper extends BaseMapper
     {
         $quizSolutionMapper = QuizSolutionMapper::getInstance();
         // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
-        $solution = $quizSolutionMapper->findByColumn('question_id', $question->getId());
-        $quizSolutionMapper->delete($solution);
+        $quizSolutionMapper->deleteByColumn('question_id', $question->getId());
     }
 
     /**

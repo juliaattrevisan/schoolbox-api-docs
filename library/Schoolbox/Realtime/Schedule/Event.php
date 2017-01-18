@@ -147,6 +147,11 @@ class Event implements EventInterface, Serializable {
 		$this->effector = UserMapper::getInstance()->hydrate($array['u']);
 		$this->action   = $array['a'];
 		$this->mapper   = $array['o']['c']::getInstance();
+
+        // The hydrate cache must be invalidated for this object,
+        // because this object could have already been hydrated in this request.
+        $this->mapper->invalidateHydrateCache($array['o']['i']);
+
 		$this->object   = $this->getMapper()->hydrate($array['o']['i']);
 		$this->diff     = $array['d'];
 	}

@@ -14,7 +14,6 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;

@@ -227,13 +227,7 @@ class Module extends BaseModule
         $lc['userMapper']  = $this->getMapperFactory()->getLazy(UserMapper::class);
         $lc['errorMapper'] = $this->getMapperFactory()->getLazy(ErrorMapper::class);
         $lc['access']      = $this->getMapperFactory()->getLazy(Access::class);
-        $lc['transactor']  = $injector->lazyNew(Transactor::class, [
-            'folderMapper'                  => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'unitImplementationMapperProxy' => $injector->lazyGet('unitImplementationDataSource'),
-            'unitSpecificationMapperProxy'  => $injector->lazyGet('unitSpecificationDataSource'),
-            'assessmentMapperProxy'         => $injector->lazyGet('assessmentDataSource'),
-            'router'                        => $injector->lazyGet('router'),
-        ]);
+        $lc['transactor']  = $injector->get('transactor');
 
         // abstract controller
         $ac =& $injector->params[Controller::class];
