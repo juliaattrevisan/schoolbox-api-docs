@@ -76,8 +76,6 @@ class Renderer
             }
         }
 
-        var_dump($subjects);exit;
-
         // Get the menu sections in their correct order
 
         $sections = $this->getMenuSideSectionMapper()->findAll()->sortBy('sortOrder', 'asc');
