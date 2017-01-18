@@ -1,7 +1,74 @@
-<script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
-<script type="text/javascript">
-    $(function () {
+<link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css"/>
+
+<script src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
+<script src="/javascript/components/jstree/dist/jstree.js"></script>
+<script>
+    $(function() {
         $('#sections').mightyList({});
+
+        $('section[data-role="sideMenuTree"]')
+            .on('ready.jstree', function (event, jstree) {
+                jstree.instance.open_node(jstree.instance.get_node('node_0'));
+            })
+            .on('click', 'a[href]', function () {
+                // Listen on click, instead of select_node, because select_node
+                // fires on initial page load.
+                window.location.href = this.href;
+            })
+            .jstree({
+                "animation": 50,
+                "core": {
+                    force_text: true,
+                    check_callback: true,
+                    "themes": {
+                        "variant": "schoolbox",
+                        "dots": true,
+                        "icons": false
+                    }
+                },
+                "plugins": ["dnd", 'state'],
+                dnd: {
+                    copy: false
+                }
+            })
+            .on('move_node.jstree', function (e, data) {
+                var id = data.node.id.split('_').pop();
+                var parentId = data.parent.split('_').pop();
+                var position = data.position;
+
+                $.ajax({
+                    url: '/adminv2/menu-side/order',
+                    method: 'post',
+                    data: {
+                        position: position,
+                        parentId: parentId,
+                        id: id
+                    }
+                });
+            });
+
+        $('#content').find('ul[data-sortable]').sortable({
+            handle: '.grip',
+            axis: 'y',
+
+            update: function () {
+                var order = '';
+                // Update the sort order in the database
+                $('[data-menu-section]').each(function (e) {
+                    if (order != '') {
+                        order += ',';
+                    }
+                    order += $(this).data('menu-section');
+                });
+
+                $.post('{{ routeLookup('adminMenuSide.postSectionOrder') }}', {
+                    order: order
+                })
+                .success(function () {
+                });
+            }
+        });
+
     });
 </script>
 
@@ -77,78 +144,3 @@
         </section>
     </div>
 </div>
-
-<!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css"/>
-<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
-
-<script>
-    $(function () {
-        $('section[data-role="sideMenuTree"]')
-                .on('ready.jstree', function (event, jstree) {
-                    jstree.instance.open_node(jstree.instance.get_node('node_0'));
-                })
-                .on('click', 'a[href]', function () {
-                    // Listen on click, instead of select_node, because select_node
-                    // fires on initial page load.
-                    window.location.href = this.href;
-                })
-                .jstree({
-                    "animation": 50,
-                    "core": {
-                        force_text: true,
-                        check_callback: true,
-                        "themes": {
-                            "variant": "schoolbox",
-                            "dots": true,
-                            "icons": false
-                        }
-                    },
-                    "plugins": ["dnd", 'state'],
-                    dnd: {
-                        copy: false
-                    }
-                })
-                .on('move_node.jstree', function (e, data) {
-                    var id = data.node.id.split('_').pop();
-                    var parentId = data.parent.split('_').pop();
-                    var position = data.position;
-
-                    $.ajax({
-                        url: '/adminv2/menu-side/order',
-                        method: 'post',
-                        data: {
-                            position: position,
-                            parentId: parentId,
-                            id: id
-                        }
-                    });
-                });
-    });
-
-    $(function () {
-        $('#content').find('ul[data-sortable]').sortable({
-            handle: '.grip',
-            axis: 'y',
-            update: function () {
-                var order = '';
-                // Update the sort order in the database
-                $('[data-menu-section]').each(function (e) {
-                    if (order != '') {
-                        order += ',';
-                    }
-                    order += $(this).data('menu-section');
-                });
-
-                $.post('{{ routeLookup('adminMenuSide.postSectionOrder') }}', {
-                    order: order
-                })
-                        .success(function () {
-                        });
-            }
-        });
-    });
-</script>
-<!-- END custom_head -->
-
-
