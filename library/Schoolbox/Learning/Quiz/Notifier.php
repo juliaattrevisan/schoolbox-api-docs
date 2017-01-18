@@ -335,10 +335,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	public function notifyStudentOverdue($quiz, $owner, $diff = null) {
         $envelope = new Envelope();
 
-        if ($this->conf->get('restrict_parent_duework_access')) {
-            return $envelope;
-        }
-
         $quizId = $quiz->getId();
         $quiz   = $this->fullyHydrateQuiz($quiz);
 
@@ -360,7 +356,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
         $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
         foreach($unattemptedStudents as $student) {
-            $bob->setParam('child', new UserParam($student));
             $envelope->targetToUser($student->getId(), $bob->build());
         }
 
@@ -489,7 +484,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
         $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
         foreach($unattemptedStudents as $student) {
-            $bob->setParam('child', new UserParam($student));
             $envelope->targetToUser($student->getId(), $bob->build());
         }
 
