@@ -26,6 +26,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -436,7 +437,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
 		foreach($unattemptedStudents as $student) {
-            $bob->setParam('child', new UserParam($student));
+            $bob->setParam('child', new ChildParam($student));
             $envelope->targetToParent($student->getId(), $bob->build());
 
 //			$childName = $student->getFirstname();
@@ -535,7 +536,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
         $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
         foreach($unattemptedStudents as $student) {
-            $bob->setParam('child', new UserParam($student));
+            $bob->setParam('child', new ChildParam($student));
             $envelope->targetToParent($student->getId(), $bob->build());
         }
 
@@ -778,7 +779,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 //            $msg = new Message(":child's $quizType was renamed from :oldname to :newname in :catname", $icon, $href);
             foreach ($students as $student) {
-                $bob->setParam('child', new UserParam($student));
+                $bob->setParam('child', new ChildParam($student));
                 $envelope->targetToParent($student->getId(), $bob->build());
 //                $msgr->targetToParent(
 //                    $student->getId(),
@@ -824,7 +825,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
             foreach ($students as $student) {
-                $bob->setParam('child', new UserParam($student));
+                $bob->setParam('child', new ChildParam($student));
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
 
@@ -863,7 +864,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
             foreach ($students as $student) {
-                $bob->setParam('child', new UserParam($student));
+                $bob->setParam('child', new ChildParam($student));
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
 
