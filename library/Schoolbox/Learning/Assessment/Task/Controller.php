@@ -53,6 +53,7 @@ class Controller extends Assessment\Controller
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
 
+
     /**
      * This gives you a summary of progress made within an Assessment
      * It is the consolidation of pages previously known as "quickmark" and "quiz review"
@@ -240,11 +241,20 @@ class Controller extends Assessment\Controller
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
+     * @param string      $explicitReturnUrl
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl, $defaultReturnUrl = '')
     {
-        return $defaultReturnUrl;
+        /**
+         * First priority is an explicit return URL sent
+         * Then go to default
+         */
+        if ($explicitReturnUrl) {
+            return Redirect::decode($explicitReturnUrl);
+        } else {
+            return $defaultReturnUrl;
+        }
     }
 }

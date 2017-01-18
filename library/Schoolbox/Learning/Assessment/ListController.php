@@ -155,26 +155,7 @@ class ListController extends Web\Controller\Base
 
             $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
 
-            // Did we just create a Quiz? If so, ALWAYS begin to add sections
-            if($assessment instanceof QuizAssessable){
-                $data = [ 'assessmentId' => $assessment->getId() ];
-                $redirect = $this->getRouter()->generate('learningQuiz.getQuizSummary', $data);
-
-                // If caller requested a returnUrl, pass it through.
-                if($explicitReturnUrl){
-                    $redirect .= '?' . Redirect::RETURN_URL . "=$explicitReturnUrl";
-                }
-                $this->redirect($redirect);
-            }
-            // Or did caller explicitly request a return URl?
-            elseif ($explicitReturnUrl) {
-                // by default, always give precedence to the return URL given via POST
-                $this->redirect(Redirect::decode($post[Redirect::RETURN_URL]));
-
-            } else {
-                // failing that, decide based on what kind of assessment y'all just created
-                $this->redirect($controller->determineRedirect($assessment, $defaultReturnUrl));
-            }
+            $this->redirect($controller->determineRedirect($assessment, $explicitReturnUrl, $defaultReturnUrl));
 
         } catch (DomainException $e) {
             $this->sendError($e->getMessage(), [], 400, $e->getCode());

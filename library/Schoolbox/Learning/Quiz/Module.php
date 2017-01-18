@@ -58,6 +58,7 @@ class Module extends RestfulModule
                 '/quiz/summary/{assessmentId}'                              => 'getQuizSummary',
                 '/quiz/intro/{assessmentId}'                                => 'getQuizIntro',
                 '/quiz/{assessmentId}/attempts/export'                      => 'getExportAttempts',
+                '/quiz/section/create/{assessmentId}'                       => 'getQuizSectionCreate',
             ],
             'POST' => []
         ];

@@ -31,6 +31,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 
 class Controller extends Assessment\Controller
 {
@@ -497,13 +498,20 @@ class Controller extends Assessment\Controller
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
+     * @param string      $explicitReturnUrl
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl, $defaultReturnUrl = '')
     {
-        // if your context is a project, redirect back to its status screen
-        if ($assessment->getContext() instanceof Assessment\Project) {
+        /**
+         * First priority is an explicit return URL sent
+         * Then check if this is in a project, if so go to project status
+         * Finally default to... default return url
+         */
+        if ($explicitReturnUrl) {
+            return Redirect::decode($explicitReturnUrl);
+        } elseif ($assessment->getContext() instanceof Assessment\Project) {
             return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
         }
 
