@@ -5,7 +5,7 @@
 <!--<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.js"></script>-->
 <!--<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>-->
 <!--<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>-->
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>-->
@@ -26,8 +26,8 @@
             container: '[data-collapsable-container]'
         });
 
-        $('#startDate, #endDate, #publishDate').alaressDateTimePicker({type:'event', enableTime: true});
-        $('input[name*="repeat_until"]').alaressDateTimePicker();
+//        $('#startDate, #endDate, #publishDate').alaressDateTimePicker({type:'event', enableTime: true});
+//        $('input[name*="repeat_until"]').alaressDateTimePicker();
 
     });
 </script>
@@ -77,67 +77,14 @@
                         <label for="startDate">
                             From
                         </label>
-                        <input name="startDate" id="startDate" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-allday data-datepicker-call="event" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                     </div>
-                    <!--<div class="small-12 large-6 columns" data-hide-watch="#allday" data-hide-watch-invert>-->
-                        <!--<div class="row">-->
-                            <!--<div class="small-4 columns">-->
-                                <!--<label class="timepick">-->
-                                    <!--Hour-->
-                                    <!--<input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" data-timepicker="hour" />-->
-                                <!--</label>-->
-                            <!--</div>-->
-                            <!--<div class="small-4 columns">-->
-                                <!--<label class="timepick">-->
-                                    <!--Minute-->
-                                    <!--<input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" data-timepicker="minute" />-->
-                                <!--</label>-->
-                            <!--</div>-->
-                            <!--<div class="small-4 columns">-->
-                                <!--<label>Period-->
-                                    <!--<select name="startPeriod">-->
-                                        <!--<option value="am" {EVENT_START_AM}>AM</option>-->
-                                        <!--<option value="pm" {EVENT_START_PM}>PM</option>-->
-                                    <!--</select>-->
-                                <!--</label>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
                     <div class="small-6 columns">
                         <label for="endDate">
                             Until
                         </label>
-                        <input name="endDate" id="endDate" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-allday data-datepicker-call="event" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
                     </div>
-                    <!--<div class="small-12 large-6 columns" data-hide-watch="#allday" data-hide-watch-invert>-->
-                        <!--<div class="row">-->
-                            <!--<div class="small-4 columns" >-->
-                                <!--<label class="timepick">-->
-                                    <!--Hour-->
-                                    <!--<input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" data-timepicker="hour" />-->
-                                <!--</label>-->
-                            <!--</div>-->
-                            <!--<div class="small-4 columns" >-->
-                                <!--<label class="timepick">-->
-                                    <!--Minute-->
-                                    <!--<input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" data-timepicker="minute" />-->
-                                <!--</label>-->
-                            <!--</div>-->
-                            <!--<div class="small-4 columns" >-->
-                                <!--<label>Period-->
-                                    <!--<select name="endPeriod">-->
-                                        <!--<option value="am" {EVENT_END_AM}>AM</option>-->
-                                        <!--<option value="pm" {EVENT_END_PM}>PM</option>-->
-                                    <!--</select>-->
-                                <!--</label>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                    <!--<div class="small-12 columns">-->
-                        <!--<input id="allday" name="allday" type="checkbox" value="1" {EVENT_ALLDAY_CHECKED}>-->
-                        <!--<label for="allday" class="checkbox-label">All Day</label>-->
-                    <!--</div>-->
-
                 </fieldset>
 
                 <fieldset class="content" data-collapsable-container>
@@ -166,7 +113,7 @@
                                 <label>
                                     Repeat Until
                                     <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
-                                    <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+                                    <input name="repeat_until" data-datepicker type="text" size="15" maxlength="30" value="" />
                                 </label>
                             </div>
                             <!-- END recurring_dates -->
@@ -221,7 +168,7 @@
                         <label>
                             Publish Date
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
-                            <input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
+                            <input id="publishDate" name="publishDate" data-datepicker data-datepicker-time type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
                         </label>
                     </div>
                     <div class="small-12 columns">

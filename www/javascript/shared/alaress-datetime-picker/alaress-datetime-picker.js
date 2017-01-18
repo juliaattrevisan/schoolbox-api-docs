@@ -50,15 +50,20 @@ countPickers = function () {
 // Extend jQuery with our datepicker function
 
 $.fn.alaressDateTimePicker = function(optionsOverride) {
-
+console.log(optionsOverride);
     // Default options
     // Default picker type: event
     var options = {
         displayFormat: 'd/m/Y h:iK',
         displayFormatDate: 'd/m/Y',
         databaseFormat: 'Y-m-d H:i:s',
-        enableTime: false,
-        type: 'default'
+        enableTime: false, //Don't show time picker
+        // bothFormats: false, //Can use both displayFormat and displayFormatDate
+        allDay: false, //Show All Day switch
+        // allDayExt: false, //Sync with external AllDay input hidden field
+        // allDateTime: 'start',
+        type: 'default',
+
     };
 
     // Override with user any options
