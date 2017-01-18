@@ -61,6 +61,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         VALUES (:folderId, :courseId, NOW(), NOW(), :deleted)
     ");
 
+    $deleteNewCourseQuery = $database->prepare("UPDATE `course_specification` SET `deleted_at` = NOW() WHERE `id` = :courseId");
 
     // Go
     $selectOldCoursesQuery->execute();
@@ -89,6 +90,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         // Convert units for this course
         $selectOldUnitsQuery->execute(['parent' => $deprecatedCourse['id']]);
         $unitSuccessCount = 0;
+        $unitExistCount = 0;
         $unitFailureCount = 0;
 
         $log->debug(sprintf('%d units found in course', $selectOldUnitsQuery->rowCount()));
@@ -102,6 +104,9 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 ]);
                 $log->debug(sprintf('Unit "%s" converted', $deprecatedUnit['name']));
                 $unitSuccessCount++;
+                if(!$deprecatedUnit['deleted_at']){
+                    $unitExistCount++;
+                }
             } catch (PDOException $e) {
                 $log->error(sprintf('Unit "%s" could not be converted!', $deprecatedUnit['name']), [$e]);
                 $log->warning($e->getMessage());
@@ -110,6 +115,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         }
         $log->info(sprintf('%d units converted, %d failed to convert', $unitSuccessCount, $unitFailureCount));
 
+        if(!$deprecatedCourse['deleted_at'] && $unitExistCount == 0) {
+            $log->info("No units are active, deleting the course");
+            $deleteNewCourseQuery->execute(['courseId' =>$courseId]);
+        }
     }
     $log->info(sprintf('%d courses converted, %d failed to convert', $successCount, $failureCount));
     exit($failureCount > 0 ? 1 : 0);
