@@ -1564,28 +1564,9 @@ $train-line-unvisited-color: $content-ui-background;
 	}
 }
 
-
-@media #{$small-only} {
-    // top level breadcrumbing: on mobile, only show current and previous
-    #content > .breadcrumb li {
-        display: none;
-
-        &:nth-last-child(-n+2) {
-            display: list-item;
-        }
-    }
-}
-
-@media #{$large-up} {
-	#content > .breadcrumb {
-		margin-left: -1rem;
-	}
-}
-
 article {
   	@extend .clearfix;
 }
-
 
 .wait-overlay {
 	position: absolute;
