@@ -38,21 +38,6 @@ class Module extends BaseModule
     protected $basename = 'pastoral';
 
     /**
-     * Module constructor.
-     * @param ContainerInterface $injector
-     * @param string $basename
-     */
-    public function __construct(ContainerInterface $injector, $basename = '')
-    {
-        $this->setUserMapper(UserMapper::getInstance());
-        $this->setPastoralMapper(PastoralMapper::getInstance());
-        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
-        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
-
-        parent::__construct($injector, $basename);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
@@ -286,53 +271,26 @@ class Module extends BaseModule
      */
     public function getPastoralAccessMapper()
     {
-        return $this->pastoralAccessMapper;
+        return $this->getMapperFactory()->get(PastoralAccessMapper::class);
     }
 
-    /**
-     * @param PastoralAccessMapper $mapper
-     * @return $this
-     */
-    public function setPastoralAccessMapper(PastoralAccessMapper $mapper)
-    {
-        $this->pastoralAccessMapper = $mapper;
-        return $this;
-    }
 
     /**
      * @return PastoralCommentMapper
      */
     public function getPastoralCommentMapper()
     {
-        return $this->pastoralCommentMapper;
+        return $this->getMapperFactory()->get(PastoralCommentMapper::class);
     }
 
-    /**
-     * @param PastoralCommentMapper $mapper
-     * @return $this
-     */
-    public function setPastoralCommentMapper(PastoralCommentMapper $mapper)
-    {
-        $this->pastoralCommentMapper = $mapper;
-        return $this;
-    }    
 
     /**
      * @return PastoralMapper
      */
     public function getPastoralMapper()
     {
-        return $this->pastoralMapper;
-    }
+        return $this->getMapperFactory()->get(PastoralMapper::class);
 
-    /**
-     * @param PastoralMapper $mapper
-     * @return $this
-     */
-    public function setPastoralMapper(PastoralMapper $mapper)
-    {
-        $this->pastoralMapper = $mapper;
-        return $this;
     }
 
     /**
@@ -340,28 +298,8 @@ class Module extends BaseModule
      */
     public function getUserMapper()
     {
-        return $this->userMapper;
+        return $this->getMapperFactory()->get(UserMapper::class);
+
     }
 
-    /**
-     * @param UserMapper $mapper
-     * @return $this
-     */
-    public function setUserMapper(UserMapper $mapper)
-    {
-        $this->userMapper = $mapper;
-        return $this;
-    }
-
-    /** @var UserMapper */
-    protected $userMapper;
-
-    /** @var PastoralMapper */
-    protected $pastoralMapper;
-
-    /** @var PastoralAccessMapper */
-    protected $pastoralAccessMapper;
-
-    /** @var PastoralCommentMapper */
-    protected $pastoralCommentMapper;
 }
