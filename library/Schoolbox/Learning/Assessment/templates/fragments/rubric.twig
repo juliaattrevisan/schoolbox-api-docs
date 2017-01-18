@@ -2,10 +2,11 @@
 Usage:
 
 {% include '@learningAssessment/fragments/rubric.twig' with {
-    rubric: rubric,
-    rubricAttachZone: rubricAttachZone,
-    resultSets: rubricResultSets,
-    assessment: assessment
+    rubric:           array,
+    rubricAttachZone: array,
+    resultSets:       array,
+    rubricHasMarks:   bool
+    assessment:       IAssessable
 } only %}
 
 #}
@@ -145,10 +146,13 @@ Usage:
         {% if rubricHasMarks %}
         <div class="small-12 columns no-pad">
             <div class="alert-box warning">
-                <strong>Warning:</strong> you have already marked some students' work.
+                <strong>Warning:</strong> you have already marked some students' work.<br>
+                Invalidating or altering a student's rubric mark will <em>not</em> update their mark for this activity unless you explicitly assign
+                the the grade from the rubric.
                 <ul>
-                    <li>Changing the number of descriptors&mdash;or the result set&mdash;will invalidate any existing marks given;</li>
-                    <li>If you add/remove {{ locale.translate('rubricCriterion',true,false) }}, students who have been marked will be automatically remarked;</li>
+                    <li>Changing the value of existing descriptors&mdash;or the result set&mdash;will invalidate any existing marks given;</li>
+                    <li>You can safely add {{ locale.translate('rubricCriterion',true,false) }}. This will not alter a student's rubric mark, nor the activity grade;</li>
+                    <li>Removing {{ locale.translate('rubricCriterion',true,false) }} will invalidate any marks given for that {{ locale.translate('rubricCriterion',false,false) }}'s row;</li>
                     <li>You can safely change wordings and orders of descriptors.</li>
                 </ul>
             </div>
