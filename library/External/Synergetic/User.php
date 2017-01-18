@@ -800,6 +800,7 @@ class External_Synergetic_User implements External_UserInterface
                     c1.FileYear = '" . $this->database->quote($this->getCurrentYear($externalId)) . "' AND
                     c1.StaffID = '{$this->database->quote($externalId)}'
                 LEFT JOIN luFileType ON c2.FileType = luFileType.Code
+                ORDER BY luFileType.Description ASC, c2.Description ASC
             ";
         } else {
             return [];
