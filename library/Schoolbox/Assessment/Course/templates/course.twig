@@ -22,7 +22,7 @@ Usage:
          * Validation for the final save course form
          * (the other validation is done in each mage step below)
          */
-        $("#update-course-form").alaressValidate({
+        var modifyValidation = {
             rules: {
                 name: "required",
                 parent: "required",
@@ -31,8 +31,10 @@ Usage:
             messages: {
                 name: "Please enter a name for this course.",
                 parent: "Please select a faculty or subject for this course."
-            },
-        });
+            }
+        };
+
+        $("#update-course-form").alaressValidate(modifyValidation);
 
         $('[data-unit-name]').each(function() {
             $(this).rules('add', {
@@ -135,6 +137,9 @@ Usage:
 
                 // Display the 'Save Course' section
                 $mageSaveCourseButton.closest('[data-mage-collapsed]').slideDown();
+
+                // Reset validation
+                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
             },
             validateOptions: {
                 rules: {
@@ -142,8 +147,8 @@ Usage:
                     parent: "required"
                 },
                 messages: {
-                    name: "Please enter a name for your course",
-                    parent: "Please select a faculty or subject for your course"
+                    name: "Please enter a name for this course",
+                    parent: "Please select a faculty or subject for this course"
                 }
             }
         });
@@ -165,6 +170,9 @@ Usage:
                 noonitName.val('');
                 $(this).val($(this).data('mage-reset')).removeAttr('readonly').removeData('mage-submitted');
                 $(document).foundation();
+
+                // Reset validation
+                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
             },
 
             validateOptions: {
