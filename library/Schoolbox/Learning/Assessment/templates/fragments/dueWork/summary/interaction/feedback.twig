@@ -8,12 +8,20 @@
  #}
 {% if currentFeedback.response.id %}
     {% if not currentFeedback.isPublished %}
-        {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentFeedback.assessable.id, studentId: currentFeedback.response.submittedOnBehalfOf.id, responseId: responseId}) %}
+        {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {
+            assessmentId: currentFeedback.assessable.id,
+            studentId: currentFeedback.response.submittedOnBehalfOf.id,
+            responseId: responseId,
+            response: currentFeedback.response
+        }) %}
         {% set tooltip = 'Resume Inline Grading' %}
     {% endif %}
 {% else %}
     {% if not currentFeedback.isPublished %}
-        {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: currentFeedback.assessable.id}) %}
+        {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {
+            assessmentId: currentFeedback.assessable.id,
+            assessment: currentFeedback.assessable
+        }) %}
         {% set tooltip = 'Resume Quickmark' %}
     {% endif %}
 {% endif %}
