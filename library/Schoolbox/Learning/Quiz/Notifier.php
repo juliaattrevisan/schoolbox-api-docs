@@ -537,7 +537,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		// renamed
 		if(isset($diff['title'])) {
             $bob = new Builder();
-            $bob->addTopic("assess.$quizId.renamed")
+            $bob->addTopic("assess.$quizId.updated")
                 ->addFilter('roleType', [Role::STUDENT])
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
@@ -586,7 +586,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 //			$msg = new Message(":author $verb :quizname to :date in :catname", $icon, $href);
 
             $bob = new Builder();
-            $bob->addTopic("assess.$quizId.datechanged")
+            $bob->addTopic("assess.$quizId.updated")
                 ->addFilter('roleType', [Role::STUDENT])
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
@@ -758,7 +758,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
             }
 
             $bob = new Builder();
-            $bob->addTopic("assess.$quizId.datechanged")
+            $bob->addTopic("assess.$quizId.updated")
                 ->addFilter('roleType', [Role::PARENT])
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
