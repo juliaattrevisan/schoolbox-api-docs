@@ -142,6 +142,18 @@ Usage:
 
 <div class="row">
     <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
+        {% if rubricHasMarks %}
+        <div class="small-12 columns no-pad">
+            <div class="alert-box warning">
+                <strong>Warning:</strong> you have already marked some students' work.
+                <ul>
+                    <li>Changing the number of descriptors&mdash;or the result set&mdash;will invalidate any existing marks given;</li>
+                    <li>If you add/remove {{ locale.translate('rubricCriterion',true,false) }}, students who have been marked will be automatically remarked;</li>
+                    <li>You can safely change wordings and orders of descriptors.</li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
         <div class="small-12 columns no-pad">
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
         </div>
