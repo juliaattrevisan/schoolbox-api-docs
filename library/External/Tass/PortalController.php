@@ -92,7 +92,9 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         $token = $this->getToken([
             'prod_code' => 'TIA',
             'app_code'  => $this->appCodes['teacherKiosk'],
+            'deep_link' => $this->getRequest()->get['link'],
         ]);
+
         if ($token) {
             $this->getResponse()->redirect->to(
                 $this->portalHost."/kiosk/TIALogin.cfm?sso_token=$token"
