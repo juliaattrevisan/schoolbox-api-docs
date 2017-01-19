@@ -89,7 +89,7 @@ class Module extends BaseModule
             ];
         };
 
-        $preloadCourse = function (array $params) {
+        $preloadCourseSpec = function (array $params) {
             try{
                 return ['courseSpec' => $this->getCourseSpecificationMapper()->findById($params['id'])];
             } catch (MapperException\Deleted $e) {
@@ -99,7 +99,7 @@ class Module extends BaseModule
             }
         };
 
-        $preloadUnit = function (array $params) {
+        $preloadUnitSpec = function (array $params) {
             try{
                 return ['unitSpec' => $this->getUnitSpecificationMapper()->findById($params['id'])];
             } catch (MapperException\Deleted $e) {
@@ -110,15 +110,15 @@ class Module extends BaseModule
         };
 
 
-        $this->register('GET', '/modify/{id}', 'modifyCourse', null, $preloadCourse);
+        $this->register('GET', '/modify/{id}', 'modifyCourse', null, $preloadCourseSpec);
         $this->register('POST', '/new', 'createCourse');
-        $this->register('POST', '/delete/{id}', 'deleteCourseSpecification', null, $preloadCourse);
+        $this->register('POST', '/delete/{id}', 'deleteCourseSpecification', null, $preloadCourseSpec);
         $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
-        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', null, $preloadCourse);
-        $this->register('POST', '/modify/{id}', 'updateCourse', null, $preloadCourse);
-        $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', null, $preloadUnit);
-        $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', null, $preloadUnit);
-        $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnit);
+        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', null, $preloadCourseSpec);
+        $this->register('POST', '/modify/{id}', 'updateCourse', null, $preloadCourseSpec);
+        $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', null, $preloadUnitSpec);
+        $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', null, $preloadUnitSpec);
+        $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnitSpec);
     }
 
     /**
