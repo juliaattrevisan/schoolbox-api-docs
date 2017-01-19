@@ -81,7 +81,7 @@ class Controller extends Base
 
         foreach ($sideMenus as $node) {
             $nodeId   = $node->getId();
-            $parentId = $node->getParentId();
+            $parentId = $node->getParent()->getId();
 
             if (!$parentId) {
                 $treeList->add($node);
@@ -245,7 +245,7 @@ class Controller extends Base
             $item = new MenuSide();
 
             $itemOrder = $this->getMenuSideMapper()->findAll()->sortBy('sortOrder', 'desc')->first();
-            $item->setParentId(0);
+            $item->setParent((new Menuside())->setId(0));
             $item->setSortOrder($itemOrder->getSortOrder() + 1);
         }
 
@@ -357,7 +357,7 @@ class Controller extends Base
         try {
             /** @var MenuSide $item */
             $item = $this->getMenuSideMapper()->findById($post['id']);
-            $item->setParentId($post['parentId']);
+            $item->setParent((new MenuSide())->setId($post['parentId']));
             $this->getMenuSideMapper()->save($item);
 
             $parentChildren = $this->getMenuSideMapper()->findByColumn('parent_id', $post['parentId']);

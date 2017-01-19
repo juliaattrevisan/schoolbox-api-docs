@@ -17,9 +17,6 @@ class Model implements ISoftDeletable
     protected $id;
 
     /** @var int */
-    protected $parentId;
-
-    /** @var int */
     protected $sortOrder;
 
     /** @var Model */
@@ -77,21 +74,11 @@ class Model implements ISoftDeletable
     }    
 
     /**
-     * @param int $parentId
-     * @return self
-     */
-    public function setParentId($parentId)
-    {
-        $this->parentId = $parentId;
-        return $this;
-    }
-
-    /**
      * @return int
      */
     public function getParentId()
     {
-        return $this->parentId;
+        return $this->getParent()->getId();
     }
 
     /**
