@@ -232,7 +232,7 @@
             {% if selectedFolder %}
             <li class="icon-home" title="Class"><a href="/homepage/{{ selectedFolder.id }}" title="Class Page">{{ selectedFolder.nameWithCodes }}</a></li>
             {% endif %}
-            <li class="icon-staff-students" title="Students">{% for u in effort.allEffort | column('user') %}{{ u.fullName }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+            <li class="icon-staff-students" title="Students">{{ effort.allEffort | length }} students</li>
         </ul>
     </div>
 </div>
