@@ -110,14 +110,15 @@ class Module extends BaseModule
         };
 
 
-        $this->register('GET',  '/modify/{id}',                                     'modifyCourse',   null, $preloadCourse);
-        $this->register('POST', '/new',                                             'createCourse');
-        $this->register('POST', '/delete/{id}',                          'deleteCourseSpecification', null, $preloadCourse);
+        $this->register('GET', '/modify/{id}', 'modifyCourse', null, $preloadCourse);
+        $this->register('POST', '/new', 'createCourse');
+        $this->register('POST', '/delete/{id}', 'deleteCourseSpecification', null, $preloadCourse);
         $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
-        $this->register('POST', '/{id}/units/new',                                  'newUnit',        null, $preloadCourse);
-        $this->register('POST', '/modify/{id}',                                       'updateCourse', null, $preloadCourse);
-        $this->register('POST', '/units/{id}/delete',                      'deleteUnitSpecification', null, $preloadUnit);
-        $this->register('POST', '/units/{id}/sequence',                     'saveAssessmentSequence', null, $preloadUnit);
+        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', null, $preloadCourse);
+        $this->register('POST', '/modify/{id}', 'updateCourse', null, $preloadCourse);
+        $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', null, $preloadUnit);
+        $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', null, $preloadUnit);
+        $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnit);
     }
 
     /**
