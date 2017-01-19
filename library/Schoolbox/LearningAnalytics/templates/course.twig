@@ -5,6 +5,16 @@
 <script type="text/javascript" src="/learninganalytics/js/progress/unit.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/effort/scatter.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
+
+{% set selectedFolder = metadata.selectedClassFolder %}
+{% set courseSpec     = metadata.courseSpecification %}
+{% set routeUsed      = metadata.routeUsed %}
+{% set route          = metadata.route %}
+{% set taskTypeId     = metadata.selectedTaskIdFilter %}
+{% set term           = metadata.term %}
+{% set folders        = metadata.unitImplementationFolders %}
+{% set routeArgs      = { courseSpecId: courseSpec.id, folderId: selectedFolder.id, taskTypeId: taskTypeId, termSlug: metadata.term } %}
+
 <script type="text/javascript">
     $(function () {
 
@@ -23,7 +33,8 @@
             element: '[data-graph=overall]',
             title: '',
             mostAdvancedStudent: {{ overallProgress.mostAdvancedStudent }},
-            classCompletions: {{ overallProgress.classCompletions }}
+            classCompletions: {{ overallProgress.classCompletions }},
+            clusterName: '{{ selectedFolder ? 'Class' : 'Cohort' }}'
         });
 
         /**
@@ -44,39 +55,30 @@
              * These correspond to a series of data and their respective
              * five-point summaries
              */
-            allAssessments: [
-{% for currentTask in results.tasks.all %}
-"{{ currentTask.getTitle() }}"{% if not loop.last %},
-{% endif %}
-{% endfor %}
-
-            ],
+            allAssessments: {{ results.activities.all | column('title') | json_encode | raw }},
 
             /* All the raw data
              */
             allData: $.fn.boxPlotCalculateAllSeriesData([
-{% for currentTask in results.tasks.all %}
-[
-    {# Highcharts won't render without at least one data point #}
-    {% if results.all[currentTask.getTask().getId()]|length == 0 %}
-    {
-        info: null,
-        uid: null,
-        value: -100
-    }
-    {% endif %}
-    {% for currentValue in results.all[currentTask.getTask().getId()] %}
-    {
-        info: "{{ currentValue.user.getFullName() }}",
-        uid: '{{ currentValue.user.getId() }}',
-        value: {% if currentValue.value %}{{ currentValue.value }}{% else %}null{% endif %}
-    }{% if not loop.last %},
-    {% endif %}
-    {% endfor %}
-]{% if not loop.last %},
-{% endif %}
-{% endfor %}
-])
+                {% for activity in results.activities.all -%}
+                [
+                    {% for feedback in results.all[activity.id] -%}
+                    {
+                        info: "{{ feedback.reviewee.fullName }}",
+                        uid: '{{ feedback.reviewee.id }}',
+                        value: {{ feedback.normalisedMark ?: 'null' }}
+                    }{% if not loop.last %}, {% endif -%}
+                    {% else %}{# Highcharts won't render without at least one data point -#}
+                    {
+                        info: null,
+                        uid: null,
+                        value: -100
+                    }
+                {% endfor -%}
+                ]{% if not loop.last %},
+                {% endif -%}
+            {% endfor %}
+            ])
         });
 
         /**
@@ -85,8 +87,9 @@
         $.fn.unitProgressRender({
             element: '[data-graph=unit-progress]',
             title: '',
+            clusterName: '{{ selectedFolder ? 'Class' : 'Cohort' }}',
             units: [
-                {% for currentUnit in progress.allUnits %}"{{ currentUnit.unit.getTitle() }}"{% if not loop.last %},{% endif %}{% endfor %}
+                {% for currentUnit in progress.allUnits %}"{{ currentUnit.unit.title }}"{% if not loop.last %},{% endif %}{% endfor %}
 
             ],
             mostAdvancedStudents: [
@@ -99,7 +102,7 @@
             ]
         });
 
-{% if rubrics.allRubrics|length > 0 %}
+{% if rubrics.allRubrics | length > 0 %}
         /**
          *  Boxplots for Rubrics
          */
@@ -136,7 +139,7 @@
 {% for currentCriterion in allCriteria %}
 [
 {# Highcharts won't render without at least one data point #}
-{% if currentCriterion.allValues|length == 0 %}
+{% if currentCriterion.allValues | length == 0 %}
     {
         info: null,
         uid: null,
@@ -177,8 +180,8 @@
             allData: [
 {% for userId, currentTally in effort.allEffort %}
 {
-    info: "{{ currentTally.user.getFullname() }}",
-    uid: '{{ currentTally.user.getExternalId() }}',
+    info: "{{ currentTally.user.fullname }}",
+    uid: '{{ currentTally.user.externalId }}',
     value: [{{ currentTally.hits }},{{ currentTally.average }}]{% if not loop.last %},
 {% endif %}
 }{% if not loop.last %},
@@ -189,40 +192,52 @@
     });
 </script>
 
-<ul class="breadcrumb">
-   <li><a href="/submission/listSubmission">Submissions</a></li>
-    <li title="Course"  {% if metadata.route != 'folder' %} class="active" {% endif %}><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}" title="Course">{{ metadata.pageTitle }}</a></li>
-    {% if metadata.route == 'folder' %}
-        <li title="Class" class="active"><a href="/homepage/{{metadata.folder.selected.getId()}}" title="Class Page">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</a></li>
-    {% endif %}
-</ul>
+{% set trail = [
+    [ 'Learning' ],
+    [ 'Courses', routeLookup('course.courseList') ],
+    [ courseSpec.title, '/homepage/' ~ courseSpec.folder.id ],
+    [ 'Analytics', routeLookup('learningAnalytics.' ~ routeUsed | replace({'folder': 'course'}), routeArgs) ],
+] %}
+
+{% if selectedFolder %}
+    {% set trail = trail | merge([ [ selectedFolder.nameWithCodes ] ]) %}
+{% endif %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(trail) }}
+
 
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
-        {% if metadata.folder.all|length %}
+        {% if folders | length %}
         <dl class="sub-nav">
-            {% for folder in metadata.folder.all %}
-                <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
-                    <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="button">
-                        {{ folder.getName() }} {% if folder.getCodeString() %}({{ folder.getCodeString() }}){% endif %}
-                    </a>
+            <dd{% if not selectedFolder %} class="active"{% endif %}>
+                <a href="{{ routeLookup('learningAnalytics.' ~ routeUsed | replace({'folder': 'course'}), routeArgs) }}" class="button">All classes</a>
+            </dd>
+            {% for folder in folders %}
+                {% set active = (folder.id == selectedFolder.id) and (route == 'folder') %}
+                {% set href   = routeLookup('learningAnalytics.' ~ routeUsed | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
+
+                <dd class="{% if active %}active{% endif %}">
+                    <a href="{{ href }}" class="button">{{ folder.nameWithCodes }}</a>
                 </dd>
             {% endfor %}
         </dl>
         {% endif %}
-        <ul class="meta">
-            <li class="icon-course-builder" title="Course"><a href="/homepage/{{ metadata.folder.course.getId()}}" title="Course Page">{{ metadata.pageTitle }}</a></li>
 
-            {% if metadata.route == 'folder' %}
-            <li class="icon-home" title="Class"><a href="/homepage/{{metadata.folder.selected.getId()}}" title="Class Page">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</a></li>
+        <ul class="meta">
+            <li class="icon-course-builder" title="Course"><a href="/homepage/{{ courseSpec.folder.id }}" title="Course Page">{{ courseSpec.title }}</a></li>
+
+            {% if selectedFolder %}
+            <li class="icon-home" title="Class"><a href="/homepage/{{ selectedFolder.id }}" title="Class Page">{{ selectedFolder.nameWithCodes }}</a></li>
             {% endif %}
-            <li class="icon-staff-students" title="Students">{{ effort.allEffort|length }} Students</li>
+            <li class="icon-staff-students" title="Students">{% for u in effort.allEffort | column('user') %}{{ u.fullName }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
         </ul>
     </div>
 </div>
 
-{{ contextSelector|raw }}
+{{ contextSelector | raw }}
 
 <div class="row">
     <div class="small-12 large-6 island">
@@ -236,16 +251,16 @@
         <h3 class="subheader">Top Students</h3>
 
         <section>
-            {% if results.ranking.top|length > 0 %}
+            {% if results.ranking.top | length > 0 %}
             <ul class="information-list">
-                {% for currentStudent in results.ranking.top|slice(0,3) %}
+                {% for currentStudent in results.ranking.top | slice(0,3) %}
                 <li>
                     <div class="card small-12">
-                        <a href="/search/user/{{ currentStudent.user.getId() }}" title="View Profile">
-                            <img src="/portrait.php?userId={{ currentStudent.user.getExternalId() }}&size=square64" alt="View Profile" />
-                            <p>{{ currentStudent.user.getFullName() }}</p>
+                        <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
+                            <img src="/portrait.php?userId={{ currentStudent.user.externalId }}&size=square64" alt="View Profile" />
+                            <p>{{ currentStudent.user.fullName }}</p>
                         </a>
-                        <p class="meta">{{ currentStudent.average|number_format(1) }}%</p>
+                        <p class="meta">{{ currentStudent.average | number_format(1) }}%</p>
                     </div>
                 </li>
                 {% endfor %}
@@ -263,16 +278,16 @@
         <h3 class="subheader">Bottom Students</h3>
 
         <section>
-            {% if results.ranking.bottom|length > 0 %}
+            {% if results.ranking.bottom | length > 0 %}
             <ul class="information-list">
-                {% for currentStudent in results.ranking.bottom|slice(0,3) %}
+                {% for currentStudent in results.ranking.bottom | slice(0,3) %}
                 <li>
                     <div class="card small-12">
-                        <a href="/search/user/{{ currentStudent.user.getId() }}" title="View Profile">
-                            <img src="/portrait.php?userId={{ currentStudent.user.getExternalId() }}&size=square64" alt="View Profile" />
-                            <p>{{ currentStudent.user.getFullName() }}</p>
+                        <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
+                            <img src="/portrait.php?userId={{ currentStudent.user.externalId }}&size=square64" alt="View Profile" />
+                            <p>{{ currentStudent.user.fullName }}</p>
                         </a>
-                        <p class="meta">{{ currentStudent.average|number_format(1) }}%</p>
+                        <p class="meta">{{ currentStudent.average | number_format(1) }}%</p>
                     </div>
                 </li>
                 {% endfor %}
@@ -293,9 +308,9 @@
         <div class="small-12 columns">
             <h2 class="subheader">Results</h2>
 
-            {% if results.tasks.types.selected.getId() > 0 %}
+            {% if results.tasks.types.selected.id > 0 %}
             <ul class="meta">
-                <li class="icon-due-work">{{ results.tasks.types.selected.getName() }}</li>
+                <li class="icon-due-work">{{ results.tasks.types.selected.name }}</li>
             </ul>
             {% endif %}
         </div>
@@ -305,15 +320,15 @@
     </nav>
     <ul id="result-filter-options" class="f-dropdown" data-dropdown-content>
 
-        {% if metadata.route == 'course' %}
-            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}" class="icon-due-work" title="All">All</a></li>
+        {% if route == 'course' %}
+            <li><a href="{{ routeLookup('learningAnalytics.course', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
             {% for currentTaskType in results.tasks.types.all %}
-            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}" class="icon-due-work" title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
+            <li><a href="{{ routeLookup('learningAnalytics.courseWithTask', routeArgs) }}/task/{{ currentTaskType.id }}" class="icon-due-work" title="{{ currentTaskType.name }}">{{ currentTaskType.name }}</a></li>
             {% endfor %}
-        {% elseif metadata.route == 'folder' %}
-            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}" class="icon-due-work" title="All">All</a></li>
+        {% elseif route == 'folder' %}
+            <li><a href="{{ routeLookup('learningAnalytics.folder', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
             {% for currentTaskType in results.tasks.types.all %}
-            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}" class='icon-due-work' title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
+            <li><a href="{{ routeLookup('learningAnalytics.folderWithTask', routeArgs) }}/task/{{ currentTaskType.id }}" class='icon-due-work' title="{{ currentTaskType.name }}">{{ currentTaskType.name }}</a></li>
             {% endfor %}
         {% endif %}
     </ul>
@@ -331,17 +346,17 @@
     <div class="small-12 island">
         <h2 class="subheader">Unit Progress</h2>
         <section class="content">
-            <div data-graph='unit-progress' style="height:{{ ((progress.allUnits|length)*50)+100 }}px"></div>
+            <div data-graph='unit-progress' style="height:{{ ((progress.allUnits | length)*50)+100 }}px"></div>
         </section>
     </div>
 </div>
 
-{% if rubrics.allRubrics|length > 0 %}
+{% if rubrics.allRubrics | length > 0 %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Rubrics</h2>
         <section class="content">
-            <div data-graph="rubrics" style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
+            <div data-graph="rubrics" style="height:{{ ((rubrics.allRubrics | length)*150)+75 }}px"></div>
         </section>
     </div>
 </div>

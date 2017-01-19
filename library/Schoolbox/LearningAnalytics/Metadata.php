@@ -11,65 +11,42 @@
 namespace Schoolbox\LearningAnalytics;
 
 use Schoolbox\Collection;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Alaress_Date_Format;
+use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder;
 
-class Metadata {
+class Metadata
+{
 
     /**
-     * An array of params from aura
+     * The param bag from Aura
      * 
      * @var array
      */
     protected $params = array();
 
     /**
-     * A Collection of UnitInstances
+     * The siblings of selectedCourseImplementation (including that implementation as well)
      *
-     * @var Collection
+     * @var Collection|Implementation\Unit\Model[]
      */
-    protected $allUnitInstances = null;
+    protected $unitImplementations;
 
     /**
-     * Default title of the page
+     * The course specification that the selectedCourseImplementation was spawned from
      *
-     * @var string
+     * @var Specification\Model
      */
-    protected $pageTitle = 'Statistics';
+    protected $courseSpecification;
 
     /**
-     * A Collection of Folder instances which are using the same Course
-     * This is used for navigational purposes
+     * The class folder (optional)
      *
-     * @var Collection
+     * @var Folder\Model
      */
-    protected $allFolders = null;
-
-    /**
-     * A Collection of Folder instances which should be used to aggregate
-     * numeric data (a subset of $allFolders)
-     *
-     * @var Collection
-     */
-    protected $allAggregateFolders = null;
-
-    /**
-     * The originating Course folder, used to spawn the Units used in the
-     * current Folder
-     *
-     * @var Folder
-     */
-    protected $courseFolder = null;
-
-    /**
-     * The folder corresponding to the id in the url
-     *
-     * @var Folder
-     */
-    protected $selectedFolder = null;
+    protected $selectedClassFolder;
 
     /**
      * Selected Term to filter
@@ -78,70 +55,35 @@ class Metadata {
      */
     protected $term;
 
-//
-//    We'll need this later, I think
-//
-//    /**
-//     * Start of date range filter
-//     *
-//     * @var Alaress_Date_Format
-//     */
-//    protected $from;
-//
-//    /**
-//     * End of date range filter
-//     *
-//     * @var Alaress_Date_Format
-//     */
-//    protected $to;
+    /**
+     * The name of the Aura route that was spawned
+     *
+     * @var string
+     */
+    private $routeUsed;
+
 
     /**
      * Metadata constructor.
-     * @param $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
+     *
+     * @param array                                  $params               bag of holding
+     * @param Specification\Model                    $courseSpecification  spec from which all data on this page inherits
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations  units that match the term filter
+     * @param Term                                   $term                 term to filter
+     * @param Folder\Model                           $selectedClassFolder  if given, the class folder to filter
+     * @param string                                 $routeUsed            pass directly through to twig for route lookups
      */
-    public function __construct($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+    public function __construct(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term, $routeUsed, Folder\Model $selectedClassFolder = null)
+    {
         $this->setParams($params);
 
-        $this->setCourseFolder($courseFolder);
-        $this->setPageTitle($this->getCourseFolder()->getName());
+        $this->setSelectedClassFolder($selectedClassFolder);
 
-        $this->setAllUnitInstances($allUnitInstances);
-        $this->setAllFolders($allFoldersUsingCourse);
-        $this->setAllAggregateFolders(new Collection());
+        $this->setUnitImplementations($unitImplementations);
+        $this->setCourseSpecification($courseSpecification);
 
         $this->setTerm($term);
-
-        $this->process();
-    }
-
-    /**
-     * Process
-     */
-    protected function process() {
-        $folderMapper = new FolderMapper();
-        $params = $this->getParams();
-
-        /* Only aggregate for one folder in 'folder' route
-         * That is defined by having a $params['folderId']
-         *
-         * Otherwise aggregate for all folders that used the same course
-         */
-        if ($params['folderId']) {
-            try {
-                $this->setSelectedFolder($folderMapper->findById($params['folderId']));
-                $this->getAllAggregateFolders()->add($this->getSelectedFolder());
-            } catch (MapperException $e) {
-                $this->setAllAggregateFolders($this->getAllFolders());
-            }
-        }
-        else {
-            //If folderid not set, show all
-            $this->setAllAggregateFolders($this->getAllFolders());
-        }
+        $this->setRouteUsed($routeUsed);
     }
 
     /**
@@ -152,18 +94,20 @@ class Metadata {
      *
      * Passed directly through to twig
      *
-     * @return string
+     * @return string|null
      */
-    public function getRoute() {
+    public function getRoute()
+    {
         return $this->params['route'];
     }
 
     /**
      * Get the selected task type to filter by
      *
-     * @return mixed
+     * @return string|null
      */
-    public function getSelectedTaskIdFilter() {
+    public function getSelectedActivityTypeFilter()
+    {
         return $this->params['taskId'];
     }
 
@@ -173,81 +117,111 @@ class Metadata {
     /**
      * Set all folders
      *
-     * @param null $allFolders
+     * @param Specification\Model $courseSpecification
      */
-    protected function setAllFolders($allFolders)
+    protected function setCourseSpecification(Specification\Model $courseSpecification)
     {
-        $this->allFolders = $allFolders;
+        $this->courseSpecification = $courseSpecification;
     }
 
     /**
      * Get all folders
      *
-     * @return null
+     * @return Specification\Model
      */
-    public function getAllFolders()
+    public function getCourseSpecification()
     {
-        return $this->allFolders;
+        return $this->courseSpecification;
     }
 
     /**
      * Set all unit instances
      *
-     * @param \Schoolbox\Collection $allUnitInstances
+     * @param \Schoolbox\Collection|Implementation\Unit\Model[] $unitImplementations
      */
-    protected function setAllUnitInstances($allUnitInstances)
+    protected function setUnitImplementations(Collection $unitImplementations)
     {
-        $this->allUnitInstances = $allUnitInstances;
+        $this->unitImplementations = $unitImplementations;
     }
+
+    /**
+     * Get the unique list of folders that relate to the unit implementations held internally
+     *
+     * @return Collection|Folder\Model[]
+     */
+    public function getUnitImplementationFolders()
+    {
+        $folders = [];
+
+        foreach ($this->getUnitImplementations()->getColumnValues('folder') as $folder) {
+            /** @var Folder\Model $folder */
+            $folders[$folder->getId()] = $folder;
+        }
+
+        return new Collection($folders);
+    }
+
+
+    /**
+     * Get the unique list of units that relate to the given folder
+     *
+     * @return Collection|Implementation\Unit\Model[]
+     */
+    public function getSelectedFolderUnitImplementations()
+    {
+        if (!$this->hasSelectedClassFolder()) {
+            return new Collection();
+        }
+
+        $units = [];
+
+        foreach ($this->getUnitImplementations() as $unit) {
+            if ($unit->getFolder()->getId() == $this->getSelectedClassFolder()->getId()) {
+                $units[$unit->getId()] = $unit;
+            }
+        }
+
+        return new Collection($units);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function hasSelectedClassFolder()
+    {
+        return $this->getSelectedClassFolder() instanceof Folder\Model;
+    }
+
 
     /**
      * Get all unit instances
      *
-     * @return \Schoolbox\Collection
+     * @return \Schoolbox\Collection|Implementation\Unit\Model[]
      */
-    public function getAllUnitInstances()
+    public function getUnitImplementations()
     {
-        return $this->allUnitInstances;
+        return $this->unitImplementations;
     }
 
     /**
      * Set course folder
      *
-     * @param Folder $courseFolder
+     * @param Folder\Model $selectedClassFolder
      */
-    protected function setCourseFolder($courseFolder)
+    protected function setSelectedClassFolder(Folder\Model $selectedClassFolder)
     {
-        $this->courseFolder = $courseFolder;
+        $this->selectedClassFolder = $selectedClassFolder;
     }
 
     /**
      * Get course folder
      *
-     * @return Folder
+     * @return Folder\Model
      */
-    public function getCourseFolder()
+    public function getSelectedClassFolder()
     {
-        return $this->courseFolder;
-    }
-
-    /**
-     * Set page title
-     *
-     * @param string $pageTitle
-     */
-    protected function setPageTitle($pageTitle)
-    {
-        $this->pageTitle = $pageTitle;
-    }
-
-    /**
-     * Get page title
-     *
-     * @return string
-     */
-    public function getPageTitle()
-    {
-        return $this->pageTitle;
+        return $this->selectedClassFolder;
     }
 
     /**
@@ -271,46 +245,6 @@ class Metadata {
     }
 
     /**
-     * Set all aggregate folders
-     *
-     * @param \Schoolbox\Collection $allAggregateFolders
-     */
-    protected function setAllAggregateFolders($allAggregateFolders)
-    {
-        $this->allAggregateFolders = $allAggregateFolders;
-    }
-
-    /**
-     * Get all aggregate folders
-     *
-     * @return \Schoolbox\Collection
-     */
-    public function getAllAggregateFolders()
-    {
-        return $this->allAggregateFolders;
-    }
-
-    /**
-     * Set selected folder
-     *
-     * @param Folder $selectedFolder
-     */
-    protected function setSelectedFolder($selectedFolder)
-    {
-        $this->selectedFolder = $selectedFolder;
-    }
-
-    /**
-     * Get selected folder
-     *
-     * @return Folder
-     */
-    public function getSelectedFolder()
-    {
-        return $this->selectedFolder;
-    }
-
-    /**
      * Get term
      *
      * @return Term
@@ -330,45 +264,22 @@ class Metadata {
         $this->term = $term;
     }
 
-//    We'll need this later, I think
-//
-//    /**
-//     * Get From
-//     *
-//     * @return Alaress_Date_Format
-//     */
-//    protected function getFrom()
-//    {
-//        return $this->from;
-//    }
-//
-//    /**
-//     * Set From
-//     *
-//     * @param Alaress_Date_Format $from
-//     */
-//    protected function setFrom($from)
-//    {
-//        $this->from = $from;
-//    }
-//
-//    /**
-//     * Get To
-//     *
-//     * @return Alaress_Date_Format
-//     */
-//    protected function getTo()
-//    {
-//        return $this->to;
-//    }
-//
-//    /**
-//     * Set To
-//     *
-//     * @param Alaress_Date_Format $to
-//     */
-//    protected function setTo($to)
-//    {
-//        $this->to = $to;
-//    }
+    /**
+     * @return string
+     */
+    public function getRouteUsed()
+    {
+        return $this->routeUsed;
+    }
+
+    /**
+     * @param string $routeUsed
+     * @return static
+     */
+    public function setRouteUsed($routeUsed)
+    {
+        $this->routeUsed = $routeUsed;
+        return $this;
+    }
+
 }

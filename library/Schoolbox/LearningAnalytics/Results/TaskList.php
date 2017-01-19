@@ -10,34 +10,34 @@
 
 namespace Schoolbox\LearningAnalytics\Results;
 
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Task;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\LearningAnalytics\Registry;
 use Schoolbox\LearningAnalytics\Metadata;
 
-class TaskList {
+class TaskList
+{
 
     /**
      * An instance of LearningAnalytics\Registry
      *
      * @var Registry
      */
-    private $registry = null;
+    private $registry;
 
     /**
      * Request metadata
      *
      * @var Metadata
      */
-    private $metadata = null;
+    private $metadata;
 
     /**
-     * An array of taskId-task relations
-     *
-     * Note this stacks them in the source task's id, not the
-     * individual derivative instances of that task
-     *
-     * @var array
+     * @var Collection|Collection[]|IAssessable[][]
      */
-    private $allTasks = array();
+    private $activities = [];
 
     /**
      * Constructor
@@ -45,21 +45,10 @@ class TaskList {
      * @param Registry $registry
      * @param Metadata $metadata
      */
-    public function __construct(Registry $registry, Metadata $metadata) {
+    public function __construct(Registry $registry, Metadata $metadata)
+    {
         $this->setRegistry($registry);
         $this->setMetadata($metadata);
-
-        $this->process();
-    }
-
-    /**
-     * Task List Union
-     * All the tasks in all the units
-     *
-     * Group by the originating task id, not the task instance id
-     * This is so you can stack results from multiple classes
-     */
-    private function process() {
 
         /* A unique list of all tasks which get matched with data in TaskResults
          *
@@ -75,48 +64,40 @@ class TaskList {
          * here prevents matching in TaskResults(), effectively removing
          * them from the boxplots.
          */
-        $allTasks = array();
 
-        foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
-            foreach ($currentUnit->getTasks() as $currentTask) {
+        $this->setActivities(new Collection());
 
-                /* If this is a submissionBox
-                 */
-                if (is_numeric($currentTask->getSubmissionBox()->getId())) {
+        foreach ($this->getRegistry()->getUnitImplementations() as $unitImplementation) {
+            $this->extractActivities($unitImplementation);
+        }
+    }
 
-                    /* If a taskId filter was selected, only include those types
-                     * Otherwise include them all
-                     */
-                    if ($this->getMetadata()->getSelectedTaskIdFilter()) {
-                        if ($this->getMetadata()->getSelectedTaskIdFilter() == $currentTask->getSubmissionBox()->getWorkType()->getId()) {
-                            $allTasks[$currentTask->getTask()->getId()] = $currentTask;
-                        }
-                    }
-                    else {
-                        $allTasks[$currentTask->getTask()->getId()] = $currentTask;
-                    }
-                }
-                /* If this is a Quiz
-                 */
-                else if (is_numeric($currentTask->getAssessment()->getId())) {
 
-                    /* If a taskId filter was selected, only include those types
-                     * Otherwise include them all
-                     */
-                    if ($this->getMetadata()->getSelectedTaskIdFilter()) {
-                        if ($this->getMetadata()->getSelectedTaskIdFilter() == $currentTask->getAssessment()->getWorkType()->getId()) {
-                            $allTasks[$currentTask->getTask()->getId()] = $currentTask;
-                        }
-                    }
-                    else {
-                        $allTasks[$currentTask->getTask()->getId()] = $currentTask;
-                    }
+    /**
+     * @param AssessmentContext $context
+     * @param callable          $filter
+     */
+    protected function extractActivities(AssessmentContext $context, callable $filter = null)
+    {
+        // by default, leave tasks out of it
+        $filter = $filter ?: function ($input) { return is_object($input) && !$input instanceof Task\Model; };
+
+        foreach ($context->getAssessables() as $activity) {
+            if ($activity instanceof AssessmentContext) {
+                // recurse into project
+                $this->extractActivities($activity, $filter);
+
+            } else {
+                $specActivity = $activity->getSpecificationAssessment();
+
+                if ($filter($specActivity)) {
+                    $this->getActivities()->offsetSet($specActivity->getId(), $specActivity);
                 }
             }
         }
 
-        $this->setAllTasks(array_values($allTasks));
     }
+
 
     /* Getters/Setters
      */
@@ -144,21 +125,21 @@ class TaskList {
     /**
      * Set all tasks
      *
-     * @param array $allTasks
+     * @param Collection|Collection[]|IAssessable[][] $activities
      */
-    private function setAllTasks($allTasks)
+    private function setActivities(Collection $activities)
     {
-        $this->allTasks = $allTasks;
+        $this->activities = $activities;
     }
 
     /**
      * Get all tasks
      *
-     * @return array
+     * @return Collection|Collection[]|IAssessable[][]
      */
-    public function getAllTasks()
+    public function getActivities()
     {
-        return $this->allTasks;
+        return $this->activities;
     }
 
     /**

@@ -10,103 +10,61 @@
 
 namespace Schoolbox\LearningAnalytics\Results;
 
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\LearningAnalytics\Registry;
 
-class TaskResults {
+class TaskResults
+{
 
     /**
-     * An instance of LearningAnalytics\Registry
+     * Feedback instances, indexed by assessment, then student
      *
-     * @var Registry
+     * @var IFeedback[][]
      */
-    private $registry = null;
-
-    /**
-     * A set of unitId-results relations
-     *
-     * @var array
-     */
-    private $allResults = array();
+    private $results = [];
 
     /**
      * Constructor
      *
      * @param Registry $registry
      */
-    public function __construct(Registry $registry) {
-        $this->setRegistry($registry);
+    public function __construct(Registry $registry)
+    {
+        $results = [];
 
-        $this->process();
-    }
+        foreach ($registry->getUnitImplementations() as $unitImplementation) {
 
-    /**
-     * Process
-     */
-    private function process() {
-        $allResults = array();
-        $everyone = $this->getRegistry()->getAllStudentRegistry();
+            $result = new Unit($unitImplementation);
 
-        foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
-            $allStudents = $everyone[$currentUnit->getId()];
-
-            /* Merge and stack results for each unit
-             */
-            $results = new Unit($allStudents, $currentUnit);
-
-            foreach ($results->getAllValues() as $taskId => $currentResultValue) {
-
-                if (count($allResults[$taskId])) {
-                    $allResults[$taskId] = array_merge($allResults[$taskId], $currentResultValue->getAll());
-                }
-                else {
-                    $allResults[$taskId] = $currentResultValue->getAll();
-                }
+            foreach ($result->getResults() as $specActivityId => $activityFeedbacks) {
+                // flatten
+                $results[$specActivityId] = $activityFeedbacks;
             }
         }
 
-        $this->setAllResults($allResults);
+        $this->setResults($results);
     }
 
     /* Getters/Setters
      */
 
     /**
-     * Set registry
-     *
-     * @param Registry $registry
-     */
-    private function setRegistry($registry)
-    {
-        $this->registry = $registry;
-    }
-
-    /**
-     * Get registry
-     *
-     * @return Registry
-     */
-    private function getRegistry()
-    {
-        return $this->registry;
-    }
-
-    /**
      * Set all results
      *
-     * @param array $allResults
+     * @param IFeedback[][] $results
      */
-    private function setAllResults($allResults)
+    private function setResults($results)
     {
-        $this->allResults = $allResults;
+        $this->results = $results;
     }
 
     /**
-     * Get all results
+     * Feedback instances, indexed by assessment, then student
      *
-     * @return array
+     * @return IFeedback[][]
      */
-    public function getAllResults()
+    public function getResults()
     {
-        return $this->allResults;
+        return $this->results;
     }
 }

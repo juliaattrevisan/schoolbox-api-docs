@@ -12,149 +12,143 @@ namespace Schoolbox\LearningAnalytics;
 
 use Alaress\Web\Controller\Base;
 
+use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
-use Schoolbox\LearningAnalytics\Progress\Overall;
-use Schoolbox\LearningAnalytics\Progress\AllUnits as AllUnitProgress;
-use Schoolbox\LearningAnalytics\Results\Averages;
-use Schoolbox\LearningAnalytics\Results\TaskList;
-use Schoolbox\LearningAnalytics\Results\TaskResults;
+use Schoolbox\Error;
+use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
-use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
-use Schoolbox\LearningAnalytics\Effort\AllEffort;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
-class Controller extends Base {
+class Controller extends Base
+{
 
     /**
-     * Same calculations as process(), just for a different set of units
+     * @api   GET /learning/analytics/course/{courseSpecId}
+     * @level 165
      *
-     * @param array $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
+     * @param array                                  $params
+     * @param Specification\Model                    $courseSpecification
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param Term                                   $term
      */
-    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
-        $this->process(
-            $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
-        );
+    public function course(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    {
+        $this->process($params, $courseSpecification, $unitImplementations, $term, 'course');
     }
 
-    /**
-     * Same calculations as process(), just for a different set of units
-     *
-     * @param array $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
-     */
-    public function courseWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
-        $this->process(
-            $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
-        );
-    }
 
     /**
-     * Same calculations as process(), just for a different set of units
+     * @api   GET /learning/analytics/course/{courseSpecId}/term/{termSlug}
+     * @level 165
      *
-     * @param array $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
+     * @param array                                  $params
+     * @param Specification\Model                    $courseSpecification
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param Term                                   $term
      */
-    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
-        $this->process(
-            $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
-        );
+    public function courseWithTerms(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    {
+        $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTerms');
     }
 
-    /**
-     * Same calculations as process(), just for a different set of units
-     *
-     * @param array $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
-     */
-    public function courseWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
-        $this->process(
-            $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
-        );
-    }
 
     /**
-     * Same calculations as process(), just for a different set of units
+     * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}
+     * @level 165
      *
-     * @param array $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
+     * @param array                                  $params
+     * @param Specification\Model                    $courseSpecification
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param Term                                   $term
      */
-    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
-        $this->process(
-            $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
-        );
+    public function courseWithTask(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    {
+        $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTask');
     }
 
-    /**
-     * Same calculations as process(), just for a different set of units
-     *
-     * @param array $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
-     */
-    public function folderWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
-        $this->process(
-            $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
-        );
-    }
 
     /**
-     * Same calculations as process(), just for a different set of units
+     * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}/term/{termSlug}
+     * @level 165
      *
-     * @param array $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
+     * @param array                                  $params
+     * @param Specification\Model                    $courseSpecification
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param Term                                   $term
      */
-    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
-        $this->process(
-            $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
-        );
+    public function courseWithTaskAndTerms(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    {
+        $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTaskAndTerms');
     }
 
+
     /**
-     * Same calculations as process(), just for a different set of units
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}
+     * @level 165
      *
-     * @param array $params
-     * @param Folder $courseFolder
-     * @param Collection $allFoldersUsingCourse
-     * @param Collection $allUnitInstances
-     * @param Term $term
+     * @param array                                  $params
+     * @param Folder                                 $selectedClassFolder
+     * @param Specification\Model                    $courseSpecification
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param Term                                   $term
      */
-    public function folderWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
-        $this->process(
-            $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
-        );
+    public function folder(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    {
+        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folder', $selectedClassFolder);
     }
+
+
+    /**
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/term/{termSlug}
+     * @level 165
+     *
+     * @param array                                  $params
+     * @param Folder                                 $selectedClassFolder
+     * @param Specification\Model                    $courseSpecification
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param Term                                   $term
+     */
+    public function folderWithTerms(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    {
+        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTerms', $selectedClassFolder);
+    }
+
+
+    /**
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}
+     * @level 165
+     *
+     * @param array                                  $params
+     * @param Folder                                 $selectedClassFolder
+     * @param Specification\Model                    $courseSpecification
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param Term                                   $term
+     */
+    public function folderWithTask(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    {
+        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTask', $selectedClassFolder);
+    }
+
+
+    /**
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termSlug}
+     * @level 165
+     *
+     * @param array                                  $params
+     * @param Folder                                 $selectedClassFolder
+     * @param Specification\Model                    $courseSpecification
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param Term                                   $term
+     */
+    public function folderWithTaskAndTerms(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    {
+        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTaskAndTerms', $selectedClassFolder);
+    }
+
 
     /**
      * Generate a context selector phplib fragment
@@ -184,6 +178,7 @@ class Controller extends Base {
         return $contextSelector->renderAsString($this->getDi()->get('sitePage'), ['term' => $term]);
     }
 
+
     /**
      * Calculate all data about $allUnitInstances
      *
@@ -198,57 +193,35 @@ class Controller extends Base {
      * Both are processed identically as data is grouped based on task
      * instances' originating task id, not the individual instance id
      *
-     * @param Collection $allUnitInstances
-     * @param Metadata $metadata
+     * @param array                                  $params                bag of holding
+     * @param Specification\Model                    $courseSpecification   spec from which all data on this page inherits
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations   units that match the term filter
+     * @param Term                                   $term                  term to filter
+     * @param Folder                                 $selectedClassFolder   if given, the class folder to filter
+     * @param string                                 $routeUsed             pass directly through to twig for route lookups
      */
-    private function process(Collection $allUnitInstances, Metadata $metadata) {
+    private function process(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term, $routeUsed, Folder $selectedClassFolder = null)
+    {
+        if ($unitImplementations->count() == 0) {
+            throw Error\Mapper::getInstance()->generateException(Error\Mapper::ERROR_NO_ANALYTICS_DATA);
+        }
 
-        /**
-         * Extend timeout processing data
-         */
-        set_time_limit(120);
-        
+        $analysis = new CohortAnalysis($courseSpecification, $unitImplementations, $selectedClassFolder, $term);
+
+
+        $metadata = new Metadata($params, $courseSpecification, $unitImplementations, $term, $routeUsed, $selectedClassFolder);
+
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
          * so just hit the external db once
          */
-        $registry = new Registry($allUnitInstances);
-
-        /**
-         * Overall Progress
-         */
-        $overallProgress = new Overall($registry);
+        $registry = new Registry($unitImplementations);
 
         /**
          * Results for all the units in each $folder contained in $allFolders
          * (generated by Registry)
          */
-        $taskList = new TaskList($registry, $metadata);
-        $taskResults = new TaskResults($registry);
         $taskTypes = new TaskTypes($metadata);
-
-        /**
-         * Grade Averages for student rankings
-         */
-        $allAverages = new Averages($taskResults->getAllResults());
-
-        /**
-         * Individual Unit Progress for all the units in each $folder
-         * contained in $allFolders (generated by Registry)
-         */
-        $stackedUnitProgress = new AllUnitProgress($registry);
-
-        /**
-         * Rubrics
-         */
-        $allRubrics = new AllRubrics($registry, $metadata);
-
-        /**
-         * Effort
-         *
-         * A metric based on Homepage accesses to grade average
-         */
-        $allEffort = new AllEffort($registry, $metadata, $allAverages);
 
         /**
          * Context Selector is a phplib -_-
@@ -259,43 +232,32 @@ class Controller extends Base {
          */
         $this->getResponse()->content->set([
             'template' => '@learningAnalytics/course.twig',
-            'data' => [
+            'data'     => [
                 'contextSelector' => $contextSelectorHtml,
-                'metadata' => [
-                    'pageTitle' => $metadata->getPageTitle(),
-                    'route' => $metadata->getRoute(),
-                    'folder' => [
-                        'all' => $metadata->getAllFolders(),
-                        'course' => $metadata->getCourseFolder(),
-                        'selected' => $metadata->getSelectedFolder(),
-                    ],
-                ],
-                'overallProgress' => [
-                    'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
-                    'classCompletions' => $overallProgress->getClassCompletions(),
-                ],
+                'metadata'        => $metadata,
+                'overallProgress' => $analysis->getOverallProgress(),
                 'results' => [
-                    'all' => $taskResults->getAllResults(),
-                    'tasks' => [
-                        'all' => $taskList->getAllTasks(),
+                    'all' => $analysis->getCohortGradesByActivity($registry),
+                    'activities' => [
+                        'all'   => $analysis->getActivities($registry, $metadata),
                         'types' => [
-                            'all' => $taskTypes->getAllTaskTypes(),
-                            'selected' => $taskTypes->getSelectedTaskFilter(),
+                            'all'      => $taskTypes->getActivityTypes(),
+                            'selected' => $taskTypes->getSelectedActivityTypeFilter(),
                         ],
                     ],
                     'ranking' => [
-                        'top' => $allAverages->findDescending('average'),
-                        'bottom' => $allAverages->findAscending('average'),
+                        'top'    => $analysis->getCohortRankings(SORT_DESC),
+                        'bottom' => $analysis->getCohortRankings(SORT_ASC),
                     ],
                 ],
                 'progress' => [
-                    'allUnits' => $stackedUnitProgress->getStackedUnitProgress(),
+                    'allUnits' => $analysis->getProgressByUnit(),
                 ],
-                'rubrics' => [
-                    'allRubrics' => $allRubrics->getAllRubrics(),
-                ],
+//                'rubrics' => [
+//                    'allRubrics' => $analysis->getCohortGradesByIndicator($registry, $metadata),
+//                ],
                 'effort' => [
-                    'allEffort' => $allEffort->getTally(),
+                    'allEffort' => $analysis->getEffort(),
                 ],
             ]
         ]);
