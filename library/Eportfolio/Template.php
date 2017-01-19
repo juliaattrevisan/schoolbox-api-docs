@@ -16,28 +16,28 @@ class Template {
 	/**
 	 * The primary key
 	 *
-	 * @var
+	 * @var int
 	 */
 	private $id;
 
 	/**
 	 * The name of the template
 	 *
-	 * @var
+	 * @var string
 	 */
 	private $name;
 
 	/**
 	 * Left column width
 	 *
-	 * @var
+	 * @var float
 	 */
 	private $leftColumnWidth;
 
 	/**
 	 * Right column width
 	 *
-	 * @var
+	 * @var float
 	 */
 	private $rightColumnWidth;
 
@@ -56,7 +56,7 @@ class Template {
 	/**
 	 * Get id
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getId() {
 		return $this->id;
@@ -65,7 +65,7 @@ class Template {
 	/**
 	 * Set left column width
 	 *
-	 * @param  $leftColumnWidth
+	 * @param float $leftColumnWidth
 	 */
 	public function setLeftColumnWidth($leftColumnWidth) {
 		$this->leftColumnWidth = $leftColumnWidth;
@@ -74,7 +74,7 @@ class Template {
 	/**
 	 * Get left column width
 	 *
-	 * @return
+	 * @return float
 	 */
 	public function getLeftColumnWidth() {
 		return $this->leftColumnWidth;
@@ -83,7 +83,7 @@ class Template {
 	/**
 	 * Set name
 	 *
-	 * @param  $name
+	 * @param string $name
 	 */
 	public function setName($name) {
 		$this->name = $name;
@@ -92,7 +92,7 @@ class Template {
 	/**
 	 * Get name
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function getName() {
 		return $this->name;
@@ -101,7 +101,7 @@ class Template {
 	/**
 	 * Set right column width
 	 *
-	 * @param  $rightColumnWidth
+	 * @param string $rightColumnWidth
 	 */
 	public function setRightColumnWidth($rightColumnWidth) {
 		$this->rightColumnWidth = $rightColumnWidth;
@@ -110,7 +110,7 @@ class Template {
 	/**
 	 * Get right column width
 	 *
-	 * @return
+	 * @return float
 	 */
 	public function getRightColumnWidth() {
 		return $this->rightColumnWidth;
