@@ -78,7 +78,7 @@ class Model implements ISoftDeletable
      */
     public function getParentId()
     {
-        return $this->parent->getId();
+        return $this->getParent()->getId();
     }
 
     /**
