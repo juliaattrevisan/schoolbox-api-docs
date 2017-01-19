@@ -26,6 +26,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -241,7 +242,7 @@ class Controller extends Base\Base
     /**
      * Saves the sequence of Assessments in specified UnitSpecification
      *
-     * @api /course/units/{id}/sequence
+     * @api /course/unitspecs/{id}/sequence
      * @level 165
      *
      * @var int[] $_POST['sequence'] AssessmentIds, indexed by sequence
@@ -1062,13 +1063,14 @@ class Controller extends Base\Base
         ]));
     }
 
+
     /**
      * Delete a unit specification.
      *
      * Does not delete the folder the UnitSpec is linked to.
      * (Essentially we are converting a Unit back to a Folder)
      *
-     * @api   POST /course/units/{id}/delete
+     * @api   POST /course/unitspecs/{id}/delete
      * @level 160
      *
      * @param UnitSpecification $unitSpec The unit spec to delete
@@ -1089,6 +1091,35 @@ class Controller extends Base\Base
             'id' => $unitSpec->getId(),
         ]));
     }
+
+    /**
+     * Delete a unit implementation.
+     *
+     * Does not delete the folder the UnitImpl is linked to.
+     * (Essentially we are converting a Unit back to a Folder)
+     *
+     * @api   POST /course/units/{id}/delete
+     * @level 160
+     *
+     * @param UnitImplementation $unitImpl The unit implementation to delete
+     */
+    public function deleteUnitImplementation(UnitImplementation $unitImpl)
+    {
+        // Does this Course exist ?
+        if(!$unitImpl->getId()){
+            $this->sendError('Unit not found');
+            return;
+        }
+        if($unitImpl->isDeleted()){
+            $this->getResponse()->status->set(410);
+        }
+        // Call delete(), even if already deleted, to enable mapper hooks to fire
+        $this->getUnitimplementationMapper()->delete($unitImpl);
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'id' => $unitImpl->getId(),
+        ]));
+    }
+
 
     /**
      * Returns a HTTP 500 error with a specific text message
