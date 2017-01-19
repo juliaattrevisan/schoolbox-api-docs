@@ -27,6 +27,7 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('role_id', self::TYPE_INTEGER);
-        $this->uses('permission', self::TYPE_STRING);
+        $this->uses('permission', self::TYPE_INTEGER);
+        $this->uses('page', self::TYPE_STRING);
     }
 }
