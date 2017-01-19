@@ -23,7 +23,7 @@ use Schoolbox\GenericCollection;
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Descriptor createModel($idValue = null)
  * @method Descriptor[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
- * @method Descriptor findOneByColumnList($columnList, $order = [])
+ * @method Descriptor findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
  * @method Descriptor hydrate(array $row, $alias = '', $callback = null)
  */
 class DescriptorMapper extends Schoolbox\Mapper {
