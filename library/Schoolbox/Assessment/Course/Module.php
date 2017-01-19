@@ -109,6 +109,15 @@ class Module extends BaseModule
             }
         };
 
+        $preloadUnitImpl = function (array $params) {
+            try{
+                return ['unitImpl' => $this->getUnitImplementationMapper()->findById($params['id'])];
+            } catch (MapperException\Deleted $e) {
+                return ['unitImpl' => $e->getDeletedObject()];
+            } catch (MapperException $e){
+                return ['unitImpl' => $this->getUnitImplementationMapper()->createModel()];
+            }
+        };
 
         $this->register('GET', '/modify/{id}', 'modifyCourse', null, $preloadCourseSpec);
         $this->register('POST', '/new', 'createCourse');
@@ -118,7 +127,7 @@ class Module extends BaseModule
         $this->register('POST', '/modify/{id}', 'updateCourse', null, $preloadCourseSpec);
         $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', null, $preloadUnitSpec);
         $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', null, $preloadUnitSpec);
-        $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnitSpec);
+        $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnitImpl);
     }
 
     /**
@@ -154,7 +163,7 @@ class Module extends BaseModule
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class, [], [
-                'setAssessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
+                'setAssessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
                 'setCourseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
                 'setCourseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
                 'setUnitSpecificationMapper'    => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
@@ -199,6 +208,14 @@ class Module extends BaseModule
     protected function getUnitSpecificationMapper()
     {
         return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+    }
+
+    /**
+     * @return UnitImplementationMapper
+     */
+    protected function getUnitImplementationMapper()
+    {
+        return $this->getMapperFactory()->get(UnitImplementationMapper::class);
     }
 
     /**
