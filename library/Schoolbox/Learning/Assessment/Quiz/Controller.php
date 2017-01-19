@@ -208,22 +208,22 @@ class Controller extends Assessment\Controller
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
+     * @param string|null $explicitReturnUrl
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = '')
     {
         /**
          * Always go to the screen when a quiz has been created,
          * but send the return url with it
          */
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
-        $redirect = $this->getRouter()->generate('learningQuiz.getQuizSectionCreate', ['assessmentId' => $assessment->getId()]);
+        $redirect = "/assess/section/create/{$quiz->getId()}";
 
         if ($explicitReturnUrl) {
             $redirect .= '?' . Redirect::RETURN_URL . "=$explicitReturnUrl";
         }
-
         return $redirect;
     }
 

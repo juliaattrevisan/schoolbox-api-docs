@@ -158,7 +158,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         if ($postReturnUrl) {
             $returnUrl = Redirect::decode($postReturnUrl);
         } else {
-            $returnUrl = $this->determineRedirect($assessment, $internalReturnUrl);
+            $returnUrl = $this->determineRedirect($assessment, $postReturnUrl, $internalReturnUrl);
         }
 
         // we're done here
@@ -385,10 +385,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
+     * @param string|null $postReturnUrl an encoded URL
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    protected function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '')
     {
         // if your context is a project, redirect back to its status screen
         if ($assessment->getContext() instanceof Project) {

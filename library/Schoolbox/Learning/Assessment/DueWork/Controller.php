@@ -514,11 +514,11 @@ class Controller extends Assessment\Controller
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
-     * @param string      $explicitReturnUrl
+     * @param string|null $explicitReturnUrl
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl, $defaultReturnUrl = '')
+    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = '')
     {
         /**
          * First priority is an explicit return URL sent
