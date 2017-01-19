@@ -15,6 +15,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizModel;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -24,9 +25,22 @@ use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
 use Timetable_ColourMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 
 class Controller extends Base
 {
+    /**
+     * @var QuizMapper
+     */
+    private $quizMapper;
+
+    /**
+     * @var QuizAttemptMapper
+     */
+    private $quizAttemptMapper;
+
     /**
      * @var ShowcaseMapper
      */
@@ -68,13 +82,15 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper            $errorMapper
-     * @param AssessmentMapperProxy  $assessmentMapperProxy
-     * @param FolderMapper           $folderMapper
-     * @param TermMapper             $termMapper
-     * @param GradeGroup             $defaultGradeGroup
-     * @param ShowcaseMapper         $showcaseMapper
-     * @param RubricMapper           $rubricMapper
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param FolderMapper $folderMapper
+     * @param TermMapper $termMapper
+     * @param GradeGroup $defaultGradeGroup
+     * @param ShowcaseMapper $showcaseMapper
+     * @param RubricMapper $rubricMapper
+     * @param QuizMapper $quizMapper
+     * @param QuizAttemptMapper $quizAttemptMapper
      * @param Timetable_ColourMapper $timetableColourMapper
      */
     public function __construct(
@@ -85,6 +101,8 @@ class Controller extends Base
         GradeGroup $defaultGradeGroup,
         ShowcaseMapper $showcaseMapper,
         RubricMapper $rubricMapper,
+        QuizMapper $quizMapper,
+        QuizAttemptMapper $quizAttemptMapper,
         Timetable_ColourMapper $timetableColourMapper
     ) {
         $this->setErrorMapper($errorMapper);
@@ -94,6 +112,8 @@ class Controller extends Base
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
         $this->setRubricMapper($rubricMapper);
+        $this->quizMapper = $quizMapper;
+        $this->quizAttemptMapper = $quizAttemptMapper;
         $this->timetableColourMapper = $timetableColourMapper;
     }
 
@@ -342,9 +362,29 @@ class Controller extends Base
         $graphData = [];
         $graphScatter = [];
         $graphFeedback = [];
+        $quizzes = [];
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
+
+            // If this is a quiz we need to find out if the student has made any attempts so we can display a link to view them
+
+            if ($assessment instanceof QuizModel)
+            {
+                try {
+                    $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
+                    $attempts = $this->quizAttemptMapper->findByColumnList([
+                        'assess_id' =>$quiz->getId(),
+                        'user_id' => $viewee->getId()
+                    ]);
+
+                    if ($attempts->count() > 0) {
+                        $quizzes[$assessment->getId()] = $quiz;
+                    }
+                } catch (MapperException $e) {
+                }
+            }
+
             $graphAssessments[] = $assessment->getTitle();
 
             $feedback = $assessment->getParticipant($viewee)->findMostRecentVisibleFeedback($this->getUser());
@@ -427,6 +467,7 @@ class Controller extends Base
             'canComment'        => $conversation->canComment($this->getUser()),
             'comments'          => $conversation->getVisibleComments($this->getUser()),
             'currentUser'       => $this->getUser(),
+            'quizzes'           => $quizzes,
             'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term)
         ]));
     }

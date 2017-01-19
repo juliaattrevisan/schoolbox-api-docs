@@ -246,7 +246,7 @@
             <section>
                 <ul class="action-list">
                     {% for assessment in markbook.assessments %}
-                        <li class="actions-small-1">
+                        <li class="actions-small-2">
                             <div class="list-item clearfix content">
                                 <div class="row">
                                     <div class="small-12 large-5 card column xl">
@@ -273,6 +273,9 @@
                                 </div>
                             </div>
                             <nav>
+                                {% if quizzes[assessment.id] is not empty %}
+                                    <a class="icon-view" href="/assess/attempts/{{ quizzes[assessment.id].id }}/{{ student.id }}" title="View Attempts"></a>
+                                {% endif %}
                                 {% if assessment.getFamilyName == 'dueWork' and feedback %}
                                     <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
                                     <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
