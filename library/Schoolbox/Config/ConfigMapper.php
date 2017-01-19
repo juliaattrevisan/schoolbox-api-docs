@@ -30,8 +30,10 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 		// Load database only on request, so this can be tested
 		$this->map = new MappingCollection();
 		$this->setup();
-		$this->setConfigLoader($this); // this line will possibly blow up in my face
-		$this->setColumnFactory(new ColumnFactory());
+        $this->initCaches();
+        $this->setConfigLoader($this); // this line will possibly blow up in my face
+        $this->setMonitor(self::$perfmon);
+        $this->setColumnFactory(new ColumnFactory());
 
 		$w = realpath( __DIR__ . "/../../..");
 		$this->consts = array(
