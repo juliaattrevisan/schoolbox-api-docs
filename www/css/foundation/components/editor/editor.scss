@@ -3,12 +3,6 @@
 }
 
 .cke_dialog_body {
-    input[type=checkbox], input[type=radio] {
-        opacity: 1;
-        width: auto;
-        height: auto;
-    }
-
     .schoolboxresource-preview {
         border: 1px solid #ccc;
         width: 100%;
@@ -22,23 +16,46 @@
         display: block;
     }
 
-    .schoolboxresource-button {
-        margin-top: 0.875rem;
-        display: block;
-        padding: 0.75rem;
-    }
-
-    .cke_dialog_ui_input_select,
-    .cke_dialog_ui_input_select {
-        width: 100%;
-    }
-
     .schoolboxlink-anchor-preamble {
         color: #808080;
     }
 
     .schoolboxlink-anchor-example {
         font-weight: bold;
+    }
+
+    .cke_dialog_ui_input_select {
+        width: 100%;
+    }
+
+    .cke_dialog_ui_hbox_last {
+        vertical-align: bottom;
+    }
+
+    /**
+     * Overwrite our global input styles for ckeditor dialogs
+     */
+    input,
+    select {
+        height: auto;
+        min-height: 28px;
+    }
+
+    select {
+        line-height: normal !important;
+    }
+
+    input[type="checkbox"]+label,
+    input[type="radio"]+label {
+        margin: 0;
+    }
+
+    input[type=checkbox],
+    input[type=radio] {
+        position: static;
+        opacity: 1;
+        width: auto;
+        height: auto;
     }
 }
 
@@ -99,18 +116,4 @@ a.cke_button {
  */
 .cke_contents {
     padding: 1rem !important;
-}
-
-/* Overwrite our global input styles for ckeditor dialogs
- */
-.cke_dialog_body {
-    input[type="checkbox"]+label,
-    input[type="radio"]+label {
-        margin: 0;
-    }
-
-    input[type=checkbox],
-    input[type=radio] {
-        position: static;
-    }
 }
