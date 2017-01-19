@@ -161,7 +161,6 @@
 
             if (checked) {
                 $cells.removeClass(opt.hideVerticalClass).find(opt.inputSelector).prop('disabled', false);
-
             } else {
                 $cells.addClass(opt.hideVerticalClass).find(opt.inputSelector).prop('disabled', true);
             }
@@ -331,6 +330,11 @@
 
                     this.name = split.join('][');
 
+                    var $elem = $(this);
+                    var attr = $(this).attr('data-descriptor-value');
+                    if(attr !== undefined && attr !== false){
+                        $elem.attr('data-descriptor-level-index', nextIndex);
+                    }
                 });
 
                 $td.after($clone);
@@ -468,13 +472,14 @@
             });
 
             // Renumber descriptor texts
-            $row.find('[data-descriptor="text"]').each(function(i) {
+            $row.find('[data-descriptor-text]').each(function(i) {
                 this.name = this.name.replace(/\[\d+]\[text]$/, '[' + String(i) + '][text]');
             });
 
             // Renumber descriptor values
-            $row.find('[data-descriptor="value"]').each(function(i) {
+            $row.find('[data-descriptor-value]').each(function(i) {
                 this.name = this.name.replace(/\[\d+]\[points]$/, '[' + String(i) + '][points]');
+                $(this).attr('data-descriptor-level-index', String(i));
             });
         });
     };

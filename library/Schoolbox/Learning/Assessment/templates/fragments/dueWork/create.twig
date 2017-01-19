@@ -110,6 +110,7 @@
     rubric: rubric,
     rubricAttachZone: rubricAttachZone,
     resultSets: rubricResultSets,
+    rubricHasMarks: rubricHasMarks,
     assessment: assessment
 } only %}
 
@@ -166,7 +167,7 @@
                     return true; // jq.continue
                 }
 
-                $row.find('[data-descriptor="value"]').each(function () {
+                $row.find('[data-descriptor-value]').each(function () {
                     var i = parseInt($(this).val());
 
                     if (!isNaN(i)) {
@@ -191,7 +192,7 @@
 
         // configure callbacks into the grid
         $grid
-            .on('change', '[data-descriptor="value"],[data-criterion-name]', calculateGridTotal)
+            .on('change', '[data-descriptor-value], [data-criterion-name]', calculateGridTotal)
             .rubricEditable({
                 afterApplyResultSet: calculateGridTotal
             });

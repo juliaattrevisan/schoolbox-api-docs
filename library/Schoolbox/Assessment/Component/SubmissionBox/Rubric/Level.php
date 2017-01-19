@@ -27,7 +27,7 @@ class Level implements ISoftDeletable
     private $name;
 
     /**
-     * 1-indexed. 0 indicates unknown (most likely inserted during data-recovery but sequence unable to be derived)
+     * 0-indexed
      *
      * @var int
      */
