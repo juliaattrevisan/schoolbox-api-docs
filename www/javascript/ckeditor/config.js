@@ -35,6 +35,9 @@ CKEDITOR.editorConfig = function (config) {
 
     // Simplify the dialog windows.
     config.removeDialogTabs = 'image:advanced;link:advanced';
+
+    // Dialog background colour
+    config.dialog_backgroundCoverColor = "#000000";
 };
 
 // Inject nanospell
@@ -74,7 +77,7 @@ var nanospell = {
                 }
             });
         }
-    },
+    }
 };
 
 nanospell.ckeditor('all', {
