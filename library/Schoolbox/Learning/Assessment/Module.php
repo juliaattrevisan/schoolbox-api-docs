@@ -90,7 +90,7 @@ class Module extends BaseModule
         $participantView = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasRole(Role::STAFF),
-            new IsParticipant()
+            new Rule\IsUser('studentId')
         );
 
         // if parent access is NOT restricted, allow for parents also
@@ -101,7 +101,7 @@ class Module extends BaseModule
         $canSubmit = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasRole(Role::STAFF),
-            new IsParticipant()
+            new Rule\IsUser('studentId')
         );
 
 
