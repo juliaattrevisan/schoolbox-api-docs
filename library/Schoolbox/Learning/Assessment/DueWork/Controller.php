@@ -509,9 +509,12 @@ class Controller extends Assessment\Controller
         // Do any students have marks for this rubric?
         $levelIds = Rubric\LevelMapper::getInstance()->findIdsByColumn('box_id', $dueWork->getRubric()->getSubmissionBox()->getId());
         $descriptorIds = Rubric\DescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-        $markIds = Rubric\MarkMapper::getInstance()->findIdsByColumn('descriptor_id', $descriptorIds);
+        $countMarkIds = Rubric\MarkMapper::getInstance()->countByColumnList([
+            'descriptor_id' => $descriptorIds,
+            'valid'         => true
+        ]);
 
-        $data['rubricHasMarks'] = !!count($markIds);
+        $data['rubricHasMarks'] = !!$countMarkIds;
 
         return $data;
     }
