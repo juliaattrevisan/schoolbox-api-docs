@@ -498,8 +498,8 @@ class Controller extends Assessment\Controller
         $rs = new Collection();
 
         foreach ($resultSets as $result) {
-            if (!$rs[$result->getResultSetId()] instanceof Collection) {
-                $rs[$result->getResultSetId()] = new Collection();
+            if (!$rs[$result->getResultSetId()] instanceof \ICollection) {
+                $rs[$result->getResultSetId()] = $this->getResultSetMapper()->createCollection();
             }
             $rs[$result->getResultSetId()][$result->getValue()] = $result;
         }
