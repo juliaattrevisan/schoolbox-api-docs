@@ -189,7 +189,9 @@ class TreeBuilder extends AbstractTreeBuilder
             throw new Resource\Exception("No permission for this node");
         }
         if ($file instanceof Resource\AbstractFile) {
-            return $this->generateFileArray($file, $file->getTitle(),
+            return $this->generateFileArray(
+                $file,
+                $file->getTitle(),
                 [
                     'data-permission' => $permission,
                     'data-type' => 'file'
@@ -204,6 +206,8 @@ class TreeBuilder extends AbstractTreeBuilder
                 $file->getFolder()->getId(),
                 'link',
                 $file->getDescription(),
+                null,
+                null,
                 [
                     'data-id' => $file->getId(),
                     'data-permission' => $permission,

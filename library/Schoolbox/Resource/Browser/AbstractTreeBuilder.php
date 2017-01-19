@@ -238,7 +238,12 @@ abstract class AbstractTreeBuilder
         }
 
         // Output something.
-        return $this->generateFolderArray($folder, $type, $name, $colour, $coverImage,
+        return $this->generateFolderArray(
+            $folder,
+            $type,
+            $name,
+            $colour,
+            $coverImage,
             [
                 'data-permission' => $permission,
                 'data-type' => $type
@@ -262,7 +267,9 @@ abstract class AbstractTreeBuilder
             throw new Resource\Exception("No permission for this node");
         }
 
-        return $this->generateFileArray($file, $file->getTitle(),
+        return $this->generateFileArray(
+            $file,
+            $file->getTitle(),
             [
                 'data-permission' => $permission,
                 'data-type' => 'file'
@@ -286,7 +293,16 @@ abstract class AbstractTreeBuilder
      */
     protected function generateFolderArray(IFolder $folder, $type, $name = null, Color $colour = null, IStorage $coverImage, array $liAttributes = null, array $aAttributes = null)
     {
-        return $this->generateNodeArray($folder->getId(), $folder->getParent()->getId(), $type, $name ?: $folder->getName(), $colour, $coverImage, $liAttributes, $aAttributes);
+        return $this->generateNodeArray(
+            $folder->getId(),
+            $folder->getParent()->getId(),
+            $type,
+            $name ?: $folder->getName(),
+            $colour,
+            $coverImage,
+            $liAttributes,
+            $aAttributes
+        );
     }
 
 
@@ -299,7 +315,16 @@ abstract class AbstractTreeBuilder
      */
     protected function generateFileArray(Resource\AbstractFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
     {
-        return $this->generateNodeArray($file->getId(), $file->getFolder()->getId(), 'file', $name ?: $file->getTitle(), null, $liAttributes, $aAttributes);
+        return $this->generateNodeArray(
+            $file->getId(),
+            $file->getFolder()->getId(),
+            'file',
+            $name ?: $file->getTitle(),
+            null,
+            null,
+            $liAttributes,
+            $aAttributes
+        );
     }
 
 
