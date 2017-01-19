@@ -169,7 +169,7 @@ abstract class Mapper implements IMapper, Serializable
     static private $columnFactory;
 
     /** @var IMonitor */
-    private static $perfmon;
+    protected static $perfmon;
 
     /**
      * Factory for building column hydrators.

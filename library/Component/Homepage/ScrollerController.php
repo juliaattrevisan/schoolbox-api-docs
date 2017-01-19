@@ -24,7 +24,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->parseConfig();
 
         // Load images for the current homepage
-        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), 0, true);
+        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), 0);
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());

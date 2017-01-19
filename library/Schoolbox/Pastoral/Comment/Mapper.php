@@ -11,29 +11,11 @@ namespace Schoolbox\Pastoral\Comment;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 
 class Mapper extends BaseMapper
 {
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
-     * Mapper constructor.
-     */
-    public function __construct()
-    {
-        $this->setErrorMapper(ErrorMapper::getInstance());
-        Parent::__construct();
-    }
-
     /**
      * Setup mapper
      */
@@ -88,21 +70,5 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     * @return $this
-     */
-    public function setErrorMapper($errorMapper) {
-        $this->errorMapper = $errorMapper;
-        return $this;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    public function getErrorMapper() {
-        return $this->errorMapper;
     }
 }

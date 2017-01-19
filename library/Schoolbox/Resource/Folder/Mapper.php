@@ -94,12 +94,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     protected $ancestry;
 
-    /**
-     * Mapper constructor.
-     */
-    public function __construct() {
-        parent::__construct();
-    }
 
     /**
      * @inheritdoc
@@ -267,10 +261,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @deprecated use File\Mapper::findForFolders() directly
      * @param Model $folder
      * @param int $limit
-     * @param bool $excludeWork
      * @return File\Model[]|Collection
      */
-    public function findImages(Model $folder, $limit = 0, $excludeWork = false)
+    public function findImages(Model $folder, $limit = 0)
     {
         /** @var File\Mapper $fileMapper */
         $fileMapper = $this->getJoinMapper('files');
