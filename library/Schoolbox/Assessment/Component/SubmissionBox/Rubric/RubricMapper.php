@@ -820,6 +820,14 @@ class RubricMapper
             foreach($existingCriterionDescriptors as $levelId => $existingDescriptor){
                 /** @var Descriptor $newDescriptor */
                 $newDescriptor = $newCriterionDescriptors->getOffset($levelId);
+
+                // Has the descriptor been deleted?
+                if(!$newDescriptor){
+                    $hasDescriptorValuesChanged = true;
+                    break;
+                }
+
+                // Has the value changed ?
                 $existingValue = $existingDescriptor->getValue();
                 $newValue      = $newDescriptor->getValue();
                 if($existingValue != $newValue){
