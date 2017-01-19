@@ -157,8 +157,12 @@ if (is_array($_SESSION['children'])) {
 }
 
 // retrieve category listing
-$categoryList = $groupHandler->involvedInCategoryList($user['uid']);
-
+if(!$user['hide_timetable']) {
+    $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
+}
+else {
+    $categoryList = [];
+}
 // parse IDs into array
 if (is_array($categoryList)) {
     foreach ($categoryList as $category) {
