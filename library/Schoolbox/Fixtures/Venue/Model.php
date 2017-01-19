@@ -25,16 +25,16 @@ class Model implements ISoftDeletable, ValueLabelInterface
     use DeletedAtDate;
 
     /** @var string */
-    protected $name;
+    private $name;
     
     /** @var float $latitude */
-    protected $latitude;
+    private $latitude;
 
     /** @var float $longitude */
-    protected $longitude;
+    private $longitude;
 
     /** @var string $address*/
-    protected $address;
+    private $address;
 
     /**
      * {@inheritdoc}
