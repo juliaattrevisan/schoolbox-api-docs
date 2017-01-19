@@ -253,9 +253,9 @@ class Controller extends Base
                 'progress' => [
                     'allUnits' => $analysis->getProgressByUnit(),
                 ],
-//                'rubrics' => [
-//                    'allRubrics' => $analysis->getCohortGradesByIndicator($registry, $metadata),
-//                ],
+                'rubrics' => [
+                    'allRubrics' => $analysis->getCohortGradesByIndicator($registry, $metadata),
+                ],
                 'effort' => [
                     'allEffort' => $analysis->getEffort(),
                 ],
