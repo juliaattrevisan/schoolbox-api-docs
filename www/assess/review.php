@@ -117,8 +117,17 @@ $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATAB
 $attemptDate = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $term = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
+
+if (isset($_GET["returnUrl"])) {
+    $returnUrl = \Schoolbox\Learning\Assessment\Redirect::decode($_GET["returnUrl"]);
+} else {
+    $returnUrl = "/submission/listSubmission/{$term->getCode()}/{$folder->getId()}";
+}
+
 $this->setVar(
     array(
+        'RETURN_URL' => $returnUrl,
+        'RETURN_URL_SUFFIX' => empty($returnUrl) ? '' : '?returnUrl=' . $returnUrl,
         'ASSESS_ASSESS_ID' => $assess['assess_id'],
         'ASSESS_TITLE' => Scrub::text($assess['title']),
         'ASSESS_START' => $openDate->getShort(),

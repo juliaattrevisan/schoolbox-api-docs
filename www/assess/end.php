@@ -138,8 +138,11 @@ $numMarkedQuestions     = $responseHandler->numAutomarked($attemptId);
 $numUnmarkedQuestions   = $responseHandler->numNotAutomarked($attemptId);
 $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($attemptId);
 
+$returnUrlSuffix = isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "";
+
 $this->setVar(
     array(
+        'RETURN_URL_SUFFIX' => $returnUrlSuffix,
         'ATTEMPT_MARKS'                    => $marks,
         'ATTEMPT_PERCENTAGE'               => $percentage,
         'ATTEMPT_TOTAL'                    => $total,
@@ -217,7 +220,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text'  => $assess['title'],
-        'href'  => '/assess/intro/' . $assess['assess_id'],
+        'href'  => '#',
         'class' => 'active'
     ],
 ]);

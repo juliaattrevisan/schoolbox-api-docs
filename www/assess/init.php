@@ -107,4 +107,7 @@ if (!$attempt) {
 
 /* Redirect to the original destination
  */
-SitePage::localRedir('/assess/attempt/' . $this->arg[0] . '/' . $this->arg[1]);
+
+$returnUrlSuffix = isset($_GET['returnUrl']) ? "?returnUrl=". $_GET['returnUrl'] : '';
+
+SitePage::localRedir('/assess/attempt/' . $this->arg[0] . '/' . $this->arg[1] . $returnUrlSuffix);

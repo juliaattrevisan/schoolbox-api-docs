@@ -190,17 +190,19 @@ class Controller extends Assessment\Controller
      */
     protected function redirectToSummaryOrIntro(User $sessionUser, User $participantUser, IAssessable $assessment)
     {
+        $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
+
         if ($sessionUser->getId() == $participantUser->getId()) {
             // this is the special case: redirect to intro
             $this->getResponse()->redirect->afterPost(
-                $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ])
+                $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
             );
             return;
         }
 
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
-        $this->getResponse()->redirect->to("/assess/attempts/{$quiz->getId()}/{$participantUser->getId()}");
+        $this->getResponse()->redirect->to("/assess/attempts/{$quiz->getId()}/{$participantUser->getId()}" . $returnUrlSuffix);
     }
 
 
