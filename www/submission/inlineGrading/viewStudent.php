@@ -21,7 +21,7 @@ if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
     $assessmentId = $submissionBox->getAssessmentId();
     $studentId = $submission->getOwner()->getId();
 
-    $url .= $assessmentId.'/'.$studentId.'/'.$this->arg[0]; //assessmentId/userId/submissionId
+    $url .= $assessmentId.'/'.$studentId; //assessmentId/userId/submissionId
     $this->localRedir($url, null, 301);
 }
 $this->pageNotFound();

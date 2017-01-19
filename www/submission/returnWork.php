@@ -17,7 +17,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
     }
     $assessmentId= $submissionBox->getAssessmentId();
 
-    $this->localRedir('/learning/responses/'.$assessmentId.'/'.$this->arg[1], null, 301); // assessmentId/userId
+    $this->localRedir('/learning/assessments/'.$assessmentId.'/'.$this->arg[1].'/responses', null, 301); // assessmentId/userId
 }
 $this->pageNotFound();
 
