@@ -345,7 +345,7 @@ class DataTransferObject
                 throw new \DomainException('Invalid Pair: ' . print_r($pair, true));
             }
         }
-        return $nextAvailable;
+        return $end;
     }
 
 
