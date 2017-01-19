@@ -29,6 +29,7 @@
         </div>
     {% else %}
         {% for class in classList %}
+            {% set course = courses[class.id][0] %}
             <div class="small-6 medium-6 large-4 island">
                 <section>
                     <div class="card-new small-12">
@@ -47,7 +48,11 @@
                                     <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
                                 {% endif %}
                                 <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
-                                <li><a href=" {{ routeLookup('learningAnalytics.course', {}) }} " class="icon-poll">Analytics</a></li>
+
+                                {% if course %}
+                                    <li><a href="{{ routeLookup('learningAnalytics.folder', {courseId: course.id, folderId: class.id}) }}" class="icon-poll">Analytics</a></li>
+                                {% endif %}
+
                                 {% if term.contains(now) %}
                                     <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
                                 {% endif %}

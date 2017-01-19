@@ -28,6 +28,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation;
 
 class Controller extends Base
 {
@@ -262,6 +263,10 @@ class Controller extends Base
             }
         }
 
+        $courseImplementations = Implementation\Mapper::getInstance()->findByFolderId($folderList->getColumnValues('id'))->groupByCallback(function (Implementation\Model $i) {
+            return $i->getFolder()->getId();
+        });
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
             'currentUser' => $this->getUser(),
             'terms'       => $this->getTermMapper()->findAll(),
@@ -269,6 +274,7 @@ class Controller extends Base
             'term'        => $term,
             'classList'   => $folderList,
             'classTypes'  => $classTypes,
+            'courses'     => $courseImplementations,
         ]));
     }
 
