@@ -65,14 +65,6 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, '(?:getPendingAssessments|getClasses)', new Rule\IsLoggedIn());
 
         $this->addRoutePermission(
-            $authorizer,
-            '(?:getPendingAssessments|getMarkbook)',
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params) {
-                return $params['class']->getId();
-            }, Access::getInstance())
-        );
-
-        $this->addRoutePermission(
                 $authorizer,
                 '(?:getPendingAssessmentsForUser)',
                 new Rule\Any(
