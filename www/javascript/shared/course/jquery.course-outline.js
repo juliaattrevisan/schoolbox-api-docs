@@ -77,6 +77,8 @@
                     confirmLabel: 'Delete',
                     cancelLabel: 'Cancel',
                     confirmEvent: function(element) {
+                        var toaster = component.find('[data-alert]');
+                        toaster.toastActivate({text: 'Deleting unit...'});
 
                         /* The list element containing this row
                          */
@@ -90,9 +92,14 @@
                             .done(function () {
                                 // Delete this unit from the list
                                 element.closest('[data-unit]').remove();
+
+                                toaster.toastTimeout({
+                                    text: 'Unit deleted',
+                                    css: 'pop success'
+                                });
                             })
                             .fail(function () {
-                                component.find('[data-alert]').toastTimeout({
+                                toaster.toastTimeout({
                                     text: 'Could not delete this unit',
                                     css: 'pop alert'
                                 });
