@@ -66,19 +66,37 @@
         // Delete unit - "are you sure?"
         component.on(
             'click.courseInstance',
-            'a[data-interaction="open_delete_unit_form"]',
+            'a[data-action="delete-unit"]',
             function(event) {
                 event.preventDefault();
+
                 var element = $(this);
+
                 element.confirmDialog({
                     text: 'Are you sure you wish to delete this unit? All tasks, linked due work and quizzes within the unit will be deleted.',
+                    confirmLabel: 'Delete',
+                    cancelLabel: 'Cancel',
                     confirmEvent: function(element) {
-                        var unit_element = element.closest('[data-unit]');
-                        var form         = unit_element.find('[data-form_type="delete_unit"]');
-                        $.post(form.attr('action'), form.serialize(), function(data) {
-                            // Delete this unit from the list
-                            unit_element.remove();
-                        }, 'json');
+
+                        /* The list element containing this row
+                         */
+                        $.ajax(element.attr('href'), {
+                                headers: {
+                                    'X-HTTP-Method-Override': 'DELETE'
+                                },
+                                dataType: 'json',
+                                type: 'POST'
+                            })
+                            .done(function () {
+                                // Delete this unit from the list
+                                element.closest('[data-unit]').remove();
+                            })
+                            .fail(function () {
+                                component.find('[data-alert]').toastTimeout({
+                                    text: 'Could not delete this unit',
+                                    css: 'pop alert'
+                                });
+                            });
                     }
                 });
             }
