@@ -124,14 +124,14 @@ class Controller extends Base
     {
         // Blow away old permissions, could probably be more graceful and update
 
-        $this->getCourseConfigMapper()->deleteByColumn("page", "course");
-        $this->getCourseConfigMapper()->deleteByColumn("page", "unit");
+        $this->getCourseConfigMapper()->deleteByColumn('page', 'course');
+        $this->getCourseConfigMapper()->deleteByColumn('page', 'unit');
 
         // Add course permissions back
 
-        foreach ($this->getRequest()->post["course_group"] as $roleId => $permission) {
+        foreach ($this->getRequest()->post->get('course_group',[]) as $roleId => $permission) {
             $model = $this->getCourseConfigMapper()->createModel();
-            $model->setPage("course");
+            $model->setPage('course');
             $model->setPermission($permission);
             $model->setRoleId($roleId);
             $this->getCourseConfigMapper()->save($model);
@@ -139,9 +139,9 @@ class Controller extends Base
 
         // Add unit permissions back
 
-        foreach ($this->getRequest()->post["unit_group"] as $roleId => $permission) {
+        foreach ($this->getRequest()->post->get('unit_group',[]) as $roleId => $permission) {
             $model = $this->getCourseConfigMapper()->createModel();
-            $model->setPage("unit");
+            $model->setPage('unit');
             $model->setPermission($permission);
             $model->setRoleId($roleId);
             $this->getCourseConfigMapper()->save($model);
@@ -149,12 +149,12 @@ class Controller extends Base
 
         // Update default page templates
 
-        $courseTemplate = $this->getConfigMapper()->findOneByColumn("name", "course_builder_default_course_page_template");
-        $courseTemplate->setValue($this->getRequest()->post["courseTemplate"]);
+        $courseTemplate = $this->getConfigMapper()->findOneByColumn('name', 'course_builder_default_course_page_template');
+        $courseTemplate->setValue($this->getRequest()->post['courseTemplate']);
         $this->getConfigMapper()->save($courseTemplate);
 
-        $unitTemplate = $this->getConfigMapper()->findOneByColumn("name", "course_builder_default_unit_page_template");
-        $unitTemplate->setValue($this->getRequest()->post["unitTemplate"]);
+        $unitTemplate = $this->getConfigMapper()->findOneByColumn('name', 'course_builder_default_unit_page_template');
+        $unitTemplate->setValue($this->getRequest()->post['unitTemplate']);
         $this->getConfigMapper()->save($unitTemplate);
 
         // Update default inheritance

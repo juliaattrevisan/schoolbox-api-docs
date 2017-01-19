@@ -90,7 +90,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
 
 
         // Load images for the current homepage
-        $allImages = $this->getFolderMapper()->findImages($this->getSource(), $this->getConfig('size'), true);
+        $allImages = $this->getFolderMapper()->findImages($this->getSource(), $this->getConfig('size'));
 
         if ($allImages->count()) {
             // Iterate
