@@ -49,17 +49,6 @@ class Model implements ISoftDeletable, ValueLabelInterface
         ];
     }
 
-    /**
-     * Get lat/long together
-     * Like a fairytale
-     *
-     * @return string
-     */
-    public function getLatLong()
-    {
-        return "{$this->getLatitude()},{$this->getLongitude()}";
-    }
-
     /* Getters/Setters
      */
 

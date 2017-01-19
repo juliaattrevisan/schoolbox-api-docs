@@ -138,7 +138,8 @@ class Weather
              */
             if ($matchDayDiff < $this->getForecastLength()) {
                 $weatherController = new \Weather_Wunderground();
-                $weatherController->guessLocation($match->getVenue()->getLatLong());
+                $locationString = "{$match->getVenue()->getLatitude()},{$match->getVenue()->getLongitude()}";
+                $weatherController->guessLocation($locationString);
                 $forecast = $weatherController->getForecast();
 
                 /* Can probably find the data a little faster than spawning
