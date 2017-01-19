@@ -11,9 +11,15 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-    $submissionBox = $submissionBoxMapper->findById($this->arg[1]);
+    // Is the submission box still there?
+    try {
+        $submissionBox = $submissionBoxMapper->findById($this->arg[1]);
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        $this->pageNotFound();
+    }
     $assessmentId= $submissionBox->getAssessmentId();
-    SitePage::localRedir('/learning/assessments/'.$assessmentId.'/modify', null, 301);
+    $this->localRedir('/learning/assessments/'.$assessmentId.'/modify', null, 301);
 }
 elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $url = '/learning/folders/'.$this->arg[1].'/assessments/new?type=';
@@ -27,10 +33,10 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     else {
         $url .= 'dueWork';
     }
-    SitePage::localRedir($url, null, 301);
+    $this->localRedir($url, null, 301);
 }
 else {
-    SitePage::pageNotFound();
+    $this->pageNotFound();
 }
 
 /*

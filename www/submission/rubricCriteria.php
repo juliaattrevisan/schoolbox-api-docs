@@ -16,7 +16,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 // not in SitePage context, redirect to equivalent
 if(!isset($this)) {
     require_once('../../library/Bootstrap.php');
-    SitePage::localRedir('/submission/rubricCriteria');
+    $this->localRedir('/submission/rubricCriteria');
     die();
 }
 

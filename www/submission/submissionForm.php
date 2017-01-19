@@ -4,7 +4,7 @@
  * redirect to Redirection to 16.5 url
  *
  */
-SitePage::localRedir('/', null, 410);
+$this->localRedir('/', null, 410);
 
 /*
 *Old code

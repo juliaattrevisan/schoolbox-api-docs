@@ -7,20 +7,24 @@
  */
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
-$url = '/learning/responses/';
+$url = '/learning/assessments/';
 if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
-
-    $submission = Submission\SubmissionMapper::getInstance()->findById($this->arg[0]);
+    //Can we get the submission?
+    try {
+        $submission = Submission\SubmissionMapper::getInstance()->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
+        $this->pageNotFound();
+    }
     $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
     $submissionBox = $submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
     $assessmentId = $submissionBox->getAssessmentId();
     $studentId = $submission->getOwner()->getId();
+
     $url .= $assessmentId.'/'.$studentId.'/'.$this->arg[0]; //assessmentId/userId/submissionId
-    SitePage::localRedir($url, null, 301);
+    $this->localRedir($url, null, 301);
 }
-else {
-    SitePage::pageNotFound();
-}
+$this->pageNotFound();
 
 /*
 *Old code

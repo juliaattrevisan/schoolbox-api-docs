@@ -6,7 +6,7 @@
  *
  */
 //Just redirect to pending assessments
-SitePage::localRedir('/learning/pending/', null, 301);
+$this->localRedir('/learning/pending/', null, 301);
 
 /*
 *Old code

@@ -15,10 +15,10 @@ if (isset($this->arg[0]) && is_numeric($this->arg[0])){
 //            $url .= '/'.$this->$arg[2]; //export, not ready yet
 //        }
     }
-    SitePage::localRedir($url, null, 301);
+    $this->localRedir($url, null, 301);
 }
 
-SitePage::pageNotFound();
+$this->pageNotFound();
 
 /*
 *Old code

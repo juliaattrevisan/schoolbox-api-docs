@@ -11,10 +11,10 @@ if ((isset($this->arg[0]) && is_numeric($this->arg[0])) && (isset($this->arg[1])
     $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
     $assessmentId = $submissionBox->getAssessmentId();
     $url .= $assessmentId.'/'.$this->arg[1].'/submit'; //assessmentId/userId/submit
-    SitePage::localRedir($url, null, 301);
+    $this->localRedir($url, null, 301);
 }
 else {
-    SitePage::pageNotFound();
+    $this->pageNotFound();
 }
 
 /*

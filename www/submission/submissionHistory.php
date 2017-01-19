@@ -7,13 +7,19 @@
 $url = '/learning/assessments/';
 if ((isset($this->arg[0]) && is_numeric($this->arg[0])) && (isset($this->arg[1]) && is_numeric($this->arg[1]))){
     $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-    $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    //Is it there?
+    try {
+        $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
+        $this->pageNotFound();
+    }
     $assessmentId = $submissionBox->getAssessmentId();
     $url .= $assessmentId.'/'.$this->arg[1]; //assessmentId/userId
-    SitePage::localRedir($url, null, 301);
+    $this->localRedir($url, null, 301);
 }
 else {
-    SitePage::pageNotFound();
+    $this->pageNotFound();
 }
 
 /*
