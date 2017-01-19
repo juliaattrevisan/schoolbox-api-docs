@@ -10,7 +10,8 @@
             element: '',
             title: 'Overall Progress',
             mostAdvancedStudent: 0,
-            classCompletions: 0
+            classCompletions: 0,
+            clusterName: 'Class' // or 'Cohort'
         };
 
         /* The plot unfolds
@@ -69,7 +70,7 @@
                     data: [parseFloat(options.mostAdvancedStudent.toFixed(1))]
                 },
                 {
-                    name: 'Class Completions',
+                    name: options.clusterName + ' Completion',
                     data: [parseFloat(options.classCompletions.toFixed(1))]
                 }
             ],
