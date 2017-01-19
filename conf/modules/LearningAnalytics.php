@@ -23,6 +23,6 @@ class LearningAnalytics implements ModuleConfigInterface {
     public function configure($kernel) {
         $di = $kernel->getDependencyInjector();
         $module = new \Schoolbox\LearningAnalytics\Module($di);
-        $module->init('/learningAnalytics');
+        $module->init('/learning/analytics');
     }
 }
