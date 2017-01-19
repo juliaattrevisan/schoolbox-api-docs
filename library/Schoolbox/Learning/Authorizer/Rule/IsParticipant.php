@@ -28,6 +28,8 @@ class IsParticipant implements IAuthorizationRule
             if ($user->getId() == $params['participant']->getUser()->getId()) {
                 return true;
             }
+        } else {
+            throw new \InvalidArgumentException('participant param is not an instance of \Schoolbox\Learning\Assessment\Participant');
         }
 
         throw new Unauthorized();
