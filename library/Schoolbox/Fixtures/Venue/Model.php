@@ -8,22 +8,21 @@
 namespace Schoolbox\Fixtures\Venue;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use \Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\ValueLabelInterface;
 
 /**
  * Represents a Venue where sports are conducted.
- *
- * @package Schoolbox\Fixtures\Venue
  */
 class Model implements ISoftDeletable, ValueLabelInterface
 {
-    // Implements ISoftDeletable
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
-
-    /** @var int */
-    protected $id;
 
     /** @var string */
     protected $name;
@@ -36,19 +35,6 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /** @var string $address*/
     protected $address;
-
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $updatedAt;
-
-    /**
-     * Model constructor.
-     */
-    public function __construct()
-    {
-    }
 
     /**
      * {@inheritdoc}
@@ -76,22 +62,6 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /* Getters/Setters
      */
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() {
-        return $this->id;
-    }
 
     /**
      * @param string $name
@@ -155,38 +125,5 @@ class Model implements ISoftDeletable, ValueLabelInterface
      */
     public function getAddress() {
         return $this->address;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt) {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt() {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $updatedAt
-     * @return self
-     */
-    public function setUpdatedAt($updatedAt) {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt() {
-        return $this->updatedAt;
     }
 }
