@@ -76,8 +76,8 @@ class Mapper extends AbstractCourseMapper
     /**
      * Finds the unit spec for this folder.
      *
-     * @param int   $folderId
-     * @param array $options
+     * @param int|int[] $folderId
+     * @param array     $options
      * @return Model[]|Collection
      */
     public function findByFolderId($folderId, $options = [])
