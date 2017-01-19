@@ -91,7 +91,6 @@ class Factory implements IFactory
                 break;
             case Mapper::TYPE_DECIMAL:
                 $column = new Decimal();
-                $column->setPlaces(2);
                 break;
             case Mapper::TYPE_COLOR:
                 $column = new Color();

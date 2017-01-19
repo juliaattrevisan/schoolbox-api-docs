@@ -1,6 +1,6 @@
 <?php
 /**
- * Decimal number column type, with optional number of decimal places.
+ * Decimal number column type. Converted to float in models.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -9,41 +9,27 @@
 
 namespace Schoolbox\Column;
 
-class Decimal implements IColumnType {
-	/**
-	 * @var int
-	 */
-	protected $places = 0;
+use Schoolbox\Mapper;
 
-	/**
-	 * @param  int $places
-	 * @return $this
-	 */
-	public function setPlaces($places) {
-		$this->places = $places;
-		return $this;
-	}
+class Decimal implements IColumnType
+{
+    /**
+     * @param string|null $value
+     * @param null|Mapper $mapper
+     * @return float|string
+     */
+    public function hydrate($value, $mapper = null)
+    {
+        return is_null($value) ? $value : floatval($value);
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getPlaces() {
-		return $this->places;
-	}
-
-	public function hydrate($value, $mapper = null) {
-		// number format gets upset about empty strings
-		if ($value === '') {
-			$value = null;
-		}
-		return isset($value) ? number_format($value, $this->places, '.', '') : null;
-	}
-
-	public function dehydrate($value, $mapper = null) {
-		// number format gets upset about empty strings
-		if ($value === '') {
-			$value = null;
-		}
-		return isset($value) ? number_format($value, $this->places, '.', '') : null;
-	}
+    /**
+     * @param null|float $value
+     * @param null|Mapper $mapper
+     * @return null|float
+     */
+    public function dehydrate($value, $mapper = null)
+    {
+        return $value;
+    }
 }

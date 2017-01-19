@@ -24,21 +24,6 @@ class Mapper extends BaseMapper
     const DECIMAL_PLACES_LONGITUDE = 7;
 
     /**
-     * Override default decimal places
-     */
-    public function __construct(){
-        parent::__construct();
-
-        /** @var Decimal $latitudeHydrator */
-        $latitudeHydrator = $this->getMap()['latitude']['hydrator'];
-        $latitudeHydrator->setPlaces(self::DECIMAL_PLACES_LATITUDE);
-
-        /** @var Decimal $longitudeHydrator */
-        $longitudeHydrator = $this->getMap()['longitude']['hydrator'];
-        $longitudeHydrator->setPlaces(self::DECIMAL_PLACES_LONGITUDE);
-    }
-
-    /**
      * Setup mapping
      * @return void
      */

@@ -13,17 +13,14 @@
 namespace Schoolbox\Resource;
 
 
+use Schoolbox\Mapper\Traits\Model\Id;
+
 class HomepageTemplate {
 
 	const HOMEPAGE_REMOVE = -1;
 	const HOMEPAGE_KEEP_EXISTING = 0;
 
-	/**
-     * Template identifier
-     *
-	 * @var int
-	 */
-	protected $id;
+    use Id;
 
     /**
      * Name of homepage template
@@ -44,30 +41,14 @@ class HomepageTemplate {
      * Width of right column for template
      *
      * @deprecated
-     * @var
+     * @var float
      */
     protected $right_column_width;
 
     /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * @deprecated
      * @param float $left_column_width
+     * @return static
      */
     public function setLeftColumnWidth($left_column_width)
     {
@@ -86,6 +67,7 @@ class HomepageTemplate {
 
     /**
      * @param string $name
+     * @return static
      */
     public function setName($name)
     {
@@ -103,7 +85,8 @@ class HomepageTemplate {
 
     /**
      * @deprecated
-     * @param  $right_column_width
+     * @param float $right_column_width
+     * @return static
      */
     public function setRightColumnWidth($right_column_width)
     {
@@ -113,7 +96,7 @@ class HomepageTemplate {
 
     /**
      * @deprecated
-     * @return
+     * @return float
      */
     public function getRightColumnWidth()
     {

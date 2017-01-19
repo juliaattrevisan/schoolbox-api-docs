@@ -24,47 +24,38 @@ class DecimalTest extends TestCase {
 
 	public function getTestHydrate() {
 		return array(
-            array(null,     null,      0),
-            array(null,     null,      2),
-			array('0',     '0',        0),
-			array('0',     '0.00',     2),
-			array('0.375', '0',        0),
-			array('0.374', '0.37',     2),
-			array('0.375', '0.38',     2),
-			array('0.376', '0.38',     2),
-			array('1990',  '1990.000', 3),
-			array(-13.3,  '-13.30',    2),
+            array(null,        null),
+			array('0',         0.0),
+			array('0.00',      0.0),
+			array('0.376',     0.376),
+            array('1990',      1990.0),
+			array('1990.000',  1990.0),
+			array('-13.3',     -13.30),
 		);
 	}
 
 	public function getTestDehydrate() {
 		return array(
-            array(null,     null,      0),
-            array(null,     null,      2),
-			array('0',     '0',        0),
-			array('0',     '0.00',     2),
-			array('0.375', '0',        0),
-			array('0.374', '0.37',     2),
-			array('0.375', '0.38',     2),
-			array('0.376', '0.38',     2),
-			array('1990',  '1990.000', 3),
-			array(-13.3,  '-13.30',    2),
+            array(null,   null),
+			array(0,      0),
+			array(0.00,   0.00),
+			array(0.375,  0.375),
+			array(1990,   1990),
+			array(-13.3,  -13.30),
 		);
 	}
 
 	/**
 	 * @dataProvider getTestHydrate
 	 */
-	public function testHydrate($input, $expected_output, $places) {
-		$this->object->setPlaces($places);
+	public function testHydrate($input, $expected_output) {
 		$this->assertSame($expected_output, $this->object->hydrate($input));
 	}
 
 	/**
 	 * @dataProvider getTestDehydrate
 	 */
-	public function testDehydrate($input, $expected_output, $places) {
-		$this->object->setPlaces($places);
+	public function testDehydrate($input, $expected_output) {
 		$this->assertSame($expected_output, $this->object->dehydrate($input));
 	}
 }

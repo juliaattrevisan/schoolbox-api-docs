@@ -22,32 +22,10 @@ class TemplateMapper extends Schoolbox\Mapper {
 	protected function mapping() {
 		$this->hasTable('eportfolioTemplate');
 		$this->hasModel(Template::class);
-
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'name',
-			'property'   => 'name',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'left_column_width',
-			'property'   => 'leftColumnWidth',
-			'type'       => self::TYPE_DECIMAL,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'right_column_width',
-			'property'   => 'rightColumnWidth',
-			'type'       => self::TYPE_DECIMAL,
-		));
-
+		$this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('left_column_width', self::TYPE_DECIMAL);
+        $this->uses('right_column_width', self::TYPE_DECIMAL);
 	}
 
 	/**

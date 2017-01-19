@@ -29,7 +29,7 @@ class Descriptor implements ISoftDeletable
     private $level;
 
     /**
-     * @var int
+     * @var float
      */
     private $value;
 
@@ -93,7 +93,7 @@ class Descriptor implements ISoftDeletable
     }
 
     /**
-     * @param  int $value
+     * @param  float $value
      * @return $this
      */
     public function setValue($value)
@@ -103,7 +103,7 @@ class Descriptor implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getValue()
     {

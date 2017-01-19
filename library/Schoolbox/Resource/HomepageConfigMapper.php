@@ -17,6 +17,7 @@ use Component_Instance;
 use Component_InstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class HomepageConfigMapper
@@ -30,152 +31,39 @@ class HomepageConfigMapper extends Mapper
     {
         $this->hasModel(HomepageConfig::class);
         $this->hasTable('homepage_config');
-        $this->hasMap(
-            array(
-                'column'     => 'cid',
-                'property'   => 'category',
-                'type'       => self::TYPE_MODEL,
-                'join'       => 'category',
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'template',
-                'property' => 'template',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'template',
-            )
-        );
+
+        $this->joins('cid', FolderMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'category', 'category');
+        $this->joins('template', HomepageTemplateMapper::class, 'id', null, null, 'template');
+
         /**
          * Column widths
          */
-        $this->hasMap(
-            array(
-                'column'   => 'left_column_width',
-                'property' => 'leftColumnWidth',
-                'type'     => self::TYPE_DECIMAL,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'right_column_width',
-                'property' => 'rightColumnWidth',
-                'type'     => self::TYPE_DECIMAL,
-            )
-        );
+        $this->uses('left_column_width', self::TYPE_DECIMAL);
+        $this->uses('right_column_width', self::TYPE_DECIMAL);
+
         /**
          * Left Colours
          */
-        $this->hasMap(
-            array(
-                'column'   => 'left_head_font',
-                'property' => 'leftHeadFont',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'left_head_bg',
-                'property' => 'leftHeadBg',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'left_font',
-                'property' => 'leftFont',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'left_bg_primary',
-                'property' => 'leftBgPrimary',
-                'type'     => self::TYPE_STRING,
-            )
-        );
+        $this->uses('left_head_font', self::TYPE_STRING);
+        $this->uses('left_head_bg', self::TYPE_STRING);
+        $this->uses('left_font', self::TYPE_STRING);
+        $this->uses('left_bg_primary', self::TYPE_STRING);
+
         /**
          * Right Colours
          */
-        $this->hasMap(
-            array(
-                'column'   => 'right_head_font',
-                'property' => 'rightHeadFont',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'right_head_bg',
-                'property' => 'rightHeadBg',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'right_font',
-                'property' => 'rightFont',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'right_bg_primary',
-                'property' => 'rightBgPrimary',
-                'type'     => self::TYPE_STRING,
-            )
-        );
+        $this->uses('right_head_font', self::TYPE_STRING);
+        $this->uses('right_head_bg', self::TYPE_STRING);
+        $this->uses('right_font', self::TYPE_STRING);
+        $this->uses('right_bg_primary', self::TYPE_STRING);
+
         /**
          * Top colours
          */
-        $this->hasMap(
-            array(
-                'column'   => 'top_head_font',
-                'property' => 'topHeadFont',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'top_head_bg',
-                'property' => 'topHeadBg',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'top_font',
-                'property' => 'topFont',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'top_bg_primary',
-                'property' => 'topBgPrimary',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        /**
-         * Joins
-         */
-        $this->hasJoin(
-            'category',
-            array(
-                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-                'this_key'  => 'category',
-                'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'template',
-            array(
-                'mapper'    => '\\Schoolbox\\Resource\\HomepageTemplateMapper',
-                'this_key'  => 'template',
-                'other_key' => 'id',
-            )
-        );
+        $this->uses('top_head_font', self::TYPE_STRING);
+        $this->uses('top_head_bg', self::TYPE_STRING);
+        $this->uses('top_font', self::TYPE_STRING);
+        $this->uses('top_bg_primary', self::TYPE_STRING);
     }
 
     /**

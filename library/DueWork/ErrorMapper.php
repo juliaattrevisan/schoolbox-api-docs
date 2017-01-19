@@ -8,39 +8,17 @@
  */
 
 /**
- * Class DueWork_ErrorMapper
- * @method DueWork_Error findOneByColumn($columnName, $columnValue, $order = [])
+ * @method DueWork_Error findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
  */
 class DueWork_ErrorMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('submission_errors');
 		$this->hasModel(DueWork_Error::class);
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'code',
-			'property'   => 'code',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'display_as',
-			'property'   => 'displayAs',
-			'type'       => self::TYPE_STRING,
-		));
-
-        $this->hasMap(array(
-            'column'     => 'normalise_as',
-            'property'   => 'normaliseAs',
-            'type'       => self::TYPE_DECIMAL,
-        ));
-
+		$this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('code', self::TYPE_STRING);
+        $this->uses('display_as', self::TYPE_STRING);
+        $this->uses('normalise_as', self::TYPE_DECIMAL);
         $this->uses('is_default_for_new_submissions', self::TYPE_BOOLEAN);
 	}
 

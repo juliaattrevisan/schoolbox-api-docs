@@ -18,6 +18,7 @@ use Schoolbox\Mapper;
  *
  * @package Schoolbox\Resource
  * @method HomepageTemplate findById($id)
+ * @method HomepageTemplate createModel($idValue = null)
  */
 class HomepageTemplateMapper extends Mapper
 {
@@ -28,35 +29,10 @@ class HomepageTemplateMapper extends Mapper
     {
         $this->hasModel(HomepageTemplate::class);
         $this->hasTable('homepageTemplate');
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'left_column_width',
-                'property' => 'leftColumnWidth',
-                'type'     => self::TYPE_DECIMAL,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'right_column_width',
-                'property' => 'rightColumnWidth',
-                'type'     => self::TYPE_DECIMAL,
-            )
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('left_column_width', self::TYPE_DECIMAL);
+        $this->uses('right_column_width', self::TYPE_DECIMAL);
     }
 
     /**
@@ -82,7 +58,7 @@ class HomepageTemplateMapper extends Mapper
             )
         );
 
-        parent::delete($object);
+        return parent::delete($object);
     }
 
     public function findAll($options = array())
