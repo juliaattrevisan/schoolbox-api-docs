@@ -5,7 +5,8 @@
 @mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 	// We shoudln't use more than 4 action buttons in a row
 	@for $i from 1 through 4 {
-		.actions-#{$size}-#{$i} {
+		.actions-#{$size}-#{$i},
+		.island .row.actions-#{$size}-#{$i}{
 			position: relative;
 			min-width: $button-size * $i;
 			min-height: $button-size;
@@ -73,20 +74,16 @@
 		}
 
 		/* Inside a containing column, but not an action-
-		 * or information-list construct (e.g. h2 actions)
-		 *
-		 * These attributes also happen apply to the usage
-		 * as action- and information-list nav actions which
-		 * always appear inside islands or columns
+		 * or information-list construct (e.g. h2 actions).
 		 */
 		.row.actions-#{$size}-#{$i} {
-			nav {
-				right: 1rem;
-				@media #{$small-only} {
-					right: 0;
-				}
-			}
-		}
+			 nav {
+				 right: 1rem;
+				 @media #{$small-only} {
+					 right: 0;
+				 }
+			 }
+		 }
 	}
 }
 
