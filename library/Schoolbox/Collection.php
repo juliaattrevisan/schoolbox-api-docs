@@ -829,6 +829,27 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Indexes the collection by the given callback.
+     *
+     * Be careful! The value from the callback should contain values unique for the collection.
+     * If not, earlier values will be overwritten.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function indexByCallback(callable $callback)
+    {
+        $new = [];
+        foreach($this->stack as $item){
+            $key = call_user_func($callback, $item);
+            $new[$key] = $item;
+        }
+        // Bypass GenericCollection type-check in setStack()
+        $this->stack = $new;
+        return $this;
+    }
+
+    /**
      * Creates a deep clone of this collection.
      *
      * @return static
