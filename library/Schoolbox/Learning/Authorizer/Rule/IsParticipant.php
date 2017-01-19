@@ -10,6 +10,7 @@
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -23,8 +24,12 @@ class IsParticipant implements IAuthorizationRule
     {
 
         /* Block students seeing other students' outcomes */
-        if ($user->getId() == $params['participant']->getUser()->getId()) {
-            return true;
+        if ($params['participant'] instanceof Participant) {
+            if ($user->getId() == $params['participant']->getUser()->getId()) {
+                return true;
+            }
+        } else {
+            throw new \InvalidArgumentException('participant param is not an instance of \Schoolbox\Learning\Assessment\Participant');
         }
 
         throw new Unauthorized();
