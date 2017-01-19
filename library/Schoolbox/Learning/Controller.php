@@ -244,7 +244,7 @@ class Controller extends Base
         } else {
             // Is user a teacher or student ?
             if($this->getUser()->getRole()->isStaff()){
-                $folderList = $this->getFolderMapper()->findFoldersWithFeedbacks($this->getUser(), $term);
+                $folderList = $this->getFolderMapper()->findFoldersWithFeedbacksFromTeacher($this->getUser(), $term);
             } elseif($this->getUser()->getRole()->isStudent()){
                 $folderList = $this->getFolderMapper()->findFoldersWithResponses($this->getUser(), $term);
             }
@@ -448,12 +448,9 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
-        $folders = $this->folderMapper->findFoldersWithFeedbacks($viewee, $term);
+        $folders = $this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term);
         $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term));
 
-        if ($term->getId() == $this->termMapper->findForToday()->getId()) {
-            $folders = $this->folderMapper->findForUser($viewee);
-        }
 
         // Grab the students conversation history
 

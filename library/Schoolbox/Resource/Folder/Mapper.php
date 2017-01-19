@@ -1702,6 +1702,32 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $collection;
     }
 
+
+    /**
+     * Return a set of folders where the student has received feedback
+     *
+     * @param User $student
+     * @param Term|null $term
+     * @return GenericCollection
+     */
+    public function findFoldersWithFeedbackToStudent(User $student, Term $term = null) {
+
+        $whereClause = "(`tkc`.`student_id` = :userId OR `dwr`.`owner` = :userId OR `qza`.`user_id` = :userId)";
+        $whereParams = [
+            ':userId' => $student->getId(),
+        ];
+
+        if($term instanceof Term){
+            $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
+            $whereParams = array_merge($whereParams, [
+                ':startDate' => $term->getStart(),
+                ':endDate' => $term->getActualFinish()->isNull() ? \Alaress_Date_Format::now() : $term->getActualFinish() ,
+            ]);
+        }
+
+        return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
+    }
+
     /**
      * Return a set of folders where the teacher has provided feedback in the specified term
      *
@@ -1715,9 +1741,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param Term|null $term
      * @return GenericCollection|Model[]
      */
-    public function findFoldersWithFeedbacks(User $teacher, Term $term = null)
+    public function findFoldersWithFeedbacksFromTeacher(User $teacher, Term $term = null)
     {
-        $codeMapper = $this->getJoinMapper('codes');
 
         $whereClause = "(`tkc`.`marking_user_id` = :userId OR `dwr`.`marker` = :userId OR `qza`.`reviewer_id` = :userId)";
         $whereParams = [
@@ -1728,9 +1753,23 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
             $whereParams = array_merge($whereParams, [
                 ':startDate' => $term->getStart(),
-                ':endDate' => $term->getActualFinish(),
+                ':endDate' => $term->getActualFinish()->isNull() ? \Alaress_Date_Format::now() : $term->getActualFinish() ,
             ]);
         }
+
+        return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
+    }
+
+
+    /**
+     * Hydrates folders with feedbacks based on a where clause provided
+     *
+     * @param $whereClause
+     * @param $whereParams
+     * @return GenericCollection
+     */
+    private function findFoldersWithFeedbacks($whereClause, $whereParams) {
+        $codeMapper = $this->getJoinMapper('codes');
 
         $query = "
             SELECT
