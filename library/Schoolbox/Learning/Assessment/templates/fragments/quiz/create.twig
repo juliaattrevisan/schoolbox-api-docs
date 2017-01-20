@@ -62,19 +62,20 @@
 
 <script type="text/javascript">
     $(function() {
+        var $durationPanel = $('#durationPanel');
+        var $durationInputs = $durationPanel.find('input[type=text]');
+
         $('#hasDuration').on('click', function(event) {
-            if ($(this).is(':checked')) {
+            var $checkbox = $(this);
+            if ($checkbox.is(':checked')) {
                 $('#durationPanel').stop().hide().removeClass('hide').slideDown(600);
+                $durationInputs.prop('disabled', false);
             }
             else {
-
-                /* Empty values and hide
+                /* Hide panel + disable inputs
                  */
-                $('#durationPanel').stop().slideUp(600, function() {
-                    $(this).find('input[name=durationHours]').val('');
-                    $(this).find('input[name=durationMinutes]').val('');
-                    $(this).addClass('hide');
-                });
+                $durationPanel.stop().slideUp(600);
+                $durationInputs.prop('disabled', true);
             }
         });
     });
