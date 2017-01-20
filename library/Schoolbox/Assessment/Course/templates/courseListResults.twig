@@ -94,7 +94,7 @@
                     $.post(href, {})
                         .done(function() {
                             // Kill the element
-                            $this.parents('[data-course-row]').remove();
+                            $this.parents('[data-course-row]').slideUp();
 
                             // Toast success
                             $toast.toastTimeout({text: 'Course deleted.', css: 'success'});
