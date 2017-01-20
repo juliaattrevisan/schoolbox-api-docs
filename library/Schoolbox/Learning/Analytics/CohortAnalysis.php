@@ -139,6 +139,14 @@ class CohortAnalysis
      */
     private function reduceCompletion(array $activityCompletions, array $participantProgress)
     {
+        if (empty($activityCompletions)) {
+            $activityCompletions = [0];
+        }
+
+        if (empty($participantProgress)) {
+            $participantProgress = [[0]];
+        }
+
         return [
             'mostAdvancedStudent' => 100 * max(array_map(function (array $progress) { return array_sum($progress) / count($progress); }, $participantProgress)),
             'classCompletions'    => 100 * array_sum($activityCompletions) / count($activityCompletions),
@@ -187,19 +195,23 @@ class CohortAnalysis
         // flatten the unit specs out of the data, accommodating students who exist in more than one unit
         foreach ($this->getCompletionData() as $unitSpecId => $unitCompletionData) {
 
-            foreach ($unitCompletionData['activityCompletions'] as $specActivityId => $activityCompletion) {
-                if (!array_key_exists($specActivityId, $activityCompletions)) {
-                    $activityCompletions[$specActivityId] = true;
+            if (is_array($unitCompletionData['activityCompletions'])) {
+                foreach ($unitCompletionData['activityCompletions'] as $specActivityId => $activityCompletion) {
+                    if (!array_key_exists($specActivityId, $activityCompletions)) {
+                        $activityCompletions[$specActivityId] = true;
+                    }
+                    $activityCompletions[$specActivityId] = min($activityCompletions[$specActivityId], $activityCompletion);
                 }
-                $activityCompletions[$specActivityId] = min($activityCompletions[$specActivityId], $activityCompletion);
             }
 
-            foreach ($unitCompletionData['participantProgress'] as $participantId => $progress) {
-                foreach ($progress as $specActivityId => $isComplete) {
-                    if (empty($participantProgress[$participantId][$specActivityId])) {
-                        $participantProgress[$participantId][$specActivityId] = false;
+            if (is_array($unitCompletionData['participantProgress'])) {
+                foreach ($unitCompletionData['participantProgress'] as $participantId => $progress) {
+                    foreach ($progress as $specActivityId => $isComplete) {
+                        if (empty($participantProgress[$participantId][$specActivityId])) {
+                            $participantProgress[$participantId][$specActivityId] = false;
+                        }
+                        $participantProgress[$participantId][$specActivityId] = max($participantProgress[$participantId][$specActivityId], $isComplete);
                     }
-                    $participantProgress[$participantId][$specActivityId] = max($participantProgress[$participantId][$specActivityId], $isComplete);
                 }
             }
         }
