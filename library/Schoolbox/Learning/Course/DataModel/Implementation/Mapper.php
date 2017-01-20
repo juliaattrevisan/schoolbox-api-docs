@@ -74,7 +74,7 @@ class Mapper extends AbstractCourseMapper
     }
 
     /**
-     * Finds the unit spec for this folder.
+     * Finds the Courses Implementations for this folder.
      *
      * @param int|int[] $folderId
      * @param array     $options
