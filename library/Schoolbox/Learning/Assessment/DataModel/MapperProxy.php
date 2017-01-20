@@ -126,6 +126,20 @@ class MapperProxy
     }
 
     /**
+     * Finds all assessments that match the list of IDs.
+     *
+     * This method does not load participants.
+     *
+     * @param int[] $ids
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByIds($ids, $options = [])
+    {
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('id', $ids, $options));
+    }
+
+    /**
      * Find an assessment for the given quiz ID.
      *
      * This is intended to ease transition from Handlerland to the Aura

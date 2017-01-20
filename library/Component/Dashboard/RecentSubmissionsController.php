@@ -69,14 +69,18 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
-        $assessables = $assessmentMapperProxy->createCollection();
+        $assessmentIds = [];
+        foreach($responses as $response){
+            $assessmentIds[$response->getAssessable()->getId()] = $response->getAssessable()->getId();
+        }
+        /** @var IAssessable[]|GenericCollection $assessables */
+        $assessables = $assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+
         foreach($responses as $response){
             $assessmentId = $response->getAssessable()->getId();
-            if(!$assessables->getOffset($assessmentId) instanceof IAssessable){
-                $assessable = $assessmentMapperProxy->findById($assessmentId);
-                $assessables->setOffset($assessmentId, $assessable);
+            if (isset($assessables[$assessmentId])) {
+                $assessables[$assessmentId]->getResponses()->add($response);
             }
-            $assessables[$assessmentId]->getResponses()->add($response);
         }
 
         // Sort responses most recent first
