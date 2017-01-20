@@ -409,13 +409,13 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
-            LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa')}
-            LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf', true)}
+            LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
         ";
     }
 
