@@ -49,6 +49,10 @@ Usage:
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
 
+                    // A toast
+                    var $toast = $('[data-alert]');
+                    $toast.toastActivate({text: 'Deleting course...'});
+
                     var url = $element[0].href;
                     var settings = {
                         headers: {
@@ -57,7 +61,9 @@ Usage:
                         type: 'POST',
                         success: function(resp) {
                             if(resp.data){
-                                $courseImpl.fadeOut({
+                                // Toast success
+                                $toast.toastTimeout({text: 'Course deleted.', css: 'success'});
+                                $courseImpl.slideUp({
                                     done: function(){
                                         $courseImpl.remove();
                                         if(!$courseList.find('[data-course-impl]').length){
@@ -66,6 +72,9 @@ Usage:
                                     }
                                 });
                             }
+                        },
+                        error: function(resp) {
+                            $toast.toastTimeout({text: 'Delete failed.', css: 'alert'});
                         }
                     };
                     $.ajax(url, settings);
@@ -194,4 +203,5 @@ Usage:
 </div>
 
 <div class="toast" data-alert data-relation="save-label"></div>
+
 <div id="course-selector-modal" class="reveal-modal" data-reveal></div>
