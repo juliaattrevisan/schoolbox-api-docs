@@ -76,9 +76,6 @@ use Twig_SimpleFunction;
 
 class Bootstrap extends AbstractBootstrap {
 
-    /** @var bool */
-    protected $debugEnabled = false;
-
     /**
      * Load the core configuration file(s)
      *
@@ -121,12 +118,13 @@ class Bootstrap extends AbstractBootstrap {
         // Set up the debug bar, and add listeners for various parts of the debug bar
         // (database calls, XHProf)
         // Should go in a DI container instead of a static class.
-        if($this->debugEnabled = DebugBar::isEnabled()) {
+        $this->setDebugEnabled(DebugBar::isEnabled());
+        if($this->isDebugEnabled()) {
             DebugBar::init();
         }
 
         // Install into database
-        if($this->debugEnabled) {
+        if($this->isDebugEnabled()) {
             $debug_bar = DebugBar::getInstance();
 
             // Throw away existing connection and reconnect with persistence off
@@ -136,7 +134,7 @@ class Bootstrap extends AbstractBootstrap {
         }
 
         // XHProf on the debug bar.
-        if($this->debugEnabled && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
+        if($this->isDebugEnabled() && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
             DebugBar::getInstance()->addCollector(new XhprofCollector());
         }
     }

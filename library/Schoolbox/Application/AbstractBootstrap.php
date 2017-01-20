@@ -60,6 +60,9 @@ abstract class AbstractBootstrap implements BootstrapInterface
     /** @var Kernel */
     private $kernel;
 
+    /** @var bool  */
+    private $debugEnabled = false;
+
 
     /**
      * @param Kernel $kernel
@@ -577,6 +580,22 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isDebugEnabled()
+    {
+        return $this->debugEnabled;
+    }
+
+    /**
+     * @param bool $debugEnabled
+     */
+    protected function setDebugEnabled($debugEnabled)
+    {
+        $this->debugEnabled = $debugEnabled;
     }
 
     /**
