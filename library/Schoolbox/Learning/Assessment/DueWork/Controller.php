@@ -391,15 +391,10 @@ class Controller extends Assessment\Controller
          * if the Submission was saved successfully
          *
          * Only plagscan when actually submitting final
-         *
-         * TODO: Dirty hack because $currentFile has no primary key value atm due to swamp
-         * TODO: Rip it back out like Pacific Rim
          */
         $plagscanMapper = PlagscanMapper::getInstance();
 
         if ($isFinal && $response->getId()) {
-            $response = $this->getDueWorkResponseMapper()->findById($response->getId());
-
             foreach ($response->getAllFiles() as $currentFile) {
                 $plagscanMapper->saveNewPlagscanStub($currentFile);
             }
