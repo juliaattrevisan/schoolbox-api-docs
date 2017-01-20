@@ -198,7 +198,7 @@
             /**
              * Save typing based inputs on keyup (with a timeout)
              */
-            $(config.element).on('keyup', 'input[data-item-element][type=text], input[data-item-element][type=tel], input[data-item-element][type=email], input[data-item-element][type=password], input[data-item-element][type=url]', function() {
+            $(config.element).on('keyup change', '[data-item-element]', function(event) {
 
                 var self = this;
 
@@ -215,27 +215,6 @@
                 }, 1000);
 
             });
-
-            /**
-             * Save selects & all other inputs on change (also with a timeout)
-             */
-            $(config.element).on('change', 'select[data-item-element], input[data-item-element][type=checkbox], input[data-item-element][type=radio], input[data-item-element][type=range], input[data-item-element][type=date], input[data-item-element][type=datetime], input[data-item-element][type=time], input[data-item-element][type=month],input[data-item-element][type=week], input[data-item-element][type=number]', function() {
-
-                var self = this;
-
-                /**
-                 * Clear any existing save timeout
-                 */
-                window.clearTimeout(mightyList.saveTimeout);
-
-                /**
-                 * Set a new save timeout
-                 */
-                mightyList.saveTimeout = window.setTimeout(function() {
-                    saveElement(self);
-                }, 1000);
-            });
-
 
         }
 
