@@ -118,8 +118,24 @@ abstract class AbstractMapperProxy
             if (method_exists($dataModel, 'getId') && method_exists($domainObject, 'setId')) {
                 $domainObject->setId($dataModel->getId());
             }
+
+            // Whack in a post-save
+            $this->postSave($domainObject, $dataModel);
         }
         return true;
+    }
+
+    /**
+     * Overridable post-save stub.
+     *
+     * This can be used to sync ID properties from sub-objects from the data
+     * model to the domain model.
+     *
+     * @param $domainObject
+     * @param $dataModel
+     */
+    protected function postSave($domainObject, $dataModel)
+    {
     }
 
     /**

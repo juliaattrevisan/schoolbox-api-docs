@@ -121,6 +121,28 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
+     * Sync IDs from data model files to the domain model.
+     *
+     * @param DomainObject $domainObject
+     * @param DataObject   $dataModel
+     */
+    protected function postSave($domainObject, $dataModel)
+    {
+        foreach ($dataModel->getFiles() as $dataModelFile) {
+            // All we can do is match on hash
+            $hash = $dataModelFile->getStorage()->getHash();
+
+            foreach ($domainObject->getAllFiles() as $domainObjectFile) {
+                if ($domainObjectFile->getStorage()->getHash() == $hash) {
+                    // Match found
+                    $domainObjectFile->setId($dataModelFile->getId());
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
      * @param Collection|DomainObject[] $domainObjects
      * @return GenericCollection|DataObject[]
      */

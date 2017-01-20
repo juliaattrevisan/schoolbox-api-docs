@@ -151,6 +151,18 @@ class SubmissionMapper extends BaseMapper
             $file->setSubmission($object);
         }
         $joinMapper->save($addedFiles);
+
+        // Set IDs on files that are not new
+        foreach ($object->getFiles() as $file) {
+            if (!$file->getId()) {
+                foreach ($existingFiles as $existingFile) {
+                    if ($file->getStorage()->getHash() == $existingFile->getStorage()->getHash()) {
+                        $file->setId($existingFile->getId());
+                        break;
+                    }
+                }
+            }
+        }
     }
 
 
