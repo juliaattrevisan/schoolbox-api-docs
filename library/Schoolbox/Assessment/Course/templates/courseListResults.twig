@@ -69,7 +69,7 @@
     {% endif %}
 </div>
 
-<div class="toast" data-alert data-course-toast></div>
+<div class="toast" data-course-toast></div>
 
 <script type="text/javascript">
     $(function () {
@@ -91,13 +91,18 @@
                     var $toast = $('[data-course-toast]');
                     $toast.toastActivate({text: 'Deleting course...'});
 
-                    $.post(href, {}).done(function () {
-                        // Kill the element
-                        $this.parents('[data-course-row]').remove();
+                    $.post(href, {})
+                        .done(function() {
+                            // Kill the element
+                            $this.parents('[data-course-row]').remove();
 
-                        // Toast success
-                        $toast.toastTimeout({text: 'Course deleted.'});
-                    });
+                            // Toast success
+                            $toast.toastTimeout({text: 'Course deleted.', css: 'success'});
+                        })
+                        .fail(function() {
+                            // Toast fail
+                            $toast.toastTimeout({text: 'Delete failed.', css: 'alert'});
+                        });
                 }
             });
         })
