@@ -363,10 +363,9 @@ $container-bg: white !default;
 	}
 }
 
-.island {
-	.empty-state {
-		margin-bottom: 0;
-	}
+// component-container already has it's own margin-bottom
+.component-container .empty-state {
+	margin-bottom: 0;
 }
 
 .trace {
