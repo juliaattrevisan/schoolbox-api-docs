@@ -79,17 +79,6 @@ class Bootstrap extends AbstractBootstrap {
     /** @var bool */
     protected $debugEnabled = false;
 
-    /** @var Kernel */
-    protected $kernel;
-
-    /**
-     * @param Kernel $kernel
-     */
-    public function __construct($kernel) {
-        $this->kernel = $kernel;
-    }
-
-
     /**
      * Load the core configuration file(s)
      *
@@ -219,7 +208,7 @@ class Bootstrap extends AbstractBootstrap {
     {
         parent::installDependencies();
 
-        $di = $this->kernel->getDependencyInjector();
+        $di = $this->getKernel()->getDependencyInjector();
 
         // Mapper notifications:
         // They rely upon the session being injected into them, so do that.
@@ -237,7 +226,7 @@ class Bootstrap extends AbstractBootstrap {
         require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
         $customModuleLocation = sprintf(
             '/conf/modules/Custom/%s/',
-            ucfirst($this->kernel->getDependencyInjector()->get('config')->get('site_location'))
+            ucfirst($this->getKernel()->getDependencyInjector()->get('config')->get('site_location'))
         );
         $modulePaths = array_merge(
             glob(SITE_root . '/conf/modules/*.php'),
@@ -257,7 +246,7 @@ class Bootstrap extends AbstractBootstrap {
             if(class_exists($class, false)) {
                 /** @var Config\Modules\ModuleConfigInterface $obj */
                 $obj = new $class();
-                $obj->configure($this->kernel);
+                $obj->configure($this->getKernel());
             }
 
         }
@@ -282,7 +271,7 @@ class Bootstrap extends AbstractBootstrap {
                 'type'    => $e->getCode(),
             );
 
-            $this->kernel->callExceptionCallbacks($e);
+            $this->getKernel()->callExceptionCallbacks($e);
 
         } elseif (is_array($e)) {
             $error = $e;
@@ -346,7 +335,7 @@ class Bootstrap extends AbstractBootstrap {
 
                 // Use Sitepage to output an error message in the school's design.
                 // If there's no SitePage in DI yet: just output a styleless error.
-                $di = $this->kernel->getDependencyInjector();
+                $di = $this->getKernel()->getDependencyInjector();
 
                 if (!$e instanceof \Exception) {
                     $e = $error;

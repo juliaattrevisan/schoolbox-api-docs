@@ -26,18 +26,6 @@ use Schoolbox\Notif\Notif;
 
 class Bootstrap extends AbstractBootstrap {
 
-	/** @var Kernel */
-	protected $kernel;
-
-
-	/**
-	 * @param Kernel $kernel
-	 */
-	public function __construct($kernel) {
-		$this->kernel = $kernel;
-	}
-
-
 	/**
 	 * Load the core configuration file(s)
 	 *
@@ -87,7 +75,7 @@ class Bootstrap extends AbstractBootstrap {
 	 * @return void
 	 */
 	public function registerErrorHandling() {
-		set_error_handler(array($this->kernel, 'onError'));
+		set_error_handler(array($this->getKernel(), 'onError'));
 	}
 
 
@@ -97,7 +85,7 @@ class Bootstrap extends AbstractBootstrap {
 	 * @return void
 	 */
 	public function registerExceptionHandling() {
-		set_exception_handler(array($this->kernel, 'onException'));
+		set_exception_handler(array($this->getKernel(), 'onException'));
 	}
 
 
@@ -107,7 +95,7 @@ class Bootstrap extends AbstractBootstrap {
 	 * @return void
 	 */
 	public function registerShutdownHandling() {
-		register_shutdown_function(array($this->kernel, 'onShutdown'));
+		register_shutdown_function(array($this->getKernel(), 'onShutdown'));
 	}
 
 
