@@ -514,7 +514,7 @@ class Controller extends Assessment\Controller
             'valid'         => true
         ]);
 
-        $data['rubricHasMarks'] = !!$countMarkIds;
+        $data['rubricHasMarks'] = $countMarkIds > 0;
 
         return $data;
     }
