@@ -391,12 +391,15 @@ class Controller extends Assessment\Controller
          * if the Submission was saved successfully
          *
          * Only plagscan when actually submitting final
+         * Only plagscan non-online-submission files (for some reason, plag won't do html files)
          */
         $plagscanMapper = PlagscanMapper::getInstance();
 
         if ($isFinal && $response->getId()) {
             foreach ($response->getAllFiles() as $currentFile) {
-                $plagscanMapper->saveNewPlagscanStub($currentFile);
+                if (!$currentFile->getEditableInline()) {
+                    $plagscanMapper->saveNewPlagscanStub($currentFile);
+                }
             }
         }
 
