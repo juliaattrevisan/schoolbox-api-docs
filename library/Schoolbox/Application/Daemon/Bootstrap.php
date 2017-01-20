@@ -9,20 +9,12 @@
 
 namespace Schoolbox\Application\Daemon;
 
-
-use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\Redis;
-use Alaress\Web\Router\RouterFactory;
-use Aura\Di;
 use Autoloader;
 use Database;
 use Schoolbox\Application\AbstractBootstrap;
 use Schoolbox\Config\ConfigMapper;
-use Config\Modules\ModuleConfigInterface;
-use Schoolbox\MapperFactory;
-use Schoolbox\Notif\Notifactory;
-use Schoolbox\Notif\SilentNotif;
-use Schoolbox\Notif\Notif;
+
 
 class Bootstrap extends AbstractBootstrap {
 
