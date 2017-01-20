@@ -54,7 +54,7 @@ console.log(optionsOverride);
     // Default options
     // Default picker type: event
     var options = {
-        displayFormat: 'd/m/Y h:iK',
+        displayFormat: 'd/m/Y h:iK', //Default display format
         displayFormatDate: 'd/m/Y',
         databaseFormat: 'Y-m-d H:i:s',
         enableTime: false, //Don't show time picker

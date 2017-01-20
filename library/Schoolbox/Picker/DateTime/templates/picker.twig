@@ -174,7 +174,7 @@
                 </div>
             </div>
     </div>
-</div>
+</div>{{ displayFormat }} {{ displayFormatDate }}
 <script>
 
     var allDaySwitch = ($('#allday').val());
@@ -334,8 +334,8 @@
 
             $('.period-description').each(function() {
 
-                var s = moment($(this).attr('data-period-start'), 'HH:mmA').format('HHmm');
-                var e = moment($(this).attr('data-period-end'), 'HH:mmA').format('HHmm');
+                var s = moment($(this).attr('data-period-start'), 'hh:mma').format('HHmm');
+                var e = moment($(this).attr('data-period-end'), 'hh:mma').format('HHmm');
                 var t = moment('{{ value }}').format('HHmm');
                 if((t >= s) && (t < e)) {
                     $(this).addClass('period-selected');
@@ -449,7 +449,7 @@
 
     $('.timetable-submit').click(function() {
         var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
-        var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'HH:mmA');
+        var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'hh:mma');
         var newDate = (timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0)).format(convertFormat('Y-m-d H:i:s'));
         {# Turn AllDay off #}
         $('#allday').val(0);

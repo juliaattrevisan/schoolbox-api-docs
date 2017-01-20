@@ -21,6 +21,7 @@ use \External_Timetable;
 use \Schoolbox\CampusMapper;
 use \External_Synergetic_Timetable;
 use Schoolbox\Learning\Upcoming;
+use \Config;
 
 class Controller extends Base
 {
@@ -59,6 +60,10 @@ class Controller extends Base
         $terms = $this->getTerms();
         $value = \Alaress_Date_Format::newLocal(urldecode($value));
         $timetableDayNumber = $this->getTimetableDay($value);
+        $displayFormatDate = strlen(Config::get('date_local')) > 0 ? Config::get('date_local'): 'd/m/Y';
+        $displayFormatTime = strlen(Config::get('date_time')) > 0 ? Config::get('date_time'): 'h:iK';
+
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@pickerDatetime/picker.twig',
@@ -69,8 +74,8 @@ class Controller extends Base
                     'value' => $value->geJSDate(),
                     'type' => $type,
                     'enableTime' => $time,
-                    'displayFormat' => 'd/m/Y h:iK',
-                    'displayFormatDate' => 'd/m/Y',
+                    'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
+                    'displayFormatDate' => $this->convertFormat($displayFormatDate),
 //                    'databaseFormat' => urldecode($database),
                     'timetable' => $timetable,
                     'terms' => $terms,
@@ -80,6 +85,22 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Converts schoolbox config date and time formats info flatpickr friendly
+     * @param $format
+     */
+    public function convertFormat($format){
+        $formatMap = array(
+            '/S/' => '', // not supported
+            '/h/' => 'h', // 01-12 not supported, use 1-12 hours
+            '/g/' => 'h', // 1-12 hours
+            '/a/' => 'K', // no lowercase am/pm supported unfortunately
+            '/A/' => 'K', // AM/PM
+            '/G/' => 'H', // 00 - 23 hours
+            '/s/' => 'S', // 00 - 59 seconds
+        );
+        return preg_replace(array_keys($formatMap), array_values($formatMap), trim($format));
+    }
     /**
      * Return the HTML picker for injecting into modal
      * @param int $id The ID number of the javascript picker
