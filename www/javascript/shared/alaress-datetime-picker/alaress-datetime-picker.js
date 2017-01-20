@@ -50,7 +50,6 @@ countPickers = function () {
 // Extend jQuery with our datepicker function
 
 $.fn.alaressDateTimePicker = function(optionsOverride) {
-console.log(optionsOverride);
     // Default options
     // Default picker type: event
     var options = {
@@ -60,7 +59,7 @@ console.log(optionsOverride);
         enableTime: false, //Don't show time picker
         // bothFormats: false, //Can use both displayFormat and displayFormatDate
         allDay: false, //Show All Day switch
-        // allDayExt: false, //Sync with external AllDay input hidden field
+        allDayExt: false, //Sync with external AllDay input hidden field
         // allDateTime: 'start',
         type: 'default',
 
@@ -83,18 +82,16 @@ console.log(optionsOverride);
 
         var element = $(element);
 
-        if(element.val().length > 0 ) {
+        if (element.val().length > 0) {
             var originalValue = element.val();
         }
         //if no value has been passed, use today
         else {
             var originalValue = moment().format(convertFormat(options.displayFormat));
         }
-
-        if($('#allday').val() == 1) {
-            originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat))
+        if (options.allDayExt !== false && $('#'+options.allDayExt).val() == 1) {
+            originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat));
         }
-
         //Count this picker in
         var pickerId = countPickers();
 

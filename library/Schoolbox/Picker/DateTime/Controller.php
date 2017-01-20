@@ -58,7 +58,18 @@ class Controller extends Base
     public function getPicker($type, $id, $time, $value) {
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
-        $value = \Alaress_Date_Format::newLocal(urldecode($value));
+        try {
+            $value = \Alaress_Date_Format::newLocalShort($value);
+            try {
+                $value = \Alaress_Date_Format::newLocal($value);
+            }
+            catch (\Exception $e) {
+                var_dump($e->getMessage());
+            }
+        }
+        catch (\Exception $e) {
+            var_dump($e->getMessage());
+        }
         $timetableDayNumber = $this->getTimetableDay($value);
         $displayFormatDate = strlen(Config::get('date_local')) > 0 ? Config::get('date_local'): 'd/m/Y';
         $displayFormatTime = strlen(Config::get('date_time')) > 0 ? Config::get('date_time'): 'h:iK';

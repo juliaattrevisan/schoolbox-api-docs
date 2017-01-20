@@ -72,9 +72,10 @@
                 enableTime: getValue($(this), 'data-datepicker-time'),
                 // bothFormats: false, //Can use both displayFormat and displayFormatDate
                 allDay: getValue($(this), 'data-datepicker-allday'), //Show All Day switch
-                // allDayExt: false, //Sync with external AllDay input hidden field
+                allDayExt: getValue($(this), 'data-datepicker-alldayext'), //Sync with external AllDay input hidden field
                 // allDateTime: 'start', //Set time to start or end of the day: start, finish
-                type: getValue($(this), 'data-datepicker-call') //Ajax call type: events, duework or nothing
+                type: getValue($(this), 'data-datepicker-call'), //Ajax call type: events, duework or nothing
+                element: $(this),
             }
             $(this).alaressDateTimePicker(options);
         })

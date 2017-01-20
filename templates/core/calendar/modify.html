@@ -11,7 +11,7 @@
 <!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>-->
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
-<script type="text/javascript" src="/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js"></script>
+<!--<script type="text/javascript" src="/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js"></script>-->
 <script type="text/javascript">
     $(function() {
         $.fn.alaressEditor();
@@ -77,13 +77,13 @@
                         <label for="startDate">
                             From
                         </label>
-                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-allday data-datepicker-call="event" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-allday data-datepicker-alldayext="allday" data-datepicker-call="event" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                     </div>
                     <div class="small-6 columns">
                         <label for="endDate">
                             Until
                         </label>
-                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-allday data-datepicker-call="event" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-allday data-datepicker-alldayext="allday" data-datepicker-call="event" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
                     </div>
                 </fieldset>
 
