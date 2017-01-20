@@ -246,6 +246,7 @@
             <section>
                 <ul class="action-list">
                     {% for assessment in markbook.assessments %}
+                        {%  if assessment.isParticipant(student) %}
                         <li class="actions-small-2">
                             <div class="list-item clearfix content">
                                 <div class="row">
@@ -294,6 +295,7 @@
                                 {% endif %}
                             </nav>
                         </li>
+                    {%  endif %}
                     {% endfor %}
                 </ul>
                 <div class="toast" data-alert="" id="publish-to-eportfolio-label">Activity showcased</div>
