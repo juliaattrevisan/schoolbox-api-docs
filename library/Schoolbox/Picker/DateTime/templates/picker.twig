@@ -121,7 +121,6 @@
 
                     {# Placeholder for timetable ot be rendered in #}
                     <div id="timetable{{ id }}">
-                        <form>
                             <select name="campus">
                                 {% for campus in timetable %}
                                     <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
@@ -135,7 +134,6 @@
                             <select name="cycle">
                                 {# Options will be appended here #}
                             </select>
-                        </form>
                         {# Build all, hide, reveal one later #}
                         {% for campus in timetable %}
                             <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
