@@ -62,6 +62,8 @@ class Module extends BaseModule
                     return $params['response']->getAssessable()->getContext()->getFolder()->getId();
                 } elseif ($params['assessment'] instanceof IAssessable) {
                     return $params['assessment']->getContext()->getFolder()->getId();
+                } elseif ($params['contextId']) {
+                    return $params['contextId'];
                 } else {
                     throw new Unauthorized();
                 }
@@ -94,7 +96,7 @@ class Module extends BaseModule
         $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $hasWriteAccess,          $preloadResponse); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasWriteAccess, $preloadPlagscanWithAss); // a || r
-        $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasWriteAccess, $preloadPlagscanWithAss); // a || r
+        $this->register('GET', $plagscanPattern . '/{contextId:\d+}/iframe', 'getPlagscanReportContents', $hasWriteAccess, $preloadPlagscanWithAss); // a || r
     }
 
 
