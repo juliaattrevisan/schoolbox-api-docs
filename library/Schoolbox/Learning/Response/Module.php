@@ -79,7 +79,7 @@ class Module extends BaseModule
             new IsParticipant()
         );
 
-        $plagscanPattern    = '/plagscans/{plagscanId:\d+}';
+        $plagscanPattern    = '/plagscans/{assessmentId:\d+}/{responseId:\d+}/{plagscanId:\d+}';
         $assessmentPattern  = '/assessments/{assessmentId:\d+}';
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
         $responsePattern    = $assessmentPattern . '/responses/{responseId:\d+}';
@@ -94,8 +94,7 @@ class Module extends BaseModule
         $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $hasWriteAccess,          $preloadResponse); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasWriteAccess, $preloadPlagscanWithAss); // a || r
-        $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasWriteAccess, $preloadPlagscan); // a || r
-
+        $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasWriteAccess, $preloadPlagscanWithAss); // a || r
     }
 
 
