@@ -68,6 +68,9 @@
         <a class='button submit expand' href="/course/new/{{ search | url_encode }}">{{ label }}</a>
     {% endif %}
 </div>
+
+<div class="toast" data-course-toast></div>
+
 <script type="text/javascript">
     $(function () {
         $('[data-collapser]').collapsable();
@@ -77,13 +80,31 @@
         $('a[data-action="course-delete"]').on('click', function(event) {
             event.preventDefault();
 
+            var $this = $(this);
             var href = this.href;
+
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this course? This will delete ALL units within this course, as well as any other content that has been added!',
                 confirmEvent: function() {
-                    $.post(href, {}).done(function () {
-                        location.reload();
-                    });
+
+                    // A toast
+                    var $toast = $('[data-course-toast]');
+                    $toast.toastActivate({text: 'Deleting course...'});
+
+                    $.post(href, {})
+                        .done(function() {
+                            // Kill the element
+                            $this.parents('[data-course-row]').slideUp(function() {
+                                $(this).remove();
+                            });
+
+                            // Toast success
+                            $toast.toastTimeout({text: 'Course deleted.', css: 'success'});
+                        })
+                        .fail(function() {
+                            // Toast fail
+                            $toast.toastTimeout({text: 'Delete failed.', css: 'alert'});
+                        });
                 }
             });
         })
