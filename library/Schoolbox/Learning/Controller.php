@@ -28,7 +28,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 
 class Controller extends Base
 {
@@ -263,9 +264,40 @@ class Controller extends Base
             }
         }
 
-        $courseImplementations = Implementation\Mapper::getInstance()->findByFolderId($folderList->getColumnValues('id'))->groupByCallback(function (Implementation\Model $i) {
-            return $i->getFolder()->getId();
+        /**
+         * Sets of CourseSpecIds, each set indexed by class folder.id
+         * @var int[][]
+         */
+        $courseSpecs = [];
+
+        // Get CourseImpls, then group by Folder
+        $courseImpls = CourseImplementation\Mapper::getInstance()->findByFolderId($folderList->getColumnValues('id'));
+        $courseImplsPerClass = $courseImpls->groupByCallback(function(CourseImplementation\Model $courseImpl){
+            return $courseImpl->getFolder()->getId();
         });
+
+        // If a course import has unit implementations that are within the specified
+        // term, add the course spec to the folder.
+        /**
+         * @var CourseImplementation\Model[] $courseImpls
+         */
+        foreach($courseImplsPerClass as $folderId => $courseImpls){
+            $courseSpecs[$folderId] = [];
+            $hasUnitsInTerm = false;
+            foreach($courseImpls as $courseImpl){
+                foreach($courseImpl->getUnits() as $unitImpl){
+                    if($unitImpl->getOpenDate()->gte($term->getStart())){
+                        if($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->lte($term->getActualFinish())){
+                            $hasUnitsInTerm = true;
+                            break;
+                        }
+                    }
+                }
+                if($hasUnitsInTerm){
+                    $courseSpecs[$folderId][] = $courseImpl->getSpecification()->getId();
+                }
+            }
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
             'currentUser' => $this->getUser(),
@@ -274,7 +306,7 @@ class Controller extends Base
             'term'        => $term,
             'classList'   => $folderList,
             'classTypes'  => $classTypes,
-            'courses'     => $courseImplementations,
+            'courses'     => $courseSpecs,
         ]));
     }
 
