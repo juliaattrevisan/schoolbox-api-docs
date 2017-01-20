@@ -181,7 +181,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /** @var Plagscan $plagscan */
         try {
-            $plagscan = $this->findOneByColumn('student_submission_file_id', $file->getId());
+            $plagscan = $this->findOneByColumn('student_submission_file_id', $file->getId(), ['cache' => false]);
         }
         catch (\Schoolbox\Mapper\Exception $e) {
 
