@@ -9,86 +9,19 @@
 
 namespace Schoolbox\Application\WebRequest;
 
-
-use Alaress\Application\Boot\BootstrapInterface;
-use Alaress\Authorizer\Rule;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
-use Alaress\Module\Loader as ModuleLoader;
-use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
-use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
-use DebugBar\Bridge\Twig\TwigCollector;
 use Alaress\Redis;
-use Alaress\Session\Factory;
-use Alaress\Session\Session;
-use Alaress\Web\Output;
-use Alaress\Web\Router\RouterFactory;
-use Alaress_Date_Locale_Config;
 use Aura\Di;
 use Autoloader;
 use Config;
 use Database;
-use DeprecatedDatabase;
-use PDO;
 use Schoolbox\Application\AbstractBootstrap;
-use Schoolbox\Application\WebRequest;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
-use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\L10n\RosettaStone;
 
-// Learning related uses
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-
-
-use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
-use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplTranslator;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
-use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplTranslator;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
-use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
-
-use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecTranslator;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
-use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecMapperProxy;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecTranslator;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
-
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-
-use Schoolbox\Error;
-use Schoolbox\MapperFactory;
-use Schoolbox\Notif\SilentNotif;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Role;
-use Schoolbox\UserMapper;
-use Scrub;
-use Twig_Extension_Debug;
-use Twig_Extensions_Extension_Text;
-use Twig_Loader_Filesystem;
-use Twig_SimpleFilter;
-use Twig_SimpleFunction;
 
 class Bootstrap extends AbstractBootstrap {
-
-    /** @var bool */
-    protected $debugEnabled = false;
-
-    /** @var Kernel */
-    protected $kernel;
-
-    /**
-     * @param Kernel $kernel
-     */
-    public function __construct($kernel) {
-        $this->kernel = $kernel;
-    }
-
 
     /**
      * Load the core configuration file(s)
@@ -132,12 +65,13 @@ class Bootstrap extends AbstractBootstrap {
         // Set up the debug bar, and add listeners for various parts of the debug bar
         // (database calls, XHProf)
         // Should go in a DI container instead of a static class.
-        if($this->debugEnabled = DebugBar::isEnabled()) {
+        $this->setDebugEnabled(DebugBar::isEnabled());
+        if($this->isDebugEnabled()) {
             DebugBar::init();
         }
 
         // Install into database
-        if($this->debugEnabled) {
+        if($this->isDebugEnabled()) {
             $debug_bar = DebugBar::getInstance();
 
             // Throw away existing connection and reconnect with persistence off
@@ -147,7 +81,7 @@ class Bootstrap extends AbstractBootstrap {
         }
 
         // XHProf on the debug bar.
-        if($this->debugEnabled && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
+        if($this->isDebugEnabled() && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
             DebugBar::getInstance()->addCollector(new XhprofCollector());
         }
     }
@@ -219,7 +153,7 @@ class Bootstrap extends AbstractBootstrap {
     {
         parent::installDependencies();
 
-        $di = $this->kernel->getDependencyInjector();
+        $di = $this->getKernel()->getDependencyInjector();
 
         // Mapper notifications:
         // They rely upon the session being injected into them, so do that.
@@ -237,7 +171,7 @@ class Bootstrap extends AbstractBootstrap {
         require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
         $customModuleLocation = sprintf(
             '/conf/modules/Custom/%s/',
-            ucfirst($this->kernel->getDependencyInjector()->get('config')->get('site_location'))
+            ucfirst($this->getKernel()->getDependencyInjector()->get('config')->get('site_location'))
         );
         $modulePaths = array_merge(
             glob(SITE_root . '/conf/modules/*.php'),
@@ -257,7 +191,7 @@ class Bootstrap extends AbstractBootstrap {
             if(class_exists($class, false)) {
                 /** @var Config\Modules\ModuleConfigInterface $obj */
                 $obj = new $class();
-                $obj->configure($this->kernel);
+                $obj->configure($this->getKernel());
             }
 
         }
@@ -282,7 +216,7 @@ class Bootstrap extends AbstractBootstrap {
                 'type'    => $e->getCode(),
             );
 
-            $this->kernel->callExceptionCallbacks($e);
+            $this->getKernel()->callExceptionCallbacks($e);
 
         } elseif (is_array($e)) {
             $error = $e;
@@ -346,7 +280,7 @@ class Bootstrap extends AbstractBootstrap {
 
                 // Use Sitepage to output an error message in the school's design.
                 // If there's no SitePage in DI yet: just output a styleless error.
-                $di = $this->kernel->getDependencyInjector();
+                $di = $this->getKernel()->getDependencyInjector();
 
                 if (!$e instanceof \Exception) {
                     $e = $error;

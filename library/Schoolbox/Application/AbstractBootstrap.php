@@ -58,7 +58,10 @@ use Twig_SimpleFunction;
 abstract class AbstractBootstrap implements BootstrapInterface
 {
     /** @var Kernel */
-    protected $kernel;
+    private $kernel;
+
+    /** @var bool  */
+    private $debugEnabled = false;
 
 
     /**
@@ -579,4 +582,27 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $this->kernel->setDependencyInjector($di);
     }
 
+    /**
+     * @return bool
+     */
+    protected function isDebugEnabled()
+    {
+        return $this->debugEnabled;
+    }
+
+    /**
+     * @param bool $debugEnabled
+     */
+    protected function setDebugEnabled($debugEnabled)
+    {
+        $this->debugEnabled = $debugEnabled;
+    }
+
+    /**
+     * @return Kernel
+     */
+    protected function getKernel()
+    {
+        return $this->kernel;
+    }
 }
