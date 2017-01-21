@@ -55,9 +55,18 @@ if (isset($_POST['max_file_size'])) {
     $_POST['max_file_size'] = Alaress_Byte_Format::stringToBytes($_POST['max_file_size']);
 }
 
-// sure... because this can't go badly.....
-/** @var Mimetype $mime */
-$mime = $mimeMapper->hydrate($_POST, '', function ($self, $model, $row) { return $model; });
+$mime = new Mimetype();
+$mime->setDescription($_POST["description"]);
+$mime->setMime($_POST["mime"]);
+$mime->setIconFile($_POST["iconFile"]);
+$mime->setInline($_POST["inline"] === 'true');
+$mime->setEnable($_POST["enable"] === 'true');
+$mime->setMaxFileSize($_POST["max_file_size"]);
+
+if(isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId']) ) {
+    $mime->setId($_POST['fileTypeId']);
+}
+
 
 // verify data integritae (no duplicate mimes)
 try {

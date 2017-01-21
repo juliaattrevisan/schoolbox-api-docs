@@ -371,12 +371,11 @@ class Controller extends AbstractController
                 continue;
             }
 
-            $it = $this->getItineraryItemMapper()->hydrate([
-                'id'          => $itPost['itemId'][$i],
-                'match_id'    => $itPost['matchId'][$i],
-                'description' => $itPost['description'][$i],
-                'start_at'    => $datetime->getDatabase(),
-            ]);
+            $it = new ItineraryItem();
+            $it->setId($itPost['itemId'][$i]);
+            $it->setMatch((new Match())->setId($itPost['matchId'][$i]));
+            $it->setDescription($itPost['description'][$i]);
+            $it->setStartAt($datetime);
 
             $c->add($it);
         }

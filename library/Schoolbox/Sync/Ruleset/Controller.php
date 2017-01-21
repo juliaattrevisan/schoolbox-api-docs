@@ -13,6 +13,7 @@ namespace Schoolbox\Sync\Ruleset;
 use Alaress\Web\Controller\Base;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
+use Schoolbox\Sync\Effect\Type\Model as EffectType;
 use \Schoolbox\Sync\Hydrator;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use Schoolbox\Sync\Provisioner\Provisioner;
@@ -25,6 +26,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
+use Schoolbox\Sync\Rule\Model as Rule;
 
 class Controller extends Base {
 
@@ -739,8 +741,14 @@ class Controller extends Base {
                     $effect['arguments'] = json_encode([]);
                 }
 
-                $model = $mapper->hydrate($effect);
+                $model = new Effect\Model();
+                $model->setId($effect['id']);
+                $model->setRule((new Rule())->setId($effect['rule_id']));
+                $model->setEffectType((new EffectType())->setId($effect["effect_type_id"]));
+                $model->setUserProperty($effect['user_property']);
+                $model->setArguments($arg);
                 $mapper->save($model);
+
                 $results[$effectId] = $model->getId();
             }
         }
