@@ -63,6 +63,11 @@ $mime->setInline($_POST["inline"] === 'true');
 $mime->setEnable($_POST["enable"] === 'true');
 $mime->setMaxFileSize($_POST["max_file_size"]);
 
+if(isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId']) ) {
+    $mime->setId($_POST['fileTypeId']);
+}
+
+
 // verify data integritae (no duplicate mimes)
 try {
     /** @var Mimetype $existing */
