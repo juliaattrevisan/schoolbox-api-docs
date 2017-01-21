@@ -62,35 +62,30 @@
 
 <script type="text/javascript">
     $(function() {
+        var $durationPanel = $('#durationPanel');
+        var $durationInputs = $durationPanel.find('input[type=text]');
+
         $('#hasDuration').on('click', function(event) {
-            if ($(this).is(':checked')) {
-                $('#durationPanel').stop().hide().removeClass('hide').slideDown(600);
+            var $checkbox = $(this);
+            if ($checkbox.is(':checked')) {
+                $('#durationPanel').stop().hide().removeClass('hide').fadeIn(400);
+                $durationInputs.prop('disabled', false);
             }
             else {
-
-                /* Empty values and hide
+                /* Hide panel + disable inputs
                  */
-                $('#durationPanel').stop().slideUp(600, function() {
-                    $(this).find('input[name=durationHours]').val('');
-                    $(this).find('input[name=durationMinutes]').val('');
-                    $(this).addClass('hide');
-                });
+                $durationPanel.stop().fadeOut(400);
+                $durationInputs.prop('disabled', true);
             }
         });
     });
 </script>
 
-{% if context.baseContext is unitSpecification %}
-    <label>
-        Activity Duration
-        <span class="hint has-tip tip-top" data-tooltip title="Enter the number of days you expect the activity to take. This will be used to automatically populate due dates when importing this course.">?</span>
-        <input type="number" name="default_open_span" value="{{ assessment.defaultOpenSpan }}">
-    </label>
-{% endif %}
+{% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
 
 <div class="row">
-    <div class="small-12 columns">
-        <label for="hasDuration">Duration</label>
+    <div class="small-5 medium-2 columns">
+        <label for="hasDuration">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting a quiz, students will have this much time to complete it. Switch off for no limit.">?</span></label>
         <div class="switch round">
             <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.duration != -1 %}checked="checked"{% endif %} />
             <label for="hasDuration">
@@ -99,21 +94,20 @@
             </label>
         </div>
     </div>
-</div>
-
-<div class="row {% if assessment.duration == -1 %}hide{% endif %}" id="durationPanel">
-    <div class="small-12 columns no-pad">
-        <div class="small-12 medium-6 columns">
+    <div class="small-7 medium-10 columns no-pad {% if assessment.duration == -1 %}hide{% endif %}" id="durationPanel">
+        <div class="small-6 columns">
             <label>Hours
                 <input name='durationHours' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.hours }}{% endif %}" />
             </label>
         </div>
-        <div class="small-12 medium-6 columns">
+        <div class="small-6 columns">
             <label>Minutes
                 <input name='durationMinutes' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.minutes }}{% endif %}" />
             </label>
         </div>
     </div>
 </div>
+
+
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}

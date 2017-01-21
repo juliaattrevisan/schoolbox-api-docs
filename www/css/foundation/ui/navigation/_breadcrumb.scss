@@ -94,7 +94,7 @@ $breadcrumb-active-bg-color: $content-ui-selected;
 }
 
 #content > .breadcrumb {
-	@media #{$small-up} {
+	@media #{$small-only} {
 		margin: 0 0 1rem 0;
 		li{
 			display: none;
@@ -104,7 +104,7 @@ $breadcrumb-active-bg-color: $content-ui-selected;
 			}
 		}
 	}
-	@media #{$large-up} {
+	@media #{$medium-up} {
 		margin: 0 0 1rem -1rem;
 	}
 }
