@@ -250,11 +250,11 @@ Usage:
         <div class="small-12 columns no-pad">
             <div class="alert-box warning">
                 <strong>Warning:</strong> you have already marked some students' work.<br>
-                Invalidating or altering a student's rubric mark will <em>not</em> update their mark for this activity unless you explicitly assign
-                the the grade from the rubric.
+                Invalidating or altering the rubric will <em>not</em> update their mark for this activity unless you explicitly assign
+                the grade from the rubric.
                 <ul>
-                    <li>Changing the value of existing descriptors will invalidate any existing marks given;</li>
-                    <li>You can safely add {{ locale.translate('rubricCriterion',true,false) }}. This will not alter a student's rubric mark, nor the activity grade;</li>
+                    <li>Changing the value of existing descriptors will invalidate any existing marks given</li>
+                    <li>You can safely add {{ locale.translate('rubricCriterion',true,false) }}. This will not alter a student's rubric mark.</li>
                     <li>Removing {{ locale.translate('rubricCriterion',true,false) }} will invalidate any marks given for that {{ locale.translate('rubricCriterion',false,false) }}'s row;</li>
                     <li>You can safely change wordings and orders of descriptors.</li>
                 </ul>
