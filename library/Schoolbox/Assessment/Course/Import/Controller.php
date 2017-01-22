@@ -1041,7 +1041,7 @@ class Controller extends Base\Base
                 if(0 == $folderCrumb->getParent()->getId()){
                     break;
                 }
-                $folderCrumb = $this->getFolderMapper()->findCheaplyById($folderCrumb->getParent()->getId());
+                $folderCrumb = $this->getFolderMapper()->findCheaplyById($folderCrumb->getParent()->getId(), ['deleted' => true]);
             }
         }
 
