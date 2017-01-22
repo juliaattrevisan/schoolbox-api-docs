@@ -1381,10 +1381,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         if ($row) {
             // This done by hand to ensure no caches are harmed
+            /** @var Model $folder */
             $folder = new $this->model;
             $folder->setId($row['id']);
             $folder->setName($row['name']);
             $folder->setInherit($row['inherit']);
+            /** @var Model $parent */
             $parent = new $this->model;
             $parent->setId($row['parent']);
             $folder->setParent($parent);
