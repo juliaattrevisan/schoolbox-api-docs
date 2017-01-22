@@ -108,6 +108,7 @@
             $(config.assessmentList)
                 .on('keydown paste keypress', 'textarea', timeoutUpdate)
                 .on('change', ':input', timeoutUpdate)
+                .on('change', '[data-rubric-descriptor]', timeoutUpdate)
                 .on('blur', ':input', doASaveActionNao)
                 .on('addedfile.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
@@ -179,7 +180,7 @@
             // do a preval comparison to find out if we can skip AJAX
             // (Do not skip attachzones)
             var $this = $(this);
-            if (!$this.is('.attachzone') && $this.val() == $this.data('preval')) {
+            if ((! ($this.is('.attachzone') || $this.attr('name').indexOf('rubric') == 0 )) && $this.val() == $this.data('preval')) {
                 return;
             }
 
