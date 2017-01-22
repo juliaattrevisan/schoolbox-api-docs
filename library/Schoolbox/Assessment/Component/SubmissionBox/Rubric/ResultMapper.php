@@ -11,8 +11,11 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox;
-use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\GenericCollection;
 
+/**
+ * @method Result[]|GenericCollection findAll($options = array())
+ */
 class ResultMapper extends Schoolbox\Mapper {
 
     protected function mapping()

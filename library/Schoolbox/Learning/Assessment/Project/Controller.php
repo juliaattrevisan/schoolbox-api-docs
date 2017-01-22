@@ -134,12 +134,6 @@ class Controller extends Assessment\Controller
             }
         }
 
-        /* Manufacture a universal returnUrl
-         * Return to summary screen with this suffix
-         */
-        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment ]);
-        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
-
         $twigData = [
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'       => $assessment->getBaseContext(),
@@ -147,7 +141,6 @@ class Controller extends Assessment\Controller
             'participantCounts' => $participantCounts,
             'assessmentCounts'  => $assessmentCounts,
             'currentUser'       => $this->getUser(),
-            'returnUrlSuffix'   => $returnUrlSuffix,
             'returnUrl'         => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
         ];
 

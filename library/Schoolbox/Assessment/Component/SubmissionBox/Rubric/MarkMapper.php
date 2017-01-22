@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -21,6 +22,7 @@ use Schoolbox\UserMapper;
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Mark hydrate(array $row, $alias = '', $callback = null)
  * @method Mark createModel($idValue = null)
+ * @method GenericCollection|Mark[] findByColumnList($columnList, $options = array())
  */
 class MarkMapper extends Mapper
 {
@@ -52,11 +54,11 @@ class MarkMapper extends Mapper
     {
         return "
             SELECT  {$this->getColumnString()},
-                    {$this->getJoinColumnString('user')},
-                    {$this->getJoinColumnString('descriptor')}
+                    {$this->getJoinColumnString('user', 'u')},
+                    {$this->getJoinColumnString('descriptor', 'd')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('user')}
-            LEFT JOIN {$this->getJoinSql('descriptor')}
+            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
     }
 
@@ -67,22 +69,35 @@ class MarkMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = $this->createCollection();
+        $marks = $this->createCollection();
+        $students = $this->getJoinMapper('user')->createCollection();
+        $descriptors = $this->getJoinMapper('descriptor')->createCollection();
+
+        $studentKey = "u.{$this->getJoinMapper('user')->getIdentifierColumn()}";
+        $descriptorKey = "d.{$this->getJoinMapper('descriptor')->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $model = $this->hydrate($r);
 
+            $userId = $r[$studentKey];
+            if(!$students->offsetExists($userId)){
+                $students->setOffset($userId, $this->hydrateJoin($r, 'user', 'u'));
+            }
             /** @var User $student */
-            $student = $this->hydrateJoin($r, 'user');
-            $model->setStudent($student);
+            $student = $students->getOffset($userId);
 
+            $descriptorId = $r[$descriptorKey];
+            if(!$descriptors->offsetExists($descriptorId)){
+                $descriptors->setOffset($descriptorId, $this->hydrateJoin($r, 'descriptor', 'd'));
+            }
             /** @var Descriptor $descriptor */
-            $descriptor = $this->hydrateJoin($r, 'descriptor');
-            $model->setDescriptor($descriptor);
+            $descriptor = $descriptors->getOffset($descriptorId);
 
-            $c->add($model);
+            $mark = $this->hydrate($r);
+            $mark->setStudent($student);
+            $mark->setDescriptor($descriptor);
+            $marks->add($mark);
         }
 
-        return $c;
+        return $marks;
     }
 }

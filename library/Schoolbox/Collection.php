@@ -812,19 +812,31 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function indexBy($column)
     {
-        $this->reindex();
+        $callback = function ($item) use ($column) {
+            return call_user_func([$item, $this->getGetMethodName($column)]);
+        };
 
-        $keys = $this->getColumnValues($column);
-        $len = count($keys);
-        $new = array();
+        return $this->indexByCallback($callback);
+    }
 
-        for ($i = 0; $i < $len; ++$i) {
-            $new[$keys[$i]] = $this->stack[$i];
+    /**
+     * Indexes the collection by the given callback.
+     *
+     * Be careful! The value from the callback should contain values unique for the collection.
+     * If not, earlier values will be overwritten.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function indexByCallback(callable $callback)
+    {
+        $new = [];
+        foreach($this->stack as $item){
+            $key = call_user_func($callback, $item);
+            $new[$key] = $item;
         }
-
         // Bypass GenericCollection type-check in setStack()
         $this->stack = $new;
-
         return $this;
     }
 

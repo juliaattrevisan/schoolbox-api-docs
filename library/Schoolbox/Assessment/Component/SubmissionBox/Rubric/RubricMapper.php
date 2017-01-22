@@ -347,6 +347,7 @@ class RubricMapper
         $criteriaStatement = $this->database->query("
             SELECT
                 COUNT(box_id) usages,
+                MAX(`sequence`) sequence,
                 COALESCE(MAX(selected), 0) selected,
                 crit_id,
                 `grouping`,
@@ -465,7 +466,7 @@ class RubricMapper
               SELECT MAX(tstamp)
               FROM rubric_mark rm
               JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-              JOIN rubric_level rl ON rl.id = rd.level_id
+              JOIN rubric_level rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
               WHERE rl.box_id = :boxId
               AND rm.student_id = :userId
               AND rm.valid = TRUE
@@ -702,52 +703,32 @@ class RubricMapper
      * Save rubrics selections for a particular Participant
      *
      * @param Participant $participant
-     * @param $rubricVars
+     * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
      */
-    public function saveForParticipant(Participant $participant, $rubricVars)
+    public function saveForParticipant(Participant $participant, array $descriptors = [])
     {
-        /* Optional rubric
-         */
-        // If the mark gets passed at the same time as rubrics,
-        // then rubrics get clobbered. We don't want that.
-        if (is_array($rubricVars)) {
+        $descriptorMapper = DescriptorMapper::getInstance();
+        $markMapper       = MarkMapper::getInstance();
+        $marks            = $markMapper->createCollection();
+        $tStamp           = Alaress_Date_Format::now();
 
-            /* Find the submission box instance
-             */
-            try {
-                /** @var SubmissionBox $submissionBox */
-                $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $participant->getAssessable()->getId());
-
-                $descriptorIds = [];
-
-                foreach ($rubricVars as $criterionId => $levelId) {
-                    // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
-                    $descriptorIds[] = DescriptorMapper::getInstance()->findIdsByColumnList(
-                        [
-                            'criterion_id'      => $criterionId,
-                            'level_id'          => $levelId
-                        ]
-                    )[0];
-                }
-
-                $grid = $this->findBySubmissionBox($submissionBox);
-                $this->applyMark($grid, $descriptorIds);
-
-                $marks = $grid->getORMMarks($participant->getUser(), \Alaress_Date_Format::now());
-                SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
+        foreach($descriptors as $descriptorId => $isChecked){
+            if(!$isChecked){
+                continue;
             }
-            catch (\Schoolbox\Mapper\Exception $e) {
-
-                /* noop (submission box not found)
-                 */
-            }
+            $marks->add($markMapper->createModel()
+                ->setStudent($participant->getUser())
+                ->setDescriptor($descriptorMapper->createModel($descriptorId))
+                ->setCreatedAt($tStamp)
+                ->setValid(true)
+            );
         }
+        $markMapper->save($marks);
     }
 
     /**
      * @param Rubric $rubric
      * @param SubmissionBox $submissionBox
-     * @return int
      */
     public function save($rubric, $submissionBox)
     {
@@ -755,6 +736,9 @@ class RubricMapper
         $rubric->setSubmissionBox($submissionBox);
 
         // TODO some way to wrap all this in a transaction would be nice... -_-;
+        $existingLevelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
+        $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
+        $existingDescriptors = $existingDescriptors->map(function(Descriptor $d){return clone $d;});
 
         // first, persist the row and column headers (criteria and levels, respectively)
         CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
@@ -766,6 +750,8 @@ class RubricMapper
 
         // finally, now that everything else is saved, save the descriptors
         $descIds  = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
+
+        $this->checkDescriptorValueChanges($existingDescriptors, $descs);
 
         // wash up before dinner, kids
 
@@ -781,6 +767,109 @@ class RubricMapper
         // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
         $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
         $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
+    }
+
+    /**
+     * Invalidates selected student marks if already given for this rubric and the rubric has changed.
+     *
+     * * If an existing descriptor has had its value changed then invalidate all marks for the rubric.
+     * * If an indicator is added, do nothing.
+     * * If an indicator is removed, invalidate marks for that indicator.
+     *
+     * @param Collection|Descriptor[] $existingDescriptors
+     * @param Collection|Descriptor[] $newDescriptors The newly saved descriptors
+     * @return bool Did we invalidate any descriptors?
+     */
+    protected function checkDescriptorValueChanges(Collection $existingDescriptors, Collection $newDescriptors)
+    {
+        // Group descriptors by criterionId, then LevelId, to enable O(1) lookup
+        $criteriaCallback = function(Descriptor $descriptor){
+            return $descriptor->getCriterion()->getId();
+        };
+        /** @var Collection|Descriptor[][] $existingCriteriaDescriptors */
+        $existingCriteriaDescriptors = $existingDescriptors->groupByCallback($criteriaCallback);
+        /** @var Collection|Descriptor[][] $newCriteriaDescriptors */
+        $newCriteriaDescriptors = $newDescriptors->groupByCallback($criteriaCallback);
+
+        $levelsCallback = function(Descriptor $descriptor){
+            return $descriptor->getLevel()->getId();
+        };
+        foreach($existingCriteriaDescriptors as $existingCriterionDescriptors){
+            $existingCriterionDescriptors->indexByCallback($levelsCallback);
+        }
+        foreach($newCriteriaDescriptors as $newCriterionDescriptors){
+            $newCriterionDescriptors->indexByCallback($levelsCallback);
+        }
+
+        // Have any descriptor values been updated ? (but not completely deleted)
+        $hasDescriptorValuesChanged = false;
+        $deletedDescriptors = DescriptorMapper::getInstance()->createCollection();
+        foreach($existingCriteriaDescriptors as $criterionId => $existingCriterionDescriptors)
+        {
+            /** @var Collection $newCriterionDescriptors */
+            $newCriterionDescriptors = $newCriteriaDescriptors->getOffset($criterionId);
+
+            // Have we deleted this criterion?
+            if(!$newCriterionDescriptors){
+                // Make a note of them, we may need you later...
+                $deletedDescriptors = $deletedDescriptors->merge($existingCriterionDescriptors);
+                continue;
+            }
+
+            // Examine each descriptor in this criterion
+            foreach($existingCriterionDescriptors as $levelId => $existingDescriptor){
+                /** @var Descriptor $newDescriptor */
+                $newDescriptor = $newCriterionDescriptors->getOffset($levelId);
+
+                // Has the descriptor been deleted?
+                if(!$newDescriptor){
+                    $hasDescriptorValuesChanged = true;
+                    break;
+                }
+
+                // Has the value changed ?
+                $existingValue = $existingDescriptor->getValue();
+                $newValue      = $newDescriptor->getValue();
+                if($existingValue != $newValue){
+                    $hasDescriptorValuesChanged = true;
+                    break;
+                }
+            }
+        }
+
+        // Did we detect a value change?
+        if($hasDescriptorValuesChanged){
+            $this->invalidateDescriptorMarks($existingDescriptors);
+            return true;
+        }
+
+        // Did we delete any criterion?
+        if($deletedDescriptors->count()){
+            $this->invalidateDescriptorMarks($deletedDescriptors);
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Invalidates all marks given for the specified descriptors
+     *
+     * @param Collection|Descriptor[] $descriptors
+     */
+    protected function invalidateDescriptorMarks(Collection $descriptors)
+    {
+        $markMapper = MarkMapper::getInstance();
+        $descriptorIds = $descriptors->getColumnValues('id');
+        $columnList = [
+            'descriptor_id' => $descriptorIds,
+            'valid'         => true,
+        ];
+        $marks = $markMapper->findByColumnList($columnList);
+        foreach($marks as $mark){
+            $mark->setValid(false);
+        }
+        $markMapper->save($marks);
     }
 
 

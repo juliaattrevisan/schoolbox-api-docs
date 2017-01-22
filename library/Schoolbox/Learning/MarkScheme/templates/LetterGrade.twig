@@ -3,7 +3,7 @@
 {% block grading %}
     {% set mark = participant.mark.unpublished %}
     <label>Grade
-        <select name="mark" tabindex="{{ tabIndex.mark }}">
+        <select data-mark-input name="mark" tabindex="{{ tabIndex.mark }}">
 
             {# Empty state #}
             {% set found = (mark.humanReadable is null) %}

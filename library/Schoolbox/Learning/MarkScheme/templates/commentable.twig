@@ -29,7 +29,10 @@
 
         {% if assessment.useRubric and rubricContext %}
         <div class="small-12 island">
-            {% include '@rubric/grid-markable.twig' with {rubric: rubricContext.rubric, markType: rubricContext.markType} only %}
+            {% include '@rubric/grid-markable.twig' with {
+                rubric: rubricContext.rubric,
+                markType: rubricContext.markType
+            } only %}
         </div>
         {% endif %}
 

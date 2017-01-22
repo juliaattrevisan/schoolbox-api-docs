@@ -174,6 +174,7 @@ class Descriptor implements Calculable, Twiggable
     public function toContext()
     {
         return [
+            'id'       => $this->getId(),
             'text'     => $this->getText(),
             'value'    => $this->getValue(),
             'selected' => $this->isSelected(),
