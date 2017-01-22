@@ -195,6 +195,7 @@ class CohortAnalysis
         // flatten the unit specs out of the data, accommodating students who exist in more than one unit
         foreach ($this->getCompletionData() as $unitSpecId => $unitCompletionData) {
 
+            // Did this UnitSpec have any ActivitySpecs inside it?
             if (is_array($unitCompletionData['activityCompletions'])) {
                 foreach ($unitCompletionData['activityCompletions'] as $specActivityId => $activityCompletion) {
                     if (!array_key_exists($specActivityId, $activityCompletions)) {
@@ -204,6 +205,7 @@ class CohortAnalysis
                 }
             }
 
+            // Did this UnitSpec have any ActivitySpecs inside it?
             if (is_array($unitCompletionData['participantProgress'])) {
                 foreach ($unitCompletionData['participantProgress'] as $participantId => $progress) {
                     foreach ($progress as $specActivityId => $isComplete) {
