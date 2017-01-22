@@ -6,9 +6,9 @@
 {% set statusComplete   = 'complete'   %}
 
 {% if assessment is quiz %}
-{% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) ~ returnUrlSuffix %}
+{% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) %}
 {% else %}
-{% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+{% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment})  %}
 {% endif %}
 
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
@@ -40,7 +40,7 @@
     <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
         {% if routeModify %}
         <li>
-            <a class="icon-modify" href="{{ routeModify }}">Modify</a>
+            <a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a>
         </li>
         {% endif %}
         {% block headerOptions %}{% endblock %}
@@ -114,10 +114,10 @@
                             <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                                 {%- spaceless %}
                                     {% if pActionResponses %}
-                                        <li><a class="icon-task" href="{{ pActionResponses }}" title="View Inline Grader for {{ participant.user.firstName }}">Inline Grader</a></li>
+                                        <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View and grade submission</a></li>
                                     {% endif %}
                                     {% if pActionSummary %}
-                                        <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">Submission History</a></li>
+                                        <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">Submission history</a></li>
                                     {% endif %}
                                     {% if pSobo %}
                                     <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
@@ -125,7 +125,7 @@
                                     {% if assessment is quiz %}
                                         {% set attempt = participant.findMostRecentResponse %}
                                         {% if attempt and not attempt.submitted %}
-                                            <form id="form-quiz-submit-{{ attempt.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit') ~ returnUrlSuffix }}">
+                                            <form id="form-quiz-submit-{{ attempt.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                                                 <input type="hidden" name="attemptId" value="{{ attempt.id }}">
                                             </form>
                                             <li><a data-quiz-submit="{{ attempt.id }}" class="icon-tick" href="#" title="Mark As Submitted">Mark As Submitted</a></li>
