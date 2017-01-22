@@ -30,6 +30,6 @@ class Decimal implements IColumnType
      */
     public function dehydrate($value, $mapper = null)
     {
-        return $value;
+        return $value === '' ? null : $value;
     }
 }
