@@ -25,6 +25,7 @@ class Mark
 {
     use Id;
     use CreatedAtDate;
+    use UpdatedAtDate;
 
     /** @var User */
     private $student;
