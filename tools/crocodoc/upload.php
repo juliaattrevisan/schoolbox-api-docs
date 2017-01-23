@@ -9,6 +9,8 @@
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Learning\InlineGrader\Authenticator;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SingleFileMapper;
+use Schoolbox\Learning\InlineGrader\Asynchronous\Upload as AsynchronousCrocodocUpload;
+
 use Crocodoc\Document;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -58,7 +60,7 @@ var_dump(get_class($logger));
 
 try {
     $authenticator = new Authenticator();
-    $uploader = new \Schoolbox\Learning\InlineGrader\Asynchronous\Upload($authenticator, $logger, SingleFileMapper::getInstance());
+    $uploader = new AsynchronousCrocodocUpload($authenticator, $logger, SingleFileMapper::getInstance());
 }
 catch (RangeException $e) {
 
