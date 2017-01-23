@@ -8,6 +8,7 @@
 namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 
 /**
@@ -17,12 +18,7 @@ use Schoolbox\User;
  */
 class Model
 {
-    /**
-     * Primary key
-     *
-     * @var int
-     */
-    protected $id;
+    use Id;
 
     /**
      * The human-readable title of this term.
@@ -120,24 +116,6 @@ class Model
     public function isMarkableBy(User $user)
     {
         return !$this->getArchived() || $user->isSuperuser();
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param  int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
     }
 
     /**
