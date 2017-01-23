@@ -31,12 +31,12 @@ class ResponseFile
      *
      * @var array
      */
-    private $allowedFileTypes = array(
+    const VALID_FILES = [
         'doc', 'docx',
         'xls', 'xlsx',
         'ppt', 'pptx',
         'pdf'
-    );
+    ];
 
     /**
      * @var Submission
@@ -184,7 +184,7 @@ class ResponseFile
     {
         $ext = $this->getFile()->getStorage()->getExtension();
 
-        return strlen(\Cfg::get('crocodoc_api_token')) && in_array($ext, $this->getAllowedFileTypes());
+        return strlen(\Cfg::get('crocodoc_api_token')) && in_array($ext, self::VALID_FILES);
     }
 
     /* Getters/Setters
@@ -223,24 +223,6 @@ class ResponseFile
     protected function setFile($file)
     {
         $this->file = $file;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getAllowedFileTypes()
-    {
-        return $this->allowedFileTypes;
-    }
-
-    /**
-     * @param array $allowedFileTypes
-     * @return $this
-     */
-    protected function setAllowedFileTypes($allowedFileTypes)
-    {
-        $this->allowedFileTypes = $allowedFileTypes;
         return $this;
     }
 

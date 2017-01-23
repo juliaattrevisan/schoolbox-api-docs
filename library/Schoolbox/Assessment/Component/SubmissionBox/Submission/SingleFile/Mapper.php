@@ -16,6 +16,7 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFile;
 
 /**
  * A mapper for a single file within a student's submission to a due work.
@@ -148,6 +149,10 @@ class Mapper extends BaseMapper
      */
     public function findPendingCrocodocUpload()
     {
+        /* Get a list of legal files that crocodoc accepts
+         */
+        $allowedExtensions = ResponseFile::VALID_FILES;
+
         $query = $this->getSelectString();
         $query .= "
             WHERE uuid is null AND ( ext like 'docx' OR
