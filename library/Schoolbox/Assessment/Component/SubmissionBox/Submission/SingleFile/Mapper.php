@@ -157,7 +157,7 @@ class Mapper extends BaseMapper
 
         $query .= "
             WHERE uuid IS NULL
-            AND YEAR(submitted_at) = 2016
+            AND YEAR(submitted_at) = YEAR(NOW())
             AND ext IN ($allowedExtensions)
             LIMIT 0,100
         ";
