@@ -222,7 +222,13 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected static function isWithinWebRequest()
     {
-        return count($_REQUEST) > 0;
+        if (PHP_SAPI === 'cli') {
+            return false;
+        }
+        if (!isset($_SERVER['REQUEST_METHOD'])) {
+            return false;
+        }
+        return true;
     }
 
     /**
