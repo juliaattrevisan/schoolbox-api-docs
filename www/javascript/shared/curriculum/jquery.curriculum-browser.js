@@ -102,7 +102,7 @@
 
         // Update data
         data.actions  = actions;
-        data.readonly = self.config.readonly;
+        data.readonly = self.config.view.readonly;
 
         var viewPanel = self.updateViewPanel(self.config.view.templates.view(data));
 
