@@ -17,7 +17,6 @@ class TestMapper extends Mapper {
      */
     private $test;
 
-
     /**
      * @param MapperTest $test
      */
@@ -27,6 +26,14 @@ class TestMapper extends Mapper {
         $this->test = isset($test) ? $test : null;
     }
 
+    /**
+     * Switch the cache back on for test purposes, even though this is a test
+     * that is likely run over CLI (where cache is usually switched off).
+     */
+    protected function setup()
+    {
+        $this->enableCache();
+    }
 
     protected function mapping() {
         $this->hasTable('test_table');
