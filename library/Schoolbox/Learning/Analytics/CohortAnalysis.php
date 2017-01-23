@@ -97,6 +97,10 @@ class CohortAnalysis
                 foreach ($unitImpl->getAssessables() as $implActivity) {
 
                     $specActivity   = $implActivity->getSpecificationAssessment();
+                    if($specActivity == null) {
+                        //skip assessments that have no spec
+                        continue;
+                    }
                     $specActivityId = $specActivity->getId();
 
                     if (empty($specActivityComplete[$unitSpecId][$specActivityId])) {
@@ -246,6 +250,10 @@ class CohortAnalysis
                 // participants can exist in units simultaneously, so we need to flatten according to specActivity before summating.
                 foreach ($unitImplementation->getAssessables() as $implActivity) {
 
+                    if($implActivity->getSpecificationAssessment() == null) {
+                        //skip activities with no specification
+                        continue;
+                    }
                     $specActivityId = $implActivity->getSpecificationAssessment()->getId();
 
                     if (empty($activities[$specActivityId])) {

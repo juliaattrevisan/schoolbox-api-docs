@@ -45,6 +45,12 @@ class Unit {
         $results = [];
 
         foreach ($this->getUnitImplementation()->getAssessables() as $activity) {
+
+            if($activity->getSpecificationAssessment() == null) {
+                //skip activities with no specification
+                continue;
+            }
+
             $specActivityId = $activity->getSpecificationAssessment()->getId();
 
             foreach ($activity->getFeedbacks() as $feedback) {
