@@ -1534,14 +1534,13 @@ class Controller extends Base
                              */
                             if (!$error) {
                                 try {
-                                    $this->makeDateTime($itineraryDate, $itineraryTime);
+                                    $datetime = $this->makeDateTime($itineraryDate, $itineraryTime);
 
                                     /* Stack up if you could get the date to process
                                      */
                                     $items[] = [
-                                        'date' => $row[$i],
-                                        'time' => $row[$i + 1],
-                                        'description' => $row[$i + 2]
+                                        'datetime' => $datetime,
+                                        'description' => $itineraryDesc
                                     ];
                                 } catch (\Exception $e) {
                                     $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDateIndex, "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$itineraryDate} {$itineraryTime})");
@@ -1549,17 +1548,17 @@ class Controller extends Base
                             }
                         }
 
-
+                        /* Save all the things
+                         */
                         foreach ($items as $item) {
+                            if (!empty(trim($item['description']))) {
+                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Itinerary Item '{$item['description']}'");
 
-                            /* !!!!!! $row['description'] doesn't exist in this context ><
-                             */
-                            if (!empty(trim($row['description']))) {
-                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Itinerary Item '{$row['description']}'");
                                 $itineraryItem = new ItineraryItem();
                                 $itineraryItem->setMatch($match);
-                                $itineraryItem->setStartAt($this->makeDateTime($item['date'], $item['time']));
-                                $itineraryItem->setDescription($row['description']);
+                                $itineraryItem->setStartAt($item['datetime']);
+                                $itineraryItem->setDescription($item['description']);
+
                                 $this->getItineraryItemMapper()->save($itineraryItem);
                             }
                         }
