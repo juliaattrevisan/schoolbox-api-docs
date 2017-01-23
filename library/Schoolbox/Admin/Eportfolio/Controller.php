@@ -377,11 +377,13 @@ class Controller extends Base
      * @param $status
      */
     private function log($message, $id, $status=null) {
+        // Use actual time instead of request time
+        $time = new \Alaress_Date_Format(time(), \Alaress_Date_Format::TIMESTAMP);
         $log = new EportfolioImportLog();
         $log->setImportId($id);
         $log->setResult($message);
-        $log->setUpdatedAt(\Alaress_Date_Format::now());
-        $log->setCreatedAt(\Alaress_Date_Format::now());
+        $log->setUpdatedAt($time);
+        $log->setCreatedAt($time);
         $this->eportfolioImportLogMapper->save($log);
 
         if ($status != null) {
