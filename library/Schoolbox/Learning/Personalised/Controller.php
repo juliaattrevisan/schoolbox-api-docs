@@ -264,8 +264,10 @@ class Controller extends Base
         $participant = $this->participantMapper->createModel()
             ->setAssessment($assessment)
             ->setStudent($student)
-            ->setOpenDate($openDate)
-            ->setDueDate($dueDate);
+            // Set open and due of participation to start/end of day,
+            // as that's how an assessment's dates should be if imported
+            ->setOpenDate($openDate->startOfDay())
+            ->setDueDate($dueDate->endOfDay());
         $this->participantMapper->save($participant);
 
         $this->buildJsonResponse('ok');
