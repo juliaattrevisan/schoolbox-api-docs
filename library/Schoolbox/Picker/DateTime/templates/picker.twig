@@ -458,16 +458,24 @@
 
     {# Setup calendar #}
     var newDate, latestDate;
-
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
         defaultDate: new Date({{ value }}),
         dateFormat: '{{ displayFormat }}',
         inline: true,
         altInput: false,
-        enableTime: {{ enableTime }},
+        {#enableTime: {{ enableTime }},#}
         allowInput: true,
         disableMobile: true,
         minuteIncrement: 1,
+        {# Build datepicker options here... again... #}
+        enableTime: getValue($('#{{ element }}'), 'data-datepicker-time'),
+        // bothFormats: false, //Can use both displayFormat and displayFormatDate
+        allDay: getValue($('#{{ element }}'), 'data-datepicker-allday'), //Show All Day switch
+        allDayExt: getValue($('#{{ element }}'), 'data-datepicker-alldayext'), //Sync with external AllDay input hidden field
+        // allDateTime: 'start', //Set time to start or end of the day: start, finish
+        type: getValue($('#{{ element }}'), 'data-datepicker-call'), //Ajax call type: events, duework or nothing
+
+
         onReady: function(selectedDates, dateStr, instance) {
             //Wrong format, swaps day with month
             var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');

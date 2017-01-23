@@ -47,25 +47,42 @@ countPickers = function () {
     return pickerCounter;
 };
 
+function getValue(input, attribute){
+    var value = input.attr(attribute);
+    // There is no such attribute, return false
+    if(value === undefined){
+        return false;
+    }
+    // The attribute is there and has a value, return it
+    else if(value.length > 0 ) {
+        return value;
+    }
+    // The attribute is there, but no value is set, return true
+    else {
+        return true;
+    }
+};
+
 // Extend jQuery with our datepicker function
 
 $.fn.alaressDateTimePicker = function(optionsOverride) {
-    // Default options
-    // Default picker type: event
+
+    var element = this;
+
+    // Build datepicker options form the element data attributes
     var options = {
         displayFormat: 'd/m/Y h:iK', //Default display format
         displayFormatDate: 'd/m/Y',
         databaseFormat: 'Y-m-d H:i:s',
-        enableTime: false, //Don't show time picker
+        enableTime: getValue(element, 'data-datepicker-time'),
         // bothFormats: false, //Can use both displayFormat and displayFormatDate
-        allDay: false, //Show All Day switch
-        allDayExt: false, //Sync with external AllDay input hidden field
-        // allDateTime: 'start',
-        type: 'default',
-
+        allDay: getValue(element, 'data-datepicker-allday'), //Show All Day switch
+        allDayExt: getValue(element, 'data-datepicker-alldayext'), //Sync with external AllDay input hidden field
+        // allDateTime: 'start', //Set time to start or end of the day: start, finish
+        type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
     };
 
-    // Override with user any options
+    // Override with user any options --- should this stay? Todo
     for (var attribute in optionsOverride) {
         options[attribute] = optionsOverride[attribute];
     }
@@ -74,85 +91,76 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
     window.pickerInstance = [];
 
-    // Iterate all the elements that want datetime pickers
+    if (element.val().length > 0) {
+        var originalValue = element.val();
+    }
+    //if no value has been passed, use today
+    else {
+        var originalValue = moment().format(convertFormat(options.displayFormat));
+    }
+    if (options.allDayExt !== false && $('#'+options.allDayExt).val() == 1) {
+        originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat));
+    }
+    //Count this picker in
+    var pickerId = countPickers();
 
-    var elements = this;
+    var modalSize = (options.type == 'event' || options.type == 'duework') ? '650px' : '325px';
+    element.after('<div data-reveal id="picker' + pickerId + '" class="reveal-modal" style="width: ' + modalSize + ';"></div>');
 
-    elements.each(function (index, element) {
+    // Create click event to open the modal for the element
 
-        var element = $(element);
+    element.click(function () {
 
-        if (element.val().length > 0) {
-            var originalValue = element.val();
-        }
-        //if no value has been passed, use today
-        else {
-            var originalValue = moment().format(convertFormat(options.displayFormat));
-        }
-        if (options.allDayExt !== false && $('#'+options.allDayExt).val() == 1) {
-            originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat));
-        }
-        //Count this picker in
-        var pickerId = countPickers();
+        // var elementClicked = $(this);
+        var picker = $('#picker' + pickerId);
 
-        var modalSize = (options.type == 'event' || options.type == 'duework') ? '650px' : '325px';
-        element.after('<div data-reveal id="picker' + pickerId + '" class="reveal-modal" style="width: ' + modalSize + ';"></div>');
+        // Only AJAX in the picker if we haven't already
 
-        // Create click event to open the modal for the element
+        if (picker.data('status') === undefined) {
 
-        element.click(function () {
-            var elementClicked = $(this);
-            var picker = $('#picker' + pickerId);
+            // Update picker status
+            picker.data('status', 'loading');
+            // if datetime, pass date only
+            // AJAX in the modal contents if they haven't already been loaded
+            picker.load('/picker/datetime/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
 
-            // Only AJAX in the picker if we haven't already
+                // $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
 
-            if (picker.data('status') === undefined) {
+                // Capture closure of modal
+                $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
 
-                // Update picker status
-                picker.data('status', 'loading');
-                // if datetime, pass date only
-                // AJAX in the modal contents if they haven't already been loaded
-                picker.load('/picker/datetime/type/'+options.type+'/time/' + options.enableTime + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
+                // Update the elements value with the selected date
+                    if($('#allday').val() == 1) {
+                        element.val(moment(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat)).format(convertFormat(options.displayFormatDate)));
+                    }
+                    else {
+                        element.val(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat));
+                    }
 
-                    // $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
-
-                    // Capture closure of modal
-
-                    $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
-
-                    // Update the elements value with the selected date
-                        if($('#allday').val() == 1) {
-                            element.val(moment(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat)).format(convertFormat(options.displayFormatDate)));
-                        }
-                        else {
-                            element.val(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat));
-                        }
-
-                    });
-
-                    // Update picker status
-
-                    picker.data('status', 'loaded');
-
-                    // Display the datetime picker modal
-
-                    $('#picker' + pickerId).foundation('reveal', 'open');
                 });
 
-            } else if (picker.data('status') == 'loaded') {
+                // Update picker status
 
-                // Use Y-m-d to avoid mis interpreting d/m/Y
-                var formatDate = moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat));
-                window.pickerInstance[pickerId].setDate(formatDate);
+                picker.data('status', 'loaded');
 
-                $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
+                // Display the datetime picker modal
 
-                // Since the contents have already been AJAX'd in, we can just show the modal again
+                $('#picker' + pickerId).foundation('reveal', 'open');
+            });
 
-                picker.foundation('reveal', 'open');
-            }
+        } else if (picker.data('status') == 'loaded') {
 
-        });
+            // Use Y-m-d to avoid mis interpreting d/m/Y
+            var formatDate = moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat));
+            window.pickerInstance[pickerId].setDate(formatDate);
+
+            $('#pickerCalendar' + pickerId).data('dateDisplay', element.val());
+
+            // Since the contents have already been AJAX'd in, we can just show the modal again
+
+            picker.foundation('reveal', 'open');
+        }
 
     });
+
 };

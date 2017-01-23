@@ -55,7 +55,7 @@ class Controller extends Base
      * @param int $id The ID number of the javascript picker
      * @param string $value Default date to display
      */
-    public function getPicker($type, $id, $time, $value) {
+    public function getPicker($element, $id, $value) {
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
         try {
@@ -83,8 +83,9 @@ class Controller extends Base
                     'id' => $id,
                     //Pass unix timestamp to flatpicker, it misinterprets day and month in d/m/Y format
                     'value' => $value->geJSDate(),
-                    'type' => $type,
-                    'enableTime' => $time,
+                    'element' => $element,
+//                    'type' => $type,
+//                    'enableTime' => $time,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
                     'displayFormatDate' => $this->convertFormat($displayFormatDate),
 //                    'databaseFormat' => urldecode($database),
@@ -111,33 +112,6 @@ class Controller extends Base
             '/s/' => 'S', // 00 - 59 seconds
         );
         return preg_replace(array_keys($formatMap), array_values($formatMap), trim($format));
-    }
-    /**
-     * Return the HTML picker for injecting into modal
-     * @param int $id The ID number of the javascript picker
-     * @param string $value Default date to display
-     */
-    public function getDueworkPicker($id, $display, $database, $value) {
-
-        $timetable = $this->getTimetable();
-        $terms = $this->getTerms();
-        $timetableDayNumber = $this->getTimetableDay($value);
-
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@pickerDatetime/picker.twig',
-                'format' => 'nochrome',
-                'data' => [
-                    'id' => $id,
-                    'value' => $value,
-                    'displayFormat' => urldecode($display),
-                    'databaseFormat' => urldecode($database),
-                    'timetable' => $timetable,
-                    'terms' => $terms,
-                    'timetableDay' => $timetableDayNumber
-                ]
-            )
-        );
     }
 
     /**
