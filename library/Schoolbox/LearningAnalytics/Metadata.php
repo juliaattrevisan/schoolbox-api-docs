@@ -155,7 +155,9 @@ class Metadata
 
         foreach ($this->getUnitImplementations()->getColumnValues('folder') as $folder) {
             /** @var Folder\Model $folder */
-            $folders[$folder->getId()] = $folder;
+            if($folder->getId()) {
+                $folders[$folder->getId()] = $folder;
+            }
         }
 
         return new Collection($folders);
