@@ -182,7 +182,7 @@ class Factory
         else {
             //If mark is set to empty string this is a special case
             //TODO potentially the mark post var may not have been set, we may lose the mark in this case so we should
-            //test the existance of the post var aswell
+            //test the existence of the post var as well
 
             $feedback
                 ->setNormalisedMark(null)
