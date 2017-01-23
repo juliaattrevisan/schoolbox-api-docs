@@ -64,6 +64,7 @@ class External_Tass_User implements External_UserInterface
             return array();
         }
 
+        $addnum = $this->helper->getAddNum();
         $companyCode = $this->database->smartQuote($this->companyCode);
 
         $query = "
@@ -78,8 +79,6 @@ class External_Tass_User implements External_UserInterface
          * from there as well
          */
         if (Config::get('external_tass_commrules')) {
-
-            $addnum = $this->helper->getAddNum();
 
             $query .= "
                 UNION
