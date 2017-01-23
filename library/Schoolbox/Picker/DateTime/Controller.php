@@ -59,9 +59,9 @@ class Controller extends Base
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
         try {
-            $value = \Alaress_Date_Format::newLocalShort($value);
+            $value = \Alaress_Date_Format::newLocal($value);
             try {
-                $value = \Alaress_Date_Format::newLocal($value);
+                $value = \Alaress_Date_Format::newLocalShort($value);
             }
             catch (\Exception $e) {
                 var_dump($e->getMessage());

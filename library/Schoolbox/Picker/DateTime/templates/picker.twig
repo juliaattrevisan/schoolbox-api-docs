@@ -518,7 +518,7 @@
             if (instance.config.allDayExt !== false ) {
                 var allDaySwitch = $('#'+instance.config.allDayExt);
             }
-            if ( allDaySwitch.val() == 1 || instance.config.enableTime === false ) {
+            if ( (allDaySwitch !== undefined && allDaySwitch.val() == 1) || instance.config.enableTime === false ) {
                 timeDiv.css('display', 'none');
 //                calendarDiv.addClass('all-day');
 //                calendarDiv.removeClass('has-time');
