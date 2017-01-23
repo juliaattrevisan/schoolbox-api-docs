@@ -119,19 +119,17 @@ set upsConfig = {
                                     <div class="list-item">
                                         <div class="small-12 card">
                                             <h2>
-                                                <a href="#">
-                                                    <div class="grip">
-                                                        {% if currentRule.name|length %}
-                                                            {{ currentRule.name }}
-                                                        {% else %}
-                                                            Rule {{ currentRule.id }}
-                                                        {% endif %}
+                                                <div class="grip">
+                                                    {% if currentRule.name|length %}
+                                                        {{ currentRule.name }}
+                                                    {% else %}
+                                                        Rule {{ currentRule.id }}
+                                                    {% endif %}
 
-                                                        {% if currentRule.description|length %}
-                                                            <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                                                        {% endif %}
-                                                    </div>
-                                                </a>
+                                                    {% if currentRule.description|length %}
+                                                        <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                                                    {% endif %}
+                                                </div>
                                             </h2>
                                         </div>
                                     </div>
