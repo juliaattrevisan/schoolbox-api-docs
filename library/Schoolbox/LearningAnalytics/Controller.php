@@ -12,16 +12,19 @@ namespace Schoolbox\LearningAnalytics;
 
 use Alaress\Web\Controller\Base;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 class Controller extends Base
 {
@@ -177,31 +180,70 @@ class Controller extends Base
 
 
     /**
-     * Generate a context selector phplib fragment
+     * Generate a set of terms that have data, so we can insert in navigation context selector
      *
-     * @param Term $term
-     * @return string
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Web\Exception\InvalidComponent
+     * Filter by class if supplied.
+     *
+     * @param CourseSpecification $courseSpec
+     * @param Folder              $class
+     * @return Term[]|GenericCollection
      */
-    private function generateContextSelector(Term $term)
+    private function getTermsHavingData(CourseSpecification $courseSpec, Folder $class = null)
     {
-        /* Url Acrobatics, since the contextselector just appends args continually
-         *
-         * Trim the leading slash
-         * Replace any /term/* args that were previously chosen from contextselector
-         * Append /term, since the contextselector term value is something like 2016-1
-         */
-        $currentUrl = ltrim($this->getRequest()->url->get(PHP_URL_PATH), '/');
-        $currentUrl = preg_replace('/\/term\/(.*)/', '', $currentUrl);
-        $currentUrl .= '/term';
+        // Get all courses imported from our courseSpec
+        $courseImplMapper = CourseImplementationMapper::getInstance();
+        $courseImpls = $courseImplMapper->findAllByCourseSpecificationId($courseSpec->getId(), [], true);
+        $courseImplsPerClass = $courseImpls->groupByCallback(function(CourseImplementation $courseImpl){
+            return $courseImpl->getFolder()->getId();
+        });
 
-        /* Construct it in phplib sigh
-         */
-        $termMapper = new TermMapper();
-        $contextSelector = new ContextSelector($currentUrl);
-        $contextSelector->setTerms($termMapper->findAll());
-        return $contextSelector->renderAsString($this->getDi()->get('sitePage'), ['term' => $term]);
+        /** @var Term[]|GenericCollection $allTerms */
+        $allTerms = $this->termMapper->findAll()->indexBy('id');
+
+        /** @var Term[]|GenericCollection $terms */
+        $terms = $this->termMapper->createCollection();
+
+        foreach($courseImplsPerClass as $classFolderId => $courseImpls){
+
+            // Are we filtering for a specific class ? And it doesn't match this set of courseImports?
+            if($class && $class->getId() != $classFolderId){
+                continue;
+            }
+
+            // Examine all courses imported to this folder
+            /** @var CourseImplementation[] $courseImpls */
+            foreach($courseImpls as $courseImpl){
+                // Examine all unitImpls in the courseImpl
+                foreach($courseImpl->getUnits() as $unitImpl){
+                    // Examine each term that is yet to be confirmed
+                    foreach($allTerms as $term){
+                        // Does this unit start after the term begins?
+                        if($unitImpl->getOpenDate()->gte($term->getStart())){
+                            // Does the unit end before the term finishes?
+                            if($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->lte($term->getActualFinish())){
+                                // The unit is inside the term.
+
+                                // Add to our list to display
+                                $terms->setOffset($term->getId(), $term);
+
+                                // Remove from available so we don't traverse again
+                                $allTerms->offsetUnset($term->getId());
+
+                                // Have we selected all terms?
+                                if(!$allTerms->count()){
+                                    // We're done. Bug out.
+                                    break 4;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $terms->sortByCallback(function(Term $term1, Term $term2){
+            return $term1->compare($term2);
+        });
     }
 
 
@@ -249,17 +291,15 @@ class Controller extends Base
          */
         $taskTypes = new TaskTypes($metadata);
 
-        /**
-         * Context Selector is a phplib -_-
-         */
-        $contextSelectorHtml = $this->generateContextSelector($metadata->getTerm());
+        /** @var Term[]|GenericCollection $selectableTerms */
+        $selectableTerms = $this->getTermsHavingData($courseSpecification);
 
         /* Twig data
          */
         $this->getResponse()->content->set([
             'template' => '@learningAnalytics/course.twig',
             'data'     => [
-                'contextSelector' => $contextSelectorHtml,
+                'terms'           => $selectableTerms,
                 'metadata'        => $metadata,
                 'overallProgress' => $analysis->getOverallProgress(),
                 'results' => [
