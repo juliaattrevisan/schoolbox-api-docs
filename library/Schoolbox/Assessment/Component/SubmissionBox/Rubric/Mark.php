@@ -10,7 +10,6 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 use Alaress_Date_Format;
 
@@ -25,7 +24,6 @@ class Mark
 {
     use Id;
     use CreatedAtDate;
-    use UpdatedAtDate;
 
     /** @var User */
     private $student;

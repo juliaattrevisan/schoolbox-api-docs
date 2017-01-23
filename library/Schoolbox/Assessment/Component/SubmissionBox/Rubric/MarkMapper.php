@@ -44,7 +44,6 @@ class MarkMapper extends Mapper
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('published_at', self::TYPE_DATETIME);
 
         // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
@@ -156,7 +155,6 @@ class MarkMapper extends Mapper
                 JOIN rubric_level   rl ON rl.id = rd.level_id
                 JOIN submission_box sb ON sb.id = rl.box_id
                 SET
-                  rm.updated_at = :now,
                   rm.published_at = :now
                 WHERE rm.student_id = :student_id
                 AND sb.assessment_id = :assessment_id
