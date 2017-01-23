@@ -116,6 +116,7 @@ class DueWork_Detail
                     $insertion['user']['status'] = self::SUBMITTED;
 
                     // determine whether to give the ontime or late class
+                    /** @var Alaress_Date_Format $submitTime */
                     $submitTime                = $submissions->first()->getCreatedAt();
                     $dueTime                   = $this->submissionBox->getDueDate();
                     $insertion['user']['time'] = $submitTime;
