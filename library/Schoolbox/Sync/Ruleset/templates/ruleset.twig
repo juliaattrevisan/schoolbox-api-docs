@@ -118,18 +118,17 @@ set upsConfig = {
 
                                     <div class="list-item">
                                         <div class="small-12 card">
+                                            <i class="icon-grip grip"></i>
                                             <h2>
-                                                <div class="grip">
-                                                    {% if currentRule.name|length %}
-                                                        {{ currentRule.name }}
-                                                    {% else %}
-                                                        Rule {{ currentRule.id }}
-                                                    {% endif %}
+                                                {% if currentRule.name|length %}
+                                                    {{ currentRule.name }}
+                                                {% else %}
+                                                    Rule {{ currentRule.id }}
+                                                {% endif %}
 
-                                                    {% if currentRule.description|length %}
-                                                        <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                                                    {% endif %}
-                                                </div>
+                                                {% if currentRule.description|length %}
+                                                    <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                                                {% endif %}
                                             </h2>
                                         </div>
                                     </div>
