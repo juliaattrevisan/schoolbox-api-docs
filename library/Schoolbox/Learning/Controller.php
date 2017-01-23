@@ -294,7 +294,8 @@ class Controller extends Base
                     }
                 }
                 if($hasUnitsInTerm){
-                    $courseSpecs[$folderId][] = $courseImpl->getSpecification()->getId();
+                    $courseSpecId = $courseImpl->getSpecification()->getId();
+                    $courseSpecs[$folderId][$courseSpecId] = $courseSpecId;
                 }
             }
         }
