@@ -3,10 +3,10 @@
 
     <div class="list-item">
         <div class="row">
-            <div class="small-2 medium-1 large-1 columns">
+            <div class="small-12 medium-1 large-1 columns">
                 <span class="meta">Then</span>
             </div>
-            <div class="small-10 medium-11 large-4 columns">
+            <div class="small-12 medium-4 large-3 columns">
                 <label title="This Schoolbox User Field will be modified">
                     {% include 'sub/select.twig' with {
                         name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][userProperty]',
@@ -18,7 +18,7 @@
                     } %}
                 </label>
             </div>
-            <div class="small-12 medium-6 large-3 columns">
+            <div class="small-12 medium-3 large-3 columns">
                 <label title="Mapping Type">
                     {% include 'sub/select.twig' with {
                         name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][type]',

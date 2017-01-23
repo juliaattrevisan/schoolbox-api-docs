@@ -1,9 +1,9 @@
 <div class="list-item">
     <div class="row">
-        <div class="small-1 medium-1 large-1 columns">
+        <div class="small-12 medium-1 large-1 columns">
             <span class="meta">If</span>
         </div>
-        <div class="small-11 medium-5 large-5 columns">
+        <div class="small-12 medium-4 large-3 columns">
             <label title="Data from your SIS">
                 {% include '@upsCondition/subfragments/select.twig' with {
                     name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
@@ -19,9 +19,9 @@
                 preselected: currentCondition.arguments[2]
             } %}
         </div>
-        <div class="small-12 medium-3 large-3 columns">
+        <div class="small-12 medium-4 large-5 columns">
             <label title="A newline-separated list of possible values from your SIS">
-                <textarea name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5" placeholder="SIS values">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
+                <textarea name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="1" placeholder="SIS values">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
             </label>
         </div>
         <div class="small-12 columns">
