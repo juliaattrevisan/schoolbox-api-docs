@@ -210,7 +210,9 @@ class Factory
         }
 
         // FC and VCal treat event end as exclusive, so add one day to end
-        $endDate = clone $studentEnd;
+        $endDate           = clone $studentEnd;
+        // Do the same for assessmentEnd for consistency, even though FullCalendar doesn't require it
+        $assessmentEndDate = clone $assessmentEnd;
         return [
             'id'         => $resourceType.'-'.$assessable->getId(),
             'title'      => $assessable->getTitle(),
@@ -227,7 +229,7 @@ class Factory
                 'description'     => \Scrub::html($assessable->getDescription()),
                 'link'            => $this->generateLink($assessable),
                 'assessmentStart' => $assessmentStart->getDatabase(),
-                'assessmentEnd'   => $assessmentEnd->getDatabase(),
+                'assessmentEnd'   => $assessmentEndDate->addDays(1)->getDatabase(),
             ],
         ];
     }
