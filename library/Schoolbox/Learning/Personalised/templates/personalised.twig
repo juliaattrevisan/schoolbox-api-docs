@@ -543,7 +543,12 @@
                 eventRender: function(event, element, view) {
                     // Set a title
                     if ('title' in event) {
-                        element.attr('title', event.title + ' ('+$.fullCalendar.formatRange(event.start, event.end, 'Do MMMM YYYY')+')');
+                        // All day offset -_- FC is exclusive end, we want inclusive
+                        var end = event.end;
+                        if (event.allDay) {
+                            end = end.clone().subtract({days: 1});
+                        }
+                        element.attr('title', event.title + ' ('+$.fullCalendar.formatRange(event.start, end, 'Do MMMM YYYY')+')');
                     }
                 },
 
