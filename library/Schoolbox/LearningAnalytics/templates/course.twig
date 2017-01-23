@@ -13,7 +13,7 @@
 {% set taskTypeId     = metadata.selectedTaskIdFilter %}
 {% set term           = metadata.term %}
 {% set folders        = metadata.unitImplementationFolders %}
-{% set routeArgs      = { courseSpecId: courseSpec.id, folderId: selectedFolder.id, taskTypeId: taskTypeId, termSlug: metadata.term } %}
+{% set routeArgs      = { courseSpecId: courseSpec.id, folderId: selectedFolder.id, taskTypeId: taskTypeId, termSlug: metadata.term.code } %}
 
 <script type="text/javascript">
     $(function () {
