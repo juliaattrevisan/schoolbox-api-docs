@@ -2651,7 +2651,9 @@ abstract class Mapper implements IMapper, Serializable
     {
         // courtesy of late static bindings, this private var is accessible even if you're in a different mapper
         // however, it is not accessible to subclasses
-        if ($mapper->localBodyCacheBypass) {
+        // Always bypass the cache if within CLI/daemon context.
+        // This is because database contents will change before the process dies.
+        if (!self::isWithinWebRequest() || $mapper->localBodyCacheBypass) {
             // fetch direct
             $model = $cache->fetch([ $mapper, $row, $alias ]);
 
