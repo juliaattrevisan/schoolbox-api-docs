@@ -138,10 +138,10 @@ class Module extends BaseModule
 
             $pb = $this->getUnitImplementationMapper()->getPredicateBuilder()
                        ->equals('s.course_specification_id', $courseSpecification->getId())
-                       ->notLessThan('open_date', $from->getDatabase());
+                       ->notLessThan('open_date', $from->getDatabaseDate());
 
             if (!$to->isNull()) {
-                $pb->notGreaterThan('due_date', $to->getDatabase());
+                $pb->notGreaterThan('due_date', $to->getDatabaseDate());
             }
 
             $unitImplementations = $this->getUnitImplementationMapper()->findByPredicates($pb);
