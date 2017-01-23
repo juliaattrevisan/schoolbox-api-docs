@@ -38,12 +38,17 @@ class MarkMapper extends Mapper
         $this->hasModel(Mark::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('valid', self::TYPE_BOOLEAN);
+
         $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
-        // this cannot be self::COLUMN_CREATED_TIMESTAMP because the mapper will then ignore input values when saving
-        $this->uses('tstamp', self::TYPE_DATETIME, null, 'createdAt');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('published_at', self::TYPE_DATETIME, null, 'createdAt');
+
+        // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
+        // hence marks already given are invalid.
+        $this->uses('valid', self::TYPE_BOOLEAN);
     }
 
 
