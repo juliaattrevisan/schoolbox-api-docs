@@ -390,11 +390,10 @@ class RubricMapper
         $descriptors = [];
 
         foreach ($descriptorCollection as $d) {
-            // only populate if a description is given
             $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getSequence()] = [
                 'id'     => $d->getId(),
                 'text'   => $d->getDescription(),
-                'points' => $d->getValue() || $d->getDescription() ? $d->getValue() : ''
+                'points' => $d->getValue(),
             ];
         }
 
