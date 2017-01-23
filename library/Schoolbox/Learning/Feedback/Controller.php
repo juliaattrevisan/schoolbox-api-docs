@@ -15,8 +15,10 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Feedback\Factory as FeedbackFactory;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 class Controller extends Base
 {
@@ -50,9 +52,17 @@ class Controller extends Base
     public function postParticipantFeedback(Participant $participant)
     {
         $feedbacks = $this->getFloatingFeedback($participant);
+        $post = $this->getRequest()->post;
 
         try {
-            $this->processFeedback($participant, $feedbacks, $this->getRequest()->post);
+            $this->processFeedback($participant, $feedbacks, $post);
+
+            // Did we just potentially publish rubric draft marks?
+            if(isset($post['publish']) && $post['publish']){
+                if($participant->getAssessable() instanceof DueWork){
+                    RubricMarkMapper::getInstance()->publishDraftMarks($participant->getUser(), $participant->getAssessable());
+                }
+            }
         }
         catch (\RangeException $e) {
             $this->sendError('Invalid mark given');

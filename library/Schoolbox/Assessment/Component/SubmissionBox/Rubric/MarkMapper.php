@@ -137,4 +137,36 @@ class MarkMapper extends Mapper
 
         return $statement->rowCount();
     }
+
+    /**
+     * Publishes any draft marks for the specified User and DueWork
+     *
+     * @param User $user
+     * @param IAssessable $dueWork
+     * @return int How many marks were published.
+     */
+    public function publishDraftMarks(User $user, IAssessable $dueWork)
+    {
+        $now = \Alaress_Date_Format::now();
+
+        $query = "
+                UPDATE rubric_mark rm
+                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
+                JOIN rubric_level   rl ON rl.id = rd.level_id
+                JOIN submission_box sb ON sb.id = rl.box_id
+                SET rm.published_at = :now
+                WHERE rm.student_id = :student_id
+                AND sb.assessment_id = :assessment_id
+                AND rm.published_at IS NULL
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'now'           => $now->getDatabase(),
+            'student_id'    => $user->getId(),
+            'assessment_id' => $dueWork->getId(),
+        ]);
+
+        return $statement->rowCount();
+    }
 }
