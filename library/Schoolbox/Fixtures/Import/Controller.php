@@ -1495,7 +1495,12 @@ class Controller extends Base
 
                         $items = [];
 
-                        for ($i = 11; $i < count($row); $i += 3) {
+                        /* So that 11 and 3 aren't so mystical
+                         */
+                        $itineraryItemsStart = 11;
+                        $colsPerItineraryItem = 3;
+
+                        for ($i = $itineraryItemsStart; $i < count($row); $i += $colsPerItineraryItem) {
 
                             /* Be optimistic, presuming everything was done by the book
                              */
