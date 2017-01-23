@@ -214,6 +214,32 @@ abstract class Mapper implements IMapper, Serializable
     private $localBodyCacheBypass = false;
 
     /**
+     * Is caching enabled for this mapper?
+     * Affects only hydrate and select cache.
+     *
+     * @var bool
+     */
+    protected $cacheEnabled = true;
+
+    /**
+     * Is this mapper being instantiated within a web request?
+     *
+     * The performance monitor is always off for daemon/CLI requests.
+     *
+     * @return bool
+     */
+    protected static function isWithinWebRequest()
+    {
+        if (PHP_SAPI === 'cli') {
+            return false;
+        }
+        if (!isset($_SERVER['REQUEST_METHOD'])) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Retreives the singleton instance of this class.
      *
      * @return static
@@ -227,7 +253,7 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty(self::$perfmon)) {
             // we want this to exist once ever, and only functional in development
-            self::$perfmon = (INSTANCE_ID == 'vagrantx' && count($_REQUEST))
+            self::$perfmon = (INSTANCE_ID == 'vagrantx' && self::isWithinWebRequest())
                 ? new DevMonitor(DebugBar::getInstance())
                 : new LiveMonitor()
             ;
@@ -252,6 +278,12 @@ abstract class Mapper implements IMapper, Serializable
 
 
         $this->initCaches();
+        // Switch on the cache if this is a web request: otherwise switch off
+        if (self::isWithinWebRequest()) {
+            $this->enableCache();
+        } else {
+            $this->disableCache();
+        }
         $this->setConfigLoader(new ConfigLoader());
         $this->setup();
         $this->setColumnFactory(self::$columnFactory);
@@ -1515,6 +1547,38 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * Enables cache
+     *
+     * Intentionally not exposed, this should be controlled by `setup()` or
+     * `postSetup()`.
+     */
+    protected function enableCache()
+    {
+        $this->cacheEnabled = true;
+    }
+
+    /**
+     * Disables cache
+     *
+     * Intentionally not exposed, this should be controlled by `setup()` or
+     * `postSetup()`.
+     */
+    protected function disableCache()
+    {
+        $this->cacheEnabled = true;
+    }
+
+    /**
+     * Is cache enabled?
+     *
+     * @return bool
+     */
+    protected function isCacheEnabled()
+    {
+        return $this->cacheEnabled;
+    }
+
+    /**
      * TODO: PDO Array support for using WHERE IN
      *
      * @deprecated findByColumn/findByColumnList now have array support
@@ -1745,7 +1809,12 @@ abstract class Mapper implements IMapper, Serializable
             // fold the column list into the predicate builder
             $statement = $this->prepareSelect($select, $from, $predicate, $columnList, $options);
 
-            if (array_key_exists('cache', $options) && $options['cache'] === false) {
+            // Always bypass if within CLI/daemon context.
+            // This is because database contents will change before the process dies.
+            $bypassCache =
+                !$this->isCacheEnabled()
+                || (array_key_exists('cache', $options) && $options['cache'] === false);
+            if ($bypassCache) {
                 // cache bypass is EXPLICITLY defined
                 $c = $this->selectCache->fetch([ $statement, true ]);
 
@@ -2628,7 +2697,9 @@ abstract class Mapper implements IMapper, Serializable
     {
         // courtesy of late static bindings, this private var is accessible even if you're in a different mapper
         // however, it is not accessible to subclasses
-        if ($mapper->localBodyCacheBypass) {
+        // Always bypass the cache if within CLI/daemon context.
+        // This is because database contents will change before the process dies.
+        if (!$mapper->isCacheEnabled() || $mapper->localBodyCacheBypass) {
             // fetch direct
             $model = $cache->fetch([ $mapper, $row, $alias ]);
 
