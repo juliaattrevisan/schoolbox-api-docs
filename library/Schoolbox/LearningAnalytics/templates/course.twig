@@ -359,7 +359,7 @@
 {% if rubrics.allRubrics | length > 0 %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Rubrics</h2>
+        <h2 class="subheader">{{ locale.translate('rubricCriterion', true) }}</h2>
         <section class="content">
             <div data-graph="rubrics" style="height:{{ ((rubrics.allRubrics | length)*150)+75 }}px"></div>
         </section>

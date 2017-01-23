@@ -252,18 +252,6 @@ class Controller extends Base
             }
         }
 
-        /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = $this->getTimetableColourMapper()->findAll();
-        $colourIndex = 0;
-
-        foreach($folderList as $folder){
-            if (!$folder->getColour()) {
-                /* Apply colour from list if no colour exists */
-                $folder->setColour($colourList[$colourIndex]->getHexColour());
-                $colourIndex = ($colourIndex + 1) % $colourList->count();
-            }
-        }
-
         /**
          * Sets of CourseSpecIds, each set indexed by class folder.id
          * @var int[][]
@@ -299,6 +287,20 @@ class Controller extends Base
                 }
             }
         }
+
+
+        /* Get Timetable colours to use as random colours for null set folders */
+        $colourList = $this->getTimetableColourMapper()->findAll();
+        $colourIndex = 0;
+
+        foreach($folderList as $folder){
+            if (!$folder->getColour()) {
+                /* Apply colour from list if no colour exists */
+                $folder->setColour($colourList[$colourIndex]->getHexColour());
+                $colourIndex = ($colourIndex + 1) % $colourList->count();
+            }
+        }
+
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
             'currentUser' => $this->getUser(),
