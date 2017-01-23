@@ -46,7 +46,8 @@ class RubricContext
 
         $markTypeSlug = $dueWork->getMarkType()->getSlug();
 
-        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student);
+        $publishedOnly = false;
+        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext(),
@@ -69,7 +70,7 @@ class RubricContext
     }
 
     /**
-     * Get a readonly grid and the student's current rubric values
+     * Get a readonly grid and the student's current published rubric values
      *
      * @param DueWork $dueWork
      * @param User $student
@@ -82,7 +83,8 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student);
+        $publishedOnly = true;
+        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext($currentUser),

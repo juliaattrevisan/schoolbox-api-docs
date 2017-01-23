@@ -446,13 +446,16 @@ class RubricMapper
     /**
      * @param Rubric $grid
      * @param User   $student
+     * @param bool   $publishedOnly       Whether to exclude draft marks
      * @return Rubric
      */
-    public function applyStudentMark($grid, $student)
+    public function applyStudentMark($grid, $student, $publishedOnly)
     {
         if (!$grid->getSubmissionBox() instanceof SubmissionBox) {
             throw new \InvalidArgumentException("Cannot apply marks without a submission box");
         }
+
+        $publishedClause = $publishedOnly ? 'AND rm.published_at IS NOT NULL' : '';
 
         // retrieve marks (descriptor selections for student)
         $stmt = $this->database->query("
@@ -462,6 +465,8 @@ class RubricMapper
             JOIN rubric_level rl ON rl.id = rd.level_id
             WHERE rl.box_id = :boxId
             AND rm.student_id = :userId
+            $publishedClause
+            AND rm.valid = TRUE
             AND rm.created_at = (
               SELECT MAX(created_at)
               FROM rubric_mark rm
@@ -470,8 +475,9 @@ class RubricMapper
               WHERE rl.box_id = :boxId
               AND rm.student_id = :userId
               AND rm.valid = TRUE
+              $publishedClause
             )
-            AND rm.valid = TRUE
+            
         ", [
             'boxId'  => $grid->getSubmissionBox()->getId(),
             'userId' => $student->getId()
@@ -497,7 +503,7 @@ class RubricMapper
     public function findBySubmissionBoxAndStudent($box, $student)
     {
         $grid = $this->findBySubmissionBox($box);
-        return $this->applyStudentMark($grid, $student);
+        return $this->applyStudentMark($grid, $student, true);
     }
 
     /**

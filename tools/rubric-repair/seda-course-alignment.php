@@ -367,7 +367,7 @@ $kernel->run
                             $student = $return->getOwner();
                             $studentId = $student->getId();
 
-                            SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($oldGrid, $student);
+                            SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($oldGrid, $student, false);
                             $array = $oldGrid->toContext();
 
                             $markedDenominator   = 0;
@@ -470,7 +470,7 @@ $kernel->run
 
                     $student = $userCache[$studentId];
 
-                    SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($grid, $student);
+                    SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($grid, $student, false);
 
                     $array = $grid->toContext();
 

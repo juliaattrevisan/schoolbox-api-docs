@@ -54,7 +54,7 @@ class Controller extends BaseController
             $studentId = $student->getId();
 
             // this will modify the "selection" of descriptors in the grid
-            SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($rubric, $student);
+            SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($rubric, $student, true);
 
             foreach ($rubric->getSumPerGroup() as $group) {
                 foreach ($group->getAllCriteria() as $criterion) {
