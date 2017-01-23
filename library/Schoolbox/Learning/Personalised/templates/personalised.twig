@@ -292,6 +292,32 @@
             }
         };
 
+        /**
+         * Builds a date span text and datetime tag value.
+         *
+         * @param start  A moment object
+         * @param end    A moment object
+         * @param allDay Is this an all day event?
+         * @returns {Object} text: a text representation, datetime: an ISO8601 time interval
+         */
+        var buildDateSpan = function(start, end, allDay) {
+            var format = 'Do MMMM YYYY',
+                datetime = '';
+            if (allDay) {
+                // All day offset -_- FC is exclusive end, we want inclusive
+                end = end.clone().subtract({days: 1});
+                datetime = start.format('YYYY-MM-DD') + '/' + end.format('YYYY-MM-DD');
+            } else {
+                format = format + ', h:mm a';
+                datetime = start.toISOString() + '/' + end.toISOString();
+            }
+
+            return {
+                text: $.fullCalendar.formatRange(start, end, format),
+                datetime: datetime
+            }
+        };
+
         // On hash change - update calendar based on hash contents
         $(window).on('hashchange', function() {
             var calendarParams = getCalendarParams(window.location.hash);
@@ -422,35 +448,25 @@
                                     break;
 
                                 case 'eventSpan':
-                                    $this.text(eventSpan);
+                                    var eventSpan = buildDateSpan(
+                                        calEvent.start,
+                                        calEvent.end,
+                                        calEvent.allDay
+                                    );
+                                    $this
+                                        .text(eventSpan.text)
+                                        .attr('datetime', eventSpan.datetime);
                                     break;
 
                                 case 'assessmentSpan':
-                                    $this.text(assessmentSpan);
-                                    break;
-
-                                case 'assessmentStart':
-                                case 'assessmentEnd':
-                                    // Output in our configured format
-                                    var assessmentDate = moment(calEvent.meta[valueTag]);
-
+                                    var assessmentSpan = buildDateSpan(
+                                        moment(calEvent.meta.assessmentStart),
+                                        moment(calEvent.meta.assessmentEnd),
+                                        calEvent.allDay
+                                    );
                                     $this
-                                        .text(assessmentDate.format('dddd, Do MMMM YYYY'))
-                                        .attr('datetime', assessmentDate.toISOString());
-                                    break;
-
-                                case 'start':
-                                case 'end':
-                                    // Output in our configured format
-                                    var date = calEvent[valueTag],
-                                        format = 'dddd, Do MMMM YYYY';
-
-                                    if (!calEvent.allDay) {
-                                        format = format+', h:mm a'
-                                    }
-                                    $this
-                                        .text(date.format(format))
-                                        .attr('datetime', date.toISOString());
+                                        .text(assessmentSpan.text)
+                                        .attr('datetime', assessmentSpan.datetime);
                                     break;
 
                                 case 'href':
@@ -562,11 +578,8 @@
                     // Set a title
                     if ('title' in event) {
                         // All day offset -_- FC is exclusive end, we want inclusive
-                        var end = event.end;
-                        if (event.allDay) {
-                            end = end.clone().subtract({days: 1});
-                        }
-                        element.attr('title', event.title + ' ('+$.fullCalendar.formatRange(event.start, end, 'Do MMMM YYYY')+')');
+                        var eventSpan = buildDateSpan(event.start, event.end, event.allDay);
+                        element.attr('title', event.title + ' ('+eventSpan.text+')');
                     }
                 },
 
