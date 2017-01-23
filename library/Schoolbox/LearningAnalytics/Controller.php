@@ -188,7 +188,7 @@ class Controller extends Base
      * @param Folder              $class
      * @return Term[]|GenericCollection
      */
-    private function getTermsHavingData(CourseSpecification $courseSpec, Folder $class = null)
+    protected function getTermsWithResults(CourseSpecification $courseSpec, Folder $class = null)
     {
         // Get all courses imported from our courseSpec
         $courseImplMapper = CourseImplementationMapper::getInstance();
@@ -200,7 +200,21 @@ class Controller extends Base
         /** @var Term[]|GenericCollection $allTerms */
         $allTerms = $this->termMapper->findAll()->indexBy('id');
 
-        /** @var Term[]|GenericCollection $terms */
+        $termsWithResults = $this->filterTermsWithResults($allTerms, $courseImplsPerClass, $class);
+
+        return $termsWithResults->sortByCallback(function(Term $term1, Term $term2){
+            return $term1->compare($term2);
+        });
+    }
+
+    /**
+     * @param Term[]|Collection                               $allTerms
+     * @param CourseImplementation[][]|Collection[]|Collection $courseImplsPerClass
+     * @param Folder|null $class
+     * @return Term[]|GenericCollection $terms
+     */
+    protected function filterTermsWithResults(Collection $allTerms, Collection $courseImplsPerClass, Folder $class = null)
+    {
         $terms = $this->termMapper->createCollection();
 
         foreach($courseImplsPerClass as $classFolderId => $courseImpls){
@@ -232,7 +246,7 @@ class Controller extends Base
                                 // Have we selected all terms?
                                 if(!$allTerms->count()){
                                     // We're done. Bug out.
-                                    break 4;
+                                    return $terms;
                                 }
                             }
                         }
@@ -240,10 +254,7 @@ class Controller extends Base
                 }
             }
         }
-
-        return $terms->sortByCallback(function(Term $term1, Term $term2){
-            return $term1->compare($term2);
-        });
+        return $terms;
     }
 
 
@@ -292,7 +303,7 @@ class Controller extends Base
         $taskTypes = new TaskTypes($metadata);
 
         /** @var Term[]|GenericCollection $selectableTerms */
-        $selectableTerms = $this->getTermsHavingData($courseSpecification);
+        $selectableTerms = $this->getTermsWithResults($courseSpecification);
 
         /* Twig data
          */
