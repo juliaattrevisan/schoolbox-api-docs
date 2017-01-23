@@ -144,9 +144,15 @@
 
                                         {% if participant is not empty %}
                                             {% if not isAwaiting %}
-                                                {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
-                                                {% set upcomingFound = true %}
-                                                {% set value = '<i class="icon-eye" title="Next Assessment">' %}
+                                                {% if assessment.dueAt.isPast %}
+                                                    {# The assessment is past its due date and is not awaiting #}
+
+                                                    {% set value = '<i class="icon-close" title="Past Due Date. No Response">' %}
+                                                {% else %}
+                                                    {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
+                                                    {% set upcomingFound = true %}
+                                                    {% set value = '<i class="icon-eye" title="Next Assessment">' %}
+                                                {% endif %}
                                             {% endif %}
                                         {% endif %}
 
