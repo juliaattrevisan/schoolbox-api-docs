@@ -156,7 +156,7 @@ class Factory
             $feedback->setComment($postComment);
         }
 
-        if ($postMark) {
+        if ($postMark !== '') {
 
             // mark defined and non-empty
             try {
@@ -178,6 +178,15 @@ class Factory
                     ->setNormalisedMark($code->getNormaliseAs())
                     ->setHumanReadableMark($postMark);
             }
+        }
+        else {
+            //If mark is set to empty string this is a special case
+            //TODO potentially the mark post var may not have been set, we may lose the mark in this case so we should
+            //test the existence of the post var as well
+
+            $feedback
+                ->setNormalisedMark(null)
+                ->setHumanReadableMark('');
         }
 
         // Attach any attached files (if this kind of attachment accepts them)
