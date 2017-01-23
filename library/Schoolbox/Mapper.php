@@ -214,6 +214,18 @@ abstract class Mapper implements IMapper, Serializable
     private $localBodyCacheBypass = false;
 
     /**
+     * Is this mapper being instantiated within a web request?
+     *
+     * The performance monitor is always off for daemon/CLI requests.
+     *
+     * @return bool
+     */
+    protected static function isWithinWebRequest()
+    {
+        return count($_REQUEST) > 0;
+    }
+
+    /**
      * Retreives the singleton instance of this class.
      *
      * @return static
@@ -227,7 +239,7 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty(self::$perfmon)) {
             // we want this to exist once ever, and only functional in development
-            self::$perfmon = (INSTANCE_ID == 'vagrantx' && count($_REQUEST))
+            self::$perfmon = (INSTANCE_ID == 'vagrantx' && self::isWithinWebRequest())
                 ? new DevMonitor(DebugBar::getInstance())
                 : new LiveMonitor()
             ;
