@@ -18,6 +18,7 @@ namespace Schoolbox\Learning\InlineGrader\Asynchronous;
 
 use \Psr\Log\LoggerInterface;
 use Schoolbox\Learning\InlineGrader\Authenticator;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SingleFileMapper;
 
 class Upload
 {
@@ -35,14 +36,21 @@ class Upload
     private $logger;
 
     /**
+     * @var SingleFileMapper
+     */
+    private $singleFileMapper;
+
+    /**
      * Upload constructor.
      * @param Authenticator $authenticator
      * @param LoggerInterface $logger
+     * @param SingleFileMapper $singleFileMapper
      */
-    public function __construct(Authenticator $authenticator, LoggerInterface $logger)
+    public function __construct(Authenticator $authenticator, LoggerInterface $logger, SingleFileMapper $singleFileMapper)
     {
         $this->setAuthenticator($authenticator);
         $this->setLogger($logger);
+        $this->setSingleFileMapper($singleFileMapper);
     }
 
     /**
@@ -52,6 +60,9 @@ class Upload
     {
 
     }
+
+    /* Getters/Setters
+     */
 
     /**
      * @return Authenticator
@@ -87,6 +98,24 @@ class Upload
     {
         $this->logger = $logger;
 
+        return $this;
+    }
+
+    /**
+     * @return SingleFileMapper
+     */
+    private function getSingleFileMapper()
+    {
+        return $this->singleFileMapper;
+    }
+
+    /**
+     * @param SingleFileMapper $singleFileMapper
+     * @return $this
+     */
+    private function setSingleFileMapper($singleFileMapper)
+    {
+        $this->singleFileMapper = $singleFileMapper;
         return $this;
     }
 }
