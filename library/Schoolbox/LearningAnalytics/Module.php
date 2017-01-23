@@ -10,6 +10,8 @@
 
 namespace Schoolbox\LearningAnalytics;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
@@ -20,6 +22,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Role;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Assessment\Term\Model as TermModel;
@@ -80,6 +83,20 @@ class Module extends BaseModule
             function($params) {
                 return $this->folderDependencies($params);
             }
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission($authorizer, '.*', new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF)
+            )
         );
     }
 
