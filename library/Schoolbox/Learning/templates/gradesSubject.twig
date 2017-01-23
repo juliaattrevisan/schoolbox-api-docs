@@ -263,7 +263,7 @@
                                         {% set feedback = assessment.participant(student).findMostRecentVisibleFeedback(currentUser) %}
                                         {% if feedback %}
                                             <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
-                                            <p class="comment">{{ feedback.comment }}</p>
+                                            <p class="comment">{{ feedback.comment | nl2br  }}</p>
                                         {% endif %}
                                     </div>
 
