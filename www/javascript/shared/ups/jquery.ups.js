@@ -433,6 +433,9 @@
 
                     // Hide the empty state
                     $emptyState.addClass('hide');
+
+                    // Show the save button
+                    $('#rule-'+ruleId).find('div[data-ruleset-save-rule-row]').removeClass('hide');
                 });
             });
         }
@@ -591,6 +594,9 @@
 
                     // Hide the empty state
                     $emptyState.addClass('hide');
+
+                    // Show the save button
+                    $('#rule-'+ruleId).find('div[data-ruleset-save-rule-row]').removeClass('hide');
                 });
             });
         }
