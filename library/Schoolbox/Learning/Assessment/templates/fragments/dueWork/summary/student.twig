@@ -28,12 +28,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-    {% if submissionsBlocked %}
-        <div class="empty-state">
-            <i class="icon-due-work"></i>
-            <p>{{ submissionsBlocked }}</p>
-        </div>
-    {% else %}
+    {% if not submissionsBlocked %}
         {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable, participant: participant }) %}
         {% if submitRoute %}
             {% set submitText %}{% spaceless %}
