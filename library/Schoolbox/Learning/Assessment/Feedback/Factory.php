@@ -156,7 +156,7 @@ class Factory
             $feedback->setComment($postComment);
         }
 
-        if ($postMark) {
+        if ($postMark !== '') {
 
             // mark defined and non-empty
             try {
@@ -178,6 +178,11 @@ class Factory
                     ->setNormalisedMark($code->getNormaliseAs())
                     ->setHumanReadableMark($postMark);
             }
+        }
+        else {
+            $feedback
+                ->setNormalisedMark(null)
+                ->setHumanReadableMark('');
         }
 
         // Attach any attached files (if this kind of attachment accepts them)
