@@ -218,9 +218,9 @@ class Controller extends Base
                     // Examine each term that is yet to be confirmed
                     foreach($allTerms as $term){
                         // Does this unit start after the term begins?
-                        if($unitImpl->getOpenDate()->gte($term->getStart())){
+                        if($unitImpl->getOpenDate()->compareDateOnly($term->getStart()) >= 0){
                             // Does the unit end before the term finishes?
-                            if($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->lte($term->getActualFinish())){
+                            if($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->compareDateOnly($term->getActualFinish()) <= 0 ){
                                 // The unit is inside the term.
 
                                 // Add to our list to display
