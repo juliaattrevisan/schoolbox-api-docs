@@ -124,18 +124,21 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
             // AJAX in the modal contents if they haven't already been loaded
             picker.load('/picker/datetime/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
 
-                // $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
-
                 // Capture closure of modal
                 $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
 
                 // Update the elements value with the selected date
-                    if($('#allday').val() == 1) {
-                        element.val(moment(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat)).format(convertFormat(options.displayFormatDate)));
+                    var format =  options.displayFormat;
+                    if(options.allDay === true) {
+                        format = options.displayFormatDate;
+                        if(options.allDayExt !== false && $('#'+options.allDayExt).val() == 0) {
+                            format = options.displayFormat;
+                        }
                     }
-                    else {
-                        element.val(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat));
+                    if(options.enableTime === false) {
+                        format = options.displayFormatDate;
                     }
+                    element.val(moment(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat)).format(convertFormat(format)));
 
                 });
 
