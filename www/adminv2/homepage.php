@@ -36,7 +36,7 @@ $nav->parse($this, 'homepage');
 
 // Get list of templates
 $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
-$homepageTemplateList = $homepageTemplateMapper->findAll()->sortBy('name', 'asc');
+$homepageTemplateList = $homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]);
 
 foreach ($homepageTemplateList as $currentTemplate) {
     $this->setVar(array(
