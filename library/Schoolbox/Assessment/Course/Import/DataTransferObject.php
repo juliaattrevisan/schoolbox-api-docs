@@ -268,6 +268,8 @@ class DataTransferObject
 
         // TODO up to here - ensure you label this commit as SA-1891
 
+        $end = clone $nextAvailable;
+
         foreach($sortedPairs as $pair){
 
             // Is this pair an Impl-only or Impl/Spec pair?
