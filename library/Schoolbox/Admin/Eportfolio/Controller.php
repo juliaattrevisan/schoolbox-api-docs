@@ -16,6 +16,7 @@ use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -156,8 +157,7 @@ class Controller extends Base
      */
     private function deployCallback($post, $id)
     {
-        $dryRun = $post['dryRun'] == '1';
-        if ($dryRun) {
+        if ($post['dryRun'] == '1') {
             $this->log('Starting dry run.', $id);
         } else {
             $this->log('Starting import.', $id);
@@ -235,139 +235,154 @@ class Controller extends Base
 
             /** @var \Schoolbox\User $destUser */
             foreach ($destinationUsers as $destUser) {
-
-                $this->log('Importing ePortfolio pages from ' . $user->getFullName() . ' to ' . $destUser->getFullName(), $id);
-
-                $destUserId = $destUser->getId();
-
-                // Don't copy into the source user
-
-                if ($destUserId != $user->getId()) {
-
-                    $import = true;
-
-                    if (!($destUser->getEportfolioEnable())) {
-                        if ($post['enableEportfolios'] == '1') {
-                            // If this is a dry run, don't enable eportfolio either
-                            if ($dryRun) {
-                                $this->log('Eportfolio was disabled. Would have enabled for user.', $id);
-                            } else {
-                                $destUser->setEportfolioEnable(true);
-                                $this->userMapper->save($destUser);
-                                $this->log('Eportfolio was disabled. Enabling for user.', $id);
-                            }
-                        } else {
-                            $this->log('Skipping user. Eportfolio is disabled.', $id);
-                            $import = false;
-                        }
-                    }
-
-                    if ($import) {
-                        foreach ($eportfolioList as $eportfolio) {
-
-                            /** @var EportfolioPage $page */
-                            /** @var \Component_ControllerAbstract[] $componentList */
-                            list($page, $componentList) = $eportfolio;
-
-                            // Check this user doesn't already have this page.
-
-                            if ($post['skipDuplicates']) {
-
-                                $existingPageList = $this->eportfolioPageMapper->findByColumnList(
-                                    array(
-                                        'uid' => $destUserId,
-                                        'page_title' => $page->getPageTitle(),
-                                    )
-                                );
-
-                                if (count($existingPageList) > 0) {
-                                    $this->log('Skipping page "' . $page->getPageTitle() . '". Already exists on this users ePortfolio.', $id);
-                                    continue;
-                                }
-                            }
-
-                            // If this is a dry run, skip the import step
-
-                            if ($dryRun) {
-                                $this->log('Would have imported page "' . $page->getPageTitle() . '".', $id);
-                                continue;
-                            } else {
-                                $this->log('Importing page "' . $page->getPageTitle() . '".', $id);
-                            }
-
-                            // Create a new ePortfolio page.
-
-                            // Does this user already have a page of this name? Skip unless prompted otherwise
-
-                            $newPage = clone $page;
-                            $newPage->setUid($destUserId);
-                            $this->eportfolioPageMapper->create($newPage);
-
-                            // copy each component and its config to the new page.
-                            // Ensure that they're in sequence though.
-
-                            $i = 0;
-
-                            foreach ($componentList as $component) {
-                                $newInstance = clone $component->getInstance();
-                                $newInstance
-                                    ->setIdentifier($newPage->getPageId())
-                                    ->setSequence($i++);
-                                \Component_InstanceMapper::getInstance()->create($newInstance);
-
-                                // Copy each config
-                                foreach ($newInstance->getConfig() as $configDefinition) {
-                                    /** @var \Component_Config $config */
-                                    /** @var \Component_ConfigDefinition $configDefinition */
-                                    $config = new \Component_Config();
-                                    $config
-                                        ->setConfigDefinitionId($configDefinition->getId())
-                                        ->setInstanceId($newInstance->getId())
-                                        ->setValue($configDefinition->getValue());
-                                    \Component_ConfigMapper::getInstance()->create($config);
-                                }
-
-                                // Clone a new textbox for any textbox components
-                                if ($component instanceof ComponentEportfolioTextboxController) {
-                                    try {
-                                        /** @var \Component\Eportfolio\Textbox $textbox */
-                                        $textbox = EportfolioTextboxMapper::getInstance()->findOneByColumn(
-                                            'component_instance_id',
-                                            $component->getInstance()->getId()
-                                        );
-
-                                        $newTextbox = clone $textbox;
-                                        $newTextbox->setComponentInstanceId($newInstance->getId());
-                                        EportfolioTextboxMapper::getInstance()->create($newTextbox);
-                                    } catch (MapperException $e) {
-                                        // This component has no textbox yet, that's okay.
-                                    }
-                                }
-                            }
-
-                            // Copy only the allow parents permission.
-                            $parentPermission = 0;
-
-                            /** @var \Eportfolio\Permission $perm */
-                            foreach (EportfolioPermissionMapper::getInstance()->findParentSetting($page->getPageId()) as $perm) {
-                                $parentPermission = $perm->getValue();
-                            }
-
-                            EportfolioPermissionMapper::getInstance()->updatePermissions(
-                                $newPage->getPageId(),
-                                $parentPermission,
-                                array(),
-                                array()
-                            );
-                        }
-                    }
-                } else {
-                    $this->log('Skipping user. Source user is the same as destination user.', $id);
-                }
+                $this->importSingleUser($post, $id, $user, $destUser, $eportfolioList);
             }
         }
 
         $this->log('Deployment completed', $id, 'COMPLETED');
+    }
+
+    /**
+     * Imports a single user.
+     *
+     * @param \Aura\Web\Request\Values $post POST data
+     * @param int $logId
+     * @param User $srcUser
+     * @param User $destUser
+     * @param array $eportfolioList A list of pages to import.
+     *                              In the format: [EportfolioPage, \Component_ControllerAbstract[]]
+     */
+    private function importSingleUser($post, $logId, User $srcUser, User $destUser, $eportfolioList)
+    {
+        $dryRun = $post['dryRun'] == '1';
+        $this->log('Importing ePortfolio pages from ' . $srcUser->getFullName() . ' to ' . $destUser->getFullName(), $logId);
+
+        $destUserId = $destUser->getId();
+
+        // Don't copy into the source user
+
+        if ($destUserId != $srcUser->getId()) {
+
+            $import = true;
+
+            if (!($destUser->getEportfolioEnable())) {
+                if ($post['enableEportfolios'] == '1') {
+                    // If this is a dry run, don't enable eportfolio either
+                    if ($dryRun) {
+                        $this->log('Eportfolio was disabled. Would have enabled for user.', $logId);
+                    } else {
+                        $destUser->setEportfolioEnable(true);
+                        $this->userMapper->save($destUser);
+                        $this->log('Eportfolio was disabled. Enabling for user.', $logId);
+                    }
+                } else {
+                    $this->log('Skipping user. Eportfolio is disabled.', $logId);
+                    $import = false;
+                }
+            }
+
+            if ($import) {
+                foreach ($eportfolioList as $eportfolio) {
+
+                    /** @var EportfolioPage $page */
+                    /** @var \Component_ControllerAbstract[] $componentList */
+                    list($page, $componentList) = $eportfolio;
+
+                    // Check this user doesn't already have this page.
+
+                    if ($post['skipDuplicates']) {
+
+                        $existingPageList = $this->eportfolioPageMapper->findByColumnList(
+                            [
+                                'uid'        => $destUserId,
+                                'page_title' => $page->getPageTitle(),
+                            ]
+                        );
+
+                        if (count($existingPageList) > 0) {
+                            $this->log('Skipping page "' . $page->getPageTitle() . '". Already exists on this users ePortfolio.', $logId);
+                            continue;
+                        }
+                    }
+
+                    // If this is a dry run, skip the import step
+
+                    if ($dryRun) {
+                        $this->log('Would have imported page "' . $page->getPageTitle() . '".', $logId);
+                        continue;
+                    } else {
+                        $this->log('Importing page "' . $page->getPageTitle() . '".', $logId);
+                    }
+
+                    // Create a new ePortfolio page.
+
+                    // Does this user already have a page of this name? Skip unless prompted otherwise
+
+                    $newPage = clone $page;
+                    $newPage->setUid($destUserId);
+                    $this->eportfolioPageMapper->create($newPage);
+
+                    // copy each component and its config to the new page.
+                    // Ensure that they're in sequence though.
+
+                    $i = 0;
+
+                    foreach ($componentList as $component) {
+                        $newInstance = clone $component->getInstance();
+                        $newInstance
+                            ->setIdentifier($newPage->getPageId())
+                            ->setSequence($i++);
+                        \Component_InstanceMapper::getInstance()->create($newInstance);
+
+                        // Copy each config
+                        foreach ($newInstance->getConfig() as $configDefinition) {
+                            /** @var \Component_Config $config */
+                            /** @var \Component_ConfigDefinition $configDefinition */
+                            $config = new \Component_Config();
+                            $config
+                                ->setConfigDefinitionId($configDefinition->getId())
+                                ->setInstanceId($newInstance->getId())
+                                ->setValue($configDefinition->getValue());
+                            \Component_ConfigMapper::getInstance()->create($config);
+                        }
+
+                        // Clone a new textbox for any textbox components
+                        if ($component instanceof ComponentEportfolioTextboxController) {
+                            try {
+                                /** @var \Component\Eportfolio\Textbox $textbox */
+                                $textbox = EportfolioTextboxMapper::getInstance()->findOneByColumn(
+                                    'component_instance_id',
+                                    $component->getInstance()->getId()
+                                );
+
+                                $newTextbox = clone $textbox;
+                                $newTextbox->setComponentInstanceId($newInstance->getId());
+                                EportfolioTextboxMapper::getInstance()->create($newTextbox);
+                            } catch (MapperException $e) {
+                                // This component has no textbox yet, that's okay.
+                            }
+                        }
+                    }
+
+                    // Copy only the allow parents permission.
+                    $parentPermission = 0;
+
+                    /** @var \Eportfolio\Permission $perm */
+                    foreach (EportfolioPermissionMapper::getInstance()->findParentSetting($page->getPageId()) as $perm) {
+                        $parentPermission = $perm->getValue();
+                    }
+
+                    EportfolioPermissionMapper::getInstance()->updatePermissions(
+                        $newPage->getPageId(),
+                        $parentPermission,
+                        [],
+                        []
+                    );
+                }
+            }
+        } else {
+            $this->log('Skipping user. Source user is the same as destination user.', $logId);
+        }
     }
 
     /**
