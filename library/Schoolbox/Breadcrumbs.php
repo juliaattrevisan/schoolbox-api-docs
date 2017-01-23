@@ -73,12 +73,12 @@ class Breadcrumbs
             ],
             [
                 'text'  => $parent->getName(),
-                'href'  => "/course/modify/{$parent->getId()}",
+                'href'  => "/course/modify/{$parent->getCourseSpecification()->getId()}",
                 'class' => '',
             ],
             [
                 'text'  => $folder->getName(),
-                'href'  => "/course/modify/{$parent->getId()}#{$folder->getId()}",
+                'href'  => "/homepage/{$folder->getId()}",
                 'class' => '',
             ],
         ];
