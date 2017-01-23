@@ -364,6 +364,11 @@ ul.az-error-list {
     }
 }
 
+// components have their own margin bottom - remove the dropzone-wrap one
+.component-container .attachzone, .dropzone-wrap {
+    margin-bottom: 0;
+}
+
 
 .dzone {
     font-size: $paragraph-font-size;
