@@ -22,6 +22,13 @@ class Result extends Base
 {
 
     /**
+     * Effectively no limit
+     * This is used when a folder has multiple codes - the executeSearch()
+     * didn't take this into account
+     */
+    const NO_LIMIT = 999;
+
+    /**
      * Get all the search results
      *
      * @param User $user
@@ -56,29 +63,39 @@ class Result extends Base
 
         $results = new Collection();
 
-        foreach ($this->buildSearchResult($statement, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
-            $folder = $mapper->hydrate($row, 'c');
+        /* Count folders manually, rather than leaving it to the buildSearchResult's iterator
+         * It can't tell that this is a 1:N join
+         */
+        $i = 0;
 
-            /* Accumulate folder codes here
-             */
-            if (!($results->getOffset($folder->getId()) instanceof Folder)) {
-                $results->setOFfset($folder->getId(), $folder);
+        foreach ($this->buildSearchResult($statement, $user, 'c.id', $sanitiser->getOffset(), self::NO_LIMIT) as $row) {
+            if ($i < $sanitiser->getLimit()) {
+                $folder = $mapper->hydrate($row, 'c');
+
+                /* Accumulate folder codes here
+                 */
+                if (!($results->getOffset($folder->getId()) instanceof Folder)) {
+                    $results->setOffset($folder->getId(), $folder);
+                }
+
+                /* Reassign var
+                 */
+                $folder = $results->getOffset($folder->getId());
+
+                $code = $code_mapper->hydrate($row, 'cc');
+
+                if (strlen($code->getCode())) {
+                    $folder->getCodes()->add($code);
+                }
+
+                /* Accumulate homepage configs
+                 */
+                $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+                $folder->setHomepage($homepageConfig);
             }
-
-            /* Reassign var
-             */
-            $folder = $results->getOffset($folder->getId());
-
-            $code = $code_mapper->hydrate($row, 'cc');
-
-            if (strlen($code->getCode())) {
-                $folder->getCodes()->add($code);
+            else {
+                break;
             }
-
-            /* Accumulate homepage configs
-             */
-            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
-            $folder->setHomepage($homepageConfig);
         }
 
         /* What, it times out doing new Collection(array_values($results))
