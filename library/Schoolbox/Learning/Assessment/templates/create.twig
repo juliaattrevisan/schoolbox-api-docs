@@ -188,11 +188,6 @@
              * Inject assessmentType-specific details
              */
             $('input[data-mage-next="part-2"]').mage({
-                validateOptions: {
-                    rules: {
-                        type: {required: true}
-                    }
-                },
                 onXhrDone: function(data) {
                     $('#assessmentForm')
                         .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) }}')
@@ -205,6 +200,15 @@
                     setupAssessmentEnd(assessmentType);
                 }
             });
+
+            /**
+             * Once they have clicked an activity type - trigger a click on the part-2 hidden input
+             * to send the user straight to the next section
+             */
+            $('input[name=type]').click(function() {
+                $('[data-mage-next=part-2]').trigger('click');
+            });
+
         {% endif %}
     });
 </script>
@@ -239,9 +243,8 @@
                         <div class="column small-12 medium-12 error-placeholder"></div>
                     </fieldset>
 
-                    <div class="small-12 column">
-                        {{ mage.submitRow('Next', 'part-1', 'part-2', 'GET') }}
-                    </div>
+                    <input type="hidden" name="part-1" data-mage-next="part-2" formmethod="GET">
+
                 </fieldset>
                 {% endif %}
 
