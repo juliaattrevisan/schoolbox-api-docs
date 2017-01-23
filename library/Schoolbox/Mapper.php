@@ -1763,7 +1763,12 @@ abstract class Mapper implements IMapper, Serializable
             // fold the column list into the predicate builder
             $statement = $this->prepareSelect($select, $from, $predicate, $columnList, $options);
 
-            if (array_key_exists('cache', $options) && $options['cache'] === false) {
+            // Always bypass if within CLI/daemon context.
+            // This is because database contents will change before the process dies.
+            $bypassCache =
+                !self::isWithinWebRequest()
+                || (array_key_exists('cache', $options) && $options['cache'] === false);
+            if ($bypassCache) {
                 // cache bypass is EXPLICITLY defined
                 $c = $this->selectCache->fetch([ $statement, true ]);
 
