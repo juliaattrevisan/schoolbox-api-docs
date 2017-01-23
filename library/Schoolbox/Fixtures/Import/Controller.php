@@ -1497,41 +1497,63 @@ class Controller extends Base
 
                         for ($i = 11; $i < count($row); $i += 3) {
 
-                            if (!empty($row[$i]) || !empty($row[$i + 1]) || !empty($row[$i + 2])) {
+                            /* Be optimistic, presuming everything was done by the book
+                             */
+                            $error = false;
 
-                                $error = false;
+                            /* Screw arithmetic, go algebra
+                             */
+                            $itineraryDateIndex = $i;
+                            $itineraryDate = trim($row[$itineraryDateIndex]);
 
-                                if (empty($row[$i])) {
-                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No date specified");
-                                    $error = true;
-                                }
-                                if (empty($row[$i + 1])) {
-                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No time specified");
-                                    $error = true;
-                                }
-                                if (empty($row[$i + 2])) {
-                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No description specified");
-                                    $error = true;
-                                }
+                            $itineraryTimeIndex = $i+1;
+                            $itineraryTime = trim($row[$itineraryTimeIndex]);
 
+                            $itineraryDescIndex = $i+2;
+                            $itineraryDesc = trim($row[$itineraryDescIndex]);
+
+                            /* Only try to spawn itinerary items if all three data exist
+                             * Report errors for each missing data
+                             */
+                            if (!strlen($itineraryDate)) {
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDateIndex, "SKIPPED ITINERARY ITEM: No date specified");
+                                $error = true;
+                            }
+
+                            if (!strlen($itineraryTime)) {
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryTimeIndex, "SKIPPED ITINERARY ITEM: No time specified");
+                                $error = true;
+                            }
+
+                            if (!strlen($itineraryDesc)) {
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDescIndex, "SKIPPED ITINERARY ITEM: No description specified");
+                                $error = true;
+                            }
+
+                            /* Only proceed if no errors were encountered for this itinerary item
+                             */
+                            if (!$error) {
                                 try {
-                                    $this->makeDateTime($row[$i], $row[$i + 1]);
-                                } catch (\Exception $e) {
-                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$row[$i]} {$row[$i+1]})");
-                                    $error = true;
-                                }
+                                    $this->makeDateTime($itineraryDate, $itineraryTime);
 
-                                if (!$error) {
+                                    /* Stack up if you could get the date to process
+                                     */
                                     $items[] = [
                                         'date' => $row[$i],
                                         'time' => $row[$i + 1],
                                         'description' => $row[$i + 2]
                                     ];
+                                } catch (\Exception $e) {
+                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDateIndex, "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$itineraryDate} {$itineraryTime})");
                                 }
                             }
                         }
 
+
                         foreach ($items as $item) {
+
+                            /* !!!!!! $row['description'] doesn't exist in this context ><
+                             */
                             if (!empty(trim($row['description']))) {
                                 $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Itinerary Item '{$row['description']}'");
                                 $itineraryItem = new ItineraryItem();
