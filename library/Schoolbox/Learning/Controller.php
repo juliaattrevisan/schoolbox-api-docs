@@ -286,7 +286,7 @@ class Controller extends Base
             $hasUnitsInTerm = false;
             foreach($courseImpls as $courseImpl){
                 foreach($courseImpl->getUnits() as $unitImpl){
-                    if($unitImpl->getOpenDate()->compareDateOnly($term->getStart())){
+                    if($unitImpl->getOpenDate()->compareDateOnly($term->getStart()) >= 0){
                         if($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->compareDateOnly($term->getActualFinish()) <= 0){
                             $hasUnitsInTerm = true;
                             break;
