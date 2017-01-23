@@ -95,122 +95,113 @@ set upsConfig = {
             </div>
 
             {% if ruleset.getRules() is not empty %}
-            <div class="sortable" data-sortable>
+            <section>
+                <ul class="sortable information-list" data-sortable>
             
-                {% for currentRule in ruleset.getRules() %}
-                <div class="actions-small-2" id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
+                    {% for currentRule in ruleset.getRules() %}
+                    <li id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
 
-                    {# Ensure rule[] gets POSTed, even when it has no Conditions or Effects
-                     # We do that so the Rule can be sequenced prior to creation of Conditions
-                     # and/or Effects
-                     #}
-                    {% if currentRule.conditions|length == 0 %}
-                        <input type="hidden" name="rule[{{ currentRule.id }}]" value="" />
-                        <input type="hidden" name="rule[{{ currentRule.id }}][conditions]" value="" />
-                        <input type="hidden" name="rule[{{ currentRule.id }}][effects]" value="" />
-                    {% endif %}
+                        {# Ensure rule[] gets POSTed, even when it has no Conditions or Effects
+                         # We do that so the Rule can be sequenced prior to creation of Conditions
+                         # and/or Effects
+                         #}
+                        {% if currentRule.conditions|length == 0 %}
+                            <input type="hidden" name="rule[{{ currentRule.id }}]" value="" />
+                            <input type="hidden" name="rule[{{ currentRule.id }}][conditions]" value="" />
+                            <input type="hidden" name="rule[{{ currentRule.id }}][effects]" value="" />
+                        {% endif %}
 
-                    <div class="row">
+                        <div class="actions-small-2 small-12 column">
+                            <div class="grip ui-sortable-handle"></div>
 
-                        <div class="small-12 columns">
-                            <ul class="component-titlebar" style="background-color:#ddd;">
-                                <li class="actions-small-3">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <h3>
+                                        {% if currentRule.name|length %}
+                                            {{ currentRule.name }}
+                                        {% else %}
+                                            Rule {{ currentRule.id }}
+                                        {% endif %}
+                                    </h3>
+                                    {% if currentRule.description|length %}
+                                        <p class="meta" title="{{ currentRule.description }}">
+                                            {{ currentRule.description }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
 
-                                    <div class="list-item">
-                                        <div class="small-12 card">
-                                            <i class="icon-grip grip"></i>
-                                            <h2>
-                                                {% if currentRule.name|length %}
-                                                    {{ currentRule.name }}
-                                                {% else %}
-                                                    Rule {{ currentRule.id }}
-                                                {% endif %}
+                            <nav>
+                                <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Expand/Collapse Content"></a>
+                                <a class="icon-more" title="Actions" data-dropdown="rule-{{ currentRule.id }}-options"></a>
+                            </nav>
 
-                                                {% if currentRule.description|length %}
-                                                    <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                                                {% endif %}
-                                            </h2>
-                                        </div>
-                                    </div>
-
-                                    <nav>
-                                        <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Expand/Collapse Content"></a>
-                                        <a class="icon-more" title="Actions" data-dropdown="rule-{{ currentRule.id }}-options"></a>
-                                    </nav>
-
-                                </li>
-                            </ul>
                         </div>
 
-                    </div>
+                        <div class="small-12 column">
 
-                    <div class="row">
-                        <div class="small-12 island">
-                            <section>
-
-                                <div class="small-12 columns no-pad">
-                                    <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
-                                        <legend>Conditions</legend>
-                                        <div class="empty-state {{ currentRule.conditions is empty ? '' : 'hide' }}" data-empty-state-conditions >
-                                            <i class="icon-help"></i>
-                                            <p>Conditions are optional, but you may prevent the effects below by creating one.</p>
-                                            <p>You can <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" data-condition-create="{{ currentRule.id }}">create a general condition</a>
-                                                or if you prefer to run these rules only on initial user creation use the
-                                                <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" title="Create user exists condition" data-condition-create="{{ currentRule.id }}">user exists condition</a></p>
-                                        </div>
-
-                                        <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-conditions">
-                                            {% for currentCondition in currentRule.conditions %}
-                                            {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
-                                            {% endfor %}
-                                        </ul>
-
-                                        <legend>Effects</legend>
-                                        <div class="empty-state {{ currentRule.effects is empty ? '' : 'hide' }}" data-empty-state-effects>
-                                            <i class="icon-help"></i>
-                                            <p>Use effects to map data fields from your SIS to user account attributes.</p>
-                                            <p>When <a href="/adminv2/ups/effect/add/{{ currentRule.id }}" title="Add new Effect" data-effect-create="{{ currentRule.id }}">creating a data mapping</a> they may either be directly copied, altered using <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">filters</a> or mapped using a lookup table.</p>
-                                            <p>Start by selecting your user account field you wish to populate, then select a method and finally add a <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">token</a> to use as a modifier.</p>
-                                        </div>
-                                        <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
-                                            {% for currentEffect in currentRule.effects %}
-                                            {% include allEffectStructures.containers[currentEffect.id] %}
-                                            {% endfor %}
-                                        </ul>
-
-                                        <div class="row {{ currentRule.effects is empty and currentRule.conditions is empty ? 'hide' : '' }}" data-ruleset-save-rule-row>
-                                            <div class="small-12 medium-8 column"></div>
-                                            <div class="small-12 medium-4 column">
-                                                <input type="submit" value="Save Rule" data-ruleset-save-rule />
-                                            </div>
-                                        </div
-
-                                        <span class="label full-width hide" data-relation="response-message"></span>
-                                    </section>
+                            <div class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
+                                <h4>Conditions</h4>
+                                <div class="empty-state {{ currentRule.conditions is empty ? '' : 'hide' }}" data-empty-state-conditions >
+                                    <i class="icon-help"></i>
+                                    <p>Conditions are optional, but you may prevent the effects below by creating one.</p>
+                                    <p>You can <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" data-condition-create="{{ currentRule.id }}">create a general condition</a>
+                                        or if you prefer to run these rules only on initial user creation use the
+                                        <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" title="Create user exists condition" data-condition-create="{{ currentRule.id }}">user exists condition</a></p>
                                 </div>
 
-                                <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                            <li class="separator">Rule</li>
-                            <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
-                            <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule">Edit Rule</a></li>
-                            <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule">Delete Rule</a></li>
-                            <li class="separator">Conditions</li>
-                            <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" class="icon-add" title="Add new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                            <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" class="icon-add" title="Add new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
-                            <li class="separator">Effects</li>
-                            <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Add new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
-                            <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
-                            <li class="separator">Help</li>
-                            <li><a class="icon-help" title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
-                        </ul>
+                                <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-conditions">
+                                    {% for currentCondition in currentRule.conditions %}
+                                    {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
+                                    {% endfor %}
+                                </ul>
 
-                            </section>
+                                <h4>Effects</h4>
+                                <div class="empty-state {{ currentRule.effects is empty ? '' : 'hide' }}" data-empty-state-effects>
+                                    <i class="icon-help"></i>
+                                    <p>Use effects to map data fields from your SIS to user account attributes.</p>
+                                    <p>When <a href="/adminv2/ups/effect/add/{{ currentRule.id }}" title="Add new Effect" data-effect-create="{{ currentRule.id }}">creating a data mapping</a> they may either be directly copied, altered using <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">filters</a> or mapped using a lookup table.</p>
+                                    <p>Start by selecting your user account field you wish to populate, then select a method and finally add a <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">token</a> to use as a modifier.</p>
+                                </div>
+                                <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
+                                    {% for currentEffect in currentRule.effects %}
+                                    {% include allEffectStructures.containers[currentEffect.id] %}
+                                    {% endfor %}
+                                </ul>
+
+                                <div class="row {{ currentRule.effects is empty and currentRule.conditions is empty ? 'hide' : '' }}" data-ruleset-save-rule-row>
+                                    <div class="small-12 medium-8 column"></div>
+                                    <div class="small-12 medium-4 column">
+                                        <input type="submit" value="Save Rule" data-ruleset-save-rule />
+                                    </div>
+                                </div
+
+                                <span class="label full-width hide" data-relation="response-message"></span>
+                            </div>
+
+
+                            <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
+                                <li class="separator">Rule</li>
+                                <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                                <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule">Edit Rule</a></li>
+                                <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule">Delete Rule</a></li>
+                                <li class="separator">Conditions</li>
+                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" class="icon-add" title="Add new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" class="icon-add" title="Add new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                                <li class="separator">Effects</li>
+                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Add new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
+                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
+                                <li class="separator">Help</li>
+                                <li><a class="icon-help" title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
+                            </ul>
+
                         </div>
-                    </div>
 
-                </div>
-                {% endfor %}
-            </div>
+                    </li>
+                    {% endfor %}
+
+                </ul>
+            </section>
             {% endif %}
 
             {# Javascript controls visibility of this, because
