@@ -256,10 +256,13 @@
          */
         var updateAssessment = function(calEvent, delta, revertFunc) {
             var format = 'Y-MM-DD HH:mm:ss';
+            // Account for Fullcalendar exclusive vs inclusive end dates
             var data = {
                 assessmentId: calEvent.meta.assessmentId,
                 openDate: calEvent.start.format(format),
-                dueDate: calEvent.end.format(format)
+                dueDate: calEvent.allDay
+                    ? calEvent.end.clone().subtract({days: 1}).format(format)
+                    : calEvent.end.format(format)
             };
 
             calEvent.className.push('loading');
