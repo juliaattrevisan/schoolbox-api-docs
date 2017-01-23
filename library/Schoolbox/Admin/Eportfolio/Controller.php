@@ -154,9 +154,10 @@ class Controller extends Base
      * @param \Aura\Web\Request\Values $post
      * @param int $id ID of the import for logging purposes
      */
-    private function deployCallback($post, $id) {
-
-        if ($post['dryRun'] == '1') {
+    private function deployCallback($post, $id)
+    {
+        $dryRun = $post['dryRun'] == '1';
+        if ($dryRun) {
             $this->log('Starting dry run.', $id);
         } else {
             $this->log('Starting import.', $id);
@@ -247,9 +248,14 @@ class Controller extends Base
 
                     if (!($destUser->getEportfolioEnable())) {
                         if ($post['enableEportfolios'] == '1') {
-                            $destUser->setEportfolioEnable(true);
-                            $this->userMapper->save($destUser);
-                            $this->log('Eportfolio was disabled. Enabling for user.', $id);
+                            // If this is a dry run, don't enable eportfolio either
+                            if ($dryRun) {
+                                $this->log('Eportfolio was disabled. Would have enabled for user.', $id);
+                            } else {
+                                $destUser->setEportfolioEnable(true);
+                                $this->userMapper->save($destUser);
+                                $this->log('Eportfolio was disabled. Enabling for user.', $id);
+                            }
                         } else {
                             $this->log('Skipping user. Eportfolio is disabled.', $id);
                             $import = false;
@@ -282,7 +288,7 @@ class Controller extends Base
 
                             // If this is a dry run, skip the import step
 
-                            if ($post['dryRun'] == '1') {
+                            if ($dryRun) {
                                 $this->log('Would have imported page "' . $page->getPageTitle() . '".', $id);
                                 continue;
                             } else {
