@@ -55,7 +55,7 @@ class Controller extends Base
      * @param int $id The ID number of the javascript picker
      * @param string $value Default date to display
      */
-    public function getPicker($element, $id, $value) {
+    public function getPicker($type, $element, $id, $value) {
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
         try {
@@ -84,7 +84,7 @@ class Controller extends Base
                     //Pass unix timestamp to flatpicker, it misinterprets day and month in d/m/Y format
                     'value' => $value->geJSDate(),
                     'element' => $element,
-//                    'type' => $type,
+                    'type' => $type,
 //                    'enableTime' => $time,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
                     'displayFormatDate' => $this->convertFormat($displayFormatDate),

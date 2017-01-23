@@ -122,7 +122,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
             picker.data('status', 'loading');
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            picker.load('/picker/datetime/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
+            picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
 
                 // Capture closure of modal
                 $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {

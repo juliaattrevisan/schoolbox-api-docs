@@ -585,19 +585,19 @@
 
                 {% elseif (type == 'event') %}
 
-                {# AJAX in appointments for the selected date #}
+                    {# AJAX in appointments for the selected date #}
 
-                loadingResponse('calendar');
+                    loadingResponse('calendar');
 
-                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
-                        .done(function (data) {
+                    $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
+                            .done(function (data) {
 
-                            appendResponse(data, 'events', 'calendar');
+                                appendResponse(data, 'events', 'calendar');
 
-                        })
-                        .fail(function () {
-                            console.log('Failed to retrieve appointments for specified date');
-                        });
+                            })
+                            .fail(function () {
+                                console.log('Failed to retrieve appointments for specified date');
+                            });
                 {% else %}
                 {#Do nothing#}
                 {% endif %}
@@ -607,4 +607,5 @@
 
     };
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", pickerOptions );
+    console.log(pickerOptions);
 </script>
