@@ -1504,7 +1504,7 @@ class Controller extends Base
 
                             /* Be optimistic, presuming everything was done by the book
                              */
-                            $error = false;
+                            $itineraryError = false;
 
                             /* Screw arithmetic, go algebra
                              */
@@ -1522,22 +1522,22 @@ class Controller extends Base
                              */
                             if (!strlen($itineraryDate)) {
                                 $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDateIndex, "SKIPPED ITINERARY ITEM: No date specified");
-                                $error = true;
+                                $itineraryError = true;
                             }
 
                             if (!strlen($itineraryTime)) {
                                 $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryTimeIndex, "SKIPPED ITINERARY ITEM: No time specified");
-                                $error = true;
+                                $itineraryError = true;
                             }
 
                             if (!strlen($itineraryDesc)) {
                                 $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDescIndex, "SKIPPED ITINERARY ITEM: No description specified");
-                                $error = true;
+                                $itineraryError = true;
                             }
 
                             /* Only proceed if no errors were encountered for this itinerary item
                              */
-                            if (!$error) {
+                            if (!$itineraryError) {
                                 try {
                                     $datetime = $this->makeDateTime($itineraryDate, $itineraryTime);
 
