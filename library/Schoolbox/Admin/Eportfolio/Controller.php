@@ -180,7 +180,7 @@ class Controller extends Base
                 foreach ($destinationUserArray as $userId) {
                     if (!isset($destinationUsers[$userId]) && $userId != $user->getId()) {
                         try {
-                            $destinationUsers->add($this->userMapper->findById($userId));
+                            $destinationUsers = $destinationUsers->add($this->userMapper->findById($userId));
                         } catch (MapperException $e) {
                             $this->log('Unable to locate user ID ' . $userId . '.', $id);
                         }
@@ -190,7 +190,7 @@ class Controller extends Base
 
             if (is_array($post['role'])) {
                 foreach ($post['role'] as $roleId) {
-                    $destinationUsers->mergeUnique($this->userMapper->findByColumn('group_id', $roleId));
+                    $destinationUsers = $destinationUsers->mergeUnique($this->userMapper->findByColumn('group_id', $roleId));
                 }
             }
 
@@ -200,7 +200,7 @@ class Controller extends Base
                 foreach ($post['campus'] as $campusId) {
                     $campus = new Campus();
                     $campus->setId($campusId);
-                    $destinationUsers->mergeUnique($this->campusMapper->findUsersInCampus($campus));
+                    $destinationUsers = $destinationUsers->mergeUnique($this->campusMapper->findUsersInCampus($campus));
                 }
             }
 
