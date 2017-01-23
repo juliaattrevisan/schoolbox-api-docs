@@ -13,12 +13,10 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Feedback\Factory as FeedbackFactory;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
 {
@@ -56,21 +54,42 @@ class Controller extends Base
 
         try {
             $this->processFeedback($participant, $feedbacks, $post);
-
-            // Did we just potentially publish rubric draft marks?
-            if(isset($post['publish']) && $post['publish']){
-                if($participant->getAssessable() instanceof DueWork){
-                    RubricMarkMapper::getInstance()->publishDraftMarks($participant->getUser(), $participant->getAssessable());
-                }
-            }
+            $this->processRubric($participant, $post);
         }
         catch (\RangeException $e) {
             $this->sendError('Invalid mark given');
             return;
         }
-        catch (\Schoolbox\Mapper\Exception $e) {
+        catch (MapperException $e) {
             $this->sendError('Invalid mark given');
             return;
+        }
+    }
+
+    /**
+     * Process any rubric data attached to the Feedback
+     *
+     * @param Participant $participant
+     * @param $post
+     */
+    protected function processRubric(Participant $participant, $post)
+    {
+        if(!$participant->getAssessable() instanceof DueWork){
+            return;
+        }
+        /** @var DueWork $dueWork */
+        $dueWork = $participant->getAssessable();
+
+        $isDraft = !isset($post['publish']) || !$post['publish'];
+
+        // Did we just give some rubric marks?
+        if (is_array($post['rubric'])) {
+            $rubMap = RubricMapper::getInstance();
+            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft);
+        }
+        // Else did we just publish draft marks via the status page?
+        elseif(!$isDraft){
+            RubricMarkMapper::getInstance()->publishDraftMarks($participant->getUser(), $dueWork);
         }
     }
 
@@ -93,6 +112,7 @@ class Controller extends Base
 
         try {
             $this->processFeedback($participant, $feedbacks, $this->getRequest()->post, $response);
+            $this->processRubric($participant, $this->getRequest()->post);
         }
         catch (\RangeException $e) {
             $this->sendError('Invalid mark given');
@@ -133,16 +153,6 @@ class Controller extends Base
         $feedback = $feedbackFactory->produce();
 
         $this->getFeedbackDataSource()->save($feedback);
-
-        /* Optional rubric
-         */
-        // If the mark gets passed at the same time as rubrics,
-        // then rubrics get clobbered. We don't want that.
-        if (is_array($postVars['rubric'])) {
-            $draft = !isset($postVars['publish']) || !$postVars['publish'];
-            $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $postVars['rubric']['descriptors'], $draft);
-        }
 
         $template = '';
         $data = [
