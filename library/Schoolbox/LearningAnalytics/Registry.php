@@ -11,108 +11,55 @@
 namespace Schoolbox\LearningAnalytics;
 
 use Schoolbox\Collection;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Course;
+use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\User;
 
 class Registry {
 
     /**
      * An array of unitId-user data
      *
-     * @var Collection
+     * @var Collection[]|User[][]
      */
-    private $allStudentRegistry = null;
+    private $students;
 
     /**
      * A Collection of UnitInstance instances
      *
      * @var Collection
      */
-    private $allUnitRegistry = null;
+    private $unitImplementations;
 
     /**
      * Constructor
      *
-     * @param Collection $allUnitInstances
+     * @param Collection|Implementation\Unit\Model[] $unitImplementations
      */
-    public function __construct(Collection $allUnitInstances) {
-        $this->findRegistries($allUnitInstances);
-    }
+    public function __construct(Collection $unitImplementations)
+    {
+        $this->setUnitImplementations($unitImplementations);
 
-    /**
-     * A list of all the students who are associated with each unit
-     *
-     * This basically serves as a preload for the external db, because
-     * we reuse this list of students and we don't want to hit the
-     * external db more than we have to
-     *
-     * @param Collection $allUnitInstances
-     */
-    private function findRegistries(Collection $allUnitInstances) {
-        $unitInstanceMapper = new UnitInstanceMapper();
-        $folderMapper = FolderMapper::getInstance();
-        $submissionBoxMapper = SubmissionBoxMapper::getInstance();
-        $quizMapper = QuizMapper::getInstance();
+        $users = [];
 
-        /* A registry of unitId-studentList relations
-         */
-        $allStudentRegistry = array();
+        foreach ($unitImplementations as $unit) {
+            $unitId = $unit->getId();
 
-        /* Also maintain a growing collection of units
-         * These contain task completion details, which $allUnitInstances do not
-         */
-        $allUnitRegistryTemp = array();
+            foreach ($unit->getAssessables() as $activity) {
+                foreach ($activity->getAllParticipants() as $participant) {
+                    $u = $participant->getUser();
 
-        /* Extract all the students first because we're going to
-         * reuse this list again
-         */
-        foreach ($allUnitInstances as $currentUnitInstance) {
-            $folder = $currentUnitInstance->getCategory();
-            $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
-
-            $allUnits = $unitInstanceMapper->findForCategoryId($folder->getId());
-
-            foreach ($allUnits as $currentUnit) {
-
-                /* Rehydrate submission box in each taskInstance of the unit
-                 * This feels viciously expensive. May be able to solve this
-                 * by writing yet another custom query and mapping them all
-                 * together manually, because I need the workType hydration
-                 */
-                foreach ($currentUnit->getTasks() as $currentTask) {
-                    if (is_numeric($currentTask->getSubmissionBox()->getId())) {
-                        try {
-                            $submissionBox = $submissionBoxMapper->findById($currentTask->getSubmissionBox()->getId());
-                            $currentTask->setSubmissionBox($submissionBox);
-                        }
-                        catch (\Exception $e) {
-                        }
-                    }
-                    else if (is_numeric($currentTask->getAssessment()->getId())) {
-                        try {
-                            $quiz = $quizMapper->findById($currentTask->getAssessment()->getId());
-                            $currentTask->setAssessment($quiz);
-                        }
-                        catch (\Exception $e) {
-                        }
+                    if (empty($users[$unitId][$u->getId()])) {
+                        $users[$unitId][$u->getId()] = $u;
                     }
                 }
-
-                $allUnitRegistryTemp[$currentUnit->getId()] = $currentUnit;
-
-                $studentListProcessor = new StudentList($folder, $currentUnit);
-                $allStudentRegistry[$currentUnit->getId()] = $studentListProcessor->getStudentList();
             }
+
+            // je ne parle pas...?
+            $users[$unitId] = new Collection($users[$unitId]);
         }
 
-        /* Inject $allRegistryTemp as stack
-         */
-        $allUnitRegistry = new Collection($allUnitRegistryTemp);
-
-        $this->setAllStudentRegistry($allStudentRegistry);
-        $this->setAllUnitRegistry($allUnitRegistry);
+        $this->setStudents(new Collection($users));
     }
 
     /* Getters/Setters
@@ -121,40 +68,50 @@ class Registry {
     /**
      * Set all student registry
      *
-     * @param array $allStudentRegistry
+     * @param Collection|User[] $students
      */
-    private function setAllStudentRegistry($allStudentRegistry)
+    private function setStudents($students)
     {
-        $this->allStudentRegistry = $allStudentRegistry;
+        $this->students = $students;
     }
 
     /**
      * Get all student registry
      *
-     * @return array
+     * @return Collection[]|User[][]
      */
-    public function getAllStudentRegistry()
+    public function getStudents()
     {
-        return $this->allStudentRegistry;
+        return $this->students;
+    }
+
+
+    /**
+     * @param Implementation\Unit\Model $unitImplementation
+     * @return Collection|User[]
+     */
+    public function getStudentsByUnitImplementation(Implementation\Unit\Model $unitImplementation)
+    {
+        return $this->students[$unitImplementation->getId()];
     }
 
     /**
      * Set all unit registry
      *
-     * @param \Schoolbox\Collection $allUnitRegistry
+     * @param Collection|Implementation\Unit\Model[] $allUnitRegistry
      */
-    private function setAllUnitRegistry($allUnitRegistry)
+    private function setUnitImplementations($allUnitRegistry)
     {
-        $this->allUnitRegistry = $allUnitRegistry;
+        $this->unitImplementations = $allUnitRegistry;
     }
 
     /**
      * Get all unit registry
      *
-     * @return \Schoolbox\Collection
+     * @return Collection|Implementation\Unit\Model[]
      */
-    public function getAllUnitRegistry()
+    public function getUnitImplementations()
     {
-        return $this->allUnitRegistry;
+        return $this->unitImplementations;
     }
 } 

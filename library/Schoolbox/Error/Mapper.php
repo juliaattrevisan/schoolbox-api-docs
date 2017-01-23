@@ -161,6 +161,7 @@ class Mapper extends BaseMapper
     const ERROR_ASSESSMENT_NOT_YET_OPEN = 187;
 
     const ERROR_ZIP_EXTRACT = 188;
+    const ERROR_NO_ANALYTICS_DATA = 198;
 
     public function mapping()
     {

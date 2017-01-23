@@ -9,6 +9,7 @@
         var options = options || {
             element: '',
             title: 'Unit Progress',
+            clusterName: 'Class', // or 'Cohort'
 
             /* All unit names
              */
@@ -86,7 +87,7 @@
                     data: options.mostAdvancedStudents
                 },
                 {
-                    name: 'Class Completion',
+                    name: options.clusterName + ' Completion',
                     data: options.classCompletions
                 }
             ],

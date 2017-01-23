@@ -8,6 +8,7 @@
 namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 
 /**
@@ -15,14 +16,9 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Assessment\Term
  */
-class Model
+class Model implements \IComparable
 {
-    /**
-     * Primary key
-     *
-     * @var int
-     */
-    protected $id;
+    use Id;
 
     /**
      * The human-readable title of this term.
@@ -246,5 +242,43 @@ class Model
     {
         $this->archived = $archived;
         return $this;
+    }
+
+    /**
+     * Orders Terms by:
+     * * Start
+     * * Display finish
+     * * Actual finish
+     * @param Model $other
+     * @return int
+     */
+    public function compare($other)
+    {
+        if(!$other instanceof Model){
+            throw new \DomainException('Can only compare to other Term objects. Found: ' . get_class($other));
+        }
+
+        $startCompare = $this->start->compare($other->start);
+        if(0 != $startCompare){
+            return $startCompare;
+        }
+        $displayFinishCompare = $this->displayFinish->compare($other->displayFinish);
+        if(0 != $displayFinishCompare){
+            return $displayFinishCompare;
+        }
+
+        // Interpret NULL date as infinitely in future
+
+        if($this->actualFinish->isNull() && $other->actualFinish->isNull()){
+            return 0;
+        }
+        if($other->actualFinish->isNull()){
+            return -1;
+        }
+        if($this->actualFinish->isNull()){
+            return 1;
+        }
+        return $this->actualFinish->compare($other->actualFinish);
+
     }
 }

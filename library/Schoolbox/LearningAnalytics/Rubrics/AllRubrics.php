@@ -10,8 +10,10 @@
 
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
+use DueWork_Rubric_Handler;
 use Schoolbox\LearningAnalytics\Metadata;
 use Schoolbox\LearningAnalytics\Registry;
+use Schoolbox\Resource\Folder;
 
 class AllRubrics {
 
@@ -20,75 +22,67 @@ class AllRubrics {
      *
      * @var Metadata
      */
-    private $metadata = null;
+    private $metadata;
 
     /**
-     * An instance of LearningAnalytics\Registry
-     *
      * @var Registry
      */
-    private $registry = null;
+    private $registry;
 
     /**
      * An array of rubric data to plot
      *
      * @var array
      */
-    private $allRubrics = null;
+    private $allRubrics = [];
 
     /**
      * A rubric handler instance
      *
-     * @var \DueWork_Rubric_Handler
+     * @var DueWork_Rubric_Handler
      */
-    private $rubricHandler = null;
+    private $rubricHandler;
 
     /**
-     * Constructor
-     *
      * @param Registry $registry
      * @param Metadata $metadata
      */
-    public function __construct(Registry $registry, Metadata $metadata) {
+    public function __construct(Registry $registry, Metadata $metadata)
+    {
         $this->setMetadata($metadata);
         $this->setRegistry($registry);
-        $this->setRubricHandler(new \DueWork_Rubric_Handler());
+        $this->setRubricHandler(new DueWork_Rubric_Handler());
 
-        $this->process();
-    }
-
-    /**
-     * Process
-     */
-    private function process() {
-        $allCriteria = array();
+        $indicators = [];
 
         /* All the students' values
          */
-        $groupedMarks = array();
+        $groupedMarks = [];
 
         /* A list of all the criteria for this folder
          */
-        foreach($this->getMetadata()->getAllAggregateFolders() as $currentFolder) {
-            foreach($this->getRegistry()->getAllStudentRegistry() as $unitId => $allStudents) {
-                foreach ($allStudents as $currentStudent) {
+        foreach ($this->getMetadata()->getUnitImplementations()->getColumnValues('folder') as $folder) {
+            /** @var Folder\Model $folder */
+
+            foreach ($this->getRegistry()->getStudents() as $unitImplementationId => $unitStudents) {
+                foreach ($unitStudents as $student) {
 
                     /* Oddly enough this method gets the students' marks for a
                      * criterion spanning across the entire course, which is
                      * nice and convenient
                      */
-                    $allMarks = $this->getRubricHandler()->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $currentFolder->getId());
+                    $markData = $this->getRubricHandler()->getStudentMarksByCriteriaInCategory($student->getId(), $folder->getId());
 
-                    foreach($allMarks as $criterionId => $current) {
-                        $groupedMarks[$current['name']][] = array(
-                            'user' => $currentStudent->getId(),
-                            'value' => $current['value'],
-                        );
+                    foreach ($markData as $indicator) {
+                        $groupedMarks[$indicator['name']][] = [
+                            'user'  => $student->getId(),
+                            'value' => $indicator['value'],
+                        ];
                     }
                 }
             }
 
-            $allCriteria = $allCriteria + $this->getRubricHandler()->getAvailableCriteria($currentFolder->getId());
+            $indicators = $indicators + $this->getRubricHandler()->getAvailableCriteria($folder->getId());
         }
 
         /* Recombine and preserve criterion grouping
@@ -112,29 +106,29 @@ class AllRubrics {
          * like punctuation and other slight changes like that. The names need
          * to be exactly the same in order to aggregate.
          */
-        $allRubrics = array();
+        $rubricData = [];
 
-        foreach ($allCriteria as $criteriaGroup => $currentCriterion) {
-            foreach ($currentCriterion as $criterionId => $details) {
+        foreach ($indicators as $criteriaGroup => $currentCriterion) {
+            foreach ($currentCriterion as $indicator => $details) {
                 $reforged = $details;
                 $reforged['allValues'] = $groupedMarks[$reforged['name']];
 
                 /* Group by rubric name, not id
                  */
-                if (isset($allRubrics[$criteriaGroup][$details['name']])) {
-                    $allRubrics[$criteriaGroup][$details['name']]['allValues'] = array_merge($allRubrics[$criteriaGroup][$details['name']], $reforged['allValues']);
+                if (isset($rubricData[$criteriaGroup][$details['name']])) {
+                    $rubricData[$criteriaGroup][$details['name']]['allValues'] = array_merge($rubricData[$criteriaGroup][$details['name']], $reforged['allValues']);
                 }
                 else {
-                    $allRubrics[$criteriaGroup][$details['name']] = $reforged;
+                    $rubricData[$criteriaGroup][$details['name']] = $reforged;
                 }
             }
 
             /* Sort in order of spawn
              */
-            asort($allRubrics[$criteriaGroup]);
+            asort($rubricData[$criteriaGroup]);
         }
 
-        $this->setAllRubrics($allRubrics);
+        $this->setRubricData($rubricData);
     }
 
     /* Getters/Setters
@@ -145,7 +139,7 @@ class AllRubrics {
      *
      * @param Metadata $metadata
      */
-    private function setMetadata($metadata)
+    private function setMetadata(Metadata $metadata)
     {
         $this->metadata = $metadata;
     }
@@ -165,7 +159,7 @@ class AllRubrics {
      *
      * @param Registry $registry
      */
-    private function setRegistry($registry)
+    private function setRegistry(Registry $registry)
     {
         $this->registry = $registry;
     }
@@ -183,11 +177,11 @@ class AllRubrics {
     /**
      * Set all rubrics
      *
-     * @param array $allRubrics
+     * @param array $rubricData
      */
-    private function setAllRubrics($allRubrics)
+    private function setRubricData(array $rubricData)
     {
-        $this->allRubrics = $allRubrics;
+        $this->allRubrics = $rubricData;
     }
 
     /**
@@ -195,7 +189,7 @@ class AllRubrics {
      *
      * @return array
      */
-    public function getAllRubrics()
+    public function getRubricData()
     {
         return $this->allRubrics;
     }
@@ -203,7 +197,7 @@ class AllRubrics {
     /**
      * Set rubric handler
      *
-     * @param \DueWork_Rubric_Handler $rubricHandler
+     * @param DueWork_Rubric_Handler $rubricHandler
      */
     private function setRubricHandler($rubricHandler)
     {
@@ -213,7 +207,7 @@ class AllRubrics {
     /**
      * Get rubric handler
      *
-     * @return \DueWork_Rubric_Handler
+     * @return DueWork_Rubric_Handler
      */
     private function getRubricHandler()
     {

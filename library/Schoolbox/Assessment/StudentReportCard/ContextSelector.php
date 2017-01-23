@@ -209,7 +209,7 @@ class ContextSelector
 
 		foreach ($this->terms as $term) {
 			$termValue = sprintf(
-				'%s (%s—%s)',
+				'%s (%s&ndash;%s)',
 				$term->getTitle(),
 				$term->getStart()->getDateOnly(),
 				$term->getDisplayFinish()->getDateOnly()

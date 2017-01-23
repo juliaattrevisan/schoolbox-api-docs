@@ -3,6 +3,7 @@
 use Aura\Router\Router;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 use Schoolbox\User;
 
 class SitePage extends Page
@@ -453,16 +454,18 @@ class SitePage extends Page
                         continue;
                     }
                 }
-                //Skip if user account is disable
-                if(!$linkedUser->getEnabled()) {
+                // Skip if user account is disable
+                if (!$linkedUser->getEnabled()) {
                     continue;
                 }
-                /* Fully hydrate, note this stores back in session so it only happens once */
-                if ($linkedUser->getRole()->getName() == null) {
-                    $linkedUser = \Schoolbox\UserMapper::getInstance()->findById($linkedUser->getId());
-                    $linkedUserList[] = $linkedUser;
-                }
 
+                $linkedUserList[] = $linkedUser;
+            }
+
+            /** @var User[] $linkedUserList */
+            $linkedUserList = UserMapper::getInstance()->findByColumn('id', array_map(function (User $user) { return $user->getId(); }, $linkedUserList))->getAll();
+
+            foreach ($linkedUserList as $linkedUser) {
                 $this->setVar(array(
                         'MENU_SWITCH_USERID' => $linkedUser->getId(),
                         'MENU_SWITCH_EXTERNAL_ID' => $linkedUser->getExternalId(),
@@ -473,6 +476,7 @@ class SitePage extends Page
                 $this->parse('switch_user_block', 'switch_user', true);
                 $canSwitch = true;
             }
+
             if (count($linkedUserList) > 0) {
                 $this->user->setLinkedUser($linkedUserList);
             }

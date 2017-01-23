@@ -74,10 +74,10 @@ class Mapper extends AbstractCourseMapper
     }
 
     /**
-     * Finds the unit spec for this folder.
+     * Finds the Courses Implementations for this folder.
      *
-     * @param int   $folderId
-     * @param array $options
+     * @param int|int[] $folderId
+     * @param array     $options
      * @return Model[]|Collection
      */
     public function findByFolderId($folderId, $options = [])
@@ -142,11 +142,17 @@ class Mapper extends AbstractCourseMapper
      *
      * @param int|array $courseSpecId
      * @param array     $options
+     * @param bool      $loadUnits
      * @return Collection|Model[]
      */
-    public function findAllByCourseSpecificationId($courseSpecId, $options = [])
+    public function findAllByCourseSpecificationId($courseSpecId, $options = [], $loadUnits = false)
     {
-        return $this->findByColumn('course_specification_id', $courseSpecId, $options);
+        $courseImpls = $this->findByColumn('course_specification_id', $courseSpecId, $options);
+
+        if($loadUnits){
+            $courseImpls = $this->loadUnitsForCollection($courseImpls);
+        }
+        return $courseImpls;
     }
 
     /**

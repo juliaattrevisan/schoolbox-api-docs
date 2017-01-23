@@ -276,7 +276,7 @@ class DueWork_Rubric_Handler
             }
 
             if ($row['dmax_mark']) {
-                $localAvg = $row['mark'] / $row['dmax_mark'];
+                $localAvg = 0 == $row['dmax_mark'] ? null : $row['mark'] / $row['dmax_mark'];
             } elseif ($row['rmax_mark']) {
                 $localAvg = $row['mark'] / $row['rmax_mark'];
             } else {

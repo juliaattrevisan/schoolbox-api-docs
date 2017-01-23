@@ -12,11 +12,8 @@
 
 namespace Schoolbox\LearningAnalytics\Results;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Assessment\Course\UnitInstance;
-use Schoolbox\Collection;
-use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\Mapper\Exception as MapperException;
 
 
@@ -25,146 +22,45 @@ class Unit {
     /**
      * Unit instance
      *
-     * @var UnitInstance
+     * @var Implementation\Unit\Model
      */
-    private $unit = null;
+    private $unitImplementation;
 
     /**
-     * A collection of User instances
+     * All feedback within the unit implementation, indexed by *SPECIFICATION* activity ID, then student ID
      *
-     * @var Collection
+     * @var IFeedback[][]
      */
-    private $allStudents = null;
-
-    /**
-     * An array of task_id-collection pairs, containing
-     * all the students' marks for a particular task
-     *
-     * @var array
-     */
-    private $allValues = null;
-
-    /**
-     * A user mapper
-     *
-     * @var UserMapper
-     */
-    private $userMapper = null;
+    private $results = [];
 
     /**
      * Constructor
      *
-     * @param Collection $allStudents
-     * @param UnitInstance $unit
+     * @param Implementation\Unit\Model $unitImplementation
      */
-    public function __construct(Collection $allStudents, UnitInstance $unit) {
-        $this->setAllStudents($allStudents);
-        $this->setUnit($unit);
-        $this->setUserMapper(new UserMapper());
+    public function __construct(Implementation\Unit\Model $unitImplementation)
+    {
+        $this->setUnitImplementation($unitImplementation);
 
-        $this->process();
-    }
+        $results = [];
 
-    /**
-     * Collate marks for each task, for each student
-     */
-    private function process() {
-        $sectionHandler = new \Assess_Section();
-        $attemptHandler = new \Assess_Attempt();
+        foreach ($this->getUnitImplementation()->getAssessables() as $activity) {
 
-        $studentSubmissionList = array();
-        $studentQuizList = array();
-
-        /* Submission box id may not actually exist, even though there
-         * may be a submission box instance. That's when tasks exist but
-         * aren't associated with a submission box yet.
-         *
-         * Similarly with quizzes
-         */
-        foreach ($this->getUnit()->getTasks() as $currentTask) {
-            if (($currentTask->getSubmissionBox() instanceof SubmissionBox) && is_numeric($currentTask->getSubmissionBox()->getId())) {
-                $detail = new \DueWork_Detail($currentTask->getSubmissionBox(), $currentTask->getSubmissionBox());
-                $detail->processStudents($this->getAllStudents());
-
-                $studentSubmissionList[$currentTask->getSubmissionBox()->getId()] = $detail->getSitepageData();
+            if($activity->getSpecificationAssessment() == null) {
+                //skip activities with no specification
+                continue;
             }
-            else if (($currentTask->getAssessment() instanceof Quiz) && is_numeric($currentTask->getAssessment()->getId())) {
 
-                // attempt_list is a list of all valid attempts, ordered chronologically.
-                // Filter to most recent submission only.
-                $allAttempts = $attemptHandler->getList($currentTask->getAssessment()->getId());
+            $specActivityId = $activity->getSpecificationAssessment()->getId();
 
-                if (!empty($allAttempts)) {
-                    foreach ($allAttempts as $currentAttempt) {
+            foreach ($activity->getFeedbacks() as $feedback) {
+                $studentId = $feedback->getReviewee()->getId();
 
-                        /* Manipulate a bit more
-                         * Load max mark, because getList doesn't get it.
-                         */
-                        $temp = $currentAttempt;
-                        $temp['maxMark'] = $attemptHandler->getTotalMarks($currentTask->getAssessment()->getId(), $temp['attempt_id']);
-                        $temp['firstSection'] = $sectionHandler->getFirst($currentTask->getAssessment()->getId());
-
-                        $studentQuizList[$currentTask->getAssessment()->getId()][$temp['user_id']] = $temp;
-                    }
-                }
+                $results[$specActivityId][$studentId] = $feedback;
             }
         }
 
-        /* Voltron those two lists together, distilling data out of
-         * both $studentSubmissionList and $studentQuizList
-         *
-         * This could probably be done in the above loops though
-         */
-        $allValues = array();
-
-        foreach ($this->getUnit()->getTasks() as $currentTask) {
-
-            /* Group by originating task id, not task instance id
-             */
-            $allValues[$currentTask->getTask()->getId()] = new Collection();
-
-            /* Get all the stuff out of $studentSubmissionList[$submissionBoxId]
-             */
-            if (($currentTask->getSubmissionBox() instanceof SubmissionBox) && is_numeric($currentTask->getSubmissionBox()->getId())) {
-                $allUsers = array_values($studentSubmissionList[$currentTask->getSubmissionBox()->getId()]);
-
-                foreach ($allUsers as $currentUser) {
-                    $allValues[$currentTask->getTask()->getId()]->add(array(
-                        'user' => $currentUser['user']['instance'],
-                        'value' => $currentUser['return']['norm_mark']
-                    ));
-                }
-            }
-            else if (($currentTask->getAssessment() instanceof Quiz) && is_numeric($currentTask->getAssessment()->getId())) {
-                $users = $studentQuizList[$currentTask->getAssessment()->getId()];
-
-                if (is_array($users) && count($users)) {
-                    $allUsers = array_values($users);
-
-                    /* Only accumulate if an attempt was made and the maximum available
-                     * marks for the quiz is greater than zero
-                     */
-                    foreach ($allUsers as $currentUser) {
-                        if ($currentUser['totalMarks'] !== null) {
-                            if ($currentUser['maxMark'] > 0) {
-                                $normalised = 100 * $currentUser['totalMarks']/$currentUser['maxMark'];
-
-                                try {
-                                    $allValues[$currentTask->getTask()->getId()]->add(array(
-                                        'user' => $this->getUserMapper()->findById($currentUser['user_id']),
-                                        'value' => $normalised
-                                    ));
-                                } catch (MapperException $e) {
-                                    //no user found, noop
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        $this->setAllValues($allValues);
+        $this->setResults($results);
     }
 
     /* Getters/Setters
@@ -173,80 +69,41 @@ class Unit {
     /**
      * Set unit
      *
-     * @param UnitInstance $unit
+     * @param Implementation\Unit\Model $unitImplementation
      */
-    private function setUnit($unit)
+    private function setUnitImplementation(Implementation\Unit\Model$unitImplementation)
     {
-        $this->unit = $unit;
+        $this->unitImplementation = $unitImplementation;
     }
 
     /**
      * Get unit
      *
-     * @return UnitInstance
+     * @return Implementation\Unit\Model
      */
-    private function getUnit()
+    private function getUnitImplementation()
     {
-        return $this->unit;
+        return $this->unitImplementation;
     }
 
     /**
-     * Set all values
+     * Set feedback results
      *
-     * @param array $allValues
+     * @param IFeedback[][] $results
      */
-    private function setAllValues($allValues)
+    private function setResults(array $results)
     {
-        $this->allValues = $allValues;
+        $this->results = $results;
     }
 
     /**
      * Get all values
      *
-     * @return array
+     * @return IFeedback[][]
      */
-    public function getAllValues()
+    public function getResults()
     {
-        return $this->allValues;
+        return $this->results;
     }
 
-    /**
-     * Set all students
-     *
-     * @param Collection $allStudents
-     */
-    private function setAllStudents($allStudents)
-    {
-        $this->allStudents = $allStudents;
-    }
-
-    /**
-     * Get all students
-     *
-     * @return Collection
-     */
-    private function getAllStudents()
-    {
-        return $this->allStudents;
-    }
-
-    /**
-     * Set user mapper
-     *
-     * @param UserMapper $userMapper
-     */
-    private function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * Get user mapper
-     *
-     * @return UserMapper
-     */
-    private function getUserMapper()
-    {
-        return $this->userMapper;
-    }
 }

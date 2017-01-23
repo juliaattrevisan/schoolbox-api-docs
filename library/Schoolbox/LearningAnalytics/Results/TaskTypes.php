@@ -10,9 +10,9 @@
 
 namespace Schoolbox\LearningAnalytics\Results;
 
-use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\LearningAnalytics\Metadata;
 
 class TaskTypes {
@@ -20,46 +20,41 @@ class TaskTypes {
     /**
      * A Collection of task types
      *
-     * @var Collection
+     * @var GenericCollection|WorkType[]
      */
-    private $allTaskTypes = null;
+    private $activityTypes;
 
     /**
      * Request metadata
      *
      * @var Metadata
      */
-    private $metadata = null;
+    private $metadata;
 
     /**
      * The WorkType instance corresponding to the selected type
      *
      * @var WorkType
      */
-    private $selectedTaskFilter = null;
+    private $selectedTaskFilter;
+
 
     /**
      * Constructor
+     *
+     * @param Metadata $metadata
      */
-    public function __construct(Metadata $metadata) {
-        $this->setAllTaskTypes(new Collection());
+    public function __construct(Metadata $metadata)
+    {
         $this->setSelectedTaskFilter(new WorkType());
         $this->setMetadata($metadata);
 
-        $this->process();
-    }
-
-    /**
-     * Process
-     */
-    private function process() {
-        $workTypeMapper = new WorkTypeMapper();
-        $this->setAllTaskTypes($workTypeMapper->findAll());
+        $this->setActivityTypes(WorkTypeMapper::getInstance()->findAll());
 
         /* Save yourself a db call with a quick iteration instead
          */
-        foreach($this->getAllTaskTypes() as $currentTaskType) {
-            if ($currentTaskType->getId() == $this->getMetadata()->getSelectedTaskIdFilter()) {
+        foreach ($this->getActivityTypes() as $currentTaskType) {
+            if ($currentTaskType->getId() == $this->getMetadata()->getSelectedActivityTypeFilter()) {
                 $this->setSelectedTaskFilter($currentTaskType);
 
                 break;
@@ -73,21 +68,21 @@ class TaskTypes {
     /**
      * Set all task types
      *
-     * @param Collection $allTaskTypes
+     * @param GenericCollection|WorkType[] $allTaskTypes
      */
-    private function setAllTaskTypes($allTaskTypes)
+    private function setActivityTypes(GenericCollection $allTaskTypes)
     {
-        $this->allTaskTypes = $allTaskTypes;
+        $this->activityTypes = $allTaskTypes;
     }
 
     /**
      * Get all task types
      *
-     * @return Collection
+     * @return GenericCollection|WorkType[]
      */
-    public function getAllTaskTypes()
+    public function getActivityTypes()
     {
-        return $this->allTaskTypes;
+        return $this->activityTypes;
     }
 
     /**
@@ -95,7 +90,7 @@ class TaskTypes {
      *
      * @param Metadata $metadata
      */
-    private function setMetadata($metadata)
+    private function setMetadata(Metadata $metadata)
     {
         $this->metadata = $metadata;
     }
@@ -115,7 +110,7 @@ class TaskTypes {
      *
      * @param WorkType $selectedTaskFilter
      */
-    private function setSelectedTaskFilter($selectedTaskFilter)
+    private function setSelectedTaskFilter(WorkType $selectedTaskFilter)
     {
         $this->selectedTaskFilter = $selectedTaskFilter;
     }
@@ -125,7 +120,7 @@ class TaskTypes {
      *
      * @return WorkType
      */
-    public function getSelectedTaskFilter()
+    public function getSelectedActivityTypeFilter()
     {
         return $this->selectedTaskFilter;
     }

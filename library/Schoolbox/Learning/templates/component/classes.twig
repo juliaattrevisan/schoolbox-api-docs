@@ -1,4 +1,5 @@
 {% for class in classList %}
+    {% set course = courses[class.id][0] %}
     <div class="columns small-6 medium-6 large-4 left">
         <div class="row">
             <div class="card-new small-12">
@@ -17,7 +18,7 @@
                         <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
                             <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
                             <li><a href="{{ routeLookup('learningMarkbook.getMarkbook', {classId: class.id}) }}" class="icon-curriculum">Markbook</a></li>
-                            <li><a href=" {{ routeLookup('learningAnalytics.course', {}) }} " class="icon-poll">Analytics</a></li>
+                            <li><a href="{{ routeLookup('learningAnalytics.folder', {courseId: course.id, folderId: class.id}) }}" class="icon-poll">Analytics</a></li>
                             <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
                         </ul>
                     {% endif %}

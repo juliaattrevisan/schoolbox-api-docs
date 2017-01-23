@@ -15,7 +15,6 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Collection;
-use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\Folder;
@@ -31,7 +30,7 @@ use Schoolbox\GenericCollection;
  * @method SubmissionBox[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
- * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = array())
+ * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = [], $options = [])
  */
 class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInterface
 {

@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Component\Dashboard;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -28,10 +29,13 @@ class ClassController extends Component_Dashboard_ControllerAbstract
     protected $classList;
 
     /**
-     * @var Array
+     * @var array
      */
 
     protected $classTypes;
+
+    /** @var Collection|Collection[]|Implementation\Model[][] */
+    protected $courseImplementations;
 
     /**
      * Injectable constructor
@@ -61,7 +65,7 @@ class ClassController extends Component_Dashboard_ControllerAbstract
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
         $colourIndex = 0;
 
-        $classTypes = Array();
+        $classTypes = array();
 
         /* Convert external subjects to folders */
         foreach($this->getUser()->getSubjectCollection() as $subject ) {
@@ -79,6 +83,14 @@ class ClassController extends Component_Dashboard_ControllerAbstract
             }
         }
         $this->setClassTypes($classTypes);
+
+        $this->setCourseImplementations(Implementation\Mapper::getInstance()->findByFolderId($this->getClassList()->getColumnValues('id'))->groupByCallback(
+            function (Implementation\Model $i)
+            {
+                return $i->getFolder()->getId();
+            })
+        );
+
         return true;
     }
 
@@ -99,7 +111,8 @@ class ClassController extends Component_Dashboard_ControllerAbstract
                     'currentUser'         => $this->getUser(),
                     'currentSemester'     => TermMapper::getInstance()->findForToday(),
                     'classList'           => $this->getClassList(),
-                    'classTypes'          => $this->getClassTypes()
+                    'classTypes'          => $this->getClassTypes(),
+                    'courses'             => $this->getCourseImplementations(),
                 ]
             );
 
@@ -117,7 +130,7 @@ class ClassController extends Component_Dashboard_ControllerAbstract
     }
 
     /**
-     * @return Array
+     * @return array
      */
     public function getClassTypes()
     {
@@ -133,11 +146,31 @@ class ClassController extends Component_Dashboard_ControllerAbstract
     }
 
     /**
-     * @param Array $classTypes
+     * @param array $classTypes
      */
     public function setClassTypes($classTypes)
     {
         $this->classTypes = $classTypes;
+    }
+
+
+    /**
+     * @return Collection|Collection[]|Implementation\Model[][]
+     */
+    public function getCourseImplementations()
+    {
+        return $this->courseImplementations;
+    }
+
+
+    /**
+     * @param Collection|Collection[]|Implementation\Model[][] $courseImplementations
+     * @return $this
+     */
+    public function setCourseImplementations(Collection $courseImplementations)
+    {
+        $this->courseImplementations = $courseImplementations;
+        return $this;
     }
 
 }
