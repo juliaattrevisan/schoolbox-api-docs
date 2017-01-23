@@ -24,12 +24,12 @@ class Sync implements SyncInterface
     /**
      * @var string
      */
-    private $year;
+    protected $year;
 
     /**
      * @var string
      */
-    private $semester;
+    protected $semester;
 
     /**
      * Sync constructor

@@ -19,14 +19,14 @@ class Sync implements SyncInterface
     /**
      * @var MSSQL
      */
-    private $database;
+    protected $database;
 
     /**
      * The TASS company code to use, for queries which require it.
      *
      * @var string
      */
-    private $companyCode;
+    protected $companyCode;
 
     /**
      * Sync constructor

@@ -19,7 +19,7 @@ class Sync implements SyncInterface
     /**
      * @var DB2
      */
-    private $database;
+    protected $database;
 
     /**
      * Sync constructor
