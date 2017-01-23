@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/ajax/nanospell/autoload.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function() {
         $('#matchForm').alaressValidate({
@@ -199,6 +200,7 @@
         $('textarea').alaressEditor();
     });
 </script>
+{% endautoescape %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(

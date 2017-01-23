@@ -1327,6 +1327,9 @@ class Controller extends Base
 
                     // Find the division associated with the division, and create if doesn't exist
 
+                    /* Look for a division in the season specified
+                     * If it exists, use it as-is
+                     */
                     try {
                         $division = $this->getDivisionMapper()->findOneByColumnList([
                             'name' => $row[3],
@@ -1334,12 +1337,35 @@ class Controller extends Base
                             'season_id' => $season->getId()
                         ], [], $this->disableCache);
                     } catch (MapperException $e) {
-                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
-                        $division = new Division();
-                        $division->setName($row[3]);
-                        $division->setSport($sport);
-                        $division->setSeason($season);
-                        $this->getDivisionMapper()->save($division);
+
+                        /* If the division doesn't exist in that particular season
+                         * Find out if it exists at all in this sport - if it does,
+                         * update its season and then use it
+                         */
+                        try {
+                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Division '{$row[3]}' is now in Season {$season->getName()}");
+
+                            $division = $this->getDivisionMapper()->findOneByColumnList([
+                                'name'     => $row[3],
+                                'sport_id' => $sport->getId(),
+                            ], [], $this->disableCache);
+
+                            $division->setSeason($season);
+                            $this->getDivisionMapper()->save($division);
+                        }
+                        catch (MapperException $e) {
+
+                            /* Otherwise the division was never in this sport
+                             * nor in this season anywhere - spawn a new division
+                             */
+                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
+
+                            $division = new Division();
+                            $division->setName($row[3]);
+                            $division->setSport($sport);
+                            $division->setSeason($season);
+                            $this->getDivisionMapper()->save($division);
+                        }
                     }
 
                     // Find the venue associated with the match
@@ -1469,49 +1495,75 @@ class Controller extends Base
 
                         $items = [];
 
-                        for ($i = 11; $i < count($row); $i += 3) {
+                        /* So that 11 and 3 aren't so mystical
+                         */
+                        $itineraryItemsStart = 11;
+                        $colsPerItineraryItem = 3;
 
-                            if (!empty($row[$i]) || !empty($row[$i + 1]) || !empty($row[$i + 2])) {
+                        for ($i = $itineraryItemsStart; $i < count($row); $i += $colsPerItineraryItem) {
 
-                                $error = false;
+                            /* Be optimistic, presuming everything was done by the book
+                             */
+                            $itineraryError = false;
 
-                                if (empty($row[$i])) {
-                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No date specified");
-                                    $error = true;
-                                }
-                                if (empty($row[$i + 1])) {
-                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No time specified");
-                                    $error = true;
-                                }
-                                if (empty($row[$i + 2])) {
-                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No description specified");
-                                    $error = true;
-                                }
+                            /* Screw arithmetic, go algebra
+                             */
+                            $itineraryDateIndex = $i;
+                            $itineraryDate = trim($row[$itineraryDateIndex]);
 
+                            $itineraryTimeIndex = $i+1;
+                            $itineraryTime = trim($row[$itineraryTimeIndex]);
+
+                            $itineraryDescIndex = $i+2;
+                            $itineraryDesc = trim($row[$itineraryDescIndex]);
+
+                            /* Only try to spawn itinerary items if all three data exist
+                             * Report errors for each missing data
+                             */
+                            if (!strlen($itineraryDate)) {
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDateIndex, "SKIPPED ITINERARY ITEM: No date specified");
+                                $itineraryError = true;
+                            }
+
+                            if (!strlen($itineraryTime)) {
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryTimeIndex, "SKIPPED ITINERARY ITEM: No time specified");
+                                $itineraryError = true;
+                            }
+
+                            if (!strlen($itineraryDesc)) {
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDescIndex, "SKIPPED ITINERARY ITEM: No description specified");
+                                $itineraryError = true;
+                            }
+
+                            /* Only proceed if no errors were encountered for this itinerary item
+                             */
+                            if (!$itineraryError) {
                                 try {
-                                    $this->makeDateTime($row[$i], $row[$i + 1]);
-                                } catch (\Exception $e) {
-                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$row[$i]} {$row[$i+1]})");
-                                    $error = true;
-                                }
+                                    $datetime = $this->makeDateTime($itineraryDate, $itineraryTime);
 
-                                if (!$error) {
+                                    /* Stack up if you could get the date to process
+                                     */
                                     $items[] = [
-                                        'date' => $row[$i],
-                                        'time' => $row[$i + 1],
-                                        'description' => $row[$i + 2]
+                                        'datetime' => $datetime,
+                                        'description' => $itineraryDesc
                                     ];
+                                } catch (\Exception $e) {
+                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), $itineraryDateIndex, "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$itineraryDate} {$itineraryTime})");
                                 }
                             }
                         }
 
+                        /* Save all the things
+                         */
                         foreach ($items as $item) {
-                            if (!empty(trim($row['description']))) {
-                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Itinerary Item '{$row['description']}'");
+                            if (!empty(trim($item['description']))) {
+                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Itinerary Item '{$item['description']}'");
+
                                 $itineraryItem = new ItineraryItem();
                                 $itineraryItem->setMatch($match);
-                                $itineraryItem->setStartAt($this->makeDateTime($item['date'], $item['time']));
-                                $itineraryItem->setDescription($row['description']);
+                                $itineraryItem->setStartAt($item['datetime']);
+                                $itineraryItem->setDescription($item['description']);
+
                                 $this->getItineraryItemMapper()->save($itineraryItem);
                             }
                         }
