@@ -232,12 +232,14 @@
 
 <div class="row">
     <div class="small-12 large-6 island">
-    {% include 'sub/semesterSelector.twig' with {
-        currentTerm: term,
-        terms:       terms,
-        route:       'learningAnalytics.' ~ routeUsed,
-        routeArgs:   routeArgs
-    } only %}
+        <div class="context-switch clearfix">
+        {% include 'sub/semesterSelector.twig' with {
+            currentTerm: term,
+            terms:       terms,
+            route:       'learningAnalytics.' ~ routeUsed,
+            routeArgs:   routeArgs
+        } only %}
+        </div>
     </div>
 </div>
 
