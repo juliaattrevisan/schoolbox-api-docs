@@ -25,7 +25,6 @@ class Mark
 {
     use Id;
     use CreatedAtDate;
-    use UpdatedAtDate;
 
     /** @var User */
     private $student;
@@ -86,10 +85,12 @@ class Mark
 
     /**
      * @param Alaress_Date_Format $publishedAt
+     * @return static
      */
     public function setPublishedAt(Alaress_Date_Format $publishedAt)
     {
         $this->publishedAt = $publishedAt;
+        return $this;
     }
 
     /**

@@ -3,12 +3,9 @@
 -- Insert 'published_at' to make consistent with submissions and enable identification of drafts
 ALTER TABLE rubric_mark
     CHANGE COLUMN tstamp created_at TIMESTAMP NOT NULL,
-    ADD COLUMN updated_at TIMESTAMP NOT NULL AFTER created_at,
-    ADD COLUMN published_at TIMESTAMP NULL DEFAULT NULL AFTER updated_at;
+    ADD COLUMN published_at TIMESTAMP NULL DEFAULT NULL AFTER created_at;
 
 -- Up until now, no such thing as drafts. So all marks were only touched once.
 UPDATE rubric_mark
-SET
-  updated_at = created_at,
-  published_at = created_at;
+SET published_at = created_at;
 

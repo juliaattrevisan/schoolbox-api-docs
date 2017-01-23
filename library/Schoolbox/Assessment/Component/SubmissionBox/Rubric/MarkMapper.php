@@ -12,6 +12,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -43,8 +44,7 @@ class MarkMapper extends Mapper
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('published_at', self::TYPE_DATETIME, null, 'createdAt');
+        $this->uses('published_at', self::TYPE_DATETIME);
 
         // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
         // hence marks already given are invalid.
@@ -104,5 +104,37 @@ class MarkMapper extends Mapper
         }
 
         return $marks;
+    }
+
+    /**
+     * This will HARD-DELETE all draft marks for the specified user and assessable.
+     *
+     * @param User $user
+     * @param IAssessable $dueWork
+     * @return int
+     */
+    public function deleteDraftMarks(User $user, IAssessable $dueWork)
+    {
+        $query = "
+            DELETE FROM rubric_mark WHERE id IN (
+              SELECT * FROM (
+                SELECT rm.id FROM rubric_mark rm
+                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
+                JOIN rubric_level   rl ON rl.id = rd.level_id
+                JOIN submission_box sb ON sb.id = rl.box_id
+                WHERE rm.student_id = :student_id
+                AND sb.assessment_id = :assessment_id
+                AND rm.published_at IS NULL
+              ) t
+            )
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'student_id'    => $user->getId(),
+            'assessment_id' => $dueWork->getId(),
+        ]);
+
+        return $statement->rowCount();
     }
 }

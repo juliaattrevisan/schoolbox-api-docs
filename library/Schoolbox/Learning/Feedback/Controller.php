@@ -129,9 +129,9 @@ class Controller extends Base
         // If the mark gets passed at the same time as rubrics,
         // then rubrics get clobbered. We don't want that.
         if (is_array($postVars['rubric'])) {
-
+            $draft = !isset($postVars['publish']) || !$postVars['publish'];
             $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $postVars['rubric']['descriptors']);
+            $rubMap->saveForParticipant($participant, $postVars['rubric']['descriptors'], $draft);
         }
 
         $template = '';
