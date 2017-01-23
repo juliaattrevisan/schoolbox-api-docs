@@ -80,12 +80,14 @@ class Factory
             $folder = $context->getCourse()->getFolder();
 
             // The unit itself
+            // FC and VCal treat event end as exclusive, so add one day to end
+            $endDate = clone $context->getDueDate();
             $result->add([
                 'id'         => 'unit-'.$context->getId(),
                 'title'      => $context->getTitle(),
                 'editable'   => false,
                 'start'      => $context->getOpenDate()->getDatabase(),
-                'end'        => $context->getDueDate()->getDatabase(),
+                'end'        => $endDate->addDays(1)->getDatabase(),
                 'allDay'     => true,
                 'resourceId' => $folder->getId().'-unit',
                 'className'  => ['unit', 'readonly'],
@@ -136,11 +138,13 @@ class Factory
      */
     protected function buildAssessableEventBackground(IAssessable $assessable, Folder $folder, $resourceType)
     {
+        // FC and VCal treat event end as exclusive, so add one day to end
+        $endDate = clone $assessable->getDueAt();
         return [
             'id'         => $resourceType.'-'.$assessable->getId().'-bounds',
             'editable'   => false,
             'start'      => $assessable->getOpenAt()->getDatabase(),
-            'end'        => $assessable->getDueAt()->getDatabase(),
+            'end'        => $endDate->addDays(1)->getDatabase(),
             'allDay'     => true,
             'resourceId' => $folder->getId().'-'.$resourceType,
             'rendering'  => 'background',
@@ -205,12 +209,14 @@ class Factory
             }
         }
 
+        // FC and VCal treat event end as exclusive, so add one day to end
+        $endDate = clone $studentEnd;
         return [
             'id'         => $resourceType.'-'.$assessable->getId(),
             'title'      => $assessable->getTitle(),
             'editable'   => true,
             'start'      => $studentStart->getDatabase(),
-            'end'        => $studentEnd->getDatabase(),
+            'end'        => $endDate->addDays(1)->getDatabase(),
             'allDay'     => true,
             'resourceId' => $folder->getId().'-'.$resourceType,
             'constraint' => $resourceType.'-'.$assessable->getId().'-bounds',
