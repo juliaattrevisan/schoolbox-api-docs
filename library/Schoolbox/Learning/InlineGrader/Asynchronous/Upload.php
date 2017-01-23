@@ -58,7 +58,7 @@ class Upload
      */
     public function uploadPendingCrocodocs()
     {
-
+        $allFiles = $this->getSingleFileMapper()->findPendingCrocodocUpload();
     }
 
     /* Getters/Setters
