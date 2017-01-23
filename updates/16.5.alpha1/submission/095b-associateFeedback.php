@@ -155,5 +155,5 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     $log->notice(sprintf('%d returns updated with inferred submission_id values.', $returnTransactions));
 
-    exit(1);
+    exit(0);
 });
