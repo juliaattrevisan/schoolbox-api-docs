@@ -45,15 +45,15 @@ class Module extends BaseModule
         $get = [
             // For a Course - aggregating all Classes which have imported Course
             'course'                 => "/course/{courseSpecId}",
-            'courseWithTerms'        => "/course/{courseSpecId}/term/{termSlug}",
+            'courseWithTerms'        => "/course/{courseSpecId}/term/{termCode}",
             'courseWithTask'         => "/course/{courseSpecId}/task/{taskTypeId}",
-            'courseWithTaskAndTerms' => "/course/{courseSpecId}/task/{taskTypeId}/term/{termSlug}",
+            'courseWithTaskAndTerms' => "/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}",
 
             // Per Class that uses a particular Course
             'folder'                 => "/course/{courseSpecId}/class/{folderId}",
-            'folderWithTerms'        => "/course/{courseSpecId}/class/{folderId}/term/{termSlug}",
+            'folderWithTerms'        => "/course/{courseSpecId}/class/{folderId}/term/{termCode}",
             'folderWithTask'         => "/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}",
-            'folderWithTaskAndTerms' => "/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termSlug}",
+            'folderWithTaskAndTerms' => "/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}",
         ];
 
         foreach ($get as $method => $route) {
@@ -105,7 +105,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @var int $params['courseSpecId']
-     * @var int $params['termSlug']
+     * @var int $params['termCode']
      *
      * @return array
      * @throws MapperException
@@ -124,7 +124,7 @@ class Module extends BaseModule
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
         }
 
-        $term = $this->findTerm($params['termSlug']);
+        $term = $this->findTerm($params['termCode']);
 
         /* No acrobatics required
          */
@@ -214,14 +214,14 @@ class Module extends BaseModule
 
 
     /**
-     * @param string $termSlug
+     * @param string $termCode
      * @return TermModel
      * @throws MapperException
      */
-    private function findTerm($termSlug)
+    private function findTerm($termCode)
     {
         try {
-            return $this->getTermMapper()->findOneByColumn('code', $termSlug);
+            return $this->getTermMapper()->findOneByColumn('code', $termCode);
 
         } catch (\Exception $e) {
             throw new MapperException('Invalid date range.');

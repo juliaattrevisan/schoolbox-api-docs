@@ -50,7 +50,7 @@
                                 <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
 
                                 {% for courseSpecId in courseSpecIds %}
-                                    <li><a href="{{ routeLookup('learningAnalytics.folderWithTerms', {courseSpecId: courseSpecId, folderId: class.id, termSlug: term.code}) }}" class="icon-poll">Analytics</a></li>
+                                    <li><a href="{{ routeLookup('learningAnalytics.folderWithTerms', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) }}" class="icon-poll">Analytics</a></li>
                                 {% endfor %}
 
                                 {% if term.contains(now) %}

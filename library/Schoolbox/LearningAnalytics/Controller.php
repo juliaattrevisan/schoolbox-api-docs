@@ -47,13 +47,13 @@ class Controller extends Base
         // Redirect to current term
         $currentTerm = $this->termMapper->findForToday();
 
-        $data = ['courseSpecId' => $courseSpecId, 'termSlug' => $currentTerm->getCode()];
+        $data = ['courseSpecId' => $courseSpecId, 'termCode' => $currentTerm->getCode()];
         $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTerms', $data));
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/term/{termSlug}
+     * @api   GET /learning/analytics/course/{courseSpecId}/term/{termCode}
      * @level 165
      *
      * @param array                                  $params
@@ -82,14 +82,14 @@ class Controller extends Base
         $data = [
             'courseSpecId' => $courseSpecId,
             'taskTypeId'   => $taskTypeId,
-            'termSlug'     => $currentTerm->getCode(),
+            'termCode'     => $currentTerm->getCode(),
         ];
         $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTaskAndTerms', $data));
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}/term/{termSlug}
+     * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}
      * @level 165
      *
      * @param array                                  $params
@@ -118,14 +118,14 @@ class Controller extends Base
         $data = [
             'courseSpecId' => $courseSpecId,
             'folderId'     => $folderId,
-            'termSlug'     => $currentTerm->getCode(),
+            'termCode'     => $currentTerm->getCode(),
         ];
         $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTerms', $data));
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/term/{termSlug}
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/term/{termCode}
      * @level 165
      *
      * @param array                                  $params
@@ -157,14 +157,14 @@ class Controller extends Base
             'courseSpecId' => $courseSpecId,
             'folderId'     => $folderId,
             'taskTypeId'   => $taskTypeId,
-            'termSlug'     => $currentTerm->getCode(),
+            'termCode'     => $currentTerm->getCode(),
         ];
         $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTaskAndTerms', $data));
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termSlug}
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}
      * @level 165
      *
      * @param array                                  $params
