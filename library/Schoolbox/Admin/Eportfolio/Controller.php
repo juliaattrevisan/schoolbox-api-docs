@@ -170,6 +170,7 @@ class Controller extends Base
             $this->log('Unable to locate source user.', $id);
         }
 
+        $nothingWrong = true;
         if (isset($user)) {
             $destinationUsers = new Collection();
 
@@ -235,11 +236,21 @@ class Controller extends Base
 
             /** @var \Schoolbox\User $destUser */
             foreach ($destinationUsers as $destUser) {
-                $this->importSingleUser($post, $id, $user, $destUser, $eportfolioList);
+                try {
+                    $this->importSingleUser($post, $id, $user, $destUser, $eportfolioList);
+                } catch (\Exception $e) {
+                    // Something done went wrong - abort
+                    $this->log('Something went wrong: '.$e->getMessage(), $id);
+                    $nothingWrong = false;
+                }
             }
         }
 
-        $this->log('Deployment completed', $id, 'COMPLETED');
+        if ($nothingWrong) {
+            $this->log('Deployment completed', $id, 'COMPLETED');
+        } else {
+            $this->log('Deployment completed, but one or more imports failed!', $id, 'FAILED');
+        }
     }
 
     /**
