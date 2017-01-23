@@ -85,9 +85,9 @@
     }
 </style>
 {% if type == 'event' or type =='duework' %}
-{% set width = 6 %}
+    {% set width = 6 %}
 {% else %}
-{% set width = 12 %}
+    {% set width = 12 %}
 {% endif %}
 <div class="row">
     <dl class="tabs" data-tab>
@@ -98,51 +98,51 @@
 <div class="row">
     <div class="tabs-content">
         <div class='content active' id="byDate-{{ id }}">
-                <div class="small-12 medium-{{ width }} columns">
+            <div class="small-12 medium-{{ width }} columns">
 
-                    {# Placeholder for calendar ot be rendered in #}
-                    <div id="pickerCalendar{{ id }}"></div>
+                {# Placeholder for calendar ot be rendered in #}
+                <div id="pickerCalendar{{ id }}"></div>
 
-                </div>
-                {# Hide second column if showing just a calendar #}
-                {% if width == 6 %}
+            </div>
+            {# Hide second column if showing just a calendar #}
+            {% if width == 6 %}
                 <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for appointments to be rendered in #}
                     <div id="calendarResponse{{ id }}"></div>
 
                 </div>
-                {% endif %}
+            {% endif %}
         </div>
     </div>
     <div class='content' id="byTimetable-{{ id }}" style="display: none;">
-            <div class="row">
-                <div class="small-12 medium-{{ width }} columns">
+        <div class="row">
+            <div class="small-12 medium-{{ width }} columns">
 
-                    {# Placeholder for timetable ot be rendered in #}
-                    <div id="timetable{{ id }}">
-                            <select name="campus">
-                                {% for campus in timetable %}
-                                    <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
-                                {% endfor %}
-                            </select>
-                            <select name = "term">
-                                {% for term in terms %}
-                                    <option value="{{ term.id }}" data-duration="{{ term.duration }}" {% if term.id == timetableDay.term %} selected {% endif %}>{{ term.title }} </option>
-                                {% endfor %}
-                            </select>
-                            <select name="cycle">
-                                {# Options will be appended here #}
-                            </select>
-                        {# Build all, hide, reveal one later #}
+                {# Placeholder for timetable ot be rendered in #}
+                <div id="timetable{{ id }}">
+                    <select name="campus">
                         {% for campus in timetable %}
-                            <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
-                                <th>
-                                    {% for i in 1..timetable[campus.campusId].dayCount %}
-                                        <td class="day-{{ i }}">{{ i }}</td>
-                                    {% endfor %}
-                                </th>
-                                {% set k=0 %}
+                            <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name = "term">
+                        {% for term in terms %}
+                            <option value="{{ term.id }}" data-duration="{{ term.duration }}" {% if term.id == timetableDay.term %} selected {% endif %}>{{ term.title }} </option>
+                        {% endfor %}
+                    </select>
+                    <select name="cycle">
+                        {# Options will be appended here #}
+                    </select>
+                    {# Build all, hide, reveal one later #}
+                    {% for campus in timetable %}
+                        <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
+                            <th>
+                                {% for i in 1..timetable[campus.campusId].dayCount %}
+                            <td class="day-{{ i }}">{{ i }}</td>
+                            {% endfor %}
+                            </th>
+                            {% set k=0 %}
                             {% for description in timetable[campus.campusId].desc %}
                                 <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k]  }}">{{ description }}</td>
                                     {% for i in 1..timetable[campus.campusId].dayCount %}
@@ -152,32 +152,31 @@
                                     {% set k=k+1 %}
                                 </tr>
                             {% endfor %}
-                            </table>
-                        {% endfor %}
-                    </div>
+                        </table>
+                    {% endfor %}
                 </div>
+            </div>
 
-                {% if width == 6 %}
+            {% if width == 6 %}
                 <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for appointments to be rendered in #}
                     <div id="timetableResponse{{ id }}"></div>
 
                 </div>
-                {% endif %}
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="small-4 columns"></div>
+            <div class="small-4 columns"></div>
+            <div class="small-4 columns">
+                <a href="#" class="button submit timetable-submit close-reveal-modal" >Update</a>
             </div>
-            <div class="row">
-                <div class="small-4 columns"></div>
-                <div class="small-4 columns"></div>
-                <div class="small-4 columns">
-                    <a href="#" class="button submit timetable-submit close-reveal-modal" >Update</a>
-                </div>
-            </div>
+        </div>
     </div>
 </div>
 <script>
 
-    var allDaySwitch = ($('#allday').val());
     {# Tabs #}
 
     $('#tab-1-{{ id }}').click(function(){
@@ -296,7 +295,7 @@
     {# Timtable picker #}
 
     {# Build cycles dynamically #}
-//    function buildCycles(onFirstLoad) {
+    //    function buildCycles(onFirstLoad) {
     function buildCycles() {
 
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
@@ -304,7 +303,7 @@
         var optionsHtml = '';
         //Select cycle number on first load
 //        if(onFirstLoad === true) {
-            cycleSelected = parseInt({{ timetableDay.daysUntilDate }}/daysInCycle);
+        cycleSelected = parseInt({{ timetableDay.daysUntilDate }}/daysInCycle);
 //        }
         for (i = 1; i <= (termDuration / daysInCycle); i++) {
             var selected = '';
@@ -441,7 +440,7 @@
                     console.log('Failed to retrieve appointments for specified period');
                 });
         {% else %}
-            {# Don't fetch anything#}
+        {# Don't fetch anything#}
         {% endif %}
     });
 
@@ -456,89 +455,124 @@
         window.pickerInstance[{{ id }}].setDate(newDate);
     });
 
+    {# Change input fields associted with the allDayExt #}
+
+    var allDayExt = getValue($('#{{ element }}'), 'data-datepicker-alldayext');
+    $('#'+allDayExt).change( function() {
+        if ( $(this).val() == 1) {
+            $('[data-datepicker-alldayext = '+$(this).attr("id")+']').each( function() {
+                var value = $(this).val();
+                $(this).val(moment(value,  convertFormat('{{ displayFormat }}')).format(convertFormat('{{ displayFormatDate }}')));
+            });
+        }
+        else {
+            $('[data-datepicker-alldayext = '+$(this).attr("id")+']').each( function() {
+                var value = $(this).val();
+                $(this).val(moment(value,  convertFormat('{{ displayFormatDate }}')).format(convertFormat('{{ displayFormat }}')));
+            });
+        }
+    });
+
     {# Setup calendar #}
     var newDate, latestDate;
-    window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
+
+    var pickerOptions = {
         defaultDate: new Date({{ value }}),
         dateFormat: '{{ displayFormat }}',
         inline: true,
         altInput: false,
-        {#enableTime: {{ enableTime }},#}
         allowInput: true,
         disableMobile: true,
         minuteIncrement: 1,
         {# Build datepicker options here... again... #}
         enableTime: getValue($('#{{ element }}'), 'data-datepicker-time'),
-        // bothFormats: false, //Can use both displayFormat and displayFormatDate
-        allDay: getValue($('#{{ element }}'), 'data-datepicker-allday'), //Show All Day switch
-        allDayExt: getValue($('#{{ element }}'), 'data-datepicker-alldayext'), //Sync with external AllDay input hidden field
-        // allDateTime: 'start', //Set time to start or end of the day: start, finish
-        type: getValue($('#{{ element }}'), 'data-datepicker-call'), //Ajax call type: events, duework or nothing
+        {# bothFormats: false, //Can use both displayFormat and displayFormatDate #}
+        allDay: getValue($('#{{ element }}'), 'data-datepicker-allday'), {# Show All Day switch #}
+        allDayExt: allDayExt, {# Sync with external AllDay input hidden field #}
+        {# allDateTime: 'start', //Set time to start or end of the day: start, finish #}
+        type: getValue($('#{{ element }}'), 'data-datepicker-call'), {# Ajax call type: events, duework or nothing #}
 
-
-        onReady: function(selectedDates, dateStr, instance) {
+        onReady: function (selectedDates, dateStr, instance) {
+//            alert('onReady: '+dateStr);
             //Wrong format, swaps day with month
             var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
             var calendarDiv = $('#picker{{ id }}').find('.flatpickr-calendar');
             var presetObj = new Date('{{ value }}');
 
-            timeDiv.after(
-                '<div class="row"><div class="small-6 columns">' +
-                '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
+            var html = '<div class="row"><div class="small-6 columns">';
+
+            {# Build an All Day switch if it's been set in the options #}
+            if( instance.config.allDay === true ) {
+            html += '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
                 '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
-                '</div><div class="small-6 columns">' +
-                '<div class="submit-calendar"><a href="#" class="button submit picker-submit close-reveal-modal" >Update</a><div>' +
-                '</div></div>'
-            );
-            
+                '</div>';
+            }
+            html += '<div class="small-6 columns">' +
+                    '<div class="submit-calendar"><a href="#" class="button submit picker-submit close-reveal-modal" >Update</a><div>' +
+                    '</div></div>';
+
+
+            timeDiv.after(html);
+
             {# Hide time picker if allday hidden field is set to 1 #}
-            if($('#allday').val() == 1) {
+            if (instance.config.allDayExt !== false ) {
+                var allDaySwitch = $('#'+instance.config.allDayExt);
+            }
+            if ( allDaySwitch.val() == 1 || instance.config.enableTime === false ) {
                 timeDiv.css('display', 'none');
-                calendarDiv.addClass('all-day');
-                calendarDiv.removeClass('has-time');
+//                calendarDiv.addClass('all-day');
+//                calendarDiv.removeClass('has-time');
             }
             else {
-                $('#hideTime{{ id }}').prop('checked', false);
+                if(instance.config.allDay === true ) {
+                    $('#hideTime{{ id }}').prop('checked', false);
+                }
+                timeDiv.css('display', 'block');
             }
-            $('#hideTime{{ id }}').click(function () {
-                if ($('#hideTime{{ id }}').is(':checked')) {
-                    timeDiv.css('display', 'none');
-                    calendarDiv.addClass('all-day');
-                    calendarDiv.removeClass('hasTime');
-                    $('#allday').val(1);
-                    // Get rid of time
-                    var allDay = moment(instance.input.value, convertFormat('{{ displayFormat }}')).format(convertFormat('Y-m-d'));
-                    instance.setDate(allDay);
-                    $('*[data-pickerid="{{ id }}"]').val(allDay);
-                }
-                else {
-                    $('#allday').val(0);
-                    timeDiv.css('display', 'block');
-                    calendarDiv.addClass('has-time');
-                    calendarDiv.removeClass('all-day');
-                }
-            });
+            if( instance.config.allDay === true ) {
+                $('#hideTime{{ id }}').click(function () {
+                    if ($('#hideTime{{ id }}').is(':checked')) {
+                        timeDiv.css('display', 'none');
+//                        calendarDiv.addClass('all-day');
+//                        calendarDiv.removeClass('hasTime');
+                        if (instance.config.allDayExt !== false ) {
+                            allDaySwitch.val(1).trigger('change');
+                        }
+                        // Get rid of time
+                        var allDay = moment(instance.input.value, convertFormat('{{ displayFormat }}')).format(convertFormat('Y-m-d'));
+                        instance.setDate(allDay);
+                        $('*[data-pickerid="{{ id }}"]').val(allDay);
+                    }
+                    else {
+                        timeDiv.css('display', 'block');
+                        if (instance.config.allDayExt !== false ) {
+                            allDaySwitch.val(0).trigger('change');
+                        }
+//                        calendarDiv.addClass('has-time');
+//                        calendarDiv.removeClass('all-day');
+                    }
+                });
+            }
         },
-        onChange: function(selectedDates, dateString, instance) {
+        onChange: function (selectedDates, dateStr, instance) {
+//            alert('onChange: '+dateStr);
             {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
-
-            var dateSplit = dateString.split(' ');
+            var dateSplit = dateStr.split(' ');
             $('#pickerCalendar{{ id }}').attr('data-date', dateSplit[0]);
             $('#pickerCalendar{{ id }}').attr('data-time', dateSplit[1]);
 
-
             {# Check if selected date has changed and don't send an ajax on time change #}
             var selectedObj = new Date(selectedDates);
-            newDate = selectedObj.getDate()+'/'+(selectedObj.getMonth()+1)+'/'+selectedObj.getFullYear();
-            if(newDate !== latestDate) {
+            newDate = selectedObj.getDate() + '/' + (selectedObj.getMonth() + 1) + '/' + selectedObj.getFullYear();
+            if (newDate !== latestDate) {
 
-                {% if type == 'duework'  %}
+                {% if type == 'duework' %}
 
                     loadingResponse('calendar');
 
                     var classCode = $('*[name = "classCode"]').val();
 
-                    $.get(('{{ routeLookup('pickerDatetime.getDueByDate') }}').replace(/{classCode}/g, classCode).replace(/{date}/g,  encodeURIComponent(dateSplit[0])))
+                    $.get(('{{ routeLookup('pickerDatetime.getDueByDate') }}').replace(/{classCode}/g, classCode).replace(/{date}/g, encodeURIComponent(dateSplit[0])))
 
                         .done(function (data) {
 
@@ -551,24 +585,26 @@
 
                 {% elseif (type == 'event') %}
 
-                    {# AJAX in appointments for the selected date #}
+                {# AJAX in appointments for the selected date #}
 
-                    loadingResponse('calendar');
+                loadingResponse('calendar');
 
-                    $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
-                            .done(function (data) {
+                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
+                        .done(function (data) {
 
-                                appendResponse(data, 'events', 'calendar');
+                            appendResponse(data, 'events', 'calendar');
 
-                            })
-                            .fail(function () {
-                                console.log('Failed to retrieve appointments for specified date');
-                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to retrieve appointments for specified date');
+                        });
                 {% else %}
-                    {#Do nothing#}
+                {#Do nothing#}
                 {% endif %}
             }
             latestDate = newDate;
-        }
-    });
+        },
+
+    };
+    window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", pickerOptions );
 </script>
