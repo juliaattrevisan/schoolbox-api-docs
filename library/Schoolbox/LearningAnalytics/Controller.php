@@ -25,19 +25,27 @@ use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 class Controller extends Base
 {
+    /** @var TermMapper $termMapper */
+    private $termMapper;
+
+    public function __construct(TermMapper $termMapper)
+    {
+        $this->termMapper = $termMapper;
+    }
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param int $courseSpecId
      */
-    public function course(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function course($courseSpecId)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'course');
+        // Redirect to current term
+        $currentTerm = $this->termMapper->findForToday();
+
+        $data = ['courseSpecId' => $courseSpecId, 'termSlug' => $currentTerm->getCode()];
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTerms', $data));
     }
 
 
@@ -60,14 +68,20 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param int $courseSpecId
+     * @param int $taskTypeId
      */
-    public function courseWithTask(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function courseWithTask($courseSpecId, $taskTypeId)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTask');
+        // Redirect to current term
+        $currentTerm = $this->termMapper->findForToday();
+
+        $data = [
+            'courseSpecId' => $courseSpecId,
+            'taskTypeId'   => $taskTypeId,
+            'termSlug'     => $currentTerm->getCode(),
+        ];
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTaskAndTerms', $data));
     }
 
 
@@ -90,15 +104,20 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Folder                                 $selectedClassFolder
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param int $courseSpecId
+     * @param int $folderId
      */
-    public function folder(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function folder($courseSpecId, $folderId)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folder', $selectedClassFolder);
+        // Redirect to current term
+        $currentTerm = $this->termMapper->findForToday();
+
+        $data = [
+            'courseSpecId' => $courseSpecId,
+            'folderId'     => $folderId,
+            'termSlug'     => $currentTerm->getCode(),
+        ];
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTerms', $data));
     }
 
 
@@ -122,15 +141,22 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Folder                                 $selectedClassFolder
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param int $courseSpecId
+     * @param int $folderId
+     * @param int $taskTypeId
      */
-    public function folderWithTask(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function folderWithTask($courseSpecId, $folderId, $taskTypeId)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTask', $selectedClassFolder);
+        // Redirect to current term
+        $currentTerm = $this->termMapper->findForToday();
+
+        $data = [
+            'courseSpecId' => $courseSpecId,
+            'folderId'     => $folderId,
+            'taskTypeId'   => $taskTypeId,
+            'termSlug'     => $currentTerm->getCode(),
+        ];
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTaskAndTerms', $data));
     }
 
 

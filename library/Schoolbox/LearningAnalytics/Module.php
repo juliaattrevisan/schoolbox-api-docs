@@ -15,7 +15,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\Learning\Course\DataModel\Specification;
@@ -26,6 +25,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Module extends BaseModule
 {
@@ -40,32 +40,13 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $get = [
-
-            /**
-             * For a Course - aggregating all Folders which use this Course
-             */
-
-            /* folderId is associated with a course, a set of units. This finds all
-             * the units associated with all the folders that use the course.
-             *
-             * Extra args can focus the results on all Tasks within a Course; and
-             * also further focus on a particular time range via Term args
-             */
+            // For a Course - aggregating all Classes which have imported Course
             'course'                 => "/course/{courseSpecId}",
             'courseWithTerms'        => "/course/{courseSpecId}/term/{termSlug}",
             'courseWithTask'         => "/course/{courseSpecId}/task/{taskTypeId}",
             'courseWithTaskAndTerms' => "/course/{courseSpecId}/task/{taskTypeId}/term/{termSlug}",
 
-            /**
-             * Per Folder that uses a particular Course
-             */
-
-            /* folderId is associated with a course, a set of units. This finds all
-             * the units associated with a particular folder that uses the course.
-             *
-             * Extra args can focus the results on all Tasks within a Folder; and
-             * also further focus on a particular time range via Term args
-             */
+            // Per Class that uses a particular Course
             'folder'                 => "/course/{courseSpecId}/class/{folderId}",
             'folderWithTerms'        => "/course/{courseSpecId}/class/{folderId}/term/{termSlug}",
             'folderWithTask'         => "/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}",
@@ -84,19 +65,18 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        /* Inject ingredients into course controller method
+        /* All routes that include the term will be processed, those without a term
+         * will receive scalars and redirect to current term equivalent
          */
         $this->addRoutePreload(
-            $matcher, 'course.*',
+            $matcher, 'courseWith.*Terms',
             function($params) {
                 return $this->courseDependencies($params);
             }
         );
 
-        /* Inject ingredients into folder controller method
-         */
         $this->addRoutePreload(
-            $matcher, 'folder.*',
+            $matcher, 'folderWith.*Terms',
             function($params) {
                 return $this->folderDependencies($params);
             }
@@ -107,13 +87,14 @@ class Module extends BaseModule
      * Pass params when using course view
      *
      * @param array $params
+     * @var int $params['courseSpecId']
+     * @var int $params['termSlug']
+     *
      * @return array
      * @throws MapperException
      */
     private function courseDependencies(array $params)
     {
-        /* Try to find the parent course folder which spawned minions
-         */
         try {
             $courseSpecification = $this->getCourseSpecificationMapper()->findById($params['courseSpecId']);
 
@@ -123,8 +104,10 @@ class Module extends BaseModule
             }
 
         } catch (MapperException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(148);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
         }
+
+        $term = $this->findTerm($params['termSlug']);
 
         /* No acrobatics required
          */
@@ -133,7 +116,6 @@ class Module extends BaseModule
             /* All the unit instances associated with the specified folder which used the same
              * $courseFolder as a source. Filter it based due dates between $from and $to
              */
-            $term = $this->findTerm($params);
             $from = $term->getStart();
             $to   = $term->getActualFinish();
 
@@ -176,7 +158,7 @@ class Module extends BaseModule
             }
 
         } catch (MapperException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(159);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SUBJECT_NO_TASKS);
         }
 
         /* Inject (this is used in twig)
@@ -206,10 +188,8 @@ class Module extends BaseModule
         try {
             $preload['selectedClassFolder'] = $this->getFolderMapper()->findById($params['folderId']);
 
-
-
         } catch (MapperException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(159);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SUBJECT_NO_TASKS);
         }
 
         return $preload;
@@ -217,28 +197,18 @@ class Module extends BaseModule
 
 
     /**
-     * @param array $params
+     * @param string $termSlug
      * @return TermModel
      * @throws MapperException
      */
-    private function findTerm(array $params)
+    private function findTerm($termSlug)
     {
-         // If a date range was specified, use that.
-        if (isset($params['termSlug'])) {
-            try {
-                return $this->getTermMapper()->findOneByColumn('code', $params['termSlug']);
+        try {
+            return $this->getTermMapper()->findOneByColumn('code', $termSlug);
 
-            } catch (\Exception $e) {
-                throw new MapperException('Invalid date range.');
-            }
+        } catch (\Exception $e) {
+            throw new MapperException('Invalid date range.');
         }
-
-        $from = $this->getTermMapper()->findOldest()->getStart();
-
-        return $this->getTermMapper()->createModel()
-            ->setStart($from)
-            ->setActualFinish(new \Alaress_Date_NullDate())
-        ;
     }
 
     /**
