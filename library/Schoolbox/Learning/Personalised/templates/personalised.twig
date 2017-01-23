@@ -92,7 +92,7 @@
     {# Metadata #}
     <ul class="meta">
         <li class="icon-calendar date">
-            <time data-value="start"></time>&ndash;<time data-value="end"></time>
+            <time data-value="eventSpan"></time>
         </li>
     </ul>
 
@@ -112,11 +112,11 @@
     <ul class="meta">
         <li class="icon-calendar date">
             {# Assessment's open/close date #}
-            Open between: <time data-value="assessmentStart"></time>&ndash;<time data-value="assessmentEnd"></time>
+            Open between: <time data-value="assessmentSpan"></time>
         </li>
         <li class="icon-staff-students date" data-personalised-date>
             {# My open/close date #}
-            My timeframe: <time data-value="start"></time>&ndash;<time data-value="end"></time>
+            My timeframe: <time data-value="eventSpan"></time>
         </li>
     </ul>
 
@@ -397,6 +397,16 @@
                             modal = $('#assessmentModal');
                         }
 
+                        // Build date spans
+                        var eventEnd = calEvent.end,
+                            assessmentEnd = moment(calEvent.meta.assessmentEnd);
+                        if (calEvent.allDay) {
+                            eventEnd      = eventEnd.clone().subtract({days: 1});
+                            assessmentEnd = assessmentEnd.clone().subtract({days: 1});
+                        }
+                        var eventSpan = $.fullCalendar.formatRange(calEvent.start, eventEnd, 'Do MMMM YYYY'),
+                            assessmentSpan = $.fullCalendar.formatRange(calEvent.meta.assessmentStart, assessmentEnd, 'Do MMMM YYYY');
+
                         // Update contents
                         modal.find('[data-value]').each(function() {
                             var $this = $(this),
@@ -409,6 +419,14 @@
 
                                 case 'description':
                                     $this.html(calEvent.meta.description);
+                                    break;
+
+                                case 'eventSpan':
+                                    $this.text(eventSpan);
+                                    break;
+
+                                case 'assessmentSpan':
+                                    $this.text(assessmentSpan);
                                     break;
 
                                 case 'assessmentStart':
