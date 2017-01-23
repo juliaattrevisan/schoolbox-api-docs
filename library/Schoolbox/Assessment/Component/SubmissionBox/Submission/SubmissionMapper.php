@@ -345,32 +345,6 @@ class SubmissionMapper extends BaseMapper
     }
 
     /**
-     * Get list of submissions that should be submitted to crocodoc
-     *
-     * @return Collection|Submission[]
-     */
-    public function getCrocodoc() {
-
-        $query = $this->getSelectString();
-        $query .= "
-            WHERE uuid is null AND ( ext like 'docx' OR
-                                        ext like 'doc' OR
-                                        ext like 'xls' OR
-                                        ext like 'xlsx' OR
-                                        ext like 'ppt' OR
-                                        ext like 'pptx' OR
-                                        ext like 'pdf')
-                 AND YEAR(submitted) = YEAR(NOW())
-            LIMIT 0,100
-            ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        return $this->hydrateSelect($statement);
-    }
-
-
-    /**
      * Retrieves the number of submissions that have been made on each box in a
      * list.
      *

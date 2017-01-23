@@ -16,6 +16,7 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFile;
 
 /**
  * A mapper for a single file within a student's submission to a due work.
@@ -139,5 +140,31 @@ class Mapper extends BaseMapper
         }
 
         return $resultSet;
+    }
+
+    /**
+     * Get list of submissions that should be submitted to crocodoc
+     *
+     * @return Collection
+     */
+    public function findPendingCrocodocUpload()
+    {
+        /* Get a list of legal files that crocodoc accepts
+         */
+        $allowedExtensions = "'" . implode("','", ResponseFile::getAllowedFileTypes()) . "'";
+
+        $query = $this->getSelectString();
+
+        $query .= "
+            WHERE uuid IS NULL
+            AND YEAR(submitted_at) = YEAR(NOW())
+            AND ext IN ($allowedExtensions)
+            LIMIT 0,100
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+
+        return $this->hydrateSelect($statement);
     }
 }

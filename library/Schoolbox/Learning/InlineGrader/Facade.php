@@ -15,9 +15,19 @@ use \Schoolbox\Assessment\Term\Mapper as TermMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use \Schoolbox\Learning\InlineGrader\Document;
+use Zend\Stdlib\Exception\DomainException;
 
 class Facade
 {
+
+    /**
+     * Synchronous
+     *
+     * Files are uploaded synchronously to crocodoc every time the save action occurs
+     * This can be generally slow especially with large files, so we prefer async
+     */
+    const SYNCHRONOUS = false;
+
     /**
      * @var Authenticator
      */
@@ -78,10 +88,17 @@ class Facade
     public function start()
     {
         /* If this was previously uploaded in the past, resume scribbling
-         * Otherwise upload it and start a new scribble
+         * Otherwise upload it and start a new scribble (when synchronous = true)
+         *
+         * If synchronous = false, throw DomainException and revert to Download link
          */
         if (!strlen($this->getFile()->getCrocodocId())) {
-            $this->upload();
+            if (self::SYNCHRONOUS) {
+                $this->upload();
+            }
+            else {
+                throw new DomainException("Crocodoc uuid does not exist");
+            }
         }
 
         /* Sequential dependency - crocodoc requires a crocodoc id to

@@ -31,7 +31,7 @@ class ResponseFile
      *
      * @var array
      */
-    private $allowedFileTypes = array(
+    private static $allowedFileTypes = array(
         'doc', 'docx',
         'xls', 'xlsx',
         'ppt', 'pptx',
@@ -229,9 +229,9 @@ class ResponseFile
     /**
      * @return array
      */
-    protected function getAllowedFileTypes()
+    public static function getAllowedFileTypes()
     {
-        return $this->allowedFileTypes;
+        return self::$allowedFileTypes;
     }
 
     /**
