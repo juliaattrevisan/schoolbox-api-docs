@@ -26,17 +26,17 @@ class Sync implements SyncInterface
     /**
      * @var \MSSQL
      */
-    private $database;
+    protected $database;
 
     /**
      * @var string
      */
-    private $year;
+    protected $year;
 
     /**
      * @var string
      */
-    private $semester;
+    protected $semester;
 
     /**
      * Sync constructor
