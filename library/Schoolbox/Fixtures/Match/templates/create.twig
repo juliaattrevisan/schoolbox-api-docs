@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/ajax/nanospell/autoload.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function() {
         $('#matchForm').alaressValidate({
@@ -95,12 +96,12 @@
             {% if match.homeTeam.id -%}
             value: {
                 id: {{ match.homeTeam.id }},
-                name: "{{ match.homeTeam.name|purify }}"
+                name: "{{ match.homeTeam.name }}"
             },
             {% elseif match.homeSchool.Id -%}
             value: {
                 id: "{{ tagPrefix }}{{ match.homeSchool.id }}",
-                name: "{{ match.homeSchool.name|purify }}"
+                name: "{{ match.homeSchool.name }}"
             },
             {% endif -%}
             multiple: false,
@@ -130,12 +131,12 @@
             {% if match.awayTeam.id -%}
             value: {
                 id: {{ match.awayTeam.id }},
-                name: "{{ match.awayTeam.name|purify }}"
+                name: "{{ match.awayTeam.name }}"
             },
             {% elseif match.awaySchool.id -%}
             value: {
                 id: "{{ tagPrefix }}{{ match.awaySchool.id }}",
-                name: "{{ match.awaySchool.name|purify }}"
+                name: "{{ match.awaySchool.name }}"
             },
             {% endif -%}
             multiple: false,
@@ -199,6 +200,7 @@
         $('textarea').alaressEditor();
     });
 </script>
+{% endautoescape %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
