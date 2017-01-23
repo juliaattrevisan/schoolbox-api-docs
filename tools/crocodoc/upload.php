@@ -20,7 +20,7 @@ $logger = $kernel->logger();
 
 //if(Config::get('crocodoc_api_token')) {
 //
-    $pendingUpload = SubmissionMapper::getInstance()->getCrocodoc();
+//    $pendingUpload = SubmissionMapper::getInstance()->getCrocodoc();
 //
 //    foreach($pendingUpload as $submission) {
 //        $logger->notice("Uploading ".$submission->getFileName()."(".$submission->getId().")");
@@ -60,7 +60,8 @@ var_dump(get_class($logger));
 
 try {
     $authenticator = new Authenticator();
-    $uploader = new AsynchronousCrocodocUpload($authenticator, $logger, SingleFileMapper::getInstance());
+
+    (new AsynchronousCrocodocUpload($authenticator, $logger, SingleFileMapper::getInstance()))->uploadPendingCrocodocs();
 }
 catch (RangeException $e) {
 

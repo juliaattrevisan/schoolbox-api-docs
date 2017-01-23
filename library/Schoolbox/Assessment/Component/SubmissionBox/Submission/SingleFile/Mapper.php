@@ -151,23 +151,26 @@ class Mapper extends BaseMapper
     {
         /* Get a list of legal files that crocodoc accepts
          */
-        $allowedExtensions = ResponseFile::VALID_FILES;
+        $allowedExtensions = ResponseFile::getAllowedFileTypes();
 
-        $query = $this->getSelectString();
-        $query .= "
-            WHERE uuid is null AND ( ext like 'docx' OR
-                                        ext like 'doc' OR
-                                        ext like 'xls' OR
-                                        ext like 'xlsx' OR
-                                        ext like 'ppt' OR
-                                        ext like 'pptx' OR
-                                        ext like 'pdf')
-                 AND YEAR(submitted) = YEAR(NOW())
-            LIMIT 0,100
-            ";
+        new \Alaress_Probe($allowedExtensions);
+        die();
 
-        $statement = $this->database->prepare($query);
-        $statement->execute();
+//        $query = $this->getSelectString();
+//        $query .= "
+//            WHERE uuid is null AND ( ext like 'docx' OR
+//                                        ext like 'doc' OR
+//                                        ext like 'xls' OR
+//                                        ext like 'xlsx' OR
+//                                        ext like 'ppt' OR
+//                                        ext like 'pptx' OR
+//                                        ext like 'pdf')
+//                 AND YEAR(submitted) = YEAR(NOW())
+//            LIMIT 0,100
+//            ";
+//
+//        $statement = $this->database->prepare($query);
+//        $statement->execute();
 
         return $this->hydrateSelect($statement);
     }
