@@ -95,12 +95,12 @@
             {% if match.homeTeam.id -%}
             value: {
                 id: {{ match.homeTeam.id }},
-                name: "{{ match.homeTeam.name }}"
+                name: "{{ match.homeTeam.name|purify }}"
             },
             {% elseif match.homeSchool.Id -%}
             value: {
                 id: "{{ tagPrefix }}{{ match.homeSchool.id }}",
-                name: "{{ match.homeSchool.name }}"
+                name: "{{ match.homeSchool.name|purify }}"
             },
             {% endif -%}
             multiple: false,
@@ -130,12 +130,12 @@
             {% if match.awayTeam.id -%}
             value: {
                 id: {{ match.awayTeam.id }},
-                name: "{{ match.awayTeam.name }}"
+                name: "{{ match.awayTeam.name|purify }}"
             },
             {% elseif match.awaySchool.id -%}
             value: {
                 id: "{{ tagPrefix }}{{ match.awaySchool.id }}",
-                name: "{{ match.awaySchool.name }}"
+                name: "{{ match.awaySchool.name|purify }}"
             },
             {% endif -%}
             multiple: false,
