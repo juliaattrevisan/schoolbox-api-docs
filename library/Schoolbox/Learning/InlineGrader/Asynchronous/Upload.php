@@ -17,10 +17,12 @@
 namespace Schoolbox\Learning\InlineGrader\Asynchronous;
 
 use \Psr\Log\LoggerInterface;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
 use Schoolbox\Learning\InlineGrader\Authenticator;
+use Schoolbox\Learning\InlineGrader\Document;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SingleFileMapper;
-use Schoolbox\Learning\InlineGrader\Document;
+
 class Upload
 {
 
@@ -63,28 +65,40 @@ class Upload
 
         /** @var SingleFile $currentFile */
         foreach ($allFiles as $currentFile) {
-            $this->getLogger()->notice("{$currentFile->getId()} {$currentFile->getBasename()}: starting upload");
+            $prefix = "{$currentFile->getId()} {$currentFile->getBasename()}";
+
+            $this->getLogger()->notice("$prefix: starting upload");
+
+            /* Swamptastically convert it into a format that Document accepts
+             */
+            $responseFile = (new DueWorkSubmissionFile())
+                ->setId($currentFile->getId())
+                ->setStorage($currentFile->getStorage())
+                ->setEditableInline($currentFile->getEditableInline())
+                ->setCrocodocId($currentFile->getUuid())
+                ->setFilename($currentFile->getFilename())
+                ->setPlagscan($currentFile->getPlagscan());
 
             try {
-//                $document = new Document($currentFile);
-//                $result = $document->upload();
-//
-//                if ($result['errors']) {
-//                    $this->getLogger()->error($result['errors']);
-//
-//                    switch ($result['responseCode']) {
-//                        case 401:
-//                            // This is an authentication error, caused by a wrong token.
-//                            // Give up because the token is not going to fix itself.
-//                            $this->getLogger()->error('Authentication error received - exiting');
-//                            exit;
-//                        default:
-//                            break;
-//                    }
-//                }
-//                else {
-//                    $this->getLogger()->notice("{$currentFile->getId()} {$currentFile->getFileName()}: completed successfully");
-//                }
+                $document = new Document($responseFile);
+                $result = $document->upload();
+
+                if ($result['errors']) {
+                    $this->getLogger()->error($result['errors']);
+
+                    switch ($result['responseCode']) {
+                        case 401:
+                            // This is an authentication error, caused by a wrong token.
+                            // Give up because the token is not going to fix itself.
+                            $this->getLogger()->error("{$prefix}: Authentication error received - exiting");
+                            exit;
+                        default:
+                            break;
+                    }
+                }
+                else {
+                    $this->getLogger()->notice("{$prefix}: completed successfully");
+                }
             } catch (\RangeException $e) {
                 $this->getLogger()->error($e->getMessage());
             }
