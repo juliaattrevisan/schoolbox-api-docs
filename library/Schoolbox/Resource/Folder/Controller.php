@@ -156,7 +156,7 @@ class Controller extends BaseController
             $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
         }
 
-        $homepageTemplates = $homepageTemplateMapper->findAll();
+        $homepageTemplates = $homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]);
         $homepageTemplates->prepend($homepageTemplateMapper->getKeepExistingHomepageTemplate());
 
         $config = new ConfigLoader();
