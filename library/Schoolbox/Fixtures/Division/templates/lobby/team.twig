@@ -5,20 +5,22 @@
         data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: team.id}) }}"
         data-team-player-list-proxy>
 
-        <li class="actions-small-1">
-            <div class="icon-up-arrow expander" title="Expand/Collapse Team" data-collapser="team-{{ team.id }}"></div>
-            <div class="list-item">
-                <div class="small-12 card wrap-down">
-                    <h3>{{ team.name }}</h3>
-                    <p class="meta">
-                        <span data-player-count>{{ players|length }}</span> player(s) in team
-                    </p>
+        <li>
+            <div class="actions-small-1">
+                <div class="icon-up-arrow expander" title="Expand/Collapse Team" data-collapser="team-{{ team.id }}"></div>
+                <div class="list-item">
+                    <div class="small-12 card wrap-down">
+                        <h3>{{ team.name }}</h3>
+                        <p class="meta">
+                            <span data-player-count>{{ players|length }}</span> player(s) in team
+                        </p>
+                    </div>
                 </div>
+                <nav>
+                    <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}" class="icon-modify" title="Modify Team"></a>
+                </nav>
+                <div class="toast" data-alert data-team-indicator></div>
             </div>
-            <nav>
-                <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}" class="icon-modify" title="Modify Team"></a>
-            </nav>
-            <div class="toast" data-alert data-team-indicator></div>
         </li>
         <li>
             <ul class="information-list sortable-card"

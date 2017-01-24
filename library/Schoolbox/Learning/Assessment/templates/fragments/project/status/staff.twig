@@ -6,16 +6,16 @@
             handle: '.grip',
             axis:   'y'
         })
-        .on('sortstop', function() {
-            var sequence = [];
-            assessmentList.find('[data-assessment]').each(function(idx, elem){
-                sequence.push($(elem).attr('data-assessment'));
-            });
-            var data = {
-                id: sequence
-            };
-            $.post(assessmentList.attr('data-action'), data);
-        });
+                .on('sortstop', function() {
+                    var sequence = [];
+                    assessmentList.find('[data-assessment]').each(function(idx, elem){
+                        sequence.push($(elem).attr('data-assessment'));
+                    });
+                    var data = {
+                        id: sequence
+                    };
+                    $.post(assessmentList.attr('data-action'), data);
+                });
 
         $('[data-delete]').click(function(event) {
             event.preventDefault();
@@ -39,24 +39,24 @@
                     toast.toastActivate({text: 'Deleting ' + assessmentName + '...'});
 
                     $.post($(element).attr('href'), {assessmentId: assessmentId})
-                    .success(function() {
-                        toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
-                        listItem.fadeOut({
-                            done: function() {
-                                listItem.remove();
+                            .success(function() {
+                                toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
+                                listItem.fadeOut({
+                                    done: function() {
+                                        listItem.remove();
 
-                                {# Hide component actions and respawn empty state #}
-                                if (!assessmentList.find('li').length) {
-                                    $('#assessment-actions').remove();
-                                    $('#assessment-list-empty-state').removeClass('hide');
-                                }
-                            }
-                        });
-                    })
-                    .error(function() {
-                        {# Toast alert #}
-                        toast.toastTimeout({text: 'Could not delete ' + assessmentName, css: 'alert'});
-                    });
+                                        {# Hide component actions and respawn empty state #}
+                                        if (!assessmentList.find('li').length) {
+                                            $('#assessment-actions').remove();
+                                            $('#assessment-list-empty-state').removeClass('hide');
+                                        }
+                                    }
+                                });
+                            })
+                            .error(function() {
+                                {# Toast alert #}
+                                toast.toastTimeout({text: 'Could not delete ' + assessmentName, css: 'alert'});
+                            });
                 }
             });
         });
@@ -84,144 +84,146 @@
         <div class="row">
             {% if assessment.baseContext is unitSpecification %}
             <div class="small-12 island">
-            {% else %}
-            <div class="small-12 medium-6 island">
-            {% endif %}
-                <h2 class="subheader">Activities</h2>
+                {% else %}
+                <div class="small-12 medium-6 island">
+                    {% endif %}
+                    <h2 class="subheader">Activities</h2>
 
-                {% if assessment.assessables | length %}
-                <section>
-                    <ul id='assessment-list' class="information-list sortable-card"
-                        data-sortable
-                        data-assessment-list
-                        data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
-                        {% for assessable in assessment.assessables %}
-                            {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
-
-                            <li class="actions-small-1" data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
-                                <div class="grip"></div>
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
-
-                                        {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: student}) %}
-                                        {% if route %}<a href="{{ route }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">{% endif %}
-                                        <h3>{{ assessable.title }}</h3>
-                                        {% if route %}</a>{% endif %}
-
-                                        {% if assessable.getDueAt.isNull == false %}
-                                            <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
-                                        {% endif %}
-
-                                        {% if assessable.weight %}
-                                            <p class="meta">
-                                                Weight: {{ assessable.weight }}
-                                            </p>
-                                        {% endif %}
-
-                                        {% if assessable.getDueAt.isNull == false %}
-                                            <p class="meta">
-                                                {{ assessmentCounts.completed[assessable.id] }}/{{ assessmentCounts.totalParticipants }} students completed
-                                            </p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <nav>
-                                    <nav><a href="#" class="icon-more" data-dropdown="project-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
-                                </nav>
-                                <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
-                                    {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
-                                    {% if viewRoute and assessment.baseContext is not unitSpecification %}
-                                    <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
-                                    {% endif %}
-                                    {% if assessable is quiz %}
-                                    {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
-                                        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
-                                    {% endif %}
-                                {% else %}
-                                    {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
-                                        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
-                                    {% endif %}
-                                {% endif %}
-
-                                {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
-                                    <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>
-                                {% endif %}
-                                </ul>
-                            </li>
-
-                        {% endfor %}
-                    </ul>
-
-                    <div id="assessment-toast" class="toast"></div>
-
-                    <div id="assessment-actions" class="component-action">
+                    {% if assessment.assessables | length %}
                         <section>
-                            <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button" title="Create a new activity">Create Activity</a>
+                            <ul id='assessment-list' class="information-list sortable-card"
+                                data-sortable
+                                data-assessment-list
+                                data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+                                {% for assessable in assessment.assessables %}
+                                    {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+                                    <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
+                                        <div class="actions-small-1">
+                                            <div class="grip"></div>
+                                            <div class="list-item">
+                                                <div class="card small-12">
+                                                    <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
+
+                                                    {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: student}) %}
+                                                    {% if route %}<a href="{{ route }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">{% endif %}
+                                                        <h3>{{ assessable.title }}</h3>
+                                                        {% if route %}</a>{% endif %}
+
+                                                    {% if assessable.getDueAt.isNull == false %}
+                                                        <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
+                                                    {% endif %}
+
+                                                    {% if assessable.weight %}
+                                                        <p class="meta">
+                                                            Weight: {{ assessable.weight }}
+                                                        </p>
+                                                    {% endif %}
+
+                                                    {% if assessable.getDueAt.isNull == false %}
+                                                        <p class="meta">
+                                                            {{ assessmentCounts.completed[assessable.id] }}/{{ assessmentCounts.totalParticipants }} students completed
+                                                        </p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <nav>
+                                                <nav><a href="#" class="icon-more" data-dropdown="project-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
+                                            </nav>
+                                            <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
+                                                {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
+                                                {% if viewRoute and assessment.baseContext is not unitSpecification %}
+                                                    <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
+                                                {% endif %}
+                                                {% if assessable is quiz %}
+                                                    {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
+                                                        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
+                                                        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
+                                                    {% endif %}
+                                                {% endif %}
+
+                                                {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
+                                                    <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </li>
+
+                                {% endfor %}
+                            </ul>
+
+                            <div id="assessment-toast" class="toast"></div>
+
+                            <div id="assessment-actions" class="component-action">
+                                <section>
+                                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button" title="Create a new activity">Create Activity</a>
+                                </section>
+                            </div>
                         </section>
+                    {% endif %}
+
+                    <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
+                        <i class="icon-project"></i>
+                        <p>You project currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an activity</a> next.</p>
                     </div>
-                </section>
-                {% endif %}
-
-                <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
-                    <i class="icon-project"></i>
-                    <p>You project currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an activity</a> next.</p>
                 </div>
-            </div>
 
-            {% if assessment.baseContext is not unitSpecification %}
-            <div class="small-12 medium-6 island">
-                <h2 class="subheader">Students</h2>
+                {% if assessment.baseContext is not unitSpecification %}
+                    <div class="small-12 medium-6 island">
+                        <h2 class="subheader">Students</h2>
 
-                {% if assessment.allParticipants | length %}
-                    <section>
-                        <ul class="information-list">
-                            {% for participant in assessment.allParticipants %}
-                                <li>
-                                    <div class="list-item">
-                                        <div class="card small-12">
+                        {% if assessment.allParticipants | length %}
+                            <section>
+                                <ul class="information-list">
+                                    {% for participant in assessment.allParticipants %}
+                                        <li>
+                                            <div class="list-item">
+                                                <div class="card small-12">
 
-                                            {# cache to prevent repeated traversals #}
-                                            {% set publishedHumanReadableMark = participant.publishedHumanReadableMark %}
+                                                    {# cache to prevent repeated traversals #}
+                                                    {% set publishedHumanReadableMark = participant.publishedHumanReadableMark %}
 
-                                            {% if publishedHumanReadableMark is not null %}
-                                            <span class="neutral label right">
+                                                    {% if publishedHumanReadableMark is not null %}
+                                                        <span class="neutral label right">
                                                 {{ publishedHumanReadableMark }}
                                             </span>
-                                            {% endif %}
-                                            <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
-                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
-                                                <h3>
-                                                    {{ participant.user.formatName }}
-                                                </h3>
-                                            </a>
-                                            <p class="meta">
-                                                {{ participantCounts.completed[participant.user.id] }}/{{ participantCounts.totalAssessments }} activities completed
-                                            </p>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                {% else %}
-                    <div class="empty-state">
-                        <i class="icon-group"></i>
-                        <p>There are no students currently undertaking this project.</p>
+                                                    {% endif %}
+                                                    <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
+                                                        <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
+                                                        <h3>
+                                                            {{ participant.user.formatName }}
+                                                        </h3>
+                                                    </a>
+                                                    <p class="meta">
+                                                        {{ participantCounts.completed[participant.user.id] }}/{{ participantCounts.totalAssessments }} activities completed
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </section>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="icon-group"></i>
+                                <p>There are no students currently undertaking this project.</p>
+                            </div>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 column">
+            {% if baseContext is unitSpecification %}
+                <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit">Return to course</a>
+            {% else %}
+                <a href="/homepage/{{ baseContext.folder.id }}" class="button submit">Return to homepage</a>
             {% endif %}
         </div>
     </div>
-</div>
-
-<div class="row">
-    <div class="small-12 column">
-        {% if baseContext is unitSpecification %}
-        <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit">Return to course</a>
-        {% else %}
-        <a href="/homepage/{{ baseContext.folder.id }}" class="button submit">Return to homepage</a>
-        {% endif %}
-    </div>
-</div>

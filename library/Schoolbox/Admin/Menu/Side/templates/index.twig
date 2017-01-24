@@ -93,26 +93,26 @@
                     {% else %}
                         {% set title = section.title %}
                     {% endif %}
-                    <li class="no-border">
-
 
                     <li class="no-border">
-                        <div class="small-1 column grip ui-sortable-handle">&nbsp;</div>
-                        <div class="small-12 medium-8 column" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
-                            <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field: 'title'}) }}">
-                                <input type="text" name="title" value="{{ title }}" data-item-original-value="{{ title }}"
-                                       placeholder="{{ sectionName[section.section] }}" data-item-element/>
-                            </label>
-                            <span class="toast" data-save-item></span>
-                        </div>
-                        <div class="small-12 medium-3 column" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
-                            <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field:'visible'}) }}">
-                                <select name="visible" data-item-element data-item-original-value="{{ section.visible }}">
-                                    <option {% if not section.visible %}selected{% endif %} value="0">Hidden</option>
-                                    <option {% if section.visible %}selected{% endif %} value="1">Visible</option>
-                                </select>
-                            </label>
-                            <span class="toast" data-save-item></span>
+                        <div>
+                            <div class="small-1 column grip ui-sortable-handle">&nbsp;</div>
+                            <div class="small-12 medium-8 column" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
+                                <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field: 'title'}) }}">
+                                    <input type="text" name="title" value="{{ title }}" data-item-original-value="{{ title }}"
+                                           placeholder="{{ sectionName[section.section] }}" data-item-element/>
+                                </label>
+                                <span class="toast" data-save-item></span>
+                            </div>
+                            <div class="small-12 medium-3 column" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
+                                <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field:'visible'}) }}">
+                                    <select name="visible" data-item-element data-item-original-value="{{ section.visible }}">
+                                        <option {% if not section.visible %}selected{% endif %} value="0">Hidden</option>
+                                        <option {% if section.visible %}selected{% endif %} value="1">Visible</option>
+                                    </select>
+                                </label>
+                                <span class="toast" data-save-item></span>
+                            </div>
                         </div>
                     </li>
 
