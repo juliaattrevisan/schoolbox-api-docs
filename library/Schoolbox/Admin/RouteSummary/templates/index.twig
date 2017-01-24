@@ -4,29 +4,34 @@
 {# show each term #}
 <div class="row">
     <div class="small-12 island">
-
-        <section>
-
-            <table>
-                <thead>
+        <table data-sortable>
+            <thead>
+            <tr>
+                <th>Route</th>
+                <th>Path</th>
+                <th>Method</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for route in routes %}
                 <tr>
-                    <th>Route</th>
-                    <th>Path</th>
-                    <th>Method</th>
+                    <td>{{ route.name }}</td>
+                    <td>{{ route.path }}</td>
+                    <td>{{ route.method }}</td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for route in routes %}
-                    <tr>
-                        <td>{{ route.name }}</td>
-                        <td>{{ route.path }}</td>
-                        <td>{{ route.method }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-
-        </section>
-
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
+
+<script type="text/javascript">
+    // Sortable table
+    $(function () {
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
