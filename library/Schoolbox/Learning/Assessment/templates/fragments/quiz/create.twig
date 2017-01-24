@@ -69,7 +69,7 @@
         var $durationPanel = $('#durationPanel');
         var $durationInputs = $durationPanel.find('input[type=text]');
 
-        $('#hasDuration').on('click', function(event) {
+        $('#hasDuration').on('click', function() {
             var $checkbox = $(this);
             if ($checkbox.is(':checked')) {
                 $('#durationPanel').stop().hide().removeClass('hide').fadeIn(400);
