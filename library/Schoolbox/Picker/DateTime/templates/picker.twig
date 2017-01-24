@@ -381,8 +381,8 @@
 
             $('.period-description').each(function() {
 
-                var s = moment($(this).attr('data-period-start'), 'hh:mma').format('HHmm');
-                var e = moment($(this).attr('data-period-end'), 'hh:mma').format('HHmm');
+                var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm');
+                var e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm');
                 var t = moment('{{ value }}').format('HHmm');
                 if((t >= s) && (t < e)) {
                     $(this).addClass('period-selected');
@@ -459,34 +459,33 @@
 
         {% if type == 'duework'  %}
 
-        // Can the assessment form have dates and be called outside the class page?
-        var classCode = $('*[name = "classCode"]').val();
+            // Can the assessment form have dates and be called outside the class page?
+            var classCode = $('*[name = "classCode"]').val();
 
-        loadingResponse('timetable');
+            loadingResponse('timetable');
 
-        $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{classCode}/g, classCode))
-                .done(function (data) {
+            $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{classCode}/g, classCode))
+                    .done(function (data) {
 
-                    appendResponse(data, 'duework', 'timetable');
+                        appendResponse(data, 'duework', 'timetable');
 
-                })
-                .fail(function () {
-                    console.log('Failed to retrieve appointments for specified period');
-                });
-
+                    })
+                    .fail(function () {
+                        console.log('Failed to retrieve appointments for specified period');
+                    });
         {% elseif type == 'event' %}
-        {# Or fetch events #}
+            {# Or fetch events #}
 
-        loadingResponse('timetable');
-        $.get(('{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
-                .done(function (data) {
+            loadingResponse('timetable');
+            $.get(('{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                    .done(function (data) {
 
-                    appendResponse(data, 'events', 'timetable');
+                        appendResponse(data, 'events', 'timetable');
 
-                })
-                .fail(function () {
-                    console.log('Failed to retrieve appointments for specified period');
-                });
+                    })
+                    .fail(function () {
+                        console.log('Failed to retrieve appointments for specified period');
+                    });
         {% else %}
         {# Don't fetch anything#}
         {% endif %}
@@ -496,9 +495,9 @@
     $('.timetable-submit').click(function() {
         var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
         var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'h:mma');
-        var newDate = timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0).format(convertFormat('Y-m-d H:i:s'));
+        var newDate = moment(timetableDate).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0).format(convertFormat('Y-m-d H:i:s'));
         {# Turn AllDay off #}
-        $('#allday').val(0);
+        manageAllDay(false);
         window.pickerInstance[{{ id }}].setDate(newDate);
     });
 
