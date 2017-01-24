@@ -160,13 +160,46 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    public function notifyStaffJoined($userAccess, $user)
+    protected function notifyJoined($userAccess, $user)
     {
         if ($userAccess->getUser()->getId() == $user->getId()) {
             return $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
         } else {
             return $this->notifyAdmin(':effector added :user to :groupname', self::TRIGGER_JOINED, $userAccess, $user);
         }
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyStaffJoined($userAccess, $user)
+    {
+        return $this->notifyJoined($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyStudentJoined($userAccess, $user)
+    {
+        return $this->notifyJoined($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyParentJoined($userAccess, $user)
+    {
+        return $this->notifyJoined($userAccess, $user);
     }
 
 
