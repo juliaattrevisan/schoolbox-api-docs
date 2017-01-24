@@ -63,48 +63,13 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
             {
                 $this->setVar("NEW_CATEGORY_ID", $catInfo['id']);
 
-
-                // TODO SA-1310
-                // This Component is broken after the migration of SA-1212.
-                // Need to replace Handlers calls with calls to Mappers, and use new Model object graph.
-                echo '<h3>Component_Dashboard_ActivityController is disabled. See SA-1310</h3>';
-                return false;
-
-                $sub = $this->activity->submissionDetails($catInfo['id']);
-
                 /* What's New for Online Assessments
                  */
                 $this->setVar('online_assessment_block', '');
-                if ($sub['onlineAssessments']) {
-                    $this->parse('online_assessment_block', 'new_online_assessment');
-                }
-
                 $this->setVar('reviewed_block', '');
-                if ($sub['reviewedOnlineAssessments']) {
-                    $this->parse('reviewed_block', 'reviewed_online_assessment');
-                }
-
                 $this->setVar('due_block', '');
-                if($sub['duework'])
-                    $this->parse('due_block', 'due_work');
-
                 $this->setVar('ret_block', '');
-                if($sub['retwork'])
-                    $this->parse('ret_block', 'ret_work');
-
                 $this->setVar('sub_block', '');
-                if(is_array($sub['subboxes'])) {
-                    foreach($sub['subboxes'] as $subid => $subdetails) {
-                        $subout = array('BOX_ID'     => $subid,
-                                        'BOX_NAME'   => $subdetails['description'],
-                                        'BOX_COUNT'  => $subdetails['count'],
-                                        'BOX_PLURAL' => ($subdetails['count'] > 1 ? 's' : ''),
-                                        );
-                        $this->setVar($subout);
-
-                        $this->parse('sub_block', 'sub_work', true);
-                    }
-                }
 
 
                 $cat = $this->activity->newCategory($catInfo['id']);
@@ -175,7 +140,7 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                     $this->parse("new_wiki_item", "new_wiki");
                 }
 
-                if($sub['duework'] || $sub['retwork'] || $sub['subboxes'] || $cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'] || $cat['wiki'])
+                if( $cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'] || $cat['wiki'])
                 {
                     if($catInfo['code'])
                         $this->setVar("NEW_CATEGORY_NAME", $catInfo['name'].' ('.$catInfo['code'].')');
