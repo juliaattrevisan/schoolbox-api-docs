@@ -84,31 +84,35 @@ class Sync implements SyncInterface
         // Attempt to create separate accounts for parent and spouse
         $companyCode = $this->database->smartQuote($this->companyCode);
 
-        /* If Tass Comm rules are enabled then locate the guardian relationship
-         * from there as well
-         */
-        if (Config::get('external_tass_commrules')) {
+//        /* If Tass Comm rules are enabled then locate the guardian relationship
+//         * from there as well
+//         */
+//        if (Config::get('external_tass_commrules')) {
+//
+//            $addnum = $this->helper->getAddNum();
+//            $typecode = $this->helper->getTypeCode();
+//
+//            $studentjoin = "LEFT JOIN studcommrules as scr
+//                    ON p.par_code = scr.par_code
+//                    AND scr.add_num IN ({$addnum})
+//            ";
+//
+//            if (!empty($typecode)) {
+//                $studentjoin .= "AND scr.commtype_code IN ({$typecode}) ";
+//            }
+//
+//            $studentjoin .= "
+//                LEFT JOIN student as s
+//                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
+//                    OR (scr.par_code = scr.par_code AND scr.cmpy_code = s.cmpy_code)";
+//        } else {
+//            $studentjoin = "LEFT JOIN student as s
+//                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
+//        }
 
-            $addnum = $this->helper->getAddNum();
-            $typecode = $this->helper->getTypeCode();
-
-            $studentjoin = "LEFT JOIN studcommrules as scr
-                    ON p.par_code = scr.par_code
-                    AND scr.add_num IN ({$addnum})
-            ";
-
-            if (!empty($typecode)) {
-                $studentjoin .= "AND scr.commtype_code IN ({$typecode}) ";
-            }
-
-            $studentjoin .= "
-                LEFT JOIN student as s
-                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-                    OR (scr.par_code = scr.par_code AND scr.cmpy_code = s.cmpy_code)";
-        } else {
-            $studentjoin = "LEFT JOIN student as s
+        // Ignore TASS communication rules for now
+        $studentjoin = "LEFT JOIN student as s
                     ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
-        }
 
         // Single Tuple contains data for [P]arent and [S]pouse
         $query = "
