@@ -34,7 +34,7 @@ class Controller extends Base
 
             // method is publicly available, despite what the red worms say
             foreach ($route->method as $method) {
-                $routeSummaries[] = [
+                $routeSummaries[$parsedName['controller']][] = [
                     'name'       => $route->name,
                     'method'     => $method,
                     'path'       => $route->path,
@@ -44,6 +44,9 @@ class Controller extends Base
                 ];
             }
         }
+
+        // Alpha-sort route summaries
+        ksort($routeSummaries);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
