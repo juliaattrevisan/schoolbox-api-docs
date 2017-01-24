@@ -1216,7 +1216,7 @@ class StudentReportCard
         $categoryList = array();
         /* Subjects involved with currently
          */
-        if ($this->targetTerm->contains(\Alaress_Date_Format::now())) {
+        if ($this->targetTerm->contains(\Alaress_Date_Format::now()) && !$this->getTargetUser()->getHideTimetable()) {
             $categoryList = $this->groupHandler->involvedInCategoryList($this->targetUserId, true, READ_ACCESS);
             // filter this list, so that it only contains categories in which contain results
             foreach ($categoryList as $k => $cat) {
