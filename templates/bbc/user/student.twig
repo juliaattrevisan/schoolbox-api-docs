@@ -3,6 +3,6 @@
 {% if showButtons %}
     {% block buttons_miscellaneous %}
         <!-- Start on School Grades page initially -->
-        <li class="no-pad"><a href="http://tass.bbc.qld.edu.au/kiosk/index.cfm?do=kiosk.students.main.student.details&stud_code={{ user.getExternalId() }}" class="no-margin fat icon-fat button size-32 icon-progress" data-equalizer-watch>TASS Profile</a></li>
+        <li class="no-pad"><a href="/tassportal/teacherkiosk?link=%2Fkiosk%2Findex.cfm%3Fdo%3Dkiosk.students.main.student.details%26stud_code%3D{{ user.getExternalId() }}" class="no-margin fat icon-fat button size-32 icon-progress" data-equalizer-watch>TASS Profile</a></li>
     {% endblock buttons_miscellaneous %}
 {% endif %}
