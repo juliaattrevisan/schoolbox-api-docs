@@ -9,15 +9,15 @@
             <tr>
                 <th>Route</th>
                 <th>Path</th>
-                <th>Method</th>
+                <th>Endpoint</th>
             </tr>
             </thead>
             <tbody>
             {% for route in routes %}
                 <tr>
                     <td>{{ route.name }}</td>
-                    <td>{{ route.path }}</td>
-                    <td>{{ route.method }}</td>
+                    <td>{{ route.method }} {{ route.path }}</td>
+                    <td>{{ route.controller }}::{{ route.action }}</td>
                 </tr>
             {% endfor %}
             </tbody>
