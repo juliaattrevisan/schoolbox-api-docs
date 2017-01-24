@@ -90,15 +90,15 @@
     {% set width = 12 %}
 {% endif %}
 <div class="row">
-    <dl class="tabs-material" data-tab>
-        <dd class="active"><a href="#" id="tab-1-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>View By Date</a></dd>
-        <dd class=""><a href="#" id="tab-2-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>View By Timetable</a></dd>
+    <dl class="tabs-material" data-tab role="tablist">
+        <dd class="active" role="presentation"><a href="#byDate-{{ id }}">View By Date</a></dd>
+        <dd role="presentation"><a href="#byTimetable-{{ id }}">View By Timetable</a></dd>
     </dl>
 </div>
 
 <div class="row" style="padding:0.875rem;">
     <div class="tabs-content">
-        <div class='content active' id="byDate-{{ id }}">
+        <div class="content active" id="byDate-{{ id }}" role="tabpanel" aria-hidden="false">
             <div class="small-12 medium-{{ width }} columns">
 
                 {# Placeholder for calendar ot be rendered in #}
@@ -115,57 +115,58 @@
                 </div>
             {% endif %}
         </div>
-    </div>
-    <div class='content' id="byTimetable-{{ id }}" style="display: none;">
-        <div class="row">
-            <div class="small-12 medium-{{ width }} columns">
 
-                {# Placeholder for timetable ot be rendered in #}
-                <div id="timetable{{ id }}">
-                    <select name="campus">
-                        {% for campus in timetable %}
-                            <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
-                        {% endfor %}
-                    </select>
-                    <select name = "term">
-                        {% for term in terms %}
-                            <option value="{{ term.id }}" data-duration="{{ term.duration }}" {% if term.id == timetableDay.term %} selected {% endif %}>{{ term.title }} </option>
-                        {% endfor %}
-                    </select>
-                    <select name="cycle">
-                        {# Options will be appended here #}
-                    </select>
-                    {# Build all, hide, reveal one later #}
-                    {% for campus in timetable %}
-                        <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
-                            <th>
-                                {% for i in 1..timetable[campus.campusId].dayCount %}
-                            <td class="day-{{ i }}">{{ i }}</td>
-                            {% endfor %}
-                            </th>
-                            {% set k=0 %}
-                            {% for description in timetable[campus.campusId].desc %}
-                                <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k]  }}">{{ description }}</td>
-                                    {% for i in 1..timetable[campus.campusId].dayCount %}
-                                        <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
-
-                                    {% endfor %}
-                                    {% set k=k+1 %}
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% endfor %}
-                </div>
-            </div>
-
-            {% if width == 6 %}
+        <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
+            <div class="row">
                 <div class="small-12 medium-{{ width }} columns">
 
-                    {# Placeholder for appointments to be rendered in #}
-                    <div id="timetableResponse{{ id }}"></div>
+                    {# Placeholder for timetable ot be rendered in #}
+                    <div id="timetable{{ id }}">
+                        <select name="campus">
+                            {% for campus in timetable %}
+                                <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="term">
+                            {% for term in terms %}
+                                <option value="{{ term.id }}" data-duration="{{ term.duration }}" {% if term.id == timetableDay.term %} selected {% endif %}>{{ term.title }} </option>
+                            {% endfor %}
+                        </select>
+                        <select name="cycle">
+                            {# Options will be appended here #}
+                        </select>
+                        {# Build all, hide, reveal one later #}
+                        {% for campus in timetable %}
+                            <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
+                                <th>
+                                    {% for i in 1..timetable[campus.campusId].dayCount %}
+                                <td class="day-{{ i }}">{{ i }}</td>
+                                {% endfor %}
+                                </th>
+                                {% set k=0 %}
+                                {% for description in timetable[campus.campusId].desc %}
+                                    <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k]  }}">{{ description }}</td>
+                                        {% for i in 1..timetable[campus.campusId].dayCount %}
+                                            <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
 
+                                        {% endfor %}
+                                        {% set k=k+1 %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endfor %}
+                    </div>
                 </div>
-            {% endif %}
+
+                {% if width == 6 %}
+                    <div class="small-12 medium-{{ width }} columns">
+
+                        {# Placeholder for appointments to be rendered in #}
+                        <div id="timetableResponse{{ id }}"></div>
+
+                    </div>
+                {% endif %}
+            </div>
         </div>
         <div class="row">
             <div class="small-4 columns"></div>
@@ -228,24 +229,7 @@
 
     }
 
-    {# Tabs #}
-    $('#tab-1-{{ id }}').click(function(){
-        $('#byDate-{{ id }}').css('display', 'block');
-        $('#byTimetable-{{ id }}').css('display', 'none');
 
-        $(this).parent().addClass('active');
-        $('#tab-2-{{ id }}').parent().removeClass('active');
-
-    });
-
-    $('#tab-2-{{ id }}').click(function(){
-        $('#byDate-{{ id }}').css('display', 'none');
-        $('#byTimetable-{{ id }}').css('display', 'block');
-
-        $(this).parent().addClass('active');
-        $('#tab-1-{{ id }}').parent().removeClass('active');
-
-    });
 
     {# Show loader #}
 

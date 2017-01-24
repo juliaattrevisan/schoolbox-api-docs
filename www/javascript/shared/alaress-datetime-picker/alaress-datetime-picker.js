@@ -152,6 +152,9 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                 // Display the datetime picker modal
 
                 $('#picker' + pickerId).foundation('reveal', 'open');
+
+                // Initialise tabs
+                $(document).foundation('reflow', 'tab');
             });
 
         } else if (picker.data('status') == 'loaded') {
