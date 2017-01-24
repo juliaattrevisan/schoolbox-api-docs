@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector\Tass\Base;
 
 use Config;
+use External_Tass_Helper;
 use MSSQL;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
@@ -28,6 +29,9 @@ class Sync implements SyncInterface
      */
     protected $companyCode;
 
+    /** @var External_Tass_Helper */
+    private $helper;
+
     /**
      * Sync constructor
      */
@@ -35,6 +39,7 @@ class Sync implements SyncInterface
     {
         $this->database    = MSSQL::getInstance();
         $this->companyCode = Config::get('external_tass_company_code');
+        $this->helper = new External_Tass_Helper();
     }
 
     /**
@@ -77,8 +82,37 @@ class Sync implements SyncInterface
     public function findAllParents()
     {
         // Attempt to create separate accounts for parent and spouse
-        // Not yet supported: children from split families
         $companyCode = $this->database->smartQuote($this->companyCode);
+
+//        /* If Tass Comm rules are enabled then locate the guardian relationship
+//         * from there as well
+//         */
+//        if (Config::get('external_tass_commrules')) {
+//
+//            $addnum = $this->helper->getAddNum();
+//            $typecode = $this->helper->getTypeCode();
+//
+//            $studentjoin = "LEFT JOIN studcommrules as scr
+//                    ON p.par_code = scr.par_code
+//                    AND scr.add_num IN ({$addnum})
+//            ";
+//
+//            if (!empty($typecode)) {
+//                $studentjoin .= "AND scr.commtype_code IN ({$typecode}) ";
+//            }
+//
+//            $studentjoin .= "
+//                LEFT JOIN student as s
+//                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
+//                    OR (scr.par_code = scr.par_code AND scr.cmpy_code = s.cmpy_code)";
+//        } else {
+//            $studentjoin = "LEFT JOIN student as s
+//                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
+//        }
+
+        // Ignore TASS communication rules for now
+        $studentjoin = "LEFT JOIN student as s
+                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
 
         // Single Tuple contains data for [P]arent and [S]pouse
         $query = "
@@ -103,8 +137,7 @@ class Sync implements SyncInterface
                 ON p.par_code = sf.par_code
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
                 AND p.cmpy_code = sf.cmpy_code
-            LEFT JOIN student as s
-                ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
+            $studentjoin
             LEFT JOIN family f
                 ON f.entity_code = p.par_code AND f.entity_gender = 'M'
             LEFT JOIN persondefs pd
@@ -138,8 +171,7 @@ class Sync implements SyncInterface
                 ON p.par_code = sf.par_code
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
                 AND p.cmpy_code = sf.cmpy_code
-            LEFT JOIN student as s
-                ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
+            $studentjoin
             LEFT JOIN family f
                 ON f.entity_code = p.par_code AND f.entity_gender = 'F'
             LEFT JOIN persondefs pd

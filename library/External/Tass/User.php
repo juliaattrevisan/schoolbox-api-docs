@@ -23,18 +23,29 @@ class External_Tass_User implements External_UserInterface
      */
     private $companyCode;
 
+    /** @var External_Tass_Helper */
+    private $helper;
+
+    /** @var Group */
+    private $groupHandler;
+
+    /**
+     * External_Tass_User constructor.
+     */
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
         $this->groupHandler = new Group;
         $this->companyCode  = Config::get('external_tass_company_code');
+        $this->helper = new External_Tass_Helper();
     }
 
+    /**
+     * @param $synID
+     */
     function getParent($synID)
     {
-
     }
-
 
     /**
      * Get all the parents of the students id
@@ -52,14 +63,45 @@ class External_Tass_User implements External_UserInterface
         if (empty($idList)) {
             return array();
         }
+
+        $addnum = $this->helper->getAddNum();
+        $companyCode = $this->database->smartQuote($this->companyCode);
+
         $query = "
             SELECT pa.par_code, pa.e_mail, pa.add_num
             FROM paraddress pa
             INNER JOIN parent p ON pa.par_code=p.par_code AND pa.cmpy_code=p.cmpy_code
             INNER JOIN student s ON p.par_code=s.par_code AND p.cmpy_code=s.cmpy_code
-            WHERE s.stud_code IN ($idList)
-            AND pa.add_num IN (1, 4, 5)
+            WHERE s.stud_code IN ($idList) AND pa.cmpy_code = {$companyCode} AND pa.add_num IN ($addnum)
         ";
+
+        /* If Tass Comm rules are enabled then locate the guardian relationship
+         * from there as well
+         */
+        if (Config::get('external_tass_commrules')) {
+
+            $query .= "
+                UNION
+                SELECT DISTINCT pa.par_code, pa.e_mail, pa.add_num
+                FROM paraddress pa
+                INNER JOIN studcommrules scr ON pa.par_code=scr.par_code
+                    AND pa.cmpy_code = scr.cmpy_code
+                    AND scr.cmpy_code = {$companyCode}
+                    AND pa.add_num = scr.add_num
+            ";
+
+            $typecode = $this->helper->getTypeCode();
+
+            if (!empty($typecode)) {
+                $query .= "AND scr.commtype_code IN ({$typecode}) ";
+            }
+
+            $query .= "
+                INNER JOIN student s ON scr.par_code=s.par_code AND scr.cmpy_code=s.cmpy_code
+                WHERE s.stud_code IN ($idList) AND pa.cmpy_code = {$companyCode} AND pa.add_num IN ($addnum)
+            ";
+        }
+
         $this->getDatabase()->query($query);
         while ($row = $this->getDatabase()->getNextArray()) {
             if(stristr($row['e_mail'],';')) {
@@ -138,7 +180,10 @@ class External_Tass_User implements External_UserInterface
 
     function getStudentContactList($tassID)
     {
-
+        /* commrules support not added here
+         * based on the ?good/?bad assumption that the contacts to show on a
+         * students profile should only be the primary ones from the parent table
+         */
         $query = "SELECT  'P' + student.par_code as StudentContactID,
                           parent.f_name StudentContactPreferred,
                           addr1 StudentContactAddress1,
@@ -192,8 +237,6 @@ class External_Tass_User implements External_UserInterface
     }
 
     /**
-     *
-     *
      * @param User $user
      * @return array
      */
@@ -251,7 +294,6 @@ class External_Tass_User implements External_UserInterface
     */
     public function getEnrolledStudents($tassID)
     {
-
         /* If the TassID is 8 characters long then it is assumed to be
 		 * someone in the split-parent scenario.
 		 */
@@ -263,6 +305,14 @@ class External_Tass_User implements External_UserInterface
 
         // remove the P|S prefix
         $id = substr($tassID, 1);
+
+        $companyCode = $this->database->smartQuote($this->companyCode);
+        $commrules = Config::get('external_tass_commrules');
+        $addnum = $this->helper->getAddNum();
+        $typecode = $this->helper->getTypeCode();
+
+        /* If Tass Comm rules are enabled then locate the guardian relationship from there as well */
+
         $splitParentLength = Config::get('external_tass_parent_id_length') + 1;
         if (strlen($id) == $splitParentLength) {
             // This is a split family parent, deal with them differently
@@ -270,7 +320,7 @@ class External_Tass_User implements External_UserInterface
             $parentNum = $id[$splitParentLength-1];
 
             $query = "
-                SELECT
+                SELECT DISTINCT
                     sf.stud_codes AS RelatedID
                 FROM parent AS p
                 INNER JOIN paraddress as pa
@@ -284,8 +334,25 @@ class External_Tass_User implements External_UserInterface
                     AND p.cmpy_code = s.cmpy_code
                 WHERE sf.par_code = {$this->getDatabase()->smartQuote($parentCode)}
                 AND   sf.sfa_num  = {$this->getDatabase()->smartQuote($parentNum)}
-                ORDER BY p.par_code ASC
             ";
+
+            if ($commrules) {
+
+                $query = $query . "
+                    UNION
+
+                    SELECT DISTINCT
+                        scr.stud_code AS RelatedID
+                    FROM studcommrules as scr
+                    WHERE cmpy_code = {$companyCode}
+                    AND par_code = {$this->getDatabase()->smartQuote($parentCode)}
+                    AND add_num IN({$addnum}) 
+                ";
+
+                if (!empty($typecode)) {
+                    $query .= "AND commtype_code IN ({$typecode}) ";
+                }
+            }
 
             $return = array();
             $result = $this->getDatabase()->getAll($query);
@@ -302,13 +369,31 @@ class External_Tass_User implements External_UserInterface
             }
         } else {
             $query = "
-				SELECT s.stud_code AS RelatedID
-				FROM student s
+                SELECT DISTINCT
+                    s.stud_code AS RelatedID
+                FROM student s
                 LEFT JOIN parent p
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
-				WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
-			";
+                WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
+            ";
+            if ($commrules) {
+                $query = $query . "
+                    UNION
+
+                    SELECT DISTINCT
+                        scr.stud_code AS RelatedID
+                    FROM studcommrules as scr
+                    WHERE cmpy_code = {$companyCode}
+                    AND par_code = {$this->getDatabase()->smartQuote($id)}
+                    AND add_num IN ({$addnum})
+                ";
+
+                if (!empty($typecode)) {
+                    $query .= "AND commtype_code IN ({$typecode}) ";
+                }
+            }
+
             $return = $this->getDatabase()->getAll($query);
         }
 
@@ -465,6 +550,7 @@ class External_Tass_User implements External_UserInterface
 
         // pia_sfaccess: only join the relevant paraddress
         // no pia_sfaccess: get all paraddress
+        
         $database = $this->getDatabase();
         $query = "
             SELECT
