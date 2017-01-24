@@ -58,6 +58,7 @@ class Factory
     {
         $zone = new Zone('files');
         $zone->setMulti(false)->setAttachmentsLabel('');
+        $zone->setAttachPrompt('attach file');
 
         /* Figure out what the hash is
          * TODO: I'm sure there's a better way, but I can't remember it right now
