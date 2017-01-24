@@ -108,7 +108,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
     element.attr('data-datepicker-id', pickerId);
 
     var modalSize = (options.type == 'event' || options.type == 'duework') ? '650px' : '325px';
-    element.after('<div data-reveal id="picker' + pickerId + '" class="reveal-modal" style="width: ' + modalSize + ';"></div>');
+    element.after('<div data-reveal id="picker' + pickerId + '" class="reveal-modal no-pad" style="width: ' + modalSize + ';"></div>');
 
     // Create click event to open the modal for the element
 

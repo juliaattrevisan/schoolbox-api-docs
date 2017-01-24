@@ -90,12 +90,13 @@
     {% set width = 12 %}
 {% endif %}
 <div class="row">
-    <dl class="tabs" data-tab>
-        <dd class=""><a href="#" id="tab-1-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
-        <dd class=""><a href="#" id="tab-2-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>Timetable</a></dd>
+    <dl class="tabs-material" data-tab>
+        <dd class="active"><a href="#" id="tab-1-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>View By Date</a></dd>
+        <dd class=""><a href="#" id="tab-2-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>View By Timetable</a></dd>
     </dl>
 </div>
-<div class="row">
+
+<div class="row" style="padding:0.875rem;">
     <div class="tabs-content">
         <div class='content active' id="byDate-{{ id }}">
             <div class="small-12 medium-{{ width }} columns">
@@ -232,11 +233,17 @@
         $('#byDate-{{ id }}').css('display', 'block');
         $('#byTimetable-{{ id }}').css('display', 'none');
 
+        $(this).parent().addClass('active');
+        $('#tab-2-{{ id }}').parent().removeClass('active');
+
     });
 
     $('#tab-2-{{ id }}').click(function(){
         $('#byDate-{{ id }}').css('display', 'none');
         $('#byTimetable-{{ id }}').css('display', 'block');
+
+        $(this).parent().addClass('active');
+        $('#tab-1-{{ id }}').parent().removeClass('active');
 
     });
 
