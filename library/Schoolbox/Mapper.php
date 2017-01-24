@@ -1336,7 +1336,8 @@ abstract class Mapper implements IMapper, Serializable
             $this->soft_delete_column,
             $this->soft_delete_undeleted_value,
             self::CALLBACK_PRERESTORE,
-            self::CALLBACK_POSTRESTORE
+            self::CALLBACK_POSTRESTORE,
+            self::METHOD_CREATE
         );
     }
 
