@@ -10,7 +10,7 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>{{ participant.assessable.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {assessment: participant.assessable, student: participant.user, user: currentUser, icon: 'icon-due-work'} %}
+        {% include '@learningAssessment/meta.twig' with {assessment: participant.assessable, submissionsBlocked: submissionsBlocked, student: participant.user, user: currentUser, icon: 'icon-due-work'} %}
     </div>
 </div>
 
@@ -28,12 +28,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-    {% if submissionsBlocked %}
-        <div class="empty-state">
-            <i class="icon-due-work"></i>
-            <p>{{ submissionsBlocked }}</p>
-        </div>
-    {% else %}
+    {% if not submissionsBlocked %}
         {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable, participant: participant }) %}
         {% if submitRoute %}
             {% set submitText %}{% spaceless %}
