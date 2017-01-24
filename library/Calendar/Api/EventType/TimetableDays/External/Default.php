@@ -110,17 +110,19 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
 
                 // Store the event in a temporary array so we can deduplicate when there are multiple campuses
 
-                if (!isset($days[$dayNumber])) {
-                    $days[$dayNumber] = [];
+                $index = "{$dayNumber}_{$campus->getExtTimetableCode()}";
+
+                if (!isset($days[$index])) {
+                    $days[$index] = [];
                 }
 
-                $days[$dayNumber]['event'] = $event;
+                $days[$index]['event'] = $event;
 
-                if (!isset($days[$dayNumber]['campus'])) {
-                    $days[$dayNumber]['campus'] = [];
+                if (!isset($days[$index]['campus'])) {
+                    $days[$index]['campus'] = [];
                 }
 
-                $days[$dayNumber]['records'][] = [
+                $days[$index]['records'][] = [
                     'campusName' => $campusName,
                     'dayName' => $dayName
                 ];
