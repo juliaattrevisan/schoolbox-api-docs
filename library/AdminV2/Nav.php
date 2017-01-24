@@ -16,6 +16,7 @@ class AdminV2_Nav
         'dashboard'        => 'Dashboard',
         'homepage'         => 'Homepages',
         'eportfolio'       => 'ePortfolios',
+        'eportfolio/deploy'=> 'ePortfolio Deployment',
         'allowed-file'     => 'Allowed Files',
         'setting'          => 'Settings',
         'calendar'         => 'Calendar',

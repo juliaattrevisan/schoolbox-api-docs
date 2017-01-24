@@ -148,13 +148,13 @@ abstract class Eportfolio_Page_Abstract {
 
 		/* Optional add-page butonye
 		 */
-		$this->getPage()->setBlock(TEMPLATE_content, 'can_add_page', 'can_add_page_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'can_add_page', 'can_add_page_block');
 
-		$this->getPage()->setVar('can_add_page_block', '');
+        $this->getPage()->setVar('can_add_page_block', '');
 
-		if ($this->getPermission() > WRITE_ACCESS) {
-			$this->getPage()->parse('can_add_page_block', 'can_add_page');
-		}
+        if ($this->getPermission() > WRITE_ACCESS) {
+            $this->getPage()->parse('can_add_page_block', 'can_add_page');
+        }
 
         /* Only show the showcase tab if there is something to see */
         $this->getPage()->setBlock(TEMPLATE_content, 'showcase_page', 'showcase_page_block');

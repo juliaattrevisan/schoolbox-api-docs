@@ -1,0 +1,237 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+
+        var pages = $('[data-pages]');
+        var sourceEmpty = $('#source-empty');
+        var previousUser = null;
+
+        $('#sourceUserId').selectizeSelector({
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {groupID: 0},
+                dataType: 'json'
+            }
+        }).on('selectize.item_add', function (e, value) {
+
+            {# Retrieve pages for the selected user #}
+
+            if (previousUser != value) {
+                previousUser = value;
+
+                $.get('{{ routeLookup('adminEportfolio.getUserPages', {userId: 'userId'}) }}'.replace(/userId/g, value))
+                    .done(function (data) {
+
+                        {# Blow away any existing old checkboxes#}
+
+                        pages.html('');
+
+                        if (data.pages.length > 0) {
+                            {# Clone a checkbox for each page#}
+
+                            for (var i = 0; i < data.pages.length; i++) {
+                                var pageCurrent = data.pages[i];
+                                pages.append(
+                                        $('[data-clone-page]').html()
+                                                .replace(/pageId/g, pageCurrent.pageId)
+                                                .replace(/pageTitle/g, pageCurrent.pageTitle)
+                                );
+                            }
+                            sourceEmpty.hide();
+                            pages.show();
+                        } else {
+                            sourceEmpty.show();
+                            pages.hide();
+                        }
+                    })
+            }
+        }).on('selectize.item_remove', function () {
+            pages.html('');
+            $('#source-empty').show();
+            $('[data-pages]').hide();
+            previousUser = null;
+        });
+
+        $('#destinationUserId').selectizeSelector({
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {groupID: 0},
+                dataType: 'json'
+            },
+            multiple: true
+        });
+
+        jQuery.validator.addMethod("pageSelected", function () {
+            if ($('#sourceUserId').val() === '') {
+                return true;
+            }
+            return ($('[data-checkbox-page]:checked').length > 1);
+        }, jQuery.validator.format("You must select at least one page before you can proceed"));
+
+
+        jQuery.validator.addMethod("destinationSelected", function () {
+            return (
+                $('[data-campus]:checked').length > 0 ||
+                $('[data-role]:checked').length > 0 ||
+                $('#destinationUserId').val() !== ''
+            )
+        }, jQuery.validator.format("You must select at least one target user, role or campus before you can proceed"));
+
+
+        $('#form').alaressValidate({
+            rules: {
+                'sourceUserId': {
+                    'required': true
+                },
+                'destinationUserId': {
+                    'destinationSelected': true
+                },
+                'page[]': {
+                    'pageSelected': true
+                }
+            },
+            messages: {
+                'sourceUserId': {
+                    'required': 'You must specify a source user before you can proceed'
+                }
+            },
+             errorPlacement: function(error, element) {
+                if ($(element).attr('name') == 'page[]') {
+                    error.appendTo($('#errorPage'));
+                }
+                else {
+                    $.alaressValidate.defaultErrorPlacement(error, element);
+                }
+             }
+        })
+
+    });
+</script>
+
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="small-12 island">
+    <h1>ePortfolio Deployment</h1>
+    <form id="form" action="{{ routeLookup('adminEportfolio.postDeploy') }}" method="post">
+        <section>
+            <fieldset class="content">
+                <div class="row">
+                    <div class="small-12">
+                        <div class="small-12 columns">
+                            <label>
+                                Source User
+                                <span class="hint has-tip tip-top" data-tooltip title="Enter the name of the user whose ePortfolio pages you want to copy">?</span>
+                            </label>
+                            <input type="text" required id="sourceUserId" name="sourceUserId" placeholder="Copy ePortfolios From User">
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label>Select Page(s) To Copy</label>
+                            <span id="errorPage"></span>
+                            <fieldset class="checklist" data-pages style="display: none;"></fieldset>
+
+                            <p id="source-empty">The selected source user does not have any ePortfolio pages to copy.</p>
+
+                            <div class="hide">
+                                <div data-clone-page>
+                                    <input data-checkbox-page id="checkbox-pageId" type="checkbox" value="pageId" name="page[]" checked>
+                                    <label for="checkbox-pageId">pageTitle</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset class="content">
+                <div class="row">
+                    <div class="small-12">
+                        <div class="small-12 columns">
+                            <label>
+                                Target User(s)
+                                <span class="hint has-tip tip-top" data-tooltip title="Enter the names of users you want to copy the selected ePortfolio pages to">?</span>
+                            </label>
+                            <input type="text" id="destinationUserId" name="destinationUserId" placeholder="Copy ePortfolios To These Users">
+                        </div>
+
+                        <div class="small-12 medium-6 columns">
+                            <label>
+                                Target Role(s)
+                                <span class="hint has-tip tip-top" data-tooltip title="Select the roles you want to copy the selected ePortfolio pages to. All users in the selected roles will receive a copy of the ePortfolio pages selected.">?</span>
+                            </label>
+                            <fieldset class="checklist">
+                                {% for role in roles %}
+                                    <input data-role id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
+                                    <label for="checkbox-role-{{ role.id }}">{{ role.name }}</label>
+                                {% endfor %}
+                            </fieldset>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <label>
+                                Target Campus(es)
+                                <span class="hint has-tip tip-top" data-tooltip title="Select the campuses you want to copy the selected ePortfolio pages to. All users in the selected campuses will receive a copy of the ePortfolio pages selected.">?</span>
+                            </label>
+                            <fieldset class="checklist">
+                                {% for campus in campuses %}
+                                    <input data-campus id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
+                                    <label for="checkbox-campus-{{ campus.id }}">{{ campus.name }}</label>
+                                {% endfor %}
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset class="content">
+                <div class="row">
+                    <div class="small-12">
+                        <div class="small-12 columns">
+                            <label>
+                                Skip Duplicates
+                                <span class="hint has-tip tip-top" data-tooltip title="If enabled pages will not be copied to users if they already have a page with the same name.">?</span>
+                            </label>
+                            <div class="switch round">
+                                <input id="skipDuplicates" type="checkbox" name="skipDuplicates" value="1" checked>
+                                <label for="skipDuplicates">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="small-12 columns">
+                            <label>
+                                Enable ePortfolios
+                                <span class="hint has-tip tip-top" data-tooltip title="If enabled users who do not have ePortfolios enabled will have the setting automatically enabled.">?</span>
+                            </label>
+                            <div class="switch round">
+                                <input id="enableEportfolios" type="checkbox" name="enableEportfolios" value="1" checked>
+                                <label for="enableEportfolios">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="small-12 columns">
+                            <label>
+                                Perform Dry Run
+                                <span class="hint has-tip tip-top" data-tooltip title="If enabled no changes will be made to the database.">?</span>
+                            </label>
+                            <div class="switch round">
+                                <input id="dryRun" type="checkbox" name="dryRun" value="1" checked>
+                                <label for="dryRun">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </section>
+        <input type="submit" class="expand" value="Deploy Selected Pages">
+    </form>
+</div>
