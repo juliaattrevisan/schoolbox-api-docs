@@ -556,20 +556,23 @@
                                 {% endfor %}
                             </ul>
                         </div>
+                        {% if session.user.getRole().isStaff() and config.mail_enable %}
+                            <div class="component-action">
+                                <section>
+                                    <form action="/mail/createMail.php" method="post">
+                                        <div class="row">
+                                            <div class="small-12 columns">
+                                                <input type="hidden" name="replyto" value="{{ session.user.getEmail() }}"/>
+                                                <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
+                                                <button type="submit" class="button">Email All {{ group }} Teachers</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </section>
+                            </div>
+                        {% endif %}
                     </section>
                     {% endfor %}
-
-                    {% if session.user.getRole().isStaff() and config.mail_enable %}
-                    <form action="/mail/createMail.php" method="post">
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input type="hidden" name="replyto" value="{{ session.user.getEmail() }}"/>
-                                <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
-                                <button type="submit" class="button icon-email">Email All {{ group }} Teachers</button>
-                            </div>
-                        </div>
-                    </form>
-                    {% endif %}
                 </div>
             </div>
             {% endfor %}
