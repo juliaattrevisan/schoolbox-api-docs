@@ -31,7 +31,7 @@
 {% import 'sub/visibility.twig' as visibility %}
 {{ visibility.dropdown(assessment.markVisibility) }}
 
-{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}

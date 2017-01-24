@@ -197,7 +197,7 @@
 </script>
 
 
-{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Due Work'} %}
 
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
