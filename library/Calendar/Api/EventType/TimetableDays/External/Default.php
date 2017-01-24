@@ -56,8 +56,11 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $stack            = new Collection();
         $currentTimestamp = $startTimestamp;
+
+        // Collection that holds the list of events to be rendered
+
+        $stack            = new Collection();
 
         // Figure out event type
         try {
@@ -78,6 +81,8 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
             // noop
         }
 
+        $days = [];
+
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
         while ($currentTimestamp < $endTimestamp) {
@@ -92,24 +97,75 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
 
                 $event = new Event();
                 $event->setAllday(true);
-                $event->setStartTime(
-                    new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
-                );
-                $event->setEndTime(
-                    new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
-                );
+                $event->setStartTime(new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U'));
+                $event->setEndTime(new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U'));
                 $event->setEventId(md5($campusId.$event->getStartTime()->getDatabaseDate()));
                 $event->setPublishDate(null);
-                $event->setTitle(sprintf("%s: %s", $campusName, $dayName));
                 $event->setCampusList($campusId);
+                $event->setTitle(sprintf("%s: %s", $campusName, $dayName));
                 $event->setAccess(Event::CAMPUS_ACCESS);
                 $event->setType($eventType);
                 $event->setColour($eventColor);
                 $event->setConnectorId($this->getConnectorId());
-                $stack->add($event);
+
+                // Store the event in a temporary array so we can deduplicate when there are multiple campuses
+
+                $index = "{$dayNumber}_{$campus->getExtTimetableCode()}";
+
+                if (!isset($days[$index])) {
+                    $days[$index] = [];
+                }
+
+                $days[$index]['event'] = $event;
+
+                if (!isset($days[$index]['campus'])) {
+                    $days[$index]['campus'] = [];
+                }
+
+                $days[$index]['records'][] = [
+                    'campusName' => $campusName,
+                    'dayName' => $dayName
+                ];
             }
+
             $currentTimestamp = strtotime('+1 day', $currentTimestamp);
         }
+
+        // Deduplicate multiple campuses
+
+        foreach ($days as $day) {
+
+            /** @var Event $event */
+            $event = $day['event'];
+
+            // Check how many campuses there were
+
+            if (count($day['records']) == 1) {
+
+                // There was only one campus, just shunt the appointment in as it was
+
+                $stack->add($event);
+
+            } else {
+
+                // There is more than one campus, need to mangle the title to contain both campus names
+
+                $title = '';
+                $dayName = '';
+
+                foreach ($day['records'] as $record) {
+                    if ($title != '') {
+                        $title .= " / ";
+                    }
+                    $title .= $record['campusName'];
+                    $dayName = $record['dayName'];
+                }
+
+                $event->setTitle($title . ": {$dayName}");
+                $stack->add($event);
+            }
+        }
+
         return $stack;
     }
 
