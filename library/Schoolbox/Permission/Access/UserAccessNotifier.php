@@ -175,13 +175,46 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    public function notifyStaffLeft($userAccess, $user)
+    protected function notifyLeft($userAccess, $user)
     {
         if ($userAccess->getUser()->getId() == $user->getId()) {
             return $this->notifyAdmin(':user left :groupname', self::TRIGGER_LEFT, $userAccess);
         } else {
             return $this->notifyAdmin(':effector removed :user from :groupname', self::TRIGGER_LEFT, $userAccess, $user);
         }
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyStaffLeft($userAccess, $user)
+    {
+        return $this->notifyLeft($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyStudentLeft($userAccess, $user)
+    {
+        return $this->notifyLeft($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyParentLeft($userAccess, $user)
+    {
+        return $this->notifyLeft($userAccess, $user);
     }
 
 
