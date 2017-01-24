@@ -395,7 +395,7 @@ class Controller extends Base
                             /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                             foreach ($attachmentObjects as $storageObject) {
                                 $this->loadPositions($storageObject);
-                                $this->loadDivisions($storageObject);
+//                                $this->loadDivisions($storageObject);
                             }
 
                             // Now we can load teams
@@ -594,125 +594,125 @@ class Controller extends Base
         }
     }
 
-    /**
-     * Iterate a CSV file looking for divisions
-     * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @throws \Exception
-     */
-    private function loadDivisions($storageObject)
-    {
-        // Go through the CSV and extract all of the information into an array
-
-        $reader = new Reader($storageObject->readStream());
-        $reader->setLoadFromFirst(true);
-
-        while ($reader->valid()) {
-
-            $reader->next();
-            $row = $reader->current();
-
-            if ($this->makeKey($row[0]) == Controller::TYPE_DIVISION) {
-
-                $error = false;
-                $season = null;
-
-                if (empty(trim($row[1]))) {
-                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: No season name specified");
-                    $error = true;
-
-                } else {
-                    try {
-                        /** @var Season $season */
-                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
-                    } catch (MapperException $e) {
-                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: Season not found in database ({$row[1]})");
-                        $error = true;
-                    }
-                }
-
-                if (empty(trim($row[2]))) {
-                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED DIVISION: No sport name specified");
-                    $error = true;
-                }
-
-                if (empty(trim($row[3]))) {
-                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED DIVISION: No division name specified");
-                    $error = true;
-                }
-
-                if (!empty($row[4])) {
-                    $url = new \Url($row[4]);
-
-                    if (!$url->isUrl()) {
-                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 5, "SKIPPED DIVISION: Invalid URL specified ({$row[4]})");
-                        $error = true;
-                    }
-                }
-
-                if (!$error) {
-
-                    // Find the sport associated with the division, and create if doesn't exist
-
-                    try {
-                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], [], $this->disableCache);
-                    } catch (MapperException $e) {
-                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
-                        $sport = new Sport();
-                        $sport->setName($row[2]);
-                        $this->getSportMapper()->save($sport);
-                    }
-
-                    // Create or update the division
-
-                    try {
-                        $division = $this->getDivisionMapper()->findOneByColumnList([
-                            'sport_id' => $sport->getId(),
-                            'season_id' => $season->getId(),
-                            'name' => $row[3]
-                        ], [], $this->disableCache);
-                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Division '{$row[3]}'");
-                    } catch (MapperException $e) {
-                        $division = new Division();
-                        $division->setName($row[3]);
-                        $division->setSeason($season);
-                        $division->setSport($sport);
-                        $this->getDivisionMapper()->save($division);
-                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
-                    }
-
-                    // Add new players to division, this will not delete any existing players so as not to screw over existing
-                    // match participants/results
-
-                    $players = [];
-
-                    for ($i = 5; $i < count($row); $i++) {
-                        if (is_numeric($row[$i])) {
-                            $players[] = $row[$i];
-                        }
-                    }
-
-                    foreach ($players as $player) {
-                        try {
-                            $this->getDivisionUserMapper()->findOneByColumnList([
-                                'division_id' => $division->getId(),
-                                'user_id' => $player
-                            ], [], $this->disableCache);
-                        } catch (MapperException $e) {
-                            $user = new User();
-                            $user->setId($player);
-
-                            $divisionUser = new DivisionUser();
-                            $divisionUser->setDivision($division);
-                            $divisionUser->setSequence(0);
-                            $divisionUser->setUser($user);
-                            $this->getDivisionUserMapper()->save($divisionUser);
-                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to division '{$division->getName()}'");
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    /**
+//     * Iterate a CSV file looking for divisions
+//     * @param \Schoolbox\Resource\Storage\Model $storageObject
+//     * @throws \Exception
+//     */
+//    private function loadDivisions($storageObject)
+//    {
+//        // Go through the CSV and extract all of the information into an array
+//
+//        $reader = new Reader($storageObject->readStream());
+//        $reader->setLoadFromFirst(true);
+//
+//        while ($reader->valid()) {
+//
+//            $reader->next();
+//            $row = $reader->current();
+//
+//            if ($this->makeKey($row[0]) == Controller::TYPE_DIVISION) {
+//
+//                $error = false;
+//                $season = null;
+//
+//                if (empty(trim($row[1]))) {
+//                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: No season name specified");
+//                    $error = true;
+//
+//                } else {
+//                    try {
+//                        /** @var Season $season */
+//                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+//                    } catch (MapperException $e) {
+//                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: Season not found in database ({$row[1]})");
+//                        $error = true;
+//                    }
+//                }
+//
+//                if (empty(trim($row[2]))) {
+//                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED DIVISION: No sport name specified");
+//                    $error = true;
+//                }
+//
+//                if (empty(trim($row[3]))) {
+//                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED DIVISION: No division name specified");
+//                    $error = true;
+//                }
+//
+//                if (!empty($row[4])) {
+//                    $url = new \Url($row[4]);
+//
+//                    if (!$url->isUrl()) {
+//                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 5, "SKIPPED DIVISION: Invalid URL specified ({$row[4]})");
+//                        $error = true;
+//                    }
+//                }
+//
+//                if (!$error) {
+//
+//                    // Find the sport associated with the division, and create if doesn't exist
+//
+//                    try {
+//                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], [], $this->disableCache);
+//                    } catch (MapperException $e) {
+//                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
+//                        $sport = new Sport();
+//                        $sport->setName($row[2]);
+//                        $this->getSportMapper()->save($sport);
+//                    }
+//
+//                    // Create or update the division
+//
+//                    try {
+//                        $division = $this->getDivisionMapper()->findOneByColumnList([
+//                            'sport_id' => $sport->getId(),
+//                            'season_id' => $season->getId(),
+//                            'name' => $row[3]
+//                        ], [], $this->disableCache);
+//                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Division '{$row[3]}'");
+//                    } catch (MapperException $e) {
+//                        $division = new Division();
+//                        $division->setName($row[3]);
+//                        $division->setSeason($season);
+//                        $division->setSport($sport);
+//                        $this->getDivisionMapper()->save($division);
+//                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
+//                    }
+//
+//                    // Add new players to division, this will not delete any existing players so as not to screw over existing
+//                    // match participants/results
+//
+//                    $players = [];
+//
+//                    for ($i = 5; $i < count($row); $i++) {
+//                        if (is_numeric($row[$i])) {
+//                            $players[] = $row[$i];
+//                        }
+//                    }
+//
+//                    foreach ($players as $player) {
+//                        try {
+//                            $this->getDivisionUserMapper()->findOneByColumnList([
+//                                'division_id' => $division->getId(),
+//                                'user_id' => $player
+//                            ], [], $this->disableCache);
+//                        } catch (MapperException $e) {
+//                            $user = new User();
+//                            $user->setId($player);
+//
+//                            $divisionUser = new DivisionUser();
+//                            $divisionUser->setDivision($division);
+//                            $divisionUser->setSequence(0);
+//                            $divisionUser->setUser($user);
+//                            $this->getDivisionUserMapper()->save($divisionUser);
+//                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to division '{$division->getName()}'");
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Iterate a CSV file looking for venues
