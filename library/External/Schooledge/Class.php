@@ -10,4 +10,19 @@
  */
 class External_Schooledge_Class extends External_Humanedge_Class implements External_ClassInterface
 {
+    /**
+     * @inheritDoc
+     */
+    public function getStudents($classCode)
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTeacherName($classCode)
+    {
+        return [];
+    }
 }
