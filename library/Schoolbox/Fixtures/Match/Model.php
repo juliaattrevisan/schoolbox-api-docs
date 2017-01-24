@@ -79,6 +79,39 @@ class Model implements ISoftDeletable
         $this->setItinerary(new Collection());
     }
 
+    /**
+     * Get the Team or School names for display purposes
+     *
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        $homeName = 'Unknown';
+        $awayName = 'Unknown';
+
+        if ($this->getHomeTeam()->getId()) {
+            $homeName = $this->getHomeTeam()->getName();
+        }
+        elseif ($this->getHomeSchool()->getId()) {
+            $homeName = $this->getHomeSchool()->getName();
+        }
+
+        if ($this->getAwayTeam()->getId()) {
+            $awayName = $this->getAwayTeam()->getName();
+        }
+        elseif ($this->getAwaySchool()->getId()) {
+            $awayName = $this->getAwaySchool()->getName();
+        }
+
+        if (strlen($this->getName())) {
+            $matchName = "{$this->getName()}; ";
+        }
+        else {
+            $matchName = '';
+        }
+
+        return "{$matchName} {$homeName} vs {$awayName}";
+    }
 
     /**
      * This Match contains $team
