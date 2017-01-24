@@ -8,14 +8,6 @@
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage({
-            setFormData: function (data) {
-                if (CKEDITOR.instances['description'] != undefined) {
-                    data.push({
-                        name: 'description',
-                        value: CKEDITOR.instances['description'].getData()
-                    });
-                }
-            },
             onXhrDone: function (data) {
                 if('string' == typeof data.returnUrl){
                     window.location.href = data.returnUrl;

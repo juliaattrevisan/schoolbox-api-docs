@@ -156,15 +156,6 @@
             $('input[data-mage-next="end"]').mage({
                 validateOptions: validateOptions,
                 beforeSubmit: beforeSubmit,
-                setFormData: function(data) {
-                    if (CKEDITOR.instances['description'] != undefined) {
-                        data.push({
-                            name: 'description',
-                            value: CKEDITOR.instances['description'].getData()
-                        });
-                    }
-                },
-
                 onXhrDone: function (data) {
                     if('string' == typeof data.returnUrl){
                         window.location.href = data.returnUrl;
