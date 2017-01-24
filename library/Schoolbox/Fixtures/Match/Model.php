@@ -79,32 +79,39 @@ class Model implements ISoftDeletable
         $this->setItinerary(new Collection());
     }
 
-    /**
-     * Get the Team or School names for display purposes
-     *
-     * @return string
-     */
-    public function getDisplayName()
-    {
-        $homeName = 'Unknown';
-        $awayName = 'Unknown';
-
-        if ($this->getHomeTeam() instanceof Team) {
-            $homeName = $this->getHomeTeam()->getName();
-        }
-        elseif ($this->getHomeSchool() instanceof School) {
-            $homeName = $this->getHomeSchool()->getName();
-        }
-
-        if ($this->getAwayTeam() instanceof Team) {
-            $awayName = $this->getAwayTeam()->getName();
-        }
-        elseif ($this->getAwaySchool() instanceof School) {
-            $awayName = $this->getAwaySchool()->getName();
-        }
-
-        return "{$homeName} vs {$awayName}";
-    }
+//    /**
+//     * Get the Team or School names for display purposes
+//     *
+//     * @return string
+//     */
+//    public function getDisplayName()
+//    {
+//        $homeName = 'Unknown';
+//        $awayName = 'Unknown';
+//
+//        if ($this->getHomeTeam() instanceof Team) {
+//            $homeName = $this->getHomeTeam()->getName();
+//        }
+//        elseif ($this->getHomeSchool() instanceof School) {
+//            $homeName = $this->getHomeSchool()->getName();
+//        }
+//
+//        if ($this->getAwayTeam() instanceof Team) {
+//            $awayName = $this->getAwayTeam()->getName();
+//            ob_start();
+//            print_r($this->getAwayTeam());
+//            $x = ob_get_contents();
+//            ob_end_clean();
+//
+//            $awayName = $x;
+//        }
+//        elseif ($this->getAwaySchool() instanceof School) {
+//            $awayName = $this->getAwaySchool()->getName();
+//            $awayName = 'bravo';
+//        }
+//
+//        return "{$homeName} vs {$awayName}";
+//    }
 
     /**
      * This Match contains $team
