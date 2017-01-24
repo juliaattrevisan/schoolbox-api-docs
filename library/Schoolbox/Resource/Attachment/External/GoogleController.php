@@ -37,6 +37,9 @@ class GoogleController extends AbstractController implements ExternalInterface {
     /** @var string */
     protected $gAppsClientId;
 
+    /** @var string */
+    protected $gDriveEnabled;
+
 
     /**
      * @param bool          $multi
@@ -53,11 +56,14 @@ class GoogleController extends AbstractController implements ExternalInterface {
         $this->setViewsFromMimeFilter($mimeFilter);
 
         if ($conf) {
+            $this->gDriveEnabled = $conf->get('googledrive_enabled');
             $this->gAppsApiKey   = $conf->get('googleapps_api_key');
             $this->gAppsClientId = $conf->get('googleapps_client_id');
         }
 
-        if(!($this->gAppsApiKey && $this->gAppsClientId)) {
+        if (!$this->gDriveEnabled) {
+            throw new OutOfRangeException("Google Drive not enabled");
+        } else if (!($this->gAppsApiKey && $this->gAppsClientId)) {
             throw new OutOfRangeException("Google Apps credentials not specified");
         }
     }
