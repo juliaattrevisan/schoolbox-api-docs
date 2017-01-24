@@ -177,8 +177,57 @@
 </div>
 <script>
 
-    {# Tabs #}
+    {# Picker settings#}
 
+    {# Build datepicker options here... again... #}
+
+    var pickerOptions = {
+
+        {# Flatpickr related #}
+        enableTime: getValue($('#{{ element }}'), 'data-datepicker-time'),
+
+        {# All the rest #}
+        {# bothFormats: false, //Can use both displayFormat and displayFormatDate #}
+        allDay: getValue($('#{{ element }}'), 'data-datepicker-allday'), {# Show All Day switch #}
+        allDayExt: getValue($('#{{ element }}'), 'data-datepicker-alldayext'),
+        {# allDateTime: 'start', //Set time to start or end of the day: start, finish #}
+        type: getValue($('#{{ element }}'), 'data-datepicker-call'), {# Ajax call type: events, duework or nothing #}
+
+    };
+
+    function manageAllDay ( state ) {
+        {# Get external allDay hidden field, if it's been set #}
+        if(pickerOptions.allDayExt !== false) {
+            var allDaySwitch = $('#'+pickerOptions.allDayExt);
+        }
+
+        {# Get all linked inputs, e.g. startDate, endDate #}
+        $('[data-datepicker-alldayext = '+ pickerOptions.allDayExt +']').each( function() {
+            {# Get their pickerIds#}
+            var pId = $(this).attr('data-datepicker-id');
+            var timeDiv = $('#pickerCalendar'+pId).closest('#picker'+pId).find('.flatpickr-time');
+            {# All Day is on  #}
+            if(state === true) {
+                timeDiv.css('display', 'none');
+                $('#hideTime'+pId).prop('checked', true);
+                $('[data-datepicker-id='+pId+']').val(moment($(this).val(),  convertFormat('{{ displayFormat }}')).format(convertFormat('{{ displayFormatDate }}')));
+                if(pickerOptions.allDayExt !== false) {
+                    allDaySwitch.val(1);
+                }
+            }
+            else {
+                timeDiv.css('display', 'block');
+                $('#hideTime'+pId).prop('checked', false);
+                $('[data-datepicker-id='+pId+']').val(moment($(this).val(),  convertFormat('{{ displayFormatDate }}')).format(convertFormat('{{ displayFormat }}')));
+                if(pickerOptions.allDayExt !== false) {
+                    allDaySwitch.val(0);
+                }
+            }
+        });
+
+    }
+
+    {# Tabs #}
     $('#tab-1-{{ id }}').click(function(){
         $('#byDate-{{ id }}').css('display', 'block');
         $('#byTimetable-{{ id }}').css('display', 'none');
@@ -213,7 +262,6 @@
 
         {# Ajax returned date #}
         timetableDate = moment(data.date, convertFormat('{{ displayFormat }}')).format(convertFormat('F d, Y'));
-
         if (template == 'duework') {
 
             if (data.students.length == 0) {
@@ -445,38 +493,20 @@
     });
 
     {# Submit timetable datetime #}
-
     $('.timetable-submit').click(function() {
         var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
-        var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'hh:mma');
-        var newDate = (timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0)).format(convertFormat('Y-m-d H:i:s'));
+        var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'h:mma');
+        var newDate = timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0).format(convertFormat('Y-m-d H:i:s'));
         {# Turn AllDay off #}
         $('#allday').val(0);
         window.pickerInstance[{{ id }}].setDate(newDate);
     });
 
-    {# Change input fields associted with the allDayExt #}
-
-    var allDayExt = getValue($('#{{ element }}'), 'data-datepicker-alldayext');
-    $('#'+allDayExt).change( function() {
-        if ( $(this).val() == 1) {
-            $('[data-datepicker-alldayext = '+$(this).attr("id")+']').each( function() {
-                var value = $(this).val();
-                $(this).val(moment(value,  convertFormat('{{ displayFormat }}')).format(convertFormat('{{ displayFormatDate }}')));
-            });
-        }
-        else {
-            $('[data-datepicker-alldayext = '+$(this).attr("id")+']').each( function() {
-                var value = $(this).val();
-                $(this).val(moment(value,  convertFormat('{{ displayFormatDate }}')).format(convertFormat('{{ displayFormat }}')));
-            });
-        }
-    });
-
     {# Setup calendar #}
     var newDate, latestDate;
 
-    var pickerOptions = {
+    window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
+
         defaultDate: new Date({{ value }}),
         dateFormat: '{{ displayFormat }}',
         inline: true,
@@ -484,78 +514,46 @@
         allowInput: true,
         disableMobile: true,
         minuteIncrement: 1,
-        {# Build datepicker options here... again... #}
-        enableTime: getValue($('#{{ element }}'), 'data-datepicker-time'),
-        {# bothFormats: false, //Can use both displayFormat and displayFormatDate #}
-        allDay: getValue($('#{{ element }}'), 'data-datepicker-allday'), {# Show All Day switch #}
-        allDayExt: allDayExt, {# Sync with external AllDay input hidden field #}
-        {# allDateTime: 'start', //Set time to start or end of the day: start, finish #}
-        type: getValue($('#{{ element }}'), 'data-datepicker-call'), {# Ajax call type: events, duework or nothing #}
+        enableTime: pickerOptions.enableTime,
 
         onReady: function (selectedDates, dateStr, instance) {
-//            alert('onReady: '+dateStr);
-            //Wrong format, swaps day with month
+
             var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
-            var calendarDiv = $('#picker{{ id }}').find('.flatpickr-calendar');
-            var presetObj = new Date('{{ value }}');
 
             var html = '<div class="row"><div class="small-6 columns">';
 
             {# Build an All Day switch if it's been set in the options #}
-            if( instance.config.allDay === true ) {
-            html += '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
-                '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
-                '</div>';
+            if (pickerOptions.allDay === true) {
+                html += '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
+                        '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
+                        '</div>';
             }
             html += '<div class="small-6 columns">' +
                     '<div class="submit-calendar"><a href="#" class="button submit picker-submit close-reveal-modal" >Update</a><div>' +
                     '</div></div>';
 
-
             timeDiv.after(html);
 
-            {# Hide time picker if allday hidden field is set to 1 #}
-            if (instance.config.allDayExt !== false ) {
-                var allDaySwitch = $('#'+instance.config.allDayExt);
-            }
-            if ( (allDaySwitch !== undefined && allDaySwitch.val() == 1) || instance.config.enableTime === false ) {
-                timeDiv.css('display', 'none');
-//                calendarDiv.addClass('all-day');
-//                calendarDiv.removeClass('has-time');
-            }
-            else {
-                if(instance.config.allDay === true ) {
-                    $('#hideTime{{ id }}').prop('checked', false);
+            if (pickerOptions.allDay === true) {
+                {# Hide time picker if allday hidden field is set to 1 #}
+                if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
+                    manageAllDay(true);
                 }
-                timeDiv.css('display', 'block');
-            }
-            if( instance.config.allDay === true ) {
+                else {
+                    manageAllDay(false);
+                }
                 $('#hideTime{{ id }}').click(function () {
                     if ($('#hideTime{{ id }}').is(':checked')) {
-                        timeDiv.css('display', 'none');
-//                        calendarDiv.addClass('all-day');
-//                        calendarDiv.removeClass('hasTime');
-                        if (instance.config.allDayExt !== false ) {
-                            allDaySwitch.val(1).trigger('change');
-                        }
-                        // Get rid of time
-                        var allDay = moment(instance.input.value, convertFormat('{{ displayFormat }}')).format(convertFormat('Y-m-d'));
-                        instance.setDate(allDay);
-                        $('*[data-pickerid="{{ id }}"]').val(allDay);
+                        manageAllDay(true);
                     }
                     else {
-                        timeDiv.css('display', 'block');
-                        if (instance.config.allDayExt !== false ) {
-                            allDaySwitch.val(0).trigger('change');
-                        }
-//                        calendarDiv.addClass('has-time');
-//                        calendarDiv.removeClass('all-day');
+                        manageAllDay(false);
                     }
                 });
             }
         },
         onChange: function (selectedDates, dateStr, instance) {
-//            alert('onChange: '+dateStr);
+
             {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
             var dateSplit = dateStr.split(' ');
             $('#pickerCalendar{{ id }}').attr('data-date', dateSplit[0]);
@@ -568,11 +566,11 @@
 
                 {% if type == 'duework' %}
 
-                    loadingResponse('calendar');
+                loadingResponse('calendar');
 
-                    var classCode = $('*[name = "classCode"]').val();
+                var classCode = $('*[name = "classCode"]').val();
 
-                    $.get(('{{ routeLookup('pickerDatetime.getDueByDate') }}').replace(/{classCode}/g, classCode).replace(/{date}/g, encodeURIComponent(dateSplit[0])))
+                $.get(('{{ routeLookup('pickerDatetime.getDueByDate') }}').replace(/{classCode}/g, classCode).replace(/{date}/g, encodeURIComponent(dateSplit[0])))
 
                         .done(function (data) {
 
@@ -585,19 +583,19 @@
 
                 {% elseif (type == 'event') %}
 
-                    {# AJAX in appointments for the selected date #}
+                {# AJAX in appointments for the selected date #}
 
-                    loadingResponse('calendar');
+                loadingResponse('calendar');
 
-                    $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
-                            .done(function (data) {
+                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
+                        .done(function (data) {
 
-                                appendResponse(data, 'events', 'calendar');
+                            appendResponse(data, 'events', 'calendar');
 
-                            })
-                            .fail(function () {
-                                console.log('Failed to retrieve appointments for specified date');
-                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to retrieve appointments for specified date');
+                        });
                 {% else %}
                 {#Do nothing#}
                 {% endif %}
@@ -605,7 +603,5 @@
             latestDate = newDate;
         },
 
-    };
-    window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", pickerOptions );
-    console.log(pickerOptions);
+    });
 </script>

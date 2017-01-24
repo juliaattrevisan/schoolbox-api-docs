@@ -94,15 +94,18 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
     if (element.val().length > 0) {
         var originalValue = element.val();
     }
-    //if no value has been passed, use today
+    // if no value has been passed, use today
     else {
         var originalValue = moment().format(convertFormat(options.displayFormat));
     }
     if (options.allDayExt !== false && $('#'+options.allDayExt).val() == 1) {
         originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat));
     }
-    //Count this picker in
+    // Count this picker in
     var pickerId = countPickers();
+
+    // Set pickerID to the element attr
+    element.attr('data-datepicker-id', pickerId);
 
     var modalSize = (options.type == 'event' || options.type == 'duework') ? '650px' : '325px';
     element.after('<div data-reveal id="picker' + pickerId + '" class="reveal-modal" style="width: ' + modalSize + ';"></div>');
