@@ -1489,7 +1489,11 @@ class Controller extends Base
                         }
 
                         /* Save all the things
+                         * First, empty all the itinerary items then resave them
                          */
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "PURGING: Removing all itinerary items for match '{$match->getName()}, {$match->getDisplayName()}'");
+                        $this->getItineraryItemMapper()->deleteByColumn('match_id', $match->getId());
+
                         foreach ($items as $item) {
                             if (!empty(trim($item['description']))) {
                                 $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Itinerary Item '{$item['description']}'");
