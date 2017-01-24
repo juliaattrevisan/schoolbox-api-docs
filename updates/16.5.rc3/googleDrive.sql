@@ -1,0 +1,2 @@
+INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES
+  ('googledrive_enabled', '1', 'Google Drive', 'If enabled Google Drive will be available once API key populated', 3, null, 10, 'true', 'false', 'false');
