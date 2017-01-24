@@ -103,7 +103,14 @@ class Model implements ISoftDeletable
             $awayName = $this->getAwaySchool()->getName();
         }
 
-        return "{$homeName} vs {$awayName}";
+        if (strlen($this->getName())) {
+            $matchName = "{$this->getName()}; ";
+        }
+        else {
+            $matchName = '';
+        }
+
+        return "{$matchName} {$homeName} vs {$awayName}";
     }
 
     /**
