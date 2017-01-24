@@ -1359,7 +1359,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @return bool
      */
-    public function updateAll($object, $field, $value, $pre_trigger = null, $post_trigger = null)
+    protected function updateAll($object, $field, $value, $pre_trigger = null, $post_trigger = null)
     {
         $collection = $this->getModelAsCollection($object);
         if (count($collection) === 0) {
