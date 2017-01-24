@@ -41,11 +41,6 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
         }
 
         $this->setBlock($templateHandle, 'category_block', 'new_category');
-        $this->setBlock('category_block', 'new_online_assessment', 'online_assessment_block');
-        $this->setBlock('category_block', 'reviewed_online_assessment', 'reviewed_block');
-        $this->setBlock('category_block', 'due_work', 'due_block');
-        $this->setBlock('category_block', 'ret_work', 'ret_block');
-        $this->setBlock('category_block', 'sub_work', 'sub_block');
         $this->setBlock('category_block', "new_news", "new_news_item");
         $this->setBlock("category_block", "new_file", "new_file_item");
         $this->setBlock("category_block", "new_url", "new_url_item");
@@ -62,15 +57,6 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
             foreach($this->catList as $catInfo)
             {
                 $this->setVar("NEW_CATEGORY_ID", $catInfo['id']);
-
-                /* What's New for Online Assessments
-                 */
-                $this->setVar('online_assessment_block', '');
-                $this->setVar('reviewed_block', '');
-                $this->setVar('due_block', '');
-                $this->setVar('ret_block', '');
-                $this->setVar('sub_block', '');
-
 
                 $cat = $this->activity->newCategory($catInfo['id']);
 
