@@ -556,7 +556,7 @@ fi
 
 ## Run SQL updates to current install
 echo "";
-$instdir/tools/update-sql.sh;
+$instdir/tools/update-sql.sh 2>&1 | tee -a /var/log/$package/upgrade.log;
 
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {
