@@ -12,22 +12,22 @@
     {% if isStaff %}
         <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-4" data-equalizer>
             <li class="no-pad">
-                <a href="https://reports.lauriston.vic.edu.au/ReportServer?/Schoolbox/Students/Assessment+Data&amp;rs:Command=Render&rc:Toolbar=false&StudentID={{ user.getId() }}"
+                <a href="https://reports.lauriston.vic.edu.au/ReportServer?/Schoolbox/Students/Assessment+Data&amp;rs:Command=Render&rc:Toolbar=false&StudentID={{user.getExternalId()}}"
                    class="no-margin button fat icon-fat size-32 icon-due-work"
                    data-equalizer-watch>Assessment Data</a>
             </li>
             <li class="no-pad">
-                <a href="https://reports.lauriston.vic.edu.au/ReportServer?/Schoolbox/Students/Reporting+Grades&amp;rs:Command=Render&rc:Toolbar=false&StudentID={{ user.getId() }}"
+                <a href="https://reports.lauriston.vic.edu.au/ReportServer?/Schoolbox/Students/Reporting+Grades&amp;rs:Command=Render&rc:Toolbar=false&StudentID={{user.getExternalId()}}"
                    class="no-margin button fat icon-fat size-32 icon-progress"
                    data-equalizer-watch>Reporting Grades</a>
             </li>
             <li class="no-pad">
-                <a href="https://reports.lauriston.vic.edu.au/ReportServer?/Schoolbox/Students/Learning+Support&amp;rs:Command=Render&rc:Toolbar=false&StudentID={{ user.getId() }}"
+                <a href="https://reports.lauriston.vic.edu.au/ReportServer?/Schoolbox/Students/Learning+Support&amp;rs:Command=Render&rc:Toolbar=false&StudentID={{user.getExternalId()}}"
                    class="no-margin button fat icon-fat size-32 icon-staff"
                    data-equalizer-watch>learning Support</a>
             </li>
             <li class="no-pad">
-                <a href="https://reports.lauriston.vic.edu.au/ReportServer?/Schoolbox/Students/Student+Notes&amp;rs:Command=Render&rc:Toolbar=false&StudentID={{ user.getId() }}"
+                <a href="https://reports.lauriston.vic.edu.au/ReportServer?/Schoolbox/Students/Student+Notes&amp;rs:Command=Render&rc:Toolbar=false&StudentID={{user.getExternalId()}}"
                    class="no-margin button fat icon-fat size-32 icon-forms"
                    data-equalizer-watch>Student Notes</a>
             </li>
