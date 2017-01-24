@@ -729,7 +729,7 @@ class Mapper extends BaseMapper
     protected function augmentListWithProjectContexts($modelList, $contextProjectIds)
     {
         if (!empty($contextProjectIds)) {
-            $contextProjects = $this->findByColumn('id', $contextProjectIds)->indexBy('id');
+            $contextProjects = $this->findByColumn('id', $contextProjectIds, ['deleted' => true])->indexBy('id');
             foreach ($modelList as $model) {
                 // This has to be a project
                 $context = $model->getAssessmentContext();
@@ -797,8 +797,8 @@ class Mapper extends BaseMapper
             }
         }
 
-        // Fetch
-        $specifications = $this->findByColumn('id', $specificationIds)->indexBy('id');
+        // Fetch (even deleted specs are required)
+        $specifications = $this->findByColumn('id', $specificationIds, ['deleted' => true])->indexBy('id');
 
         // Pass 2: hydrate
         foreach ($modelList as $model) {
