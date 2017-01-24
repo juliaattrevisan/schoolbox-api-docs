@@ -8,6 +8,7 @@
     $.fn.mightyList = function(options) {
         options = options || {};
 
+        var mightyList = this;
         var config = init(options, $(this));
 
         setupNewItems();
@@ -174,16 +175,16 @@
         }
 
         /**
-         * Submit asynchronously on blur
+         * Attach save timeouts to input changes
          */
         function setupPersist() {
 
             /* Remember original value
              *
-             * Compare against this in onBlur event to determine whether anything
+             * Compare against this in onChange event to determine whether anything
              * changed and needs to be saved
              */
-            $(config.element).on('enter', '[data-item-element]', function(event) {
+            $(config.element).on('enter', '[data-item-element]', function() {
                 var element = $(this);
 
                 /* Force trim
@@ -193,38 +194,65 @@
                 element.attr('data-item-original-value', element.val());
             });
 
-            $(config.element).on('blur', '[data-item-element]', function(event) {
-                var element = $(this);
 
-                /* Force trim
+            /**
+             * Save typing based inputs on keyup (with a timeout)
+             */
+            $(config.element).on('keyup change', '[data-item-element]', function(event) {
+
+                var self = this;
+
+                /**
+                 * Clear any existing save timeout
                  */
-                element.val($.trim(element.val()));
+                window.clearTimeout(mightyList.saveTimeout);
 
-                /* Only execute if there is data to send
+                /**
+                 * Set a new save timeout
                  */
-                var newData = element.val();
-                var originalData = element.attr('data-item-original-value');
+                mightyList.saveTimeout = window.setTimeout(function() {
+                    saveElement(self);
+                }, 1000);
 
-                if (newData && (newData != originalData)) {
-                    $.when(config.onModify(element, newData)).then(function () {
-                        /* Spawn a new row automatically if there are no
-                         * empty ones ready to utilise
-                         */
-                        if (canSpawnRow()) {
-                            spawnNewRow();
-                        }
-                    });
-                } else {
-                    $.when(config.onRevert(element)).then(function () {
-                        /* Spawn a new row automatically if there are no
-                         * empty ones ready to utilise
-                         */
-                        if (canSpawnRow()) {
-                            spawnNewRow();
-                        }
-                    });
-                }
             });
+
+        }
+
+        /**
+         * Apply modify/revert to element
+         * @param element
+         */
+        function saveElement(element) {
+            var $element = $(element);
+
+            /* Force trim
+             */
+            $element.val($.trim($element.val()));
+
+            /* Only execute if there is data to send
+             */
+            var newData = $element.val();
+            var originalData = $element.attr('data-item-original-value');
+
+            if (newData && (newData != originalData)) {
+                $.when(config.onModify($element, newData)).then(function () {
+                    /* Spawn a new row automatically if there are no
+                     * empty ones ready to utilise
+                     */
+                    if (canSpawnRow()) {
+                        spawnNewRow();
+                    }
+                });
+            } else {
+                $.when(config.onRevert($element)).then(function () {
+                    /* Spawn a new row automatically if there are no
+                     * empty ones ready to utilise
+                     */
+                    if (canSpawnRow()) {
+                        spawnNewRow();
+                    }
+                });
+            }
         }
 
         /**
