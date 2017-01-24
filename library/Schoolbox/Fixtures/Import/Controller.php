@@ -1490,34 +1490,7 @@ class Controller extends Base
                         /* Save all the things
                          * First, empty all the itinerary items then resave them
                          */
-                        if ($match->getName()) {
-                            $matchName = "{$match->getName()}; ";
-                        }
-                        else {
-                            $matchName = '';
-                        }
-
-                        /* Construct home team representation
-                         */
-                        if ($teamHome != null) {
-                            $matchName .= $match->getHomeTeam()->getName();
-                        }
-                        elseif ($schoolHome != null) {
-                            $matchName .= $match->getHomeSchool()->getName();
-                        }
-
-                        $matchName .= ' vs ';
-
-                        /* Construct away team representation
-                         */
-                        if ($teamAway != null) {
-                            $matchName .= $match->getAwayTeam()->getName();
-                        }
-                        elseif ($schoolAway != null) {
-                            $matchName .= $match->getAwaySchool()->getName();
-                        }
-
-                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "PURGING: Removing all itinerary items for match '{$matchName}'");
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "PURGING: Removing all itinerary items for match '{$match->getDisplayName()}'");
                         $this->getItineraryItemMapper()->deleteByColumn('match_id', $match->getId());
 
                         foreach ($items as $item) {
