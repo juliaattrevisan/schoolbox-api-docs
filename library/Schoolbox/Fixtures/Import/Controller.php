@@ -1016,7 +1016,6 @@ class Controller extends Base
                         $division = $this->getDivisionMapper()->findOneByColumnList([
                             'name' => $row[3],
                             'sport_id' => $sport->getId(),
-                            'season_id' => $season->getId()
                         ], [], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
