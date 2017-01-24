@@ -797,8 +797,8 @@ class Mapper extends BaseMapper
             }
         }
 
-        // Fetch
-        $specifications = $this->findByColumn('id', $specificationIds)->indexBy('id');
+        // Fetch (even deleted specs are required)
+        $specifications = $this->findByColumn('id', $specificationIds, ['deleted' => true])->indexBy('id');
 
         // Pass 2: hydrate
         foreach ($modelList as $model) {
