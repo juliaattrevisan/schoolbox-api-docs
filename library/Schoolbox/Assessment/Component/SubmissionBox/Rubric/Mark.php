@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
+use Alaress_Date_Format;
 
 /**
  * Class Mark
@@ -29,6 +30,9 @@ class Mark
 
     /** @var Descriptor */
     private $descriptor;
+
+    /** @var Alaress_Date_Format */
+    private $publishedAt;
 
     /** @var bool */
     private $valid;
@@ -71,6 +75,40 @@ class Mark
     }
 
     /**
+     * @return Alaress_Date_Format
+     */
+    public function getPublishedAt()
+    {
+        return $this->publishedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format $publishedAt
+     * @return static
+     */
+    public function setPublishedAt(Alaress_Date_Format $publishedAt)
+    {
+        $this->publishedAt = $publishedAt;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPublished()
+    {
+        return ($this->publishedAt instanceof Alaress_Date_Format && !$this->publishedAt->isNull());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDraft()
+    {
+        return !$this->isPublished();
+    }
+
+    /**
      * @return boolean
      */
     public function isValid()
@@ -96,5 +134,4 @@ class Mark
         $this->valid = $valid;
         return $this;
     }
-
 }

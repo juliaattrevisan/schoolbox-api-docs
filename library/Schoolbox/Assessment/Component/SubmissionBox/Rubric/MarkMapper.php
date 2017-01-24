@@ -12,6 +12,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -38,12 +39,16 @@ class MarkMapper extends Mapper
         $this->hasModel(Mark::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('valid', self::TYPE_BOOLEAN);
+
         $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
-        // this cannot be self::COLUMN_CREATED_TIMESTAMP because the mapper will then ignore input values when saving
-        $this->uses('tstamp', self::TYPE_DATETIME, null, 'createdAt');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('published_at', self::TYPE_DATETIME);
+
+        // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
+        // hence marks already given are invalid.
+        $this->uses('valid', self::TYPE_BOOLEAN);
     }
 
 
@@ -99,5 +104,70 @@ class MarkMapper extends Mapper
         }
 
         return $marks;
+    }
+
+    /**
+     * This will HARD-DELETE all draft marks for the specified user and assessable.
+     *
+     * @param User $user
+     * @param IAssessable $dueWork
+     * @return int
+     */
+    public function deleteDraftMarks(User $user, IAssessable $dueWork)
+    {
+        $query = "
+            DELETE FROM rubric_mark WHERE id IN (
+              SELECT * FROM (
+                SELECT rm.id FROM rubric_mark rm
+                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
+                JOIN rubric_level   rl ON rl.id = rd.level_id
+                JOIN submission_box sb ON sb.id = rl.box_id
+                WHERE rm.student_id = :student_id
+                AND sb.assessment_id = :assessment_id
+                AND rm.published_at IS NULL
+              ) t
+            )
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'student_id'    => $user->getId(),
+            'assessment_id' => $dueWork->getId(),
+        ]);
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * Publishes any draft marks for the specified User and DueWork
+     *
+     * @param User $user
+     * @param IAssessable $dueWork
+     * @return int How many marks were published.
+     */
+    public function publishDraftMarks(User $user, IAssessable $dueWork)
+    {
+        $now = \Alaress_Date_Format::now();
+
+        $query = "
+                UPDATE rubric_mark rm
+                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
+                JOIN rubric_level   rl ON rl.id = rd.level_id
+                JOIN submission_box sb ON sb.id = rl.box_id
+                SET
+                  rm.published_at = :now
+                WHERE rm.student_id = :student_id
+                AND sb.assessment_id = :assessment_id
+                AND rm.published_at IS NULL
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'now'           => $now->getDatabase(),
+            'student_id'    => $user->getId(),
+            'assessment_id' => $dueWork->getId(),
+        ]);
+
+        return $statement->rowCount();
     }
 }

@@ -390,11 +390,10 @@ class RubricMapper
         $descriptors = [];
 
         foreach ($descriptorCollection as $d) {
-            // only populate if a description is given
             $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getSequence()] = [
                 'id'     => $d->getId(),
                 'text'   => $d->getDescription(),
-                'points' => $d->getValue() || $d->getDescription() ? $d->getValue() : ''
+                'points' => $d->getValue(),
             ];
         }
 
@@ -446,13 +445,16 @@ class RubricMapper
     /**
      * @param Rubric $grid
      * @param User   $student
+     * @param bool   $publishedOnly       Whether to exclude draft marks
      * @return Rubric
      */
-    public function applyStudentMark($grid, $student)
+    public function applyStudentMark($grid, $student, $publishedOnly)
     {
         if (!$grid->getSubmissionBox() instanceof SubmissionBox) {
             throw new \InvalidArgumentException("Cannot apply marks without a submission box");
         }
+
+        $publishedClause = $publishedOnly ? 'AND rm.published_at IS NOT NULL' : '';
 
         // retrieve marks (descriptor selections for student)
         $stmt = $this->database->query("
@@ -462,16 +464,19 @@ class RubricMapper
             JOIN rubric_level rl ON rl.id = rd.level_id
             WHERE rl.box_id = :boxId
             AND rm.student_id = :userId
-            AND rm.tstamp = (
-              SELECT MAX(tstamp)
+            $publishedClause
+            AND rm.valid = TRUE
+            AND rm.created_at = (
+              SELECT MAX(created_at)
               FROM rubric_mark rm
               JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
               JOIN rubric_level rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
               WHERE rl.box_id = :boxId
               AND rm.student_id = :userId
               AND rm.valid = TRUE
+              $publishedClause
             )
-            AND rm.valid = TRUE
+            
         ", [
             'boxId'  => $grid->getSubmissionBox()->getId(),
             'userId' => $student->getId()
@@ -497,7 +502,7 @@ class RubricMapper
     public function findBySubmissionBoxAndStudent($box, $student)
     {
         $grid = $this->findBySubmissionBox($box);
-        return $this->applyStudentMark($grid, $student);
+        return $this->applyStudentMark($grid, $student, true);
     }
 
     /**
@@ -703,27 +708,34 @@ class RubricMapper
      * Save rubrics selections for a particular Participant
      *
      * @param Participant $participant
-     * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
+     * @param bool[]      $descriptors key = descriptor.id, val = whether it is checked
+     * @param bool        $isDraft Whether these are draft marks
      */
-    public function saveForParticipant(Participant $participant, array $descriptors = [])
+    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft)
     {
-        $descriptorMapper = DescriptorMapper::getInstance();
-        $markMapper       = MarkMapper::getInstance();
-        $marks            = $markMapper->createCollection();
-        $tStamp           = Alaress_Date_Format::now();
+        $descriptorMapper   = DescriptorMapper::getInstance();
+        $markMapper         = MarkMapper::getInstance();
+        $publishedAt        = $isDraft ? new \Alaress_Date_NullDate() : Alaress_Date_Format::now();
+
+        // Blow away any previous draft marks for this student and assessment
+        $markMapper->deleteDraftMarks($participant->getUser(), $participant->getAssessable());
+
+        $marksToSave = $markMapper->createCollection();
 
         foreach($descriptors as $descriptorId => $isChecked){
             if(!$isChecked){
                 continue;
             }
-            $marks->add($markMapper->createModel()
-                ->setStudent($participant->getUser())
-                ->setDescriptor($descriptorMapper->createModel($descriptorId))
-                ->setCreatedAt($tStamp)
-                ->setValid(true)
+
+            $marksToSave->add(
+                $markMapper->createModel()
+                    ->setStudent($participant->getUser())
+                    ->setDescriptor($descriptorMapper->createModel($descriptorId))
+                    ->setPublishedAt($publishedAt)
+                    ->setValid(true)
             );
         }
-        $markMapper->save($marks);
+        $markMapper->save($marksToSave);
     }
 
     /**
@@ -936,7 +948,7 @@ class RubricMapper
             JOIN rubric_descriptor rd ON rd.level_id = rl.id AND rd.criterion_id = rc.id AND rd.deleted_at IS TRUE
             JOIN rubric_mark rm ON rm.descriptor_id = rd.id AND rm.valid IS TRUE
             WHERE {$where}
-            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC, rm.tstamp
+            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC, rm.created_at
         ");
         // Note that this will return all marks for the given student and subject through time, but because we
         // have ordered by mark.timestamp, the latter values will overwrite previous marks.
