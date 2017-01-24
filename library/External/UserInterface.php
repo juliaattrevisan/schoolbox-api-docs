@@ -176,6 +176,7 @@ interface External_UserInterface {
      * StudentCampus
      *
      * @importance high - used in sync scripts.
+     * @deprecated No new sync scripts will be developed - use the User Provisioning System instead
      *
      * @return array
      */
@@ -291,6 +292,7 @@ interface External_UserInterface {
      * StudentGender
      *
      * @importance high - used in sync script.
+     * @deprecated No new sync scripts will be developed - use the User Provisioning System instead
      *
      * @return array
      */
@@ -323,6 +325,7 @@ interface External_UserInterface {
      * Get staff account information
      *
      * @importance high - used in sync scripts.
+     * @deprecated No new sync scripts will be developed - use the User Provisioning System instead
      *
      * @return array(
      *     array(
