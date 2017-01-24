@@ -1314,6 +1314,11 @@ abstract class Mapper implements IMapper, Serializable
             $this->triggerCallbacks($postCallback, $model);
         }
 
+        // Raise notifications
+        foreach ($deletedItems as $model) {
+            $this->raiseNotification($model, self::METHOD_DELETE);
+        }
+
         // return the number of rows deleted
         return $statement->rowCount();
     }
