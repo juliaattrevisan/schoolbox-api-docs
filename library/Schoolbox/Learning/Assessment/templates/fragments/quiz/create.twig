@@ -7,7 +7,7 @@
 <script type="text/javascript">
     $(function () {
 
-        /* Description
+        /* Description + Completion Message
          */
         $.fn.alaressEditor();
     });
@@ -112,6 +112,13 @@
     </div>
 </div>
 
-
+<div class="row">
+    <div class="small-12 columns">
+        <label>
+            Completion Message
+            <textarea name="completion_message">{{ assessment.completionMessage }}</textarea>
+        </label>
+    </div>
+</div>
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}

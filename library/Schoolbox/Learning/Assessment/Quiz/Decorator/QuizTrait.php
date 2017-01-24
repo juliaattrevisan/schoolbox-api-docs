@@ -28,6 +28,9 @@ trait QuizTrait
      */
     protected $maxAttempts = 0;
 
+    /** @var string */
+    protected $completionMessage;
+
     /**
      * @return int
      */
@@ -80,5 +83,21 @@ trait QuizTrait
     {
         $this->maxAttempts = $maxAttempts;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompletionMessage()
+    {
+        return $this->completionMessage;
+    }
+
+    /**
+     * @param string $completionMessage
+     */
+    public function setCompletionMessage($completionMessage)
+    {
+        $this->completionMessage = $completionMessage;
     }
 }
