@@ -1,0 +1,48 @@
+<?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Admin\RouteSummary;
+
+use Alaress\Module\Module as BaseModule;
+use Alaress\Authorizer\Rule;
+use Aura\Di\ContainerInterface;
+use Twig_Loader_Chain;
+
+/**
+ * A module for viewing a list of routes defined within Schoolbox.
+ */
+class Module extends BaseModule
+{
+    protected $basename = 'adminRouteSummary';
+
+    /**
+     * @inheritdoc
+     */
+    protected function registerRoutes()
+    {
+        $this->register('GET',  "", 'getRouteList', new Rule\IsSuperuser());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set(
+            'controller:'.$this->basename,
+            $injector->lazyNew(Controller::class)
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+}
