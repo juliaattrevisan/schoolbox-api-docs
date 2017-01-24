@@ -9,11 +9,11 @@ namespace Schoolbox\Learning\Personalised\Event;
 
 use Aura\Router\Router;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskResponse;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Personalised\Participant;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -190,10 +190,26 @@ class Factory
             $feedback          = $participantObject->findMostRecentPublishedFeedback();
 
             if ($feedback instanceof IFeedback) {
-                $mark = $feedback->getNormalisedMark();
-                if (isset($mark)) {
-                    // > mastery threshold (hardcode to 70 for now)
-                    $className[] = ($mark >= 70 ? 'mastered' : 'fail');
+
+                // Currently unavoidable hardcode of task handling -_-
+                if ($assessable instanceof Task) {
+                    $response = $participantObject->findMostRecentResponse();
+                    if ($response instanceof TaskResponse) {
+                        if ($response->isMarkedAsCompleted()) {
+                            $className[] = 'mastered';
+
+                        } elseif ($response->isMarkedAsSelfAssessed()) {
+                            $className[] = 'notmarked';
+                        }
+                    }
+
+                } else {
+                    $mark = $feedback->getNormalisedMark();
+                    if (isset($mark)) {
+                        // > mastery threshold (hardcode to 70 for now)
+                        // TODO un-hardcode this
+                        $className[] = ($mark >= 70 ? 'mastered' : 'fail');
+                    }
                 }
 
             } else {
