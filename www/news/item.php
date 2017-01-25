@@ -108,8 +108,8 @@ $this->setTab('news');
 $topic = $newsHandler->getTopicByID($article['item_topic_id']);
 
 if (!$topic) {
-    // Topic was deleted, default to first topic
-    $topic = $newsHandler->getTopicList()[0];
+    // Topic was deleted
+    error(180);
 }
 
 $url = new Url($topic['name'], '');
