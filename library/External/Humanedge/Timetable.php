@@ -185,7 +185,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             // Statement 2: electives
             $query = "
                 SELECT
-                    s.Code + ISNULL(b.Suffix, '') AS ClassCode,
+                    s.Code + '_' + RIGHT(f.Code,1) AS ClassCode,
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
@@ -200,7 +200,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 $periodJoin
                 $coreRoomJoin
                 INNER JOIN tblStudent st on a.FormID = st.FormID
-                LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
+                INNER JOIN tblForm f ON a.FormId = f.ID
                 WHERE st.deleted = 0
                 AND st.code = $quotedId
                 AND d.SortOrder = $quotedDay
@@ -236,7 +236,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             // Statement 2: electives
             $query = "
                 SELECT
-                    s.Code + ISNULL(b.Suffix, '') AS ClassCode,
+                    s.Code + '_' + RIGHT(f.Code,1) AS ClassCode,
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
@@ -250,7 +250,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 $periodJoin
                 $coreRoomJoin
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
-                LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
+                INNER JOIN tblForm f ON a.FormId = f.ID
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
                 AND d.SortOrder = $quotedDay
