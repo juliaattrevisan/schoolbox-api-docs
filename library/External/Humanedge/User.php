@@ -378,7 +378,7 @@ class External_Humanedge_User implements External_UserInterface
         } elseif ($user->getRole()->isStaff()) {
             // Statement 1: core subjects
             // Statement 2: electives
-            $roomJoin = ($this->requireTeacherSubjectsHaveRooms ? 'INNER JOIN tblRoom r on r.ID = b.RoomID' : '');
+            $roomJoin = ($this->requireTeacherSubjectsHaveRooms ? 'INNER JOIN tblRoom r on a.RoomID = r.ID' : '');
             $query    = "
                 SELECT DISTINCT
                     s.Code + '_' + RIGHT(f.Code,1) AS code,
