@@ -10,24 +10,24 @@
 abstract class Evaluation_Export_Xml
 {
     /**  @var array */
-	protected $assess;
+	private $assess;
 
     /** @var Evaluation_Section */
-	protected $sectionHandler;
+    private $sectionHandler;
 
 	/**  @var Evaluation_Question */
-	protected $questionHandler;
+    private $questionHandler;
 
 	/** @var Evaluation_Factory */
-	protected $factory;
+    private $factory;
 
 	/** @var SitePage */
-	protected $page;
+    private $page;
 
     /**
      * @var array|bool
      */
-	protected $allSections;
+    private $allSections;
 
 	/**
 	 * Constructor
