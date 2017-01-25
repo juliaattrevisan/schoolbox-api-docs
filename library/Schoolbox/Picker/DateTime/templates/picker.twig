@@ -108,6 +108,7 @@
 
                 </div>
             {% endif %}
+            <a class="button submit picker-submit">Update</a>
         </div>
 
         <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
@@ -161,10 +162,9 @@
                     </div>
                 {% endif %}
             </div>
+            <a class="button submit timetable-submit">Update</a>
         </div>
     </div>
-
-    <a class="button submit timetable-submit">Update</a>
 </div>
 
 <script>
@@ -472,6 +472,14 @@
         {% endif %}
     });
 
+    {# Submit calendar datetime #}
+    $('.picker-submit').click(function() {
+        manageAllDay(false);
+        $('#{{ element }}').val(window.pickerInstance[{{ id }}].input.value);
+        $('#picker{{ id }}').foundation('reveal', 'close');
+
+    });
+
     {# Submit timetable datetime #}
     $('.timetable-submit').click(function() {
         var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
@@ -480,6 +488,9 @@
         {# Turn AllDay off #}
         manageAllDay(false);
         window.pickerInstance[{{ id }}].setDate(newDate);
+        $('#{{ element }}').val(window.pickerInstance[{{ id }}].input.value);
+        $('#picker{{ id }}').foundation('reveal', 'close');
+
     });
 
     {# Setup calendar #}
@@ -508,9 +519,7 @@
                         '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
                         '</div>';
             }
-            html += '<div class="small-6 columns">' +
-                    '<div class="submit-calendar"><a href="#" class="button submit picker-submit close-reveal-modal" >Update</a><div>' +
-                    '</div></div>';
+            html += '<div class="small-6 columns"></div></div>';
 
             timeDiv.after(html);
 

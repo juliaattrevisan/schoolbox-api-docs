@@ -141,7 +141,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                     if(options.enableTime === false) {
                         format = options.displayFormatDate;
                     }
-                    element.val(moment(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat)).format(convertFormat(format)));
+                    // element.val(moment(window.pickerInstance[pickerId].input.value, convertFormat(options.displayFormat)).format(convertFormat(format)));
 
                 });
 
