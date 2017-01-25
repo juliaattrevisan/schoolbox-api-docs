@@ -378,7 +378,8 @@ class External_Humanedge_User implements External_UserInterface
         } elseif ($user->getRole()->isStaff()) {
             // Statement 1: core subjects
             // Statement 2: electives
-            $roomJoin = ($this->requireTeacherSubjectsHaveRooms ? 'INNER JOIN tblRoom r on a.RoomID = r.ID' : '');
+            $coreRoomJoin  = ($this->requireTeacherSubjectsHaveRooms ? 'INNER JOIN tblRoom r on a.RoomID = r.ID' : '');
+            $electRoomJoin = ($this->requireTeacherSubjectsHaveRooms ? 'INNER JOIN tblRoom r on b.RoomID = r.ID' : '');
             $query    = "
                 SELECT DISTINCT
                     s.Code + '_' + RIGHT(f.Code,1) AS code,
@@ -389,7 +390,7 @@ class External_Humanedge_User implements External_UserInterface
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 INNER JOIN tblForm f ON a.FormId = f.ID
-                $roomJoin
+                $coreRoomJoin
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
 
@@ -403,7 +404,7 @@ class External_Humanedge_User implements External_UserInterface
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
                 INNER JOIN tblTeacher t on b.TeacherID = t.ID
-                $roomJoin
+                $electRoomJoin
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
 
