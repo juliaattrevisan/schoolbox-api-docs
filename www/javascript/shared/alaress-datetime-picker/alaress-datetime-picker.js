@@ -152,6 +152,8 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                 // Display the datetime picker modal
 
                 $('#picker' + pickerId).foundation('reveal', 'open');
+                // Initialise tabs
+                $('#picker' + pickerId).foundation('reflow', 'tab');
 
             });
 
@@ -166,11 +168,8 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
             // Since the contents have already been AJAX'd in, we can just show the modal again
 
             picker.foundation('reveal', 'open');
+
         }
-
-        // Initialise tabs
-        $(document).foundation('reflow', 'tab');
-
     });
 
 };
