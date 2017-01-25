@@ -382,6 +382,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				}
 			}
 			.profile-drop:after {
+				font-family: $font-family-icon;
 				content: "\e901";
 				color: $off-canvas-foreground;
 				display: table-cell;
@@ -395,6 +396,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				background-color: $off-canvas;
 			}
 			&.active > a:after {
+				font-family: $font-family-icon;
 				content: "\e900";
 			}
 			.content{
@@ -505,6 +507,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	// Left nav arrow override
 	ul.off-canvas-list li {
 		&.has-submenu > a:after{
+			font-family: $font-family-icon;
 			content: "\e64b";
 			font-family: 'schoolbox';
 			float: right;
@@ -542,6 +545,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 	.left-submenu .back > a:before{
+		font-family: $font-family-icon;
 		content: "\e655";
 		font-family: 'schoolbox';
 	}

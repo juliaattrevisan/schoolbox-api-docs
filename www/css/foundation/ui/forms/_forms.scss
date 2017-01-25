@@ -243,6 +243,7 @@ th, td{
 	content: "";
 }
 %fancy-check-after{
+	font-family: $font-family-icon;
 	position: absolute;
 	display: block;
 	content: "\e604";

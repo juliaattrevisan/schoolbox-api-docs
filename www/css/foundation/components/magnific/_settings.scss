@@ -96,6 +96,7 @@ img.mfp-img{
 	}
 	.mfp-arrow-left:after,
 	.mfp-arrow-right:after{
+		font-family: $font-family-icon;
 		border: 0;
 		font-size: 61px;
 		top: -5px;
