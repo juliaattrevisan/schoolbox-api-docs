@@ -28,7 +28,15 @@
         <question type="{QUESTION_TYPE_MOODLE}">
             <typeid>{QUESTION_TYPE_ID}</typeid>
             <marks>{QUESTION_MARKS}</marks>
-			<config><!-- BEGIN answer_configuration --><{ANSWER_CONFIGURATION_NAME}>{ANSWER_CONFIGURATION_VALUE}</{ANSWER_CONFIGURATION_NAME}><!-- END answer_configuration --></config>
+            <configs>
+                <!-- BEGIN answer_configuration -->
+                <config>
+                    <name>{ANSWER_CONFIGURATION_NAME}</name>
+                    <value>{ANSWER_CONFIGURATION_VALUE}</value>
+                </config>
+                <!-- END answer_configuration -->
+            </configs>
+
             <name>
                 <text>{QUESTION_MARKS} marks</text>
             </name>
