@@ -362,7 +362,6 @@ class External_Humanedge_Timetable implements External_TimetableInterface
         $periodJoin = '
             INNER JOIN tblPeriod p ON a.PeriodID = p.ID
             INNER JOIN tblDay d ON a.DayID = d.ID
-            LEFT  JOIN tblPeriodTimesByDay pd ON a.PeriodID = pd.PeriodID AND a.DayID = pd.DayID
         ';
         $coreRoomJoin  = "LEFT JOIN tblRoom r ON a.RoomID = r.ID";
         $electRoomJoin = "LEFT JOIN tblRoom r ON b.RoomID = r.ID";
