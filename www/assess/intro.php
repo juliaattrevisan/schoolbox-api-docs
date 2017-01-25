@@ -180,7 +180,6 @@ if (isset($_GET["returnUrl"])) {
     $url = sprintf('/homepage/%d', $folder->getId());
 }
 
-
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text'  => 'Learning',
