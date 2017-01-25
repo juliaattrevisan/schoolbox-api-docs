@@ -44,7 +44,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
      *
      * @param  $type_id
      * @param  $prefix
-     * @return bool
+     * @return Evaluation_Question|Evaluation_Answer|bool
      */
     public function spawn($type_id, $prefix)
     {
@@ -97,7 +97,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
      * Find out which html file to use
      *
      * @param  $type_id
-     * @return
+     * @return string
      */
     public function getQuestionType($type_id)
     {
@@ -112,7 +112,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
      * Find out which php class file to use
      *
      * @param  $type_id
-     * @return
+     * @return string
      */
     public function getQuestionClass($type_id)
     {
@@ -127,7 +127,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
      * Find out the moodle name
      *
      * @param  $type_id
-     * @return
+     * @return string|null
      */
     public function getMoodleQuestionType($type_id)
     {
