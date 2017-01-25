@@ -1,6 +1,6 @@
 <?php
 /**
- * Assessment creation. Assessments must always belong in a Category.
+ * Survey creation. Surveys must always belong in a Category.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
