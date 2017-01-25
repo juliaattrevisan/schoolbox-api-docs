@@ -15,6 +15,7 @@ if (!is_numeric($this->arg[0])) {
     error(18);
 }
 
+$data = null;
 if ($_FILES['importXML']['tmp_name']) {
     $data = file_get_contents($_FILES['importXML']['tmp_name']);
 } else {
