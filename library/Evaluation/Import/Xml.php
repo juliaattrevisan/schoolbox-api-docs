@@ -9,40 +9,57 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Evaluation_Import_Xml {
-	protected $assessHandler = null;
-	protected $sectionHandler = null;
-	protected $factory = null;
-	protected $page = null;
+abstract class Evaluation_Import_Xml
+{
+    /** @var Evaluation_Main */
+	protected $assessHandler;
 
-	/* The homepage to create for
-	 */
-	protected $categoryId = null;
+	/** @var Evaluation_Section */
+	protected $sectionHandler;
 
-	/* Temp filename to load from
-	 */
-	protected $data = '';
+	/** @var Evaluation_Factory */
+	protected $factory;
 
-	/* Resultant assess id
-	 */
-	protected $assess_id = null;
+	/** @var SitePage */
+	protected $page;
+
+    /**
+     * The homepage to create for
+     *
+     * @var int
+     */
+	protected $categoryId;
+
+	/**
+     * File contents send from browser
+     *
+     * @var string
+     */
+	protected $data;
+
+    /**
+     * Newly assigned assess_id
+     *
+     * @var int
+     */
+	protected $assess_id;
 
 	/**
 	 * The title of the Evaluation being imported
 	 *
 	 * @var string
 	 */
-	protected $title = '';
+	protected $title;
 
 	/**
 	 * Constructor
 	 *
-	 * @param $categoryId
-	 * @param $assessHandler
-	 * @param $sectionHandler
-	 * @param $factory
-	 * @param $data
-	 * @param $page
+	 * @param int $categoryId
+	 * @param Evaluation_Main $assessHandler
+	 * @param Evaluation_Section $sectionHandler
+	 * @param Evaluation_Factory $factory
+	 * @param string $data
+	 * @param SitePage $page
 	 */
 	public function __construct($categoryId, $assessHandler, $sectionHandler, $factory, $data, $page) {
 		$this->setCategoryId($categoryId);
@@ -213,7 +230,7 @@ abstract class Evaluation_Import_Xml {
 	/**
 	 * Set section handler
 	 *
-	 * @param $sectionHandler
+	 * @param Evaluation_Section $sectionHandler
 	 */
 	protected function setSectionHandler($sectionHandler) {
 		$this->sectionHandler = $sectionHandler;
@@ -222,78 +239,62 @@ abstract class Evaluation_Import_Xml {
 	/**
 	 * Get section handler
 	 *
-	 * @return null
+	 * @return Evaluation_Section
 	 */
 	protected function getSectionHandler() {
 		return $this->sectionHandler;
 	}
 
 	/**
-	 * Set factory
-	 *
-	 * @param $factory
+	 * @param Evaluation_Factory $factory
 	 */
 	protected function setFactory($factory) {
 		$this->factory = $factory;
 	}
 
 	/**
-	 * Get factory
-	 *
-	 * @return null
+	 * @return Evaluation_Factory
 	 */
 	protected function getFactory() {
 		return $this->factory;
 	}
 
 	/**
-	 * Set page
-	 *
-	 * @param $page
+	 * @param SitePage $page
 	 */
 	protected function setPage($page) {
 		$this->page = $page;
 	}
 
 	/**
-	 * Get page
-	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;
 	}
 
 	/**
-	 * Set assess handler
-	 *
-	 * @param $assessHandler
+	 * @param Evaluation_Main $assessHandler
 	 */
 	protected function setAssessHandler($assessHandler) {
 		$this->assessHandler = $assessHandler;
 	}
 
 	/**
-	 * Get assess handler
-	 *
-	 * @return null
+	 * @return Evaluation_Main
 	 */
 	protected function getAssessHandler() {
 		return $this->assessHandler;
 	}
 
 	/**
-	 * Set data
-	 *
-	 * @param $data
+	 * @param string $data
 	 */
 	protected function setData($data) {
 		$this->data = $data;
 	}
 
 	/**
-	 * Get data
-	 *
 	 * @return string
 	 */
 	protected function getData() {
@@ -301,44 +302,34 @@ abstract class Evaluation_Import_Xml {
 	}
 
 	/**
-	 * Set category id
-	 *
-	 * @param $categoryId
+	 * @param int $categoryId
 	 */
 	protected function setCategoryId($categoryId) {
 		$this->categoryId = $categoryId;
 	}
 
 	/**
-	 * Get category id
-	 *
-	 * @return null
+	 * @return int
 	 */
 	protected function getCategoryId() {
 		return $this->categoryId;
 	}
 
 	/**
-	 * Set assess id
-	 *
-	 * @param $assess_id
+	 * @param int $assess_id
 	 */
 	protected function setAssessId($assess_id) {
 		$this->assess_id = $assess_id;
 	}
 
 	/**
-	 * Get assess id
-	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getAssessId() {
 		return $this->assess_id;
 	}
 
 	/**
-	 * Set title
-	 *
 	 * @param string $title
 	 */
 	protected function setTitle($title) {
@@ -346,8 +337,6 @@ abstract class Evaluation_Import_Xml {
 	}
 
 	/**
-	 * Get title
-	 *
 	 * @return string
 	 */
 	public function getTitle() {
