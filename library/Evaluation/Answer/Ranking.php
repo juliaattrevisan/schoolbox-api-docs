@@ -291,18 +291,16 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-            for ($i = 0; $i < count($allAnswers); $i++) {
-                $currentAnswer = $allAnswers[$i];
-
-                $page->setVar(
-                    array(
-                        'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    )
-                );
-
-                $page->parse('answerCorrect_block', 'answerCorrect', true);
+            if(is_array($allAnswers) && count($allAnswers)){
+                for ($i = 0; $i < count($allAnswers); $i++) {
+                    $currentAnswer = $allAnswers[$i];
+                    $page->setVar('ANSWER_RIGHT_VALUE', Scrub::text($currentAnswer->answerRight));
+                    $page->parse('answerCorrect_block', 'answerCorrect', $i > 0);
+                }
+                return;
             }
         }
+        $page->setVar('answerOption_block', '');
     }
 
     /**

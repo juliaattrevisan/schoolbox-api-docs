@@ -269,25 +269,25 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     public function exportMoodleAnswer(SitePage $page, $question_id)
     {
         $page->setBlock('answerFormFragment', 'answerCorrect', 'answerCorrect_block');
-
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
+            if(is_array($allAnswers) && count($allAnswers)){
+                for ($i = 0; $i < count($allAnswers); $i++) {
+                    $currentAnswer = $allAnswers[$i];
 
-            for ($i = 0; $i < count($allAnswers); $i++) {
-                $currentAnswer = $allAnswers[$i];
-
-                $page->setVar(
-                    array(
+                    $page->setVar([
                         'ANSWER_LEFT_VALUE'  => Scrub::text($currentAnswer->answerLeft),
                         'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    )
-                );
+                    ]);
 
-                $page->parse('answerCorrect_block', 'answerCorrect', true);
+                    $page->parse('answerCorrect_block', 'answerCorrect', $i > 0);
+                }
+                return;
             }
         }
+        $page->setVar('answerOption_block', '');
     }
 
     /**

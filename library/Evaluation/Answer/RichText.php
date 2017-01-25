@@ -27,18 +27,11 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
 	 * @param int $question_id
 	 * @return void
 	 */
-	public function exportMoodleAnswer(SitePage $page, $question_id) {
+	public function exportMoodleAnswer(SitePage $page, $question_id)
+    {
 		$currentAnswer = $this->getByQuestionID($question_id);
-
-		/* Show correct answer
-		 */
-		$page->setVar(
-			array(
-				'CORRECT_ANSWER' => Scrub::html($currentAnswer['answer'])
-			)
-		);
-
-		$page->parse('answerOption_block', 'answerOption', true);
+		$page->setVar('CORRECT_ANSWER', Scrub::html($currentAnswer['answer']));
+		$page->parse('answerOption_block', 'answerOption');
 	}
 
 	/**

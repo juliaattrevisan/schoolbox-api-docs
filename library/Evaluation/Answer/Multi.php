@@ -310,28 +310,21 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             $allAnswers = unserialize($answerGroup['answer']);
 
             if (is_array($allAnswers) && count($allAnswers)) {
-                foreach ($allAnswers as $currentAnswer) {
-                    if ($currentAnswer->correct) {
-                        $page->setVar(array(
-                            'ACTUAL_CORRECT_VALUE' => '100'
-                        ));
-                    } else {
-                        $page->setVar(array(
-                            'ACTUAL_CORRECT_VALUE' => '0'
-                        ));
-                    }
+                for ($i = 0; $i < count($allAnswers); $i++) {
+                    $currentAnswer = $allAnswers[$i];
 
-                    $page->setVar(array(
-                        'ANSWER_VALUE' => $currentAnswer->value,
-                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                    ));
+                    $page->setVar([
+                        'ACTUAL_CORRECT_VALUE' => $currentAnswer->correct ? '100' : '0',
+                        'ANSWER_VALUE'         => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION'   => Scrub::text($currentAnswer->description),
+                    ]);
 
-                    $page->parse('answerOption_block', 'answerOption', true);
+                    $page->parse('answerOption_block', 'answerOption', $i > 0);
                 }
-            } else {
-                $page->setVar('answerOption_block', '');
+                return;
             }
         }
+        $page->setVar('answerOption_block', '');
     }
 
     /**
