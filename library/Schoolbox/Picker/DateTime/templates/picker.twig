@@ -70,14 +70,6 @@
         background: #569ff7;
         color: #fff;
     }
-    .reveal-modal a.picker-submit.close-reveal-modal, .reveal-modal a.timetable-submit.close-reveal-modal {
-        border: none;
-        color: #fff;
-        background-color: #0066b0;
-        font-size: 16px;
-        top: inherit;
-        line-height: inherit;
-    }
     table.assessment-list td {
         border: 0;
         line-height: 1em;
@@ -90,11 +82,13 @@
     {% set width = 12 %}
 {% endif %}
 <div class="row">
-    <dl class="tabs-material" data-tab role="tablist">
+    <dl class="tabs-material center" data-tab role="tablist">
         <dd class="active" role="presentation"><a href="#byDate-{{ id }}">View By Date</a></dd>
         <dd role="presentation"><a href="#byTimetable-{{ id }}">View By Timetable</a></dd>
     </dl>
 </div>
+
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>
 
 <div class="row" style="padding:0.875rem;">
     <div class="tabs-content">
@@ -168,15 +162,17 @@
                 {% endif %}
             </div>
         </div>
-        <div class="row">
-            <div class="small-4 columns"></div>
-            <div class="small-4 columns"></div>
-            <div class="small-4 columns">
-                <a href="#" class="button submit timetable-submit close-reveal-modal" >Update</a>
-            </div>
-        </div>
     </div>
 </div>
+
+<div class="reveal-action">
+    <section>
+        <a href="#" class="button close-reveal-modal">Cancel</a>
+        <a href="#" class="button submit timetable-submit">Update</a>
+    </section>
+</div>
+
+
 <script>
 
     {# Picker settings#}

@@ -36,9 +36,9 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 .tabs-material {
     width: 100%;
     border-bottom: 1px solid #eee;
-    text-align: center;
     padding: 0 0.5rem;
     margin-bottom: 0;
+    font-size: 0; // This is to remove the spacing between centered inline-block'ed elements
 
     :focus {
         outline: none;
@@ -56,6 +56,7 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
         text-transform: uppercase;
         font-weight: $font-weight-semibold;
         margin: 0 0 -1px;
+        font-size: rem-calc($base-font-size - 2);
 
         a {
             min-height: 2.5rem;
