@@ -153,8 +153,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 $('#picker' + pickerId).foundation('reveal', 'open');
 
-                // Initialise tabs
-                $(document).foundation('reflow', 'tab');
             });
 
         } else if (picker.data('status') == 'loaded') {
@@ -169,6 +167,9 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
             picker.foundation('reveal', 'open');
         }
+
+        // Initialise tabs
+        $(document).foundation('reflow', 'tab');
 
     });
 
