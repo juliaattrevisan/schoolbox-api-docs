@@ -10,7 +10,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Survey_Factory extends Evaluation_Factory {
-	protected $factoryName = 'Survey';
-
+class Survey_Factory extends Evaluation_Factory
+{
+    /**
+     * @return string
+     */
+	protected function getFactoryName()
+    {
+        return 'Survey';
+    }
 }

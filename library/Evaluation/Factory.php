@@ -12,8 +12,6 @@
  */
 abstract class Evaluation_Factory extends DeprecatedModel
 {
-    protected $factoryName = 'Assess';
-
     protected $questionPrefix = 'Question';
     protected $answerPrefix = 'Answer';
 
@@ -72,7 +70,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
     protected function getFullClassName($type_id, $prefix) {
         $classname = $this->getQuestionClass($type_id);
         if ($classname) {
-            $object = $this->factoryName . '_' . $prefix . '_' . $classname;
+            $object = $this->getFactoryName() . '_' . $prefix . '_' . $classname;
             if (class_exists($object)) {
                 return $object;
             }
@@ -137,4 +135,9 @@ abstract class Evaluation_Factory extends DeprecatedModel
 
         return $this->db->getOne($query);
     }
+
+    /**
+     * @return string
+     */
+    protected abstract function getFactoryName();
 }
