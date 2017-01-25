@@ -1381,6 +1381,7 @@ $progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
 
     &:hover {
         @extend .icon-approve;
+        font-family: $font-family-icon;
     }
 
     &.small {
@@ -1399,6 +1400,7 @@ $progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
 
     &.pending {
         @extend .icon-approve;
+        font-family: $font-family-icon;
         background-color: $warning-color;
         transform: rotate(135deg);
         &:before {
@@ -1409,6 +1411,7 @@ $progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
 
     &.complete {
         @extend .icon-approve;
+        font-family: $font-family-icon;
         background-color: $success-color;
         border-radius: $progress-tick-size-regular;
         transform: rotate(360deg);
