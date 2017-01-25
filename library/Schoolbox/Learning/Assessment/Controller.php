@@ -246,11 +246,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
         if (!$assessment->getId()) {
             // new assessment: set default values
             $assessment
-                ->setPublishAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
-                ->setOpenAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
                 ->setDueAt(new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
                 ->setCloseAt(new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
                 ->setWeight(0);
+
+            if ($assessment instanceof Quiz\Model) {
+                $assessment
+                    ->setPublishAt(new Alaress_Date_Format(new \DateTime('+1 hour')))
+                    ->setOpenAt(new Alaress_Date_Format(new \DateTime('+1 hour')));
+            } else {
+                $assessment
+                    ->setPublishAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
+                    ->setOpenAt(new Alaress_Date_Format(new \DateTime('00:00:00')));
+            }
         }
 
         $contextType = AssessmentContextType::objectToString($context) . 's';
