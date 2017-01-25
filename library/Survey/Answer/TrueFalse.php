@@ -23,14 +23,6 @@ class Survey_Answer_TrueFalse extends Evaluation_Answer_TrueFalse {
 	protected $useLongAnswers = true;
 
 	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setResponseHandler(new Survey_Response());
-		$this->setQuestionHandler(new Survey_Question());
-	}
-
-	/**
 	 * Graph the results for this answer type
 	 *
 	 * @param  $page

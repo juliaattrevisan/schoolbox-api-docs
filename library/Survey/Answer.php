@@ -10,16 +10,9 @@
  * @version     SVN: $Id$
  */
 class Survey_Answer extends Evaluation_Answer {
-    public $_table = 'assess_answer';
-    public $_index = 'answer_id';
-
-    protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
-
-	/**
-	 * Setup
-	 */
-    protected function setup() {
-        $this->setResponseHandler(new Survey_Response());
+    public function __construct()
+    {
+        parent::__construct(new Survey_Response(), new Survey_Question());
     }
 }
 

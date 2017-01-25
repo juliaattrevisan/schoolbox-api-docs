@@ -10,17 +10,12 @@
  * @version     SVN: $Id$
  */
 class Assess_Answer extends Evaluation_Answer {
-    public $_table = 'assess_answer';
-    public $_index = 'answer_id';
 
-    protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */
     public function __construct() {
-        parent::__construct();
-
-        $this->setResponseHandler(new Assess_Response());
+        parent::__construct(new Assess_Response(), new Assess_Question());
     }
 }

@@ -11,16 +11,14 @@
  * @version     SVN: $Id$
  */
 class Survey_Question extends Evaluation_Question {
-    public $_table = 'assess_question';
-    public $_index = 'question_id';
 
 	/**
 	 * Constructor
 	 */
-	public function __construct() {
+	public function __construct()
+    {
 		parent::__construct();
-
-		$this->sectionHandler = new Survey_Section();
+		$this->setSectionHandler(new Survey_Section());
 	}
 
 	/**

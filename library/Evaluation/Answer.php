@@ -29,18 +29,14 @@ abstract class Evaluation_Answer extends DeprecatedModel
     protected $useLongAnswers = false;
 
 	/**
-	 * An instance of Assess/Survey ResponseHandler
-	 *
-	 * @var Survey_Response
+	 * @var Evaluation_Response
 	 */
-	protected $responseHandler = null;
+	protected $responseHandler;
 
 	/**
-	 * An instance of Assess/Survey QuestionHandler
-	 *
-	 * @var null
+	 * @var Evaluation_Question
 	 */
-	protected $questionHandler = null;
+	protected $questionHandler;
 
     /**
      * Javascript plugin for reviewing
@@ -54,18 +50,12 @@ abstract class Evaluation_Answer extends DeprecatedModel
      *
      * Run parent constructor
      */
-    public function __construct()
+    public function __construct($responseHandler, $questionHandler)
     {
         parent::DeprecatedModel();
-
-		$this->setup();
+        $this->responseHandler = $responseHandler;
+        $this->questionHandler = $questionHandler;
     }
-
-	/**
-	 * Hook method
-	 */
-	protected function setup() {
-	}
 
     /**
      * Sets legendHTML
@@ -288,7 +278,10 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * @param SitePage $page
      * @param int $question_id
      */
-    public abstract function exportMoodleAnswer(SitePage $page, $question_id);
+    public function exportMoodleAnswer(SitePage $page, $question_id)
+    {
+        // default to noop.
+    }
 
 	/* Getters/Setters
  	 */

@@ -15,6 +15,26 @@ abstract class Evaluation_Factory extends DeprecatedModel
     protected $questionPrefix = 'Question';
     protected $answerPrefix = 'Answer';
 
+    public function __construct()
+    {
+        parent::DeprecatedModel();
+    }
+
+    /**
+     * @return Evaluation_Response
+     */
+    abstract protected function getResponseHandler();
+
+    /**
+     * @return Evaluation_Question
+     */
+    abstract protected function getQuestionHandler();
+
+    /**
+     * @return Evaluation_Section
+     */
+    abstract protected function getSectionHandler();
+
     /**
      * Spawn a Question type.
      *
@@ -23,7 +43,11 @@ abstract class Evaluation_Factory extends DeprecatedModel
      */
     public function createQuestionModel($type_id)
     {
-        return $this->spawn($type_id, $this->questionPrefix);
+        $fullClassName = $this->getFullClassName($type_id, $this->questionPrefix);
+        if(!$fullClassName){
+            error(133);
+        }
+        return new $fullClassName($this->getSectionHandler());
     }
 
     /**
@@ -34,29 +58,12 @@ abstract class Evaluation_Factory extends DeprecatedModel
      */
     public function createAnswerModel($type_id)
     {
-        return $this->spawn($type_id, $this->answerPrefix);
-    }
-
-    /**
-     * Spawn a model for either Questions or Answers.
-     *
-     * @param  $type_id
-     * @param  $prefix
-     * @return Evaluation_Question|Evaluation_Answer|bool
-     */
-    public function spawn($type_id, $prefix)
-    {
-        if (is_numeric($type_id)) {
-            $object = $this->getFullClassName($type_id, $prefix);
-            if ($object && class_exists($object)) {
-                return new $object;
-            }
+        $fullClassName = $this->getFullClassName($type_id, $this->answerPrefix);
+        if(!$fullClassName){
+            error(133);
         }
-        error(133);
-
-        return false;
+        return new $fullClassName($this->getResponseHandler(), $this->getQuestionHandler());
     }
-
 
     /**
      * Gets the class name given this question's type and the prefix (question
@@ -67,12 +74,17 @@ abstract class Evaluation_Factory extends DeprecatedModel
      *
      * @return bool|string
      */
-    protected function getFullClassName($type_id, $prefix) {
-        $classname = $this->getQuestionClass($type_id);
-        if ($classname) {
-            $object = $this->getFactoryName() . '_' . $prefix . '_' . $classname;
-            if (class_exists($object)) {
-                return $object;
+    protected function getFullClassName($type_id, $prefix)
+    {
+        if(!is_numeric($type_id)){
+            return false;
+        }
+
+        $className = $this->getQuestionClass($type_id);
+        if ($className) {
+            $fullClassName = $this->getFactoryName() . '_' . $prefix . '_' . $className;
+            if (class_exists($fullClassName)) {
+                return $fullClassName;
             }
         }
         return false;

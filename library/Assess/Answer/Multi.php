@@ -11,16 +11,6 @@
  */
 class Assess_Answer_Multi extends Evaluation_Answer_Multi
 {
-
-    /**
-    * Setup
-    */
-    protected function setup()
-    {
-        $this->setResponseHandler(new Assess_Response());
-        $this->setQuestionHandler(new Assess_Question());
-    }
-
     /**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.

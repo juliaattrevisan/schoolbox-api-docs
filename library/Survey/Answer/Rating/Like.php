@@ -22,14 +22,6 @@ class Survey_Answer_Rating_Like extends Evaluation_Answer_Rating_Like {
 	protected $useLongAnswers = true;
 
 	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setResponseHandler(new Survey_Response());
-		$this->setQuestionHandler(new Survey_Question());
-	}
-
-	/**
 	 * Graph the results for this answer type
 	 *
 	 * @param  $page
