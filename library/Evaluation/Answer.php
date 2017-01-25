@@ -282,6 +282,14 @@ abstract class Evaluation_Answer extends DeprecatedModel
         return $data;
     }
 
+    /**
+     * Exports the answer to Moodle XML format.
+     *
+     * @param SitePage $page
+     * @param int $question_id
+     */
+    public abstract function exportMoodleAnswer(SitePage $page, $question_id);
+
 	/* Getters/Setters
  	 */
 

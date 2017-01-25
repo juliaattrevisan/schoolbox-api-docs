@@ -299,7 +299,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * $this->reviewResponse()
      *
      * @param SitePage $page
-     * @param  $question_id
+     * @param int $question_id
      * @return void
      */
     public function exportMoodleAnswer(SitePage $page, $question_id)

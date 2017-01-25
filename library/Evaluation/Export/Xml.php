@@ -7,19 +7,22 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Evaluation_Export_Xml {
-	protected $assess = array();
-	protected $sectionHandler = null;
+abstract class Evaluation_Export_Xml
+{
+    /**  @var array */
+	protected $assess;
 
-	/**
-	 * An instance of Evaluation_Question_Handler
-	 *
-	 * @var null
-	 */
-	protected $questionHandler = null;
+    /** @var Evaluation_Section */
+	protected $sectionHandler;
 
-	protected $factory = null;
-	protected $page = null;
+	/**  @var Evaluation_Question */
+	protected $questionHandler;
+
+	/** @var Evaluation_Factory */
+	protected $factory;
+
+	/** @var SitePage */
+	protected $page;
 
 	/* All the sections to iterate through to render the xml
 	 */
@@ -31,11 +34,11 @@ abstract class Evaluation_Export_Xml {
 	/**
 	 * Constructor
 	 *
-	 * @param $assess
-	 * @param $factory
-	 * @param $sectionHandler
-	 * @param $questionHandler
-	 * @param $page
+	 * @param array $assess
+	 * @param Evaluation_Factory $factory
+	 * @param Evaluation_Section $sectionHandler
+	 * @param Evaluation_Question $questionHandler
+	 * @param SitePage $page
 	 */
 	public function __construct($assess, $factory, $sectionHandler, $questionHandler, $page) {
 		$this->setAssess($assess);
@@ -207,53 +210,41 @@ abstract class Evaluation_Export_Xml {
 	}
 
 	/**
-	 * Set page
-	 *
-	 * @param $page
+	 * @param SitePage $page
 	 */
 	protected function setPage($page) {
 		$this->page = $page;
 	}
 
 	/**
-	 * Get page
-	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;
 	}
 
 	/**
-	 * Set factory
-	 *
-	 * @param $factory
+	 * @param Evaluation_Factory $factory
 	 */
 	protected function setFactory($factory) {
 		$this->factory = $factory;
 	}
 
 	/**
-	 * Get factory
-	 *
-	 * @return null
+	 * @return Evaluation_Factory
 	 */
 	protected function getFactory() {
 		return $this->factory;
 	}
 
 	/**
-	 * Set assess
-	 *
-	 * @param $assess
+	 * @param array $assess
 	 */
 	protected function setAssess($assess) {
 		$this->assess = $assess;
 	}
 
 	/**
-	 * Get assess
-	 *
 	 * @return array
 	 */
 	protected function getAssess() {
@@ -261,18 +252,14 @@ abstract class Evaluation_Export_Xml {
 	}
 
 	/**
-	 * Set section handler
-	 *
-	 * @param $sectionHandler
+	 * @param Evaluation_Section $sectionHandler
 	 */
 	protected function setSectionHandler($sectionHandler) {
 		$this->sectionHandler = $sectionHandler;
 	}
 
 	/**
-	 * Get section handler
-	 *
-	 * @return null
+	 * @return Evaluation_Section
 	 */
 	protected function getSectionHandler() {
 		return $this->sectionHandler;
@@ -315,18 +302,14 @@ abstract class Evaluation_Export_Xml {
 	}
 
 	/**
-	 * Set question handler
-	 *
-	 * @param null $questionHandler
+	 * @param Evaluation_Question $questionHandler
 	 */
 	protected function setQuestionHandler($questionHandler) {
 		$this->questionHandler = $questionHandler;
 	}
 
 	/**
-	 * Get question handler
-	 *
-	 * @return null
+	 * @return Evaluation_Question
 	 */
 	protected function getQuestionHandler() {
 		return $this->questionHandler;

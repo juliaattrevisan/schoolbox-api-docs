@@ -217,11 +217,11 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
      *
      * NOTE: This question type has very little moodle documentation.
      *
-     * @param  $page
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id)
+    public function exportMoodleAnswer(SitePage $page, $question_id)
     {
         $currentAnswer = $this->getByQuestionID($question_id);
 
