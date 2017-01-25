@@ -76,6 +76,8 @@ class Result extends Base
                  */
                 if (!($results->getOffset($folder->getId()) instanceof Folder)) {
                     $results->setOffset($folder->getId(), $folder);
+
+                    $i++;
                 }
 
                 /* Reassign var
