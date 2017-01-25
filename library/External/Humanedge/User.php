@@ -347,7 +347,7 @@ class External_Humanedge_User implements External_UserInterface
             // Statement 2: electives
             $query = "
                 SELECT DISTINCT
-                    s.Code + ISNULL(b.Suffix, '') AS code,
+                    s.Code + '_' + RIGHT(f.Code,1) AS code,
                     s.Name as name,
                     '' AS campusCode,
                     '' AS classType
@@ -355,7 +355,7 @@ class External_Humanedge_User implements External_UserInterface
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 INNER JOIN tblPeriod p ON a.PeriodID = p.ID
-                LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
+                INNER JOIN tblForm f ON a.FormId = f.ID
                 WHERE st.deleted = 0
                 AND st.code = $quotedId
 
@@ -381,14 +381,14 @@ class External_Humanedge_User implements External_UserInterface
             $roomJoin = ($this->requireTeacherSubjectsHaveRooms ? 'INNER JOIN tblRoom r on r.ID = b.RoomID' : '');
             $query    = "
                 SELECT DISTINCT
-                    s.Code + ISNULL(b.Suffix, '') as code,
+                    s.Code + '_' + RIGHT(f.Code,1) AS code,
                     s.Name as name,
                     '' AS campusCode,
                     '' AS classType
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
-                LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
+                INNER JOIN tblForm f ON a.FormId = f.ID
                 $roomJoin
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
