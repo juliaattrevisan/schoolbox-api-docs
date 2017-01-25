@@ -15,7 +15,7 @@ $magellan-padding: rem-calc(0);
 $include-html-off-canvas-classes: $include-html-classes !default;
 
 $tabbar-bg: $navigation-background;
-$tabbar-height: rem-calc(80);
+$tabbar-height: rem-calc(72);
 $tabbar-icon-width: $tabbar-height;
 $tabbar-line-height: $tabbar-height;
 $tabbar-color: $black;
@@ -107,7 +107,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 .hybrid-bar{
 	.logo {
 		width: 5rem;
-		height: 5rem;
+		height: $tabbar-height;
 		float: left;
 		@media #{$mediumwide-up} {
 			display: none !important;
@@ -226,10 +226,10 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			margin: 0;
 			width: 5rem;
 			a {
-				height: 5rem;
+				height: $tabbar-height;
 				padding: rem-calc(($base-font-size - 2)) 0;
 				text-align: center;
-				@extend .size-32;
+				@extend .size-24;
 				@extend .no-text;
 
 				&.navthis {

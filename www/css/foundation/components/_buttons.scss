@@ -79,6 +79,11 @@ $button-disabled-opacity: 0.5;
 // $button-disabled-cursor: $cursor-default-value;
 
 // Override buttons with icons font-size
+.size-24[class^="icon-"]:before,
+.size-24[class*=" icon-"]:before{
+	font-size: 1.5rem;
+}
+
 .size-32[class^="icon-"]:before,
 .size-32[class*=" icon-"]:before{
 	font-size: 2rem;
