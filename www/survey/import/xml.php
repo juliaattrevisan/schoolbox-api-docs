@@ -1,7 +1,6 @@
 <?php
 /**
- * Assessment export. Uses the handlers to export their question types into a
- * Moodle format.
+ * Survey import. Uses handlers to import their question types from Moodle format.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
@@ -22,7 +21,7 @@ if ($_FILES['importXML']['tmp_name']) {
     error(134);
 }
 
-$import = new Assess_Import_Xml($this->arg[0], new Survey_Main(), new Survey_Section(), new Survey_Factory(), $data, $this);
+$import = new Survey_Import_Xml($this->arg[0], new Survey_Main(), new Survey_Section(), new Survey_Factory(), $data, $this);
 $import->import();
 
 SitePage::localRedir('/survey/summary/' . $import->getAssessId());
