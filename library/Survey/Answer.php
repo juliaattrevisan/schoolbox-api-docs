@@ -9,10 +9,22 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Survey_Answer extends Evaluation_Answer {
+class Survey_Answer extends Evaluation_Answer
+{
     public function __construct()
     {
         parent::__construct(new Survey_Response(), new Survey_Question());
+    }
+
+    /**
+     * Exports the answer to Moodle XML format.
+     *
+     * @param SitePage $page
+     * @param int $question_id
+     */
+    public function exportMoodleAnswer(SitePage $page, $question_id)
+    {
+        throw new BadMethodCallException('You need to call this on a concrete Answer type');
     }
 }
 

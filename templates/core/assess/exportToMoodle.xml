@@ -19,7 +19,6 @@
     <defaultopenspan>{ASSESS_DEFAULT_OPEN_SPAN}</defaultopenspan>
     <!-- BEGIN section -->
     <section>
-        <id>{SECTION_SECTION_ID}</id>
         <title>{SECTION_TITLE}</title>
         <description><![CDATA[
             {SECTION_DESCRIPTION}
@@ -39,7 +38,6 @@
                 </config>
                 <!-- END answer_configuration -->
             </configs>
-
             <name>
                 <text>{QUESTION_MARKS} marks</text>
             </name>

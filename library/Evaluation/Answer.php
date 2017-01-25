@@ -46,9 +46,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
     protected $pluginReview = '';
 
     /**
-     * Constructor.
-     *
-     * Run parent constructor
+     * @param Evaluation_Response $responseHandler
+     * @param Evaluation_Question $questionHandler
      */
     public function __construct($responseHandler, $questionHandler)
     {
@@ -89,7 +88,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * Output configuration tags in xml
      *
      * @param SitePage $page
-     * @param $config
+     * @param string $config
      */
     public function configureXml(SitePage $page, $config) {
         if (strlen($config)) {
@@ -278,10 +277,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * @param SitePage $page
      * @param int $question_id
      */
-    public function exportMoodleAnswer(SitePage $page, $question_id)
-    {
-        // default to noop.
-    }
+    abstract public function exportMoodleAnswer(SitePage $page, $question_id);
+
 
 	/* Getters/Setters
  	 */

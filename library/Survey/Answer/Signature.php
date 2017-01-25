@@ -204,10 +204,10 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     /**
      * Configure question/configure answer during creation/modification
      *
-     * @param $page
-     * @param $config
+     * @param SitePage $page
+     * @param string $config
      */
-    public function configureXml($page, $config)
+    public function configureXml(SitePage $page, $config)
     {
         $options = json_decode($config);
 

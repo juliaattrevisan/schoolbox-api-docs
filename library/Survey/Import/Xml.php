@@ -16,6 +16,6 @@ class Survey_Import_Xml extends Evaluation_Import_Xml {
      */
     public function hasWeighting()
     {
-        return FALSE;
+        return false;
     }
 }

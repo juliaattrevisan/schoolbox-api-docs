@@ -24,11 +24,6 @@ abstract class Evaluation_Export_Xml
 	/** @var SitePage */
     private $page;
 
-    /**
-     * @var array|bool
-     */
-    private $allSections;
-
 	/**
 	 * Constructor
 	 *
@@ -38,145 +33,164 @@ abstract class Evaluation_Export_Xml
 	 * @param Evaluation_Question $questionHandler
 	 * @param SitePage $page
 	 */
-	public function __construct($assess, $factory, $sectionHandler, $questionHandler, $page) {
+	public function __construct($assess, $factory, $sectionHandler, $questionHandler, $page)
+    {
 		$this->setAssess($assess);
 		$this->setSectionHandler($sectionHandler);
 		$this->setQuestionHandler($questionHandler);
 		$this->setFactory($factory);
 		$this->setPage($page);
-
-		/* Collection to iterate through
-		 */
-		$this->setAllSections($this->getSectionHandler()->getList($assess['assess_id']));
-
-		/* Setup blocks and content and stuff
-		 */
-		$this->setup();
 	}
 
 	/**
 	 * Set up xml content
 	 */
-	protected function setup() {
-
-		/* Set up template
-		 */
+	protected function setupBlocks()
+    {
 		$this->getPage()->setFile('xml', $this->getTemplateFile());
 		$this->getPage()->setBlock('xml', 'section', 'section_block');
-		$this->getPage()->setBlock('section', 'answerInputs', 'answerInputs_block');
-		$this->getPage()->setBlock('section', 'question', 'question_block');
-		$this->getPage()->setBlock('question', 'answer_configuration', 'answer_configuration_block');
-
-		$assess = $this->getAssess();
-
-		$varArr = array(
-			'ASSESS_TITLE' => htmlspecialchars($assess['title'], ENT_QUOTES),
-			'ASSESS_DESCRIPTION' => Scrub::HTML($assess['description']),
-			'ASSESS_COMPLETION_MESSAGE' => Scrub::HTML($assess['completion_message']),
-			'ASSESS_START' => $assess['start'],
-			'ASSESS_FINISH' => $assess['finish'],
-			'ASSESS_DURATION' => $assess['duration'],
-			'ASSESS_MAX_ATTEMPTS' => $assess['max_attempts'],
-			'ASSESS_AVAILABILITY' => $assess['availability'],
-			'ASSESS_MARK_VISIBILITY' => $assess['mark_visibility'],
-		);
-		if($this->hasWeighting()){
-			$varArr['ASSESS_WEIGHT'] = $assess['weight'];
-		}
-		$this->getPage()->setVar($varArr);
-
-		if (is_array($this->getAllSections()) && count($this->getAllSections())) {
-			foreach($this->getAllSections() as $currentSection) {
-				$this->getPage()->setVar(array(
-					'SECTION_SECTION_ID' => $currentSection['section_id'],
-					'SECTION_TITLE' => htmlspecialchars($currentSection['title'], ENT_QUOTES),
-					'SECTION_DESCRIPTION' => Scrub::HTML($currentSection['description']),
-					'SECTION_RANDOM' => $currentSection['random'],
-					'SECTION_POOL' => $currentSection['pool'],
-				));
-
-				$allQuestions = $this->getSectionHandler()->getContents($assess['assess_id'], $currentSection['section_id']);
-
-				if ($allQuestions) {
-					foreach($allQuestions as $currentQuestion) {
-
-						/* This if() clause allows for sections containing no questions.
-						 * because they come out with getContents()
-						 */
-						if ($currentQuestion['type_id']) {
-							$answerHandler = $this->getFactory()->createAnswerModel($currentQuestion['type_id']);
-
-							/* Load answer template into answerOption block
-							 */
-							$this->getPage()->setFile('answerFormFragment', $this->getEvaluationType() . '/answer/' . $this->getFactory()->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.xml');
-							$this->getPage()->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
-
-							/* Reset answer options from previous iteration
-							 */
-							$this->getPage()->setVar('answerOption_block', '');
-
-							$this->getPage()->setVar(array(
-								'QUESTION_QUESTION' => Scrub::Html($currentQuestion['question']),
-								'QUESTION_MARKS' => $currentQuestion['marks'],
-								'QUESTION_TYPE_ID' => $currentQuestion['type_id'],
-								'QUESTION_TYPE_MOODLE' => $this->getFactory()->getMoodleQuestionType($currentQuestion['type_id']),
-							));
-
-							/* Question-specific answer configuration
-							 *
-							 * Load answer configurations template into answer_configuration_form_fragment
-							 * block if there are configuration options available
-							 */
-							$currentQuestionType = $this->getQuestionHandler()->getQuestionType($currentQuestion['type_id']);
-
-							if ($currentQuestionType['has_config'] == 'true') {
-								$answerHandler->configureXml($this->getPage(), $currentQuestion['config']);
-							}
-
-							/* Load individual answers
-							 */
-							$answerHandler->exportMoodleAnswer($this->getPage(), $currentQuestion['question_id']);
-
-							$this->getPage()->parse('answerInputs_block', 'answerFormFragment', true);
-							$this->getPage()->parse('question_block', 'question', true);
-
-							/* Clear children after parsing out the parent
-							 */
-							$this->getPage()->setVar(array(
-								'answerFormFragment' => '',
-								'answerInputs_block' => '',
-								'answerCorrect_block' => '',
-								'answer_configuration_block' => '',
-							));
-						}
-					}
-				}
-				else {
-					$this->getPage()->setVar('question_block', '');
-				}
-
-				$this->getPage()->parse('section_block', 'section', true);
-				$this->getPage()->setVar('question_block', '');
-			}
-		}
-		else {
-			$this->getPage()->setVar('section_block', '');
-		}
+        $this->getPage()->setBlock('section', 'question', 'question_block');
+        $this->getPage()->setBlock('question', 'answer_configuration', 'answer_configuration_block');
+		$this->getPage()->setBlock('question', 'answerInputs', 'answerInputs_block');
 	}
+
+    /**
+     * Set the assess (quiz|survey) data using most-authoritative source
+     *
+     * @param mixed[] $assess
+     */
+	protected function renderEvaluation(array $assess)
+    {
+        $this->getPage()->setVar([
+            'ASSESS_COMPLETION_MESSAGE' => Scrub::HTML($assess['completion_message']),
+            'ASSESS_MAX_ATTEMPTS'       => $assess['max_attempts'],
+            'ASSESS_AVAILABILITY'       => $assess['availability'],
+        ]);
+
+        $this->renderSections();
+    }
+
+
+    /**
+     * Set the section data
+     */
+    protected function renderSections()
+    {
+        $sections = $this->getSectionHandler()->getList($this->assess['assess_id']);
+
+        // Do we not have any sections to render?
+        if(!is_array($sections) || !count($sections)){
+            // Bug out early.
+            $this->getPage()->setVar('section_block', '');
+            return;
+        }
+
+        foreach($sections as $currentSection) {
+            $this->renderSection($currentSection);
+        }
+    }
+
+    /**
+     * Render out the specified section
+     *
+     * @param array $section
+     */
+    protected function renderSection(array $section)
+    {
+        $this->getPage()->setVar([
+            'SECTION_TITLE'       => htmlspecialchars($section['title'], ENT_QUOTES),
+            'SECTION_DESCRIPTION' => Scrub::HTML($section['description']),
+        ]);
+
+        $allQuestions = $this->sectionHandler->getContents($this->assess['assess_id'], $section['section_id']);
+
+        // Filter questions that don't have a type (not sure if this still necessary)
+        $allQuestions = (new \Schoolbox\Collection($allQuestions))->filter(function($question){
+            return $question['type_id'];
+        });
+
+        if ($allQuestions) {
+            foreach($allQuestions as $currentQuestion) {
+                $this->renderQuestion($currentQuestion);
+            }
+        }
+        else {
+            $this->getPage()->setVar('question_block', '');
+        }
+
+        $this->getPage()->parse('section_block', 'section', true);
+    }
+
+    /**
+     * Render a question inside a section
+     *
+     * @param array $question
+     */
+    protected function renderQuestion(array $question)
+    {
+        $this->getPage()->setVar([
+            'QUESTION_QUESTION'    => Scrub::Html($question['question']),
+            'QUESTION_MARKS'       => $question['marks'],
+            'QUESTION_TYPE_ID'     => $question['type_id'],
+            'QUESTION_TYPE_MOODLE' => $this->getFactory()->getMoodleQuestionType($question['type_id']),
+        ]);
+
+        $answerHandler = $this->getFactory()->createAnswerModel($question['type_id']);
+
+        /* Question-specific answer configuration
+         *
+         * Load answer configurations template into answer_configuration_form_fragment
+         * block if there are configuration options available
+         */
+        $currentQuestionType = $this->getQuestionHandler()->getQuestionType($question['type_id']);
+
+        if ($currentQuestionType['has_config'] == 'true') {
+            $answerHandler->configureXml($this->getPage(), $question['config']);
+        } else {
+            $this->getPage()->setVar([
+                'answer_configuration_block' => ''
+            ]);
+        }
+
+        // Load answer template into answerOption block
+        $this->getPage()->setFile('answerFormFragment', $this->getEvaluationType() . '/answer/' . $this->getFactory()->getQuestionType($question['type_id']) . '/exportToMoodle.xml');
+        $this->getPage()->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
+
+        // Render Answer
+        $answerHandler->exportMoodleAnswer($this->getPage(), $question['question_id']);
+        $this->getPage()->parse('answerInputs_block', 'answerFormFragment');
+
+        // Render Question
+        $this->getPage()->parse('question_block', 'question', true);
+    }
+
+    /**
+     * Set up all PHP-Lib vars
+     */
+    protected function setVars()
+    {
+        $this->renderEvaluation($this->assess);
+    }
+
 
 	/**
 	 * Render headers and xml data
 	 */
-	public function render() {
-		header('Content-type: text/xml');
-		header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
-
-		$this->getPage()->template->pparse('finaloutput', 'xml');
-
-		/* Prevent other template crap from rendering ;)
-		 */
-		die();
+	public function render()
+    {
+        $this->setupBlocks();
+        $this->setVars();
+        $this->parse();
 	}
+
+    protected function parse()
+    {
+        header('Content-type: text/xml');
+        header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
+
+        $this->getPage()->template->pparse('finaloutput', 'xml');
+        die();
+    }
 
 	/**
 	 * Retrieves the XML content of the export, without outputting it.
@@ -186,13 +200,6 @@ abstract class Evaluation_Export_Xml
 	public function retrieveContents() {
 		return $this->getPage()->template->parse('finaloutput', 'xml');
 	}
-
-	/**
-	 * Returns whether this Evaluation can count towards final year mark
-	 * 
-	 * @return bool
-	 */
-	protected abstract function hasWeighting();
 
 	/**
 	 * Generate a filename for the exported xml
@@ -276,24 +283,6 @@ abstract class Evaluation_Export_Xml
 	 * @return string
 	 */
 	abstract protected function getEvaluationType();
-
-	/**
-	 * Set all sections
-	 *
-	 * @param $allSections
-	 */
-	protected function setAllSections($allSections) {
-		$this->allSections = $allSections;
-	}
-
-	/**
-	 * Get all sections
-	 *
-	 * @return array
-	 */
-	protected function getAllSections() {
-		return $this->allSections;
-	}
 
 	/**
 	 * @param Evaluation_Question $questionHandler

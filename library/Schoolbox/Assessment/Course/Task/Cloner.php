@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course\Task;
 
 use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -114,7 +115,8 @@ class Cloner
                 $factory,
                 $section,
                 $question,
-                new \SitePage(false)
+                new \SitePage(false),
+                AssessmentMapper::getInstance()
             );
             $output = $export->retrieveContents();
 

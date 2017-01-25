@@ -12,14 +12,24 @@
  */
 class Survey_Export_Xml extends Evaluation_Export_Xml
 {
+
     /**
-     * Returns FALSE, reflecting fact that a Survey does not count towards final year mark.
+     * Renders the survey-specific data
      *
-     * @return bool
+     * @param mixed[] $assess
      */
-    protected function hasWeighting()
+    protected function renderEvaluation(array $assess)
     {
-        return false;
+        // While 'title' and 'description' are common to quiz + survey, their authoritative sources differ.
+        $this->getPage()->setVar([
+            'ASSESS_TITLE'            => htmlspecialchars($assess['title'], ENT_QUOTES),
+            'ASSESS_DESCRIPTION'      => Scrub::HTML($assess['description']),
+            'ASSESS_START'            => $assess['start'],
+            'ASSESS_FINISH'           => $assess['finish'],
+            'ASSESS_ANONYMOUS_RESULT' => $assess['anonymous_result'],
+            'ASSESS_NOTIFY_AUTHOR'    => $assess['notify_author'],
+        ]);
+        parent::renderEvaluation($assess);
     }
 
     protected function getEvaluationType()
