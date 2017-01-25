@@ -127,17 +127,18 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     public function getTeacherName($classCode)
     {
-        $roomJoin   = ($this->requireClassTeachersHaveRooms ? 'INNER JOIN tblRoom r on r.ID = b.RoomID' : '');
-        $db         = $this->loadAPlusDatabase();
-        $classQuery = $this->quoteClassCodes($classCode);
-        $query      = "
+        $coreRoomJoin  = ($this->requireClassTeachersHaveRooms ? 'INNER JOIN tblRoom r on a.RoomID = r.ID' : '');
+        $electRoomJoin = ($this->requireClassTeachersHaveRooms ? 'INNER JOIN tblRoom r on b.RoomID = r.ID' : '');
+        $db            = $this->loadAPlusDatabase();
+        $classQuery    = $this->quoteClassCodes($classCode);
+        $query         = "
             SELECT DISTINCT
                 t.Code AS Code
             FROM tblSubject s
             INNER JOIN tblAllocation a on s.ID = a.SubjectID
             INNER JOIN tblForm f ON a.FormId = f.ID
             INNER JOIN tblTeacher t on a.TeacherID = t.ID
-            $roomJoin
+            $coreRoomJoin
             WHERE t.deleted = 0
             AND   (s.Code + '_' + RIGHT(f.Code,1)) IN ($classQuery)
 
@@ -148,7 +149,7 @@ class External_Humanedge_Class implements External_ClassInterface
             FROM tblSubject s
             INNER JOIN tblBlockItem b on s.ID = b.SubjectID
             INNER JOIN tblTeacher t on b.TeacherID = t.ID
-            $roomJoin
+            $electRoomJoin
             WHERE t.deleted = 0
             AND   (s.Code + ISNULL(b.Suffix, '')) IN ($classQuery)
         ";
