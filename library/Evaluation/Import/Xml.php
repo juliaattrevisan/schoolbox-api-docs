@@ -175,15 +175,17 @@ abstract class Evaluation_Import_Xml
 				 * When you cast the std obj to an array, you can possibly
 				 * end up with an empty config if the tags are separated
 				 */
-				if (count(array_keys((array)$currentQuestion->config))) {
-					$config = json_encode((array)$currentQuestion->config);
-				}
-				else {
-
-					/* -_-
-					 */
-					$config = 'NULL';
-				}
+                /** @var SimpleXMLElement $configs */
+                $configs = $currentQuestion->configs->children();
+                if($configs->count()){
+                    $config = [];
+                    foreach ($configs as $configSXE){
+                        $config[(string)$configSXE->name] = (string)$configSXE->value;
+                    }
+                    $config = json_encode($config);
+                } else {
+                    $config = 'NULL';
+                }
 
 				$question_id = $questionHandler->create(array(
 					'question_id' => '',
