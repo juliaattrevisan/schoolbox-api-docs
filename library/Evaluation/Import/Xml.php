@@ -196,7 +196,7 @@ abstract class Evaluation_Import_Xml
 				));
 
 				if (method_exists($answerHandler, 'importMoodleAnswer')) {
-					$answer_id = $answerHandler->importMoodleAnswer($currentQuestion->answers, $question_id);
+					$answerHandler->importMoodleAnswer($currentQuestion->answers, $question_id);
 				}
 			}
 		}
