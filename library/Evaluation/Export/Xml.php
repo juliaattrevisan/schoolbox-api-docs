@@ -110,7 +110,7 @@ abstract class Evaluation_Export_Xml
 
 							/* Load answer template into answerOption block
 							 */
-							$this->getPage()->setFile('answerFormFragment', $this->getEvaluationType() . '/answer/' . $this->getFactory()->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
+							$this->getPage()->setFile('answerFormFragment', $this->getEvaluationType() . '/answer/' . $this->getFactory()->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.xml');
 							$this->getPage()->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
 							/* Reset answer options from previous iteration

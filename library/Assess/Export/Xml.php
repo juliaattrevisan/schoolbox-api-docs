@@ -11,7 +11,7 @@
  */
 class Assess_Export_Xml extends Evaluation_Export_Xml {
 	protected $evaluationType = 'assess';
-	protected $templateFile = 'assess/exportToMoodle.html';
+	protected $templateFile = 'assess/exportToMoodle.xml';
 
 
 	/**
