@@ -2,7 +2,7 @@
 /**
  * Evaluation_Import_Xml
  *
- * Import entire Evaluation items including sections and questions
+ * Import entire Evaluation items including sections, questions and solutions
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd

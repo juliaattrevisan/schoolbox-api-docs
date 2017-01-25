@@ -2,7 +2,7 @@
 /**
  * Survey_Export_Xml
  *
- * Export an entire assessment, sections and questions into xml format
+ * Export an entire survey (including sections, questions + solutions) into xml format
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
