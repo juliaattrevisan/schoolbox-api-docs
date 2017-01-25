@@ -790,6 +790,7 @@ $selector-width: 2.25rem;
 		@extend %interaction-li;
 		.#{$selector} {
 			@if str-length($icon) > 0 {
+				font-family: $font-family-icon;
 				@extend .icon-#{$icon};
 			}
 			@extend %interaction-selector;
