@@ -9,18 +9,25 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Assess_Export_Xml extends Evaluation_Export_Xml {
-	protected $evaluationType = 'assess';
-	protected $templateFile = 'assess/exportToMoodle.xml';
-
-
+class Assess_Export_Xml extends Evaluation_Export_Xml
+{
 	/**
 	 * Returns TRUE, reflecting fact that a Quiz can count towards final year mark.
 	 * 
 	 * @return bool
 	 */
-	public function hasWeighting()
+    protected function hasWeighting()
 	{
 		return TRUE;
 	}
+
+	protected function getEvaluationType()
+    {
+        return 'assess';
+    }
+
+    protected function getTemplateFile()
+    {
+        return 'assess/exportToMoodle.xml';
+    }
 }

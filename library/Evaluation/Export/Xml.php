@@ -24,12 +24,10 @@ abstract class Evaluation_Export_Xml
 	/** @var SitePage */
 	protected $page;
 
-	/* All the sections to iterate through to render the xml
-	 */
-	protected $allSections = array();
-
-	protected $evaluationType = '';
-	protected $templateFile = '';
+    /**
+     * @var array|bool
+     */
+	protected $allSections;
 
 	/**
 	 * Constructor
@@ -194,7 +192,7 @@ abstract class Evaluation_Export_Xml
 	 * 
 	 * @return bool
 	 */
-	public abstract function hasWeighting();
+	protected abstract function hasWeighting();
 
 	/**
 	 * Generate a filename for the exported xml
@@ -270,18 +268,14 @@ abstract class Evaluation_Export_Xml
 	 *
 	 * @return string
 	 */
-	protected function getTemplateFile() {
-		return $this->templateFile;
-	}
+	abstract protected function getTemplateFile();
 
 	/**
 	 * Get evaluation type
 	 *
 	 * @return string
 	 */
-	protected function getEvaluationType() {
-		return $this->evaluationType;
-	}
+	abstract protected function getEvaluationType();
 
 	/**
 	 * Set all sections
