@@ -265,9 +265,18 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         }
 
         // overwrite default configurations
+
+        /* Apparently Component Config Instances can be orphaned from their parent Component
+         * and will die magnificently if this orphanage isn't checked
+         *
+         * I'm not sure why or how this occurs (could be from bad prior data or misconfigured componentry...?)
+         * but this check should prevent attempts to override a component's config when the component itself
+         * doesn't actually exist in $finalCollection
+         */
         foreach ($configInstanceCollection as $confInstance) {
+
             /* @var $confInstance Component_Config */
-            if ($confInstance->getId() != null) {
+            if (($confInstance->getId() != null) && isset($finalCollection[$confInstance->getInstanceId()])) {
                 // Clone config instead.
                 // Because the select cache stores references to each retrieved object,
                 // each component of the same type's config objects are the same object.
