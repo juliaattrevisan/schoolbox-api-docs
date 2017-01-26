@@ -287,6 +287,8 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $originalTotalMark = 50;
         return [
+            [-1.1,      $originalTotalMark],
+            [-1,        $originalTotalMark],
             [0,         $originalTotalMark],
             [0.0,       $originalTotalMark],
             [10.0,      $originalTotalMark],
@@ -294,6 +296,8 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             [50,        $originalTotalMark],
             [50.0,      $originalTotalMark],
             [50.000000, $originalTotalMark],
+            [50.000001, $originalTotalMark],
+            [51,        $originalTotalMark],
         ];
     }
 
@@ -301,6 +305,8 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $totalMark = 100;
         return [
+            ['-1.1',       $totalMark, -1.1],
+            ['-1',         $totalMark, -1],
             ['0',          $totalMark, 0.0],
             ['0.0',        $totalMark, 0.0],
             [' 0',         $totalMark, 0.0],
@@ -310,6 +316,8 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             ['66.6666666', $totalMark, 66.6666666],
             ['99.99',      $totalMark, 99.99],
             ['100',        $totalMark, 100.0],
+            ['100.000001', $totalMark, 100.000001],
+            ['101',        $totalMark, 101],
         ];
     }
 
@@ -317,11 +325,13 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $totalMark = 100;
         return [
+            [-1.0,     $totalMark,  '-1 / 100'],
             [0.0,      $totalMark,   '0 / 100'],
             [1.0,      $totalMark,   '1 / 100'],
             [10.00001, $totalMark,  '10 / 100'],
             [99.9,     $totalMark, '100 / 100'],
             [100,      $totalMark, '100 / 100'],
+            [101,      $totalMark, '101 / 100'],
         ];
     }
 
@@ -329,11 +339,13 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $totalMark = 3;
         return [
+            [-33.3333, $totalMark,  '-1 / 3'],
             [0.0,      $totalMark,   '0 / 3'],
             [33.3333,  $totalMark,   '1 / 3'],
             [66.66666, $totalMark,   '2 / 3'],
             [99.9,     $totalMark,   '3 / 3'],
             [50,       $totalMark, '1.5 / 3'],
+            [133.3333, $totalMark,   '4 / 3'],
         ];
     }
 
