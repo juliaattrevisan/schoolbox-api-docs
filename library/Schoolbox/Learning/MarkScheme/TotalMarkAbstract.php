@@ -77,7 +77,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         $matches = [];
-        $pattern = '/^\s*([0-9.]+)/';
+        $pattern = '/^\s*(-?[0-9.]+)/';
         if(!preg_match($pattern, $humanReadableMark, $matches)){
             throw new InvalidArgumentException("Unable to parse numerator: $humanReadableMark");
         }
