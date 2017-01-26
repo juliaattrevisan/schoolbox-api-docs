@@ -832,7 +832,12 @@ class PendingFactory
             if (is_array($studentList)) {
                 foreach ($studentList as $studentExternalId) {
                     $student = $this->studentExtCache[$studentExternalId];
-                    $participants[$student->getId()] = new Participant($student, $assessment);
+
+                    // Does this student (found in external SIS) exist in Schoolbox?
+                    if($student instanceof User){
+                        $participants[$student->getId()] = new Participant($student, $assessment);
+                    }
+
                 }
             }
             $assessment->setAllParticipants($participants);
