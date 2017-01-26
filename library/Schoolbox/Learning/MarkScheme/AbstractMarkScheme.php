@@ -35,11 +35,12 @@ abstract class AbstractMarkScheme implements IMarkScheme
             throw new \InvalidArgumentException($msg);
         }
 
-        if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN || $normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
-            $msg = 'Normalised mark must lie between '.IMarkScheme::NORMALISED_MARK_MIN.
-                ' and '.IMarkScheme::NORMALISED_MARK_MAX.' inclusive: '.$normalisedMark;
-            throw new RangeException($msg);
-        }
+        // For now - normalised marks outside min and max are allowable
+//        if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN || $normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
+//            $msg = 'Normalised mark must lie between '.IMarkScheme::NORMALISED_MARK_MIN.
+//                ' and '.IMarkScheme::NORMALISED_MARK_MAX.' inclusive: '.$normalisedMark;
+//            throw new RangeException($msg);
+//        }
     }
 
     /**
