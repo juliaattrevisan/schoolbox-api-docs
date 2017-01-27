@@ -107,6 +107,11 @@ $this->setTab('news');
 
 $topic = $newsHandler->getTopicByID($article['item_topic_id']);
 
+if (!$topic) {
+    // Topic was deleted
+    error(180);
+}
+
 $url = new Url($topic['name'], '');
 
 $owner = UserMapper::getInstance()->findByID($article['item_owner']);
