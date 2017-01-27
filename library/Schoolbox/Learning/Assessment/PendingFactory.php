@@ -937,10 +937,11 @@ class PendingFactory
                 tc.id                   AS 'tc.id',
                 tc.student_id           AS 'tc.student_id',
                 tc.marking_user_id      AS 'tc.marking_user_id',
-                tc.completion_date      AS 'tc.completion_date'
+                max(tc.completion_date) AS 'tc.completion_date'
             FROM task t
             JOIN task_completion tc ON tc.task_id = t.id
-            WHERE " . implode(' AND ', $pb->getWhere());
+            WHERE " . implode(' AND ', $pb->getWhere()) . "
+            GROUP BY t.assessment_id, tc.student_id";
 
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
