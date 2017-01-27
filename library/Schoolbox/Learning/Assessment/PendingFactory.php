@@ -1105,8 +1105,9 @@ class PendingFactory
             if (!is_null($row['qa.reviewed_at'])) {
                 $feedback = new QuizReview();
                 $feedback->setId($row['qa.attempt_id']);
-                $feedback->setPublishedAt($this->getDateFromString($row['qa.reviewed_at']));
-                $feedback->setUpdatedAt($this->getDateFromString($row['qa.reviewed_at']));
+                $reviewedAt = $this->getDateFromString($row['qa.reviewed_at']);
+                $feedback->setPublishedAt($this->getDateFromString($reviewedAt));
+                $feedback->setUpdatedAt($this->getDateFromString($reviewedAt));
 
                 $feedback->setResponse($response);
                 $feedback->setAssessable($quiz);
