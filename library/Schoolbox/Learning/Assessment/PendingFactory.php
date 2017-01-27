@@ -9,9 +9,11 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Task\ICompletion;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -133,7 +135,7 @@ class PendingFactory
      * We need this so we know which Users to get SchoolBox details for
      * key = value = user.externalId
      *
-     * @var int[] $studentExternalIds
+     * @var string[]|int[] $studentExternalIds
      */
     private $studentExternalIds = [];
 
@@ -758,47 +760,51 @@ class PendingFactory
         $query = [];
 
         // Get Students in Groups
+        $groupPb = new PredicateBuilder($this->database, '');
         if (count($this->groupIds)) {
-            $query[] = "
-                    SELECT 
-                        1             AS 'case',
-                        ua.sid        AS 'g.id',
-                        u.id          AS 'u.id',
-                        u.username    AS 'u.username',
-                        u.synergy_id  AS 'u.synergy_id',
-                        u.firstname   AS 'u.firstname',
-                        u.lastname    AS 'u.lastname',
-                        u.local_email AS 'u.local_email',
-                        u.alt_email   AS 'u.alt_email'
-                    FROM user u
-                    JOIN userAccess ua ON ua.uid = u.id
-                    JOIN groups g ON u.group_id = g.id
-                    WHERE ua.sid IN (" . implode(',', $this->groupIds) . ")
-                    AND ua.service = " . UserAccess::SERVICE_HOMEPAGE . "
-                    AND g.group_type = '" . \Group::STUDENT_GROUP_TYPE . "'
-                ";
+            $query[0] = "
+                SELECT 
+                    1             AS 'case',
+                    ua.sid        AS 'g.id',
+                    u.id          AS 'u.id',
+                    u.username    AS 'u.username',
+                    u.synergy_id  AS 'u.synergy_id',
+                    u.firstname   AS 'u.firstname',
+                    u.lastname    AS 'u.lastname',
+                    u.local_email AS 'u.local_email',
+                    u.alt_email   AS 'u.alt_email'
+                FROM user u
+                JOIN userAccess ua ON ua.uid = u.id
+                JOIN groups g ON u.group_id = g.id
+            ";
+            $groupPb->equals('ua.sid', $this->groupIds);
+            $groupPb->equals('ua.service', UserAccess::SERVICE_HOMEPAGE);
+            $groupPb->equals('g.group_type', \Group::STUDENT_GROUP_TYPE);
+            $query[0] .= ' WHERE ' . implode(' AND ', $groupPb->getWhere());
         }
 
         // Get Students in Classes
+        $classPb = new PredicateBuilder($this->database, '');
         if (count($this->studentExternalIds)) {
-            $query[] = "
-                    SELECT
-                        2             AS 'case',
-                        NULL          AS 'g.id',
-                        u.id          AS 'u.id',
-                        u.username    AS 'u.username',
-                        u.synergy_id  AS 'u.synergy_id',
-                        u.firstname   AS 'u.firstname',
-                        u.lastname    AS 'u.lastname',
-                        u.local_email AS 'u.local_email',
-                        u.alt_email   AS 'u.alt_email'
-                    FROM user u
-                    WHERE u.synergy_id IN (" . implode(',', $this->studentExternalIds) . ")
-                    AND u.deleted_at IS NULL
-                ";
+            $query[1] = "
+                SELECT
+                    2             AS 'case',
+                    NULL          AS 'g.id',
+                    u.id          AS 'u.id',
+                    u.username    AS 'u.username',
+                    u.synergy_id  AS 'u.synergy_id',
+                    u.firstname   AS 'u.firstname',
+                    u.lastname    AS 'u.lastname',
+                    u.local_email AS 'u.local_email',
+                    u.alt_email   AS 'u.alt_email'
+                FROM user u
+            ";
+            $classPb->equals('u.synergy_id', $this->studentExternalIds);
+            $classPb->isNull('u.deleted_at');
+            $query[1] .= ' WHERE ' . implode(' AND ', $classPb->getWhere());
         }
         $statement = $this->database->prepare(implode(' UNION ', $query));
-        $statement->execute();
+        $statement->execute(array_merge($groupPb->getParams(), $classPb->getParams()));
         $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($rows as $row) {
@@ -857,6 +863,10 @@ class PendingFactory
         }
 
         // Get QuizAttempts for specified Quizzes
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->isNull('q.deleted_at');
+        $pb->equals('q.availability', QuizModel::AVAILABILITY_ASSESS);
+        $pb->equals('q.assessment_id', $this->quizAssessmentIds);
         $query = "
             SELECT
                 q.assessment_id      AS 'q.assessment_id',
@@ -869,14 +879,12 @@ class PendingFactory
             FROM assess q
             JOIN assess_attempt qa ON qa.assess_id = q.assess_id AND qa.deleted_at IS NULL
             JOIN assess_section qs ON qs.assess_id = q.assess_id AND qs.deleted_at IS NULL
-            WHERE q.deleted_at IS NULL
-            AND q.availability = 'assess'
-            AND q.assessment_id IN (" . implode(',', $this->quizAssessmentIds) . ") 
+            WHERE " . implode(' AND ', $pb->getWhere()) . "
             GROUP BY q.assessment_id, qa.attempt_id, qa.user_id
         ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute($pb->getParams());
         $quizResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         // Find Students who attempted Quizzes but are't in the current studentList
@@ -899,6 +907,9 @@ class PendingFactory
         }
 
         // Get Task Completions for all selected students
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->isNull('t.deleted_at');
+        $pb->equals('t.assessment_id', $this->taskAssessmentIds);
         $query = "
             SELECT 
                 t.assessment_id         AS 't.assessment_id',
@@ -909,12 +920,10 @@ class PendingFactory
                 tc.completion_date      AS 'tc.completion_date'
             FROM task t
             JOIN task_completion tc ON tc.task_id = t.id
-            WHERE t.deleted_at IS NULL
-            AND t.assessment_id IN (" . implode(',', $this->taskAssessmentIds) . ")
-        ";
+            WHERE " . implode(' AND ', $pb->getWhere());
 
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute($pb->getParams());
         $taskResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         // Find Students who attempted Tasks but are't in the current studentList
@@ -937,6 +946,10 @@ class PendingFactory
         }
 
         // Get Due Work Submissions for all selected students
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->equals('sb.deleted', 0);
+        $pb->notNull('ss.submitted_at');
+        $pb->equals('sb.assessment_id', $this->dueWorkAssessmentIds);
         $query = "
             SELECT
                 sb.assessment_id   AS 'sb.assessment_id',
@@ -947,12 +960,9 @@ class PendingFactory
                 ss.updated_at      AS 'ss.updated_at'
             FROM submission_box sb
             JOIN student_submission ss ON ss.box_id = sb.id
-            WHERE sb.deleted = 0
-            AND ss.submitted_at IS NOT NULL
-            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
-        ";
+            WHERE " . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute($pb->getParams());
         $dueWorkSubmissions = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         // Find Students who submitted DueWorkSubmissions but are't in the current studentList
@@ -972,6 +982,10 @@ class PendingFactory
         if (!count($this->dueWorkAssessmentIds)) {
             return [];
         }
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->equals('sb.deleted', 0);
+        $pb->isNull('sr.published_at');
+        $pb->equals('sb.assessment_id', $this->dueWorkAssessmentIds);
         $query = "
             SELECT
                 sb.assessment_id                 AS 'sb.assessment_id',
@@ -984,13 +998,10 @@ class PendingFactory
                 sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
             FROM submission_box sb
             JOIN submission_return sr ON sr.box_id = sb.id
-            WHERE sb.deleted = 0
-            AND sr.published_at IS NOT NULL
-            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
-        ";
+            WHERE " . implode(' AND ', $pb->getWhere());
 
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute($pb->getParams());
         $dueWorkFeedbacks = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         // Find Students who received DueWork Feedback but are't in the current studentList
@@ -1010,6 +1021,8 @@ class PendingFactory
     {
         // Do we have Responses / Feedbacks for students that are not yet loaded?
         if (count($this->assessmentExtraStudentIds)) {
+            $pb = new PredicateBuilder($this->database, '');
+            $pb->equals('u.id', $this->assessmentExtraStudentIds);
             $query = "
                 SELECT 
                     u.id          AS 'u.id',
@@ -1020,10 +1033,9 @@ class PendingFactory
                     u.local_email AS 'u.local_email',
                     u.alt_email   AS 'u.alt_email'
                 FROM user u
-                WHERE u.id IN (" . implode(',', $this->assessmentExtraStudentIds) . ")
-            ";
+                WHERE " . implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
-            $statement->execute();
+            $statement->execute($pb->getParams());
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'],
                     $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
@@ -1349,19 +1361,20 @@ class PendingFactory
     private function getGroupsAdministered()
     {
         // Get Groups administered
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->isNull('f.deleted_at');
+        $pb->equals('ua.uid', $this->viewee->getId());
+        $pb->notLessThan('ua.type', UserAccess::ACCESS_READ);
+        $pb->equals('ua.service', UserAccess::SERVICE_HOMEPAGE);
         $query = "
             SELECT 
                 f.id   AS 'f.id',
                 f.name AS 'f.name'
             FROM folder f
             JOIN userAccess ua ON ua.sid = f.id
-            WHERE f.deleted_at IS NULL
-            AND ua.uid = {$this->viewee->getId()}
-            AND ua.type >= " . UserAccess::ACCESS_READ . "
-            AND ua.service = " . UserAccess::SERVICE_HOMEPAGE . "
-        ";
+            WHERE " . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute($pb->getParams());
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $folderId = intval($row['f.id']);
