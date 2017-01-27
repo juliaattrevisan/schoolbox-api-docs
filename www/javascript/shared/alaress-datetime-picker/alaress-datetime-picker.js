@@ -87,8 +87,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         options[attribute] = optionsOverride[attribute];
     }
 
-    // Counter for uniquely identifying these things
-
     window.pickerInstance = [];
 
     if (element.val().length > 0) {
@@ -160,8 +158,8 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         } else if (picker.data('status') == 'loaded') {
 
             // Use Y-m-d to avoid mis interpreting d/m/Y
-            var formatDate = moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat));
-            window.pickerInstance[pickerId].setDate(formatDate);
+            // var formatDate = moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat));
+            // window.pickerInstance[pickerId].setDate(formatDate);
 
             $('#pickerCalendar' + pickerId).data('dateDisplay', element.val());
 
