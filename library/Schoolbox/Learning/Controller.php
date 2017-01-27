@@ -226,10 +226,10 @@ class Controller extends Base
             ->setParam('p2');
 
         // Did user request a page that does not exist?
-        if($partOnePage < 0 || $partOnePage > $partOnePaginator->getPageCount()){
+        if($partOnePage < 0 || ($partOnePaginator->getPageCount() && $partOnePage > $partOnePaginator->getPageCount())){
             throw new \DomainException("Invalid part one page: $partOnePage");
         }
-        if($partTwoPage < 0 || $partTwoPage > $partTwoPaginator->getPageCount()){
+        if($partTwoPage < 0 || ($partTwoPaginator->getPageCount() && $partTwoPage > $partTwoPaginator->getPageCount())){
             throw new \DomainException("Invalid part two page: $partTwoPage");
         }
 
