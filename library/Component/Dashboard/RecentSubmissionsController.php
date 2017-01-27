@@ -45,7 +45,6 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $cutoffDate->addDays(-1 * $this->getConfig('days'));
 
         // Get most recent N months of DueWork Submissions
-        // Get most recent N months of DueWork Submissions
         /** @var \Schoolbox\Learning\Assessment\Response\SubSource\DueWork $studentSubmissionDataSource */
         $studentSubmissionDataSource = $this->getSitePage()->getDi()->get('submissionDataSource');
         $pb = $studentSubmissionDataSource->getPredicateBuilder();
