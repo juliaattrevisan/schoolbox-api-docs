@@ -199,6 +199,10 @@ class PendingFactory
      */
     private $toChaseLimit;
 
+    /**
+     * @var \Alaress_Date_NullDate
+     */
+    private $nullDate;
 
     /**
      * @param User $viewee
@@ -221,6 +225,7 @@ class PendingFactory
         $this->assessmentsCache = new Collection();
         $this->term = $term;
         $this->toChaseLimit = $toChaseLimit;
+        $this->nullDate = new \Alaress_Date_NullDate();
     }
 
 
@@ -1342,7 +1347,7 @@ class PendingFactory
     private function getDateFromString($dateString, $format = \Alaress_Date_Format::DATABASE_FORMAT)
     {
         if (empty($dateString)) {
-            return new \Alaress_Date_NullDate();
+            return $this->nullDate;
         }
         return new \Alaress_Date_Format($dateString, $format);
     }
