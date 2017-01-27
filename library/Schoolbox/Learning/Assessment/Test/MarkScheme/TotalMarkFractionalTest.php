@@ -39,30 +39,30 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $markScheme->getNormalisedMark(40);
     }
 
-    /**
-     * @dataProvider provider_setValidTotal
-     * @expectedException RangeException
-     * @param float $totalMark
-     */
-    public function test_getHumanReadable_tooLow($totalMark)
-    {
-        $this->markTestSkipped('Total marks less than the minimum value are now allowed');
-        $normalised = -1.0;
-        $markScheme = new TotalMarkFractional();
-        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_getHumanReadable_tooHigh()
-    {
-        $this->markTestSkipped('Total marks greater than the maximum value are now allowed');
-        $normalised = 100.0001;
-        $totalMark = 50.0;
-        $markScheme = new TotalMarkFractional();
-        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
-    }
+//    /**
+//     * @dataProvider provider_setValidTotal
+//     * @expectedException RangeException
+//     * @param float $totalMark
+//     */
+//    public function test_getHumanReadable_tooLow($totalMark)
+//    {
+//        $this->markTestSkipped('Total marks less than the minimum value are now allowed');
+//        $normalised = -1.0;
+//        $markScheme = new TotalMarkFractional();
+//        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
+//    }
+//
+//    /**
+//     * @expectedException RangeException
+//     */
+//    public function test_getHumanReadable_tooHigh()
+//    {
+//        $this->markTestSkipped('Total marks greater than the maximum value are now allowed');
+//        $normalised = 100.0001;
+//        $totalMark = 50.0;
+//        $markScheme = new TotalMarkFractional();
+//        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
+//    }
 
     /**
      * @expectedException InvalidArgumentException
