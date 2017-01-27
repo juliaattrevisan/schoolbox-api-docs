@@ -28,36 +28,17 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
 
         $quotedId = $this->getDatabase()->smartQuote($externalId);
         if ($user->getRole()->isStudent()) {
-            // Statement 1: core subjects
-            // Statement 2: electives
             $query = "
                 SELECT DISTINCT
-                    s.Code + ISNULL(b.Suffix, '') AS code,
-                    s.Name as name,
+                    ts.Code as code,
+                    ts.Name as name,
                     '' AS campusCode,
                     '' AS classType
-                FROM tblSubject s
-                INNER JOIN tblAllocation a on s.ID = a.SubjectID
-                INNER JOIN tblStudent st on a.FormID = st.FormID
-                INNER JOIN tblPeriod p ON a.PeriodID = p.ID
-                LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
-                WHERE st.deleted = 0
-                AND st.code = $quotedId
+                FROM fc.TimetableSubject ts
+                INNER JOIN fc.TimetableSubjectChoice tsc on ts.ID = tsc.TimetableSubjectID
+                INNER JOIN Student s on tsc.PersonID = s.ID
 
-                UNION
-
-                SELECT DISTINCT
-                    s.Code + ISNULL(b.Suffix, '') AS code,
-                    s.Name AS name,
-                    '' AS campusCode,
-                    '' AS classType
-                FROM tblSubject s
-                INNER JOIN tblBlockItem b on s.ID = b.SubjectID
-                INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
-                INNER JOIN tblStudent st ON sc.StudentID = st.ID
-                WHERE st.deleted = 0
-                AND st.code = $quotedId
-
+                WHERE s.Code = $quotedId
                 ORDER BY code ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
