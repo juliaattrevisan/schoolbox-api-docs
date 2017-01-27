@@ -56,7 +56,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         //setup block for submission button
         $this->setVar('FOLDER_CAT_ID', $this->getSource()->getId());
 
-        if (count($allFolders) == 0) {
+        if (count($allFolders) == 0 || $this->getContentPermission() == UserAccess::ACCESS_DENY) {
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
@@ -100,81 +100,80 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
+
                 $this->setVar('source_folder_deleted_block', '');
 
                 $maxFolders = $this->getConfig('size');
-                if ($this->getContentPermission() > UserAccess::ACCESS_DENY) {
+                $j = 0;
+                $colourIndex = 0;
+                $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
-                    $j = 0;
-                    $colourIndex = 0;
-                    $colourList = Timetable_ColourMapper::getInstance()->findAll();
+                foreach ($allFolders as $currentFolder) {
 
-                    foreach ($allFolders as $currentFolder) {
+                    /**
+                     * Set folder colour and cover image for grid layout
+                     */
+                    if ($this->getConfig('displayPortraits') == 'grid') {
 
                         /**
-                         * Set folder colour and cover image for grid layout
+                         * Check for folder colour and apply colour from list if no colour exists
                          */
-                        if ($this->getConfig('displayPortraits') == 'grid') {
-
-                            /**
-                             * Check for folder colour and apply colour from list if no colour exists
-                             */
-                            if (empty($currentFolder['colour'])) {
-                                $folderColour = $colourList[$colourIndex]->getHexColour();
-                                $colourIndex = ($colourIndex + 1) % $colourList->count();
-                            } else {
-                                $folderColour = Scrub::text($currentFolder['colour']);
-                            }
-
-                            /**
-                             * Check for folder cover image
-                             */
-                            if ($currentFolder['coverImage']->getHash() != '') {
-                                $folderCoverImage = 'background-image: url(\'/storage/image.php?hash=' . $currentFolder['coverImage']->getHash() . '&size=cardImageLarge\'); background-size: cover; background-repeat: no-repeat; background-position: center;';
-                            } else {
-                                $folderCoverImage = '';
-                            }
-
+                        if (empty($currentFolder['colour'])) {
+                            $folderColour = $colourList[$colourIndex]->getHexColour();
+                            $colourIndex = ($colourIndex + 1) % $colourList->count();
                         } else {
-                            $folderColour = '';
+                            $folderColour = Scrub::text($currentFolder['colour']);
+                        }
+
+                        /**
+                         * Check for folder cover image
+                         */
+                        if ($currentFolder['coverImage']->getHash() != '') {
+                            $folderCoverImage = 'background-image: url(\'/storage/image.php?hash=' . $currentFolder['coverImage']->getHash() . '&size=cardImageLarge\'); background-size: cover; background-repeat: no-repeat; background-position: center;';
+                        } else {
                             $folderCoverImage = '';
                         }
 
-                        $output = array(
-                            'FOLDER_ID' => $currentFolder['id'],
-                            'FOLDER_NAME' => Scrub::text($currentFolder['text']),
-                            'FOLDER_ICON' => $currentFolder['type'],
-                            'FOLDER_COLOUR' => $folderColour,
-                            'FOLDER_COVER_IMAGE' => $folderCoverImage,
-                        );
+                    } else {
+                        $folderColour = '';
+                        $folderCoverImage = '';
+                    }
 
-                        if ($maxFolders > 0 && $j >= $maxFolders) {
-                            break;
-                        }
+                    $output = array(
+                        'FOLDER_ID' => $currentFolder['id'],
+                        'FOLDER_NAME' => Scrub::text($currentFolder['text']),
+                        'FOLDER_ICON' => $currentFolder['type'],
+                        'FOLDER_COLOUR' => $folderColour,
+                        'FOLDER_COVER_IMAGE' => $folderCoverImage,
+                    );
 
-                        $this->setVar($output);
+                    if ($maxFolders > 0 && $j >= $maxFolders) {
+                        break;
+                    }
 
-                        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                            $this->parse('modify_folder_block', 'modify_folder');
-                        } else {
-                            $this->setVar('modify_folder_block', '');
-                        }
+                    $this->setVar($output);
 
-                        if ($this->getConfig('displayPortraits') == 'grid') {
-                            $this->parse('grid_folders_block', 'grid_folders', true);
-                        } else {
-                            $this->parse('list_folders_block', 'list_folders', true);
-                        }
-
-                        $j++;
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                        $this->parse('modify_folder_block', 'modify_folder');
+                    } else {
+                        $this->setVar('modify_folder_block', '');
                     }
 
                     if ($this->getConfig('displayPortraits') == 'grid') {
-                        $this->parse('grid_view_block', 'grid_view');
+                        $this->parse('grid_folders_block', 'grid_folders', true);
                     } else {
-                        $this->parse('list_view_block', 'list_view');
+                        $this->parse('list_folders_block', 'list_folders', true);
                     }
+
+                    $j++;
                 }
+
+                if ($this->getConfig('displayPortraits') == 'grid') {
+                    $this->parse('grid_view_block', 'grid_view');
+                } else {
+                    $this->parse('list_view_block', 'list_view');
+                }
+
 
                 $this->setVar([
                     'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
