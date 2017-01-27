@@ -187,8 +187,9 @@ class Controller extends Base
             : new \External_User();
 
         $term = TermMapper::getInstance()->findForToday();
+        $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
-        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term);
+        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit);
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */
@@ -202,9 +203,9 @@ class Controller extends Base
 
         /** @var IAssessable[] $assessmentsToMark */
         $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
-        $tomorrow = \Alaress_Date_Format::now()->addDays(1);
+
         foreach($assessments as $assessment){
-            if($assessment->getDueAt()->lt($tomorrow) && $assessment->numNoResponseOrFeedback()){
+            if($assessment->getDueAt()->lt($toChaseLimit) && $assessment->numNoResponseOrFeedback()){
                 $assessmentsToChase->add($assessment);
             }
         }
