@@ -1086,11 +1086,12 @@ class PendingFactory
             $response->setId($row['qa.attempt_id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
-            $response->setSubmittedAt($this->getDateFromString($row['qa.finish']));
+            $finishDate = $this->getDateFromString($row['qa.finish']);
+            $response->setSubmittedAt($finishDate);
             $response->setFirstSectionId($row['qs.first_section_id']);
             $response->setAssessable($quiz);
-            $updatedAt = $row['qa.finish'] ?: $row['qa.start'];
-            $response->setUpdatedAt($this->getDateFromString($updatedAt));
+            $updatedAt = $finishDate->isNull() ? $this->getDateFromString($row['qa.start']) : $finishDate;
+            $response->setUpdatedAt($updatedAt);
 
             $quiz->getResponses()->add($response);
             $participants = $quiz->getAllParticipants();
@@ -1106,8 +1107,8 @@ class PendingFactory
                 $feedback = new QuizReview();
                 $feedback->setId($row['qa.attempt_id']);
                 $reviewedAt = $this->getDateFromString($row['qa.reviewed_at']);
-                $feedback->setPublishedAt($this->getDateFromString($reviewedAt));
-                $feedback->setUpdatedAt($this->getDateFromString($reviewedAt));
+                $feedback->setPublishedAt($reviewedAt);
+                $feedback->setUpdatedAt($reviewedAt);
 
                 $feedback->setResponse($response);
                 $feedback->setAssessable($quiz);
