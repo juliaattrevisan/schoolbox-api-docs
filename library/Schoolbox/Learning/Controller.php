@@ -187,7 +187,7 @@ class Controller extends Base
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */
-        $assessmentsToMark = new Collection();
+        $assessmentsToMark = $this->assessmentMapperProxy->createCollection();
         foreach($assessments as $assessment){
             if($assessment->numMarkingRequired()){
                 $assessmentsToMark->add($assessment);
@@ -196,7 +196,7 @@ class Controller extends Base
         $assessmentsToMark->sortBy('dueAt', 'asc');
 
         /** @var IAssessable[] $assessmentsToMark */
-        $assessmentsToChase = new Collection();
+        $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
         $tomorrow = (new \Alaress_Date_Format())->addDays(1);
         foreach($assessments as $assessment){
             if($assessment->getDueAt()->lt($tomorrow) && $assessment->numNoResponseOrFeedback()){
