@@ -87,13 +87,11 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             if ($this->getConfig('displayPortraits') == 'grid') {
                 $this->setBlock('grid_view', 'grid_folders', 'grid_folders_block');
                 $this->setBlock('grid_folders', 'modify_folder', 'modify_folder_block');
-                $this->parse('grid_view_block', 'grid_view');
                 $this->setVar('list_view_block', '');
 
             } else {
                 $this->setBlock('list_view', 'list_folders', 'list_folders_block');
                 $this->setBlock('list_folders', 'modify_folder', 'modify_folder_block');
-                $this->parse('list_view_block', 'list_view');
                 $this->setVar('grid_view_block', '');
             }
 
@@ -170,13 +168,19 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
                         $j++;
                     }
+
+                    if ($this->getConfig('displayPortraits') == 'grid') {
+                        $this->parse('grid_view_block', 'grid_view');
+                    } else {
+                        $this->parse('list_view_block', 'list_view');
+                    }
                 }
 
                 $this->setVar([
-                        'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
-                        'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
-                        'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getName(),
-                        'COMPONENT_HANDLE' => strtolower($templateHandle)
+                    'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
+                    'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
+                    'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getName(),
+                    'COMPONENT_HANDLE' => strtolower($templateHandle)
                 ]);
 
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
