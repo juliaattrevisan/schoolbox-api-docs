@@ -900,7 +900,7 @@ class PendingFactory
             JOIN assess_attempt qa ON qa.assess_id = q.assess_id AND qa.deleted_at IS NULL
             JOIN assess_section qs ON qs.assess_id = q.assess_id AND qs.deleted_at IS NULL
             WHERE " . implode(' AND ', $pb->getWhere()) . "
-            GROUP BY q.assessment_id, qa.attempt_id, qa.user_id
+            GROUP BY q.assessment_id, qa.user_id, qa.attempt_id
         ";
 
         $statement = $this->database->prepare($query);
