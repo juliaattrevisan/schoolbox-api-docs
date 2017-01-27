@@ -192,18 +192,27 @@ class PendingFactory
      */
     private $assessmentExtraStudentIds = [];
 
+    /**
+     * Used to determine if an assessment requires chasing
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $toChaseLimit;
+
 
     /**
      * @param User $viewee
      * @param \External_UserInterface|null $externalUser
      * @param \External_ClassInterface $externalClass
      * @param Term $term
+     * @param \Alaress_Date_Format $toChaseLimit
      */
     public function __construct(
         User $viewee,
         \External_UserInterface $externalUser = null,
         \External_ClassInterface $externalClass,
-        Term $term
+        Term $term,
+        \Alaress_Date_Format $toChaseLimit
     ) {
         $this->viewee = $viewee;
         $this->database = \Database::getInstance();
@@ -211,6 +220,7 @@ class PendingFactory
         $this->externalClass = $externalClass;
         $this->assessmentsCache = new Collection();
         $this->term = $term;
+        $this->toChaseLimit = $toChaseLimit;
     }
 
 
@@ -257,9 +267,14 @@ class PendingFactory
 
         // Process the results, creating extra Participants where required, pulling User from caches
         $this->hydrateQuizResults($quizResults);
+        $this->discardIrrelevantAssessments($this->quizAssessmentIds);
+
         $this->hydrateTaskResults($taskResults);
+        $this->discardIrrelevantAssessments($this->taskAssessmentIds);
+
         $this->hydrateDueWorkResponses($dueWorkResponses);
         $this->hydrateDueWorkFeedbacks($dueWorkFeedbackResults);
+        $this->discardIrrelevantAssessments($this->dueWorkAssessmentIds);
 
         return $this->assessmentsCache;
     }
@@ -1095,6 +1110,46 @@ class PendingFactory
                 $participants[$userId]->getAllFeedbacks()->add($feedback);
             }
         }
+    }
+
+    /**
+     * Memory optimisation.
+     *
+     * For each assessment specified, discards it if does not require marking or chasing.
+     *
+     * @param int[] $assessmentIds
+     */
+    protected function discardIrrelevantAssessments(array $assessmentIds)
+    {
+        foreach($assessmentIds as $assessmentId){
+            $assessment = $this->assessmentsCache[$assessmentId];
+
+            if(!$this->isMarkingRequired($assessment) && !$this->isChasingRequired($assessment)){
+                unset($this->assessmentsCache[$assessmentId]);
+            }
+        }
+    }
+
+    /**
+     * Returns whether the assessment has students who require marking
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function isMarkingRequired(IAssessable $assessment)
+    {
+        return $assessment->numMarkingRequired() > 0;
+    }
+
+    /**
+     * Returns whether the assessment contains participants who require chasing
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function isChasingRequired(IAssessable $assessment)
+    {
+        return $assessment->getDueAt()->lt($this->toChaseLimit) && $assessment->numNoResponseOrFeedback() > 0;
     }
 
     /**
