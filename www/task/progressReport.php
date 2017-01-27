@@ -1,4 +1,20 @@
 <?php
+
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+
+if (isset($this->arg[0]) && is_numeric($this->arg[0])){
+    SitePage::localRedir('/learning/markbook/'.$this->arg[0], null, 301);
+}
+SitePage::pageNotFound();
+
+/*
+*Old code
+*/
+
 /**
  * Page for the progress report for the tasks on a homepage.
  *

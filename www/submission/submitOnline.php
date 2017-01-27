@@ -1,5 +1,26 @@
 <?php
 
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+$url = '/learning/assessments/';
+if ((isset($this->arg[0]) && is_numeric($this->arg[0])) && (isset($this->arg[1]) && is_numeric($this->arg[1]))){
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    $assessmentId = $submissionBox->getAssessmentId();
+    $url .= $assessmentId.'/'.$this->arg[1].'/submit'; //assessmentId/userId/submit
+    $this->localRedir($url, null, 301);
+}
+else {
+    $this->pageNotFound();
+}
+
+/*
+*Old code
+*/
+
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;

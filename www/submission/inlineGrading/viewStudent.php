@@ -1,4 +1,35 @@
 <?php
+
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+
+$url = '/learning/assessments/';
+if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
+    //Can we get the submission?
+    try {
+        $submission = Submission\SubmissionMapper::getInstance()->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
+        $this->pageNotFound();
+    }
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    $submissionBox = $submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+    $assessmentId = $submissionBox->getAssessmentId();
+    $studentId = $submission->getOwner()->getId();
+
+    $url .= $assessmentId.'/'.$studentId; //assessmentId/userId/submissionId
+    $this->localRedir($url, null, 301);
+}
+$this->pageNotFound();
+
+/*
+*Old code
+*/
+
 /**
  * ${NAME}
  *
@@ -9,7 +40,6 @@
  */
 
 use Schoolbox\Assessment\Component;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Breadcrumbs;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;

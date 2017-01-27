@@ -1,7 +1,50 @@
 <?php
 
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+
+if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    // Is the submission box still there?
+    try {
+        $submissionBox = $submissionBoxMapper->findById($this->arg[1]);
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        $this->pageNotFound();
+    }
+    $assessmentId= $submissionBox->getAssessmentId();
+    $this->localRedir('/learning/assessments/'.$assessmentId.'/modify', null, 301);
+}
+elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+    $url = '/learning/folders/'.$this->arg[1].'/assessments/new?type=';
+
+    if($this->arg[2] === 'task') {
+        $url .= 'task';
+    }
+    elseif($this->arg[2] === 'quiz') {
+        $url .= 'quiz';
+    }
+    else {
+        $url .= 'dueWork';
+    }
+    $this->localRedir($url, null, 301);
+}
+else {
+    $this->pageNotFound();
+}
+
+/*
+ * Old code
+ */
+
+//use Schoolbox\Assessment\Component\SubmissionBox;
+//use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;

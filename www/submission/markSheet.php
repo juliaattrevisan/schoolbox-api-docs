@@ -1,5 +1,28 @@
 <?php
 
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+
+if (isset($this->arg[0]) && is_numeric($this->arg[0])){
+    $url = '/learning/markbook/';
+    $url .= $this->arg[0]; //folder
+    if (isset($this->arg[1])) {
+        $url .= '/term/'.$this->arg[1]; //term
+//        if ($this->arg[2] == 'export') {
+//            $url .= '/'.$this->$arg[2]; //export, not ready yet
+//        }
+    }
+    $this->localRedir($url, null, 301);
+}
+
+$this->pageNotFound();
+
+/*
+*Old code
+*/
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Marksheet;

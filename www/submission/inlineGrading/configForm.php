@@ -1,4 +1,15 @@
 <?php
+
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+$this->localRedir('/', null, 410);
+
+/*
+*Old code
+*/
 /**
  * Allows you to update various configs for a submission box etc.
  * from within inline grading

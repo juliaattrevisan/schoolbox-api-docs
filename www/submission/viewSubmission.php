@@ -1,5 +1,31 @@
 <?php
 
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+$url = '/learning/assessments/';
+if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    try {
+        $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    }
+    catch(\Exception $e) {
+        $this->pageNotFound();
+    }
+    $assessmentId = $submissionBox->getAssessmentId();
+    $url .= $assessmentId.'/status'; //assessmentId/status
+    $this->localRedir($url, null, 301);
+}
+else {
+    $this->pageNotFound();
+}
+
+/*
+*Old code
+*/
+
 if (!isset($this)) {
     require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
     SitePage::localRedir('/submission/viewSubmission');

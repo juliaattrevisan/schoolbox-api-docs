@@ -1,4 +1,17 @@
 <?php
+
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+//Just redirect to pending assessments
+$this->localRedir('/learning/pending/', null, 301);
+
+/*
+*Old code
+*/
+
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');

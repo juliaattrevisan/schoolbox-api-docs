@@ -1,4 +1,29 @@
 <?php
+
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+
+if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
+    $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+    $assessmentId = $assessmentDataSource->findByTaskId($this->arg[1])->getId();
+    SitePage::localRedir('/learning/assessments/'.$assessmentId.'/modify/', null, 301);
+}
+elseif ($this->arg[0] == 'create' && is_numeric($this->arg[1])) {
+    SitePage::localRedir('/learning/folders/'.$this->arg[1].'/assessments/new?type=task', null, 301);
+}
+else {
+    SitePage::pageNotFound();
+}
+
+/*
+ * Old code
+ */
+
+
+
 /**
  * Page for creating/modifying a task
  *

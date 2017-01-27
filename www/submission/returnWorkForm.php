@@ -53,7 +53,7 @@ if (is_numeric($_GET['delete'])) {
 
     // Delete and redir somewhere
     $mapper->delete($return);
-    SitePage::localRedir("/submission/inlineGrading/view/{$boxId}/{$userId}");
+    $this->localRedir("/submission/inlineGrading/view/{$boxId}/{$userId}");
     exit;
 }
 

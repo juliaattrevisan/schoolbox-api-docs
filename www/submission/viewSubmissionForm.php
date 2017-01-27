@@ -1,4 +1,15 @@
 <?php
+
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+$this->localRedir('/', null, 410);
+
+/*
+*Old code
+*/
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 $page = new SitePage();

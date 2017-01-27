@@ -1,5 +1,31 @@
 <?php
 
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
+
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    //Is it there??
+    try {
+        $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
+        $this->pageNotFound();
+    }
+    $assessmentId= $submissionBox->getAssessmentId();
+
+    $this->localRedir('/learning/assessments/'.$assessmentId.'/'.$this->arg[1].'/responses', null, 301); // assessmentId/userId
+}
+$this->pageNotFound();
+
+/*
+ * Old code
+ */
+
+
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
