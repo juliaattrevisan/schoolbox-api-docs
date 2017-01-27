@@ -61,37 +61,25 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 ORDER BY code ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
-            // Statement 1: core subjects
-            // Statement 2: electives
-            $roomJoin = ($this->requireTeacherSubjectsHaveRooms ? 'INNER JOIN tblRoom r on r.ID = b.RoomID' : '');
-            $query    = "
+            $query = "
                 SELECT DISTINCT
-                    s.Code + ISNULL(b.Suffix, '') as code,
-                    s.Name as name,
+                    ts.Code as code,
+                    ts.Name as name,
                     '' AS campusCode,
                     '' AS classType
-                FROM tblSubject s
-                INNER JOIN tblAllocation a on s.ID = a.SubjectID
-                INNER JOIN tblTeacher t on a.TeacherID = t.ID
-                LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
-                $roomJoin
-                WHERE t.deleted = 0
-                AND t.code = $quotedId
+                FROM fc.TimetableSubject ts
+                INNER JOIN fc.TimetableClass tc on ts.ID = tc.TimetableSubjectID
 
-                UNION
+                -- Base relation - is this required?
+                LEFT  JOIN fc.TimetableClassStaff tcs on tc.ID = tcs.TimetableClassId
+                LEFT  JOIN Staff tcs_staff ON tcs.PersonID = tcs_staff.ID
 
-                SELECT DISTINCT
-                    s.Code + ISNULL(b.Suffix, '') as code,
-                    s.Name as name,
-                    '' AS campusCode,
-                    '' AS classType
-                FROM tblSubject s
-                INNER JOIN tblBlockItem b on s.ID = b.SubjectID
-                INNER JOIN tblTeacher t on b.TeacherID = t.ID
-                $roomJoin
-                WHERE t.deleted = 0
-                AND t.code = $quotedId
+                -- Individual relation
+                INNER JOIN fc.TimetableClassInstance tci on tc.ID = tci.TimetableClassID
+                LEFT  JOIN fc.TimetableClassInstanceStaff tcis on tci.ID = tcis.TimetableClassInstanceId
+                LEFT  JOIN Staff tcis_staff ON tcis.PersonID = tcis_staff.ID
 
+                WHERE (tcs_staff.Code = $quotedId OR tcis_staff.Code = $quotedId)
                 ORDER BY code ASC
             ";
         } else {
