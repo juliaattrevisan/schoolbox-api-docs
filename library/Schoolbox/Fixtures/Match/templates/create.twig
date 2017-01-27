@@ -9,6 +9,7 @@
 <script type="text/javascript">
     $(function() {
         $('#matchForm').alaressValidate({
+            ignore: ':hidden',
             rules: {
                 venueId: {
                     required: true,
@@ -20,11 +21,13 @@
                 },
                 startAtDate: {
                     required: true,
-                    minlength: 1
+                    minlength: 1,
+                    datepickerDate: true
                 },
                 startAtTime: {
                     required: true,
-                    minlength: 1
+                    minlength: 1,
+                    timepickerTime: true
                 },
                 homeTeamId: {
                     required: true,
@@ -33,14 +36,24 @@
                 awayTeamId: {
                     required: true,
                     minlength: 1
+                },
+                'itinerary[date][]': {
+                    datepickerDate: true
+                },
+                'itinerary[time][]': {
+                    timepickerTime: true
                 }
             },
             messages: {
                 'venueId': 'Please choose a Venue.',
                 'name': 'Please enter a Match name.',
                 'seasonId': 'Please choose a Season',
-                'startAtDate': 'Please choose a date.',
-                'startAtTime': 'Please choose a time.'
+                'startAtDate': {
+                    required: 'Please choose a date.'
+                },
+                'startAtTime': {
+                    required: 'Please choose a time.'
+                }
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
@@ -83,7 +96,8 @@
         });
 
         // Ensure match is scheduled within the season
-        $('[data-datepicker]').datepicker( );
+        $('[data-datepicker]').datepicker();
+        $('[data-itinerary-date]').datepicker();
 
         $('#matchForm').find('[data-timepicker]').timepicker({
             appendTo: function ($input) {
