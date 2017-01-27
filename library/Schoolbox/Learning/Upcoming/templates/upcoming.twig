@@ -242,7 +242,7 @@
 
 {% if subjects|length %}
 <div class="row">
-    <div class="small-12 medium-6 island">
+    <div class="small-12 medium-6 {{ upcomingWork|length ? 'island' : '' }}">
         <h2 class="subheader">Upcoming Due Work</h2>
         <section>
             {% if upcomingWork|length %}
