@@ -202,7 +202,7 @@ class Controller extends Base
 
         /** @var IAssessable[] $assessmentsToMark */
         $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
-        $tomorrow = (new \Alaress_Date_Format())->addDays(1);
+        $tomorrow = \Alaress_Date_Format::now()->addDays(1);
         foreach($assessments as $assessment){
             if($assessment->getDueAt()->lt($tomorrow) && $assessment->numNoResponseOrFeedback()){
                 $assessmentsToChase->add($assessment);
