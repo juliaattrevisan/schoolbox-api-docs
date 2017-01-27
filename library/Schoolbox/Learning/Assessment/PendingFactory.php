@@ -1178,8 +1178,9 @@ class PendingFactory
             $response->setId($row['tc.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setAssessable($task);
-            $response->setCreatedAt($this->getDateFromString($row['tc.completion_date']));
-            $response->setUpdatedAt($this->getDateFromString($row['tc.completion_date']));
+            $completedAt = $this->getDateFromString($row['tc.completion_date']);
+            $response->setCreatedAt($completedAt);
+            $response->setUpdatedAt($completedAt);
 
             // TODO - sigh replace this with composition ASAP
             $response->markAs($row['tc.student_id'] == $row['tc.marking_user_id']
@@ -1187,28 +1188,27 @@ class PendingFactory
                 : ICompletion::STATUS_COMPLETED
             );
 
-            $task->getResponses()->add($response);
+            $task->getResponses()->setOffset($response->getId(), $response);
             $participants = $task->getAllParticipants();
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $task);
             }
-            $participants[$userId]->getAllResponses()->add($response);
-
+            $participants[$userId]->getAllResponses()->setOffset($response->getId(), $response);
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
             if ($userId != $row['tc.marking_user_id']) {
                 $feedback = new TaskFeedback();
                 $feedback->setId($row['tc.id']);
-                $feedback->setPublishedAt($this->getDateFromString($row['tc.completion_date']));
-                $feedback->setUpdatedAt($this->getDateFromString($row['tc.completion_date']));
+                $feedback->setPublishedAt($completedAt);
+                $feedback->setUpdatedAt($completedAt);
                 $feedback->setResponse($response);
                 $feedback->setAssessable($task);
 
-                $response->getAllFeedback()->add($feedback);
-                $task->getFeedbacks()->add($feedback);
-                $participants[$userId]->getAllFeedbacks()->add($feedback);
+                $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
+                $task->getFeedbacks()->setOffset($feedback->getId(), $feedback);
+                $participants[$userId]->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
             }
         }
     }
