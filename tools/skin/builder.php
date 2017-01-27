@@ -95,7 +95,6 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
     $infile  = SITE_root . '/www/css/foundation/chrome-foundation.scss';
     $outfile = SITE_root . '/www/css/'.$siteLocation.'/chrome-foundation.css';
     $outdir  = dirname($outfile);
-    $ie9file = SITE_root . '/www/css/'.$siteLocation.'/chrome-foundation-ie9.css';
     $tmpfile = sb_tempnam('css');
     $cmd     = sprintf('sass --style compressed %s %s', escapeshellarg($infile), escapeshellarg($tmpfile));
     $logger->info("Building SASS...");
@@ -131,29 +130,6 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
 
         if ($outputCode !== 0) {
             $logger->warning("Something went wrong building editor CSS (exit code: $outputCode)");
-        }
-
-        $logger->info("Splitting for IE < 10 using blessc...");
-        $blessCmd = 'blessc';
-        exec('which '.escapeshellarg($blessCmd), $output, $outputCode);
-        if ($outputCode !== 0) {
-            $logger->info("blessc doesn't exist - assuming in node_modules");
-            $blessCmd = SITE_root.'/node_modules/.bin/blessc';
-        }
-        $blessCmd = sprintf('%s %s %s', escapeshellarg($blessCmd), escapeshellarg($outfile), escapeshellarg($ie9file));
-        exec($blessCmd, $output, $outputCode);
-        if ($outputCode === 0) {
-            $logger->info("Splitting for IE < 10 complete");
-            $logger->info("Skin built successfully");
-        } else {
-            // Something went wrong through blessc, that's a warning for now rather than an error
-            $logger->warning("Something went wrong during blessc (exit code: $outputCode)");
-            $logger->info("Command: $cmd");
-            $logger->info("Output:");
-            foreach ($output as $line) {
-                $logger->info($line);
-            }
-            $outputCode = 0;
         }
 
         // Move all of the CSS files to S3
