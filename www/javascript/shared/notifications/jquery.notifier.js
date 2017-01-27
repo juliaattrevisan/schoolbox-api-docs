@@ -66,10 +66,7 @@
             // detect websocket support
             var support = "MozWebSocket" in window ? 'MozWebSocket' : ("WebSocket" in window ? 'WebSocket' : null);
             if (support == null || settings.transport == 'poll') {
-                // falling back to long poll
-                support = "LongPoll";
-                window["LongPoll"] = LongPoll;
-                if(settings.debug) { console.warn('Websockets are not supported, falling back to polling'); }
+                console.warn('Websockets are not supported, cannot get notifications');
             }
 
             /**
@@ -624,63 +621,6 @@
             establishConnection();
         });
     }
-
-    function LongPoll() {
-        this.i = 30000;
-        // perform first check, then every 30 seconds thereafter
-        this.check.apply(this);
-        this.ii = setInterval(this.check.bind(this), this.i);
-        this.count = 0;
-    }
-
-    LongPoll.prototype = {
-
-        check     : function() {
-            var self = this;
-            // request an update
-            $.ajax({
-                accepts  : 'application/json',
-                async    : true,
-                type     : 'GET',
-                url      : '/ajax/messages.php',
-                dataType : 'json',
-                complete : function(xhr, status) {
-                    self.onmessage({ data : xhr.responseText });
-                }
-            });
-            this.count++;
-            // only allow 30 minutes of polling
-            if(this.count > 60) {
-                this.close();
-            }
-        },
-
-        send      : function(data) {
-            var self = this;
-            // send an ack
-            $.ajax({
-                accept   : 'application/json',
-                async    : true,
-                type     : 'POST',
-                url      : '/ajax/messages.php',
-                dataType : 'json',
-                data     : {data : data},
-                complete : function(xhr, status) {
-                    self.onmessage({ data : xhr.responseText });
-                }
-            });
-        },
-
-        close     : function(e) {
-            clearInterval(this.ii);
-        },
-
-        // stubs to be overridden
-        onmessage : function(e) {},
-        onopen    : function(e) {},
-        onclose   : function(e) {}
-    };
-
 
     // declare string functions (courtesy of http://stackoverflow.com/a/2729694/1877343)
     if(!String.prototype.reverse) {

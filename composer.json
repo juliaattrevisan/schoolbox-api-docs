@@ -36,23 +36,6 @@
             }
         },
         {
-            "type": "package",
-            "package": {
-                "name": "devristo/phpws",
-                "version": "0.1.0",
-                "source": {
-                    "url": "https://github.com/Devristo/phpws",
-                    "type": "git",
-                    "reference": "911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30"
-                },
-                "autoload": {
-                    "psr-0": {
-                        "Devristo\\Phpws\\": "src/"
-                    }
-                }
-            }
-        },
-        {
             "type": "vcs",
             "url":  "https://github.com/alaress/etherpad-lite-client"
         },
@@ -82,7 +65,6 @@
         "league/flysystem-aws-s3-v3": "1.0.*",
         "php-amqplib/php-amqplib": "2.6.3",
         "cboden/ratchet": "0.3.4",
-        "devristo/phpws": "0.1.0",
         "react/stomp": "0.2.*@dev",
         "react/dns": "0.4.*",
         "react/socket-client": "0.4.*",
