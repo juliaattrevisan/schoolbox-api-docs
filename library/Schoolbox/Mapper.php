@@ -390,7 +390,7 @@ abstract class Mapper implements IMapper, Serializable
         // cache of local entities
         $this->localBodyCache = new Cache(function (Mapper $mapper, array $row, $alias = '') {
 
-            $key = trim(get_class($mapper).".$alias.{$mapper->getIdentifierColumn()}", '.');
+            $key = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
 
             if (array_key_exists($key, $row) && $this->localBodyCacheBypass == false) {
                 $id = $row[$key];

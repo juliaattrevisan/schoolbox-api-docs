@@ -80,7 +80,7 @@ class Model implements IColumnType {
 	 */
     public function hydrate($value, $mapper = null)
     {
-        return $this->cache->get("'{$mapper->getTable()}'.'$value'", [ $mapper, $value ]);
+        return $this->cache->get(sprintf("'%s'.'%s'", get_class($mapper), $value), [ $mapper, $value ]);
     }
 
 	/**
