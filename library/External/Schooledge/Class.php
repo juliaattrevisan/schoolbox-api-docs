@@ -75,7 +75,37 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
      */
     public function getTeacherName($classCode)
     {
-        return [];
+        $classQuery = $this->getClassCodeQuery($classCode);
+        $quotedDate = $this->getDatabase()->smartQuote(Alaress_Date_Format::now()->getDatabaseDate());
+        $query      = "
+            SELECT DISTINCT tcs_staff.Code AS code
+            FROM fc.TimetableSubject ts
+            -- Base join to class and timetable
+            INNER JOIN fc.TimetableClass tc ON ts.ID          = tc.TimetableSubjectID
+            INNER JOIN fc.Timetable      t  ON ts.TimetableID = t.ID
+            -- Base relation to staff - is this required?
+            INNER JOIN fc.TimetableClassStaff tcs       ON tc.ID        = tcs.TimetableClassId
+            INNER JOIN dbo.Staff              tcs_staff ON tcs.PersonID = tcs_staff.ID
+            WHERE $classQuery
+            AND   $quotedDate BETWEEN CONVERT(date, t.StartDate) AND CONVERT(date, t.EndDate)
+
+            UNION
+
+            SELECT DISTINCT tcis_staff.Code AS code
+            FROM fc.TimetableSubject ts
+            -- Base join to class and timetable
+            INNER JOIN fc.TimetableClass tc ON ts.ID          = tc.TimetableSubjectID
+            INNER JOIN fc.Timetable      t  ON ts.TimetableID = t.ID
+            -- Individual relation to staff
+            INNER JOIN fc.TimetableClassInstance      tci        ON tc.ID         = tci.TimetableClassID
+            INNER JOIN fc.TimetableClassInstanceStaff tcis       ON tci.ID        = tcis.TimetableClassInstanceId
+            INNER JOIN dbo.Staff                      tcis_staff ON tcis.PersonID = tcis_staff.ID
+            WHERE $classQuery
+            AND   $quotedDate BETWEEN CONVERT(date, t.StartDate) AND CONVERT(date, t.EndDate)
+
+            ORDER BY code ASC
+        ";
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
