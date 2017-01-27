@@ -359,7 +359,20 @@ class Controller extends Assessment\Controller
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();
         if (!empty($rq->post['attachment'])) {
-            foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
+
+            // Validate attachment list first
+            try {
+                $attachments = $factory->build($rq->post['attachment'])->getAll();
+            } catch (\InvalidArgumentException $e) {
+                $result['success'] = false;
+                $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
+
+                $rs->status->setCode(403);
+                $rs->content->set($this->buildJsonOutput($result));
+                return;
+            }
+
+            foreach ($attachments as $attachment) {
 
                 /* Don't stack the online-submission.html file here, it should never
                  * appear in the attached files list at all (it should always be
