@@ -26,41 +26,51 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
             return [];
         }
 
-        $quotedId = $this->getDatabase()->smartQuote($externalId);
+        $quotedDate = $this->getDatabase()->smartQuote(Alaress_Date_Format::now()->getDatabaseDate());
+        $quotedId   = $this->getDatabase()->smartQuote($externalId);
         if ($user->getRole()->isStudent()) {
             $query = "
                 SELECT DISTINCT
-                    ts.Code as code,
-                    ts.Name as name,
-                    '' AS campusCode,
-                    '' AS classType
+                    ts.Code     AS code,
+                    ts.Name     AS name,
+                    t.ShortName AS campusCode,
+                    ''          AS classType
                 FROM fc.TimetableSubject ts
-                INNER JOIN fc.TimetableSubjectChoice tsc on ts.ID = tsc.TimetableSubjectID
-                INNER JOIN Student s on tsc.PersonID = s.ID
+
+                INNER JOIN fc.TimetableSubjectChoice tsc ON ts.ID          = tsc.TimetableSubjectID
+                INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
+                INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.ID
 
                 WHERE s.Code = $quotedId
+                AND   $quotedDate BETWEEN(CONVERT(date, t.StartDate), CONVERT(date, t.EndDate))
+
                 ORDER BY code ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
             $query = "
                 SELECT DISTINCT
-                    ts.Code as code,
-                    ts.Name as name,
-                    '' AS campusCode,
-                    '' AS classType
+                    ts.Code     AS code,
+                    ts.Name     AS name,
+                    t.ShortName AS campusCode,
+                    ''          AS classType
                 FROM fc.TimetableSubject ts
-                INNER JOIN fc.TimetableClass tc on ts.ID = tc.TimetableSubjectID
 
-                -- Base relation - is this required?
-                LEFT  JOIN fc.TimetableClassStaff tcs on tc.ID = tcs.TimetableClassId
-                LEFT  JOIN Staff tcs_staff ON tcs.PersonID = tcs_staff.ID
+                -- Base join to class and timetable
+                INNER JOIN fc.TimetableClass tc ON ts.ID          = tc.TimetableSubjectID
+                INNER JOIN fc.Timetable      t  ON ts.TimetableID = t.ID
 
-                -- Individual relation
-                INNER JOIN fc.TimetableClassInstance tci on tc.ID = tci.TimetableClassID
-                LEFT  JOIN fc.TimetableClassInstanceStaff tcis on tci.ID = tcis.TimetableClassInstanceId
-                LEFT  JOIN Staff tcis_staff ON tcis.PersonID = tcis_staff.ID
+                -- Base relation to staff - is this required?
+                LEFT  JOIN fc.TimetableClassStaff tcs       ON tc.ID        = tcs.TimetableClassId
+                LEFT  JOIN dbo.Staff              tcs_staff ON tcs.PersonID = tcs_staff.ID
+
+                -- Individual relation to staff
+                INNER JOIN fc.TimetableClassInstance      tci        ON tc.ID         = tci.TimetableClassID
+                LEFT  JOIN fc.TimetableClassInstanceStaff tcis       ON tci.ID        = tcis.TimetableClassInstanceId
+                LEFT  JOIN dbo.Staff                      tcis_staff ON tcis.PersonID = tcis_staff.ID
 
                 WHERE (tcs_staff.Code = $quotedId OR tcis_staff.Code = $quotedId)
+                AND   $quotedDate BETWEEN(CONVERT(date, t.StartDate), CONVERT(date, t.EndDate))
+
                 ORDER BY code ASC
             ";
         } else {
