@@ -5,7 +5,7 @@ $notification-header-background: $navigation-background !default;
 // where data-unread != 0
 .right-small a {
     width: 5rem;
-    height: 5rem;
+    height: $tabbar-height;
     display: block;
     cursor: pointer;
 
@@ -71,7 +71,7 @@ $notification-header-background: $navigation-background !default;
     }
     ul.off-canvas-list {
         label {
-            height: 5rem;
+            height: $tabbar-height;
             line-height: 3rem;
             background: $notification-unread-background;
             color: $notification-unread-color;
