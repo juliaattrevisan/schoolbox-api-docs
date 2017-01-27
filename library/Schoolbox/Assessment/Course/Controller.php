@@ -852,7 +852,7 @@ class Controller extends Base\Base
     protected function getCourseData($searchParam = null)
     {
         // Use the new mapper to get the list of courses
-        $allCourses = $this->getCourseSpecificationMapper()->findAllByName($searchParam);
+        $allCourses = $this->getCourseSpecificationMapper()->findAllByName($searchParam, ['order' => ['f.name' => 'asc']]);
 
         $data = [];
 
