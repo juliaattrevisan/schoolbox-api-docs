@@ -1071,7 +1071,7 @@ class PendingFactory
      * @var string|null $quizResults[]['qa.reviewed_at']
      * @var int         $quizResults[]['qa.first_section_id']
      */
-    private function hydrateQuizResults($quizResults)
+    private function hydrateQuizResults(array $quizResults)
     {
         foreach ($quizResults as $row) {
             $quiz = $this->assessmentsCache[$row['q.assessment_id']];
@@ -1163,7 +1163,7 @@ class PendingFactory
      * @var string $taskResults[]['tc.marking_user_id']
      * @var string $taskResults[]['tc.completion_date']
      */
-    private function hydrateTaskResults($taskResults)
+    private function hydrateTaskResults(array $taskResults)
     {
         foreach ($taskResults as $row) {
             $task = $this->assessmentsCache[$row['t.assessment_id']];
@@ -1219,7 +1219,7 @@ class PendingFactory
      * @var int $dueWorkResponses['ss.submitted_at']
      * @var int $dueWorkResponses['ss.updated_at']
      */
-    private function hydrateDueWorkResponses($dueWorkResponses)
+    private function hydrateDueWorkResponses(array $dueWorkResponses)
     {
         foreach ($dueWorkResponses as $row) {
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
@@ -1248,7 +1248,7 @@ class PendingFactory
      *
      * @param array $dueWorkFeedbackResults
      */
-    private function hydrateDueWorkFeedbacks($dueWorkFeedbackResults)
+    private function hydrateDueWorkFeedbacks(array $dueWorkFeedbackResults)
     {
         foreach ($dueWorkFeedbackResults as $row) {
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
