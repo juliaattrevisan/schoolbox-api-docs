@@ -1238,14 +1238,14 @@ class PendingFactory
             $response->setSubmittedAt($this->getDateFromString($row['ss.submitted_at']));
             $response->setUpdatedAt($this->getDateFromString($row['ss.updated_at']));
 
-            $dueWork->getResponses()->add($response);
+            $dueWork->getResponses()->setOffset($response->getId(), $response);
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
-            $participants[$userId]->getAllResponses()->add($response);
+            $participants[$userId]->getAllResponses()->setOffset($response->getId(), $response);
         }
     }
 
@@ -1265,14 +1265,14 @@ class PendingFactory
             $feedback->setPublishedAt($this->getDateFromString($row['sr.published_at']));
             $feedback->setAssessable($dueWork);
 
-            $dueWork->getFeedbacks()->add($feedback);
+            $dueWork->getFeedbacks()->setOffset($feedback->getId(), $feedback);
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
-            $participants[$userId]->getAllFeedbacks()->add($feedback);
+            $participants[$userId]->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
         }
     }
 
