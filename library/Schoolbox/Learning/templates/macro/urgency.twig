@@ -49,7 +49,23 @@
 {% macro marks(normalisedMark) %}
 {% spaceless %}
     {% if normalisedMark|length %}
-        gradient-{{ (normalisedMark/10)|round(0, 'floor') }}
+        {% set index = (normalisedMark/10)|round(0, 'floor') %}
+        {% set max = 10 %}
+        {% set min = 0 %}
+
+        {# For Quiz, you can get bonus marks/penalties (> 100% and < 0 respectively)
+         # Assign a gradient class for these particular scenarios. This prevents grades
+         # appearing in plain black
+         #}
+        {% if index > max %}
+            {% set index = max %}
+        {% endif %}
+
+        {% if index < min %}
+            {% set index = min %}
+        {% endif %}
+
+        gradient-{{ index }}
     {% endif %}
 {% endspaceless %}
 {% endmacro %}

@@ -52,6 +52,16 @@ class TotalMarkFractional extends TotalMarkAbstract
         parent::__construct(0);
     }
 
+    /**
+     * Quiz marks are allowed to be outside the normal mark bounds.
+     *
+     * @param float $normalisedMark
+     * @throws RangeException
+     */
+    protected function validateNormalisedMark($normalisedMark)
+    {
+        $this->validateNormalisedMarkType($normalisedMark);
+    }
 
     /**
      * @param float $totalMark
