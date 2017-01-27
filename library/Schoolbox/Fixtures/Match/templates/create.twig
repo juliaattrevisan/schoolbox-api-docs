@@ -96,7 +96,8 @@
         });
 
         // Ensure match is scheduled within the season
-        $('[data-datepicker]').datepicker( );
+        $('[data-datepicker]').datepicker();
+        $('[data-itinerary-date]').datepicker();
 
         $('#matchForm').find('[data-timepicker]').timepicker({
             appendTo: function ($input) {
