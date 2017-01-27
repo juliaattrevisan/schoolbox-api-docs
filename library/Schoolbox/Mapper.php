@@ -2725,14 +2725,6 @@ abstract class Mapper implements IMapper, Serializable
      */
     private function getLocalObjectCacheKey(Mapper $mapper, array $row, $alias = '')
     {
-        $tbl = trim($mapper->getTable());
-
-        if (empty($tbl)) {
-            // this occurs on pseudo mappers, particularly External_*
-            // just fall back to the classname
-            $tbl = get_class($mapper);
-        }
-
         $idCol = trim($mapper->getIdentifierColumn());
 
         if (empty($idCol)) {
@@ -2756,7 +2748,7 @@ abstract class Mapper implements IMapper, Serializable
 
         }
 
-        return "$tbl.$key";
+        return get_class($mapper).".$key";
     }
 
 

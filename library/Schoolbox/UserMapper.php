@@ -378,28 +378,6 @@ class UserMapper extends Mapper
         ";
     }
 
-    /** @var Cache|User[] */
-    protected $userCache;
-
-    /**
-     * @return void
-     */
-    protected function initCaches()
-    {
-        parent::initCaches();
-
-        $this->userCache = new Cache(function ($row) {
-
-            /** @var Role $role */
-            $role = $this->hydrateJoin($row, 'role', 'g');
-
-            return $this->hydrate($row)
-                ->setSuperuser($row['superuser'] == 1)
-                ->setRole($role);
-        });
-    }
-
-
     /**
      * @param PDOStatement $statement
      * @return Collection
@@ -413,7 +391,11 @@ class UserMapper extends Mapper
 
             $userId = $row['id'];
 
-            $users[$userId] = $this->userCache->get($userId, [ $row ]);
+            /** @var Role $role */
+            $role = $this->hydrateJoin($row, 'role', 'g');
+            $users[$userId] = $this->hydrate($row)
+                ->setSuperuser($row['superuser'] == 1)
+                ->setRole($role);
 
             /** @var Campus $campus */
             $campus = $this->hydrateJoin($row, 'userCampus', 'c');
