@@ -360,12 +360,13 @@ class Controller extends Assessment\Controller
         $factory = new CollectorFactory();
         if (!empty($rq->post['attachment'])) {
 
-            // Validate attachment list first
+            // Validate attachment list can actually be built
             try {
                 $attachments = $factory->build($rq->post['attachment'])->getAll();
+
             } catch (\InvalidArgumentException $e) {
                 $result['success'] = false;
-                $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
+                $result['message'] = 'One or more files were not able to be attached';
 
                 $rs->status->setCode(403);
                 $rs->content->set($this->buildJsonOutput($result));
