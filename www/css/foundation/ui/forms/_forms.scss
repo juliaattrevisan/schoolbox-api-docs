@@ -173,6 +173,7 @@ textarea{
 select {
 	padding-top: 0;
 	padding-bottom: 0;
+	font-family: $font-family-icon, $font-family-sans-serif;
 }
 
 // remove margins on forms inside tables
@@ -243,6 +244,7 @@ th, td{
 	content: "";
 }
 %fancy-check-after{
+	font-family: $font-family-icon;
 	position: absolute;
 	display: block;
 	content: "\e604";

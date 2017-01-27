@@ -24,7 +24,7 @@
 /* Add SB icons instead
  */
 .fc-button .fc-icon{
-    font-family: 'schoolbox', #{$body-font-family};
+    font-family: $font-family-icon;
 }
 
 .fc-icon-left-single-arrow:before{
