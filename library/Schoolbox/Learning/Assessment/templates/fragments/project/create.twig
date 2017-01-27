@@ -43,7 +43,7 @@
 
 {% include '@learningAssessment/fragments/markType.twig' %}
 
-{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Project'} %}
 
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
