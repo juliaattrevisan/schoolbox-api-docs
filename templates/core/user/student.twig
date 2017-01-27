@@ -512,10 +512,10 @@
                 <div class="small-12 island">
                     <h2 class="subheader">{{ group }}</h2>
                     <section>
-                    {% for subject in subjectGroup %}
                         <div class="content no-pad">
                             <ul class="subject-list">
-                                <li>
+                            {% for subject in subjectGroup %}
+                                <li class="subject-group">
                                     <div class="list-item">
                                         <div class="card small-12">
                                             {% if subject.folder.getId() and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
@@ -554,9 +554,9 @@
                                     </nav>
                                 </li>
                                 {% endfor %}
-                            </ul>
-                        </div>
                     {% endfor %}
+                        </ul>
+                    </div>
                     {% if session.user.getRole().isStaff() and config.mail_enable %}
                         <div class="component-action">
                             <section>
@@ -582,11 +582,11 @@
             <div class="row">
                 <div class="small-12 island">
                     <h2 class="subheader">Groups</h2>
-                    {% for group in groups %}
                     <section>
                         <div class="content no-pad">
                             <ul class="subject-list">
-                                <li>
+                                {% for group in groups %}
+                                <li class="subject-group">
                                     <div class="list-item">
                                         <div class="card small-12 ">
                                             {% if group.perms > 0 %}
@@ -625,10 +625,10 @@
                                     </nav>
                                 </li>
                                 {% endif %}
+                                {% endfor %}
                             </ul>
                         </div>
                     </section>
-                    {% endfor %}
                 </div>
             </div>
             {% endif %}
