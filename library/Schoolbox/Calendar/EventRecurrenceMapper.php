@@ -141,7 +141,7 @@ class EventRecurrenceMapper
              */
             $this->setFirstEventIdInSeries($event->getId());
 
-            $previous = $this->getEventMapper()->findById($event->getId());
+            $previous = $this->getEventMapper()->findOneByColumn($this->getEventMapper()->getIdentifierColumn(), $event->getId(), ['cache'=>false]);
 
             if ($efficacy == self::EFFICACY_SERIES) {
                 $this->persistSeries($event, $eventRelations, $access, $startDate, $endDate);
