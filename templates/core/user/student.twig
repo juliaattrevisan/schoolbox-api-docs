@@ -511,11 +511,11 @@
             <div class="row">
                 <div class="small-12 island">
                     <h2 class="subheader">{{ group }}</h2>
-                    {% for subject in subjectGroup %}
                     <section>
                         <div class="content no-pad">
                             <ul class="subject-list">
-                                <li>
+                            {% for subject in subjectGroup %}
+                                <li class="subject-group">
                                     <div class="list-item">
                                         <div class="card small-12">
                                             {% if subject.folder.getId() and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
@@ -554,22 +554,25 @@
                                     </nav>
                                 </li>
                                 {% endfor %}
-                            </ul>
-                        </div>
-                    </section>
                     {% endfor %}
-
+                        </ul>
+                    </div>
                     {% if session.user.getRole().isStaff() and config.mail_enable %}
-                    <form action="/mail/createMail.php" method="post">
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input type="hidden" name="replyto" value="{{ session.user.getEmail() }}"/>
-                                <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
-                                <button type="submit" class="button icon-email">Email All {{ group }} Teachers</button>
-                            </div>
+                        <div class="component-action">
+                            <section>
+                                <form action="/mail/createMail.php" method="post">
+                                    <div class="row">
+                                        <div class="small-12 columns">
+                                            <input type="hidden" name="replyto" value="{{ session.user.getEmail() }}"/>
+                                            <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
+                                            <button type="submit" class="button">Email All {{ group }} Teachers</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </section>
                         </div>
-                    </form>
                     {% endif %}
+                    </section>
                 </div>
             </div>
             {% endfor %}
@@ -579,11 +582,11 @@
             <div class="row">
                 <div class="small-12 island">
                     <h2 class="subheader">Groups</h2>
-                    {% for group in groups %}
                     <section>
                         <div class="content no-pad">
                             <ul class="subject-list">
-                                <li>
+                                {% for group in groups %}
+                                <li class="subject-group">
                                     <div class="list-item">
                                         <div class="card small-12 ">
                                             {% if group.perms > 0 %}
@@ -622,10 +625,10 @@
                                     </nav>
                                 </li>
                                 {% endif %}
+                                {% endfor %}
                             </ul>
                         </div>
                     </section>
-                    {% endfor %}
                 </div>
             </div>
             {% endif %}

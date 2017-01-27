@@ -912,7 +912,7 @@ $selector-width: 2.25rem;
 .subject-list{
 	@include information-list;
 	.subject-group{
-		border-bottom: 16px solid $body-bg;
+		border-bottom: 0;
 	}
 	li{
 		a:hover{
