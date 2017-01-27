@@ -498,7 +498,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @return MSSQL
      */
-    private function getDatabase()
+    protected function getDatabase()
     {
         return $this->database;
     }
