@@ -36,7 +36,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 class Controller extends Base
 {
     // Enable pagination of both part1 and part2 of the screen, with this many items per page.
-    const COUNT_ASSESSMENTS_PER_PAGE = 50;
+    const COUNT_ASSESSMENTS_PER_PAGE = 100;
 
     /**
      * @var QuizMapper
