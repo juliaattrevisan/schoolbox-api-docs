@@ -44,7 +44,7 @@ class PendingFactory
 
     /**
      * Indexed by assessment.id
-     * Use a collection rather than array as the this gets return to caller.
+     * Use a Collection rather than array as the this gets return to caller.
      *
      * @var IAssessable[]|Collection $assessmentsCache
      */
@@ -130,7 +130,7 @@ class PendingFactory
     /**
      * Set of all student.externalIds the specified User teaches, administers, or are in Groups or Subjects
      * where the User has created Assessments.
-     * We need this so we know which Users to get SB details for
+     * We need this so we know which Users to get SchoolBox details for
      * key = value = user.externalId
      *
      * @var int[] $studentExternalIds
@@ -140,7 +140,7 @@ class PendingFactory
     /**
      * Set of all student.ids the specified User teaches, administers, or are in Groups or Subjects
      * where the User has created Assessments.
-     * We need this so we know which Users to get SB details for
+     * We need this so we know which Users to get SchoolBox details for
      * key = value = user.id
      *
      * @var int[] $studentInternalIds
@@ -182,7 +182,7 @@ class PendingFactory
      * Occurs if Student leaves a Group/Class after Response or Feedback created.
      *
      * If we detect these cases, and can't find the Student in our cache, we need to go back to
-     * SB DB and get their data.
+     * Schoolbox DB and get their data.
      *
      * key = val = user.id
      *
@@ -745,7 +745,7 @@ class PendingFactory
 
 
     /**
-     * Get Student data from SB database to build User objects.
+     * Get Student data from SchoolBox database to build User objects.
      *
      * For classes we find the user using their externalId
      * For groups we find the users belonging to that group
@@ -832,7 +832,12 @@ class PendingFactory
             if (is_array($studentList)) {
                 foreach ($studentList as $studentExternalId) {
                     $student = $this->studentExtCache[$studentExternalId];
-                    $participants[$student->getId()] = new Participant($student, $assessment);
+
+                    // Does this student (found in external SIS) exist in Schoolbox?
+                    if($student instanceof User){
+                        $participants[$student->getId()] = new Participant($student, $assessment);
+                    }
+
                 }
             }
             $assessment->setAllParticipants($participants);
@@ -999,7 +1004,7 @@ class PendingFactory
      * When retrieving Assessment Responses and Feedbacks, we may have
      * found references to Users not in the current Participant lists.
      *
-     * In also unable to locate the missing students in our cache, we need to go back to SB DB.
+     * In also unable to locate the missing students in our cache, we need to go back to SchoolBox DB.
      */
     private function getMissingUsers()
     {
@@ -1298,7 +1303,7 @@ class PendingFactory
             // Get Classes Taught from External_DB
             $classes = $this->externalUser->getSubjectList($this->viewee);
 
-            // Get ClassCodes + SB FolderIds
+            // Get ClassCodes + SchoolBox FolderIds
             if (is_array($classes) && !empty($classes)) {
                 $folderCodes = array_map(
                     function ($row) {
