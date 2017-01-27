@@ -6,6 +6,8 @@
  */
 namespace Schoolbox\Learning;
 
+use Alaress\Paginator\Paginator;
+use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
@@ -33,6 +35,9 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 
 class Controller extends Base
 {
+    // Enable pagination of both part1 and part2 of the screen, with this many items per page.
+    const COUNT_ASSESSMENTS_PER_PAGE = 50;
+
     /**
      * @var QuizMapper
      */
@@ -205,11 +210,38 @@ class Controller extends Base
         }
         $assessmentsToChase->sortBy('dueAt', 'asc');
 
+        $path = $this->request->url->get(PHP_URL_PATH);
+        $partOnePage = $this->request->query->get('p1', 1);
+        $partTwoPage = $this->request->query->get('p2', 1);
+        $url = "$path?p1=$partOnePage&p2=$partTwoPage";
+
+        // Pagination
+        $partOnePaginator = (new UrlPaginator())
+            ->setPaginator((new Paginator())->setTotal(count($assessmentsToMark))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
+            ->setUrl($url)
+            ->setParam('p1');
+        $partTwoPaginator = (new UrlPaginator())->setPaginator(
+            (new Paginator())->setTotal(count($assessmentsToChase))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
+            ->setUrl($url)
+            ->setParam('p2');
+
+        // Did user request a page that does not exist?
+        if($partOnePage < 0 || $partOnePage > $partOnePaginator->getPageCount()){
+            throw new \DomainException("Invalid part one page: $partOnePage");
+        }
+        if($partTwoPage < 0 || $partTwoPage > $partTwoPaginator->getPageCount()){
+            throw new \DomainException("Invalid part two page: $partTwoPage");
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
             'viewer'             => $this->getUser(),
             'viewee'             => $viewee,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,
+            'partOnePaginator'   => $partOnePaginator,
+            'partOnePage'        => $partOnePage,
+            'partTwoPaginator'   => $partTwoPaginator,
+            'partTwoPage'        => $partTwoPage,
         ])->setTab('submission'));
     }
 
