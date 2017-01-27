@@ -89,17 +89,17 @@ class Model implements ISoftDeletable
         $homeName = 'Unknown';
         $awayName = 'Unknown';
 
-        if ($this->getHomeTeam()->getId()) {
+        if (($this->getHomeTeam() instanceof Team) && ($this->getHomeTeam()->getId())) {
             $homeName = $this->getHomeTeam()->getName();
         }
-        elseif ($this->getHomeSchool()->getId()) {
+        elseif (($this->getHomeSchool() instanceof School) && ($this->getHomeSchool()->getId())) {
             $homeName = $this->getHomeSchool()->getName();
         }
 
-        if ($this->getAwayTeam()->getId()) {
+        if (($this->getAwayTeam() instanceof Team) && ($this->getAwayTeam()->getId())) {
             $awayName = $this->getAwayTeam()->getName();
         }
-        elseif ($this->getAwaySchool()->getId()) {
+        elseif (($this->getAwaySchool() instanceof School) && ($this->getAwaySchool()->getId())) {
             $awayName = $this->getAwaySchool()->getName();
         }
 
