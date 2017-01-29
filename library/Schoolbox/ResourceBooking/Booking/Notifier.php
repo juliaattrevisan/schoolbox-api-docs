@@ -16,6 +16,8 @@
 
 namespace Schoolbox\ResourceBooking\Booking;
 
+use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\Param;
 use Aura\Router\Router;
 use Monolog\Logger;
 use Schoolbox\Calendar\Event;
@@ -25,6 +27,8 @@ use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
@@ -116,7 +120,7 @@ class Notifier extends AbstractModuleNotifier
      * @param User   $user
      * @param string $event
      *
-     * @return Messenger
+     * @return Envelope
      * @throws \InvalidArgumentException if $event type isn't recognised
      */
     protected function buildMessenger(Model $object, User $user, $event)
@@ -129,7 +133,8 @@ class Notifier extends AbstractModuleNotifier
             $object = $e->getDeletedObject();
             $event  = 'cancelled';
         }
-        $messenger = new Messenger();
+//        $messenger = new Messenger();
+        $envelope = new Envelope();
 
         // Hydrate event owner
         /** @var EventMapper $eventMapper */
@@ -143,16 +148,17 @@ class Notifier extends AbstractModuleNotifier
                 $next = $eventMapper->findNextInSeries($seriesId);
                 if ($next->getId() != $calendarEvent->getId()) {
                     // Not the next in series: raise no notification
-                    return $messenger;
+                    return $envelope;
                 }
             } catch (\Exception $e) {
-                return $messenger;
+                return $envelope;
             }
         }
 
+        /** @var User $owner */
         $owner          = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
-        $key            = $this->slug . '.' . $object->getId() . '.' . $event;
-        $level          = Logger::NOTICE;
+//        $key            = $this->slug . '.' . $object->getId() . '.' . $event;
+//        $level          = Logger::NOTICE;
         $isOwnerCreator = $owner->getId() == $calendarEvent->getAuthor()->getId();
         $startDate      = $calendarEvent->getStartDateTime();
 
@@ -166,15 +172,15 @@ class Notifier extends AbstractModuleNotifier
                 )
             )
         );
-        $messageParams = array(
-            'user'     => array($user->formatName(), '/search/user/' . $user->getId()),
-            'resource' => array($object->getResource()->getName(), $resourceUrl),
-            'date'     => array(
-                $startDate->getLocal(),
-                '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()
-            ),
-            'owner'    => array($owner->formatName(), '/search/user/' . $owner->getId())
-        );
+//        $messageParams = array(
+//            'user'     => array($user->formatName(), '/search/user/' . $user->getId()),
+//            'resource' => array($object->getResource()->getName(), $resourceUrl),
+//            'date'     => array(
+//                $startDate->getLocal(),
+//                '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()
+//            ),
+//            'owner'    => array($owner->formatName(), '/search/user/' . $owner->getId())
+//        );
         switch ($event) {
             case 'created':
                 $messageText = ':user booked :resource for :owner for :date';
@@ -201,37 +207,55 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Notify the owner of the booking (usually the person who the booking is for)
-        $ownerMessage = new Message(
-            $messageText,
-            '/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}",
-            $resourceUrl
-        );
-        $ownerMessageParams = $messageParams;
+//        $ownerMessage = new Message(
+//            $messageText,
+//            '/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}",
+//            $resourceUrl
+//        );
+//        $ownerMessageParams = $messageParams;
         if ($isOwnerCreator) {
-            $ownerMessageParams['owner'][0] = 'you';
+            $userParam = new UserParam($user, UserParam::STACKING_APPEND, 'you');
+//            $ownerMessageParams['owner'][0] = 'you';
+        } else {
+            $userParam = new UserParam($user, UserParam::STACKING_APPEND);
         }
-        $messenger->targetToUser(
-            $owner->getId(),
-            $ownerMessage,
-            $key,
-            $level,
-            $ownerMessageParams
-        );
+
+        $bob = (new Builder())
+            ->addTopic($this->slug . '.' . $object->getId() . '.' . $event)
+            ->setSeverity(Logger::NOTICE)
+            ->setTitle($messageText)
+            ->setIcon('/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}")
+            ->setHref($resourceUrl)
+            ->setParam('user', $userParam)
+            ->setParam('resource', new Param($object->getResource()->getName(), $resourceUrl))
+            ->setParam('date', new Param($startDate->getLocal(), '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()))
+            ->setParam('owner', new UserParam($owner));
+
+        $envelope->targetToUser($owner, $bob->build());
+
+//        $messenger->targetToUser(
+//            $owner->getId(),
+//            $ownerMessage,
+//            $key,
+//            $level,
+//            $ownerMessageParams
+//        );
 
         // Send a message to all the moderators of the object
-        $moderatorMessage = new Message(
-            $messageText,
-            '/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}",
-            $resourceUrl
-        );
+//        $moderatorMessage = new Message(
+//            $messageText,
+//            '/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}",
+//            $resourceUrl
+//        );
         foreach ($object->getResource()->getModeratorList() as $moderator) {
-            $messenger->targetToUser(
-                $moderator->getId(),
-                $moderatorMessage,
-                $key,
-                $level,
-                $messageParams
-            );
+            $envelope->targetToUser($moderator, $bob->build());
+//            $messenger->targetToUser(
+//                $moderator->getId(),
+//                $moderatorMessage,
+//                $key,
+//                $level,
+//                $messageParams
+//            );
         }
 
         // Broadcast to all resource booking moderators was removed in SB-6802
@@ -245,7 +269,7 @@ class Notifier extends AbstractModuleNotifier
 //            $messageParams
 //        );
 
-        return $messenger;
+        return $envelope;
     }
 
 
