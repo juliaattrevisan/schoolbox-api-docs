@@ -130,7 +130,6 @@ class Notifier extends AbstractModuleNotifier
             $object = $e->getDeletedObject();
             $event  = 'cancelled';
         }
-//        $messenger = new Messenger();
         $envelope = new Envelope();
 
         // Hydrate event owner
@@ -154,8 +153,6 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var User $owner */
         $owner           = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
-//        $key            = $this->slug . '.' . $object->getId() . '.' . $event;
-//        $level          = Logger::NOTICE;
         $isOwnerEffector = $user->getId() == $calendarEvent->getAuthor()->getId();
         $startDate       = $calendarEvent->getStartDateTime();
 
@@ -169,15 +166,6 @@ class Notifier extends AbstractModuleNotifier
                 )
             )
         );
-//        $messageParams = array(
-//            'user'     => array($user->formatName(), '/search/user/' . $user->getId()),
-//            'resource' => array($object->getResource()->getName(), $resourceUrl),
-//            'date'     => array(
-//                $startDate->getLocal(),
-//                '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()
-//            ),
-//            'owner'    => array($owner->formatName(), '/search/user/' . $owner->getId())
-//        );
 
         switch ($event) {
             case 'created':
@@ -211,20 +199,6 @@ class Notifier extends AbstractModuleNotifier
             $messageText .= ' for :owner for :date';
         }
 
-        // Notify the owner of the booking (usually the person who the booking is for)
-//        $ownerMessage = new Message(
-//            $messageText,
-//            '/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}",
-//            $resourceUrl
-//        );
-//        $ownerMessageParams = $messageParams;
-//        if ($isOwnerCreator) {
-//            $userParam = new UserParam($user, UserParam::STACKING_APPEND, 'you');
-////            $ownerMessageParams['owner'][0] = 'you';
-//        } else {
-//            $userParam = new UserParam($user, UserParam::STACKING_APPEND);
-//        }
-
         $bob = (new Builder())
             ->setNamespace($this->getSlug())
             ->addTopic($this->slug . '.' . $object->getId() . '.' . $event)
@@ -236,49 +210,19 @@ class Notifier extends AbstractModuleNotifier
             ->setParam('resource', new Param($object->getResource()->getName(), $resourceUrl))
             ->setParam('date', new Param($startDate->getLocal(), '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()));
 
+        // Notify the owner of the booking (usually the person who the booking is for)
         if (!$isOwnerEffector) {
             $bob->setParam('owner', new UserParam($owner, UserParam::STACKING_APPEND, 'you'));
         }
         $envelope->targetToUser($owner, $bob->build());
 
-//        $messenger->targetToUser(
-//            $owner->getId(),
-//            $ownerMessage,
-//            $key,
-//            $level,
-//            $ownerMessageParams
-//        );
-
         // Send a message to all the moderators of the object
-//        $moderatorMessage = new Message(
-//            $messageText,
-//            '/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}",
-//            $resourceUrl
-//        );
         foreach ($object->getResource()->getModeratorList() as $moderator) {
             if (!$isOwnerEffector) {
                 $bob->setParam('owner', new UserParam($owner));
             }
             $envelope->targetToUser($moderator, $bob->build());
-//            $messenger->targetToUser(
-//                $moderator->getId(),
-//                $moderatorMessage,
-//                $key,
-//                $level,
-//                $messageParams
-//            );
         }
-
-        // Broadcast to all resource booking moderators was removed in SB-6802
-//        $messenger->broadcastToService(
-//            UserAccess::SERVICE_RESOURCE_BOOKING,
-//            0,
-//            UserAccess::ACCESS_FULL,
-//            $moderatorMessage,
-//            $key,
-//            $level,
-//            $messageParams
-//        );
 
         return $envelope;
     }
