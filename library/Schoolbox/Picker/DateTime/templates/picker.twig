@@ -75,6 +75,10 @@
         line-height: 1em;
         padding: 0.325rem;
     }
+    a.picker-submit, a.timetable-submit {
+        margin-top: 20px;
+    }
+
 </style>
 {% if type == 'event' or type =='duework' %}
     {% set width = 6 %}
@@ -108,7 +112,9 @@
 
                 </div>
             {% endif %}
-            <a class="button submit picker-submit">Update</a>
+            <div class="small-12 medium-12 columns">
+                <a class="button submit picker-submit">Update</a>
+            </div>
         </div>
 
         <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
@@ -162,7 +168,9 @@
                     </div>
                 {% endif %}
             </div>
-            <a class="button submit timetable-submit">Update</a>
+            <div class="small-12 medium-12 columns">
+                <a class="button submit timetable-submit">Update</a>
+            </div>
         </div>
     </div>
 </div>
@@ -247,7 +255,8 @@
             console.log(timeDiv);
             {# Get the format #}
             if(doFormat) {
-                setPickerFormats();
+                setPickerFormats(state);
+                console.log(pickerFormats);
             }
 
             if(window.pickerInstance[pId] !== undefined) {
@@ -256,20 +265,22 @@
             else {
                 var value = $(this).val();
             }
-            alert(value);
+//            alert(value);
             {# All Day is on  #}
             if(state === true) {
                 timeDiv.css('display', 'none');
                 $('#hideTime'+pId).prop('checked', true);
                 if (doFormat) {
-
-                    var v = moment(value, convertFormat(pickerFormats.from)).format(convertFormat(pickerFormats.to));
+                    var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
                     console.log('converting format...' + pickerFormats.from + ' > ' +pickerFormats.to +': ' + state + ' v: ' + v);
-                    $(this).val(v);
-//                    if(window.pickerInstance[pId] !==undefined) {
-//                        window.pickerInstance[pId].setDate(v);
-//                    }
+                    if(window.pickerInstance[pId] !== undefined) {
+                        window.pickerInstance[pId].input.value = v;
+                    }
+                    else {
+                        $(this).val(v);
+                    }
                 }
+
                 if(pickerOptions.allDayExt !== false) {
                     $('#'+pickerOptions.allDayExt).val(1);
                 }
@@ -280,10 +291,12 @@
                 if (doFormat) {
                     var v = moment(value, convertFormat(pickerFormats.from)).format(convertFormat(pickerFormats.to));
                     console.log('converting format...' + pickerFormats.from + ' > ' +pickerFormats.to +': ' + state + ' v: ' + v);
-                    $(this).val(v);
-//                    if(window.pickerInstance[pId] !==undefined) {
-//                        window.pickerInstance[pId].setDate(v);
-//                    }
+                    if(window.pickerInstance[pId] !== undefined) {
+                        window.pickerInstance[pId].input.value = v;
+                    }
+                    else {
+                        $(this).val(v);
+                    }
                 }
                 if(pickerOptions.allDayExt !== false) {
                     $('#'+pickerOptions.allDayExt).val(0);
@@ -612,7 +625,7 @@
 
     {# Submit calendar datetime #}
     $('.picker-submit').click(function() {
-        manageAllDay(false, true);
+//        manageAllDay(false, false);
         $('#{{ element }}').val(window.pickerInstance[{{ id }}].input.value);
         $('#picker{{ id }}').foundation('reveal', 'close');
 
@@ -663,20 +676,20 @@
             if (pickerOptions.allDay === true) {
                 {# Hide time picker if allday hidden field is set to 1 #}
                 if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
-                    alert(1);
+//                    alert(1);
                     manageAllDay(true, false);
                     console.log('1 '+instance.input.value);
                 }
                 else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
-                    alert(11);
+//                    alert(11);
                     manageAllDay(false, false);
                 }
                 else if (hasTime(instance.input.value) === false ) {
-                    alert(2);
+//                    alert(2);
                     manageAllDay(true, false);
                 }
                 else {
-                    alert(3);
+//                    alert(3);
                     manageAllDay(false, false);
                 }
                 $('#hideTime{{ id }}').click(function () {
@@ -686,7 +699,7 @@
                         manageAllDay(true, true);
                     }
                     else {
-                        alert(5);
+//                        alert(5);
                         console.log('before 5 '+instance.input.value);
                         manageAllDay(false, true);
                         console.log('5 '+instance.input.value);
