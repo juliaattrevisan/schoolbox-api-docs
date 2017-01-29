@@ -23,9 +23,6 @@ use Monolog\Logger;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
@@ -277,7 +274,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffCreated(Model $object, User $user /*, $diff*/)
     {
@@ -289,7 +286,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffUpdated(Model $object, User $user /*, $diff*/)
     {
@@ -301,7 +298,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffApproved(Model $object, User $user /*, $diff*/)
     {
@@ -313,7 +310,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffPending(Model $object, User $user /*, $diff*/)
     {
@@ -325,7 +322,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffRejected(Model $object, User $user /*, $diff*/)
     {
@@ -337,7 +334,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentCreated(Model $object, User $user /*, $diff*/)
     {
@@ -349,7 +346,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentUpdated(Model $object, User $user /*, $diff*/)
     {
@@ -361,7 +358,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentApproved(Model $object, User $user /*, $diff*/)
     {
@@ -373,7 +370,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentPending(Model $object, User $user /*, $diff*/)
     {
@@ -385,7 +382,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentRejected(Model $object, User $user /*, $diff*/)
     {
@@ -397,7 +394,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyParentCreated(Model $object, User $user /*, $diff*/)
     {
@@ -409,7 +406,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyParentUpdated(Model $object, User $user /*, $diff*/)
     {
@@ -421,7 +418,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyParentApproved(Model $object, User $user /*, $diff*/)
     {
@@ -433,7 +430,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyParentPending(Model $object, User $user /*, $diff*/)
     {
@@ -445,7 +442,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyParentRejected(Model $object, User $user /*, $diff*/)
     {
@@ -457,7 +454,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $object
      * @param User  $user
      *
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffCancelled(Model $object, User $user /*, $diff*/)
     {
