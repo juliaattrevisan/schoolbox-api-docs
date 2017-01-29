@@ -75,7 +75,6 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
                 $newUser['campus'] = array(
                     self::EC,
                     self::HS,
-                    self::IS,
                     self::MD,
                     self::MG,
                     self::MR,
