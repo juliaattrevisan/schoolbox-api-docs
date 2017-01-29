@@ -153,11 +153,11 @@ class Notifier extends AbstractModuleNotifier
         }
 
         /** @var User $owner */
-        $owner          = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
+        $owner           = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
 //        $key            = $this->slug . '.' . $object->getId() . '.' . $event;
 //        $level          = Logger::NOTICE;
-        $isOwnerCreator = $owner->getId() == $calendarEvent->getAuthor()->getId();
-        $startDate      = $calendarEvent->getStartDateTime();
+        $isOwnerEffector = $user->getId() == $calendarEvent->getAuthor()->getId();
+        $startDate       = $calendarEvent->getStartDateTime();
 
         $resourceUrl   = sprintf(
             '/resource-booking/item/%d?%s',
@@ -205,7 +205,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Don't add "for owner" part if owner is creator
-        if ($isOwnerCreator) {
+        if ($isOwnerEffector) {
             $messageText .= ' for :date';
         } else {
             $messageText .= ' for :owner for :date';
@@ -236,11 +236,9 @@ class Notifier extends AbstractModuleNotifier
             ->setParam('resource', new Param($object->getResource()->getName(), $resourceUrl))
             ->setParam('date', new Param($startDate->getLocal(), '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()));
 
-        if (!$isOwnerCreator) {
-            $bob->setParam('owner', new UserParam($owner));
+        if (!$isOwnerEffector) {
+            $bob->setParam('owner', new UserParam($owner, UserParam::STACKING_APPEND, 'you'));
         }
-
-
         $envelope->targetToUser($owner, $bob->build());
 
 //        $messenger->targetToUser(
@@ -258,6 +256,9 @@ class Notifier extends AbstractModuleNotifier
 //            $resourceUrl
 //        );
         foreach ($object->getResource()->getModeratorList() as $moderator) {
+            if (!$isOwnerEffector) {
+                $bob->setParam('owner', new UserParam($owner));
+            }
             $envelope->targetToUser($moderator, $bob->build());
 //            $messenger->targetToUser(
 //                $moderator->getId(),
