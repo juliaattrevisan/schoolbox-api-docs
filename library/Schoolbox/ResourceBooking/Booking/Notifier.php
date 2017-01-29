@@ -218,6 +218,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $bob = (new Builder())
+            ->setNamespace($this->getSlug())
             ->addTopic($this->slug . '.' . $object->getId() . '.' . $event)
             ->setSeverity(Logger::NOTICE)
             ->setTitle($messageText)
