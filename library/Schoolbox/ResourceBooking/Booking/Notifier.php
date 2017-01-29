@@ -178,29 +178,37 @@ class Notifier extends AbstractModuleNotifier
 //            ),
 //            'owner'    => array($owner->formatName(), '/search/user/' . $owner->getId())
 //        );
+
         switch ($event) {
             case 'created':
-                $messageText = ':user booked :resource for :owner for :date';
+                $messageText = ':user booked :resource';
                 break;
             case 'approved':
-                $messageText = ':user approved booking of :resource for :owner for :date';
+                $messageText = ':user approved booking of :resource';
                 break;
             case 'rejected':
-                $messageText = ':user rejected booking of :resource for :owner for :date';
+                $messageText = ':user rejected booking of :resource';
                 break;
             case 'pending':
-                $messageText = ':user put on hold booking of :resource for :owner for :date';
+                $messageText = ':user put on hold booking of :resource';
                 break;
             case 'cancelled':
-                $messageText = ':user cancelled booking of :resource for :owner for :date';
+                $messageText = ':user cancelled booking of :resource';
                 break;
             case 'updated':
-                $messageText = ':user changed booking of :resource for :owner for :date';
+                $messageText = ':user changed booking of :resource';
                 break;
             default:
                 throw new \InvalidArgumentException(
                     "Event \"$event\" not one of (created, approved, rejected, pending, cancelled, updated)"
                 );
+        }
+
+        // Don't add "for owner" part if owner is creator
+        if ($isOwnerCreator) {
+            $messageText .= ' for :date';
+        } else {
+            $messageText .= ' for :owner for :date';
         }
 
         // Notify the owner of the booking (usually the person who the booking is for)
@@ -210,12 +218,12 @@ class Notifier extends AbstractModuleNotifier
 //            $resourceUrl
 //        );
 //        $ownerMessageParams = $messageParams;
-        if ($isOwnerCreator) {
-            $userParam = new UserParam($user, UserParam::STACKING_APPEND, 'you');
-//            $ownerMessageParams['owner'][0] = 'you';
-        } else {
-            $userParam = new UserParam($user, UserParam::STACKING_APPEND);
-        }
+//        if ($isOwnerCreator) {
+//            $userParam = new UserParam($user, UserParam::STACKING_APPEND, 'you');
+////            $ownerMessageParams['owner'][0] = 'you';
+//        } else {
+//            $userParam = new UserParam($user, UserParam::STACKING_APPEND);
+//        }
 
         $bob = (new Builder())
             ->setNamespace($this->getSlug())
@@ -224,10 +232,14 @@ class Notifier extends AbstractModuleNotifier
             ->setTitle($messageText)
             ->setIcon('/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}")
             ->setHref($resourceUrl)
-            ->setParam('user', $userParam)
+            ->setParam('user', new UserParam($user))
             ->setParam('resource', new Param($object->getResource()->getName(), $resourceUrl))
-            ->setParam('date', new Param($startDate->getLocal(), '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()))
-            ->setParam('owner', new UserParam($owner));
+            ->setParam('date', new Param($startDate->getLocal(), '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()));
+
+        if (!$isOwnerCreator) {
+            $bob->setParam('owner', new UserParam($owner));
+        }
+
 
         $envelope->targetToUser($owner, $bob->build());
 
