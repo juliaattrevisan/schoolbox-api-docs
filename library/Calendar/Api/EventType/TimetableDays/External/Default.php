@@ -82,18 +82,18 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
         // out that day's timetable day number for each of the user's campuses.
         while ($currentTimestamp < $endTimestamp) {
 
-            //First check if we've got more then one campus with the same timetable code
+            //Combine titles of campuses with the same code (if any)
             $campusTitles = Array();
             $userCampuses = $this->getUser()->getCampusCollection();
+
             foreach ($userCampuses as $campus) {
                 $campusName = $campus->getName();
                 $campusCode = $campus->getExtTimetableCode();
-                if(in_array($campusCode, (array) $userCampuses)) {
-                    //Combine titles
-                    $campusTitles[$campusCode] = $campusTitles[$campusCode].'/'.$campusName;
-                }
+                $campusTitles[$campusCode] = $campusTitles[$campusCode].'/'.$campusName;
             }
+
             $campusMerged = Array();
+            
             //Now build the stack
             foreach ($userCampuses as $campus) {
 
@@ -119,20 +119,15 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                     );
                     $event->setEventId(md5($campusId.$event->getStartTime()->getDatabaseDate()));
                     $event->setPublishDate(null);
-                    //Check if the current campus has the same code as any of the previous ones in the loop
-                    if (array_key_exists($campusCode, $campusTitles)) {
-                        $event->setTitle(sprintf("%s: %s", trim($campusTitles[$campusCode], '/'), $dayName));
-                        $campusMerged[$campusCode] = $campusId;
-                    }
-                    else {
-                        $event->setTitle(sprintf("%s: %s", $campusName, $dayName));
-                    }
+                    $event->setTitle(sprintf("%s: %s", trim($campusTitles[$campusCode], '/'), $dayName));
                     $event->setCampusList($campusId);
                     $event->setAccess(Event::CAMPUS_ACCESS);
                     $event->setType($eventType);
                     $event->setColour($eventColor);
                     $event->setConnectorId($this->getConnectorId());
 
+                    //Keep codes of processed campuses
+                    $campusMerged[$campusCode] = $campusId;
                     $stack->add($event);
                 }
             }
