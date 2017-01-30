@@ -26,7 +26,7 @@ Usage: include 'sub/semesterSelector.twig
             e.preventDefault();
 
             var index = $semesterSelector.prop('selectedIndex');
-            var newIndex = 'next' == $(this).data('semester-switch') ? index + 1 : index - 1;
+            var newIndex = 'next' == $(this).data('semester-switch') ? index - 1 : index + 1;
 
             if(newIndex >= 1 && newIndex < $options.length){
                 var term = $options.eq(newIndex);
