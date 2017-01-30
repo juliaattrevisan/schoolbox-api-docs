@@ -273,7 +273,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $poster
      * @return Envelope
      */
-    public function nofifyParentFollowed($post, $poster)
+    public function notifyParentFollowed($post, $poster)
     {
         return $this->notifyFollowed(Role::PARENT, $post, $poster);
     }
@@ -306,7 +306,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $poster
      * @return Envelope
      */
-    public function nofifyParentMentioned($post, $poster)
+    public function notifyParentMentioned($post, $poster)
     {
         return $this->notifyMentioned(Role::PARENT, $post, $poster);
     }

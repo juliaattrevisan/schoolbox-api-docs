@@ -96,6 +96,9 @@ class SourceMapper extends Mapper {
      */
     public function findByColumnList($columnList, $options = array())
     {
+        // enforce nocache
+        $options['cache'] = false;
+
         // cast slug to namespace ID
         if (isset($columnList['slug'])) {
             $slug = $columnList['slug'];
