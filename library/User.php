@@ -396,7 +396,7 @@ class User extends DeprecatedModel
 
     public function getGroupList()
     {
-        $query = "SELECT * FROM groups";
+        $query = "SELECT * FROM groups ORDER BY name";
         return $this->db->getAll($query);
     }
 
