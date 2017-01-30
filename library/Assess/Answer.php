@@ -29,4 +29,19 @@ class Assess_Answer extends Evaluation_Answer {
     {
         throw new BadMethodCallException('You need to call this on a concrete Answer type');
     }
+
+    /**
+     * Exports the answer to Moodle XML format.
+     *
+     * @param SitePage $page
+     * @param int $question_id
+     */
+
+    /**
+     * @inheritdoc
+     */
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
+    {
+        throw new BadMethodCallException('You need to call this on a concrete Answer type');
+    }
 }

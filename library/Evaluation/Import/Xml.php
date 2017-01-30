@@ -9,8 +9,15 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use \Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+
 abstract class Evaluation_Import_Xml
 {
+    /**
+     * @var QuizMapper
+     */
+    private $quizMapper;
+
     /** @var Evaluation_Main */
 	protected $assessHandler;
 
@@ -23,15 +30,11 @@ abstract class Evaluation_Import_Xml
 	/** @var SitePage */
 	protected $page;
 
-    /**
-     * The homepage to create for
-     *
-     * @var int
-     */
+    /** @var int */
 	protected $categoryId;
 
 	/**
-     * File contents send from browser
+     * File contents sent from browser
      *
      * @var string
      */
@@ -68,14 +71,8 @@ abstract class Evaluation_Import_Xml
 		$this->setFactory($factory);
 		$this->setData($data);
 		$this->setPage($page);
+		$this->quizMapper = QuizMapper::getInstance();
 	}
-
-	/**
-	 * Returns whether this Evaluation can count towards final year mark
-	 *
-	 * @return boolean
-	 */
-	public abstract function hasWeighting();
 
 	/**
 	 * Load data from source
@@ -98,48 +95,11 @@ abstract class Evaluation_Import_Xml
 	/**
 	 * Import data
 	 */
-	public function import() {
+	public function import()
+    {
 		$xml = $this->loadData();
 
-		//
-		// Try to get max attempts if it's there, otherwise fall back to
-		// allowresit (not allow_resit).
-		// if allowresit is true, or is not unspecified:
-		// max_attempts = 0 (unlimited), otherwise 1.
-		$max_attempts = (string)$xml->maxattempts;
-		if (strlen($max_attempts) === 0) {
-			$allow_resit  = (string)$xml->allowresit;
-			$max_attempts = ($allow_resit || strlen($allow_resit) === 0) ? 0 : 1;
-		}
-
-		// Build description and complete message
-		$description = $this->parseRichTextNode($xml, 'description');
-		$completionMessage = $this->parseRichTextNode($xml, 'completionmessage');
-
-		/* Remember the title, for the course builder
-		 */
-		$this->setTitle((string)$xml->title);
-
-		$dataArr = array(
-			'category_id' => $this->getCategoryId(),
-			'user_id' => $_SESSION['id'],
-			'title' => $this->getTitle(),
-			'description' => $description,
-			'completion_message' => $completionMessage,
-			'start' => $xml->start,
-			'finish' => $xml->finish,
-			'duration' => $xml->duration,
-			'max_attempts' => $max_attempts,
-			'availability' => $xml->availability,
-			'mark_visibility' => $xml->markvisibility,
-			'created_at' => 'NOW()',
-		);
-
-		if($this->hasWeighting()){
-			$dataArr['weight'] = $xml->weight ?: 0;
-		}
-
-		$assess_id = $this->getAssessHandler()->create($dataArr);
+		$assess_id = $this->createEvaluation($xml);
 
 		if (!$assess_id) {
 			error(112);
@@ -152,15 +112,16 @@ abstract class Evaluation_Import_Xml
 		for ($i=0; $i < count($xml->section); $i++) {
 			$currentSection = $xml->section[$i];
 
-			$section_id = $this->getSectionHandler()->create(array(
-				'section_id' => '',
-				'assess_id' => $assess_id,
-				'sequence' => $i+1,
-				'title' => $currentSection->title,
-				'description' => trim((string) $currentSection->description->text) ? trim((string) $currentSection->description->text) : $currentSection->description,
-				'random' => $currentSection->random,
-				'pool' => $currentSection->pool,
-			));
+			$sectionData = array(
+                'section_id' => '',
+                'assess_id' => $assess_id,
+                'sequence' => $i+1,
+                'title' => $currentSection->title,
+                'description' => trim((string) $currentSection->description->text) ? trim((string) $currentSection->description->text) : $currentSection->description,
+                'random' => $currentSection->random,
+                'pool' => $currentSection->pool,
+            );
+			$section_id = $this->getSectionHandler()->create($sectionData);
 
 			/* Process each question in the section
 			 */
@@ -204,6 +165,52 @@ abstract class Evaluation_Import_Xml
 		}
 		return $assess_id;
 	}
+
+    /**
+     * @param SimpleXMLElement $xml
+     * @return int
+     */
+	protected function getMaxAttempts(SimpleXMLElement $xml){
+        // Try to get max attempts if it's there, otherwise fall back to
+        // allowresit (not allow_resit).
+        // if allowresit is true, or is not unspecified:
+        // max_attempts = 0 (unlimited), otherwise 1.
+        $max_attempts = (int)$xml->maxattempts;
+        if (strlen($max_attempts) === 0) {
+            $allowResit  = (string)$xml->allowresit;
+            $max_attempts = ($allowResit || strlen($allowResit) === 0) ? 0 : 1;
+        }
+        return $max_attempts;
+    }
+
+    /**
+     * Creates the evaluation (without sections, questions or solutions)
+     *
+     * @param SimpleXMLElement $xml
+     * @return int                   The newly assigned assess_id
+     */
+	abstract protected function createEvaluation(SimpleXMLElement $xml);
+
+    /**
+     * @return QuizMapper
+     */
+    protected function getQuizMapper()
+    {
+        return $this->quizMapper;
+    }
+
+    /**
+     * @param string $dateString
+     * @param string $format
+     * @return Alaress_Date_Format
+     */
+    protected function createDateFromString($dateString, $format = Alaress_Date_Format::DATABASE_FORMAT)
+    {
+	    if(empty($dateString)){
+	        return new Alaress_Date_NullDate();
+        }
+        return new Alaress_Date_Format($dateString, $format);
+    }
 
 	/**
 	 * Parses a rich text node

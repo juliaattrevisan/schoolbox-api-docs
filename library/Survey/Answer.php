@@ -26,5 +26,13 @@ class Survey_Answer extends Evaluation_Answer
     {
         throw new BadMethodCallException('You need to call this on a concrete Answer type');
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
+    {
+        throw new BadMethodCallException('You need to call this on a concrete Answer type');
+    }
 }
 

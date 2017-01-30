@@ -11,17 +11,15 @@
  */
 
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
+use Schoolbox\Learning\Assessment\DataModel\Model as QuizAssessment;
 
 class Assess_Export_Xml extends Evaluation_Export_Xml
 {
     /** @var AssessmentMapper */
     private $assessmentMapper;
 
-    /**
-     * @var QuizAssessable
-     */
-    private $quizAssessable;
+    /** @var QuizAssessment */
+    private $quizAssessment;
 
     /**
      * @param array $assess
@@ -41,7 +39,7 @@ class Assess_Export_Xml extends Evaluation_Export_Xml
     ) {
         parent::__construct($assess, $factory, $sectionHandler, $questionHandler, $page);
         $this->assessmentMapper = $assessmentMapper;
-        $this->quizAssessable = $this->assessmentMapper->findById($assess['assessment_id']);
+        $this->quizAssessment = $this->assessmentMapper->findById($assess['assessment_id']);
     }
 
     /**
@@ -51,17 +49,17 @@ class Assess_Export_Xml extends Evaluation_Export_Xml
      */
     protected function renderEvaluation(array $assess)
     {
-        $quiz   = $this->quizAssessable;
+        $quiz   = $this->quizAssessment;
 
         $this->getPage()->setVar([
             'ASSESS_TITLE'             => htmlspecialchars($quiz->getTitle(), ENT_QUOTES),
             'ASSESS_DESCRIPTION'       => Scrub::HTML($quiz->getDescription()),
-            'ASSESS_PUBLISH'           => $quiz->getPublishAt()->getDatabase(),
+            'ASSESS_PUBLISH'           => $quiz->getPublishDate()->getDatabase(),
             'ASSESS_OPEN'              => $quiz->getOpenDate()->getDatabase(),
             'ASSESS_DUE'               => $quiz->getDueDate()->getDatabase(),
-            'ASSESS_CLOSE'             => $quiz->getCloseAt()->getDatabase(),
+            'ASSESS_CLOSE'             => $quiz->getCloseDate()->getDatabase(),
             'ASSESS_WEIGHT'            => $quiz->getWeight(),
-            'ASSESS_DURATION'          => $quiz->getDuration(),
+            'ASSESS_DURATION'          => $assess['duration'],
             'ASSESS_MARK_VISIBILITY'   => $assess['mark_visibility'],
             'ASSESS_DEFAULT_OPEN_SPAN' => $quiz->getDefaultOpenSpan(),
         ]);

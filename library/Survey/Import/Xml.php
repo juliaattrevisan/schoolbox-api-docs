@@ -10,12 +10,29 @@
 class Survey_Import_Xml extends Evaluation_Import_Xml {
 
     /**
-     * Returns FALSE, reflecting fact that a Survey does not count towards final year mark.
+     * Creates the evaluation (without sections, questions or solutions)
      *
-     * @return bool
+     * @param SimpleXMLElement $xml
+     * @return int                   The newly assigned assess_id
      */
-    public function hasWeighting()
+    protected function createEvaluation(SimpleXMLElement $xml)
     {
-        return false;
+        $dataArr = array(
+            'category_id'        => $this->getCategoryId(),
+            'user_id'            => $_SESSION['id'],
+            'type'               => 11,
+            'title'              => (string)$xml->title,
+            'description'        => $this->parseRichTextNode($xml, 'description'),
+            'completion_message' => $this->parseRichTextNode($xml, 'completionmessage'),
+            'start'              => $xml->start,
+            'finish'             => $xml->finish,
+            'max_attempts'       => $this->getMaxAttempts($xml),
+            'availability'       => $xml->availability,
+            'anonymous_result'   => $xml->anonymousresult,
+            'notify_author'      => $xml->notifyauthor,
+            'created_at'         => 'NOW()',
+        );
+
+        return $this->getAssessHandler()->create($dataArr);
     }
 }

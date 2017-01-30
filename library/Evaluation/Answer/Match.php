@@ -282,7 +282,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
                     ]);
 
-                    $page->parse('answerCorrect_block', 'answerCorrect', $i > 0);
+                    $page->parse('answerOption_block', 'answerOption', $i > 0);
                 }
                 return;
             }
@@ -300,9 +300,9 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      *
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id)
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
-        foreach ($xmlObj->subquestion as $currentAnswer) {
+        foreach ($xmlObj->answer as $currentAnswer) {
             /* Set up data object in accordance with $this->create();
                          */
 

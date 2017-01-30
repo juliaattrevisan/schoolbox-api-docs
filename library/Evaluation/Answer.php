@@ -279,6 +279,12 @@ abstract class Evaluation_Answer extends DeprecatedModel
      */
     abstract public function exportMoodleAnswer(SitePage $page, $question_id);
 
+    /**
+     * @param SimpleXMLElement $xmlObj
+     * @param int $question_id
+     */
+    abstract public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id);
+
 
 	/* Getters/Setters
  	 */

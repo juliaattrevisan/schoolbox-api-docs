@@ -233,11 +233,11 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
      * but we create the array specially because of the naming conventions and
      * structure of the original xml export.
      *
-     * @param  $xmlObj
-     * @param  $question_id
+     * @param  SimpleXMLElement $xmlObj
+     * @param  int $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id)
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
         $object = array(
             'answer_id' => '',
