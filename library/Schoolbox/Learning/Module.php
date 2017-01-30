@@ -46,7 +46,8 @@ class Module extends BaseModule
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
                 '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
                 '/grades/{userId}{/termCode}'             => 'getGrades',                    // student && term && subject
-                '/grades-btac/{userId}{/termCode}'        => 'getGradesBtac',                    // student && term && subject
+                '/grades-btac/{userId}{/termCode}'        => 'getGradesBtac',                // student && term && subject
+                '/grades-btac/{userId}/year/{year}'       => 'getGradesYearBtac',                // student && term && subject
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',          // student && term && subject
             ],
             'POST' => []
@@ -79,7 +80,7 @@ class Module extends BaseModule
 
         $this->addRoutePermission(
                 $authorizer,
-                '(?:getGrades|getGradesBtac|getGradesForSubject)',
+                '(?:getGrades|getGradesBtac|getGradesYearBtac|getGradesForSubject)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
@@ -100,7 +101,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getPendingAssessmentsForUser|getClasses|getGrades|getGradesBtac|getGradesForSubject)',
+            '(?:getPendingAssessmentsForUser|getClasses|getGrades|getGradesYearBtac|getGradesBtac|getGradesForSubject)',
             function ($params) {
                 if (array_key_exists('userId', $params)) {
                     try {

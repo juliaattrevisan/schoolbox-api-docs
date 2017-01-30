@@ -440,14 +440,33 @@ class Controller extends Base
     }
 
     /**
+     * @param User $viewee
+     * @param $year
+     */
+    public function getGradesYearBtac(User $viewee, $year) {
+
+        $assessments = new Collection();
+        $terms = $this->getTermMapper()->findForYear($year);
+
+        /** @var Term $term */
+        foreach ($terms as $term) {
+            $assessments = $assessments->merge($this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term));
+        }
+
+        $this->getGradesBtac($viewee, null, $year, $assessments);
+    }
+
+    /**
      * Displays a list of grades/results for the specified user and term for all subjects
      *
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
      * @param User $viewee
      * @param Term $term
+     * @param int|null $year
+     * @param Collection $assessments
      */
-    public function getGradesBtac(User $viewee, Term $term)
+    public function getGradesBtac(User $viewee, Term $term, $year = null, Collection $assessments)
     {
         // Storage for each folders markbook
         $markbooks = [];
@@ -456,7 +475,10 @@ class Controller extends Base
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
         $assessmentTasks = [];
-        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
+
+        if ($assessments == null) {
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
+        }
 
         $folders = new Collection();
 
@@ -498,6 +520,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesBtac.twig', [
             'student'       => $viewee,
             'term'          => $term,
+            'year'          => $year,
             'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'folders'       => $folders,
             'assessmentTasks' => $assessmentTasks,

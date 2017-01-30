@@ -40,9 +40,18 @@ Usage: include 'sub/semesterSelector.twig
     <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
 </nav>
 <div class="semester">
-    <select id="context-selector-semester" title="Select a Term">
-        <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select a term">Select a term</option>
+    <select id="context-selector-semester" title="Select a {% if year is not empty %}Year/{% endif %}Term">
+        <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select a {% if year is not empty %}year/{% endif %}term">Select a {% if year is not empty %}year/{% endif %}term</option>
+        {% set foundYear = {} %}
         {% for term in terms %}
+            {% if routeYear is not empty %}
+                {% if not foundYear['_'~term.displayFinish.year] %}
+                    {% set foundYear = foundYear|merge({('_'~term.displayFinish.year):true}) %}
+                    <option data-href="{{ routeLookup(routeYear, routeArgs|merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}selected{% endif %}>
+                        {#- dessicate -#}{{ term.displayFinish.year }} Grades Summary{#- dessicate -#}
+                    </option>
+                {% endif %}
+            {% endif %}
             <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code %}selected{% endif %}>
                 {#- dessicate -#}{{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }}){#- dessicate -#}
             </option>

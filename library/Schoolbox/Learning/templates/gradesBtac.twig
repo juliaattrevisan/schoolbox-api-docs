@@ -5,7 +5,11 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Grades for {{ term.title }}</h1>
+        {% if term is not empty %}
+            <h1>Grades for {{ term.title }}</h1>
+        {% else %}
+            <h1>{{ year }} Grades Summary</h1>
+        {% endif %}
     </div>
 </div>
 
@@ -30,15 +34,11 @@
             <div class="context-switch clearfix">
                 {% include 'sub/semesterSelector.twig' with {
                 terms:       terms,
+                year:        year,
                 currentTerm: term,
-                route:       'learning.getGrades',
+                routeYear:   'learning.getGradesYearBtac',
+                route:       'learning.getGradesBtac',
                 routeArgs:   {viewee: student, userId: student.id}
-                } only %}
-
-                {% include 'sub/subjectSelector.twig' with {
-                subjects:       folders,
-                route:          'learning.getGradesForSubject',
-                routeArgs:      {viewee: user, userId: student.id, term: term, termCode: term.code}
                 } only %}
             </div>
         </div>
@@ -49,53 +49,44 @@
 
 <div class="row">
     <div class="small-12 island">
+        {% set count = 0 %}
         {% for folder in folders %}
-            <div class="row">
-                <div class="small-12 medium-4 columns">
-                    <h2 class="subheader no-margin">
-                        <a href="{{ routeLookup('learning.getGradesForSubject', {student: student, userId: student.id, term: term, termCode: term.code, subject: subject, subjectId: folder.id}) }}"
-                           title="View Grades">
-                            {{ folder.name }}
-                        </a>
-                    </h2>
-                    {% for code in folder.codes %}
-                        {% if loop.first %}<p class="meta">{% endif -%}
-                        {{ code.code }}{% if not loop.last %},{% endif %}
-                        {%- if loop.last %}</p>{% endif %}
-                    {% endfor %}
-                </div>
-                <div class="small-12 medium-4 island">
-                    <section>
-                        {% for teacher in folder.teachers %}
-                            <div class="list-item">
-                                <div class="small-12 card">
-                                    <a href="/search/user/{{ teacher.id }}" title="">
-                                        <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
-                                             alt="{{ teacher.fullName }}"/>
-                                        <p>{{ teacher.fullName }}</p>
-                                    </a>
-                                    <p class="meta">Teacher</p>
-                                </div>
-                            </div>
+            {% if assessmentTasks[folder.id] | length %}
+                {% set count = count + 1 %}
+                <div class="row">
+                    <div class="small-12 medium-8 columns">
+                        <h2 class="subheader no-margin">
+                            <a href="{{ routeLookup('learning.getGradesForSubject', {student: student, userId: student.id, term: term, termCode: term.code, subject: subject, subjectId: folder.id}) }}"
+                               title="View Grades">
+                                {{ folder.name }}
+                            </a>
+                        </h2>
+                        {% for code in folder.codes %}
+                            {% if loop.first %}<p class="meta">{% endif -%}
+                            {{ code.code }}{% if not loop.last %},{% endif %}
+                            {%- if loop.last %}</p>{% endif %}
                         {% endfor %}
-                    </section>
-                </div>
-                <div class="small-12 medium-4 columns">
-                    {% if markbooks[folder.id].weightedMean is not empty %}
-                        <section class="content">
-                            <span class="{{ urgency.marks(markbooks[folder.id].meanNormalised) }}">
-                                <p>Grade Average</p>
-                                {{ markbooks[folder.id].weightedMean }}
-                            </span>
+                    </div>
+                    <div class="small-12 medium-4 island">
+                        <section>
+                            {% for teacher in folder.teachers %}
+                                <div class="list-item">
+                                    <div class="small-12 card">
+                                        <a href="/search/user/{{ teacher.id }}" title="">
+                                            <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
+                                                 alt="{{ teacher.fullName }}"/>
+                                            <p>{{ teacher.fullName }}</p>
+                                        </a>
+                                        <p class="meta">Teacher</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </section>
-                    {% endif %}
+                    </div>
                 </div>
-            </div>
 
-            <section>
-                <ul class="information-list">
-                    {% if true or assessmentTasks[folder.id] | length %}
-
+                <section>
+                    <ul class="information-list">
                         {% for assessment in assessmentTasks[folder.id] %}
                             <li class="actions-small-2">
                                 <div class="list-item clearfix content">
@@ -147,15 +138,14 @@
                                 </nav>
                             </li>
                         {% endfor %}
-
-                    {% endif %}
-                </ul>
-            </section>
+                    </ul>
+                </section>
+            {% endif %}
         {% endfor %}
     </div>
 </div>
 
-{% if folders | length == 0 %}
+{% if count == 0 %}
 
     <div class="row">
         <div class="small-12 island">
