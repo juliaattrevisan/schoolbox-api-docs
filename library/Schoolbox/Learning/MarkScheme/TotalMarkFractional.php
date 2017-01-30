@@ -31,8 +31,8 @@ use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
  */
 class TotalMarkFractional extends TotalMarkAbstract
 {
-    const GRANULARITY_NUMERATOR   = 0.25;
-    const GRANULARITY_DENOMINATOR = 0.25;
+    const GRANULARITY_NUMERATOR   = 0.05;
+    const GRANULARITY_DENOMINATOR = 0.05;
 
     const TOTAL_MARK_MIN = 0.0;
 
