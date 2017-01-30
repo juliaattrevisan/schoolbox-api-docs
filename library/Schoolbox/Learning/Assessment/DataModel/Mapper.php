@@ -561,8 +561,6 @@ class Mapper extends BaseMapper
         // Load related 1-M models
         // Due work files
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
-        // Due work grade levels
-        $modelList = $this->augmentListWithDueWorkGradeLevels($modelList, $dueWorkIds);
         // Project contexts
         $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
         // Folder codes for all contexts
@@ -689,35 +687,6 @@ class Mapper extends BaseMapper
         }
         return $modelList;
     }
-    /**
-     * Augments the list from hydrateSelect() with the grade levels for their selected grade scheme.
-     *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $dueWorkIds
-     * @return Collection|Model[]
-     */
-    protected function augmentListWithDueWorkGradeLevels($modelList, $dueWorkIds)
-    {
-        if (!empty($dueWorkIds)) {
-            $gradeGroups = SubmissionBox\GradeLevel\Group\Mapper::getInstance()->findAllWithGradeLevels()->indexBy('id');
-            // Augment list
-            foreach ($modelList as $model) {
-                try {
-                    $submodel = $model->getSubObject();
-                } catch (\UnexpectedValueException $e) {
-                    // Broken assessment - not much I can do besides ignore
-                    continue;
-                }
-                if ($submodel instanceof SubmissionBox) {
-                    if ($submodel->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
-                        $submodel->setGradeGroup($gradeGroups[$submodel->getGradeGroup()->getId()]);
-                    }
-                }
-            }
-        }
-        return $modelList;
-    }
-
 
     /**
      * Augments the list from hydrateSelect() with context projects.

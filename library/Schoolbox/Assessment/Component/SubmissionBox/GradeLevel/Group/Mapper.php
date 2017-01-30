@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for submission box grade groups.
  *
@@ -6,12 +7,21 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
+
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
+
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group
+ * @method Model findByIdWithFallback($identifierValue)
+ */
 class Mapper extends BaseMapper
 {
     /**
