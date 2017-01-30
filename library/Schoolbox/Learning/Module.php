@@ -154,7 +154,6 @@ class Module extends BaseModule
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                 'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-                'configMapper'          => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             ])
         );
     }

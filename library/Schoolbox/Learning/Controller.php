@@ -13,7 +13,6 @@ use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\PendingFactory;
@@ -87,11 +86,6 @@ class Controller extends Base
     private $timetableColourMapper;
 
     /**
-     * @var ConfigMapper
-     */
-    private $configMapper;
-
-    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
@@ -104,7 +98,6 @@ class Controller extends Base
      * @param QuizMapper $quizMapper
      * @param QuizAttemptMapper $quizAttemptMapper
      * @param Timetable_ColourMapper $timetableColourMapper
-     * @param ConfigMapper $configMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -116,8 +109,7 @@ class Controller extends Base
         RubricMapper $rubricMapper,
         QuizMapper $quizMapper,
         QuizAttemptMapper $quizAttemptMapper,
-        Timetable_ColourMapper $timetableColourMapper,
-        ConfigMapper $configMapper
+        Timetable_ColourMapper $timetableColourMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -129,7 +121,6 @@ class Controller extends Base
         $this->quizMapper = $quizMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;
         $this->timetableColourMapper = $timetableColourMapper;
-        $this->configMapper = $configMapper;
     }
 
     /**
@@ -198,7 +189,7 @@ class Controller extends Base
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
         // Should we include tasks?
-        $includeTasks = $this->configMapper->get('pending_assessment_types');
+        $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
 
         $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks);
         $assessments = $factory->getPendingAssessments();
