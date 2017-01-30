@@ -1137,12 +1137,21 @@ class PendingFactory
 
             // Have we reached the last row for an Assessment ?
             if($rowIdx == $lastIdx || $quiz->getId() != $quizResults[$rowIdx + 1]['q.assessment_id']){
-
-                // Does this assessment require marking or chasing ?
-                if(!$this->isMarkingRequired($quiz) && !$this->isChasingRequired($quiz)){
-                    unset($this->assessmentsCache[$quiz->getId()]);
-                }
+                $this->checkAssessmentRelevance($quiz);
             }
+        }
+    }
+
+    /**
+     * Checks if the assessment requires marking or chasing, and discards if neither to save memory.
+     *
+     * @param IAssessable $assessment
+     */
+    protected function checkAssessmentRelevance(IAssessable $assessment)
+    {
+        // Does this assessment require marking or chasing ?
+        if(!$this->isMarkingRequired($assessment) && !$this->isChasingRequired($assessment)){
+            unset($this->assessmentsCache[$assessment->getId()]);
         }
     }
 
@@ -1230,11 +1239,7 @@ class PendingFactory
 
             // Have we reached the last row for an Assessment ?
             if($rowIdx == $lastIdx || $task->getId() != $taskResults[$rowIdx + 1]['t.assessment_id']){
-
-                // Does this assessment require marking or chasing ?
-                if(!$this->isMarkingRequired($task) && !$this->isChasingRequired($task)){
-                    unset($this->assessmentsCache[$task->getId()]);
-                }
+                $this->checkAssessmentRelevance($task);
             }
         }
     }
@@ -1309,11 +1314,7 @@ class PendingFactory
 
             // Have we reached the last row for an Assessment ?
             if($rowIdx == $lastIdx || $dueWork->getId() != $dueWorkFeedbackResults[$rowIdx + 1]['sb.assessment_id']){
-
-                // Does this assessment require marking or chasing ?
-                if(!$this->isMarkingRequired($dueWork) && !$this->isChasingRequired($dueWork)){
-                    unset($this->assessmentsCache[$dueWork->getId()]);
-                }
+                $this->checkAssessmentRelevance($dueWork);
             }
         }
     }
