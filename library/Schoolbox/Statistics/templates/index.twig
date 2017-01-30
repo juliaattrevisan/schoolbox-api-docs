@@ -185,7 +185,7 @@
                         {% if recentVisitorsMore %}
                             <div class="component-action">
                                 <section>
-                                    <a href="{{ routeLookup('statistics.recentVisitors', {folderId: folder.id, startDate: startDate, endDate: endDate, roleFilter: roleFilter}) }}" class="button">View all</a>
+                                    <a href="{{ routeLookup('statistics.getRecentVisitors', {folderId: folder.id, startDate: startDate, endDate: endDate, roleFilter: roleFilter}) }}" class="button">View all</a>
                                 </section>
                             </div>
                         {% endif %}
