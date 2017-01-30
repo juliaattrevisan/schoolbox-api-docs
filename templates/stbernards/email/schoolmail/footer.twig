@@ -1,0 +1,22 @@
+<tr>{{ fn.spacer(config.fqdn, 16, 4, 3) }}</tr>
+<tr>
+    {{ fn.spacer(config.fqdn, 0, 8) }}
+    <td width="608" valign="top">
+
+        {% if hideUnsubscribe is defined and hideUnsubscribe %}
+            {# noop #}
+        {% else %}
+            <p>If you do not wish to receive these emails from {{ config.school_name }}, please
+                <a href="http://{{ config.fqdn }}/settings/messages">unsubscribe</a>.
+            </p>
+        {% endif %}
+
+        <p>
+            &copy; {{ config.year }}
+            <a href="{{ config.school_address }}">{{ config.school_name }}</a> |
+            <a href="http://{{ config.fqdn }}/policy.php">Guidelines of Use and Privacy Policy</a>
+        </p>
+    </td>
+    {{ fn.spacer(config.fqdn, 0, 8) }}
+</tr>
+<tr>{{ fn.spacer(config.fqdn, 16, 4, 3) }}</tr>
