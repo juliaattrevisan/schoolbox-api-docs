@@ -10,6 +10,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -153,6 +154,7 @@ class Module extends BaseModule
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                 'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
+                'configMapper'          => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             ])
         );
     }

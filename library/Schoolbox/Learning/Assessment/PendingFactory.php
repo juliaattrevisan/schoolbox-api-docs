@@ -205,18 +205,27 @@ class PendingFactory
     private $nullDate;
 
     /**
+     * Should we include Tasks in the results ? As opposed to just Quiz + DueWork ?
+     *
+     * @var int
+     */
+    private $includeTasks;
+
+    /**
      * @param User $viewee
      * @param \External_UserInterface|null $externalUser
      * @param \External_ClassInterface $externalClass
      * @param Term $term
      * @param \Alaress_Date_Format $toChaseLimit
+     * @param bool $includeTasks
      */
     public function __construct(
         User $viewee,
         \External_UserInterface $externalUser = null,
         \External_ClassInterface $externalClass,
         Term $term,
-        \Alaress_Date_Format $toChaseLimit
+        \Alaress_Date_Format $toChaseLimit,
+        $includeTasks
     ) {
         $this->viewee = $viewee;
         $this->database = \Database::getInstance();
@@ -226,6 +235,7 @@ class PendingFactory
         $this->term = $term;
         $this->toChaseLimit = $toChaseLimit;
         $this->nullDate = new \Alaress_Date_NullDate();
+        $this->includeTasks = $includeTasks;
     }
 
 
@@ -264,9 +274,12 @@ class PendingFactory
         // - Now process result arrays, inserting missing Participants when required.
 
         $quizResults = $this->getQuizResponsesAndFeedback();
-        $taskResults = $this->getTaskResponsesAndFeedback();
         $dueWorkResponses = $this->getDueWorkResponses();
         $dueWorkFeedbackResults = $this->getDueWorkFeedbacks();
+        $taskResults = null;
+        if($this->includeTasks){
+            $taskResults = $this->getTaskResponsesAndFeedback();
+        }
 
         $this->getMissingUsers();
 
@@ -274,12 +287,14 @@ class PendingFactory
         $this->hydrateQuizResults($quizResults);
         $this->discardIrrelevantAssessments($this->quizAssessmentIds);
 
-        $this->hydrateTaskResults($taskResults);
-        $this->discardIrrelevantAssessments($this->taskAssessmentIds);
-
         $this->hydrateDueWorkResponses($dueWorkResponses);
         $this->hydrateDueWorkFeedbacks($dueWorkFeedbackResults);
         $this->discardIrrelevantAssessments($this->dueWorkAssessmentIds);
+
+        if($this->includeTasks) {
+            $this->hydrateTaskResults($taskResults);
+            $this->discardIrrelevantAssessments($this->taskAssessmentIds);
+        }
 
         return $this->assessmentsCache;
     }
