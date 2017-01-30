@@ -87,14 +87,16 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             if ($this->getConfig('displayPortraits') == 'grid') {
                 $this->setBlock('grid_view', 'grid_folders', 'grid_folders_block');
                 $this->setBlock('grid_folders', 'modify_folder', 'modify_folder_block');
-                $this->setVar('list_view_block', '');
 
             } else {
                 $this->setBlock('list_view', 'list_folders', 'list_folders_block');
                 $this->setBlock('list_folders', 'modify_folder', 'modify_folder_block');
-                $this->setVar('grid_view_block', '');
             }
 
+            $this->setVar('list_view_block', '');
+            $this->setVar('list_folders_block','');
+            $this->setVar('grid_view_block', '');
+            $this->setVar('grid_folders_block', '');
             $this->setVar('empty_state_block', '');
 
             if (!$this->isSourceRenderable()) {
@@ -109,6 +111,10 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                 $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
                 foreach ($allFolders as $currentFolder) {
+
+                    if ($maxFolders > 0 && $j >= $maxFolders) {
+                        break;
+                    }
 
                     /**
                      * Set folder colour and cover image for grid layout
@@ -146,10 +152,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                         'FOLDER_COLOUR' => $folderColour,
                         'FOLDER_COVER_IMAGE' => $folderCoverImage,
                     );
-
-                    if ($maxFolders > 0 && $j >= $maxFolders) {
-                        break;
-                    }
 
                     $this->setVar($output);
 
