@@ -11,12 +11,12 @@
                 {% if preselected is iterable %}
                     {% for current in preselected %}
                         {% if current in entireDataset|keys %}
-                            {% raw %}{{% endraw %}"id":{{ current }},"name":"{{ entireDataset[current] }}"{% raw %}}{% endraw %}
+                            {% raw %}{{% endraw %}"id":{{ current }},"name":"{{ entireDataset[current]|raw }}"{% raw %}}{% endraw %}
                         {% endif %}
                         {% if not loop.last %},{% endif %}
                     {% endfor %}
                 {% elseif preselected != '' %}
-                    {% raw %}{{% endraw %}"id":{{ preselected }},"name":"{{ entireDataset[preselected] }}"{% raw %}}{% endraw %}
+                    {% raw %}{{% endraw %}"id":{{ preselected }},"name":"{{ entireDataset[preselected]|raw }}"{% raw %}}{% endraw %}
                 {% endif %}
             ],
             ajax: {
