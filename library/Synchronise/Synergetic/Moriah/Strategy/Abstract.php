@@ -18,8 +18,7 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
 
     /*  id campus name
 
-         5 Primary School K-2
-        11 Primary School 3-5
+        11 Primary School K-6
          9 Middle School
          4 High School
 
@@ -37,13 +36,12 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
 //    const S  =  2; // Secondary School;
     const EC =  3; // Early Childhood Centre;
     const HS =  4; // High School;
-    const IS =  5; // Primary School K-2;
     const MD =  6; // Dover Rd Preschool;
     const MG =  7; // Glenayr Ave Preschool;
     const MR =  8; // Randwick Preschool;
     //const MS =  9; // Middle School;
     const P  = 10; // Preschool;
-    const PS = 11; // Primary School 3-5;
+    const PS = 11; // Primary School K-6;
     const Z  = 12; // Mt Zion;
 
     /**
@@ -112,8 +110,7 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
     {
         /*  id campus name
 
-             5 Primary School K-2
-            11 Primary School 3-5
+            11 Primary School K-6
              9 Middle School
              4 High School
 
@@ -130,7 +127,6 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
             case '00':
             case '01':
             case '02':
-                return self::IS;
             case '03':
             case '04':
             case '05':
