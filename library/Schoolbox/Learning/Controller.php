@@ -439,6 +439,61 @@ class Controller extends Base
     }
 
     /**
+     * Displays a list of grades/results for the specified user and term for all subjects
+     *
+     * @api   GET /learning/grades/{userId}{/termCode}
+     * @level 165
+     * @param User $viewee
+     * @param Term $term
+     */
+    public function getGradesBtac(User $viewee, Term $term)
+    {
+        // Storage for each folders markbook
+        $markbooks = [];
+        $markbooksFolders = [];
+
+        // Keep a collection of all folders student has an assessment in for use in the dropdown
+
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
+
+        $folders = new Collection();
+
+        /** @var IAssessable $assessment */
+        foreach ($assessments as $assessment) {
+            $folder = $assessment->getContext()->getFolder();
+
+            if ($folder instanceof Folder) {
+                if (!isset($foldersFound[$folder->getId()])) {
+
+                    if (!isset($markbooksFolders[$folder->getId()])) {
+                        $markbooksFolders[$folder->getId()] = new Collection();
+                        $folders->add($folder);
+                    }
+
+                    $markbooksFolders[$folder->getId()]->add($assessment);
+                }
+            }
+        }
+
+        foreach ($markbooksFolders as $folderId => $assessments) {
+            $markbooks[$folderId] =
+                (new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()))
+                    ->getStudentStatistics()[$viewee->getId()];
+        }
+
+        // Squish this mess out
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
+            'student'       => $viewee,
+            'term'          => $term,
+            'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
+            'folders'       => $folders,
+            'markbooks'     => $markbooks,
+            'mailHandle'    => $this->getSession()->get('mailhandle'),
+        ]));
+    }
+
+    /**
      * Displays a list of grades for the specified user, term and subject
      *
      * @api   GET /learning/grades/{userId}/{termCode}/{subjectId}
