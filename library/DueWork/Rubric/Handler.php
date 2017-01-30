@@ -123,12 +123,12 @@ class DueWork_Rubric_Handler
     {
         $stmt = Database::getInstance()->prepare(
             "
-                        SELECT criterion_id, mark, UNIX_TIMESTAMP(tstamp) AS tstamp
+                        SELECT criterion_id, mark, UNIX_TIMESTAMP(created_at) AS created_at
                         FROM rubric_mark
                         WHERE student_id = :sid
                         AND submission_box_id = :sbid
                         AND valid = 1
-                        ORDER BY tstamp DESC, criterion_id ASC
+                        ORDER BY created_at DESC, criterion_id ASC
                     "
         );
 
@@ -142,7 +142,7 @@ class DueWork_Rubric_Handler
         $marks = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $marks[$row['tstamp']][$row['criterion_id']] = $row['mark'];
+            $marks[$row['created_at']][$row['criterion_id']] = $row['mark'];
         }
 
         // remove timetstamps and replace with indices
@@ -170,14 +170,14 @@ class DueWork_Rubric_Handler
               m.criterion_id,
               COALESCE(d.value, m.mark) mark,
               d.description,
-              UNIX_TIMESTAMP(m.tstamp) tstamp
+              UNIX_TIMESTAMP(m.created_at) created_at
             FROM rubric_mark m
             LEFT JOIN rubric_descriptor d ON m.`descriptor_id` = d.id
             WHERE m.submission_box_id = :sbid
             AND m.student_id = :sid
             AND m.valid IS TRUE
             AND d.valid IS TRUE
-            ORDER BY tstamp DESC, m.criterion_id ASC
+            ORDER BY created_at DESC, m.criterion_id ASC
         ");
 
         $stmt->execute(
@@ -190,8 +190,8 @@ class DueWork_Rubric_Handler
         $marks = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $marks[$row['tstamp']][$row['criterion_id']]['mark'] = $row['mark'];
-            $marks[$row['tstamp']][$row['criterion_id']]['description'] = $row['description'];
+            $marks[$row['created_at']][$row['criterion_id']]['mark'] = $row['mark'];
+            $marks[$row['created_at']][$row['criterion_id']]['description'] = $row['description'];
         }
 
         // Use the youngest rubric mark set.
@@ -237,7 +237,7 @@ class DueWork_Rubric_Handler
                         WHERE sb.rubric_result_set = rr.resultset_id
                         AND sb.rubric_result_set > 0
                     ) AS rmax_mark,
-                    rm.tstamp
+                    rm.created_at
                 FROM rubric_mark rm
                 LEFT JOIN rubric_descriptor rd
                     ON rm.descriptor_id = rd.id
@@ -253,7 +253,7 @@ class DueWork_Rubric_Handler
                 ORDER BY
                     sb.id ASC,
                     rm.criterion_id ASC,
-                    rm.tstamp DESC,
+                    rm.created_at DESC,
                     rm.mark DESC
             "
         );
@@ -488,14 +488,14 @@ class DueWork_Rubric_Handler
         return true;
     }
 
-    public function updateMarks($marks, $studentID, $boxID, $stamp)
+    public function updateMarks($marks, $studentID, $boxID, $createdAt)
     {
 
         // the ON DUPLICATE clause is equivalent to the nonexistent ON DUPLICATE KEY IGNORE
         $insertStmt = $this->db->prepare(
             "
-                INSERT INTO rubric_mark (`student_id`,`submission_box_id`, `criterion_id`, `tstamp`, `mark`)
-                VALUES (:sid, :sbid, :cid, :stamp, :mark)
+                INSERT INTO rubric_mark (`student_id`,`submission_box_id`, `criterion_id`, `created_at`, `mark`)
+                VALUES (:sid, :sbid, :cid, :created_at, :mark)
                 ON DUPLICATE KEY UPDATE valid = valid
             "
         );
@@ -507,7 +507,7 @@ class DueWork_Rubric_Handler
                 WHERE student_id = :sid
                 AND submission_box_id = :sbid
                 AND criterion_id = :cid
-                AND tstamp = :stamp
+                AND created_at = :created_at
                 AND valid = 1
             "
         );
@@ -516,11 +516,11 @@ class DueWork_Rubric_Handler
             // attempt an update of a record
             $updateStmt->execute(
                 array(
-                    'mark'  => $mark,
-                    'sid'   => $studentID,
-                    'sbid'  => $boxID,
-                    'cid'   => $cID,
-                    'stamp' => $stamp
+                    'mark'       => $mark,
+                    'sid'        => $studentID,
+                    'sbid'       => $boxID,
+                    'cid'        => $cID,
+                    'created_at' => $createdAt
                 )
             );
 
@@ -528,11 +528,11 @@ class DueWork_Rubric_Handler
             if (!$updateStmt->rowCount()) {
                 $insertStmt->execute(
                     array(
-                        'sid'   => $studentID,
-                        'sbid'  => $boxID,
-                        'cid'   => $cID,
-                        'stamp' => $stamp,
-                        'mark'  => $mark
+                        'sid'        => $studentID,
+                        'sbid'       => $boxID,
+                        'cid'        => $cID,
+                        'created_at' => $createdAt,
+                        'mark'       => $mark
                     )
                 );
             }
@@ -550,7 +550,7 @@ class DueWork_Rubric_Handler
 //	public function getLatestMarkTimestamp($studentID, $boxID) {
 //        $db = Database::getInstance();
 //        $stmt = $db->prepare("
-//            SELECT MAX(tstamp) FROM rubric_mark
+//            SELECT MAX(created_at) FROM rubric_mark
 //            WHERE student_id = :sid
 //            AND submission_box_id = :sbid
 //            AND valid = 1
@@ -676,7 +676,7 @@ class DueWork_Rubric_Handler
                                 WHERE submission_box_id = :sbid
                                 AND student_id = :sid
                                 AND valid = 1
-                                ORDER BY tstamp DESC
+                                ORDER BY created_at DESC
                             ) t
                             GROUP BY criterion_id
                         ) u
