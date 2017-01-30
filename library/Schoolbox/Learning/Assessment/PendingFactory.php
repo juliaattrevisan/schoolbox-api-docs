@@ -276,25 +276,15 @@ class PendingFactory
         $quizResults = $this->getQuizResponsesAndFeedback();
         $dueWorkResponses = $this->getDueWorkResponses();
         $dueWorkFeedbackResults = $this->getDueWorkFeedbacks();
-        $taskResults = null;
-        if($this->includeTasks){
-            $taskResults = $this->getTaskResponsesAndFeedback();
-        }
+        $taskResults = $this->getTaskResponsesAndFeedback();
 
         $this->getMissingUsers();
 
         // Process the results, creating extra Participants where required, pulling User from caches
         $this->hydrateQuizResults($quizResults);
-        $this->discardIrrelevantAssessments($this->quizAssessmentIds);
-
         $this->hydrateDueWorkResponses($dueWorkResponses);
         $this->hydrateDueWorkFeedbacks($dueWorkFeedbackResults);
-        $this->discardIrrelevantAssessments($this->dueWorkAssessmentIds);
-
-        if($this->includeTasks) {
-            $this->hydrateTaskResults($taskResults);
-            $this->discardIrrelevantAssessments($this->taskAssessmentIds);
-        }
+        $this->hydrateTaskResults($taskResults);
 
         return $this->assessmentsCache;
     }
@@ -959,7 +949,8 @@ class PendingFactory
             FROM task t
             JOIN task_completion tc ON tc.task_id = t.id
             WHERE " . implode(' AND ', $pb->getWhere()) . "
-            GROUP BY t.assessment_id, tc.student_id";
+            GROUP BY t.assessment_id, tc.student_id" . "
+            ORDER BY t.assessment_id";
 
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
@@ -999,7 +990,8 @@ class PendingFactory
                 ss.updated_at      AS 'ss.updated_at'
             FROM submission_box sb
             JOIN student_submission ss ON ss.box_id = sb.id
-            WHERE " . implode(' AND ', $pb->getWhere());
+            WHERE " . implode(' AND ', $pb->getWhere()) . "
+            ORDER BY sb.assessment_id";
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
         $dueWorkSubmissions = $statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -1037,7 +1029,8 @@ class PendingFactory
                 sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
             FROM submission_box sb
             JOIN submission_return sr ON sr.box_id = sb.id
-            WHERE " . implode(' AND ', $pb->getWhere());
+            WHERE " . implode(' AND ', $pb->getWhere()) . "
+            ORDER BY sb.assessment_id";
 
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
@@ -1097,7 +1090,13 @@ class PendingFactory
      */
     private function hydrateQuizResults(array $quizResults)
     {
-        foreach ($quizResults as $row) {
+        $countRows = count($quizResults);
+        if(!count($quizResults)){
+            return;
+        }
+        $lastIdx = $countRows - 1;
+
+        foreach ($quizResults as $rowIdx => $row) {
             $quiz = $this->assessmentsCache[$row['q.assessment_id']];
             $userId = $row['qa.user_id'];
             $response = new QuizAttempt();
@@ -1135,26 +1134,18 @@ class PendingFactory
                 $quiz->getFeedbacks()->add($feedback);
                 $participants[$userId]->getAllFeedbacks()->add($feedback);
             }
-        }
-    }
 
-    /**
-     * Memory optimisation.
-     *
-     * For each assessment specified, discards it if does not require marking or chasing.
-     *
-     * @param int[] $assessmentIds
-     */
-    protected function discardIrrelevantAssessments(array $assessmentIds)
-    {
-        foreach($assessmentIds as $assessmentId){
-            $assessment = $this->assessmentsCache[$assessmentId];
+            // Have we reached the last row for an Assessment ?
+            if($rowIdx == $lastIdx || $quiz->getId() != $quizResults[$rowIdx + 1]['q.assessment_id']){
 
-            if(!$this->isMarkingRequired($assessment) && !$this->isChasingRequired($assessment)){
-                unset($this->assessmentsCache[$assessmentId]);
+                // Does this assessment require marking or chasing ?
+                if(!$this->isMarkingRequired($quiz) && !$this->isChasingRequired($quiz)){
+                    unset($this->assessmentsCache[$quiz->getId()]);
+                }
             }
         }
     }
+
 
     /**
      * Returns whether the assessment has students who require marking
@@ -1191,7 +1182,13 @@ class PendingFactory
      */
     private function hydrateTaskResults(array $taskResults)
     {
-        foreach ($taskResults as $row) {
+        $countRows = count($taskResults);
+        if(!count($taskResults)){
+            return;
+        }
+        $lastIdx = $countRows - 1;
+
+        foreach ($taskResults as $rowIdx => $row) {
             $task = $this->assessmentsCache[$row['t.assessment_id']];
             $userId = $row['tc.student_id'];
             $response = new TaskCompletion();
@@ -1229,6 +1226,15 @@ class PendingFactory
                 $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
                 $task->getFeedbacks()->setOffset($feedback->getId(), $feedback);
                 $participants[$userId]->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
+            }
+
+            // Have we reached the last row for an Assessment ?
+            if($rowIdx == $lastIdx || $task->getId() != $taskResults[$rowIdx + 1]['t.assessment_id']){
+
+                // Does this assessment require marking or chasing ?
+                if(!$this->isMarkingRequired($task) && !$this->isChasingRequired($task)){
+                    unset($this->assessmentsCache[$task->getId()]);
+                }
             }
         }
     }
@@ -1277,7 +1283,13 @@ class PendingFactory
      */
     private function hydrateDueWorkFeedbacks(array $dueWorkFeedbackResults)
     {
-        foreach ($dueWorkFeedbackResults as $row) {
+        $countRows = count($dueWorkFeedbackResults);
+        if(!count($dueWorkFeedbackResults)){
+            return;
+        }
+        $lastIdx = $countRows - 1;
+
+        foreach ($dueWorkFeedbackResults as $rowIdx => $row) {
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId = $row['sr.owner'];
             $feedback = new DueWorkFeedback();
@@ -1294,6 +1306,15 @@ class PendingFactory
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
             $participants[$userId]->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
+
+            // Have we reached the last row for an Assessment ?
+            if($rowIdx == $lastIdx || $dueWork->getId() != $dueWorkFeedbackResults[$rowIdx + 1]['sb.assessment_id']){
+
+                // Does this assessment require marking or chasing ?
+                if(!$this->isMarkingRequired($dueWork) && !$this->isChasingRequired($dueWork)){
+                    unset($this->assessmentsCache[$dueWork->getId()]);
+                }
+            }
         }
     }
 
