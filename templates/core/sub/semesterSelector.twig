@@ -16,19 +16,19 @@ Usage: include 'sub/semesterSelector.twig
 
         {# Wire up context selector #}
 
-        $semesterSelector.change(function() {
+        $semesterSelector.change(function () {
             window.location.href = $semesterSelector.find(':selected').data('href');
         });
 
         {# Wire up next/previous term buttons #}
 
-        $("[data-semester-switch]").click(function(e) {
+        $("[data-semester-switch]").click(function (e) {
             e.preventDefault();
 
             var index = $semesterSelector.prop('selectedIndex');
-            var newIndex = 'next' == $(this).data('semester-switch') ? index + 1 : index - 1;
+            var newIndex = 'next' == $(this).data('semester-switch') ? index - 1 : index + 1;
 
-            if(newIndex >= 1 && newIndex < $options.length){
+            if (newIndex >= 1 && newIndex < $options.length){
                 var term = $options.eq(newIndex);
                 window.location.href = term.data('href');
             }
@@ -37,7 +37,7 @@ Usage: include 'sub/semesterSelector.twig
 </script>
 
 <nav>
-    <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
+    <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
 </nav>
 <div class="semester">
     <select id="context-selector-semester" title="Select a Term">
@@ -50,5 +50,5 @@ Usage: include 'sub/semesterSelector.twig
     </select>
 </div>
 <nav>
-    <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
+    <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
 </nav>
