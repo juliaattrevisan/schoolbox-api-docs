@@ -56,11 +56,8 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $currentTimestamp = $startTimestamp;
-
-        // Collection that holds the list of events to be rendered
-
         $stack            = new Collection();
+        $currentTimestamp = $startTimestamp;
 
         // Figure out event type
         try {
@@ -81,92 +78,68 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
             // noop
         }
 
-        $days = [];
-
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
         while ($currentTimestamp < $endTimestamp) {
-            foreach ($this->getUser()->getCampusCollection() as $campus) {
-                $campusId  = $campus->getId();
+
+            //First check if we've got more then one campus with the same timetable code
+            $campusTitles = Array();
+            $userCampuses = $this->getUser()->getCampusCollection();
+            foreach ($userCampuses as $campus) {
                 $campusName = $campus->getName();
-                $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
-                if ($dayNumber <= 0) {
-                    continue;
+                $campusCode = $campus->getExtTimetableCode();
+                if(in_array($campusCode, (array) $userCampuses)) {
+                    //Combine titles
+                    $campusTitles[$campusCode] = $campusTitles[$campusCode].'/'.$campusName;
                 }
-                $dayName = $this->getExternalTimetable()->getDayName($dayNumber);
-
-                $event = new Event();
-                $event->setAllday(true);
-                $event->setStartTime(new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U'));
-                $event->setEndTime(new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U'));
-                $event->setEventId(md5($campusId.$event->getStartTime()->getDatabaseDate()));
-                $event->setPublishDate(null);
-                $event->setCampusList($campusId);
-                $event->setTitle(sprintf("%s: %s", $campusName, $dayName));
-                $event->setAccess(Event::CAMPUS_ACCESS);
-                $event->setType($eventType);
-                $event->setColour($eventColor);
-                $event->setConnectorId($this->getConnectorId());
-
-                // Store the event in a temporary array so we can deduplicate when there are multiple campuses
-
-                $index = "{$dayNumber}_{$campus->getExtTimetableCode()}";
-
-                if (!isset($days[$index])) {
-                    $days[$index] = [];
-                }
-
-                $days[$index]['event'] = $event;
-
-                if (!isset($days[$index]['campus'])) {
-                    $days[$index]['campus'] = [];
-                }
-
-                $days[$index]['records'][] = [
-                    'campusName' => $campusName,
-                    'dayName' => $dayName
-                ];
             }
+            $campusMerged = Array();
+            //Now build the stack
+            foreach ($userCampuses as $campus) {
 
+                $campusCode = $campus->getExtTimetableCode();
+                //Check if a campus with the same timetable code hasn't already been added to the stack. Skip if yes.
+                if(!array_key_exists($campusCode, $campusMerged)) {
+
+                    $campusId  = $campus->getId();
+                    $campusName = $campus->getName();
+                    $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
+                    if ($dayNumber <= 0) {
+                        continue;
+                    }
+                    $dayName = $this->getExternalTimetable()->getDayName($dayNumber);
+
+                    $event = new Event();
+                    $event->setAllday(true);
+                    $event->setStartTime(
+                        new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
+                    );
+                    $event->setEndTime(
+                        new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
+                    );
+                    $event->setEventId(md5($campusId.$event->getStartTime()->getDatabaseDate()));
+                    $event->setPublishDate(null);
+                    //Check if the current campus has the same code as any of the previous ones in the loop
+                    if (array_key_exists($campusCode, $campusTitles)) {
+                        $event->setTitle(sprintf("%s: %s", trim($campusTitles[$campusCode], '/'), $dayName));
+                        $campusMerged[$campusCode] = $campusId;
+                    }
+                    else {
+                        $event->setTitle(sprintf("%s: %s", $campusName, $dayName));
+                    }
+                    $event->setCampusList($campusId);
+                    $event->setAccess(Event::CAMPUS_ACCESS);
+                    $event->setType($eventType);
+                    $event->setColour($eventColor);
+                    $event->setConnectorId($this->getConnectorId());
+
+                    $stack->add($event);
+                }
+            }
             $currentTimestamp = strtotime('+1 day', $currentTimestamp);
         }
-
-        // Deduplicate multiple campuses
-
-        foreach ($days as $day) {
-
-            /** @var Event $event */
-            $event = $day['event'];
-
-            // Check how many campuses there were
-
-            if (count($day['records']) == 1) {
-
-                // There was only one campus, just shunt the appointment in as it was
-
-                $stack->add($event);
-
-            } else {
-
-                // There is more than one campus, need to mangle the title to contain both campus names
-
-                $title = '';
-                $dayName = '';
-
-                foreach ($day['records'] as $record) {
-                    if ($title != '') {
-                        $title .= " / ";
-                    }
-                    $title .= $record['campusName'];
-                    $dayName = $record['dayName'];
-                }
-
-                $event->setTitle($title . ": {$dayName}");
-                $stack->add($event);
-            }
-        }
-
         return $stack;
+
     }
 
     /**
