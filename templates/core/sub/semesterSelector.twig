@@ -37,7 +37,7 @@ Usage: include 'sub/semesterSelector.twig
 </script>
 
 <nav>
-    <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
+    <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
 </nav>
 <div class="semester">
     <select id="context-selector-semester" title="Select a Term">
@@ -50,5 +50,5 @@ Usage: include 'sub/semesterSelector.twig
     </select>
 </div>
 <nav>
-    <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
+    <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
 </nav>
