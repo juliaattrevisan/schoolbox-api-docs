@@ -188,7 +188,7 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
      * @param User $author
      * @return Envelope
      */
-    public function nofifyParentFollowed($thread, $author)
+    public function notifyParentFollowed($thread, $author)
     {
         return $this->notifyFollowed(Role::PARENT, $thread, $author);
     }
