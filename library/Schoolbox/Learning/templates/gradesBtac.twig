@@ -51,7 +51,7 @@
     <div class="small-12 island">
         {% for folder in folders %}
             <div class="row">
-                <div class="small-12 medium-6 columns">
+                <div class="small-12 medium-4 columns">
                     <h2 class="subheader no-margin">
                         <a href="{{ routeLookup('learning.getGradesForSubject', {student: student, userId: student.id, term: term, termCode: term.code, subject: subject, subjectId: folder.id}) }}"
                            title="View Grades">
@@ -64,21 +64,31 @@
                         {%- if loop.last %}</p>{% endif %}
                     {% endfor %}
                 </div>
-                <div class="small-12 medium-6 island">
+                <div class="small-12 medium-4 island">
                     <section>
-                    {% for teacher in folder.teachers %}
-                        <div class="list-item">
-                            <div class="small-12 card">
-                                <a href="/search/user/{{ teacher.id }}" title="">
-                                    <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
-                                         alt="{{ teacher.fullName }}"/>
-                                    <p>{{ teacher.fullName }}</p>
-                                </a>
-                                <p class="meta">Teacher</p>
+                        {% for teacher in folder.teachers %}
+                            <div class="list-item">
+                                <div class="small-12 card">
+                                    <a href="/search/user/{{ teacher.id }}" title="">
+                                        <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
+                                             alt="{{ teacher.fullName }}"/>
+                                        <p>{{ teacher.fullName }}</p>
+                                    </a>
+                                    <p class="meta">Teacher</p>
+                                </div>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
                     </section>
+                </div>
+                <div class="small-12 medium-4 columns">
+                    {% if markbooks[folder.id].weightedMean is not empty %}
+                        <section class="content">
+                            <span class="{{ urgency.marks(markbooks[folder.id].meanNormalised) }}">
+                                <p>Grade Average</p>
+                                {{ markbooks[folder.id].weightedMean }}
+                            </span>
+                        </section>
+                    {% endif %}
                 </div>
             </div>
 
