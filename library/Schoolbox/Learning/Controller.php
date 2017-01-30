@@ -15,6 +15,7 @@ use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -454,6 +455,7 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
+        $assessmentTasks = [];
         $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
 
         $folders = new Collection();
@@ -467,7 +469,17 @@ class Controller extends Base
 
                     if (!isset($markbooksFolders[$folder->getId()])) {
                         $markbooksFolders[$folder->getId()] = new Collection();
+                        $folder->loadTeachers();
                         $folders->add($folder);
+                    }
+
+                    if ($assessment instanceof DueWork) {
+                        if ($assessment->getWorkType()->getName() == "Assessment Task") {
+                            if (!isset($assessmentTasks[$folder->getId()])) {
+                                $assessmentTasks[$folder->getId()] = [];
+                            }
+                            $assessmentTasks[$folder->getId()][] = $assessment;
+                        }
                     }
 
                     $markbooksFolders[$folder->getId()]->add($assessment);
@@ -483,13 +495,15 @@ class Controller extends Base
 
         // Squish this mess out
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesBtac.twig', [
             'student'       => $viewee,
             'term'          => $term,
             'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'folders'       => $folders,
+            'assessmentTasks' => $assessmentTasks,
             'markbooks'     => $markbooks,
             'mailHandle'    => $this->getSession()->get('mailhandle'),
+            'currentUser'   => $this->getUser(),
         ]));
     }
 
