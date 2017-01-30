@@ -109,7 +109,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 
 		$articleId = $article->getId();
 		$heading = $article->getHeading();
-		$shortDate = $article->getPostDate()->getDateOnly();
+		$shortDate = $article->getPublishDate()->getDateOnly();
 
 		$authorName = $user->formatName();
 
@@ -147,7 +147,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
             ->setMeta(array(
                 'title'  => $heading,
                 'author' => $authorName,
-                'date'   => $article->getPostDate()->getLong(),
+                'date'   => $article->getPublishDate()->getLong(),
                 'thumb'  => $thumb,
                 'blurb'  => $article->getBlurb(),
             ))
@@ -155,7 +155,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
             ->setByline("$shortDate by $authorName in $topicName")
 
             // timestamp and filters are optional
-            ->setTimestamp($article->getPostDate()->getUnixTimestamp())
+            ->setTimestamp($article->getPublishDate()->getUnixTimestamp())
 
             // and then you build
             ->build();
