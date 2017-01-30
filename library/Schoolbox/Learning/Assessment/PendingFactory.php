@@ -419,6 +419,13 @@ class PendingFactory
         // Get Assessments for Groups and Subjects administered/taught by User
         $folderIds = array_unique(array_merge($this->classIds, $this->groupIds));
 
+        $taskSelect = $this->includeTasks ?
+            "tk.id                    AS 'tk.id',
+             tk.requires_confirmation AS 'tk.requires_confirmation'," : '';
+        $taskJoin = $this->includeTasks ? 'LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL' : '';
+        $taskUser = $this->includeTasks ? "OR tk.user_id = {$this->viewee->getId()}" : '';
+        $taskId   = $this->includeTasks ? "OR tk.id IS NOT NULL" : '';
+
         $folderClause = count($folderIds) ? " OR f.id IN (" . implode(',', $folderIds) . ") " : '';
         $query1 = "
         SELECT 
@@ -443,15 +450,14 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
-                tk.id        AS 'tk.id',
-                tk.requires_confirmation AS 'tk.requires_confirmation',
+                $taskSelect
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
             FROM assessment a 
             LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
-            LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            $taskJoin
             
             JOIN assessment_folder af   ON af.assessment_id = a.id 
             JOIN folder f               ON f.id = af.folder_id AND f.deleted_at IS NULL
@@ -459,8 +465,8 @@ class PendingFactory
             LEFT JOIN folder_code fc    ON fc.folder_id = f.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug     ON ug.cid = f.id
             
-            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
@@ -488,15 +494,14 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
-                tk.id        AS 'tk.id',
-                tk.requires_confirmation AS 'tk.requires_confirmation',
+                $taskSelect
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
             FROM assessment a 
             LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
-            LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            $taskJoin
             
             JOIN project_assessment pra ON pra.assessment_id = a.id
             JOIN project p              ON pra.project_id = p.id
@@ -507,8 +512,8 @@ class PendingFactory
             LEFT JOIN folder_code fc    ON fc.folder_id = pf.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug     ON ug.cid = pf.id
             
-            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
@@ -536,15 +541,14 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
-                tk.id        AS 'tk.id',
-                tk.requires_confirmation AS 'tk.requires_confirmation',
+                $taskSelect
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
             FROM assessment a 
             LEFT JOIN assess qz                            ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw                    ON dw.assessment_id = a.id AND dw.deleted = 0
-            LEFT JOIN task tk                              ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            $taskJoin
             
             JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
             JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id
@@ -558,8 +562,8 @@ class PendingFactory
             LEFT JOIN folder_code fc                       ON fc.folder_id = cif.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
-            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
@@ -588,15 +592,14 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
-                tk.id        AS 'tk.id',
-                tk.requires_confirmation AS 'tk.requires_confirmation',
+                $taskSelect
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
             FROM assessment a 
             LEFT JOIN assess qz                            ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw                    ON dw.assessment_id = a.id AND dw.deleted = 0
-            LEFT JOIN task tk                              ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            $taskJoin
             
             JOIN project_assessment pa                     ON pa.assessment_id = a.id
             JOIN project p                                 ON p.id = pa.project_id
@@ -614,7 +617,7 @@ class PendingFactory
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
             WHERE a.deleted_at IS NULL
-            AND ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
+            AND ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
@@ -1245,6 +1248,7 @@ class PendingFactory
     private function hydrateDueWorkResponses(array $dueWorkResponses)
     {
         foreach ($dueWorkResponses as $row) {
+
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId = $row['ss.owner'];
             $response = new DueWorkSubmission();
