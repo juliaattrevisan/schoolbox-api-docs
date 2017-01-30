@@ -99,7 +99,7 @@
         "easyrdf/easyrdf": "~0.8.0",
         "caxy/php-htmldiff": "dev-master",
         "imagine/imagine": "dev-0.6.2-patches",
-        "jenssegers/date": "~2.0.22",
+        "jenssegers/date": "~3.2.8",
         "mpratt/embera": "~1.8.6"
     },
     "require-dev": {

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6163d67f557d03fc0792c27131e3fd32",
-    "content-hash": "b21627708291f5f5c5b8e2f313bc4344",
+    "hash": "ec802b2f72fe7587dd8cff038057222f",
+    "content-hash": "b613f974b31457482620a2aa3c0de63f",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -483,7 +483,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/caxy/php-htmldiff/zipball/256f031a4d5ba0a8a4e3d565bafe69f58b32c701",
+                "url": "https://api.github.com/repos/caxy/php-htmldiff/zipball/253f5db5c1f4a6158536ad172915cd23af79d122",
                 "reference": "256f031a4d5ba0a8a4e3d565bafe69f58b32c701",
                 "shasum": ""
             },
@@ -1129,31 +1129,36 @@
         },
         {
             "name": "jenssegers/date",
-            "version": "v2.0.22",
+            "version": "v3.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jenssegers/date.git",
-                "reference": "ab8ab076184e1880e2886909a3f7438befa377b9"
+                "reference": "ad55257ae655af540e055c0fcd48bc3ec1962ec4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jenssegers/date/zipball/ab8ab076184e1880e2886909a3f7438befa377b9",
-                "reference": "ab8ab076184e1880e2886909a3f7438befa377b9",
+                "url": "https://api.github.com/repos/jenssegers/date/zipball/ad55257ae655af540e055c0fcd48bc3ec1962ec4",
+                "reference": "ad55257ae655af540e055c0fcd48bc3ec1962ec4",
                 "shasum": ""
             },
             "require": {
-                "nesbot/carbon": "~1.0,<1.18",
-                "php": ">=5.3.0",
-                "symfony/translation": "~2.0"
+                "nesbot/carbon": "^1.0",
+                "php": ">=5.4",
+                "symfony/translation": "^2.7|^3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0",
-                "satooshi/php-coveralls": "~0.6"
+                "phpunit/phpunit": "^4.0|^5.0",
+                "satooshi/php-coveralls": "^1.0"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
             "autoload": {
-                "psr-0": {
-                    "Jenssegers\\Date": "src/"
+                "psr-4": {
+                    "Jenssegers\\Date\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1163,17 +1168,21 @@
             "authors": [
                 {
                     "name": "Jens Segers",
-                    "homepage": "http://jenssegers.be"
+                    "homepage": "https://jenssegers.com"
                 }
             ],
-            "description": "A date library to help you work with dates",
+            "description": "A date library to help you work with dates in different languages",
+            "homepage": "https://github.com/jenssegers/date",
             "keywords": [
+                "carbon",
                 "date",
                 "datetime",
+                "i18n",
                 "laravel",
-                "time"
+                "time",
+                "translation"
             ],
-            "time": "2015-07-04 15:04:16"
+            "time": "2017-01-02 09:21:15"
         },
         {
             "name": "league/flysystem",
