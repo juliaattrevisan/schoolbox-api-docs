@@ -148,10 +148,8 @@
                 </article>
                 <div class="component-action">
                     <section>
-                        <a href="/resources/{FILE_CAT_ID}" class="button">View All Files</a>
-
                         <!-- BEGIN submit_file -->
-                        <a href="/cms/file/new/{FILE_CAT_ID}" class="button">Post File</a>
+                        <p><a href="/cms/file/new/{FILE_CAT_ID}">Select a file</a> or drag and drop multiple onto this component</p>
                         <script type="text/javascript">
                             $(function () {
                                 $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
@@ -191,6 +189,7 @@
                             });
                         </script>
                         <!-- END submit_file -->
+                        <a href="/resources/{FILE_CAT_ID}" class="button">View All Files</a>
                     </section>
                 </div>
                 <!-- END source_folder_exists -->
