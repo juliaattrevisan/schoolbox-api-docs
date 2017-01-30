@@ -280,23 +280,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                     );
                 }
             } else {
-                $laravelDate = LaravelDate::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
-                $errors      = LaravelDate::getLastErrors();
-                if ($errors['error_count']) {
+                try {
+                    $laravelDate = LaravelDate::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
+                } catch (InvalidArgumentException $e) {
                     // I don't have a datetime, try again with trailing data allowed
+                    // This can also throw an InvalidArgumentException - allow that to fall on carpet
                     $laravelDate = LaravelDate::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
-                    if (!($laravelDate instanceof LaravelDate)) {
-                        // I still don't have a datetime, exception out
-                        $errors = LaravelDate::getLastErrors();
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'LaravelDate creation failed with %d errors: (%s)',
-                                $errors['error_count'],
-                                implode(', ', $errors['errors'])
-                            )
-                        );
-                    }
                 }
+
+                $errors = LaravelDate::getLastErrors();
                 if ($errors['warning_count']) {
                     // I have a datetime, but it's not what I expected. Warn the user.
                     // This date will also fail isValid()
