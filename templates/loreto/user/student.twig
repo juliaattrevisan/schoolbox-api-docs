@@ -3,7 +3,7 @@
 {% block details_tutorTeacher %}
 {% if showClasses %}
     {% if tutorTeacher %}
-    <dt class="no-margin small-6 medium-3">Academic Advisor</dt>
+    <dt class="no-margin small-6 medium-3">Academic Care Coordinator</dt>
     <dd class="no-margin small-6 medium-9">
         {% if tutorTeacher.getId() %}
             <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
@@ -17,7 +17,7 @@
 
 {% block details_coordTeacher %}
 {% if coordTeacher %}
-<dt class="no-margin small-6 medium-3">Year Coordinator:</dt>
+<dt class="no-margin small-6 medium-3">Year Wellbeing Coordinator</dt>
 <dd class="no-margin small-6 medium-9">
     {% if coordTeacher.getId() %}
         <a href="{{ session.mailhandle }}{{ coordTeacher.getEmail() }}">{{ coordTeacher.formatName() }}</a>
@@ -31,12 +31,12 @@
 {% block details_tutorGroup %}
 {% if showClasses %}
     {% if externalUser.StudentTutorDescription %}
-    <dt class="no-margin small-6 medium-3">Homeroom</dt>
+    <dt class="no-margin small-6 medium-3">Circle Class</dt>
     <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
     {% endif %}
 
     {% if externalUser.StudentFormStaffName %}
-    <dt class="no-margin small-6 medium-3">Homeroom Teacher</dt>
+    <dt class="no-margin small-6 medium-3">Circle Teacher</dt>
     <dd class="no-margin small-6 medium-9">{{ externalUser.StudentFormStaffName }}</dd>
     {% endif %}
 {% endif %}
