@@ -33,7 +33,7 @@ $nav->parse($this, 'eportfolio');
 
 // Get list of templates
 $templateHandler = new EportfolioTemplate();
-$templateList = $templateHandler->getAll();
+$templateList = $templateHandler->getAll('name');
 if (is_array($templateList)) {
     foreach ($templateList as $template) {
         $this->setVar(array(
