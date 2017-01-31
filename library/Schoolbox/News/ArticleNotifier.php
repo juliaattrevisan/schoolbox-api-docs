@@ -54,27 +54,30 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 * @param TriggerBundle $bundle
 	 * @return void
 	 */
-	public function bundleTriggers($bundle) {
-
+	public function bundleTriggers($bundle)
+    {
 		/** @var Article $article */
 		$article = $bundle->getEvent()->getObject();
 
-		$stamp = $article->getPublishDate()->getUnixTimestamp();
+		$publishDate = $article->getPublishDate()->getUnixTimestamp();
 
-		switch($bundle->getMethod()) {
+		switch ($bundle->getMethod()) {
 			case Mapper::METHOD_CREATE:
-				$bundle->attach(self::TRIGGER_POSTED, $stamp);
+			    // fire at the time of publication (if it's in the past or null, it will be immediate)
+				$bundle->attach(self::TRIGGER_POSTED, $publishDate);
 				break;
+
 			case Mapper::METHOD_UPDATE:
-				// in the future
-				if($stamp >= time()) {
-					$bundle->attach(self::TRIGGER_POSTED, $stamp);
-				}
-				// in the past: detach any existing
-				else {
+				if ($publishDate >= time()) {
+                    // in the future
+					$bundle->attach(self::TRIGGER_POSTED, $publishDate);
+
+				} else {
+                    // in the past: detach any existing
 					$bundle->detach(self::TRIGGER_POSTED);
 				}
 				break;
+
 			case Mapper::METHOD_DELETE:
 				$bundle->detach(self::TRIGGER_POSTED);
 		}
@@ -109,7 +112,13 @@ class ArticleNotifier extends AbstractModuleNotifier {
 
 		$articleId = $article->getId();
 		$heading = $article->getHeading();
-		$shortDate = $article->getPublishDate()->getDateOnly();
+
+		// use the more recent of the two available dates
+		$activeDate = $article->getPublishDate() < $article->getPostDate()
+            ? $article->getPostDate()
+            : $article->getPublishDate();
+
+		$shortDate = $activeDate->getDateOnly();
 
 		$authorName = $user->formatName();
 
@@ -147,7 +156,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
             ->setMeta(array(
                 'title'  => $heading,
                 'author' => $authorName,
-                'date'   => $article->getPublishDate()->getLong(),
+                'date'   => $activeDate->getLong(),
                 'thumb'  => $thumb,
                 'blurb'  => $article->getBlurb(),
             ))
@@ -155,7 +164,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
             ->setByline("$shortDate by $authorName in $topicName")
 
             // timestamp and filters are optional
-            ->setTimestamp($article->getPublishDate()->getUnixTimestamp())
+            ->setTimestamp($activeDate->getUnixTimestamp())
 
             // and then you build
             ->build();
