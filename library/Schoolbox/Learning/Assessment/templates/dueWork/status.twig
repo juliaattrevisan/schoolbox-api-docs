@@ -16,6 +16,9 @@
 {% extends '@learningAssessment/status.twig' %}
 
 {% block headerOptions %}
+    <li>
+        <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}" class="icon-progress">View Report</a>
+    </li>
     <li class="separator">Bulk Actions</li>
     <li>
         <a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish drafts&hellip;</a>
