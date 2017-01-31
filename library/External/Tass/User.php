@@ -244,7 +244,7 @@ class External_Tass_User implements External_UserInterface
     {
         $externalId = $user->getExternalId();
 
-        if (empty($tassCode)) {
+        if (empty($externalId)) {
             return [];
         }
         if ($user->getRole()->isStudent()) {
