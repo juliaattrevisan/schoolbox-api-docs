@@ -262,7 +262,7 @@ class Controller extends Base\Base
      */
     protected function courseTpl($template, $data = [])
     {
-        $this->tpl('course', $template, $data);
+        $this->tpl('course', $template, $data, 'course');
     }
 
     /**

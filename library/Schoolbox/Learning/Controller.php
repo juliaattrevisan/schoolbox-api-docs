@@ -210,7 +210,7 @@ class Controller extends Base
             'viewee'             => $viewee,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,
-        ]));
+        ])->setTab('submission'));
     }
 
     /**
@@ -302,6 +302,7 @@ class Controller extends Base
         }
 
 
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
             'currentUser' => $this->getUser(),
             'terms'       => $this->getTermMapper()->findAll(),
@@ -310,7 +311,7 @@ class Controller extends Base
             'classList'   => $folderList,
             'classTypes'  => $classTypes,
             'courses'     => $courseSpecs,
-        ]));
+        ])->setTab('classes'));
     }
 
     /**
@@ -365,7 +366,7 @@ class Controller extends Base
             'folders'       => $folders,
             'markbooks'     => $markbooks,
             'mailHandle'    => $this->getSession()->get('mailhandle'),
-        ]));
+        ])->setTab('grade'));
     }
 
     /**
