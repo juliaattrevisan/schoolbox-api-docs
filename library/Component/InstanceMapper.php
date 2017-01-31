@@ -25,42 +25,13 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     {
         $this->hasTable('component_instance');
         $this->hasModel(Component_Instance::class);
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true
-        ));
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('component_definition_id', self::TYPE_INTEGER, null, 'definitionId');
+        $this->uses('module', self::TYPE_STRING);
+        $this->uses('identifier', self::TYPE_INTEGER);
+        $this->uses('position', self::TYPE_INTEGER);
+        $this->uses('sequence', self::TYPE_INTEGER);
 
-        $this->hasMap(array(
-            'column'     => 'component_definition_id',
-            'property'   => 'definitionId',
-            'type'       => self::TYPE_INTEGER,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'module',
-            'property'   => 'module',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'identifier',
-            'property'   => 'identifier',
-            'type'       => self::TYPE_INTEGER,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'position',
-            'property'   => 'position',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'sequence',
-            'property'   => 'sequence',
-            'type'       => self::TYPE_INTEGER,
-        ));
     }
 
     /**
