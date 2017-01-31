@@ -4,7 +4,7 @@
 
         {# Tabs #}
 
-        <dl class="tabs" data-tab="">
+        <dl class="tabs" data-tab>
 
             {# Display topic tabs #}
 
@@ -14,7 +14,7 @@
                 {# Only display topic if there is actually news in it #}
 
                 {% if news[topic.id] | length %}
-                    <dd {% if not active %}class="active"{% set active = true %}{% endif %}>
+                    <dd {% if not active and not allDefault %}class="active"{% set active = true %}{% endif %}>
                         <a href="#component{{ componentInstanceId }}-{{ topic.id }}">{{ topic.name }}</a>
                     </dd>
                 {% endif %}
@@ -23,7 +23,7 @@
 
             {# Display special 'All' grouping #}
 
-            <dd>
+            <dd {% if allDefault %}class="active"{% endif %}>
                 <a href="#component{{ componentInstanceId }}-all">All</a>
             </dd>
         </dl>
@@ -38,7 +38,7 @@
                 {% set active = false %}
 
                 {% for topic in topics %}
-                    <ul class="news-list content {% if not active and news[topic.id] | length %}active{% set active = true %}{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
+                    <ul class="news-list content {% if not active and news[topic.id] and not allDefault | length %}active{% set active = true %}{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
                         {% for item in news[topic.id] %}
                             <li>
                                 <div class="list-item">
@@ -67,9 +67,9 @@
                     </ul>
                 {% endfor %}
 
-                {# Special 'All' grouping with every article#}
+                {# Special 'All' grouping with every article #}
 
-                <ul class="news-list content" id="component{{ componentInstanceId }}-all">
+                <ul class="news-list content {% if allDefault %}active{% endif %}" id="component{{ componentInstanceId }}-all">
                     {% for item in newsAll %}
                         <li>
                             <div class="list-item">
