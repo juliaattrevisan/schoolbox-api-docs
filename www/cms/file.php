@@ -74,7 +74,7 @@ if(is_numeric($this->arg[0])) {
         ]
     ]);
 }
-else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	// Prevent files attached to root
 	if(0 == $this->arg[1]){
@@ -135,7 +135,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
             'class' => 'active',
         ]
     ]);
-} else if($this->arg[0] == 'multicat') {
+} elseif($this->arg[0] == 'multicat') {
 	/* Upload a file to multiple categories */
 
 	$this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
