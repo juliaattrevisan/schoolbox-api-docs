@@ -6,6 +6,7 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Breadcrumbs;
 
 $groupHandler = new Group;
+$file = $folder = null;
 
 $zone = new GenericZone('cms', FileMapper::getInstance());
 $zone->setAttachmentsLabel('')
@@ -24,7 +25,6 @@ if(is_numeric($this->arg[0])) {
     }
     catch (Exception $e) {
 		error(41);
-        exit; // shut up, storm!
 	}
 
 	if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
