@@ -9,6 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use \Schoolbox\Learning\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 
 abstract class Evaluation_Import_Xml
@@ -99,6 +100,8 @@ abstract class Evaluation_Import_Xml
     {
 		$xml = $this->loadData();
 
+		$this->checkValidQuizType($xml);
+
 		$assess_id = $this->createEvaluation($xml);
 
 		if (!$assess_id) {
@@ -167,6 +170,21 @@ abstract class Evaluation_Import_Xml
 	}
 
     /**
+     * Ensure not trying to load a quiz as survey or vice-versa
+     *
+     * @param SimpleXMLElement $xml
+     */
+    protected function checkValidQuizType(SimpleXMLElement $xml)
+    {
+        if($xml->availability != $this->getAvailability()){
+            // Rename 'assess' as 'quiz' for UI
+            $format   = $xml->availability == Quiz::AVAILABILITY_ASSESS ? 'quiz' : $xml->availability;
+            $importAs = $this->getAvailability() == Quiz::AVAILABILITY_ASSESS ? 'quiz' : $this->getAvailability();
+            error(null, "Cannot import {$format} as a {$importAs}");
+        }
+    }
+
+    /**
      * @param SimpleXMLElement $xml
      * @return int
      */
@@ -190,6 +208,13 @@ abstract class Evaluation_Import_Xml
      * @return int                   The newly assigned assess_id
      */
 	abstract protected function createEvaluation(SimpleXMLElement $xml);
+
+    /**
+     * Is this import controller for 'assess' or 'survey' ?
+     *
+     * @return string
+     */
+    abstract protected function getAvailability();
 
     /**
      * @return QuizMapper

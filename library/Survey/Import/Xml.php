@@ -7,6 +7,8 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Schoolbox\Learning\Quiz\Model as Quiz;
+
 class Survey_Import_Xml extends Evaluation_Import_Xml {
 
     /**
@@ -34,5 +36,13 @@ class Survey_Import_Xml extends Evaluation_Import_Xml {
         );
 
         return $this->getAssessHandler()->create($dataArr);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getAvailability()
+    {
+        return Quiz::AVAILABILITY_SURVEY;
     }
 }

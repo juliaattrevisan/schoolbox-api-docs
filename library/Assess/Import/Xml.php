@@ -93,9 +93,17 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setDuration((int)$xml->duration)
             ->setMaxAttempts($this->getMaxAttempts($xml))
             ->setWeight($quizAssessable->getWeight())
-            ->setAvailability(Quiz::AVAILABILITY_ASSESS)
+            ->setAvailability($this->getAvailability())
             ->setMarkVisibility((int)$xml->markvisibility);
 
         return $this->getQuizMapper()->save($quiz)[0];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getAvailability()
+    {
+        return Quiz::AVAILABILITY_ASSESS;
     }
 }
