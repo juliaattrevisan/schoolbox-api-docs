@@ -108,7 +108,7 @@ class Sync implements SyncInterface
         $statement = $this->database->prepare("
             SELECT
                 p.denbighID      AS staff_id,
-                s.staffCode      AS network_login,
+                s.username       AS network_login,
                 1                AS active_flag,
                 p.title          AS staff_title,
                 p.given_names    AS staff_given_name,
@@ -117,7 +117,7 @@ class Sync implements SyncInterface
                 ''               AS default_email_code,
                 ''               AS work_email,
                 p.email          AS email,
-                ''               AS staff_campus,
+                s.campus         AS staff_campus,
                 ''               AS staff_category_type,
                 ''               AS staff_category,
                 ''               AS staff_department,

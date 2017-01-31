@@ -184,9 +184,11 @@ DROP TABLE IF EXISTS `Staff`;
 
 CREATE TABLE `Staff` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `peopleDenbighID` varchar(16) CHARACTER SET latin1 NOT NULL,
-  `staffCode` varchar(16) CHARACTER SET latin1 NOT NULL,
-  `tutorGroup` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
+  `peopleDenbighID` varchar(24) CHARACTER SET latin1 NOT NULL,
+  `staffCode` varchar(24) CHARACTER SET latin1 NOT NULL,
+  `tutorGroup` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+  `campus` varchar(24) CHARACTER SET latin1 DEFAULT NULL,
+  `username` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `peopleDenbighID` (`peopleDenbighID`),
   KEY `staffCode` (`staffCode`),
