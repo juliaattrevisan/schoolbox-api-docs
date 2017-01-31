@@ -49,30 +49,22 @@
 
 
         $('#season').selectizeSelector({
+            {% if division.season.id %}
             value: {
                 id: {{ match.season.id }},
                 name: "{{ match.season.name }} - {{ match.season.start.localShort }} to {{ match.season.end.localShort }}"
             },
+            {% endif %}
             multiple: false,
+            ajax: {
+                url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
+                type: 'GET',
+                dataType: 'json'
+            },
             selectize: {
                 preload: true,
+                persist: true,
                 hideSelected: false,
-                load: function(query, callback) {
-                    // Load: get values from AJAX, and callback with result
-                    var ajaxSettings = {
-                        url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: { query: query }
-                    };
-                    $.ajax(ajaxSettings)
-                            .done(function(result) {
-                                callback(result)
-                            })
-                            .fail(function() {
-                                callback()
-                            })
-                },
                 score: function(search) {
                     return function(item) {
                         // Simply filter list, don't reorder
