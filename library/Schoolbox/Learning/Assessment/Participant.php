@@ -257,6 +257,18 @@ class Participant
     }
 
     /**
+     * Returns this Participant's published Human-Readable mark
+     *
+     * @return null|string
+     */
+    public function getPublishedHumanReadableMark()
+    {
+        $feedback = $this->findMostRecentPublishedFeedback();
+        return $feedback ? $feedback->getHumanReadableMark() : null;
+    }
+
+
+    /**
      * Determine what sort of objects are permitted in the Response collection
      *
      * @return string|null
