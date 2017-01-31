@@ -162,7 +162,9 @@ abstract class Evaluation_Import_Xml
 				));
 
 				if (method_exists($answerHandler, 'importMoodleAnswer')) {
-					$answerHandler->importMoodleAnswer($currentQuestion->answers, $question_id);
+				    /** @var SimpleXMLElement $answers */
+				    $answers = $currentQuestion->answers;
+					$answerHandler->importMoodleAnswer($answers, $question_id);
 				}
 			}
 		}
