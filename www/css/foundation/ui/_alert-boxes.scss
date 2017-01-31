@@ -84,8 +84,7 @@ $alert-default-background: darken($body-bg, 10%);
     }
 }
 
-.alert-box:empty,
-.toast:empty{
+.alert-box:empty{
     display: none;
 }
 
@@ -98,16 +97,16 @@ $alert-default-background: darken($body-bg, 10%);
     text-align: center;
     font-size: $base-font-size;
     position: fixed;
-    bottom: -60px;
+    bottom: 0;
     margin: 0 10%;
     left: $off-canvas-width;
     right: 0;
     z-index: 100;
-    display: none;
-    @include transition(bottom, .3s, ease-in-out, 0s);
+    display: block;
+    @include transform(translateY(100%));
+    @include transition(all, .3s, cubic-bezier(0.65, 0.05, 0.36, 1), 0s);
     &.pop{
-        bottom: 0;
-        display: block !important;
+        @include transform(translateY(0));
     }
     .close {
         @include alert-close();
