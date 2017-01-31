@@ -18,6 +18,20 @@ if ((isset($this->arg[0]) && is_numeric($this->arg[0])) && (isset($this->arg[1])
     $url .= $assessmentId.'/'.$this->arg[1]; //assessmentId/userId
     $this->localRedir($url, null, 301);
 }
+//If no user has been passed, use current user
+elseif (isset($this->arg[0]) && is_numeric($this->arg[0])) {
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    //Is it there?
+    try {
+        $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
+        $this->pageNotFound();
+    }
+    $assessmentId = $submissionBox->getAssessmentId();
+    $url .= $assessmentId; //assessmentId
+    $this->localRedir($url, null, 301);
+}
 else {
     $this->pageNotFound();
 }
