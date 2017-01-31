@@ -174,7 +174,7 @@ abstract class DescriptorList implements Twiggable, Calculable
      */
     public function getSelectedDescriptors()
     {
-        return $this->getAllDescriptors()->filter(function ($item){
+        return $this->getAllDescriptors()->filter(function (Descriptor $item){
             return $item->isSelected();
         });
     }
