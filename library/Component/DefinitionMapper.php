@@ -11,7 +11,8 @@
 
 /**
  * Class Component_DefinitionMapper
- * @method Component_Definition findOneByColumn($columnName, $columnValue, $order = [])
+ * @method Component_Definition findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ * @method Component_Definition findById($identifierValue)
  */
 class Component_DefinitionMapper extends Schoolbox\Mapper {
 
@@ -19,55 +20,14 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 	protected function mapping () {
 		$this->hasTable('component_definition');
 		$this->hasModel(Component_Definition::class);
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'name',
-			'property'   => 'name',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'class',
-			'property'   => 'class',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'description',
-			'property'   => 'description',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'module',
-			'property'   => 'module',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'visible',
-			'property'   => 'visible',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'multiple',
-			'property'   => 'multiple',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'component_category',
-			'property'   => 'componentCategory',
-			'type'       => self::TYPE_STRING,
-		));
-
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('class', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('module', self::TYPE_STRING);
+        $this->uses('visible', self::TYPE_STRING);
+        $this->uses('multiple', self::TYPE_STRING);
+        $this->uses('component_category', self::TYPE_STRING);
 	}
 
 	/**
