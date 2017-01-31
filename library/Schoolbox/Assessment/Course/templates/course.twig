@@ -31,7 +31,9 @@ Usage:
             messages: {
                 name: "Please enter a name for this course.",
                 parent: "Please select a faculty or subject for this course."
-            }
+            },
+            onfocusout: false,
+            onkeyup: false
         };
 
         $("#update-course-form").alaressValidate(modifyValidation);
