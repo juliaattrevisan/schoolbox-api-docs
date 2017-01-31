@@ -1,10 +1,16 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Online Submission</h2>
-        <section class="content">
-            <article>
-                {{ file.storage.read | purify }}
-            </article>
-        </section>
+        {% if file.exists %}
+            <section class="content">
+                <article>
+                    {{ file.storage.read | purify }}
+                </article>
+            </section>
+        {% else %}
+            <div data-alert="" class="alert-box warning">
+                File not found
+            </div>
+        {% endif %}
     </div>
 </div>

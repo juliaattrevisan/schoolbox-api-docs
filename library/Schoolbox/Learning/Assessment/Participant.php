@@ -210,11 +210,16 @@ class Participant
      */
     public function findMostRecentSubmittedResponse()
     {
-        $filteredResponses = $this->allResponses->filter(function(IResponse $response) {
-            return $response->isSubmitted();
-        });
-
-        return $filteredResponses->sortBy('submittedAt', 'desc')->first();
+        /** @var IResponse|null $mostRecentSubmittedResponse */
+        $mostRecentSubmittedResponse = null;
+        foreach($this->allResponses as $response){
+            if($response->isSubmitted()){
+                if(!$mostRecentSubmittedResponse || $response->getSubmittedAt()->gt($mostRecentSubmittedResponse->getSubmittedAt())){
+                    $mostRecentSubmittedResponse = $response;
+                }
+            }
+        }
+        return $mostRecentSubmittedResponse;
     }
 
     /**

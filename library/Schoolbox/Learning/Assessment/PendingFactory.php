@@ -192,18 +192,40 @@ class PendingFactory
      */
     private $assessmentExtraStudentIds = [];
 
+    /**
+     * Used to determine if an assessment requires chasing
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $toChaseLimit;
+
+    /**
+     * @var \Alaress_Date_NullDate
+     */
+    private $nullDate;
+
+    /**
+     * Should we include Tasks in the results ? As opposed to just Quiz + DueWork ?
+     *
+     * @var int
+     */
+    private $includeTasks;
 
     /**
      * @param User $viewee
      * @param \External_UserInterface|null $externalUser
      * @param \External_ClassInterface $externalClass
      * @param Term $term
+     * @param \Alaress_Date_Format $toChaseLimit
+     * @param bool $includeTasks
      */
     public function __construct(
         User $viewee,
         \External_UserInterface $externalUser = null,
         \External_ClassInterface $externalClass,
-        Term $term
+        Term $term,
+        \Alaress_Date_Format $toChaseLimit,
+        $includeTasks
     ) {
         $this->viewee = $viewee;
         $this->database = \Database::getInstance();
@@ -211,6 +233,9 @@ class PendingFactory
         $this->externalClass = $externalClass;
         $this->assessmentsCache = new Collection();
         $this->term = $term;
+        $this->toChaseLimit = $toChaseLimit;
+        $this->nullDate = new \Alaress_Date_NullDate();
+        $this->includeTasks = $includeTasks;
     }
 
 
@@ -249,17 +274,17 @@ class PendingFactory
         // - Now process result arrays, inserting missing Participants when required.
 
         $quizResults = $this->getQuizResponsesAndFeedback();
-        $taskResults = $this->getTaskResponsesAndFeedback();
         $dueWorkResponses = $this->getDueWorkResponses();
         $dueWorkFeedbackResults = $this->getDueWorkFeedbacks();
+        $taskResults = $this->getTaskResponsesAndFeedback();
 
         $this->getMissingUsers();
 
         // Process the results, creating extra Participants where required, pulling User from caches
         $this->hydrateQuizResults($quizResults);
-        $this->hydrateTaskResults($taskResults);
         $this->hydrateDueWorkResponses($dueWorkResponses);
         $this->hydrateDueWorkFeedbacks($dueWorkFeedbackResults);
+        $this->hydrateTaskResults($taskResults);
 
         return $this->assessmentsCache;
     }
@@ -384,6 +409,13 @@ class PendingFactory
         // Get Assessments for Groups and Subjects administered/taught by User
         $folderIds = array_unique(array_merge($this->classIds, $this->groupIds));
 
+        $taskSelect = $this->includeTasks ?
+            "tk.id                    AS 'tk.id',
+             tk.requires_confirmation AS 'tk.requires_confirmation'," : '';
+        $taskJoin = $this->includeTasks ? 'LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL' : '';
+        $taskUser = $this->includeTasks ? "OR tk.user_id = {$this->viewee->getId()}" : '';
+        $taskId   = $this->includeTasks ? "OR tk.id IS NOT NULL" : '';
+
         $folderClause = count($folderIds) ? " OR f.id IN (" . implode(',', $folderIds) . ") " : '';
         $query1 = "
         SELECT 
@@ -408,15 +440,14 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
-                tk.id        AS 'tk.id',
-                tk.requires_confirmation AS 'tk.requires_confirmation',
+                $taskSelect
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
             FROM assessment a 
             LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
-            LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            $taskJoin
             
             JOIN assessment_folder af   ON af.assessment_id = a.id 
             JOIN folder f               ON f.id = af.folder_id AND f.deleted_at IS NULL
@@ -424,8 +455,8 @@ class PendingFactory
             LEFT JOIN folder_code fc    ON fc.folder_id = f.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug     ON ug.cid = f.id
             
-            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
@@ -453,15 +484,14 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
-                tk.id        AS 'tk.id',
-                tk.requires_confirmation AS 'tk.requires_confirmation',
+                $taskSelect
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
             FROM assessment a 
             LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
-            LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            $taskJoin
             
             JOIN project_assessment pra ON pra.assessment_id = a.id
             JOIN project p              ON pra.project_id = p.id
@@ -472,8 +502,8 @@ class PendingFactory
             LEFT JOIN folder_code fc    ON fc.folder_id = pf.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug     ON ug.cid = pf.id
             
-            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
@@ -501,15 +531,14 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
-                tk.id        AS 'tk.id',
-                tk.requires_confirmation AS 'tk.requires_confirmation',
+                $taskSelect
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
             FROM assessment a 
             LEFT JOIN assess qz                            ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw                    ON dw.assessment_id = a.id AND dw.deleted = 0
-            LEFT JOIN task tk                              ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            $taskJoin
             
             JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
             JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id
@@ -523,8 +552,8 @@ class PendingFactory
             LEFT JOIN folder_code fc                       ON fc.folder_id = cif.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
-            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
@@ -553,15 +582,14 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
-                tk.id        AS 'tk.id',
-                tk.requires_confirmation AS 'tk.requires_confirmation',
+                $taskSelect
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
             FROM assessment a 
             LEFT JOIN assess qz                            ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw                    ON dw.assessment_id = a.id AND dw.deleted = 0
-            LEFT JOIN task tk                              ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            $taskJoin
             
             JOIN project_assessment pa                     ON pa.assessment_id = a.id
             JOIN project p                                 ON p.id = pa.project_id
@@ -579,7 +607,7 @@ class PendingFactory
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
             WHERE a.deleted_at IS NULL
-            AND ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
+            AND ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
@@ -880,7 +908,7 @@ class PendingFactory
             JOIN assess_attempt qa ON qa.assess_id = q.assess_id AND qa.deleted_at IS NULL
             JOIN assess_section qs ON qs.assess_id = q.assess_id AND qs.deleted_at IS NULL
             WHERE " . implode(' AND ', $pb->getWhere()) . "
-            GROUP BY q.assessment_id, qa.attempt_id, qa.user_id
+            GROUP BY q.assessment_id, qa.user_id, qa.attempt_id
         ";
 
         $statement = $this->database->prepare($query);
@@ -917,10 +945,12 @@ class PendingFactory
                 tc.id                   AS 'tc.id',
                 tc.student_id           AS 'tc.student_id',
                 tc.marking_user_id      AS 'tc.marking_user_id',
-                tc.completion_date      AS 'tc.completion_date'
+                max(tc.completion_date) AS 'tc.completion_date'
             FROM task t
             JOIN task_completion tc ON tc.task_id = t.id
-            WHERE " . implode(' AND ', $pb->getWhere());
+            WHERE " . implode(' AND ', $pb->getWhere()) . "
+            GROUP BY t.assessment_id, tc.student_id" . "
+            ORDER BY t.assessment_id";
 
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
@@ -960,7 +990,8 @@ class PendingFactory
                 ss.updated_at      AS 'ss.updated_at'
             FROM submission_box sb
             JOIN student_submission ss ON ss.box_id = sb.id
-            WHERE " . implode(' AND ', $pb->getWhere());
+            WHERE " . implode(' AND ', $pb->getWhere()) . "
+            ORDER BY sb.assessment_id";
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
         $dueWorkSubmissions = $statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -998,7 +1029,8 @@ class PendingFactory
                 sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
             FROM submission_box sb
             JOIN submission_return sr ON sr.box_id = sb.id
-            WHERE " . implode(' AND ', $pb->getWhere());
+            WHERE " . implode(' AND ', $pb->getWhere()) . "
+            ORDER BY sb.assessment_id";
 
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
@@ -1056,20 +1088,27 @@ class PendingFactory
      * @var string|null $quizResults[]['qa.reviewed_at']
      * @var int         $quizResults[]['qa.first_section_id']
      */
-    private function hydrateQuizResults($quizResults)
+    private function hydrateQuizResults(array $quizResults)
     {
-        foreach ($quizResults as $row) {
+        $countRows = count($quizResults);
+        if(!count($quizResults)){
+            return;
+        }
+        $lastIdx = $countRows - 1;
+
+        foreach ($quizResults as $rowIdx => $row) {
             $quiz = $this->assessmentsCache[$row['q.assessment_id']];
             $userId = $row['qa.user_id'];
             $response = new QuizAttempt();
             $response->setId($row['qa.attempt_id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
-            $response->setSubmittedAt($this->getDateFromString($row['qa.finish']));
+            $finishDate = $this->getDateFromString($row['qa.finish']);
+            $response->setSubmittedAt($finishDate);
             $response->setFirstSectionId($row['qs.first_section_id']);
             $response->setAssessable($quiz);
-            $updatedAt = $row['qa.finish'] ?: $row['qa.start'];
-            $response->setUpdatedAt($this->getDateFromString($updatedAt));
+            $updatedAt = $finishDate->isNull() ? $this->getDateFromString($row['qa.start']) : $finishDate;
+            $response->setUpdatedAt($updatedAt);
 
             $quiz->getResponses()->add($response);
             $participants = $quiz->getAllParticipants();
@@ -1084,8 +1123,9 @@ class PendingFactory
             if (!is_null($row['qa.reviewed_at'])) {
                 $feedback = new QuizReview();
                 $feedback->setId($row['qa.attempt_id']);
-                $feedback->setPublishedAt($this->getDateFromString($row['qa.reviewed_at']));
-                $feedback->setUpdatedAt($this->getDateFromString($row['qa.reviewed_at']));
+                $reviewedAt = $this->getDateFromString($row['qa.reviewed_at']);
+                $feedback->setPublishedAt($reviewedAt);
+                $feedback->setUpdatedAt($reviewedAt);
 
                 $feedback->setResponse($response);
                 $feedback->setAssessable($quiz);
@@ -1094,7 +1134,48 @@ class PendingFactory
                 $quiz->getFeedbacks()->add($feedback);
                 $participants[$userId]->getAllFeedbacks()->add($feedback);
             }
+
+            // Have we reached the last row for an Assessment ?
+            if($rowIdx == $lastIdx || $quiz->getId() != $quizResults[$rowIdx + 1]['q.assessment_id']){
+                $this->checkAssessmentRelevance($quiz);
+            }
         }
+    }
+
+    /**
+     * Checks if the assessment requires marking or chasing, and discards if neither to save memory.
+     *
+     * @param IAssessable $assessment
+     */
+    protected function checkAssessmentRelevance(IAssessable $assessment)
+    {
+        // Does this assessment require marking or chasing ?
+        if(!$this->isMarkingRequired($assessment) && !$this->isChasingRequired($assessment)){
+            unset($this->assessmentsCache[$assessment->getId()]);
+        }
+    }
+
+
+    /**
+     * Returns whether the assessment has students who require marking
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function isMarkingRequired(IAssessable $assessment)
+    {
+        return $assessment->numMarkingRequired() > 0;
+    }
+
+    /**
+     * Returns whether the assessment contains participants who require chasing
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function isChasingRequired(IAssessable $assessment)
+    {
+        return $assessment->getDueAt()->lt($this->toChaseLimit) && $assessment->numNoResponseOrFeedback() > 0;
     }
 
     /**
@@ -1108,17 +1189,24 @@ class PendingFactory
      * @var string $taskResults[]['tc.marking_user_id']
      * @var string $taskResults[]['tc.completion_date']
      */
-    private function hydrateTaskResults($taskResults)
+    private function hydrateTaskResults(array $taskResults)
     {
-        foreach ($taskResults as $row) {
+        $countRows = count($taskResults);
+        if(!count($taskResults)){
+            return;
+        }
+        $lastIdx = $countRows - 1;
+
+        foreach ($taskResults as $rowIdx => $row) {
             $task = $this->assessmentsCache[$row['t.assessment_id']];
             $userId = $row['tc.student_id'];
             $response = new TaskCompletion();
             $response->setId($row['tc.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setAssessable($task);
-            $response->setCreatedAt($this->getDateFromString($row['tc.completion_date']));
-            $response->setUpdatedAt($this->getDateFromString($row['tc.completion_date']));
+            $completedAt = $this->getDateFromString($row['tc.completion_date']);
+            $response->setCreatedAt($completedAt);
+            $response->setUpdatedAt($completedAt);
 
             // TODO - sigh replace this with composition ASAP
             $response->markAs($row['tc.student_id'] == $row['tc.marking_user_id']
@@ -1126,28 +1214,32 @@ class PendingFactory
                 : ICompletion::STATUS_COMPLETED
             );
 
-            $task->getResponses()->add($response);
+            $task->getResponses()->setOffset($response->getId(), $response);
             $participants = $task->getAllParticipants();
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $task);
             }
-            $participants[$userId]->getAllResponses()->add($response);
-
+            $participants[$userId]->getAllResponses()->setOffset($response->getId(), $response);
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
             if ($userId != $row['tc.marking_user_id']) {
                 $feedback = new TaskFeedback();
                 $feedback->setId($row['tc.id']);
-                $feedback->setPublishedAt($this->getDateFromString($row['tc.completion_date']));
-                $feedback->setUpdatedAt($this->getDateFromString($row['tc.completion_date']));
+                $feedback->setPublishedAt($completedAt);
+                $feedback->setUpdatedAt($completedAt);
                 $feedback->setResponse($response);
                 $feedback->setAssessable($task);
 
-                $response->getAllFeedback()->add($feedback);
-                $task->getFeedbacks()->add($feedback);
-                $participants[$userId]->getAllFeedbacks()->add($feedback);
+                $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
+                $task->getFeedbacks()->setOffset($feedback->getId(), $feedback);
+                $participants[$userId]->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
+            }
+
+            // Have we reached the last row for an Assessment ?
+            if($rowIdx == $lastIdx || $task->getId() != $taskResults[$rowIdx + 1]['t.assessment_id']){
+                $this->checkAssessmentRelevance($task);
             }
         }
     }
@@ -1164,9 +1256,10 @@ class PendingFactory
      * @var int $dueWorkResponses['ss.submitted_at']
      * @var int $dueWorkResponses['ss.updated_at']
      */
-    private function hydrateDueWorkResponses($dueWorkResponses)
+    private function hydrateDueWorkResponses(array $dueWorkResponses)
     {
         foreach ($dueWorkResponses as $row) {
+
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId = $row['ss.owner'];
             $response = new DueWorkSubmission();
@@ -1177,14 +1270,14 @@ class PendingFactory
             $response->setSubmittedAt($this->getDateFromString($row['ss.submitted_at']));
             $response->setUpdatedAt($this->getDateFromString($row['ss.updated_at']));
 
-            $dueWork->getResponses()->add($response);
+            $dueWork->getResponses()->setOffset($response->getId(), $response);
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
-            $participants[$userId]->getAllResponses()->add($response);
+            $participants[$userId]->getAllResponses()->setOffset($response->getId(), $response);
         }
     }
 
@@ -1193,9 +1286,15 @@ class PendingFactory
      *
      * @param array $dueWorkFeedbackResults
      */
-    private function hydrateDueWorkFeedbacks($dueWorkFeedbackResults)
+    private function hydrateDueWorkFeedbacks(array $dueWorkFeedbackResults)
     {
-        foreach ($dueWorkFeedbackResults as $row) {
+        $countRows = count($dueWorkFeedbackResults);
+        if(!count($dueWorkFeedbackResults)){
+            return;
+        }
+        $lastIdx = $countRows - 1;
+
+        foreach ($dueWorkFeedbackResults as $rowIdx => $row) {
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId = $row['sr.owner'];
             $feedback = new DueWorkFeedback();
@@ -1204,14 +1303,19 @@ class PendingFactory
             $feedback->setPublishedAt($this->getDateFromString($row['sr.published_at']));
             $feedback->setAssessable($dueWork);
 
-            $dueWork->getFeedbacks()->add($feedback);
+            $dueWork->getFeedbacks()->setOffset($feedback->getId(), $feedback);
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
-            $participants[$userId]->getAllFeedbacks()->add($feedback);
+            $participants[$userId]->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
+
+            // Have we reached the last row for an Assessment ?
+            if($rowIdx == $lastIdx || $dueWork->getId() != $dueWorkFeedbackResults[$rowIdx + 1]['sb.assessment_id']){
+                $this->checkAssessmentRelevance($dueWork);
+            }
         }
     }
 
@@ -1287,7 +1391,7 @@ class PendingFactory
     private function getDateFromString($dateString, $format = \Alaress_Date_Format::DATABASE_FORMAT)
     {
         if (empty($dateString)) {
-            return new \Alaress_Date_NullDate();
+            return $this->nullDate;
         }
         return new \Alaress_Date_Format($dateString, $format);
     }

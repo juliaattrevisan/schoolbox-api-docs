@@ -6,6 +6,8 @@
  */
 namespace Schoolbox\Learning;
 
+use Alaress\Paginator\Paginator;
+use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
@@ -33,6 +35,9 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 
 class Controller extends Base
 {
+    // Enable pagination of both part1 and part2 of the screen, with this many items per page.
+    const COUNT_ASSESSMENTS_PER_PAGE = 100;
+
     /**
      * @var QuizMapper
      */
@@ -79,7 +84,6 @@ class Controller extends Base
 
     /** @var Timetable_ColourMapper */
     private $timetableColourMapper;
-
 
     /**
      * Controller constructor.
@@ -182,12 +186,16 @@ class Controller extends Base
             : new \External_User();
 
         $term = TermMapper::getInstance()->findForToday();
+        $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
-        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term);
+        // Should we include tasks?
+        $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
+
+        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks);
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */
-        $assessmentsToMark = new Collection();
+        $assessmentsToMark = $this->assessmentMapperProxy->createCollection();
         foreach($assessments as $assessment){
             if($assessment->numMarkingRequired()){
                 $assessmentsToMark->add($assessment);
@@ -196,20 +204,47 @@ class Controller extends Base
         $assessmentsToMark->sortBy('dueAt', 'asc');
 
         /** @var IAssessable[] $assessmentsToMark */
-        $assessmentsToChase = new Collection();
-        $tomorrow = (new \Alaress_Date_Format())->addDays(1);
+        $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
+
         foreach($assessments as $assessment){
-            if($assessment->getDueAt()->lt($tomorrow) && $assessment->numNoResponseOrFeedback()){
+            if($assessment->getDueAt()->lt($toChaseLimit) && $assessment->numNoResponseOrFeedback()){
                 $assessmentsToChase->add($assessment);
             }
         }
         $assessmentsToChase->sortBy('dueAt', 'asc');
+
+        $path = $this->request->url->get(PHP_URL_PATH);
+        $partOnePage = $this->request->query->get('p1', 1);
+        $partTwoPage = $this->request->query->get('p2', 1);
+        $url = "$path?p1=$partOnePage&p2=$partTwoPage";
+
+        // Pagination
+        $partOnePaginator = (new UrlPaginator())
+            ->setPaginator((new Paginator())->setTotal(count($assessmentsToMark))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
+            ->setUrl($url)
+            ->setParam('p1');
+        $partTwoPaginator = (new UrlPaginator())->setPaginator(
+            (new Paginator())->setTotal(count($assessmentsToChase))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
+            ->setUrl($url)
+            ->setParam('p2');
+
+        // Did user request a page that does not exist?
+        if($partOnePage < 0 || ($partOnePaginator->getPageCount() && $partOnePage > $partOnePaginator->getPageCount())){
+            throw new \DomainException("Invalid part one page: $partOnePage");
+        }
+        if($partTwoPage < 0 || ($partTwoPaginator->getPageCount() && $partTwoPage > $partTwoPaginator->getPageCount())){
+            throw new \DomainException("Invalid part two page: $partTwoPage");
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
             'viewer'             => $this->getUser(),
             'viewee'             => $viewee,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,
+            'partOnePaginator'   => $partOnePaginator,
+            'partOnePage'        => $partOnePage,
+            'partTwoPaginator'   => $partTwoPaginator,
+            'partTwoPage'        => $partTwoPage,
         ])->setTab('submission'));
     }
 
