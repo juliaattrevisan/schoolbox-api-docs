@@ -907,6 +907,22 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
+        // Get student contact types from config, and wrangle into a query
+        $studentContactTypes =
+            implode(
+                ',',
+                array_map(
+                    [$this->getDatabase(), 'smartQuote'],
+                    array_map(
+                        'trim',
+                        explode(',', Config::get('external_synergetic_student_contact_types'))
+                    )
+                )
+            );
+        if (strlen($studentContactTypes) === 0) {
+            $studentContactTypes = "'SC1','SC2'";
+        }
+
         $query = "
             SELECT DISTINCT
 				cp.NetworkLogin AS StudentContactNetworkLogin,
@@ -927,7 +943,7 @@ class External_Synergetic_User implements External_UserInterface
 			FROM dbo.vStudentContactAllAddress s
 			LEFT JOIN dbo.Community cp ON s.StudentContactID = cp.ID
 			LEFT JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
-            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
+            WHERE StudentContactType IN ({$studentContactTypes})
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             ORDER BY StudentContactID
