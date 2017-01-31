@@ -48,11 +48,10 @@
                     </tr>
                     {% for participant in dueWork.allParticipants %}
                     <tr>
-                        <td class="no-pad">
+                        <td>
                             <div class="card small-12">
                                 <a href="/search/user/{{ participant.user.id }}" title="View Profile">
-                                    <img src="/portrait?userId={{ participant.user.externalId }}&size=square64" alt="View Profile" />
-                                    <p>{{ participant.user.formatName('{lastname}, {firstname}') }}</p>
+                                    <h3>{{ participant.user.formatName('{lastname}, {firstname}') }}</h3>
                                 </a>
                             </div>
                         </td>
