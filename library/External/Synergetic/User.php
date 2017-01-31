@@ -927,7 +927,7 @@ class External_Synergetic_User implements External_UserInterface
 			FROM dbo.vStudentContactAllAddress s
 			LEFT JOIN dbo.Community cp ON s.StudentContactID = cp.ID
 			LEFT JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
-            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             ORDER BY StudentContactID
