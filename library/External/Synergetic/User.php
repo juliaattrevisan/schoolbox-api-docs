@@ -478,7 +478,7 @@ class External_Synergetic_User implements External_UserInterface
                 ON StudentContactCountryCode = StudentCountry.Code
             LEFT JOIN dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
-            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
+            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
         ;
@@ -617,7 +617,7 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
             LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
             LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
-            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
+            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             AND StudentBoarder = 'B'
@@ -673,7 +673,7 @@ class External_Synergetic_User implements External_UserInterface
             
             WHERE
                 StudentID = '$externalUserId'
-                AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
+                AND StudentContactType IN ('SC1', 'SC2', 'SC3')
                 AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
                 AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
         ;
