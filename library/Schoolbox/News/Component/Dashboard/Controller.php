@@ -109,7 +109,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 'news'                  => $newsByTopic,
                 'newsAll'               => $newsAll,
                 'topics'                => $topics,
-                'heading'               => $this->getConfig('componentname','value')
+                'heading'               => $this->getConfig('componentname','value'),
+                'allDefault'            => $this->getConfig('default', 'value'),
             ],
             true,
             false,
