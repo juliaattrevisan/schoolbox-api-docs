@@ -37,6 +37,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 
 class Module extends BaseModule
 {
@@ -125,6 +126,7 @@ class Module extends BaseModule
         $this->register('GET',  "$assRoute/modify", 'getUpdateAssessmentForm',  $canWrite,  $preloadAssessment); // a || c
         $this->register('POST', "$assRoute/delete", 'postDeleteAssessment',     $canWrite,  $preloadAssessment); // a || c
         $this->register('GET',  "$assRoute/status", 'getStatus',                $canWrite,  $preloadAssessment); // a || c
+        $this->register('GET',  "$assRoute/overview",'getOverview',             $canWrite,  $preloadAssessment); // a || c
 
         $this->register('GET',  "$assRoute/$studentParam",        'getSummary',            $participantView, $preloadParticipant); // s || p
         $this->register('GET',  "$assRoute/$studentParam/submit", 'getCreateResponseForm', $canSubmit, $preloadParticipant); // p
@@ -280,6 +282,7 @@ class Module extends BaseModule
             DueWorkResponseMapper::class,
             ['mapper' => $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class)]
         );
+        $dc['participantMapper'] = $injector->lazyNew(ParticipantDataSource::class);
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];

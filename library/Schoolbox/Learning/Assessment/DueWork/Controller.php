@@ -20,6 +20,7 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -49,6 +50,9 @@ class Controller extends Assessment\Controller
     /** @var DueWorkResponseMapper */
     private $dueWorkResponseMapper;
 
+    /** @var ParticipantMapper */
+    private $participantMapper;
+
     /**
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
@@ -60,6 +64,7 @@ class Controller extends Assessment\Controller
      * @param Rubric\ResultMapper           $resultSetMapper
      * @param WorkTypeMapper                $workTypeMapper
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
+     * @param ParticipantMapper             $participantMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -71,13 +76,15 @@ class Controller extends Assessment\Controller
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
         WorkTypeMapper $workTypeMapper,
-        DueWorkResponseMapper $dueWorkResponseMapper
+        DueWorkResponseMapper $dueWorkResponseMapper,
+        ParticipantMapper $participantMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->workTypeMapper        = $workTypeMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
+        $this->participantMapper     = $participantMapper;
     }
 
 
@@ -167,6 +174,77 @@ class Controller extends Assessment\Controller
                 $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
             )
         );
+    }
+
+    /**
+     * Shows a rubric overview
+     *
+     * @api   GET /learning/assessments/:assessmentId/overview
+     * @level 165
+     * @param IAssessable|Model $assessment
+     */
+    public function getOverview(IAssessable $assessment)
+    {
+        $data = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'dueWork'     => $assessment,
+        ];
+
+        if($assessment->getUseRubric()){
+            $rubric = $this->rubricMapper->findByDueWork($assessment);
+            $this->participantMapper->loadParticipationIntoAssessment($assessment);
+
+            $data = array_merge($data, [
+                'headers'  => $this->getRubricHeaders($rubric),
+                'marks'    => $this->getMarks($rubric, $assessment->getAllParticipants()),
+            ]);
+        }
+
+        $this->getResponse()->content->set([
+            'title'       => 'Overview',
+            'template'    => '@learningAssessment/dueWork/overview.twig',
+            'data'        => $data
+        ]);
+    }
+
+    /**
+     * @param Rubric\Rubric $rubric
+     * @return string[][] Indexed by group.name then criterion.id
+     */
+    protected function getRubricHeaders(Rubric\Rubric $rubric)
+    {
+        $headers = [];
+
+        foreach ($rubric->getTotalPerGroup() as $group) {
+            foreach ($group->getAllCriteria() as $criterion) {
+                $headers[$group->getName()][$criterion->getId()] = $criterion->getName();
+            }
+        }
+        return $headers;
+    }
+
+    /**
+     * @param Rubric\Rubric $rubric
+     * @param \ICollection|Participant[] $participants
+     * @return Rubric\Descriptor[][] Grouped in sets indexed by user.id
+     */
+    protected function getMarks(Rubric\Rubric $rubric, \ICollection $participants)
+    {
+        $marks = [];
+
+        foreach ($participants as $participant) {
+            $studentId = $participant->getUser()->getId();
+
+            // this will modify the "selection" of descriptors in the grid
+            $this->rubricMapper->applyStudentMark($rubric, $participant->getUser(), true);
+
+            foreach ($rubric->getSumPerGroup() as $group) {
+                foreach ($group->getAllCriteria() as $criterion) {
+                    $marks[$studentId][$criterion->getId()] = $criterion->getSelectedDescriptors()->first();
+                }
+            }
+        }
+        return $marks;
     }
 
     /**

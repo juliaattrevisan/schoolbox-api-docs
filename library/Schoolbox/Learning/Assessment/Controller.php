@@ -166,6 +166,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
     }
 
     /**
+     * Get an overview of rubric marks
+     *
+     * @param IAssessable $assessment
+     */
+    public function getOverview(IAssessable $assessment)
+    {
+        // For now, only DueWork uses this route.
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+    /**
      * Delete the given assessment.
      * Deletion is considered to be an idempotent method, so do not return an error on repeat attempts to delete an entity.
      *
