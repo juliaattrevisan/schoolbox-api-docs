@@ -862,6 +862,16 @@ $selector-width: 2.25rem;
 		input[type=checkbox]:not(.plain)+label.checkbox-label {
 			margin-top: 0.5rem;
 		}
+
+		/**
+		 * Foundation kills margin-bottom on ul li ul
+		 * Restore it to normal for lists inside information & action lists
+		 */
+		ul,
+		ol {
+			margin-#{$default-float}: $list-side-margin;
+			margin-bottom: $list-margin-bottom;
+		}
 	}
 	form {
 		margin: 0;
