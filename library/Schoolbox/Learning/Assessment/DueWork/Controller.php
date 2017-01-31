@@ -20,6 +20,7 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -33,6 +34,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 
 class Controller extends Assessment\Controller
 {
@@ -49,6 +51,9 @@ class Controller extends Assessment\Controller
     /** @var DueWorkResponseMapper */
     private $dueWorkResponseMapper;
 
+    /** @var ParticipantMapper */
+    private $participantMapper;
+
     /**
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
@@ -60,6 +65,7 @@ class Controller extends Assessment\Controller
      * @param Rubric\ResultMapper           $resultSetMapper
      * @param WorkTypeMapper                $workTypeMapper
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
+     * @param ParticipantMapper             $participantMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -71,13 +77,15 @@ class Controller extends Assessment\Controller
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
         WorkTypeMapper $workTypeMapper,
-        DueWorkResponseMapper $dueWorkResponseMapper
+        DueWorkResponseMapper $dueWorkResponseMapper,
+        ParticipantMapper $participantMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->workTypeMapper        = $workTypeMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
+        $this->participantMapper     = $participantMapper;
     }
 
 
@@ -167,6 +175,190 @@ class Controller extends Assessment\Controller
                 $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
             )
         );
+    }
+
+    /**
+     * Shows a rubric overview
+     *
+     * @api   GET /learning/assessments/:assessmentId/overview
+     * @level 165
+     * @param IAssessable|Model $assessment
+     */
+    public function getOverview(IAssessable $assessment)
+    {
+        $data = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                ->add([
+                    $assessment->getTitle(),
+                    $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]) ])
+                ->add(['Rubric Report','']),
+            'dueWork'     => $assessment,
+        ];
+
+        if($assessment->getUseRubric()){
+            $rubric = $this->rubricMapper->findByDueWork($assessment);
+            $this->participantMapper->loadParticipationIntoAssessment($assessment);
+
+            $data = array_merge($data, [
+                'headers'  => $this->getRubricHeaders($rubric),
+                'marks'    => $this->getMarks($rubric, $assessment->getAllParticipants()),
+            ]);
+        }
+
+        $this->getResponse()->content->set([
+            'title'       => 'Rubric Report',
+            'template'    => '@learningAssessment/dueWork/overview.twig',
+            'data'        => $data
+        ]);
+    }
+
+    /**
+     * Downloads a rubric overview
+     *
+     * @api   GET /learning/assessments/:assessmentId/overview/export?format=csv
+     * @level 165
+     * @param IAssessable|Model $assessment
+     */
+    public function downloadOverview(IAssessable $assessment)
+    {
+        if(!$assessment->getUseRubric()) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        $rubric = $this->rubricMapper->findByDueWork($assessment);
+        $this->participantMapper->loadParticipationIntoAssessment($assessment);
+
+        $basename = (new \Url($assessment->getTitle()))->getSlug();
+        $content = $this->array2csv($this->collateResultSquare($rubric, $assessment->getAllParticipants()));
+        $headers = $this->getResponse()->headers;
+
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', strlen($content));
+
+        $headers->set('Content-Disposition', "attachment; filename=\"$basename-results.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
+    }
+
+    /**
+     * @param Rubric\Rubric $rubric
+     * @return string[][] Indexed by group.name then criterion.id
+     */
+    protected function getRubricHeaders(Rubric\Rubric $rubric)
+    {
+        $headers = [];
+
+        foreach ($rubric->getTotalPerGroup() as $group) {
+            foreach ($group->getAllCriteria() as $criterion) {
+                $headers[$group->getName()][$criterion->getId()] = $criterion->getName();
+            }
+        }
+        return $headers;
+    }
+
+    /**
+     * @param Rubric\Rubric $rubric
+     * @param \ICollection|Participant[] $participants
+     * @return RubricDescriptor[][] Grouped in sets indexed by user.id
+     */
+    protected function getMarks(Rubric\Rubric $rubric, \ICollection $participants)
+    {
+        $marks = [];
+
+        foreach ($participants as $participant) {
+            $studentId = $participant->getUser()->getId();
+
+            // this will modify the "selection" of descriptors in the grid
+            $this->rubricMapper->applyStudentMark($rubric, $participant->getUser(), true);
+
+            foreach ($rubric->getSumPerGroup() as $group) {
+                foreach ($group->getAllCriteria() as $criterion) {
+                    $marks[$studentId][$criterion->getId()] = $criterion->getSelectedDescriptors()->first();
+                }
+            }
+        }
+        return $marks;
+    }
+
+    /**
+     * @param Rubric\Rubric $rubric
+     * @param Collection|Participant[] $participants
+     * @return array
+     */
+    protected function collateResultSquare(Rubric\Rubric $rubric, Collection $participants)
+    {
+        // array inside an array that's *nearly* empty...
+        $data = [['Name', 'External ID']];
+
+        // put header row in array
+        foreach ($this->getRubricHeaders($rubric) as $grouping => $criteria) {
+            foreach ($criteria as $id => $criterion) {
+                $data[0][] = "$grouping - $criterion";
+                $data[0][] = '';
+            }
+        }
+        $data[0][] = 'Total';
+
+        /**
+         * Collate by id, each sub-collection will contain only 1 User element
+         *
+         * @var Collection[] $participantsGrouped
+         */
+        $participantsGrouped = $participants->groupByCallback(function(Participant $participant){
+            return $participant->getUser()->getId();
+        })->getAll();
+
+        foreach ($this->getMarks($rubric, $participants) as $studentId => $marks) {
+            /** @var Participant $participant */
+            $participant = $participantsGrouped[$studentId]->first();
+            $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
+
+            $row = [$studentName, $participant->getUser()->getExternalId()];
+            $sum = '';
+
+            if (count($marks)) {
+                foreach ($marks as $mark) {
+                    if ($mark instanceof RubricDescriptor) {
+                        $row[] = $mark->getText();
+                        $row[] = $mark->getValue();
+                        $sum += $mark->getValue();
+                    } else {
+                        $row[] = $mark;
+                        $row[] = '';
+                    }
+                }
+                $row[] = $sum;
+
+            } else {
+                $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
+            }
+            $data[] = $row;
+        }
+
+        return $data;
+    }
+
+    /**
+     * The array data should obviously be in a CSV-compatible format (ie. rectangle)
+     *
+     * @param array $array
+     * @return string
+     */
+    protected function array2csv(array $array)
+    {
+        $fp = fopen('php://temp', 'w');
+        foreach ($array as $row) {
+            fputcsv($fp, $row);
+        }
+        rewind($fp);
+        $contents = stream_get_contents($fp);
+        fclose($fp);
+        return $contents;
     }
 
     /**

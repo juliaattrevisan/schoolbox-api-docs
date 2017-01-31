@@ -1,22 +1,26 @@
-<ul class="breadcrumb">
-    <li><a href="/submission/listSubmission">Submissions</a></li>
-    <li><a href="/submission/listSubmission/{{ box.duedate.getYear }}/{{ box.duedate.getMonth // 6 + 1 }}/{{ box.category.id }}">{{ box.category.name }}</a></li>
-    <li><a href="/submission/viewSubmission/{{ box.id }}">{{ box.name }}</a></li>
-    <li class="active"><a href="#">Overview</a></li>
-</ul>
+{#<ul class="breadcrumb">#}
+    {#<li><a href="/submission/listSubmission">Submissions</a></li>#}
+    {#<li><a href="/submission/listSubmission/{{ box.duedate.getYear }}/{{ box.duedate.getMonth // 6 + 1 }}/{{ box.category.id }}">{{ box.category.name }}</a></li>#}
+    {#<li><a href="/submission/viewSubmission/{{ box.id }}">{{ box.name }}</a></li>#}
+    {#<li class="active"><a href="#">Overview</a></li>#}
+{#</ul>#}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>Overview</h1>
+            <h1>Rubric Report for {{ dueWork.title }}</h1>
             <ul class="meta">
-                <li class="icon-due-work"><a href="/submission/viewSubmission/{{ box.id }}">{{ box.name }}</a></li>
-                <li class="icon-due-work">{{ box.workType.name }}</li>
+                <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
+                <li class="icon-calendar">Due {{ dueWork.dueAt.relative }} on {{ dueWork.dueAt.localShort }}</li>
             </ul>
         </div>
     </div>
     <nav>
-        <a href="/submission/overview/{{ box.id }}/csv" class="icon-download" title="Download CSV"></a>
+        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
     </nav>
 </div>
 
@@ -26,7 +30,7 @@
             <table>
                 <tbody>
                     <tr>
-                    {% if box.isRubric %}
+                    {% if dueWork.useRubric %}
                         <th rowspan="2"></th>
                         {% for group, criteria in headers %}
                             <th colspan="{{ criteria | length }}">{{ group }}</th>
@@ -43,20 +47,19 @@
                         <th>Marks</th>
                     {% endif %}
                     </tr>
-                    {% for student in students %}
+                    {% for participant in dueWork.allParticipants %}
                     <tr>
-                        <td class="no-pad">
+                        <td>
                             <div class="card small-12">
-                                <a href="/search/user/{{ student.id }}" title="View Profile">
-                                    <img src="/portrait?userId={{ student.externalId }}&size=square64" alt="View Profile" />
-                                    <p>{{ student.formatName('{lastname}, {firstname}') }}</p>
+                                <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+                                    <h3>{{ participant.user.formatName('{lastname}, {firstname}') }}</h3>
                                 </a>
                             </div>
                         </td>
-                        {% if box.isRubric %}
+                        {% if dueWork.useRubric %}
                             {% for criteria in headers %}
                                 {% for id, criterion in criteria %}
-                                    {% set mark = marks[student.id][id] %}
+                                    {% set mark = marks[participant.user.id][id] %}
                                     <td>
                                         <p>{{ mark.text }}</p>
                                         <p>{{ mark.value }}</p>
@@ -64,7 +67,7 @@
                                 {% endfor %}
                             {% endfor %}
                         {% else %}
-                            <td>{{ box.marks[student.id].displayValue }}</td>
+                            <td>{{ participant.publishedHumanReadableMark }}</td>
                         {% endif %}
                     </tr>
                     {% endfor %}
