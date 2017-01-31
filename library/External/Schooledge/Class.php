@@ -45,7 +45,6 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     public function getStudents($classCode)
     {
         $classQuery = $this->getClassCodeQuery($classCode);
-        $quotedDate = $this->getDatabase()->smartQuote(Alaress_Date_Format::now()->getDatabaseDate());
         $query      = "
             SELECT DISTINCT
                 s.FirstName    AS firstname,
@@ -63,7 +62,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.ID
 
             WHERE $classQuery
-            AND   $quotedDate BETWEEN CONVERT(date, t.StartDate) AND CONVERT(date, t.EndDate)
+            AND   t.Enabled = 1
 
             ORDER BY synergy_id ASC
         ";
@@ -76,7 +75,6 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     public function getTeacherName($classCode)
     {
         $classQuery = $this->getClassCodeQuery($classCode);
-        $quotedDate = $this->getDatabase()->smartQuote(Alaress_Date_Format::now()->getDatabaseDate());
         $query      = "
             SELECT DISTINCT tcs_staff.Code AS code
             FROM fc.TimetableSubject ts
@@ -87,7 +85,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             INNER JOIN fc.TimetableClassStaff tcs       ON tc.ID        = tcs.TimetableClassId
             INNER JOIN dbo.Staff              tcs_staff ON tcs.PersonID = tcs_staff.ID
             WHERE $classQuery
-            AND   $quotedDate BETWEEN CONVERT(date, t.StartDate) AND CONVERT(date, t.EndDate)
+            AND   t.Enabled = 1
 
             UNION
 
@@ -101,7 +99,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             INNER JOIN fc.TimetableClassInstanceStaff tcis       ON tci.ID        = tcis.TimetableClassInstanceId
             INNER JOIN dbo.Staff                      tcis_staff ON tcis.PersonID = tcis_staff.ID
             WHERE $classQuery
-            AND   $quotedDate BETWEEN CONVERT(date, t.StartDate) AND CONVERT(date, t.EndDate)
+            AND   t.Enabled = 1
 
             ORDER BY code ASC
         ";
