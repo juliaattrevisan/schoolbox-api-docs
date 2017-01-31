@@ -78,19 +78,20 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
             // noop
         }
 
+        $campusTitles = Array();
+        $userCampuses = $this->getUser()->getCampusCollection();
+
+        foreach ($userCampuses as $campus) {
+            $campusName = $campus->getName();
+            $campusCode = $campus->getExtTimetableCode();
+            $campusTitles[$campusCode] = $campusTitles[$campusCode].'/'.$campusName;
+        }
+
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
         while ($currentTimestamp < $endTimestamp) {
 
             //Combine titles of campuses with the same code (if any)
-            $campusTitles = Array();
-            $userCampuses = $this->getUser()->getCampusCollection();
-
-            foreach ($userCampuses as $campus) {
-                $campusName = $campus->getName();
-                $campusCode = $campus->getExtTimetableCode();
-                $campusTitles[$campusCode] = $campusTitles[$campusCode].'/'.$campusName;
-            }
 
             $campusMerged = Array();
             
