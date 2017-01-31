@@ -984,7 +984,7 @@ class PendingFactory
         }
         $pb = new PredicateBuilder($this->database, '');
         $pb->equals('sb.deleted', 0);
-        $pb->isNull('sr.published_at');
+        $pb->notNull('sr.published_at');
         $pb->equals('sb.assessment_id', $this->dueWorkAssessmentIds);
         $query = "
             SELECT
