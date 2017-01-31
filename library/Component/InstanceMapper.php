@@ -347,7 +347,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             }
         }
 
-        return parent::save($dirtyInstanceCollection, false);
+        return parent::save($dirtyInstanceCollection);
     }
 
     public function delete($object)
