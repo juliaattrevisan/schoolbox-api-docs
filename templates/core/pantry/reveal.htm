@@ -105,16 +105,30 @@
 
         <h2 class="subheader">Toast Reveal</h2>
         <section class="content">
-            <a class="button" toast-reveal>Pop Toast!</a>
+            <a class="button" toast-reveal-success>Success</a>
+            <a class="button" toast-reveal-fail>Fail</a>
             <div id='toaster' class="toast" data-toast></div>
         </section>
         <script type="text/javascript">
-        $('a[toast-reveal]').on('click', function(event) {
+        $('a[toast-reveal-success]').on('click', function(event) {
             event.preventDefault();
             var $toast = $('[data-toast]');
-            $toast.toastActivate();
-            $toast.toastTimeout({text: 'Toast!', duration: 3000, css: 'success'});
+            $toast.toastActivate({text: 'Warming toaster...'});
+            window.setTimeout( function () {
+                $toast.toastTimeout({text: 'Toast!', duration: 3000, css: 'success'});
+            }, 1000);
+
         });
+
+        $('a[toast-reveal-fail]').on('click', function(event) {
+            event.preventDefault();
+            var $toast = $('[data-toast]');
+            $toast.toastActivate({text: 'Warming toaster...'});
+            window.setTimeout( function () {
+                $toast.toastTimeout({text: 'Burnt Toast!', duration: 3000, css: 'alert'});
+            }, 1000);
+        });
+
         </script>
     </div>
 </div>
