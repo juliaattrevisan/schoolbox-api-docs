@@ -29,8 +29,7 @@ elseif (isset($this->arg[0]) && is_numeric($this->arg[0])) {
         $this->pageNotFound();
     }
     $assessmentId = $submissionBox->getAssessmentId();
-    $userId = $_SESSION['id'];
-    $url .= $assessmentId.'/'.$userId; //assessmentId/userId
+    $url .= $assessmentId; //assessmentId
     $this->localRedir($url, null, 301);
 }
 else {
