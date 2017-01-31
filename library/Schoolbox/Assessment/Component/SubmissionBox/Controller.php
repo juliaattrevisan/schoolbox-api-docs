@@ -208,6 +208,8 @@ class Controller extends BaseController
      * @level 150
      *
      * @param SubmissionBox $box
+     * @deprecated 165 Ported to IAssessable route
+     * @see \Schoolbox\Learning\Assessment\DueWork\Controller::getOverview()
      */
     public function viewOverview(SubmissionBox $box)
     {
