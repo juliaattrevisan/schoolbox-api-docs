@@ -204,6 +204,22 @@ abstract class EventBase implements EventInterface
     }
 
     /**
+     * Gets date of event in format like this: 19th Dec 2017
+     *
+     * @return string
+     */
+    public function getDate()
+    {
+        $startDate = $this->getStartTime()->getDateOnly();
+        if (!$this->getAllDay()) {
+            $formattedTime = $startDate . ', ' . $this->getTime();
+        } else {
+            $formattedTime = $startDate;
+        }
+        return $formattedTime;
+    }
+
+    /**
      * Special time formatting
      *
      * @return string
