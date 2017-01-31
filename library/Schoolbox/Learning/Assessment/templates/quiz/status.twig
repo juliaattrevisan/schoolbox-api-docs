@@ -208,13 +208,11 @@
                 },
                 userList: $participantList,
                 onSubmit: function (toDelete) {
-                    var list = toDelete.map(function () {
-                        return $(this).find('[data-interaction-delete]').data('interactionDelete');
-                    }).get();
+                    var userList = toDelete.map(function () { return $(this).data('interactionDraft'); }).get();
 
                     $.post(
                         '/assess/deleteAttempt',
-                        { attemptIds: list }
+                        { userIds: userList, assessmentId: {{ assessment.id }} }
                     ).always(function () {
                         location.reload();
                     });

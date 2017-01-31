@@ -11,44 +11,104 @@
 
 /* Get a list of questions and answers to softdelete
  */
-$assessHandler = new Assess_Main();
-$attemptHandler = new Assess_Attempt();
-$responseHandler = new Assess_Response();
-$groupHandler = new Group();
-
-$user_id = $this->arg[1];
 
 /* Check that you can delete these attempts first
  */
-$allAttempts = array();
+use Schoolbox\Application\Exception\NotFound;
 
-foreach ($_POST['attemptIds'] as $currentAttempt) {
-	if (is_numeric($currentAttempt)) {
-		$attempt = $attemptHandler->getByID($currentAttempt);
+$deleterer = new Deleterer();
+$attemptsToDelete = [];
 
-		if (!$assessHandler->isValidUrlAccess($attempt['assess_id'])) {
-			$this->pageNotFound();
-		}
+if (isset($_POST['userIds']) && isset($_POST['assessmentId'])) {
 
-		$attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
+    $quiz = Schoolbox\Learning\Quiz\Mapper::getInstance()->findOneByColumn('assessment_id', $_POST['assessmentId']);
 
-		$allAttempts[] = $attempt;
+    $userAttemptIds = Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance()->findIdsByColumnList([
+        'user_id'     => $_POST['userIds'],
+        'assess_id'   => $quiz->getId(),
+        'reviewed_at' => null
+    ]);
 
-		if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
-			error(142);
-		}
-	}
+    foreach ($userAttemptIds as $attemptId) {
+        $attemptsToDelete[] = $deleterer->getAttempt($attemptId);
+    }
+}
+
+foreach ($_POST['attemptIds'] as $attemptId) {
+    $attemptsToDelete[] = $deleterer->getAttempt($attemptId);
 }
 
 /* Multiple soft-delete
  */
-foreach ($allAttempts as $currentAttempt) {
-	$responseHandler->deleteResponsesForAttempt($currentAttempt['attempt_id']);
-
-	$attemptHandler->update(array(
-		'attempt_id' => $currentAttempt['attempt_id'],
-		'deleted_at' => 'NOW()'
-	));
+foreach ($attemptsToDelete as $currentAttempt) {
+    $deleterer->delete($currentAttempt);
 }
 
 SitePage::backToTheFuture(1);
+
+
+class Deleterer
+{
+    /** @var Assess_Main  */
+    protected $assessHandler;
+
+    /** @var Assess_Attempt  */
+    protected $attemptHandler;
+
+    /** @var Assess_Response  */
+    protected $responseHandler;
+
+    /** @var Group  */
+    protected $groupHandler;
+
+
+    /**
+     * Deleterer constructor.
+     */
+    public function __construct()
+    {
+        $this->assessHandler   = new Assess_Main();
+        $this->attemptHandler  = new Assess_Attempt();
+        $this->responseHandler = new Assess_Response();
+        $this->groupHandler    = new Group();
+    }
+
+
+    /**
+     * @param $attemptId
+     * @return array|bool|null
+     */
+    public function getAttempt($attemptId)
+    {
+        if (is_numeric($attemptId)) {
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
+        }
+
+        $attempt = $this->attemptHandler->getByID($attemptId);
+
+        if (!$this->assessHandler->isValidUrlAccess($attempt['assess_id'])) {
+            throw new NotFound();
+        }
+
+        $assess = $attempt['assess'] = $this->assessHandler->getByID($attempt['assess_id']);
+
+        if (!$this->assessHandler->isOwner($assess['assess_id']) && ($this->groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
+            throw Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
+        }
+
+        return $attempt;
+    }
+
+
+    /**
+     * @param array $attempt
+     */
+    public function delete(array $attempt)
+    {
+        $this->responseHandler->deleteResponsesForAttempt($attempt['attempt_id']);
+        $this->attemptHandler->update(array(
+            'attempt_id' => $attempt['attempt_id'],
+            'deleted_at' => 'NOW()'
+        ));
+    }
+}
