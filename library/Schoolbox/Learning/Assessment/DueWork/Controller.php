@@ -34,6 +34,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 
 class Controller extends Assessment\Controller
 {
@@ -208,6 +209,39 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Downloads a rubric overview
+     *
+     * @api   GET /learning/assessments/:assessmentId/overview/export?format=csv
+     * @level 165
+     * @param IAssessable|Model $assessment
+     */
+    public function downloadOverview(IAssessable $assessment)
+    {
+        if(!$assessment->getUseRubric()) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        $rubric = $this->rubricMapper->findByDueWork($assessment);
+        $this->participantMapper->loadParticipationIntoAssessment($assessment);
+
+        $basename = (new \Url($assessment->getTitle()))->getSlug();
+        $content = $this->array2csv($this->collateResultSquare($rubric, $assessment->getAllParticipants()));
+        $headers = $this->getResponse()->headers;
+
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', strlen($content));
+
+        $headers->set('Content-Disposition', "attachment; filename=\"$basename-results.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
+    }
+
+    /**
      * @param Rubric\Rubric $rubric
      * @return string[][] Indexed by group.name then criterion.id
      */
@@ -226,7 +260,7 @@ class Controller extends Assessment\Controller
     /**
      * @param Rubric\Rubric $rubric
      * @param \ICollection|Participant[] $participants
-     * @return Rubric\Descriptor[][] Grouped in sets indexed by user.id
+     * @return RubricDescriptor[][] Grouped in sets indexed by user.id
      */
     protected function getMarks(Rubric\Rubric $rubric, \ICollection $participants)
     {
@@ -245,6 +279,82 @@ class Controller extends Assessment\Controller
             }
         }
         return $marks;
+    }
+
+    /**
+     * @param Rubric\Rubric $rubric
+     * @param Collection|Participant[] $participants
+     * @return array
+     */
+    protected function collateResultSquare(Rubric\Rubric $rubric, Collection $participants)
+    {
+        // array inside an array that's *nearly* empty...
+        $data = [['Name', 'External ID']];
+
+        // put header row in array
+        foreach ($this->getRubricHeaders($rubric) as $grouping => $criteria) {
+            foreach ($criteria as $id => $criterion) {
+                $data[0][] = "$grouping - $criterion";
+                $data[0][] = '';
+            }
+        }
+        $data[0][] = 'Total';
+
+        /**
+         * Collate by id, each sub-collection will contain only 1 User element
+         *
+         * @var Collection[] $participantsGrouped
+         */
+        $participantsGrouped = $participants->groupByCallback(function(Participant $participant){
+            return $participant->getUser()->getId();
+        })->getAll();
+
+        foreach ($this->getMarks($rubric, $participants) as $studentId => $marks) {
+            /** @var Participant $participant */
+            $participant = $participantsGrouped[$studentId]->first();
+            $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
+
+            $row = [$studentName, $participant->getUser()->getExternalId()];
+            $sum = '';
+
+            if (count($marks)) {
+                foreach ($marks as $mark) {
+                    if ($mark instanceof RubricDescriptor) {
+                        $row[] = $mark->getText();
+                        $row[] = $mark->getValue();
+                        $sum += $mark->getValue();
+                    } else {
+                        $row[] = $mark;
+                        $row[] = '';
+                    }
+                }
+                $row[] = $sum;
+
+            } else {
+                $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
+            }
+            $data[] = $row;
+        }
+
+        return $data;
+    }
+
+    /**
+     * The array data should obviously be in a CSV-compatible format (ie. rectangle)
+     *
+     * @param array $array
+     * @return string
+     */
+    protected function array2csv(array $array)
+    {
+        $fp = fopen('php://temp', 'w');
+        foreach ($array as $row) {
+            fputcsv($fp, $row);
+        }
+        rewind($fp);
+        $contents = stream_get_contents($fp);
+        fclose($fp);
+        return $contents;
     }
 
     /**

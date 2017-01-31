@@ -19,7 +19,7 @@
         </div>
     </div>
     <nav>
-        <a href="/submission/overview/{{ dueWork.id }}/csv" class="icon-download" title="Download CSV"></a>
+        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
     </nav>
 </div>
 
