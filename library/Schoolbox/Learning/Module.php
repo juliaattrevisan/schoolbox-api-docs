@@ -47,7 +47,7 @@ class Module extends BaseModule
                 '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
                 '/grades/{userId}{/termCode}'             => 'getGrades',                    // student && term && subject
                 '/grades-btac/{userId}{/termCode}'        => 'getGradesBtac',                // student && term && subject
-                '/grades-btac/{userId}/year/{year}'       => 'getGradesYearBtac',                // student && term && subject
+                '/grades-year/{userId}/year/{year}'       => 'getGradesYear',                // student && year
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',          // student && term && subject
             ],
             'POST' => []
@@ -80,7 +80,7 @@ class Module extends BaseModule
 
         $this->addRoutePermission(
                 $authorizer,
-                '(?:getGrades|getGradesBtac|getGradesYearBtac|getGradesForSubject)',
+                '(?:getGrades|getGradesBtac|getGradesYear|getGradesForSubject)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
@@ -93,7 +93,6 @@ class Module extends BaseModule
             );
     }
 
-
     /**
      * @inheritdoc
      */
@@ -101,7 +100,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getPendingAssessmentsForUser|getClasses|getGrades|getGradesYearBtac|getGradesBtac|getGradesForSubject)',
+            '(?:getPendingAssessmentsForUser|getClasses|getGrades|getGradesBtac|getGradesYear|getGradesBtac|getGradesForSubject)',
             function ($params) {
                 if (array_key_exists('userId', $params)) {
                     try {
