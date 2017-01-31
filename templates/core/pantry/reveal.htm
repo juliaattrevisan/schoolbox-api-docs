@@ -103,5 +103,18 @@
             </script>
         </section>
 
+        <h2 class="subheader">Toast Reveal</h2>
+        <section class="content">
+            <a class="button" toast-reveal>Pop Toast!</a>
+            <div id='toaster' class="toast" data-toast></div>
+        </section>
+        <script type="text/javascript">
+        $('a[toast-reveal]').on('click', function(event) {
+            event.preventDefault();
+            var $toast = $('[data-toast]');
+            $toast.toastActivate();
+            $toast.toastTimeout({text: 'Toast!', duration: 3000, css: 'success'});
+        });
+        </script>
     </div>
 </div>
