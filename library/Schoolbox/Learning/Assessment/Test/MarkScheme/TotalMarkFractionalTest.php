@@ -327,13 +327,13 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $totalMark = 100;
         return [
-            [-1.0,     $totalMark,  '-1 / 100'],
-            [0.0,      $totalMark,   '0 / 100'],
-            [1.0,      $totalMark,   '1 / 100'],
-            [10.00001, $totalMark,  '10 / 100'],
-            [99.9,     $totalMark, '100 / 100'],
-            [100,      $totalMark, '100 / 100'],
-            [101,      $totalMark, '101 / 100'],
+            [-1.0,     $totalMark,   '-1 / 100'],
+            [0.0,      $totalMark,    '0 / 100'],
+            [1.0,      $totalMark,    '1 / 100'],
+            [10.00001, $totalMark,   '10 / 100'],
+            [99.9,     $totalMark, '99.9 / 100'],
+            [100,      $totalMark,  '100 / 100'],
+            [101,      $totalMark,  '101 / 100'],
         ];
     }
 
