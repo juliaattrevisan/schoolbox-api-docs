@@ -4,6 +4,7 @@
     {#<li><a href="/submission/viewSubmission/{{ box.id }}">{{ box.name }}</a></li>#}
     {#<li class="active"><a href="#">Overview</a></li>#}
 {#</ul>#}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -12,6 +13,10 @@
     <div class="list-item">
         <div class="small-12 columns">
             <h1>Rubric Report for {{ dueWork.title }}</h1>
+            <ul class="meta">
+                <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
+                <li class="icon-calendar">Due {{ dueWork.dueAt.relative }} on {{ dueWork.dueAt.localShort }}</li>
+            </ul>
         </div>
     </div>
     <nav>
