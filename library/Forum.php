@@ -245,7 +245,10 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                             AND `userAccess`.service = 1
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
-                            AND MATCH(`body`) AGAINST ('$keyword')
+                            AND (
+                                MATCH(`body`) AGAINST ('$keyword') OR 
+                                MATCH(`forumThread`.`title`) AGAINST ('$keyword')
+                            )
                             AND `forumThread`.`deleted` = 'false'
                             AND `forumPost`.`deleted` = 'false'
                         ORDER BY `$sort_by` $sort_dir
@@ -263,7 +266,10 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                             AND `userAccess`.service = 1
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
-                            AND MATCH(`body`) AGAINST ('$keyword')
+                            AND (
+                                MATCH(`body`) AGAINST ('$keyword') OR 
+                                MATCH(`forumThread`.`title`) AGAINST ('$keyword')
+                            )
                             AND `forumThread`.`deleted` = 'false'
                             AND `forumPost`.`deleted` = 'false'
             ";

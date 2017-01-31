@@ -1,0 +1,1 @@
+ALTER TABLE `forumThread` ADD FULLTEXT INDEX `threadtitle` (`title`);
