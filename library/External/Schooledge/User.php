@@ -42,7 +42,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.ID
 
                 WHERE s.Code = $quotedId
-                AND   $quotedDate BETWEEN(CONVERT(date, t.StartDate), CONVERT(date, t.EndDate))
+                AND   $quotedDate BETWEEN CONVERT(date, t.StartDate) AND CONVERT(date, t.EndDate)
 
                 ORDER BY code ASC
             ";
@@ -69,7 +69,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 LEFT  JOIN dbo.Staff                      tcis_staff ON tcis.PersonID = tcis_staff.ID
 
                 WHERE (tcs_staff.Code = $quotedId OR tcis_staff.Code = $quotedId)
-                AND   $quotedDate BETWEEN(CONVERT(date, t.StartDate), CONVERT(date, t.EndDate))
+                AND   $quotedDate BETWEEN CONVERT(date, t.StartDate) AND CONVERT(date, t.EndDate)
 
                 ORDER BY code ASC
             ";
