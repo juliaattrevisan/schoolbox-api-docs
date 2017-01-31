@@ -155,6 +155,7 @@ class Report_Parent extends Report_Abstract
         $this->getPage()->setBlock('student', 'contact', 'contact_block');
         $this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
         $this->getPage()->setBlock('contact', 'primary', 'primary_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'empty', 'empty_block');
 
         $this->getPage()->setBlock('student', 'public', 'public_block');
         $this->getPage()->setBlock('student', 'private', 'private_block');
@@ -200,11 +201,6 @@ class Report_Parent extends Report_Abstract
                 'REPLY_TO'    => $_SESSION['user']->getEmail(),
             )
         );
-
-        // Show search options
-        if (!$this->getYearLevel() && !$this->getSearchName() && !$this->getSearchForm() && !$this->getSearchBoardingStatus()) {
-            $this->getPage()->parse('show_filter_options_block', 'show_filter_options');
-        }
 
         /* Search boarding status dropdown preselection
          */
@@ -322,6 +318,12 @@ class Report_Parent extends Report_Abstract
         $showContact = false;
 
         if (is_array($allContacts) && count($allContacts)) {
+
+            // Show search options
+            if (!$this->getYearLevel() && !$this->getSearchName() && !$this->getSearchForm() && !$this->getSearchBoardingStatus()) {
+                $this->getPage()->parse('show_filter_options_block', 'show_filter_options');
+            }
+
             for ($lastID = -1, $i = 0; $i <= count($allContacts); $i++) {
                 $currentContact = $allContacts[$i];
 
@@ -555,6 +557,15 @@ class Report_Parent extends Report_Abstract
 
             $this->getPage()->parse('student_block', 'student', true);
             $this->getPage()->setVar('EMAIL_ALL_PARENTS', Scrub::text(implode(',', $allEmails)));
+            $this->getPage()->setVar('empty_block', '');
+        }
+        else {
+            $this->getPage()->parse('show_filter_options_block', 'show_filter_options');
+            if (isset($_GET["searchName"])) {
+                $this->getPage()->parse('empty_block', 'empty', true);
+            } else {
+                $this->getPage()->setVar('empty_block', '');
+            }
         }
     }
 
