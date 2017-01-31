@@ -98,7 +98,7 @@ class Sync implements SyncInterface
                 s.StudentSurname             AS student_surname
             FROM dbo.vStudentContactAllAddress s
             INNER JOIN dbo.Community cp ON s.StudentContactID = cp.ID
-            WHERE (s.StudentContactType IN ('SC1', 'SC2'))
+            WHERE (s.StudentContactType IN ('SC1', 'SC2', 'SC3'))
             AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
             AND   s.FileYear = '" . $this->database->quote($this->year) . "'
 
@@ -122,7 +122,7 @@ class Sync implements SyncInterface
                 s.StudentSurname                   AS student_surname
             FROM dbo.vStudentContactAllAddress s
             INNER JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
-            WHERE (s.StudentContactType IN ('SC1', 'SC2'))
+            WHERE (s.StudentContactType IN ('SC1', 'SC2', 'SC3'))
             AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
             AND   s.FileYear = '" . $this->database->quote($this->year) . "'
 
