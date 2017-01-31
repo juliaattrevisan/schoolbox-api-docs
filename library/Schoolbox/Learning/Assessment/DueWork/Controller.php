@@ -187,7 +187,11 @@ class Controller extends Assessment\Controller
     public function getOverview(IAssessable $assessment)
     {
         $data = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                ->add([
+                    $assessment->getTitle(),
+                    $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]) ])
+                ->add(['Rubric Report','']),
             'dueWork'     => $assessment,
         ];
 
@@ -202,7 +206,7 @@ class Controller extends Assessment\Controller
         }
 
         $this->getResponse()->content->set([
-            'title'       => 'Overview',
+            'title'       => 'Rubric Report',
             'template'    => '@learningAssessment/dueWork/overview.twig',
             'data'        => $data
         ]);
