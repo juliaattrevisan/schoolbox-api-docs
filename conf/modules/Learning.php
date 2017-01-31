@@ -10,15 +10,12 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
-use Schoolbox\Learning\Mastery\Module as MasteryModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Feedback\Module as FeedbackModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Response\Module as ResponseModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
-use Schoolbox\Learning\Personalised\Module as PersonalisedLearningModule;
-
 
 class Learning implements ModuleConfigInterface
 {
@@ -51,16 +48,10 @@ class Learning implements ModuleConfigInterface
         $markbookModule = new MarkbookModule($di);
         $markbookModule ->init("/$namespace/markbook");
 
-        $masteryModule = new MasteryModule($di);
-        $masteryModule ->init("/$namespace/mastery");
-
         $upcomingModule = new UpcomingModule($di);
         $upcomingModule->init("/$namespace/due");
 
         $assessmentExporterModule = new AssessmentExporterModule($di);
         $assessmentExporterModule->init("/$namespace/export");
-
-        $personalisedLearningModule = new PersonalisedLearningModule($di);
-        $personalisedLearningModule->init("/$namespace/personalised");
     }
 }
