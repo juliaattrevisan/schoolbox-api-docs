@@ -45,6 +45,8 @@ class Controller extends BaseController
      * @param SubmissionBox\Rubric\Rubric $rubric
      * @param Collection|User[] $students
      * @return array
+     * @deprecated 165 Ported to DueWork Controller
+     * @see \Schoolbox\Learning\Assessment\DueWork\Controller::getMarks()
      */
     protected function getMarks($rubric, $students)
     {
@@ -72,6 +74,8 @@ class Controller extends BaseController
      *
      * @param SubmissionBox $box
      * @return Collection|User[]
+     * @deprecated 165 Ported to DueWork Controller
+     * @see \Schoolbox\Learning\Assessment\Participant\DataSource::loadParticipationIntoAssessment()
      */
     protected function getStudents(SubmissionBox $box)
     {
@@ -85,6 +89,7 @@ class Controller extends BaseController
     /**
      * @param SubmissionBox $box
      * @return SubmissionBox\Rubric\Rubric
+     * @deprecated 165 Ported to DueWork Controller
      */
     protected function getRubric(SubmissionBox $box)
     {
@@ -97,6 +102,7 @@ class Controller extends BaseController
      *
      * @param SubmissionBox $box
      * @return string
+     * @deprecated 165 Ported to DueWork Controller
      */
     protected function getSubmissionBoxNameAsSlug(SubmissionBox $box)
     {
@@ -108,6 +114,8 @@ class Controller extends BaseController
     /**
      * @param SubmissionBox\Rubric\Rubric $rubric
      * @return array
+     * @deprecated 165 Ported to DueWork Controller
+     * @see \Schoolbox\Learning\Assessment\DueWork\Controller::getRubricHeaders()
      */
     protected function getRubricHeaders(SubmissionBox\Rubric\Rubric $rubric)
     {
@@ -126,6 +134,8 @@ class Controller extends BaseController
     /**
      * @param SubmissionBox $box
      * @return array
+     * @deprecated 165 Ported to DueWork controller
+     * @see \Schoolbox\Learning\Assessment\DueWork\Controller::collateResultSquare()
      */
     protected function collateResultSquare(SubmissionBox $box)
     {
@@ -187,6 +197,8 @@ class Controller extends BaseController
      *
      * @param array $array
      * @return string
+     * @deprecated 165 Ported to DueWork Controller
+     * @see \Schoolbox\Learning\Assessment\DueWork\Controller::array2csv()
      */
     protected function array2csv(array $array)
     {
@@ -238,6 +250,8 @@ class Controller extends BaseController
      * @level 150
      *
      * @param SubmissionBox $box
+     * @deprecated 165 Ported to IAssessable route
+     * @see \Schoolbox\Learning\Assessment\DueWork\Controller::downloadOverview()
      */
     public function downloadOverview(SubmissionBox $box)
     {
