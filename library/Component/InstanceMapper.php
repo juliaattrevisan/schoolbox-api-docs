@@ -29,7 +29,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         $this->uses('component_definition_id', self::TYPE_INTEGER, null, 'definitionId');
         $this->uses('module', self::TYPE_STRING);
         $this->uses('identifier', self::TYPE_INTEGER);
-        $this->uses('position', self::TYPE_INTEGER);
+        $this->uses('position', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
 
     }
