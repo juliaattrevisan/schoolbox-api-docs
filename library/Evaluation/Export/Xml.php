@@ -129,6 +129,9 @@ abstract class Evaluation_Export_Xml
      */
     protected function renderQuestion(array $question, $append)
     {
+        // Get meta for this type of question
+        $questionTypeMeta = $this->getQuestionHandler()->getQuestionType($question['type_id']);
+
         $this->getPage()->setVar([
             'QUESTION_QUESTION'    => Scrub::Html($question['question']),
             'QUESTION_MARKS'       => $question['marks'],
@@ -143,15 +146,15 @@ abstract class Evaluation_Export_Xml
          * Load answer configurations template into answer_configuration_form_fragment
          * block if there are configuration options available
          */
-        $currentQuestionType = $this->getQuestionHandler()->getQuestionType($question['type_id']);
-
-        if ($currentQuestionType['has_config'] == 'true') {
+        if ($questionTypeMeta['has_config'] == 'true') {
             $answerHandler->configureXml($this->getPage(), $question['config']);
         } else {
             $this->getPage()->setVar([
                 'answer_configuration_block' => ''
             ]);
         }
+
+
 
         // Load answer template into answerOption block
         $this->getPage()->setFile('answerFormFragment', $this->getEvaluationType() . '/answer/' . $this->getFactory()->getQuestionType($question['type_id']) . '/exportToMoodle.xml');
