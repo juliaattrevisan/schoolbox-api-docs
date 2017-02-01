@@ -101,24 +101,23 @@ class ClassController extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if ($this->getClassList()->count()) {
-            return $this->renderTwigTemplate(
-                $templateHandle,
-                '@learning/component/classes.twig',
-                [
-                    'componentInstanceId' => $this->getInstance()->getId(),
-                    'componentClass'      => $this->getComponentName(),
-                    'currentUser'         => $this->getUser(),
-                    'currentSemester'     => TermMapper::getInstance()->findForToday(),
-                    'classList'           => $this->getClassList(),
-                    'classTypes'          => $this->getClassTypes(),
-                    'courses'             => $this->getCourseImplementations(),
-                ]
-            );
-
+        if ($this->getUser()->getHideTimetable() || $this->getClassList()->count() == 0) {
+            return false;
         }
 
-        return false;
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@learning/component/classes.twig',
+            [
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'componentClass'      => $this->getComponentName(),
+                'currentUser'         => $this->getUser(),
+                'currentSemester'     => TermMapper::getInstance()->findForToday(),
+                'classList'           => $this->getClassList(),
+                'classTypes'          => $this->getClassTypes(),
+                'courses'             => $this->getCourseImplementations(),
+            ]
+        );
     }
 
     /**
