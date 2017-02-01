@@ -1565,7 +1565,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function disableCache()
     {
-        $this->cacheEnabled = true;
+        $this->cacheEnabled = false;
     }
 
     /**

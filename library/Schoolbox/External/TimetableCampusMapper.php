@@ -78,6 +78,11 @@ class TimetableCampusMapper extends Schoolbox\Mapper {
         );
     }
 
+    protected function setup()
+    {
+        $this->disableCache();
+    }
+
     /**
      * Gets the TimetableCampus object for this campus and date.
      *

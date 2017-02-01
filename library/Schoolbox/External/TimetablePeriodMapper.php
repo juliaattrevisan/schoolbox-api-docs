@@ -79,4 +79,8 @@ class TimetablePeriodMapper extends Schoolbox\Mapper {
             )
         );
     }
+
+    protected function setup() {
+        $this->disableCache();
+    }
 }
