@@ -108,7 +108,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             WHERE dbos.Code = {$this->database->smartQuote($externalUserId)}
         ";
 
-        // Student query
+        // Student query - electives
         $query = "
             SELECT DISTINCT
                 ts.Code as ClassCode,
@@ -145,6 +145,47 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             -- Student
             INNER JOIN fc.TimetableSubjectChoice tsc  ON ts.ID = tsc.TimetableSubjectID
             INNER JOIN dbo.Student               dboc ON tsc.PersonID = dboc.ID
+
+            WHERE dboc.Code = {$this->database->smartQuote($externalUserId)}
+        ";
+
+        // Student query - core
+        $query = "
+            SELECT DISTINCT
+                ts.Code as ClassCode,
+                ts.Name as ClassName,
+                td.Name as DayNumber,
+                tp.Name as PeriodNumber,
+                dbor.Code as Room,
+                tbi.Consecutive as PeriodSpan,
+                dbos.Code as StaffID,
+                dbos.FirstName AS StaffPreferredName,
+                dbos.LastName AS StaffSurname,
+                dbos.Title As StaffTitle
+
+            FROM fc.TimetableSubject ts
+
+            -- Class instance
+            INNER JOIN fc.TimetableClass             tc    ON ts.ID = tc.TimetableSubjectID
+            INNER JOIN fc.YearLevelSub               yls   ON tc.YearLevelSubID = yls.ID
+            INNER JOIN fc.TimetableBlockSubYearLevel tbsyl ON yls.ID = tbsyl.TimetableSubYearLevelID
+            INNER JOIN fc.TimetableBlock             tb    ON tbsyl.TimetableBlockId = tb.ID
+            INNER JOIN fc.TimetableBlockInstance     tbi   ON tb.ID = tbi.TimetableBlockID
+            INNER JOIN fc.TimetablePeriod            tp    ON tbi.TimetablePeriodID = tp.ID
+            INNER JOIN fc.TimetableDay               td    ON tp.TimetableDayID = td.ID
+
+            -- Optional room
+            LEFT JOIN fc.TimetableClassRoom tcr  ON tc.ID  = tcr.TimetableClassId
+            LEFT JOIN fc.Room               r    ON tcr.RoomID = r.ID
+            LEFT JOIN dbo.Room              dbor ON r.ID = dbor.ID
+
+            -- Staff
+            LEFT  JOIN fc.TimetableClassStaff tcs  ON tc.ID = tcs.TimetableClassId
+            INNER JOIN dbo.Staff              dbos ON tcs.PersonID = dbos.ID
+
+            -- Student
+            INNER JOIN fc.YearLevelSubStudent ylss ON yls.ID = ylss.YearLevelSubID
+            INNER JOIN dbo.Student            dboc ON ylss.PersonID = dboc.ID
 
             WHERE dboc.Code = {$this->database->smartQuote($externalUserId)}
         ";
