@@ -118,7 +118,7 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-            SELECT id
+            SELECT DISTINCT id
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
