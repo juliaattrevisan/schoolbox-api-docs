@@ -154,9 +154,11 @@ abstract class Evaluation_Export_Xml
             ]);
         }
 
-
-
         // Load answer template into answerOption block
+
+        // Yes, we really have to call this! (sitepage will silently ignore a call to load a different file to the same handle name)
+        $this->getPage()->setVar('answerFormFragment', '');
+
         $this->getPage()->setFile('answerFormFragment', $this->getEvaluationType() . '/answer/' . $this->getFactory()->getQuestionType($question['type_id']) . '/exportToMoodle.xml');
         $this->getPage()->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
