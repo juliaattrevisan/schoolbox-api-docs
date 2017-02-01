@@ -9,8 +9,8 @@
  */
 
 /**
- * Class Component_ConfigMapper
  * @method Component_Config createModel($idValue = null)
+ * @method Component_Config findOneByColumnList($columnList, $order = array(), $options = array())
  */
 class Component_ConfigMapper extends \Schoolbox\Mapper
 {
