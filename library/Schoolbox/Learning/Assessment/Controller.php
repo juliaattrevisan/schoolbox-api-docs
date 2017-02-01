@@ -229,8 +229,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         else if ($this->getUser()->getRole()->isStudent()) {
             $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
 
-            if (isset($_GET[Redirect::RETURN_URL])) {
-                $redirect .= "?" . Redirect::RETURN_URL . "=" . $_GET[Redirect::RETURN_URL];
+            $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
+
+            if ($redirOverride) {
+                $redirect .= "?" . Redirect::RETURN_URL . "=" . $redirOverride;
             }
             $this->getResponse()->redirect->to($redirect);
             return;

@@ -161,7 +161,7 @@ class Controller extends AbstractController
      */
     public function getQuizIntro($assessmentId)
     {
-        $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : "?returnUrl=" . Redirect::encode($_GET["page"]);
+        $returnUrlSuffix = "?returnUrl=" . $this->getRequest()->query->get('returnUrl') ?: Redirect::encode($this->getRequest()->query->get('page'));
 
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
         $this->getResponse()->redirect->to("/assess/intro/$assessId".$returnUrlSuffix);
