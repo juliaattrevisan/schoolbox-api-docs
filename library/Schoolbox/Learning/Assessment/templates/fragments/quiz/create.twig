@@ -19,44 +19,35 @@
 </label>
 
 <label>
-    Description
+    Description<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
 
 <label>
-    Weight
-    <input type="number" name="weight" value="{{ assessment.weight }}">
+    Completion Message<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users when they complete the quiz.">?</span>
+    <textarea name="completion_message">{{ assessment.completionMessage }}</textarea>
 </label>
-
-{% import 'sub/visibility.twig' as visibility %}
-{{ visibility.dropdown(assessment.markVisibility) }}
-
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
-{% if context.baseContext is not unitSpecification %}
-    {% include '@learningAssessment/fragments/dates.twig' %}
-{% endif %}
-<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
 <div class="row">
     <div class="small-12 columns">
         <label>
-            Max Attempts
+            Max Attempts<span class="hint has-tip tip-top" data-tooltip title="This is how many times a user can begin the quiz again.">?</span>
             {% set maxAttempts = 10 %}
 
             <select name="maxAttempts">
 
                 {% for i in 0..maxAttempts %}
-                {% if i == assessment.maxAttempts %}
-                    {% set selected = 'selected' %}
-                {% else %}
-                    {% set selected = '' %}
-                {% endif %}
+                    {% if i == assessment.maxAttempts %}
+                        {% set selected = 'selected' %}
+                    {% else %}
+                        {% set selected = '' %}
+                    {% endif %}
 
-                {% if i == 0 %}
-                    <option value="{{ i }}" {{ selected }}>Unlimited</option>
-                {% else %}
-                    <option value="{{ i }}" {{ selected }}>{{ i }}</option>
-                {% endif %}
+                    {% if i == 0 %}
+                        <option value="{{ i }}" {{ selected }}>Unlimited</option>
+                    {% else %}
+                        <option value="{{ i }}" {{ selected }}>{{ i }}</option>
+                    {% endif %}
                 {% endfor %}
 
             </select>
@@ -112,13 +103,24 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 columns">
-        <label>
-            Completion Message
-            <textarea name="completion_message">{{ assessment.completionMessage }}</textarea>
-        </label>
-    </div>
-</div>
+{% if context.baseContext is not unitSpecification %}
+    {% include '@learningAssessment/fragments/dates.twig' %}
+{% endif %}
+
+<legend>Grading</legend>
+<label>
+    Weight
+    <input type="number" name="weight" value="{{ assessment.weight }}">
+</label>
+
+{% import 'sub/visibility.twig' as visibility %}
+{{ visibility.dropdown(assessment.markVisibility) }}
+
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
+
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+
+
+
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
