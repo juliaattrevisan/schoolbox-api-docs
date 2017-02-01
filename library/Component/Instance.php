@@ -97,7 +97,7 @@ class Component_Instance
                 return $config;
             }
         }
-        throw new DomainException("Config with key: $key not found");
+        throw new DomainException("Config with key: '$key' not found");
     }
 
     /**
