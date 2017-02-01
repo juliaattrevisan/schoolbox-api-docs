@@ -76,8 +76,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             SELECT DISTINCT
                 ts.Code as ClassCode,
                 ts.Name as ClassName,
-                td.Name as DayNumber,
-                tp.Name as PeriodNumber,
+                td.SortOrder as DayNumber,
+                td.Name as DayName,
+                tp.StartTime as PeriodStart,
+                tp.EndTime as PeriodEnd,
+                tp.Name as PeriodName,
                 dbor.Code as Room,
                 tbi.Consecutive as PeriodSpan,
                 dbos.Code as StaffID,
@@ -106,6 +109,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             INNER JOIN dbo.Staff                      dbos ON COALESCE(tcis.PersonID, tcs.PersonID) = dbos.ID
 
             WHERE dbos.Code = {$this->database->smartQuote($externalUserId)}
+
+            ORDER BY DayNumber ASC, PeriodStart ASC;
         ";
 
         // Student query - electives
@@ -113,8 +118,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             SELECT DISTINCT
                 ts.Code as ClassCode,
                 ts.Name as ClassName,
-                td.Name as DayNumber,
-                tp.Name as PeriodNumber,
+                td.SortOrder as DayNumber,
+                td.Name as DayName,
+                tp.StartTime as PeriodStart,
+                tp.EndTime as PeriodEnd,
+                tp.Name as PeriodName,
                 dbor.Code as Room,
                 tbi.Consecutive as PeriodSpan,
                 dbos.Code as StaffID,
@@ -147,6 +155,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             INNER JOIN dbo.Student               dboc ON tsc.PersonID = dboc.ID
 
             WHERE dboc.Code = {$this->database->smartQuote($externalUserId)}
+
+            ORDER BY DayNumber ASC, PeriodStart ASC;
         ";
 
         // Student query - core
@@ -154,8 +164,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             SELECT DISTINCT
                 ts.Code as ClassCode,
                 ts.Name as ClassName,
-                td.Name as DayNumber,
-                tp.Name as PeriodNumber,
+                td.SortOrder as DayNumber,
+                td.Name as DayName,
+                tp.StartTime as PeriodStart,
+                tp.EndTime as PeriodEnd,
+                tp.Name as PeriodName,
                 dbor.Code as Room,
                 tbi.Consecutive as PeriodSpan,
                 dbos.Code as StaffID,
@@ -188,6 +201,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             INNER JOIN dbo.Student            dboc ON ylss.PersonID = dboc.ID
 
             WHERE dboc.Code = {$this->database->smartQuote($externalUserId)}
+
+            ORDER BY DayNumber ASC, PeriodStart ASC;
         ";
         return [];
     }
