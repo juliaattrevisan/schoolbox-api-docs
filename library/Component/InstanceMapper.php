@@ -253,6 +253,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
                 // each component of the same type's config objects are the same object.
                 // Setting the config value directly affects the config value for this key
                 // for ALL components of this type!
+                /** @var Component_Config $newConfig */
                 $newConfig = clone $finalCollection[$confInstance->getInstanceId()]->getConfig()
                                                                                    ->getOffset($confInstance->getConfigDefinitionId());
                 $finalCollection[$confInstance->getInstanceId()]->getConfig()
