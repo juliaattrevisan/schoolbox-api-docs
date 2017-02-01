@@ -196,133 +196,6 @@
     };
     console.log(pickerOptions);
 
-    function manageAllDay ( state, doFormat ) {
-//        console.log(window.pickerInstance);
-//        console.log("manageAllDay>>> state: " + state + ' > doFormat: ' + doFormat );
-        {# Get external allDay hidden field, if it's been set #}
-        if(pickerOptions.allDayExt !== false) {
-            var allDaySwitch = $('#'+pickerOptions.allDayExt);
-        }
-
-        if(pickerOptions.allDayExt !==false) {
-            {# Get all linked inputs, e.g. startDate, endDate #}
-            var selector = $('[data-datepicker-alldayext = '+ pickerOptions.allDayExt +']');
-        }
-        else {
-            var selector = $('#{{ element }}');
-        }
-
-        {# Change either the elememt itself of the element and it's AllDay buddy #}
-        selector.each( function() {
-
-            {# Get their pickerIds#}
-            var pId = $(this).attr('data-datepicker-id');
-            var timeDiv = $('#pickerCalendar'+pId).closest('#picker'+pId).find('.flatpickr-time');
-            {# Get the format #}
-            if(doFormat) {
-                setPickerFormats(state);
-            }
-
-            if(window.pickerInstance[pId] !== undefined) {
-                var value = window.pickerInstance[pId].input.value;
-            }
-            else {
-                var value = $(this).val();
-            }
-            {# All Day is on  #}
-            if(state === true) {
-                timeDiv.css('display', 'none');
-                $('#hideTime'+pId).prop('checked', true);
-                if (doFormat) {
-                    var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
-//                    console.log('converting format...' + pickerFormats.from + ' > ' +pickerFormats.to +': ' + state + ' v: ' + v);
-                    if(window.pickerInstance[pId] !== undefined) {
-                        window.pickerInstance[pId].input.value = v;
-                    }
-                    $(this).val(v);
-                }
-
-                if(pickerOptions.allDayExt !== false) {
-                    $('#'+pickerOptions.allDayExt).val(1);
-                }
-            }
-            else {
-                timeDiv.css('display', 'block');
-                $('#hideTime'+pId).prop('checked', false);
-                if (doFormat) {
-                    var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
-//                    console.log('converting format...' + pickerFormats.from + ' > ' +pickerFormats.to +': ' + state + ' v: ' + v);
-                    if(window.pickerInstance[pId] !== undefined) {
-                        window.pickerInstance[pId].input.value = v;
-                    }
-                    $(this).val(v);
-                }
-                if(pickerOptions.allDayExt !== false) {
-                    $('#'+pickerOptions.allDayExt).val(0);
-                }
-            }
-        });
-
-    }
-
-    var pickerFormats = {
-        from: '',
-        to: ''
-    }
-
-    function setPickerFormats (allDayState) {
-        {# No matter what, we are overriding the format #}
-
-        if (pickerOptions.altFormat !== false ){
-            var l = 1;
-            if (pickerOptions.altFormat == 'date') {
-                l = 11;
-                pickerFormats.from = '{{ displayFormatDate }}';
-                pickerFormats.to = '{{ displayFormatDate }}';
-            }
-            else if (pickerOptions.altFormat == 'datetime') {
-                l = 12;
-                pickerFormats.from  = '{{ displayFormat }}';
-                pickerFormats.to = '{{ displayFormat }}';
-            }
-        }
-        else {
-            l = 2;
-            {# If not overiding then looking at the enableTime option #}
-            if (pickerOptions.enableTime === false) {
-                l = 22;
-                pickerFormats.from = '{{ displayFormatDate }}';
-                pickerFormats.to = '{{ displayFormatDate }}';
-            }
-            else {
-                l = 3;
-                {# It depends again... #}
-                {# Looking at the allDay option #}
-                if (pickerOptions.allDay === true) {
-                    l = 4;
-                    {# Ok, the allDay changed, changing the format accordingly #}
-                    if (allDayState) {
-                        l = 41;
-                        pickerFormats.from = '{{ displayFormat }}';
-                        pickerFormats.to = '{{ displayFormatDate }}';
-                    }
-                    else {
-                        l = 42;
-                        pickerFormats.from = '{{ displayFormatDate }}';
-                        pickerFormats.to = '{{ displayFormat }}';
-                    }
-                }
-                else {
-                    l = 5;
-                    pickerFormats.from = '{{ displayFormat }}';
-                    pickerFormats.to = '{{ displayFormat }}';
-                }
-            }
-        }
-
-        console.log('format set: '+l);
-    }
-
     function hasTime (value) {
         var v = moment(value, convertFormat('{{ displayFormat }}'));
         if (v.hours() == 0 && v.minutes() == 0 && v.seconds() == 0 ) {
@@ -579,14 +452,6 @@
         {% endif %}
     });
 
-    {# Submit calendar datetime #}
-    $('.picker-submit').click(function() {
-//        manageAllDay(false, false);
-        $('#{{ element }}').val(window.pickerInstance[{{ id }}].input.value);
-        $('#picker{{ id }}').foundation('reveal', 'close');
-
-    });
-
     {# Submit timetable datetime #}
     $('.timetable-submit').click(function() {
         var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
@@ -603,6 +468,40 @@
     {# Setup calendar #}
     var newDate, latestDate;
 
+    function renderAllday(instance) {
+        var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
+
+        var html = '<div class="row"><div class="small-6 columns">';
+
+        {# Build an All Day switch if it's been set in the options #}
+        if (pickerOptions.allDay === true) {
+            html += '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
+                    '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
+                    '</div>';
+        }
+        html += '<div class="small-6 columns"></div></div>';
+
+        timeDiv.after(html);
+
+    };
+
+    function checkAllday( state ) {
+
+        var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
+
+        {# All Day is on  #}
+        if(state === true) {
+            timeDiv.css('display', 'none');
+            $('#hideTime{{ id }}').prop('checked', true);
+
+        }
+        else {
+            timeDiv.css('display', 'block');
+            $('#hideTime{{ id }}').prop('checked', false);
+        }
+
+    };
+
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
 
         defaultDate: new Date({{ value }}),
@@ -615,47 +514,43 @@
         enableTime: pickerOptions.enableTime,
 
         onReady: function (selectedDates, dateStr, instance) {
+            alert('ready{{ id }}');
+            renderAllday(instance);
 
-            var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
-
-            var html = '<div class="row"><div class="small-6 columns">';
-
-            {# Build an All Day switch if it's been set in the options #}
-            if (pickerOptions.allDay === true) {
-                html += '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
-                        '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
-                        '</div>';
+            {# Hide time picker if allday hidden field is set to 1 #}
+            if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
+                checkAllday(true);
+                alert(1);
             }
-            html += '<div class="small-6 columns"></div></div>';
+            else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
+                checkAllday(false);
+                alert(2);
 
-            timeDiv.after(html);
+            }
+            else if (hasTime(instance.input.value) === false ) {
+                checkAllday(true);
+                alert(3);
+
+            }
+            else {
+                checkAllday(false);
+                alert(4);
+
+            }
+
             if (pickerOptions.allDay === true) {
-                {# Hide time picker if allday hidden field is set to 1 #}
-                if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
-                    manageAllDay(true, false);
-                    console.log('1 '+instance.input.value);
-                }
-                else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
-                    manageAllDay(false, false);
-                }
-                else if (hasTime(instance.input.value) === false ) {
-                    manageAllDay(true, false);
-                }
-                else {
-                    manageAllDay(false, false);
-                }
                 $('#hideTime{{ id }}').click(function () {
-
                     if ($('#hideTime{{ id }}').is(':checked')) {
-                        manageAllDay(true, true);
+                        checkAllday(true);
                     }
                     else {
-                        manageAllDay(false, true);
+                        checkAllday(false);
                     }
                 });
             }
         },
         onChange: function (selectedDates, dateStr, instance) {
+            alert('change{{ id }}');
 
             {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
             var dateSplit = dateStr.split(' ');
@@ -705,6 +600,9 @@
             }
             latestDate = newDate;
         },
+        onOpen: function (selectedDates, dateStr, instance) {
+            alert('open');
+        }
 
     });
 </script>
