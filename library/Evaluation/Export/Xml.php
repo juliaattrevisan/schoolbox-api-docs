@@ -110,8 +110,8 @@ abstract class Evaluation_Export_Xml
         });
 
         if ($allQuestions) {
-            foreach($allQuestions as $currentQuestion) {
-                $this->renderQuestion($currentQuestion);
+            foreach($allQuestions as $idx => $currentQuestion) {
+                $this->renderQuestion($currentQuestion, $idx > 0);
             }
         }
         else {
@@ -125,8 +125,9 @@ abstract class Evaluation_Export_Xml
      * Render a question inside a section
      *
      * @param array $question
+     * @param bool $append   Whether to append the question to the current section, or start new section
      */
-    protected function renderQuestion(array $question)
+    protected function renderQuestion(array $question, $append)
     {
         $this->getPage()->setVar([
             'QUESTION_QUESTION'    => Scrub::Html($question['question']),
@@ -161,7 +162,7 @@ abstract class Evaluation_Export_Xml
         $this->getPage()->parse('answerInputs_block', 'answerFormFragment');
 
         // Render Question
-        $this->getPage()->parse('question_block', 'question', true);
+        $this->getPage()->parse('question_block', 'question', $append);
     }
 
     /**
