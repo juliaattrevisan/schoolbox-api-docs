@@ -196,41 +196,9 @@
     };
     console.log(pickerOptions);
 
-    {#function manageAllDay ( state ) {#}
-        {# Get external allDay hidden field, if it's been set #}
-        {#if(pickerOptions.allDayExt !== false) {#}
-            {#var allDaySwitch = $('#'+pickerOptions.allDayExt);#}
-        {#}#}
-
-        {# Get all linked inputs, e.g. startDate, endDate #}
-        {#$('[data-datepicker-alldayext = '+ pickerOptions.allDayExt +']').each( function() {#}
-            {# Get their pickerIds#}
-            {#var pId = $(this).attr('data-datepicker-id');#}
-            {#var timeDiv = $('#pickerCalendar'+pId).closest('#picker'+pId).find('.flatpickr-time');#}
-            {# All Day is on  #}
-            {#if(state === true) {#}
-                {#timeDiv.css('display', 'none');#}
-                {#$('#hideTime'+pId).prop('checked', true);#}
-                {#$('[data-datepicker-id='+pId+']').val(moment($(this).val(),  convertFormat('{{ displayFormat }}')).format(convertFormat('{{ displayFormatDate }}')));#}
-                {#if(pickerOptions.allDayExt !== false) {#}
-                    {#allDaySwitch.val(1);#}
-                {#}#}
-            {#}#}
-            {#else {#}
-                {#timeDiv.css('display', 'block');#}
-                {#$('#hideTime'+pId).prop('checked', false);#}
-                {#$('[data-datepicker-id='+pId+']').val(moment($(this).val(),  convertFormat('{{ displayFormatDate }}')).format(convertFormat('{{ displayFormat }}')));#}
-                {#if(pickerOptions.allDayExt !== false) {#}
-                    {#allDaySwitch.val(0);#}
-                {#}#}
-            {#}#}
-        {#});#}
-
-    {#}#}
-
     function manageAllDay ( state, doFormat ) {
-        console.log(window.pickerInstance);
-        console.log("manageAllDay>>> state: " + state + ' > doFormat: ' + doFormat );
+//        console.log(window.pickerInstance);
+//        console.log("manageAllDay>>> state: " + state + ' > doFormat: ' + doFormat );
         {# Get external allDay hidden field, if it's been set #}
         if(pickerOptions.allDayExt !== false) {
             var allDaySwitch = $('#'+pickerOptions.allDayExt);
@@ -243,20 +211,16 @@
         else {
             var selector = $('#{{ element }}');
         }
-        console.log('selector: '+selector);
 
         {# Change either the elememt itself of the element and it's AllDay buddy #}
         selector.each( function() {
 
             {# Get their pickerIds#}
             var pId = $(this).attr('data-datepicker-id');
-            console.log('pId '+pId);
             var timeDiv = $('#pickerCalendar'+pId).closest('#picker'+pId).find('.flatpickr-time');
-            console.log(timeDiv);
             {# Get the format #}
             if(doFormat) {
                 setPickerFormats(state);
-                console.log(pickerFormats);
             }
 
             if(window.pickerInstance[pId] !== undefined) {
@@ -265,20 +229,17 @@
             else {
                 var value = $(this).val();
             }
-//            alert(value);
             {# All Day is on  #}
             if(state === true) {
                 timeDiv.css('display', 'none');
                 $('#hideTime'+pId).prop('checked', true);
                 if (doFormat) {
                     var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
-                    console.log('converting format...' + pickerFormats.from + ' > ' +pickerFormats.to +': ' + state + ' v: ' + v);
+//                    console.log('converting format...' + pickerFormats.from + ' > ' +pickerFormats.to +': ' + state + ' v: ' + v);
                     if(window.pickerInstance[pId] !== undefined) {
                         window.pickerInstance[pId].input.value = v;
                     }
-                    else {
-                        $(this).val(v);
-                    }
+                    $(this).val(v);
                 }
 
                 if(pickerOptions.allDayExt !== false) {
@@ -289,14 +250,12 @@
                 timeDiv.css('display', 'block');
                 $('#hideTime'+pId).prop('checked', false);
                 if (doFormat) {
-                    var v = moment(value, convertFormat(pickerFormats.from)).format(convertFormat(pickerFormats.to));
-                    console.log('converting format...' + pickerFormats.from + ' > ' +pickerFormats.to +': ' + state + ' v: ' + v);
+                    var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
+//                    console.log('converting format...' + pickerFormats.from + ' > ' +pickerFormats.to +': ' + state + ' v: ' + v);
                     if(window.pickerInstance[pId] !== undefined) {
                         window.pickerInstance[pId].input.value = v;
                     }
-                    else {
-                        $(this).val(v);
-                    }
+                    $(this).val(v);
                 }
                 if(pickerOptions.allDayExt !== false) {
                     $('#'+pickerOptions.allDayExt).val(0);
@@ -378,8 +337,6 @@
         var pickerResponse = $('#'+target+'Response{{ id }}');
         pickerResponse.html('');
         pickerResponse.append('<img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;">');
-//        pickerResponse.append('<div class="loader"></div>');
-//        pickerResponse.append('<p>Loading...</p>');
     }
 
     {# Prepare and append response HTML #}
@@ -449,7 +406,7 @@
                 for (var i = 0; i < data.appointments.length; i++) {
                     html += '<li>';
                     html += '<h3>' + data.appointments[i].title + '</h3>';
-                    html += '<p class="meta")>' + data.appointments[i].startDateTime;
+                    html += '<p class="meta">' + data.appointments[i].startDateTime;
                     if (data.appointments[i].startDateTime !== data.appointments[i].endDateTime) {
                         html += ' - ' + data.appointments[i].endDateTime;
                     }
@@ -488,7 +445,6 @@
         for (i = 1; i <= (termDuration / daysInCycle); i++) {
             var selected = '';
 
-//            if(onFirstLoad && cycleSelected == i ){
             if(cycleSelected == i ){
                 selected = 'selected';
             }
@@ -650,7 +606,7 @@
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
 
         defaultDate: new Date({{ value }}),
-        dateFormat: '{{ displayFormat }}',
+        dateFormat: pickerOptions.enableTime?'{{ displayFormat }}':'{{ displayFormatDate }}',
         inline: true,
         altInput: false,
         allowInput: true,
@@ -676,33 +632,25 @@
             if (pickerOptions.allDay === true) {
                 {# Hide time picker if allday hidden field is set to 1 #}
                 if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
-//                    alert(1);
                     manageAllDay(true, false);
                     console.log('1 '+instance.input.value);
                 }
                 else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
-//                    alert(11);
                     manageAllDay(false, false);
                 }
                 else if (hasTime(instance.input.value) === false ) {
-//                    alert(2);
                     manageAllDay(true, false);
                 }
                 else {
-//                    alert(3);
                     manageAllDay(false, false);
                 }
                 $('#hideTime{{ id }}').click(function () {
 
                     if ($('#hideTime{{ id }}').is(':checked')) {
-                        alert(4);
                         manageAllDay(true, true);
                     }
                     else {
-//                        alert(5);
-                        console.log('before 5 '+instance.input.value);
                         manageAllDay(false, true);
-                        console.log('5 '+instance.input.value);
                     }
                 });
             }
