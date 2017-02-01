@@ -15,11 +15,11 @@
 </div>
 
 <div class="row">
-    {% if classList is empty  %}
+    {% if classList is empty or hideTimetable %}
         <div class="small-12 island">
             <div class = "empty-state">
                 <i class="icon-class-list"></i>
-                {% if term.contains(now) %}
+                {% if term.contains(now) or hideTimetable %}
                     <p>You are currently not enrolled in any class.</p>
                 {% else %}
                     <p>You were not enrolled in any classes during {{ term.title }}.</p>
