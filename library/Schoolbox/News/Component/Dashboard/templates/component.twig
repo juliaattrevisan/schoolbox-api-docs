@@ -38,7 +38,7 @@
                 {% set active = false %}
 
                 {% for topic in topics %}
-                    <ul class="news-list content {% if not active and news[topic.id] and not allDefault | length %}active{% set active = true %}{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
+                    <ul class="news-list content {% if not active and news[topic.id] | length  and not allDefault %}active{% set active = true %}{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
                         {% for item in news[topic.id] %}
                             <li>
                                 <div class="list-item">
