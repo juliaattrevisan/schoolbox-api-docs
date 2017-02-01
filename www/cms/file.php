@@ -108,6 +108,7 @@ if (is_numeric($this->arg[0])) {
         'MAX_FILE_SIZE'    => Cfg::get('max_file_size'),
         'CATEGORY_NAME'    => Scrub::text($folder->getName()),
         'CATEGORY_ID'      => $folder->getId(),
+        'COMPONENT_ID'     => isset($this->arg[2]) ? $this->arg[2] : '',
         'DUE_DAY'          => is_numeric($this->arg[2]) ? $this->arg[2] : '',
         'DUE_MONTH'        => is_numeric($this->arg[3]) ? $this->arg[3] : '',
         'DUE_YEAR'         => is_numeric($this->arg[4]) ? $this->arg[4] : '',

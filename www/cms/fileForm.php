@@ -122,6 +122,39 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             $affectedIds = FileMapper::getInstance()->create($collection);
         }
 
+        // Are we injecting file into specific component?
+        if(isset($_POST['component']) && is_numeric($_POST['component'])){
+            // Retrieve component
+            $componentInstance = Component_InstanceMapper::getInstance()->findByInstanceId($_POST['component']);
+
+            // Different components will behave differently (it's not enough to specify the ConfigDef.Id in the URl)
+            switch($componentInstance->getDefinition()->getName()){
+                case 'Image':
+                    $configDefinition = $componentInstance->getConfigByKey('image');
+                    $value = $file->getTitle();
+                    break;
+                default:
+                    $value = $configDefinition = null;
+                    //noop
+            }
+
+            if($configDefinition){
+                /** @var Component_Config $configInstance */
+                try{
+                    $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList([
+                        'component_config_definition_id' => $configDefinition->getId(),
+                        'component_instance_id'          => $componentInstance->getId(),
+                    ]);
+                } catch (\Schoolbox\Mapper\Exception $e){
+                    $configInstance = Component_ConfigMapper::getInstance()->createModel();
+                    $configInstance->setConfigDefinitionId($configDefinition->getId());
+                    $configInstance->setInstanceId($componentInstance->getId());
+                }
+                $configInstance->setValue($value);
+                Component_ConfigMapper::getInstance()->save($configInstance);
+            }
+        }
+
 
         /* For some reason this is necessary for upload indication to reach completed status */
         if ($_POST['uploadifydie'] == true) {
