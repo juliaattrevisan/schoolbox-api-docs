@@ -417,6 +417,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             }
             return $this->resequenceColumn($module, $identifier, $protect, $position);
         } else {
+            $success = [];
             foreach ($cols as $c) {
                 $success[] = $this->resequenceColumn($module, $identifier, $protect, $c);
             }
