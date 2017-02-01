@@ -68,41 +68,46 @@ class Result extends Base
          */
         $i = 0;
 
-        foreach ($this->buildSearchResult($statement, $user, 'c.id', $sanitiser->getOffset(), self::NO_LIMIT) as $row) {
-            if ($i < $sanitiser->getLimit()) {
-                $folder = $mapper->hydrate($row, 'c');
+        // Handle offset properly:
+        // any folders found after offset+limit get skipped,
+        // any before offset get sliced off the start
+        foreach ($this->buildSearchResult($statement, $user, 'c.id', 0, self::NO_LIMIT) as $row) {
 
-                /* Accumulate folder codes here
-                 */
-                if (!($results->getOffset($folder->getId()) instanceof Folder)) {
-                    $results->setOffset($folder->getId(), $folder);
-
-                    $i++;
-                }
-
-                /* Reassign var
-                 */
-                $folder = $results->getOffset($folder->getId());
-
-                $code = $code_mapper->hydrate($row, 'cc');
-
-                if (strlen($code->getCode())) {
-                    $folder->getCodes()->add($code);
-                }
-
-                /* Accumulate homepage configs
-                 */
-                $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
-                $folder->setHomepage($homepageConfig);
-            }
-            else {
+            // Not at offset + limit results yet? Skip
+            if (count($results) > ($sanitiser->getOffset() + $sanitiser->getLimit())) {
                 break;
             }
+
+            $folder = $mapper->hydrate($row, 'c');
+
+            /* Accumulate folder codes here
+             */
+            if (!($results->getOffset($folder->getId()) instanceof Folder)) {
+                $results->setOffset($folder->getId(), $folder);
+
+                $i++;
+            }
+
+            /* Reassign var
+             */
+            $folder = $results->getOffset($folder->getId());
+
+            $code = $code_mapper->hydrate($row, 'cc');
+
+            if (strlen($code->getCode())) {
+                $folder->getCodes()->add($code);
+            }
+
+            /* Accumulate homepage configs
+             */
+            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+            $folder->setHomepage($homepageConfig);
         }
 
         /* What, it times out doing new Collection(array_values($results))
          */
         $results->reindex();
+        $results = $results->slice($sanitiser->getOffset(), $sanitiser->getLimit());
 
         return $results;
     }
