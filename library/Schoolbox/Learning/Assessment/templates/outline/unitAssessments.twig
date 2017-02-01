@@ -42,7 +42,7 @@
         {% endif %}
         <div class="list-item">
             <div class="small-12 compact card wrap-down">
-                <a class="" title="{{ assessment.typeName }}"  href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
+                <a class="" title="{{ assessment.typeName }}"  href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
                 <span class="{{ icon.renderClass(assessment) }}"></span>
                 <p>{{ assessment.title }}</p>
                 </a>
