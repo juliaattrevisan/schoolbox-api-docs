@@ -537,7 +537,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	 */
 	.left-submenu .back > a {
 		height: $tabbar-height;
-		line-height: 3;
+		line-height: $tabbar-height;
+		padding-top: 0;
+		padding-bottom: 0;
 		color: $off-canvas-foreground;
 		background-color: $off-canvas-background;
 		&:hover {
