@@ -190,7 +190,7 @@
                     </div>
                     <nav>
                         {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
-                        {% include '@learning/dueWork/crocodocLink.twig' with {assessment: assessment, feedback:latestFeedback, file: currentFile, participant: participant} only %}
+                        {% include '@learning/dueWork/crocodocLink.twig' with {assessment: assessment, feedback: latestFeedback, file: currentFile, participant: participant} only %}
                     </nav>
                 </li>
             {% endfor %}

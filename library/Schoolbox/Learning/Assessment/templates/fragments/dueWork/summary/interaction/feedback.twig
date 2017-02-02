@@ -100,7 +100,7 @@
                 </div>
                 {% if currentFile.crocodocId|length %}
                 <nav>
-                    <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {assessmentId: currentFeedback.assessable.id, assessment: assessment, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" class="icon-download" title="Download"></a>
+                    {% include '@learning/dueWork/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
                 </nav>
                 {% endif %}
             </li>
