@@ -83,9 +83,9 @@
                     {% endif %}
 
                     {% if currentInteraction is response %}
-                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' with {showLineActions: showLineActions} %}
+                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' with {showLineActions: showLineActions, participant: participant} %}
                     {% elseif currentInteraction is feedback %}
-                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction, showLineActions: showLineActions} %}
+                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction, showLineActions: showLineActions, participant: participant} %}
                     {% endif %}
                 {% endfor %}
             </ul>
