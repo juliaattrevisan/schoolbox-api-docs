@@ -261,18 +261,22 @@ class Controller extends Base
      */
     public function getClasses(Term $term)
     {
-        if ($this->getUser()->getHideTimetable()) {
+        $now = \Alaress_Date_Format::now();
 
-            $data = [
-                'hideTimetable' => true,
-                'classList' => [],
-            ];
+        if ($this->getUser()->getHideTimetable() && $term->contains($now)) {
+
+            // Hide timetable is on and trying to look at current term - hide classes
+
+            $hideTimetable = true;
+            $folderList = [];
+            $classTypes = [];
+            $courseSpecs = [];
 
         } else {
 
             $folderList = $this->getFolderMapper()->createCollection();
             $classTypes = [];
-            $now = \Alaress_Date_Format::now();
+            $hideTimetable = false;
 
             // Are we looking at current Classes, or historical ?
             if ($term->contains($now)) {
@@ -345,18 +349,18 @@ class Controller extends Base
                     $colourIndex = ($colourIndex + 1) % $colourList->count();
                 }
             }
-
-            $data = [
-                'currentUser' => $this->getUser(),
-                'terms' => $this->getTermMapper()->findAll(),
-                'now' => $now,
-                'term' => $term,
-                'classList' => $folderList,
-                'classTypes' => $classTypes,
-                'courses' => $courseSpecs,
-                'hideTimetable' => false,
-            ];
         }
+
+        $data = [
+            'currentUser' => $this->getUser(),
+            'terms' => $this->getTermMapper()->findAll(),
+            'now' => $now,
+            'term' => $term,
+            'classList' => $folderList,
+            'classTypes' => $classTypes,
+            'courses' => $courseSpecs,
+            'hideTimetable' => $hideTimetable,
+        ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $data)->setTab('classes'));
     }
