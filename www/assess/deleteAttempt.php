@@ -25,7 +25,7 @@ $groupHandler    = new Group();
 
 
 $getAttempt = function ($attemptId) use ($attemptHandler, $assessHandler, $groupHandler) {
-    if (is_numeric($attemptId)) {
+    if (!is_numeric($attemptId)) {
         throw \Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
     }
 
