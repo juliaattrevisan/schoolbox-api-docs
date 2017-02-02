@@ -46,29 +46,34 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         $dayLimit = $this->getConfig('days');
 
-        $cutoffDate = null;
-        if(self::DAY_LIMIT_ALL != $dayLimit){
+        if (self::DAY_LIMIT_ALL == $dayLimit) {
+            $cutoffDate = null;
+        } else {
             $cutoffDate = Alaress_Date_Format::now();
             $cutoffDate->addDays(-1 * $dayLimit);
         }
 
-        // Get most recent N months of DueWork Submissions
+        // Get most recent N days of DueWork Submissions
         /** @var \Schoolbox\Learning\Assessment\Response\SubSource\DueWork $studentSubmissionDataSource */
         $studentSubmissionDataSource = $this->getSitePage()->getDi()->get('submissionDataSource');
         $pb = $studentSubmissionDataSource->getPredicateBuilder();
         $pb->equals('b.owner', $this->getUser()->getId());
-        if(self::DAY_LIMIT_ALL != $dayLimit){
+        if(self::DAY_LIMIT_ALL == $dayLimit){
+            $pb->notNull('submitted_at');
+        } else {
             $pb->greaterThan('submitted_at', $cutoffDate->getDatabase());
         }
         $studentSubmissions = $studentSubmissionDataSource->findByPredicates($pb);
 
-        // Get most recent N months of Quiz Attempts
+        // Get most recent N days of Quiz Attempts
         /** @var \Schoolbox\Learning\Assessment\Response\SubSource\Quiz $quizAttemptDataSource */
         $quizAttemptDataSource = $this->getSitePage()->getDi()->get('attemptDataSource');
         $pb = $quizAttemptDataSource->getPredicateBuilder();
         $pb->equals('a.user_id', $this->getUser()->getId());
         $pb->equals('a.availability', Quiz::AVAILABILITY_ASSESS);
-        if(self::DAY_LIMIT_ALL != $dayLimit) {
+        if(self::DAY_LIMIT_ALL == $dayLimit) {
+            $pb->notNull('finish');
+        } else {
             $pb->greaterThan('finish', $cutoffDate->getDatabase());
         }
         $quizAttempts = $quizAttemptDataSource->findByPredicates($pb);
