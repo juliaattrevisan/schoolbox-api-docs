@@ -1,7 +1,7 @@
 <?php
 /**
- * For whatever reason, we have schools with DueWork with max_mark = 0, this is not a valid state and is blowing up
- * the mark scheme factory.
+ * For whatever reason, we have schools with DueWork with markType = maxMark + max_mark = 0, this is not a
+ * valid state and is blowing up the mark scheme factory.
  *
  * It appears to exist for DueWork that is using a rubric. Presumably at some point this value was not being copied
  * to the dueWork. Solution is to do so now.
@@ -31,7 +31,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
     // Note the COALESCE - we treat no value as 0 for the purpose of this script.
-    // Note we need to include 'sb.id' in the group by cater for when the LEFT JOIN to rubric_level matches nothing
+    // Note we need to include 'sb.id' in the GROUP BY to cater for when the LEFT JOIN to rubric_level matches nothing
     $selectBoxesWithZeroMaxMark = $db->prepare("
         SELECT 
             `sb.id`,
