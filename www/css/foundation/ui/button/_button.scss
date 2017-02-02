@@ -60,12 +60,21 @@ a[disabled], a.disabled {
 			width: 0;
 		}
 	}
+}
 
-	// Fat button - for when you need a button larger than Steve's mama
-	// Like Steve's mama, fits best in a block-grid
-	&.fat {
+// Fat button - for when you need a button larger than Steve's mama
+// Like Steve's mama, fits best in a block-grid
+.fat-buttons{
+	@include flex;
+	flex-wrap: wrap;
+	list-style: none;
+	margin: 0;
+	li{
+		flex: 1;
+		flex-basis: auto;
+	}
+	a {
 		display: block;
-		min-height: 5rem;
 		padding-top: 0.875rem;
 		font-size: rem-calc($base-font-size - 3);
 		&:before {

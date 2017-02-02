@@ -40,12 +40,12 @@
         <section class="no-pad">
             <div class="content no-pad">
                 <div class="row no-margin">
-                    <div class="small-12 medium-6 large-4 columns no-pad">
+                    <div class="small-12 medium-2 columns" style="padding-top:1rem;padding-bottom:1rem;">
                         {# as far as I know portrait always shows #}
-                        <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
+                        <img class="full-width" src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=constrain200"/>
                     </div>
 
-                    <div class="small-12 medium-6 large-8 columns no-pad">
+                    <div class="small-12 medium-10 columns no-pad">
                         {% block specialAlert %}
                             {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
                                 <div class="alert-box warning icon-bell no-margin">
@@ -210,35 +210,34 @@
             </div>
             
             {% block buttons_island %}
-            <script type="text/javascript">
-                $(function() {
-                    var minColumns = 1;
-                    var maxColumns = 12;
+            {#<script type="text/javascript">#}
+                {#$(function() {#}
+                    {#var minColumns = 1;#}
+                    {#var maxColumns = 12;#}
 
-                    var element = $('#fat-buttons');
-                    var length = element.find('li').length;
+                    {#var element = $('#fat-buttons');#}
+                    {#var length = element.find('li').length;#}
 
-                    /* Enforce boundary values
-                     */
-                    if (length < minColumns) {
-                        length = minColumns;
-                    }
-                    else if (length > maxColumns) {
-                        length = maxColumns;
-                    }
+                    {#/* Enforce boundary values#}
+                     {#*/#}
+                    {#if (length < minColumns) {#}
+                        {#length = minColumns;#}
+                    {#}#}
+                    {#else if (length > maxColumns) {#}
+                        {#length = maxColumns;#}
+                    {#}#}
 
-                    element.addClass('large-block-grid-' + length);
-                });
-            </script>
-            <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-3" data-equalizer>
+                    {#element.addClass('large-block-grid-' + length);#}
+                {#});#}
+            {#</script>#}
+            <ul class='fat-buttons'>
                 {% block buttons %}
                     {% if showButtons %}
                         {% block buttons_dueWork %}
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="/learning/due/{{ user.getId() }}"
-                                       class="no-margin button fat icon-fat size-32 icon-due-work"
-                                       data-equalizer-watch>Due Work</a>
+                                       class="no-margin button icon-fat icon-due-work" >Due Work</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_dueWork %}
@@ -247,10 +246,9 @@
                     {% if showButtons %}
                         {% block buttons_grades %}
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="/learning/grades/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat size-32 icon-tick"
-                                       data-equalizer-watch>Grades</a>
+                                       class="no-margin button icon-fat icon-tick">Grades</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_grades %}
@@ -258,30 +256,27 @@
 
                     {% if eportfolioAuth %}
                         {% block buttons_eportfolio %}
-                            <li class="no-pad">
+                            <li>
                                 <a href="/eportfolio/{{ user.getId() }}/profile"
-                                   class="no-margin fat button icon-fat size-32 icon-eportfolio"
-                                   data-equalizer-watch>ePortfolio</a>
+                                   class="no-margin button icon-fat icon-eportfolio">ePortfolio</a>
                             </li>
                         {% endblock buttons_eportfolio %}
                     {% endif %}
 
                     {% if showButtons and showPastoral %}
                         {% if isStaff or isParentOfStudent %}
-                        <li class="no-pad">
+                        <li>
                             <a href="/pastoral/{{ user.getId() }}"
-                               class="no-margin fat icon-fat button size-32 icon-pastoral"
-                               data-equalizer-watch>Pastoral Care</a>
+                               class="no-margin button icon-fat icon-pastoral">Pastoral Care</a>
                         </li>
                         {% endif %}
                     {% endif %}
 
                     {% if showButtons %}
                         {% block buttons_calendar %}
-                            <li class="no-pad">
+                            <li>
                                 <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                   class="no-margin fat button icon-fat size-32 icon-calendar"
-                                   data-equalizer-watch>{TPL_LOCAL_CALENDAR_PC}</a>
+                                   class="no-margin button icon-fat icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a>
                             </li>
                         {% endblock buttons_calendar %}
                     {% endif %}
@@ -289,10 +284,9 @@
                     {% if showButtons %}
                         {% if showClasses %}
                             {% block buttons_timetable %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="/timetable/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat size-32 icon-timetable"
-                                       data-equalizer-watch>Timetable</a>
+                                       class="no-margin button icon-fat icon-timetable">Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
                         {% endif %}
@@ -301,10 +295,9 @@
                     {% if showButtons %}
                         {% block buttons_boarderLeave %}
                             {% if config.boarder_leave_enabled and user.getResidentialHouse().getId() %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="/modules/leave/student/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat size-32 icon-boarder-leave"
-                                       data-equalizer-watch>Boarder Leave</a>
+                                       class="no-margin button icon-fat icon-boarder-leave">Boarder Leave</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_boarderLeave %}
@@ -313,11 +306,10 @@
                     {% if showButtons %}
                         {% block buttons_pastoralCare %}
                             {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
-                                       class="no-margin fat button icon-fat size-32 icon-modify"
-                                       target="_blank"
-                                       data-equalizer-watch>Pastoral Care</a>
+                                       class="no-margin button icon-fat icon-modify"
+                                       target="_blank">Pastoral Care</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_pastoralCare %}

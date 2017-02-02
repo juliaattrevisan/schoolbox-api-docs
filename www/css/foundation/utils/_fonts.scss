@@ -19,6 +19,7 @@
 .icon-fat:before {
     padding-right: 0;
     display: block;
+    @extend .size-32;
 }
 
 .icon [class^="icon-"],
