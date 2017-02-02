@@ -1,9 +1,36 @@
 {% extends '@core/user/student.twig' %}
 
-
 {% block details_studiesCode %}
     {% if externalUser.StudentStudiesCode %}
     <dt class="no-margin small-6 medium-3">Studies Code:</dt>
     <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
     {% endif %}
 {% endblock details_studiesCode %}
+
+{% block buttons_island %}
+    {{ parent() }}
+    {% if isStaff %}
+        <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-4" data-equalizer>
+            <li class="no-pad">
+                <a href="/modules/remote/aHR0cHM6Ly9yZXBvcnRzLmxhdXJpc3Rvbi52aWMuZWR1LmF1L1JlcG9ydFNlcnZlcj8vU2Nob29sYm94L1N0dWRlbnRzL0Fzc2Vzc21lbnQrRGF0YSZhbXA7cnM6Q29tbWFuZD1SZW5kZXImcmM6VG9vbGJhcj1mYWxzZQ=="
+                   class="no-margin button fat icon-fat size-32 icon-due-work"
+                   data-equalizer-watch>Assessment Data</a>
+            </li>
+            <li class="no-pad">
+                <a href="/modules/remote/aHR0cHM6Ly9yZXBvcnRzLmxhdXJpc3Rvbi52aWMuZWR1LmF1L1JlcG9ydFNlcnZlcj8vU2Nob29sYm94L1N0dWRlbnRzL1JlcG9ydGluZytHcmFkZXMmYW1wO3JzOkNvbW1hbmQ9UmVuZGVyJnJjOlRvb2xiYXI9ZmFsc2U="
+                   class="no-margin button fat icon-fat size-32 icon-progress"
+                   data-equalizer-watch>Reporting Grades</a>
+            </li>
+            <li class="no-pad">
+                <a href="/modules/remote/aHR0cHM6Ly9yZXBvcnRzLmxhdXJpc3Rvbi52aWMuZWR1LmF1L1JlcG9ydFNlcnZlcj8vU2Nob29sYm94L1N0dWRlbnRzL0xlYXJuaW5nK1N1cHBvcnQmYW1wO3JzOkNvbW1hbmQ9UmVuZGVyJnJjOlRvb2xiYXI9ZmFsc2U="
+                   class="no-margin button fat icon-fat size-32 icon-staff"
+                   data-equalizer-watch>Learning Support</a>
+            </li>
+            <li class="no-pad">
+                <a href="/modules/remote/aHR0cHM6Ly9yZXBvcnRzLmxhdXJpc3Rvbi52aWMuZWR1LmF1L1JlcG9ydFNlcnZlcj8vU2Nob29sYm94L1N0dWRlbnRzL1N0dWRlbnQrTm90ZXMmYW1wO3JzOkNvbW1hbmQ9UmVuZGVyJnJjOlRvb2xiYXI9ZmFsc2U="
+                   class="no-margin button fat icon-fat size-32 icon-forms"
+                   data-equalizer-watch>Student Notes</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock buttons_island %}
