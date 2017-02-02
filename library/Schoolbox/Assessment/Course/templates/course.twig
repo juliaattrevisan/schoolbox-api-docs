@@ -288,7 +288,8 @@ Usage:
                                         unitSpec:         unitSpec,
                                         encodedReturnUrl: encodedReturnUrls[unitSpec.id],
                                         '_expanded':      false,
-                                        '_writable':      folderAccess[unitSpec.folder.id] > 1
+                                        '_writable':      folderAccess[unitSpec.folder.id] > 1,
+                                        toastSelector:    '[data-relation="ajax-response"]'
                                     } only %}
                                 {% endif %}
                             {% endfor %}
@@ -336,4 +337,6 @@ Usage:
     </div>
 </div>
 <div id="parent-select" data-reveal class="reveal-modal"></div>
+
+<div class="toast" data-alert data-relation="ajax-response"></div>
 

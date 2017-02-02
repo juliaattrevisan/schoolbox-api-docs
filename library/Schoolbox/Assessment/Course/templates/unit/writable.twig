@@ -4,12 +4,13 @@ Usage:
         unitSpec:         UnitSpecification,
         _expanded:        bool               - whether to initially display expanded or collapsed,
         encodedReturnUrl: string             - URL to return to to focus on this UnitSpec in current CourseSpec
+        toastSelector:    string             - jQuery selector for the toast HTML element
     ]
 #}
 
 <script type="text/javascript">
     $(function () {
-        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder();
+        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder({toastSelector: '{{ toastSelector | raw }}'});
     });
 </script>
 
