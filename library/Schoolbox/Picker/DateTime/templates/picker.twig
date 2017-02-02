@@ -485,23 +485,6 @@
 
     };
 
-    function checkAllday( state ) {
-
-        var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
-
-        {# All Day is on  #}
-        if(state === true) {
-            timeDiv.css('display', 'none');
-            $('#hideTime{{ id }}').prop('checked', true);
-
-        }
-        else {
-            timeDiv.css('display', 'block');
-            $('#hideTime{{ id }}').prop('checked', false);
-        }
-
-    };
-
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
 
         defaultDate: new Date({{ value }}),
@@ -514,43 +497,41 @@
         enableTime: pickerOptions.enableTime,
 
         onReady: function (selectedDates, dateStr, instance) {
-            alert('ready{{ id }}');
             renderAllday(instance);
 
             {# Hide time picker if allday hidden field is set to 1 #}
             if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
-                checkAllday(true);
-                alert(1);
+                checkAllday(true, {{ id }} );
+//                alert(1);
             }
             else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
-                checkAllday(false);
-                alert(2);
+                checkAllday(false, {{ id }} );
+//                alert(2);
 
             }
             else if (hasTime(instance.input.value) === false ) {
-                checkAllday(true);
-                alert(3);
+                checkAllday(true, {{ id }} );
+//                alert(3);
 
             }
             else {
-                checkAllday(false);
-                alert(4);
+                checkAllday(false, {{ id }} );
+//                alert(4);
 
             }
 
             if (pickerOptions.allDay === true) {
                 $('#hideTime{{ id }}').click(function () {
                     if ($('#hideTime{{ id }}').is(':checked')) {
-                        checkAllday(true);
+                        checkAllday(true, {{ id }}  );
                     }
                     else {
-                        checkAllday(false);
+                        checkAllday(false, {{ id }} );
                     }
                 });
             }
         },
         onChange: function (selectedDates, dateStr, instance) {
-            alert('change{{ id }}');
 
             {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
             var dateSplit = dateStr.split(' ');
@@ -600,9 +581,6 @@
             }
             latestDate = newDate;
         },
-        onOpen: function (selectedDates, dateStr, instance) {
-            alert('open');
-        }
 
     });
 </script>
