@@ -28,6 +28,7 @@ class Survey_Import_Xml extends Evaluation_Import_Xml {
             'completion_message' => $this->parseRichTextNode($xml, 'completionmessage'),
             'start'              => $xml->start,
             'finish'             => $xml->finish,
+            'duration'           => -1,
             'max_attempts'       => $this->getMaxAttempts($xml),
             'availability'       => $xml->availability,
             'anonymous_result'   => $xml->anonymousresult,
