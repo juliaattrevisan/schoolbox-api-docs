@@ -1,3 +1,3 @@
-{% if file.crocodocId %}
+{% if file.crocodocId and feedback.id %}
 <a href="{{ routeLookupIfAuthorized('learningResponse.getCrocodocDownload', {assessment: assessment, assessmentId: assessment.id, feedbackId: feedback.id, crocodocId: file.crocodocId, participant: participant}) }}" class="icon-download" title="Download annotated document"></a>
 {% endif %}
