@@ -1820,7 +1820,7 @@ abstract class Mapper implements IMapper, Serializable
 
             } else {
                 $params = $predicate->getParams();
-                asort($params);
+                ksort($params);
 
                 // the query itself gets cached by the DB class, but we also want to cache the params
                 $hash = sha1(sprintf('%s[%s]',
