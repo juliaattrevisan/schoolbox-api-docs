@@ -129,12 +129,12 @@ Usage:
             var $descriptorsChanged = $('[data-descriptors-changed]').hide();
 
             // Each time we change the value of a descriptor
-            $rubric.on('blur keyup', '[data-descriptor-value-original]', function(event){
+            $rubric.on('blur keyup', '[data-descriptor-value-original]', function(){
                 detectChangedDescriptorValues();
             });
 
             // Each time the user toggles on/off a indicator
-            $rubric.on('change', '[data-criterion-name]', function(event){
+            $rubric.on('change', '[data-criterion-name]', function(){
                 detectChangedDescriptorValues();
             });
 
