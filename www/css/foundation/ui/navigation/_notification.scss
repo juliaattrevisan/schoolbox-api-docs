@@ -72,7 +72,9 @@ $notification-header-background: $navigation-background !default;
     ul.off-canvas-list {
         label {
             height: $tabbar-height;
-            line-height: 3rem;
+            line-height: $tabbar-height;
+            padding-top: 0;
+            padding-bottom: 0;
             background: $notification-unread-background;
             color: $notification-unread-color;
             z-index: 1003;
