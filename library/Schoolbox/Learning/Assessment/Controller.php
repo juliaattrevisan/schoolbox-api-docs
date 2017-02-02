@@ -6,9 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Aura\Web\Request;
 use DomainException;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
