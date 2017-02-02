@@ -40,7 +40,7 @@
         };
         initTaskList();
 
-        var $toastFeedback = settings.toastSelector ? $(settings.toastSelector) : null;
+        var $toastFeedback = $(settings.toastSelector);
 
         // Delete task: "are you sure?"
         unitSpec.on('click.courseAssessmentList', '[data-action=delete-assessment]', function(event) {

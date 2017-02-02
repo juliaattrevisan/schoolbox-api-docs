@@ -14,7 +14,7 @@ $data = [
     <script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
     <script type="text/javascript">
         $(function () {
-            $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder();
+            $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder({toastSelector: '[data-relation="ajax-response-{{ componentInstance.id }}"]'});
         });
     </script>
 
@@ -54,3 +54,5 @@ $data = [
         <p><a href="{{ activityUrl }}?{{ returnUrlName }}={{ encodedReturnUrl }}">Create a task, due work, quiz, or project</a> for this unit that you can import into classes and reuse again.</p>
     </div>
 {% endif %}
+
+<div class="toast" data-alert data-relation="ajax-response-{{ componentInstance.id }}"></div>
