@@ -29,13 +29,15 @@
             }
         }
 
+        var $acceptOnlineToggle = $('#acceptOnline');
+
         /* Initial state
          */
-        toggleDates($('#acceptOnline'));
+        toggleDates($acceptOnlineToggle);
 
         /* Update upon change
          */
-        $('#acceptOnline').change(function() {
+        $acceptOnlineToggle.change(function() {
             toggleDates($(this));
         });
     });
