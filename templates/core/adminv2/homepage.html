@@ -76,6 +76,54 @@
                 }
             });
         });
+
+        // Rename template
+        var NO_TEMPLATE     = -1;
+        var $templateSelect = $('#templateSelector');
+        var $editButton     = $('[data-reveal-id="renameDialog"]');
+        var $modal          = $('#' + $editButton.data('reveal-id'));
+        var $inputLabel     = $modal.find('[data-existing-label]');
+        var $inputValue     = $modal.find('[data-existing-value]');
+        var $modalSubmit    = $modal.find('input[type=submit]');
+        var $renameForm     = $modal.find('form');
+        var $newNameInput   = $modal.find('[name=name]');
+        var $toastDiv       = $('[data-relation="ajax-action"]');
+
+        // Disable 'Rename Template' when 'No Template' is selected
+        $templateSelect.on('change', function(){
+            if(NO_TEMPLATE == $templateSelect.val()){
+                $editButton.prop('disabled', true);
+                $editButton.addClass('disabled');
+            } else {
+                $editButton.prop('disabled', false);
+                $editButton.removeClass('disabled');
+            }
+        });
+        $templateSelect.trigger('change');
+
+        // Copy selected Template details to modal when opened
+        $editButton.on('click', function(){
+            $inputLabel.val($templateSelect.find('option:selected').text());
+            $inputValue.val($templateSelect.val());
+        });
+
+        // Submit using AJAX so we can preserve location hash
+        $modalSubmit.on('click', function(event){
+            event.preventDefault();
+            var data = $renameForm.serialize();
+            var action = $renameForm.attr('action');
+            $modal.foundation('reveal', 'close');
+            $modal.find('input').prop('disabled', true);
+            $toastDiv.toastActivate({text: 'Renaming template...'});
+
+            $.post(action, data, function(){
+                $modal.find('input').prop('disabled', false);
+                $templateSelect.find('option:selected').text($newNameInput.val());
+                $modal.foundation('reveal', 'close');
+                $toastDiv.toastTimeout({text: 'Template renamed.', css: 'success'});
+            });
+        });
+
     });
 </script>
 <!-- END custom_head -->
@@ -164,23 +212,24 @@
 </div>
 
 <div id="renameDialog" class="reveal-modal" data-reveal aria-labelledby="renameDialogLabel" aria-hidden="true" role="dialog">
-    <h2 id="renameDialogLabel">Modify homepage template</h2>
+    <h2 id="renameDialogLabel">Rename homepage template</h2>
     <form action="/adminv2/homepage/homepageForm.php" method="POST">
         <label>
-            Existing Template
-            <select id="template-select" name="template" >
-                <!-- BEGIN template -->
-                <option value="{template.id}">{template.name}</option>
-                <!-- END template -->
-            </select>
+            Current name
+            <input type="text" data-existing-label readonly/>
         </label>
+        <input type="hidden" name="template" data-existing-value/>
+        <input type="hidden" name="action" value="Rename" />
+
         <label>
             New name
             <input type="text" name="name"/>
         </label>
-        <input type="submit" name="action" value="Rename" />
+        <input type="submit" value="Rename" />
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <div id="resource-browser" class="hide"></div>
+
+<div class="toast" data-alert data-relation="ajax-action"></div>
