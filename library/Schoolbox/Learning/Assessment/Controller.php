@@ -187,9 +187,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     /**
      * Delete the given assessment.
-     * Deletion is considered to be an idempotent method, so do not return an error on repeat attempts to delete an entity.
      *
-     * On success, respond with '204 No Content' and a Location header to the list
+     * Deletion is considered to be an idempotent method, so do not return an error on repeat attempts to delete an entity.
      * On failure, respond with '4XX' or '5XX' as appropriate
      *
      * @api   POST /learning/assessments/{assessmentId}/delete
