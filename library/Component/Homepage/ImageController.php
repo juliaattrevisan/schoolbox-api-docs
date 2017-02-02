@@ -12,12 +12,6 @@ use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ImageController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var DeprecatedDatabase
-     */
-    private $db;
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -30,8 +24,6 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         if(!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
-
-        $this->db = DeprecatedDatabase::getInstance();
         return true;
     }
 
