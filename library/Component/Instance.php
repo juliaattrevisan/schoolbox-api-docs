@@ -56,7 +56,7 @@ class Component_Instance
     protected $instanceCount = 0;
 
     /**
-    * @var Schoolbox\Collection
+    * @var Schoolbox\Collection|Component_ConfigDefinition[]
     */
     protected $config;
 
@@ -77,11 +77,27 @@ class Component_Instance
     }
 
     /**
-    * @return \Schoolbox\Collection|Component_ConfigDefinition[]
-    */
+     * @return Component_ConfigDefinition[]|\Schoolbox\Collection
+     */
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * Convenience method to retrieve a specific config
+     *
+     * @param string $key
+     * @return Component_ConfigDefinition
+     */
+    public function getConfigByKey($key)
+    {
+        foreach($this->config as $config){
+            if($config->getKey() == $key){
+                return $config;
+            }
+        }
+        throw new DomainException("Config with key: '$key' not found");
     }
 
     /**

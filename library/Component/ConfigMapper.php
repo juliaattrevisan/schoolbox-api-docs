@@ -9,8 +9,8 @@
  */
 
 /**
- * Class Component_ConfigMapper
  * @method Component_Config createModel($idValue = null)
+ * @method Component_Config findOneByColumnList($columnList, $order = array(), $options = array())
  */
 class Component_ConfigMapper extends \Schoolbox\Mapper
 {
@@ -19,38 +19,10 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
     {
         $this->hasTable('component_config_instance');
         $this->hasModel(Component_Config::class);
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'component_config_definition_id',
-                'property' => 'configDefinitionId',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'component_instance_id',
-                'property' => 'instanceId',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'value',
-                'property' => 'value',
-                'type'     => self::TYPE_STRING,
-            )
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('component_config_definition_id', self::TYPE_INTEGER, null, 'configDefinitionId');
+        $this->uses('component_instance_id', self::TYPE_INTEGER, null, 'instanceId');
+        $this->uses('value', self::TYPE_STRING);
     }
 
 

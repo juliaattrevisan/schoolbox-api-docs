@@ -122,6 +122,45 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             $affectedIds = FileMapper::getInstance()->create($collection);
         }
 
+        // Did caller request to inject the file into a specific component?
+        if (isset($_POST['component']) && is_numeric($_POST['component']) && $_POST['component'] > 0) {
+
+            // Retrieve component
+            $componentInstance = Component_InstanceMapper::getInstance()->findByInstanceId($_POST['component']);
+
+            // Ensure this component resides on the specified page (extra sanity test, not strictly required)
+            if ($componentInstance->getIdentifier() != $_POST['category']) {
+                throw new DomainException("Component Instance ({$componentInstance->getId()}) does not reside on folder ({$componentInstance->getIdentifier()})");
+            }
+
+            // Different components will behave differently (it's not enough to merely specify the ConfigDef.Id in the URl)
+            switch ($componentInstance->getDefinition()->getName()) {
+                case 'Image':
+                    $configDefinition = $componentInstance->getConfigByKey('image');
+                    $value = $file->getTitle();
+                    break;
+                // You can insert other component types here. (use definition.name to identify)
+                default:
+                    //noop
+                    $value = $configDefinition = null;
+            }
+
+            // Is this a component we know how to configure?
+            if ($configDefinition) {
+                try {
+                    $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList([
+                        'component_config_definition_id' => $configDefinition->getId(),
+                        'component_instance_id'          => $componentInstance->getId(),
+                    ]);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $configInstance = Component_ConfigMapper::getInstance()->createModel();
+                    $configInstance->setConfigDefinitionId($configDefinition->getId());
+                    $configInstance->setInstanceId($componentInstance->getId());
+                }
+                $configInstance->setValue($value);
+                Component_ConfigMapper::getInstance()->save($configInstance);
+            }
+        }
 
         /* For some reason this is necessary for upload indication to reach completed status */
         if ($_POST['uploadifydie'] == true) {

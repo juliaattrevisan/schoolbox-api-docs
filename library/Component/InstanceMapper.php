@@ -25,42 +25,13 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     {
         $this->hasTable('component_instance');
         $this->hasModel(Component_Instance::class);
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true
-        ));
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('component_definition_id', self::TYPE_INTEGER, null, 'definitionId');
+        $this->uses('module', self::TYPE_STRING);
+        $this->uses('identifier', self::TYPE_INTEGER);
+        $this->uses('position', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
 
-        $this->hasMap(array(
-            'column'     => 'component_definition_id',
-            'property'   => 'definitionId',
-            'type'       => self::TYPE_INTEGER,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'module',
-            'property'   => 'module',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'identifier',
-            'property'   => 'identifier',
-            'type'       => self::TYPE_INTEGER,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'position',
-            'property'   => 'position',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'sequence',
-            'property'   => 'sequence',
-            'type'       => self::TYPE_INTEGER,
-        ));
     }
 
     /**
@@ -282,6 +253,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
                 // each component of the same type's config objects are the same object.
                 // Setting the config value directly affects the config value for this key
                 // for ALL components of this type!
+                /** @var Component_Config $newConfig */
                 $newConfig = clone $finalCollection[$confInstance->getInstanceId()]->getConfig()
                                                                                    ->getOffset($confInstance->getConfigDefinitionId());
                 $finalCollection[$confInstance->getInstanceId()]->getConfig()
@@ -376,7 +348,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             }
         }
 
-        return parent::save($dirtyInstanceCollection, false);
+        return parent::save($dirtyInstanceCollection);
     }
 
     public function delete($object)
@@ -446,6 +418,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             }
             return $this->resequenceColumn($module, $identifier, $protect, $position);
         } else {
+            $success = [];
             foreach ($cols as $c) {
                 $success[] = $this->resequenceColumn($module, $identifier, $protect, $c);
             }
