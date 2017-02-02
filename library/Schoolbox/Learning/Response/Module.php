@@ -94,7 +94,7 @@ class Module extends BaseModule
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $crocodocPattern . '/download',  'getCrocodocDownload', $hasWriteOrIsParticipant, $preloadResponse); // a || r
-        $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $hasWriteAccess, $preloadResponse); // a || r
+        $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $hasWriteOrIsParticipant, $preloadResponse); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasWriteAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/{contextId:\d+}/iframe', 'getPlagscanReportContents', $hasWriteAccess, $preloadPlagscanWithAss); // a || r

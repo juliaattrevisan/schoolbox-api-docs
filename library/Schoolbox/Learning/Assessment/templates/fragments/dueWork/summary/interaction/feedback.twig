@@ -86,7 +86,7 @@
                          # responseId comes from the twig that includes this fragment
                          #}
                         {% if currentFile.crocodocId|length %}
-                            <a href="{{ routeLookup('learningResponse.getCrocodocView', {assessmentId: currentFeedback.assessable.id, assessment: assessment, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}">
+                            <a href="{{ routeLookupIfAuthorized('learningResponse.getCrocodocView', {assessmentId: currentFeedback.assessable.id, assessment: assessment, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId, participant: participant}) }}">
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                 <p>{{ currentFile.filename }}</p>
                             </a>
