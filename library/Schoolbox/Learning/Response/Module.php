@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
+use Schoolbox\Learning\Assessment\DueWork\Submission;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
@@ -152,6 +153,7 @@ class Module extends BaseModule
      */
     private function preloadResponseWithFeedback(array $params)
     {
+
         /* Die early when requested Assessment doesn't exist
          */
         try {
@@ -161,35 +163,38 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        /* Die early when requested Response doesn't exist in $assessment
+        /* Get all the feedbacks associated with $assessment, then find the requested Feedback
+         * Find everything the hard way
          */
         try {
-            /** @var Feedback\Model $response */
-            $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
-        }
-        catch (OutOfBoundsException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
+            /** @var Feedback\Model $feedback */
+            $feedbacks = $this->getFeedbackMapperProxy()->findForAssessment($assessment);
+            $feedback = false;
 
-        /* Get all the feedbacks associated with $assessment, then find the requested Feedback
-         */
-        $feedbacks = $this->getFeedbackMapperProxy()->findForAssessment($assessment);
+            foreach ($feedbacks as $currentFeedback) {
+                if ($currentFeedback->getId() == $params['feedbackId']) {
+                    $feedback = $currentFeedback;
+                }
+            }
 
-        /* Need this $feedback to determine whether the requested
-         * crocodoc annotation is part of a published feedback
-         */
-        $feedback = null;
+            if (!$feedback) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
 
-        foreach ($feedbacks as $currentFeedback) {
-            if ($currentFeedback->getId() == $params['feedbackId']) {
-                $feedback = $currentFeedback;
-                break;
+            $responses = $this->getResponseMapperProxy()->findForAssessment($assessment);
+            $response = false;
+
+            foreach ($responses as $currentResponse) {
+                if ($currentResponse->getId() == $feedback->getResponse()->getId()) {
+                    $response = $currentResponse;
+                }
+            }
+
+            if (!$response) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
-
-        /* Die early when requested Feedback doesn't exist
-         */
-        if (!$feedback) {
+        catch (OutOfBoundsException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
@@ -197,6 +202,7 @@ class Module extends BaseModule
          */
         $file = null;
 
+        /** @var Submission\Model $response */
         foreach ($response->getAllFiles() as $currentFile) {
             if ($currentFile->getCrocodocId() == $params['crocodocId']) {
                 $file = $currentFile;
@@ -210,13 +216,18 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        /* Spawn participant(s)
+         */
+        $this->getAssessmentMapperProxy()->loadParticipantsIntoAssessment($assessment, $feedback->getReviewee());
+
         /* Otherwise you succeeded in running the gauntlet
          * Shove all required ingredients into Controller at last
          */
         return [
             'response' => $response,
             'feedback' => $feedback,
-            'file' => $file
+            'file' => $file,
+            'participant' => $assessment->getParticipant($feedback->getReviewee())
         ];
     }
 
