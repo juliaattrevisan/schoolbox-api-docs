@@ -22,3 +22,19 @@
     {% endif %}
 {% endif %}
 {% endblock details_studentForm %}
+
+{% block buttons_island %}
+    {{ parent() }}
+    <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-3 large-block-grid-5" data-equalizer>
+        <li class="no-pad">
+            <a href="/synergetic/Docs/?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-document" data-equalizer-watch>Academic Reports</a>
+        </li>
+        <li class="no-pad">
+            <a href="/synergetic/fin/?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-itineraryitem" data-equalizer-watch>Fees</a>
+        </li>
+
+        <li class="no-pad">
+            <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-info" data-equalizer-watch>My Details</a>
+        </li>
+    </ul>
+{% endblock buttons_island %}
