@@ -22,6 +22,9 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
  */
 class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract
 {
+    // User has selected not to limit days of results, ie they have select 'ALL'
+    const DAY_LIMIT_ALL = 0;
+
     /**
      * Sorted by most recent student response first
      *
@@ -41,15 +44,22 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
             return false;
         }
 
-        $cutoffDate = Alaress_Date_Format::now();
-        $cutoffDate->addDays(-1 * $this->getConfig('days'));
+        $dayLimit = $this->getConfig('days');
+
+        $cutoffDate = null;
+        if(self::DAY_LIMIT_ALL != $dayLimit){
+            $cutoffDate = Alaress_Date_Format::now();
+            $cutoffDate->addDays(-1 * $dayLimit);
+        }
 
         // Get most recent N months of DueWork Submissions
         /** @var \Schoolbox\Learning\Assessment\Response\SubSource\DueWork $studentSubmissionDataSource */
         $studentSubmissionDataSource = $this->getSitePage()->getDi()->get('submissionDataSource');
         $pb = $studentSubmissionDataSource->getPredicateBuilder();
         $pb->equals('b.owner', $this->getUser()->getId());
-        $pb->greaterThan('submitted_at', $cutoffDate->getDatabase());
+        if(self::DAY_LIMIT_ALL != $dayLimit){
+            $pb->greaterThan('submitted_at', $cutoffDate->getDatabase());
+        }
         $studentSubmissions = $studentSubmissionDataSource->findByPredicates($pb);
 
         // Get most recent N months of Quiz Attempts
@@ -58,7 +68,9 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $pb = $quizAttemptDataSource->getPredicateBuilder();
         $pb->equals('a.user_id', $this->getUser()->getId());
         $pb->equals('a.availability', Quiz::AVAILABILITY_ASSESS);
-        $pb->greaterThan('finish', $cutoffDate->getDatabase());
+        if(self::DAY_LIMIT_ALL != $dayLimit) {
+            $pb->greaterThan('finish', $cutoffDate->getDatabase());
+        }
         $quizAttempts = $quizAttemptDataSource->findByPredicates($pb);
 
         /** @var IResponse[] $responses */
