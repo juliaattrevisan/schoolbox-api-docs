@@ -167,34 +167,34 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Files</h2>
-            <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2">
-                {% for currentFile in response.allFiles %}
-                    {% set selected = '' %}
-                    {% set defaultSelectedFile = selectedFileHash|length == 0 and loop.index0 == 0 %}
-                    {% set hasSelectedFile = selectedFileHash|length and currentFile.hash == selectedFileHash %}
+        <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2">
+            {% for currentFile in response.allFiles %}
+                {% set selected = '' %}
+                {% set defaultSelectedFile = selectedFileHash|length == 0 and loop.index0 == 0 %}
+                {% set hasSelectedFile = selectedFileHash|length and currentFile.hash == selectedFileHash %}
 
-                    {% if hasSelectedFile or defaultSelectedFile %}
-                        {% set selected = 'selected' %}
-                    {% endif %}
+                {% if hasSelectedFile or defaultSelectedFile %}
+                    {% set selected = 'selected' %}
+                {% endif %}
 
-                    <li class="actions-small-2 {{ selected }}">
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
-                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
-                                    <p>{{ currentFile.filename }}</p>
+                <li class="actions-small-2 {{ selected }}">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                <p>{{ currentFile.filename }}</p>
 
-                                    {% include '@learning/dueWork/plagscan/status.twig' %}
-                                </a>
-                            </div>
+                                {% include '@learning/dueWork/plagscan/status.twig' %}
+                            </a>
                         </div>
-                        <nav>
-                            {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
-                            {% include '@learning/dueWork/crocodocLink.twig' with {assessment: assessment, feedback:latestFeedback, file: currentFile, participant: participant} only %}
-                        </nav>
-                    </li>
-                {% endfor %}
-            </ul>
+                    </div>
+                    <nav>
+                        {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
+                        {% include '@learning/dueWork/crocodocLink.twig' with {assessment: assessment, feedback:latestFeedback, file: currentFile, participant: participant} only %}
+                    </nav>
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endif %}
