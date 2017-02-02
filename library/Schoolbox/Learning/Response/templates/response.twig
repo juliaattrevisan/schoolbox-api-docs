@@ -177,21 +177,28 @@
                     {% set selected = 'selected' %}
                 {% endif %}
 
-                <li class="actions-small-2 {{ selected }}">
+                <li class="actions-small-2 {{ selected }} inline-grader-file">
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                 <p>{{ currentFile.filename }}</p>
-
                                 {% include '@learning/dueWork/plagscan/status.twig' %}
                             </a>
                         </div>
                     </div>
                     <nav>
                         {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
-                        {% include '@learning/dueWork/crocodocLink.twig' with {assessment: assessment, feedback: latestFeedback, file: currentFile, participant: participant} only %}
+                        <a class="icon-download" title="" data-dropdown="download-options-{{ currentFile.id }}"></a>
                     </nav>
+                    <ul id="download-options-{{ currentFile.id }}" class="f-dropdown" data-dropdown-content>
+                        <li>
+                            {% include '@learningResponse/crocodocLink.twig' with {assessment: assessment, feedback: latestFeedback, file: currentFile, participant: participant, linkText: 'Download annotated document'} only %}
+                        </li>
+                        <li>
+                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" class='icon-download' title="Download original">Download original</a>
+                        </li>
+                    </ul>
                 </li>
             {% endfor %}
         </ul>
