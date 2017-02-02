@@ -193,7 +193,7 @@
                     </nav>
                     <ul id="download-options-{{ currentFile.id }}" class="f-dropdown" data-dropdown-content>
                         <li>
-                            {% include '@learning/dueWork/crocodocLink.twig' with {assessment: assessment, feedback: latestFeedback, file: currentFile, participant: participant, linkText: 'Download annotated document'} only %}
+                            {% include '@learningResponse/crocodocLink.twig' with {assessment: assessment, feedback: latestFeedback, file: currentFile, participant: participant, linkText: 'Download annotated document'} only %}
                         </li>
                         <li>
                             <a href="/storage/fetch.php?hash={{ currentFile.hash }}" class='icon-download' title="Download original">Download original</a>

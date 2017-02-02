@@ -100,7 +100,7 @@
                 </div>
                 {% if currentFile.crocodocId|length %}
                 <nav>
-                    {% include '@learning/dueWork/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
+                    {% include '@learningResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
                 </nav>
                 {% endif %}
             </li>
