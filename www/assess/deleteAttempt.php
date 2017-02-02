@@ -16,8 +16,43 @@
  */
 use Schoolbox\Application\Exception\NotFound;
 
-$deleterer = new Deleterer();
 $attemptsToDelete = [];
+
+$assessHandler   = new Assess_Main();
+$attemptHandler  = new Assess_Attempt();
+$responseHandler = new Assess_Response();
+$groupHandler    = new Group();
+
+
+$getAttempt = function ($attemptId) use ($attemptHandler, $assessHandler, $groupHandler) {
+    if (is_numeric($attemptId)) {
+        throw \Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
+    }
+
+    $attempt = $attemptHandler->getByID($attemptId);
+
+    if (!$assessHandler->isValidUrlAccess($attempt['assess_id'])) {
+        throw new NotFound();
+    }
+
+    $assess = $attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
+
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
+        throw Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
+    }
+
+    return $attempt;
+};
+
+$deleteAttempt = function (array $attempt) use ($responseHandler, $attemptHandler) {
+    $responseHandler->deleteResponsesForAttempt($attempt['attempt_id']);
+    $attemptHandler->update(array(
+        'attempt_id' => $attempt['attempt_id'],
+        'deleted_at' => 'NOW()'
+    ));
+
+};
+
 
 if (isset($_POST['userIds']) && isset($_POST['assessmentId'])) {
 
@@ -30,85 +65,18 @@ if (isset($_POST['userIds']) && isset($_POST['assessmentId'])) {
     ]);
 
     foreach ($userAttemptIds as $attemptId) {
-        $attemptsToDelete[] = $deleterer->getAttempt($attemptId);
+        $attemptsToDelete[] = $getAttempt($attemptId);
     }
 }
 
 foreach ($_POST['attemptIds'] as $attemptId) {
-    $attemptsToDelete[] = $deleterer->getAttempt($attemptId);
+    $attemptsToDelete[] = $getAttempt($attemptId);
 }
 
 /* Multiple soft-delete
  */
 foreach ($attemptsToDelete as $currentAttempt) {
-    $deleterer->delete($currentAttempt);
+    $deleteAttempt($currentAttempt);
 }
 
 SitePage::backToTheFuture(1);
-
-
-class Deleterer
-{
-    /** @var Assess_Main  */
-    protected $assessHandler;
-
-    /** @var Assess_Attempt  */
-    protected $attemptHandler;
-
-    /** @var Assess_Response  */
-    protected $responseHandler;
-
-    /** @var Group  */
-    protected $groupHandler;
-
-
-    /**
-     * Deleterer constructor.
-     */
-    public function __construct()
-    {
-        $this->assessHandler   = new Assess_Main();
-        $this->attemptHandler  = new Assess_Attempt();
-        $this->responseHandler = new Assess_Response();
-        $this->groupHandler    = new Group();
-    }
-
-
-    /**
-     * @param $attemptId
-     * @return array|bool|null
-     */
-    public function getAttempt($attemptId)
-    {
-        if (is_numeric($attemptId)) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
-        }
-
-        $attempt = $this->attemptHandler->getByID($attemptId);
-
-        if (!$this->assessHandler->isValidUrlAccess($attempt['assess_id'])) {
-            throw new NotFound();
-        }
-
-        $assess = $attempt['assess'] = $this->assessHandler->getByID($attempt['assess_id']);
-
-        if (!$this->assessHandler->isOwner($assess['assess_id']) && ($this->groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
-            throw Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
-        }
-
-        return $attempt;
-    }
-
-
-    /**
-     * @param array $attempt
-     */
-    public function delete(array $attempt)
-    {
-        $this->responseHandler->deleteResponsesForAttempt($attempt['attempt_id']);
-        $this->attemptHandler->update(array(
-            'attempt_id' => $attempt['attempt_id'],
-            'deleted_at' => 'NOW()'
-        ));
-    }
-}
