@@ -169,6 +169,6 @@ class Mapper extends AbstractCourseMapper
      */
     protected function getUnitOrderByClause()
     {
-        return ['open_date' => 'asc'];
+        return ['due_date' => 'asc'];
     }
 }
