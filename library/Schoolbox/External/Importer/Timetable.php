@@ -142,6 +142,8 @@ class Timetable extends AbstractImporter
                         $termTitle,
                         $termCampus
                     );
+                    $timetableCampusCache[$termTitle][$termCampus] = $timetableCampus;
+
                 } catch (Mapper\Exception $e) {
                     $this->log->warning(
                         sprintf(
@@ -158,8 +160,8 @@ class Timetable extends AbstractImporter
             $periodTitle = $row['Period Title'];
             $periodDay   = $row['Period Day'];
             /** @var TimetablePeriod $timetablePeriod */
-            if (isset($timetablePeriodCache[$periodTitle][$periodDay])) {
-                $timetablePeriod = $timetablePeriodCache[$periodTitle][$periodDay];
+            if (isset($timetablePeriodCache[$timetableCampus->getCycle()->getId()][$periodTitle][$periodDay])) {
+                $timetablePeriod = $timetablePeriodCache[$timetableCampus->getCycle()->getId()][$periodTitle][$periodDay];
             } else {
                 try {
                     $timetablePeriod = $this->timetablePeriodMapper->findOneByColumnList(
@@ -169,6 +171,8 @@ class Timetable extends AbstractImporter
                             'day'      => $periodDay,
                         ]
                     );
+
+                    $timetablePeriodCache[$timetableCampus->getCycle()->getId()][$periodTitle][$periodDay] = $timetablePeriod;
                 } catch (Mapper\Exception $e) {
                     $this->log->warning(
                         sprintf(
@@ -191,6 +195,7 @@ class Timetable extends AbstractImporter
             } else {
                 try {
                     $teacher = $this->userMapper->findByExternalId($teacherCode);
+                    $teacherCache[$teacherCode] = $teacher;
                 } catch (Mapper\Exception $e) {
                     $this->log->warning(sprintf('Teacher code "%s" not found: skipping!', $teacherCode));
                     continue;
