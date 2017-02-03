@@ -142,12 +142,14 @@ class Controller extends Base\Base
         if($courseExists && $unitExists){
             $errors[] = "Course (id: {$course->getId()}) and Unit (id: {$unit->getId()}) already linked.";
             $this->returnJson($errors, 400);
+            return;
         }
 
         // Does Unit already exist and belong to different Course?
         if($unitExists && !$courseExists){
             $errors[] = "Unit (id: {$unit->getId()}) already exists in Course (id: {$unit->getCourse()->getId()})";
             $this->returnJson($errors, 400);
+            return;
         }
 
         // Is the proposed unit folder the same as the course folder?
@@ -187,6 +189,7 @@ class Controller extends Base\Base
 
         if(count($errors)){
             $this->returnJson($errors, 400);
+            return;
         }
 
         // No errors. Proceed.
