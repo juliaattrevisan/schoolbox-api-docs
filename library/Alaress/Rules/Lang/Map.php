@@ -15,7 +15,11 @@ class Map implements Construct
     /** @var string */
     protected $field;
 
-    /** @var array */
+    /**
+     * Each element may be a scalar or itself an array
+     *
+     * @var array
+     */
     protected $map;
 
 
@@ -71,10 +75,32 @@ class Map implements Construct
         $output = [];
         foreach ($inputValue as $input) {
             if (array_key_exists($input, $this->map)) {
-                $output[] = $this->map[$input];
+                $mapVal = $this->map[$input];
+                if(is_array($mapVal)){
+                    $output = array_merge($output, $this->flattenArray($mapVal));
+                } else {
+                    $output[] = $mapVal;
+                }
             }
         }
-        return $output;
+        return array_unique($output);
+    }
+
+    /**
+     * @param array $array  A potentially multi-dimensional array
+     * @return array        A flat single-dimension array containing all values
+     */
+    protected function flattenArray(array $array)
+    {
+        $values = [];
+        foreach($array as $value){
+            if(is_array($value)){
+                $values = array_merge($values, $this->flattenArray($value));
+            } else {
+                $values[] = $value;
+            }
+        }
+        return $values;
     }
 
 } 
