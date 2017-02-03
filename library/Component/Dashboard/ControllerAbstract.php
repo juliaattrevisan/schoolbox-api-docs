@@ -9,6 +9,7 @@
 
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
+use \Schoolbox\Permission\Access\Access;
 
 /**
  * @method null getContext()
@@ -16,6 +17,20 @@ use Schoolbox\Resource\Folder\Model as Folder;
  */
 abstract class Component_Dashboard_ControllerAbstract extends Component_ControllerAbstract
 {
+    /** @var Access */
+    private $access;
+
+    /**
+     * @param Component_Instance $instance
+     * @param \Schoolbox\User $user
+     * @param SitePage $sitepage
+     */
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
+    {
+        parent::__construct($instance, $user, $sitepage);
+        $this->access = \Schoolbox\Permission\Access\Access::getInstance();
+    }
+
     /**
      * Sets up a dashboard component.
      *
@@ -28,8 +43,7 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         $this->setContextPermission(UserAccess::ACCESS_FULL);
 
         if($this->isUsingAltSource()){
-            $accessor = \Schoolbox\Permission\Access\Access::getInstance();
-            $this->setContentPermission(min($accessor->getFolderAccess($this->getUser(),[$this->getSource()->getId()]), $this->getMaximumPermission()));
+            $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(),[$this->getSource()->getId()]), $this->getMaximumPermission()));
         } else {
             $this->setContentPermission(UserAccess::ACCESS_FULL);
         }
@@ -78,5 +92,13 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
     {
         parent::setSource($source);
         return $this;
+    }
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        return $this->access;
     }
 }
