@@ -126,32 +126,32 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
             $context['rulestring'] = $rule->getSummary();
 
-
+            // Did the rule's conditions match the user?
             if (is_array($data)) {
-                foreach ($data as $property => $value) {
 
+                foreach ($data as $property => $token) {
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
-                    $value   = $this->tokenizer->parseToken($input, $value);
+                    $value   = $this->tokenizer->parseToken($input, $token);
 
                     // treat collections special-like
                     if ($this->isCollection($property)) {
 
                         // first, read the value out of the object
-                        $array = $this->mapper->getModelProperty($object, $property);
+                        $modelProperty = $this->mapper->getModelProperty($object, $property);
 
                         // wrap value in an array if not already one
                         $value = (array)$value;
 
                         foreach ($value as $subvalue) {
                             // if the value we got isn't in this array, append it
-                            if (strlen(trim($subvalue)) && !in_array($subvalue, $array)) {
-                                $array[] = $subvalue;
+                            if (strlen(trim($subvalue)) && !in_array($subvalue, $modelProperty)) {
+                                $modelProperty[] = $subvalue;
                             }
                         }
 
                         // reassign the value to the now (maybe) changed array
-                        $value = $array;
+                        $value = $modelProperty;
 
                     } else {
                         if (is_array($value)) {
