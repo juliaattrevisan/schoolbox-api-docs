@@ -365,11 +365,26 @@ class Controller extends Assessment\Controller
                 $attachments = $factory->build($rq->post['attachment'])->getAll();
 
             } catch (\InvalidArgumentException $e) {
-                $result['success'] = false;
-                $result['message'] = 'One or more files were not able to be attached';
+                $errorMessage = 'One or more files were not able to be attached';
+                if ($this->getRequest()->isXhr()) {
+                    $result['success'] = false;
+                    $result['message'] = $errorMessage;
 
-                $rs->status->setCode(403);
-                $rs->content->set($this->buildJsonOutput($result));
+                    $rs->status->setCode(403);
+                    $rs->content->set($this->buildJsonOutput($result));
+                } else {
+                    // Show some error message?
+                    $this->getSession()->getSegment(static::class)->setFlash('errorMessage', $errorMessage);
+                    $rs->redirect->to(
+                        $this->getRouter()->generate(
+                            'learningAssessment.getCreateResponseForm',
+                            [
+                                'assessmentId' => $assessment->getId(),
+                                'studentId'    => $participant->getUser()->getId(),
+                            ]
+                        )
+                    );
+                }
                 return;
             }
 
