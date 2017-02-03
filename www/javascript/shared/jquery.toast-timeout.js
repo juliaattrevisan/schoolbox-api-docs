@@ -27,7 +27,11 @@
 
                 /* Initial text to display
                  */
-                text: 'Updating...please wait'
+                text: 'Updating...please wait',
+
+                /* The style to use after toastActivate
+                 */
+                css: ''
             }
 
             var derived = {
@@ -46,7 +50,8 @@
                 .stop()
                 .text(config.text)
                 .removeClass('alert success')
-                .addClass('pop');
+                .addClass('pop')
+                .addClass(config.css);
         }
     }
 
