@@ -18,7 +18,6 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Timetable_ColourMapper;
 use Schoolbox\User;
 use SitePage;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
 class GroupController extends Component_Dashboard_ControllerAbstract
@@ -67,7 +66,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
-            $accessType = Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]);
+            $accessType = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
             switch ($accessType) {
                 case UserAccess::ACCESS_READ:
                     $userAccess[$folder->getId()] = Array('read' => true);

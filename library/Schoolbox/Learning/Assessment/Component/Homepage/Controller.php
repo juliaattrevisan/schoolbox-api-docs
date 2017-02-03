@@ -14,12 +14,10 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use SitePage;
@@ -67,7 +65,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         // TODO - this effectively hydrates all Assessment types in this Folder, then filters out
         // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
-            $visibility = new Visibility(Access::getInstance());
+            $visibility = new Visibility($this->getAccess());
 
             // Note: findAllByFolderIdForReview retrieves response+feedback for all
             // assessment types, not just tasks (as it did previously).
