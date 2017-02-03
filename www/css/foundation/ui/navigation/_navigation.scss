@@ -16,10 +16,11 @@ $include-html-off-canvas-classes: $include-html-classes !default;
 
 $tabbar-bg: $navigation-background;
 $tabbar-height: rem-calc(72);
-$tabbar-icon-width: $tabbar-height;
+$tabbar-icon-width: rem-calc(80);
 $tabbar-line-height: $tabbar-height;
 $tabbar-color: $black;
 $tabbar-middle-padding: 0;
+$tabbar-padding-left: rem-calc(($base-font-size - 2));
 
 $tabbar-left-section-border: 0;
 $tabbar-right-section-border: 0;
@@ -106,7 +107,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  */
 .hybrid-bar{
 	.logo {
-		width: 5rem;
+		width: $tabbar-menu-icon-width;
 		height: $tabbar-height;
 		float: left;
 		@media #{$mediumwide-up} {
@@ -145,7 +146,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			background-color: transparent;
 			color: $body-bg;
 			height: $tabbar-height;
-			width: $tabbar-height;
+			width: $tabbar-menu-icon-width;
 			padding: $base-font-size;
 			margin: 0;
 			opacity: 0;
@@ -208,23 +209,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		@include inline-list;
 		margin: 0;
 		height: inherit;
-		padding: 0 0 0 rem-calc(($base-font-size - 2));
-
-		li:nth-child(n+5){
-			@extend .show-for-large-up;
-		}
-		/* We have to use slightly more specific queries because of
-		 * custom tabs as search can overlap.
-		 */
-		li:nth-child(n+8){
-			@media screen and (max-width: 84em){
-				display: none !important;
-			}
-		}
+		padding: 0 0 0 $tabbar-padding-left;
 
 		li {
 			margin: 0;
-			width: 5rem;
+			width: $tabbar-menu-icon-width;
 			a {
 				height: $tabbar-height;
 				padding: rem-calc(($base-font-size - 2)) 0;
@@ -318,31 +307,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				display: block;
 				margin: 0 auto;
 			}
-		}
-	}
-
-	/* Second Nav
-	 * This appears when you're on medium displays and you have to
-	 * summon the Off-Canvas menu manually, by using the hamburger.
-	 *
-	 * Main Navigation elements from the top bar wrap down into an
-     * additional area in Off Canvas called Second Nav. These elements
-     * precede the Side Menu
-     */
-	.second-nav{
-		/* We have to use slightly more specific queries because of
-		 * custom tabs as search can overlap.
-		 */
-		@media screen and (min-width: 84em){
-			display: none !important;
-		}
-		li:nth-child(-n+7){
-			@media screen and (min-width: 64em) and (max-width: 84em){
-				display: none !important;
-			}
-		}
-		li:nth-child(-n+4){
-			@extend .hide-for-medium-down;
 		}
 	}
 
@@ -639,5 +603,129 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 	.tab-bar{
 		height: 10rem;
+	}
+}
+
+
+/**
+ * Top nav & left side bar nav items hiding and showing
+ *
+ * Based on the width of the page squeeze as many icons on the top bar (.hybrid-bar) as possible.
+ * The items that cannot fit show in the left side bar (.second-nav)
+ */
+
+// Calculate the total widths of the possible views
+$offcanvas-width-used: ($tabbar-menu-icon-width * 4) + $tabbar-padding-left; // logo + menu + search + notifications
+$normal-width-used: $off-canvas-width + ($tabbar-menu-icon-width * 2) + $tabbar-padding-left; // sidebar + search + notifications
+$docking-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sidebars + the search button
+
+// Hide all top menu items as a starting point
+.hybrid-bar ul li {
+	display: none;
+}
+
+// Medium and down
+@media #{$medium-down} {
+
+	// Display 4 on top by default
+	.hybrid-bar ul li:nth-child(-n+4) {
+		display: block;
+	}
+	.left-off-canvas-menu .second-nav li:nth-child(-n+4) {
+		display: none;
+	}
+
+	// Allow up to 7 icons, showing an extra one each time there's space
+	@for $i from 5 through 7 {
+
+		$icon-width-needed: 5rem * $i;
+		$min-width: $offcanvas-width-used + $icon-width-needed;
+
+		@media screen and (min-width: $min-width) {
+
+			.hybrid-bar ul li:nth-child(-n+#{$i}) {
+				display: block;
+			}
+			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
+				display: none;
+			}
+
+		}
+	}
+}
+
+// Medium wide & large
+@media #{$screen} and (min-width:#{lower-bound($mediumwide-range)}) and (max-width:#{upper-bound($large-range)}) {
+
+	// Display 6 by default
+	.hybrid-bar ul li:nth-child(-n+6) {
+		display: block;
+	}
+	.left-off-canvas-menu .second-nav li:nth-child(-n+6) {
+		display: none;
+	}
+
+	// Allow up to 12, showing an extra one each time there's space
+	@for $i from 7 through 12 {
+
+		$icon-width-needed: 5rem * $i;
+		$min-width: $normal-width-used + $icon-width-needed;
+
+		@media screen and (min-width: $min-width) {
+
+			.hybrid-bar ul li:nth-child(-n+#{$i}) {
+				display: block;
+			}
+			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
+				display: none;
+			}
+
+		}
+	}
+}
+
+// Xlarge and beyond
+// Have to deal with the possibility of a docked notifications sidebar in this view
+@media #{$xlarge-up} {
+
+	// Display 12 by default
+	.hybrid-bar ul li:nth-child(-n+12) {
+		display: block;
+	}
+	.left-off-canvas-menu .second-nav li:nth-child(-n+12) {
+		display: none;
+	}
+
+	// Allow up to 40 (random number to max out), showing one each time there's space
+	// Expect the docked sidebar to be showing by default, then overwrite the style if that's not the case
+	@for $i from 13 through 40 {
+
+		$icon-width-needed: 5rem * $i;
+		$min-width: $normal-width-used + $icon-width-needed;
+		$min-width-docking: $docking-width-used + $icon-width-needed;
+
+		@media screen and (min-width: $min-width-docking) {
+
+			.hybrid-bar ul li:nth-child(-n+#{$i}) {
+				display: block;
+			}
+			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
+				display: none;
+			}
+
+		}
+
+		@media screen and (min-width: $min-width) {
+			.inner-wrap:not(.docking) {
+
+				.hybrid-bar ul li:nth-child(-n+#{$i}) {
+					display: block;
+				}
+				.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
+					display: none;
+				}
+
+			}
+		}
 	}
 }
