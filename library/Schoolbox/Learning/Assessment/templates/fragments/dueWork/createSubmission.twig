@@ -5,6 +5,22 @@
 <script type="text/javascript">
     $(function () {
 
+        var form          = $('#editor-form'),
+            formSaveLabel = form.find('[data-save-draft]');
+
+        if (Number('{{ errorMessage|length }}') > 0) {
+            // Just show error message in perma-toast
+            formSaveLabel.toastActivate({
+                text: 'Error: {{ errorMessage|e('js') }}',
+                css: 'alert'
+            });
+            formSaveLabel.toastTimeout({
+                text: 'Error: {{ errorMessage|e('js') }}',
+                css: 'alert',
+                duration: 5000
+            });
+        }
+
         // Autosave on type to ensure that change gets saved
 
         var autosaveTimeout = null;
@@ -43,12 +59,6 @@
             /* Disable actual submit button
              */
             $("[data-action-save]").prop('disabled', true);
-
-            var form = $('#editor-form');
-
-            // Change button's text, but keep its width the same.
-            // Change it back once done.
-            var formSaveLabel = form.find('[data-save-draft]');
 
             // Submit form via AJAX
             var formContents = form.serializeArray();
