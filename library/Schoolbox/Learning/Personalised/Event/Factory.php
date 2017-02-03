@@ -246,6 +246,7 @@ class Factory
                 'link'            => $this->generateLink($assessable),
                 'assessmentStart' => $assessmentStart->getDatabase(),
                 'assessmentEnd'   => $assessmentEndDate->addDays(1)->getDatabase(),
+                'assessmentOrder' => $assessable->getSequence(),
             ],
         ];
     }
