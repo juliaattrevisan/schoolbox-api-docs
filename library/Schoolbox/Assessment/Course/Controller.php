@@ -114,7 +114,7 @@ class Controller extends Base\Base
     /**
      * Generates a Unit and Course for a pair of folders.
      *
-     * A single call to this method may create a Unit, a Course or both. Note that we do NOT enforce a
+     * A single call to this method may create a Unit, a Course or both. Note that we DO enforce a
      * parent-child relationship between a Unit's folder and the Course's folder.
      *
      * While to the User it appears like folders have been converted, under the hood this is achieved
@@ -131,6 +131,13 @@ class Controller extends Base\Base
     public function convertFolders(Folder $courseFolder, Folder $unitFolder)
     {
         $errors = [];
+
+        // Is the course folder not the parent of the unit folder?
+        if($unitFolder->getParent()->getId() != $courseFolder->getId()){
+            $errors[] = "Course folder (id: {$courseFolder->getId()}) is not the parent of Unit folder (id: {$unitFolder->getId()})";
+            $this->returnJson($errors, 400);
+            return;
+        }
 
         $course = $courseFolder->getCourseSpecification();
         $unit = $unitFolder->getUnitSpecification();
