@@ -135,6 +135,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'folderHasParent'   => $folder->getParent()->getId(),
             'parentHasCourse'   => $parentHasCourse,
             'parentHasUnit'     => $parentHasUnit,
+            'parentWritable'    => $this->getAccess()->getFolderAccess($this->getUser(), [$parent->getId()]) >= UserAccess::ACCESS_WRITE,
         ];
 
         return $this->renderTwigTemplate(

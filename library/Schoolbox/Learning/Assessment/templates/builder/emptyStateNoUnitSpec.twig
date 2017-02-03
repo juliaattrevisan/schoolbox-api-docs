@@ -6,6 +6,7 @@ Usage:
         folderHasCourse:  bool               - Whether this folder has a Course
         parentHasCourse:  bool               - Whether this folder's parent has a Course
         parentHasUnit:    bool               - Whether this folder's parent has a Unit
+        parentWritable:   bool               - Whether this user has WRITE+ perm to folder parent
     } only %}
 #}
 <script>
@@ -76,7 +77,12 @@ Usage:
 
     {% elseif not parentHasCourse %}
 
-        <p><a data-convert-folders="2" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}">Convert this page to a unit page</a> to start creating activities that you can import into classes and reuse again. <b>Important</b>: This action will convert the page above to a course page.</p>
+        {% if parentWritable %}
+            <p><a data-convert-folders="2" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}">Convert this page to a unit page</a> to start creating activities that you can import into classes and reuse again. <b>Important</b>: This action will convert the page above to a course page.</p>
+        {% else %}
+            <p>This page is not a unit and the parent page is not a course.</p>
+            <p>You have permission to convert this page to a unit but do not have permission to convert the parent page to a course.</p>
+        {% endif %}
 
     {% elseif parentHasCourse %}
 
