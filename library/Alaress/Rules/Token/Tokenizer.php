@@ -185,6 +185,7 @@ abstract class Tokenizer
                     $fieldValue
                 );
             }
+            $settings[$field] = array_unique($settings[$field]);
 
         } else {
             // no tokens - just set as-is
