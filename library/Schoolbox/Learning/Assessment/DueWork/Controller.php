@@ -255,6 +255,9 @@ class Controller extends Assessment\Controller
 
         /* Pump into twig land
          */
+        // For some reason I can't use get/setFlash?
+        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
+        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
@@ -264,7 +267,7 @@ class Controller extends Assessment\Controller
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
             'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
-            'errorMessage'   => $this->getSession()->getSegment(static::class)->getFlash('errorMessage'),
+            'errorMessage'   => $errorMessage,
         ]));
     }
 
@@ -375,7 +378,7 @@ class Controller extends Assessment\Controller
                     $rs->content->set($this->buildJsonOutput($result));
                 } else {
                     // Show some error message?
-                    $this->getSession()->getSegment(static::class)->setFlash('errorMessage', $errorMessage);
+                    $this->getSession()->getSegment(static::class)->set('errorMessage', $errorMessage);
                     $rs->redirect->to(
                         $this->getRouter()->generate(
                             'learningAssessment.getCreateResponseForm',
