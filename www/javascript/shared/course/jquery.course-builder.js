@@ -51,7 +51,7 @@
                 text: 'Are you sure you wish to delete this activity? You will be unable to import this activity to classes.',
                 confirmEvent: function () {
 
-                    $toastFeedback.toastActivate({text: 'Deleting Activity...'});
+                    $toastFeedback.toastActivate({text: 'Deleting activity...'});
 
                     $.ajax({
                         method: "POST",
@@ -72,7 +72,7 @@
                             });
                         },
                         error: function(){
-                            $toastFeedback.toastTimeout({text: 'Deletion Failed!', css: 'alert'});
+                            $toastFeedback.toastTimeout({text: 'Deletion failed!', css: 'alert'});
                         }
                     });
                 }
