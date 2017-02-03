@@ -10,7 +10,9 @@
      * @todo, this should really be executed once against a Course, and use delegation to select a Unit
      */
     $.fn.setupCourseBuilder = function(options) {
-        var defaults = {};
+        var defaults = {
+            toastSelector: ''
+        };
         var settings       = $.extend({}, defaults, options);
         var unitSpec       = $(this);
         var unitSpecId     = unitSpec.attr('data-unit-spec');
@@ -38,6 +40,8 @@
         };
         initTaskList();
 
+        var $toastFeedback = $(settings.toastSelector);
+
         // Delete task: "are you sure?"
         unitSpec.on('click.courseAssessmentList', '[data-action=delete-assessment]', function(event) {
             event.preventDefault();
@@ -46,19 +50,30 @@
             $element.confirmDialog({
                 text: 'Are you sure you wish to delete this activity? You will be unable to import this activity to classes.',
                 confirmEvent: function () {
-                    $.post($element.attr('href'), {}, function () {
-                        $assessmentRow.fadeOut({
-                            done: function(){
-                                // If no Assessments remaining, display empty-state
-                                var $unit = $assessmentRow.closest('[data-unit-spec]');
 
-                                $assessmentRow.remove();
+                    $toastFeedback.toastActivate({text: 'Deleting activity...'});
 
-                                if(0 == $unit.find('[data-assessment]').length){
-                                    $unit.find('[data-empty-state]').removeClass('hide');
+                    $.ajax({
+                        method: "POST",
+                        url: $element.attr('href'),
+                        success: function () {
+                            $toastFeedback.toastTimeout({text: 'Activity deleted.', css: 'success'});
+                            $assessmentRow.fadeOut({
+                                done: function () {
+                                    // If no Assessments remaining, display empty-state
+                                    var $unit = $assessmentRow.closest('[data-unit-spec]');
+
+                                    $assessmentRow.remove();
+
+                                    if (0 == $unit.find('[data-assessment]').length) {
+                                        $unit.find('[data-empty-state]').removeClass('hide');
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        },
+                        error: function(){
+                            $toastFeedback.toastTimeout({text: 'Deletion failed!', css: 'alert'});
+                        }
                     });
                 }
             })

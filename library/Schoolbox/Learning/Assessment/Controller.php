@@ -6,9 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Aura\Web\Request;
 use DomainException;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
@@ -189,9 +187,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     /**
      * Delete the given assessment.
-     * Deletion is considered to be an idempotent method, so do not return an error on repeat attempts to delete an entity.
      *
-     * On success, respond with '204 No Content' and a Location header to the list
+     * Deletion is considered to be an idempotent method, so do not return an error on repeat attempts to delete an entity.
      * On failure, respond with '4XX' or '5XX' as appropriate
      *
      * @api   POST /learning/assessments/{assessmentId}/delete
@@ -209,15 +206,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $folder = $assessment->getContext()->getFolder();
         $postReturnUrl = $this->getRequest()->query[Redirect::RETURN_URL];
 
-        /* Check for the presence of a returnUrl passed on GET request as well
-         */
-
-        // Did caller explicitly specify a returnUrl ?
-        if ($postReturnUrl) {
-            $returnUrl = Redirect::decode($postReturnUrl);
-        } else {
-            $returnUrl = $this->determineRedirect($assessment, "/homepage/{$folder->getId()}");
-        }
+        $returnUrl = $this->determineRedirect($assessment, $postReturnUrl, "/homepage/{$folder->getId()}");
 
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput([
