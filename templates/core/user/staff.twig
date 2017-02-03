@@ -26,17 +26,17 @@
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad">
-            <div class="content no-pad">
+            <div class="content">
                 <div class="row no-margin">
-                    <div class="small-12 medium-6 large-4 columns no-pad">
-                        <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
+                    <div class="small-12 medium-2 columns no-pad">
+                        <img class="full-width" src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=constrain200"/>
                     </div>
 
-                    <div class="small-12 medium-6 large-8 columns no-pad">
+                    <div class="small-12 medium-10 columns">
                         <dl class="profile">
                             {% if showTitle %}
-                                <dt class="no-margin small-6 medium-3">Position Title</dt>
-                                <dd class="no-margin small-6 medium-9">
+                                <dt class="small-6 medium-3">Position Title</dt>
+                                <dd class="small-6 medium-9">
                                     {{ user.getPositionTitle() }}
                                 </dd>
                             {% endif %}
@@ -44,8 +44,8 @@
                             {% if showEmail %}
                                 {% block details_email %}
                                     {% if user.getEmail() %}
-                                        <dt class="no-margin small-6 medium-3">Email</dt>
-                                        <dd class="no-margin small-6 medium-9">
+                                        <dt class="small-6 medium-3">Email</dt>
+                                        <dd class="small-6 medium-9">
                                             <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                                         </dd>
                                     {% endif %}
@@ -54,73 +54,70 @@
 
                             {% if showDetails %}
                                 {% if externalUser.StaffDepartment %}
-                                    <dt class="no-margin small-6 medium-3">Department</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffDepartment }}</dd>
+                                    <dt class="small-6 medium-3">Department</dt>
+                                    <dd class="small-6 medium-9">{{ externalUser.StaffDepartment }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffCategoryDescription %}
-                                    <dt class="no-margin small-6 medium-3">Type</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
+                                    <dt class="small-6 medium-3">Type</dt>
+                                    <dd class="small-6 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffBuilding %}
-                                    <dt class="no-margin small-6 medium-3">Building</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffBuilding }}</dd>
+                                    <dt class="small-6 medium-3">Building</dt>
+                                    <dd class="small-6 medium-9">{{ externalUser.StaffBuilding }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffRoom %}
-                                    <dt class="no-margin small-6 medium-3">Room</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffRoom }}</dd>
+                                    <dt class="small-6 medium-3">Room</dt>
+                                    <dd class="small-6 medium-9">{{ externalUser.StaffRoom }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffExtension %}
-                                    <dt class="no-margin small-6 medium-3">Extension</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffExtension }}</dd>
+                                    <dt class="small-6 medium-3">Extension</dt>
+                                    <dd class="small-6 medium-9">{{ externalUser.StaffExtension }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffCampusDescription %}
-                                    <dt class="no-margin small-6 medium-3">Campus</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
+                                    <dt class="small-6 medium-3">Campus</dt>
+                                    <dd class="small-6 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
                                 {% endif %}
                             {% endif %}
                         </dl>
                     </div>
                 </div>
-
-                {% block buttons_island %}
-                    <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8">
-
-                        {% block buttons %}
-                            {% if eportfolioAuth %}
-                                {% block buttons_eportfolio %}
-                                    <li class="no-pad">
-                                        <a href="/eportfolio/{{ user.getId() }}/profile"
-                                           class="no-margin fat button icon-fat size-32 icon-eportfolio"
-                                          >ePortfolio</a>
-                                    </li>
-                                {% endblock buttons_eportfolio %}
-                            {% endif %}
-
-                            {% if showButtons %}
-                                {% block buttons_calendar %}
-                                    <li class="no-pad">
-                                        <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                           class="no-margin fat button icon-fat size-32 icon-calendar"
-                                          >Calendar</a>
-                                    </li>
-                                {% endblock buttons_calendar %}
-                            {% endif %}
-
-                            {% if showButtons %}
-                                {% block buttons_timetable %}
-                                    <li class="no-pad">
-                                        <a href="/timetable/{{ user.getId() }}"
-                                           class="no-margin fat button icon-fat size-32 icon-timetable"
-                                          >Timetable</a>
-                                    </li>
-                                {% endblock buttons_timetable %}
-                            {% endif %}
-
-                        {% endblock buttons %}
-                    </ul>
-                {% endblock buttons_island %}
-
             </div>
+            {% block buttons_island %}
+                <ul class='fat-buttons'>
+                    {% block buttons %}
+                        {% if eportfolioAuth %}
+                            {% block buttons_eportfolio %}
+                                <li>
+                                    <a href="/eportfolio/{{ user.getId() }}/profile"
+                                       class="no-margin button icon-fat icon-eportfolio"
+                                    >ePortfolio</a>
+                                </li>
+                            {% endblock buttons_eportfolio %}
+                        {% endif %}
+
+                        {% if showButtons %}
+                            {% block buttons_calendar %}
+                                <li>
+                                    <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                                       class="no-margin button icon-fat icon-calendar"
+                                    >Calendar</a>
+                                </li>
+                            {% endblock buttons_calendar %}
+                        {% endif %}
+
+                        {% if showButtons %}
+                            {% block buttons_timetable %}
+                                <li>
+                                    <a href="/timetable/{{ user.getId() }}"
+                                       class="no-margin button icon-fat icon-timetable"
+                                    >Timetable</a>
+                                </li>
+                            {% endblock buttons_timetable %}
+                        {% endif %}
+
+                    {% endblock buttons %}
+                </ul>
+            {% endblock buttons_island %}
         </section>
     </div>
 </div>
