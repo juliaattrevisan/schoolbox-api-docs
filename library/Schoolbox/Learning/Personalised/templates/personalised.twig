@@ -606,6 +606,22 @@
                             resourceRow.collapse();
                         }
                     });
+
+                    // If on semester view: find this week and give it the today class
+                    if (view.type == 'timelineTerm') {
+                        var today = calendar.find('.fc-chrono .fc-widget-header.fc-today');
+                        if (today.length === 0) {
+                            // Find the last item in the past
+                            var mostRecent = calendar.find('.fc-chrono .fc-widget-header.fc-past').last();
+                            if (mostRecent.length > 0) {
+                                // If I add one week to its date: is it still less than today?
+                                var mostRecentDate = moment(mostRecent.data('date'), 'YYYY-MM-DD');
+                                if (moment().isBefore(mostRecentDate.add({weeks: 1}))) {
+                                    mostRecent.removeClass('fc-past').addClass('fc-today');
+                                }
+                            }
+                        }
+                    }
                 },
 
                 loading: function(isLoading) {
