@@ -229,7 +229,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->query($query);
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score,score_title', $sort_dir = 'desc') {
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score_title', $sort_dir = 'desc') {
         $keyword = $this->db->quote($keyword);
 
         $query = "SELECT `forumThread`.*, `forumPost`.*, `forumThread`.title AS `threadTitle`,
@@ -252,7 +252,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                             )
                             AND `forumThread`.`deleted` = 'false'
                             AND `forumPost`.`deleted` = 'false'
-                        ORDER BY $sort_by $sort_dir
+                        ORDER BY `$sort_by` $sort_dir, `score` $sort_dir
                         LIMIT $offset, $limit;
             ";
 
