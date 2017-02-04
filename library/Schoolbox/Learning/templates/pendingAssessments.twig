@@ -29,97 +29,96 @@
     <div class="small-12 columns island">
         {% if assessmentsToMark|length %}
             <h2 class="subheader">Requires Assessment</h2>
-        {% endif %}
 
-        {# Enable pagination for part1 'Requires Assessment' #}
-        {% set loopIdx = 0 %}
-        {% set firstIdx  = partOnePaginator.firstOnPage(partOnePage) %}
-        {% set lastIdx   = partOnePaginator.lastOnPage(partOnePage) %}
+            {# Enable pagination for part1 'Requires Assessment' #}
+            {% set loopIdx = 0 %}
+            {% set firstIdx  = partOnePaginator.firstOnPage(partOnePage) %}
+            {% set lastIdx   = partOnePaginator.lastOnPage(partOnePage) %}
 
-        {% for assessment in assessmentsToMark %}
+            {% for assessment in assessmentsToMark %}
 
-            {% set loopIdx = loopIdx + 1 %}
-            {% if loopIdx >= firstIdx and loopIdx <= lastIdx %}
+                {% set loopIdx = loopIdx + 1 %}
+                {% if loopIdx >= firstIdx and loopIdx <= lastIdx %}
 
-                {% set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  %}
-                <section>
-                    <div class="content collapsible">
-                        <div class="card small-6 columns no-pad">
-                            {#- Dessicator -#}
-                            <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"></span>
-                            <i class="size-32 icon-{{ icon }}"></i>
-                            <h3>
+                    {% set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  %}
+                    <section>
+                        <div class="content collapsible">
+                            <div class="card small-6 columns no-pad">
                                 {#- Dessicator -#}
-                                <a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
-                                {#- Dessicator -#}
-                            </h3>
-                            {{ assessmentContext.crumbs(assessment) }}
-                            <p class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</p>
-                        </div>
-                        <div class="small-4 columns hide-for-small-only">
-
-                            {%- if assessment is quiz -%}
-                                {%- set submitTitleSuffix = 'attempted this quiz' -%}
-                                {%- set markedTitleSuffix = 'been reviewed' -%}
-                            {%- elseif assessment is dueWork %}
-                                {%- set submitTitleSuffix = 'submitted work' -%}
-                                {%- set markedTitleSuffix = 'recevied feedback' -%}
-                            {%- elseif assessment is task -%}
-                                {% set submitTitleSuffix = 'completed this task' -%}
-                                {% set markedTitleSuffix = 'been teacher assessed' -%}
-                            {%- endif -%}
-
-                            <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
-                                <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
-                                <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have  {{ markedTitleSuffix }}"></span>
+                                <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"></span>
+                                <i class="size-32 icon-{{ icon }}"></i>
+                                <h3>
+                                    {#- Dessicator -#}
+                                    <a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                                    {#- Dessicator -#}
+                                </h3>
+                                {{ assessmentContext.crumbs(assessment) }}
+                                <p class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</p>
                             </div>
-                        </div>
-                        <div class="small-6 medium-2 columns text-right">
-                            <p title="{{ assessment.numMarkingRequired }} of {{ assessment.numParticipants }} students require marking">{{ assessment.numMarkingRequired }} unmarked</p>
-                        </div>
-                        <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
-                            {% for participant in assessment.allParticipants %}
-                                {% if participant.isMarkingRequired %}
-                                    {% set response = participant.findMostRecentResponse %}
-                                        {% if assessment is task %}
-                                            <div class="compact card small-6">
-                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
-                                                <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
-                                            </div>
-                                            <div class="small-5 columns">
-                                                <p title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</p>
-                                            </div>
-                                            <div class="small-1 columns no-pad">
-                                                {# An icon that shows if the student has attempted the task or not #}
-                                                {% include '@learningAssessment/task/progressTickForm.twig' with {
-                                                    participant: participant
-                                                } %}
-                                            </div>
-                                        {% else %}
-                                            <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+                            <div class="small-4 columns hide-for-small-only">
+
+                                {%- if assessment is quiz -%}
+                                    {%- set submitTitleSuffix = 'attempted this quiz' -%}
+                                    {%- set markedTitleSuffix = 'been reviewed' -%}
+                                {%- elseif assessment is dueWork %}
+                                    {%- set submitTitleSuffix = 'submitted work' -%}
+                                    {%- set markedTitleSuffix = 'recevied feedback' -%}
+                                {%- elseif assessment is task -%}
+                                    {% set submitTitleSuffix = 'completed this task' -%}
+                                    {% set markedTitleSuffix = 'been teacher assessed' -%}
+                                {%- endif -%}
+
+                                <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
+                                    <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have  {{ markedTitleSuffix }}"></span>
+                                </div>
+                            </div>
+                            <div class="small-6 medium-2 columns text-right">
+                                <p title="{{ assessment.numMarkingRequired }} of {{ assessment.numParticipants }} students require marking">{{ assessment.numMarkingRequired }} unmarked</p>
+                            </div>
+                            <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
+                                {% for participant in assessment.allParticipants %}
+                                    {% if participant.isMarkingRequired %}
+                                        {% set response = participant.findMostRecentResponse %}
+                                            {% if assessment is task %}
                                                 <div class="compact card small-6">
                                                     <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
                                                     <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
                                                 </div>
-                                                <div class="small-6 columns">
+                                                <div class="small-5 columns">
                                                     <p title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</p>
                                                 </div>
-                                            </a>
-                                        {% endif %}
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </div>
+                                                <div class="small-1 columns no-pad">
+                                                    {# An icon that shows if the student has attempted the task or not #}
+                                                    {% include '@learningAssessment/task/progressTickForm.twig' with {
+                                                        participant: participant
+                                                    } %}
+                                                </div>
+                                            {% else %}
+                                                <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+                                                    <div class="compact card small-6">
+                                                        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
+                                                        <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
+                                                    </div>
+                                                    <div class="small-6 columns">
+                                                        <p title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</p>
+                                                    </div>
+                                                </a>
+                                            {% endif %}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </section>
+                {% endif %}
+            {% endfor %}
+            {% if partOnePaginator.pageCount > 1 %}
+                <section class="content">
+                    {% include 'sub/paginator.twig' with {paginator: partOnePaginator, page: partOnePage, class:'pagination'} %}
                 </section>
             {% endif %}
-        {% endfor %}
-        {% if partOnePaginator.pageCount > 1 %}
-            <section class="content">
-                {% include 'sub/paginator.twig' with {paginator: partOnePaginator, page: partOnePage, class:'pagination'} %}
-            </section>
         {% endif %}
-
 
         {% if assessmentsToChase|length %}
             <h2 class="subheader">Not Submitted</h2>
@@ -215,7 +214,7 @@
         {% if not assessmentsToMark|length and not assessmentsToChase|length %}
             <div class="empty-state">
                 <i class="icon-approve"></i>
-                <p>You have no Assessments to Mark or Chase. Nice one!</p>
+                <p>You have no assessments to review or followup. To view a complete list of past assessments visit your <a href="/learning/classes">classes</a> markbook.</p>
             </div>
         {% endif %}
     </div>
