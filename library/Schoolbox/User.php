@@ -416,8 +416,11 @@ class User implements JsonSerializable, ISoftDeletable
         if($this->hasPositionTitle()) {
             return $this->getPositionTitle();
         }
+        else if($this->getRole() instanceof Role) {
+            return $this->getRole()->getName();
+        }
         else {
-            $this->getRole()->getName();
+            return '';
         }
     }
 
