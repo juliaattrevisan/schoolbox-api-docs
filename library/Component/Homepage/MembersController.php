@@ -167,7 +167,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                             'PERSON_UID'         => $user->getId(),
                             'PERSON_NAME'        => \Scrub::text($name),
                             'PERSON_EXTERNAL_ID' => \Scrub::text($user->getExternalId()),
-                            'PERSON_GROUP'       => \Scrub::text(empty($user->getPositionTitle()) ? $user->getRole()->getName() : $user->getPositionTitle()),
+                            'PERSON_GROUP'       => \Scrub::text($user->getPreferredTitle()),
                             'LIST_STYLE'         => $displayOptions[$display]['css'],
                         )
                     );

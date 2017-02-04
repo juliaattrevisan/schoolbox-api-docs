@@ -158,7 +158,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             'PERSON_UID'         => $user->getId(),
                             'PERSON_EXTERNAL_ID' => $user->getExternalId(),
                             'PERSON_NAME'        => Scrub::text($user->getFullName()),
-                            'PERSON_GROUP'       => Scrub::text(empty($user->getPositionTitle()) ? $user->getRole()->getName() : $user->getPositionTitle()),
+                            'PERSON_GROUP'       => Scrub::text($user->getPreferredTitle()),
                         ]);
 
                         /* Don't display images in list view
