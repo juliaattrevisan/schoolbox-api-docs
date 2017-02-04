@@ -18,6 +18,7 @@ use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
@@ -229,15 +230,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getAssessment(IAssessable $assessment)
     {
+        /* Check permission and default to page based on access level of user */
+
+        $folder = $assessment->getBaseContext();
+        $perms = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
+
         /* If you're a staff, get redirected to a Status overview
          */
-        if ($this->getUser()->getRole()->isStaff()) {
+        if ($perms >= UserAccess::ACCESS_WRITE) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]));
             return;
         }
         /* If you're a student, get redirected to the summary
          */
-        else if ($this->getUser()->getRole()->isStudent()) {
+        else if ($perms >= UserAccess::ACCESS_READ) {
             $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
 
             $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
