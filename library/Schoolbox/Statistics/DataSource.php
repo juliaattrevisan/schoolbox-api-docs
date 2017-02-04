@@ -386,7 +386,7 @@ class DataSource
 
         foreach ($statement as $row) {
             /** @var \Schoolbox\Permission\Access\UserAccess $record */
-            $record = $this->userAccessMapper->hydrate($row, 'ua');
+            $record = clone $this->userAccessMapper->hydrate($row, 'ua');
             $record->setUser($this->userAccessMapper->hydrateJoin($row, 'user', 'u'));
             $record->getUser()->setRole($this->userAccessMapper->hydrateJoin($row, 'user.role', 'ur'));
             $records->add($record);
