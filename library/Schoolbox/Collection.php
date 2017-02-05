@@ -522,13 +522,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             $testValues = $merged->getColumnValues($column);
             foreach ($other as $item) {
                 $value = $item->$getColumn();
-                if (!in_array($value, $testValues)) {
+                if (!in_array($value, $testValues, true)) {
                     $merged->add($item);
                 }
             }
         } else {
             foreach ($other as $item) {
-                if (!in_array($item, $merged->stack)) {
+                if (!in_array($item, $merged->stack, true)) {
                     $merged->add($item);
                 }
             }
