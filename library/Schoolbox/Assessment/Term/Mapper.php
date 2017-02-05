@@ -100,7 +100,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find whichever term is current for this date.
+     * Find first term for a year.
      *
      * @param int $year
      * @return array
@@ -111,7 +111,7 @@ class Mapper extends BaseMapper
             SELECT   {$this->getColumnString()}
             FROM     {$this->getTable()}
             WHERE    year(`start`) <= :year AND (year(`actual_finish`) >= :year OR `actual_finish` IS NULL)
-            ORDER BY `start` DESC
+            ORDER BY `start` ASC
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(['year' => $year]);

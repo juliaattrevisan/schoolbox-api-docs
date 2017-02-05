@@ -36,8 +36,8 @@
                 terms:       terms,
                 year:        year,
                 currentTerm: term,
-                routeYear:   'learning.getGradesYear',
-                route:       'learning.getGradesBtac',
+                routeYear:   'customBtacGrades.getGradesYear',
+                route:       'customBtacGrades.getGrades',
                 routeArgs:   {viewee: student, userId: student.id}
                 } only %}
             </div>
@@ -126,30 +126,6 @@
                         {% endfor %}
                     </ul>
                 </section>
-            {% else %}
-                <div class="row">
-                    <div class="small-12 columns">
-                        <h2 class="subheader no-margin">
-                            <a href="{{ routeLookup('learning.getGradesForSubject', {student: student, userId: student.id, term: term, termCode: term.code, subject: subject, subjectId: folder.id}) }}"
-                               title="View Grades">
-                                {{ folder.name }}
-                            </a>
-                            {% for code in folder.codes %}
-                                {% if loop.first %}<p class="meta">{% endif -%}
-                                {{ code.code }}{% if not loop.last and code.code is not empty %},{% endif %}
-                                {%- if loop.last %}</p>{% endif %}
-                            {% endfor %}
-                        </h2>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="small-12 columns">
-                        <div class="empty-state">
-                            <i class="icon-due-work"></i>
-                            <p>There are currently no assessment tasks for this subject.</p>
-                        </div>
-                    </div>
-                </div>
             {% endif %}
         {% endfor %}
     </div>
