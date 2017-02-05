@@ -92,7 +92,7 @@ try {
 
         case 'duework':
 
-            $page = new SitePage();
+            $page = new SitePage(false);
             $page->setDi($kernel->getDependencyInjector());
             $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, array(),  $page->getDi()->get('assessmentDataSource'));
             $filename = 'duework';
