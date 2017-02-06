@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage\Builder;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
@@ -21,21 +20,16 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
-    /** @var UnitImplementationMapper */
-    protected $unitImplementationMapper;
-
     /** @var UnitSpecificationMapper */
-    protected $unitSpecificationMapper;
+    private $unitSpecificationMapper;
 
     /** @var AssessmentMapperProxy */
-    protected $assessmentMapperProxy;
+    private $assessmentMapperProxy;
 
     /**
      * Injectable constructor
@@ -49,7 +43,6 @@ class Controller extends Component_Homepage_ControllerAbstract
         parent::__construct($instance, $user, $sitepage);
 
         $this->unitSpecificationMapper = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
-        $this->unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
         $this->assessmentMapperProxy = $assessmentProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
     }
 
@@ -70,10 +63,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        $unitSpecMapper = $this->getUnitSpecificationMapper();
-        $unitImplMapper = $this->getUnitImplementationMapper();
-        $assessmentMapperProxy = $this->getAssessmentMapperProxy();
-
         // Get the current folder and hydrate its parent
         $folder = $this->getSource();
 
@@ -84,11 +73,10 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         // Get the unit's details
         try {
-            $unitSpec = $unitSpecMapper->findByFolderId($folder->getId());
+            $unitSpec = $this->unitSpecificationMapper->findByFolderId($folder->getId());
             $options = ['order' => ['sequence' => 'ASC']];
-            $assessables = $assessmentMapperProxy->findAllByUnitSpecificationId($unitSpec->getId(), $options);
+            $assessables = $this->assessmentMapperProxy->findAllByUnitSpecificationId($unitSpec->getId(), $options);
             $unitSpec->setAssessables($assessables);
-
 
             $data = [
                 'unitSpec'         => $unitSpec,
@@ -147,6 +135,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'folderHasParent'   => $folder->getParent()->getId(),
             'parentHasCourse'   => $parentHasCourse,
             'parentHasUnit'     => $parentHasUnit,
+            'parentWritable'    => $this->getAccess()->getFolderAccess($this->getUser(), [$parent->getId()]) >= UserAccess::ACCESS_WRITE,
         ];
 
         return $this->renderTwigTemplate(
@@ -155,63 +144,5 @@ class Controller extends Component_Homepage_ControllerAbstract
             $data,
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
-    }
-
-
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return UnitImplementationMapper
-     */
-    protected function getUnitImplementationMapper()
-    {
-        return $this->unitImplementationMapper;
-    }
-
-    /**
-     * @param UnitImplementationMapper $unitImplementationMapper
-     */
-    public function setUnitImplementationMapper(UnitImplementationMapper $unitImplementationMapper)
-    {
-        $this->unitImplementationMapper = $unitImplementationMapper;
-    }
-
-
-    /**
-     * @return UnitSpecificationMapper
-     */
-    public function getUnitSpecificationMapper()
-    {
-        return $this->unitSpecificationMapper;
-    }
-
-    /**
-     * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @return static
-     */
-    public function setUnitSpecificationMapper(UnitSpecificationMapper $unitSpecificationMapper)
-    {
-        $this->unitSpecificationMapper = $unitSpecificationMapper;
-        return $this;
-    }
-
-    /**
-     * @return AssessmentMapperProxy
-     */
-    public function getAssessmentMapperProxy()
-    {
-        return $this->assessmentMapperProxy;
-    }
-
-    /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @return static
-     */
-    public function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
-    {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        return $this;
     }
 }

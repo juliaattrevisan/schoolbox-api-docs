@@ -24,9 +24,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     protected $timetable = array();
 
-    /** @var \Schoolbox\Permission\Access\Access */
-    private $access;
-
     /**
      * @var Schoolbox\Collection
      */
@@ -39,12 +36,16 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     protected $templateFile = 'timetable';
 
+    /**
+     * @param Component_Instance $instance
+     * @param User $user
+     * @param SitePage $sitepage
+     * @param External_Timetable $externalTimetable
+     */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, External_Timetable $externalTimetable)
     {
         parent::__construct($instance, $user, $sitepage);
-
         $this->externalTimetable = $externalTimetable;
-        $this->access = \Schoolbox\Permission\Access\Access::getInstance();
     }
 
     /**
@@ -223,7 +224,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 try {
                                     $folder = $this->getFolderMapper()->findByCode($class['code']);
-                                    $hasLink = $this->access->getFolderAccess($this->getUser(), [$folder->getId()]) >= UserAccess::ACCESS_READ;
+                                    $hasLink = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]) >= UserAccess::ACCESS_READ;
                                 }
                                 catch (MapperException $e) {
                                     $hasLink = false;

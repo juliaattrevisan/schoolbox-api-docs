@@ -8,6 +8,7 @@
  */
 
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Permission\Access\Access;
 
 /**
  * @method Folder|null getContext()
@@ -15,6 +16,20 @@ use Schoolbox\Resource\Folder\Model as Folder;
  */
 abstract class Component_Homepage_ControllerAbstract extends Component_ControllerAbstract
 {
+    /** @var Access */
+    private $access;
+
+    /**
+     * @param Component_Instance $instance
+     * @param \Schoolbox\User $user
+     * @param SitePage $sitepage
+     */
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
+    {
+        parent::__construct($instance, $user, $sitepage);
+        $this->access = \Schoolbox\Permission\Access\Access::getInstance();
+    }
+
     /**
      * Permission setup
      *
@@ -27,11 +42,10 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         $contextId = $this->getContext() ? $this->getContext()->getId() : 0;
         $sourceId = $this->getSource() ? $this->getSource()->getId() : 0;
 
-        $accessor = \Schoolbox\Permission\Access\Access::getInstance();
         // Content permission: based on alt source if it's there
         // Control permission: always based on current context
-        $this->setContentPermission(min($accessor->getFolderAccess($this->getUser(), [$sourceId]), $this->getMaximumPermission()));
-        $this->setContextPermission(min($accessor->getFolderAccess($this->getUser(), [$contextId]), $this->getMaximumPermission()));
+        $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), [$sourceId]), $this->getMaximumPermission()));
+        $this->setContextPermission(min($this->access->getFolderAccess($this->getUser(), [$contextId]), $this->getMaximumPermission()));
     }
 
 
@@ -159,6 +173,14 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
     /* Getters / Setters
      */
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        return $this->access;
+    }
 
     /**
      * @param Folder|null $context null when used on admin homepage config screen
