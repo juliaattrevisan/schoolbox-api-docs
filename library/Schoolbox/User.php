@@ -408,6 +408,23 @@ class User implements JsonSerializable, ISoftDeletable
     }
 
     /**
+     * This function will get the users position title, or fall back to their role if no title exists
+     * This should be used on user cards to show their role in the school
+     * @return string
+     */
+    public function getPreferredTitle(){
+        if($this->hasPositionTitle()) {
+            return $this->getPositionTitle();
+        }
+        else if($this->getRole() instanceof Role) {
+            return $this->getRole()->getName();
+        }
+        else {
+            return '';
+        }
+    }
+
+    /**
      * @param bool $webmail
      * @return self
      */

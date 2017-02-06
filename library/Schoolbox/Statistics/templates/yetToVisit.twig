@@ -39,8 +39,8 @@
             <tbody>
                 {% for yetToVisitor in yetToVisitors %}
                     <tr>
-                        <td>{{ yetToVisitor.user.fullName }}</td>
-                        <td>{{ yetToVisitor.user.role.name }}</td>
+                        <td>{{ yetToVisitor.fullName }}</td>
+                        <td>{{ yetToVisitor.preferredTitle }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

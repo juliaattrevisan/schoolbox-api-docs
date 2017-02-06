@@ -44,7 +44,7 @@
                 {% for topVisitor in topVisitors %}
                     <tr>
                         <td>{{ topVisitor.user.fullName }}</td>
-                        <td>{{ topVisitor.user.role.name }}</td>
+                        <td>{{ topVisitor.user.preferredTitle }}</td>
                         <td>{{ topVisitor.hitcount }}</td>
                     </tr>
                 {% endfor %}

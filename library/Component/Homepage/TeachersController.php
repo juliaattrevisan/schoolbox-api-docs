@@ -128,7 +128,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                                     'PERSON_UID'         => $teacher->getId(),
                                     'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
                                     'PERSON_EXTERNAL_ID' => $synid,
-                                    'PERSON_GROUP'       => Scrub::text(empty($teacher->getPositionTitle()) ? $teacher->getRole()->getName() : $teacher->getPositionTitle()),
+                                    'PERSON_GROUP'       => Scrub::text($teacher->getPreferredTitle()),
                                 ]);
 
                                 /* Don't display images in list view

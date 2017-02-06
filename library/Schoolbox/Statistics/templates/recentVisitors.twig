@@ -44,7 +44,7 @@
                 {% for recentVisitor in recentVisitors %}
                     <tr>
                         <td>{{ recentVisitor.user.fullName }}</td>
-                        <td>{{ recentVisitor.user.role.name }}</td>
+                        <td>{{ recentVisitor.user.preferredTitle }}</td>
                         <td>{{ recentVisitor.lastAccessTime.short }}</td>
                     </tr>
                 {% endfor %}

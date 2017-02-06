@@ -82,7 +82,7 @@
                                             <p>{{ topVisitor.user.fullName }}</p>
                                         </a>
                                         <span class="neutral label tally" title="Visit count">{{ topVisitor.hitcount }}</span>
-                                        <p class="meta">{{ topVisitor.user.role.name }}</p>
+                                        <p class="meta">{{ topVisitor.user.preferredTitle }}</p>
                                     </div>
 
                                     <div class="progress">
@@ -176,7 +176,7 @@
 
                                             <p>{{ recentVisitor.user.fullName }}</p>
                                         </a>
-                                        <p class="meta">{{ recentVisitor.user.role.name }}</p>
+                                        <p class="meta">{{ recentVisitor.user.preferredTitle }}</p>
                                     </div>
                                 </li>
                             {% endfor %}
@@ -210,12 +210,12 @@
                             {% for yetToVisitor in yetToVisit %}
                                 <li>
                                     <div class="card small-12">
-                                        <a href="/search/user/{{ yetToVisitor.user.id }}" title="View Profile">
-                                            <img src="/portrait.php?userId={{ yetToVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
+                                        <a href="/search/user/{{ yetToVisitor.id }}" title="View Profile">
+                                            <img src="/portrait.php?userId={{ yetToVisitor.externalId }}&amp;size=square64" alt="View Profile">
 
-                                            <p>{{ yetToVisitor.user.fullName }}</p>
+                                            <p>{{ yetToVisitor.fullName }}</p>
                                         </a>
-                                        <p class="meta">{{ yetToVisitor.user.role.name }}</p>
+                                        <p class="meta">{{ yetToVisitor.preferredTitle }}</p>
                                     </div>
                                 </li>
                             {% endfor %}

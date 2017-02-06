@@ -172,7 +172,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                         'PERSON_UID'         => $manager->getId(),
                         'PERSON_NAME'        => \Scrub::text($name),
                         'PERSON_EXTERNAL_ID' => \Scrub::text($manager->getExternalId()),
-                        'PERSON_GROUP'       => \Scrub::text(empty($manager->getPositionTitle()) ? $manager->getRole()->getName() : $manager->getPositionTitle()),
+                        'PERSON_GROUP'       => \Scrub::text($manager->getPreferredTitle()),
                     ]);
 
                     /* Don't display images in list view
