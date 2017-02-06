@@ -11,6 +11,7 @@
  */
 use \Schoolbox\Learning\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Evaluation\Import\Parser\IParser;
 
 abstract class Evaluation_Import_Xml
 {
@@ -102,7 +103,10 @@ abstract class Evaluation_Import_Xml
 
 		$this->checkValidQuizType($xml);
 
-		$assess_id = $this->createEvaluation($xml);
+		$version = $this->getVersion($xml);
+		$xmlFileParser = $this->getParser($xml, $version);
+
+		$assess_id = $this->createEvaluation($xmlFileParser);
 
 		if (!$assess_id) {
 			error(112);
@@ -116,13 +120,13 @@ abstract class Evaluation_Import_Xml
 			$currentSection = $xml->section[$i];
 
 			$sectionData = array(
-                'section_id' => '',
-                'assess_id' => $assess_id,
-                'sequence' => $i+1,
-                'title' => $currentSection->title,
-                'description' => trim((string) $currentSection->description->text) ? trim((string) $currentSection->description->text) : $currentSection->description,
-                'random' => $currentSection->random,
-                'pool' => $currentSection->pool,
+                'section_id'  => '',
+                'assess_id'   => $assess_id,
+                'sequence'    => $i + 1,
+                'title'       => $currentSection->title,
+                'description' => trim((string)$currentSection->description->text) ? trim((string)$currentSection->description->text) : $currentSection->description,
+                'random'      => $currentSection->random,
+                'pool'        => $currentSection->pool,
             );
 			$section_id = $this->getSectionHandler()->create($sectionData);
 
@@ -134,31 +138,16 @@ abstract class Evaluation_Import_Xml
 				$questionHandler = $this->getFactory()->createQuestionModel((string)$currentQuestion->typeid);
 				$answerHandler = $this->getFactory()->createAnswerModel((string)$currentQuestion->typeid);
 
-				/* Only json-encode if there are config elements
-				 *
-				 * When you cast the std obj to an array, you can possibly
-				 * end up with an empty config if the tags are separated
-				 */
-                /** @var SimpleXMLElement $configs */
-                $configs = $currentQuestion->configs->children();
-                if($configs->count()){
-                    $config = [];
-                    foreach ($configs as $configSXE){
-                        $config[(string)$configSXE->name] = (string)$configSXE->value;
-                    }
-                    $config = json_encode($config);
-                } else {
-                    $config = 'NULL';
-                }
+				$config = $this->getQuestionConfig($currentQuestion, $version);
 
 				$question_id = $questionHandler->create(array(
-					'question_id' => '',
-					'section_id' => $section_id,
-					'sequence' => $j+1,
-					'type_id' => $currentQuestion->typeid,
-					'marks' => $currentQuestion->marks,
-					'question' => trim((string) $currentQuestion->questiontext->text),
-					'config' => $config,
+                    'question_id' => '',
+                    'section_id'  => $section_id,
+                    'sequence'    => $j + 1,
+                    'type_id'     => $currentQuestion->typeid,
+                    'marks'       => $currentQuestion->marks,
+                    'question'    => trim((string)$currentQuestion->questiontext->text),
+                    'config'      => $config,
 				));
 
 				if (method_exists($answerHandler, 'importMoodleAnswer')) {
@@ -170,6 +159,43 @@ abstract class Evaluation_Import_Xml
 		}
 		return $assess_id;
 	}
+
+    /**
+     * @param SimpleXMLElement $question
+     * @param string $version
+     * @return string
+     */
+	protected function getQuestionConfig(SimpleXMLElement $question, $version)
+    {
+        /* Only json-encode if there are config elements
+         *
+         * When you cast the std obj to an array, you can possibly
+         * end up with an empty config if the tags are separated
+         */
+
+        // Backwards compatibility for versions 16.0 -
+        if(IParser::FORMAT_VERSION_160 == $version){
+            if (count(array_keys((array)$question->config))) {
+                return json_encode((array)$question->config);
+            } else {
+                return 'NULL';
+            }
+        }
+        // 16.5 +
+        else {
+            /** @var SimpleXMLElement $configs */
+            $configs = $question->configs->children();
+            if($configs->count()){
+                $config = [];
+                foreach ($configs as $configSXE){
+                    $config[(string)$configSXE->name] = (string)$configSXE->value;
+                }
+                return json_encode($config);
+            } else {
+                return 'NULL';
+            }
+        }
+    }
 
     /**
      * Ensure not trying to load a quiz as survey or vice-versa
@@ -187,29 +213,39 @@ abstract class Evaluation_Import_Xml
     }
 
     /**
-     * @param SimpleXMLElement $xml
-     * @return int
-     */
-	protected function getMaxAttempts(SimpleXMLElement $xml){
-        // Try to get max attempts if it's there, otherwise fall back to
-        // allowresit (not allow_resit).
-        // if allowresit is true, or is not unspecified:
-        // max_attempts = 0 (unlimited), otherwise 1.
-        $max_attempts = (int)$xml->maxattempts;
-        if (strlen($max_attempts) === 0) {
-            $allowResit  = (string)$xml->allowresit;
-            $max_attempts = ($allowResit || strlen($allowResit) === 0) ? 0 : 1;
-        }
-        return $max_attempts;
-    }
-
-    /**
      * Creates the evaluation (without sections, questions or solutions)
      *
-     * @param SimpleXMLElement $xml
-     * @return int                   The newly assigned assess_id
+     * Returns the newly assigned 'assess_id'
+     *
+     * @param IParser $parser
+     * @return int
      */
-	abstract protected function createEvaluation(SimpleXMLElement $xml);
+	abstract protected function createEvaluation(IParser $parser);
+
+
+    /**
+     * Gets a version-dependent parser that knows how to interpret a specific version format, but
+     * respect a consistent API of representing the file's data.
+     *
+     * @param SimpleXMLElement $xml
+     * @param string $fileFormatVersion
+     * @return IParser
+     */
+	abstract protected function getParser(SimpleXMLElement $xml, $fileFormatVersion);
+
+    /**
+     * Returns what version file the user is trying to import.
+     *
+     * Prior to 16.5, no version numbering existed, so assume 16.0
+     *
+     * @param SimpleXMLElement $xml
+     * @return string
+     */
+	protected function getVersion(SimpleXMLElement $xml)
+    {
+	    $fileVersion = (string)$xml->version;
+	    return $fileVersion ?: Evaluation\Import\Parser\Base::FORMAT_VERSION_160;
+    }
 
     /**
      * Is this import controller for 'assess' or 'survey' ?
@@ -226,39 +262,6 @@ abstract class Evaluation_Import_Xml
         return $this->quizMapper;
     }
 
-    /**
-     * @param string $dateString
-     * @param string $format
-     * @return Alaress_Date_Format
-     */
-    protected function createDateFromString($dateString, $format = Alaress_Date_Format::DATABASE_FORMAT)
-    {
-	    if(empty($dateString)){
-	        return new Alaress_Date_NullDate();
-        }
-        return new Alaress_Date_Format($dateString, $format);
-    }
-
-	/**
-	 * Parses a rich text node
-	 *
-	 * @param SimpleXMLElement $xml
-	 * @param string           $nodename
-	 *
-	 * @return string
-	 */
-	protected function parseRichTextNode(SimpleXMLElement $xml, $nodename)
-	{
-		// Value should just be a single node, but maybe it wasn't wrapped in
-		// <![CDATA[ ]]> tags.
-		$value = trim("{$xml->$nodename}");
-		if (!$xml->$nodename) {
-			foreach ($xml->xpath("/quiz/$nodename/*") as $desc_node) {
-				$value .= $desc_node->asXML();
-			};
-		}
-		return $value;
-	}
 
 	/* Getters/Setters
 	 */

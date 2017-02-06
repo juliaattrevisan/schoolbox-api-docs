@@ -12,7 +12,12 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 use \Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use \Evaluation\Import\Parser\IParser;
+use Assess\Import\Parser\IParser as AssessParser;
 
+/**
+ * Quiz-specific import-logic extension
+ */
 class Assess_Import_Xml extends Evaluation_Import_Xml
 {
     /**
@@ -58,25 +63,48 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
         $this->contextId = $contextId;
     }
 
+
+    /**
+     * Gets a version-dependent parser that knows how to interpret a specific version format, but
+     * respect a consistent API of representing the file's data.
+     *
+     * @param SimpleXMLElement $xml
+     * @param string $fileFormatVersion
+     * @return \Assess\Import\Parser\IParser|IParser
+     */
+    protected function getParser(SimpleXMLElement $xml, $fileFormatVersion)
+    {
+        switch($fileFormatVersion){
+            case IParser::FORMAT_VERSION_160:
+                return new \Assess\Import\Parser\V160($xml);
+            case IParser::FORMAT_VERSION_165:
+                return new \Assess\Import\Parser\V165($xml);
+            default:
+                throw new DomainException('No parser found for version: ' . $fileFormatVersion);
+        }
+    }
+
     /**
      * Creates the evaluation (without sections, questions or solutions)
      *
-     * @param SimpleXMLElement $xml
-     * @return int                   The newly assigned assess_id
+     * Returns the newly assigned 'assess_id'
+     *
+     * @param IParser|AssessParser $parser
+     * @return int
      */
-    protected function createEvaluation(SimpleXMLElement $xml)
+    protected function createEvaluation(IParser $parser)
     {
         // Create the IAssessable
         $quizAssessable = $this->assessmentMapper->createModel()
             ->setAssessmentContext(AssessmentContextType::stringToObject($this->contextType)->setId($this->contextId))
-            ->setTitle((string)$xml->title)
-            ->setDescription($this->parseRichTextNode($xml, 'description'))
-            ->setPublishDate($this->createDateFromString($xml->publishdate))
-            ->setOpenDate($this->createDateFromString($xml->opendate))
-            ->setDueDate($this->createDateFromString($xml->duedate))
-            ->setCloseDate($this->createDateFromString($xml->closedate))
-            ->setWeight((int)$xml->weight)
-            ->setDefaultOpenSpan((int)$xml->defaultopenspan);
+            ->setTitle($parser->getTitle())
+            ->setDescription($parser->getDescription())
+            ->setPublishDate($parser->getPublishDate())
+            ->setOpenDate($parser->getOpenDate())
+            ->setDueDate($parser->getDueDate())
+            ->setCloseDate($parser->getCloseDate())
+            ->setWeight($parser->getWeight())
+            ->setDefaultOpenSpan($parser->getDefaultOpenSpan());
 
         $assessmentId = $this->assessmentMapper->save($quizAssessable)[0];
 
@@ -87,14 +115,14 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT))
             ->setTitle($quizAssessable->getTitle())
             ->setDescription($quizAssessable->getDescription())
-            ->setCompletionMessage($this->parseRichTextNode($xml, 'completionmessage'))
+            ->setCompletionMessage($parser->getCompletionMessage())
             ->setStart($quizAssessable->getPublishDate())
             ->setFinish($quizAssessable->getDueDate())
-            ->setDuration((int)$xml->duration)
-            ->setMaxAttempts($this->getMaxAttempts($xml))
+            ->setDuration($parser->getDuration())
+            ->setMaxAttempts($parser->getMaxAttempts())
             ->setWeight($quizAssessable->getWeight())
             ->setAvailability($this->getAvailability())
-            ->setMarkVisibility((int)$xml->markvisibility);
+            ->setMarkVisibility($parser->getMarkVisibility());
 
         return $this->getQuizMapper()->save($quiz)[0];
     }
