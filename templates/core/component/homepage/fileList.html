@@ -164,7 +164,13 @@
                                         $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
                                     },
                                     sending: function (file, xhr, formData) {
-                                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                        var desc = file.name.substr(0, file.name.lastIndexOf('.'));
+                                        if(desc.length > 0){
+                                            formData.append('description', desc);
+                                        }
+                                        else {
+                                            formData.append('description', file.name);
+                                        }
                                         formData.append('category', $(file.previewElement).data('node'));
                                         formData.append('comment', '');
                                         formData.append('hidden', 0);

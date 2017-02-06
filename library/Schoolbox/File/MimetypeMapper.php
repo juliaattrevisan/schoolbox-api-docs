@@ -126,7 +126,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		$mimeType->setMime('application/octet-stream');
 		$mimeType->setInline(false);
 		$mimeType->setEnable(true);
-		$mimeType->setIconFile('binary.png');
+		$mimeType->setIconFile('application-octet-stream.svg');
 		$mimeType->setMaxFileSize(0);
 
 		return $mimeType;

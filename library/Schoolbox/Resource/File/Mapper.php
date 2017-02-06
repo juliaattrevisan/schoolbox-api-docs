@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -129,8 +129,8 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 "%pdf%",
                 "%msword%",
                 "%vnd.ms%",
-                "%rtf",
-                "text%",
+                "%rtf%",
+                "%text%",
                 "%document%",
                 "%powerpoint%",
             ],
@@ -157,6 +157,8 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                             $otherMimeParts[] = "m.mime LIKE '$mime'";
                         }
                     }
+                    //Return all files regardless their extension
+                    $mimeParts[] = "h.ext = '' OR m.fileTypeId IS NULL";
                 }
             }
             if (!empty($otherMimeParts)) {
@@ -174,7 +176,6 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             'date'   => "$table.submitted",
             'random' => "RAND()",
         );
-
         $sortColumn    = isset($sortFields[$sortColumn]) ? $sortColumn : 'name';
         $sortDirection = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
         $baseQuery    .= " ORDER BY " . $sortFields[$sortColumn] . " " . $sortDirection;
