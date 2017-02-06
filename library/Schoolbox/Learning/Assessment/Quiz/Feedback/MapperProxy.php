@@ -67,6 +67,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         }
 
         $pb = $this->getMapper()->getPredicateBuilder();
+        $pb->notNull('finish');
         $pb->notNull('reviewed_at');
         $pb->addColumnList($columnList);
         return $this->findByPredicates($pb, $options);
