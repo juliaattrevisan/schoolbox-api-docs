@@ -1,0 +1,1 @@
+UPDATE config SET value = 'tkds' WHERE name = 'site_location' AND value = 'kds';
