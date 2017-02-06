@@ -123,8 +123,8 @@ abstract class Evaluation_Import_Xml
                 'section_id'  => '',
                 'assess_id'   => $assess_id,
                 'sequence'    => $i + 1,
-                'title'       => $currentSection->title,
-                'description' => trim((string)$currentSection->description->text) ? trim((string)$currentSection->description->text) : $currentSection->description,
+                'title'       => trim($currentSection->title),
+                'description' => trim((string)$currentSection->description->text) ? trim((string)$currentSection->description->text) : trim($currentSection->description),
                 'random'      => $currentSection->random,
                 'pool'        => $currentSection->pool,
             );
