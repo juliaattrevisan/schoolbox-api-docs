@@ -1,15 +1,5 @@
 <?php
-/**
- * Configuration for De La Salle's assessment csv export
- *
- * @author      Doug MacKenzie <doug.mackenzie@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
-
-// TODO: Renamespace this for production
-namespace Config\Modules\Custom\Demo;
+namespace Config\Modules\Custom\Btac;
 
 use Alaress\Application\Kernel;
 use Custom\Btac\Grades\Module;
@@ -28,10 +18,9 @@ class Grades implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
-        // TODO: Re-enable this for production
-        //if ($di->get('config')->get('site_location') == 'btac') {
+        if ($di->get('config')->get('site_location') == 'btac') {
             $module = new Module($di);
             $module->init('/modules/custom/btac/grades');
-        //}
+        }
     }
 }
