@@ -511,7 +511,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * @param Collection $other - the second collection
      * @param string $column - a column on which to test uniqueness (ie. an ID)
-     *                            If omitted, the entire object will be tested
+     *                         If omitted, the entire object will be tested and may return an error "Fatal error: Nesting level too deep - recursive dependency?"
+     *
      * @return Collection
      */
     public function mergeUnique(Collection $other, $column = null)
@@ -522,13 +523,23 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             $testValues = $merged->getColumnValues($column);
             foreach ($other as $item) {
                 $value = $item->$getColumn();
-                if (!in_array($value, $testValues, true)) {
+
+                if(is_object($value) ){
+                    throw new \UnexpectedValueException('Cannot compare objects');
+                }
+
+                if (!in_array($value, $testValues)) {
                     $merged->add($item);
                 }
             }
         } else {
             foreach ($other as $item) {
-                if (!in_array($item, $merged->stack, true)) {
+
+                if(is_object($item) ){
+                    throw new \UnexpectedValueException('Cannot compare objects');
+                }
+
+                if (!in_array($item, $merged->stack)) {
                     $merged->add($item);
                 }
             }
