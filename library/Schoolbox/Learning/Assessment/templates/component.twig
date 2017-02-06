@@ -57,6 +57,9 @@
     </div>
     {% endif %}
 </section>
+
+<div class="toast" data-assessment-toast></div>
+
 <script type="text/javascript">
     $(function () {
         $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
@@ -70,8 +73,17 @@
                 confirmLabel: 'Yes, delete it',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function (anchor) {
-                    $.post(anchor.attr('href')).done(function () {
+
+                    var $toast = $('div[data-assessment-toast]');
+                    $toast.toastActivate({text: 'Deleting {{ typeLabel|lower }}...'});
+
+                    $.post(anchor.attr('href'))
+                    .success(function () {
+                        $toast.toastTimeout({text: '{{ typeLabel|lower|capitalize  }} deleted.', css: 'success'});
                         $item.fadeOut({ done: $item.remove });
+                    })
+                    .error(function() {
+                        $toast.toastTimeout({text: 'Deletion failed!', css: 'alert'});
                     });
                 }
             });
