@@ -305,26 +305,22 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     public function exportMoodleAnswer(SitePage $page, $question_id)
     {
         $answerGroup = $this->getByQuestionID($question_id);
+        $page->setVar('answerOption_block', '');
 
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-            if (is_array($allAnswers) && count($allAnswers)) {
-                for ($i = 0; $i < count($allAnswers); $i++) {
-                    $currentAnswer = $allAnswers[$i];
-
+            if (is_array($allAnswers)) {
+                foreach ($allAnswers as $currentAnswer) {
                     $page->setVar([
                         'ACTUAL_CORRECT_VALUE' => $currentAnswer->correct ? '100' : '0',
                         'ANSWER_VALUE'         => $currentAnswer->value,
                         'ANSWER_DESCRIPTION'   => Scrub::text($currentAnswer->description),
                     ]);
-
-                    $page->parse('answerOption_block', 'answerOption', $i > 0);
+                    $page->parse('answerOption_block', 'answerOption', true);
                 }
-                return;
             }
         }
-        $page->setVar('answerOption_block', '');
     }
 
     /**
