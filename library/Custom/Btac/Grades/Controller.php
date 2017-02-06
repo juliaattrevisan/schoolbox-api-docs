@@ -80,7 +80,7 @@ class Controller extends Base
 
         // If they are viewing an entire year, default to first semester for results
 
-        if ($term == null) {s
+        if ($term == null) {
             $term = $this->getTermMapper()->findForYear($year)->first();
         }
 

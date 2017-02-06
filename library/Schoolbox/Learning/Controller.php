@@ -400,6 +400,17 @@ class Controller extends Base
      */
     public function getGrades(User $viewee, Term $term)
     {
+        // Direct to custom BTAC page
+
+        if ($this->getConfigLoader()->get('site_location') == 'demo') {
+            return $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('customBtacGrades.getGrades', [
+                    'userId' => $viewee->getId(),
+                    'termCode' => $term->getCode()
+                ])
+            );
+        }
+
         // Storage for each folders markbook
         $markbooks = [];
         $markbooksFolders = [];
