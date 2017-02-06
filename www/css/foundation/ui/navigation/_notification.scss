@@ -4,7 +4,7 @@ $notification-header-background: $navigation-background !default;
 
 // where data-unread != 0
 .right-small a {
-    width: 5rem;
+    width: $tabbar-menu-icon-width;
     height: $tabbar-height;
     display: block;
     cursor: pointer;
