@@ -141,11 +141,27 @@ class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
     /**
      * Ensure result is correct and operand collections not mutated
      *
+     * @dataProvider provider_merge_unique_objects
+     * @param Collection[] $inputs
+     * @expectedException UnexpectedValueException
+     */
+    public function test_merge_unique_objects($inputs)
+    {
+        $actual = new Collection();
+        foreach ($inputs as $input) {
+            $actual = $actual->mergeUnique($input);
+        }
+
+    }
+
+    /**
+     * Ensure result is correct and operand collections not mutated
+     *
      * @dataProvider provider_merge
      * @param Collection[] $inputs
      * @param Collection $expected
      */
-    public function test_merge_not_unique($inputs, Collection $expected)
+    public function test_merge_not_unique($inputs, Collection $expected )
     {
         $beforeMerge = [];
         foreach($inputs as $input){
@@ -269,6 +285,35 @@ class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
             ],
             new Collection([1,2,3,4]),
         ];
+
+        return $data;
+    }
+
+    public function provider_merge_unique_objects()
+    {
+        $data = [];
+
+        $campusOne = new \Schoolbox\Campus();
+        $campusOne->setId(1);
+
+        $campusTwo = new \Schoolbox\Campus();
+        $campusTwo->setId(2);
+
+        $campusThree = new \Schoolbox\Campus();
+        $campusThree->setId(3);
+
+        $campusFour = new \Schoolbox\Campus();
+        $campusFour->setId(4);
+
+        $data[] = [
+            [
+                new Collection([]),
+                new Collection([$campusOne]),
+                new Collection([$campusOne,$campusTwo,$campusThree,$campusFour]),
+                new Collection([$campusThree,$campusFour])
+            ],
+        ];
+
         return $data;
     }
 
