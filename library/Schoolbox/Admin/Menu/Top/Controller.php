@@ -109,7 +109,7 @@ class Controller extends Base
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => self::PAGE_CURRENT,
-                'item' => $this->getMenuTopMapper()->findById($id),
+                'item' => $this->getMenuTopMapper()->findOneByColumn($this->getMenuTopMapper()->getIdentifierColumn(), $id, [], ['cache'=>false]),
                 'icons' => $this->getMenuIconMapper()->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'rolesSelected' => $rolesSelected,
