@@ -201,6 +201,7 @@ class Controller extends Assessment\Controller
 
         // And redirect somewhere
         if ($this->getRequest()->isXhr()) {
+            exit('asd');
             $result['success'] = true;
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
@@ -210,6 +211,7 @@ class Controller extends Assessment\Controller
             $this->getResponse()->content->set($this->buildJsonOutput($result));
 
         } else {
+            exit('qwe');
             // redirect after saving to Due Work Summary For Particular Student
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate(
@@ -238,24 +240,4 @@ class Controller extends Assessment\Controller
     }
 
 
-    /**
-     * Decide which URL to send the client back to
-     *
-     * @param IAssessable $assessment
-     * @param string|null $explicitReturnUrl
-     * @param string      $defaultReturnUrl
-     * @return string
-     */
-    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = '')
-    {
-        /**
-         * First priority is an explicit return URL sent
-         * Then go to default
-         */
-        if ($explicitReturnUrl) {
-            return Redirect::decode($explicitReturnUrl);
-        } else {
-            return $defaultReturnUrl;
-        }
-    }
 }

@@ -423,11 +423,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     protected function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '')
     {
-        // if your context is a project, redirect back to its status screen
-        if ($assessment->getContext() instanceof Project) {
+        /**
+         * First priority is a the post return URL
+         * Then if this is in a project, and if so then go to project status
+         * Otherwise go to default return url
+         */
+        if ($postReturnUrl) {
+            return Redirect::decode($postReturnUrl);
+        } elseif ($assessment->getContext() instanceof Project) {
             return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
         }
-        return "/homepage/{$assessment->getContext()->getBaseContext()->getFolder()->getId()}";
+
+        return $defaultReturnUrl;
     }
 
     /**

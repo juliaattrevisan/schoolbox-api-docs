@@ -724,30 +724,6 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Decide which URL to send the client back to
-     *
-     * @param IAssessable $assessment
-     * @param string|null $explicitReturnUrl
-     * @param string      $defaultReturnUrl
-     * @return string
-     */
-    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = '')
-    {
-        /**
-         * First priority is an explicit return URL sent
-         * Then check if this is in a project, if so go to project status
-         * Finally default to... default return url
-         */
-        if ($explicitReturnUrl) {
-            return Redirect::decode($explicitReturnUrl);
-        } elseif ($assessment->getContext() instanceof Assessment\Project) {
-            return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
-        }
-
-        return $defaultReturnUrl;
-    }
-
-    /**
      * Update particular fields of an existing IAssessable
      *
      * @param IAssessable $assessment
