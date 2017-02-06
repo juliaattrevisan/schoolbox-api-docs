@@ -1167,20 +1167,14 @@ abstract class Mapper implements IMapper, Serializable
             return false;
         }
         $collection = $this->getModelAsCollection($object);
-        $success    = $this->updateAll(
+        return $this->updateAll(
             $collection,
             $this->soft_delete_column,
             $this->soft_delete_deleted_value,
             self::CALLBACK_PRESOFTDELETE,
-            self::CALLBACK_POSTSOFTDELETE
+            self::CALLBACK_POSTSOFTDELETE,
+            self::METHOD_DELETE
         );
-        if ($success) {
-            // raise delete notification
-            foreach ($collection as $model) {
-                $this->raiseNotification($model, self::METHOD_DELETE);
-            }
-        }
-        return $success;
     }
 
     /**
@@ -1320,6 +1314,11 @@ abstract class Mapper implements IMapper, Serializable
             $this->triggerCallbacks($postCallback, $model);
         }
 
+        // Raise notifications
+        foreach ($deletedItems as $model) {
+            $this->raiseNotification($model, self::METHOD_DELETE);
+        }
+
         // return the number of rows deleted
         return $statement->rowCount();
     }
@@ -1342,7 +1341,8 @@ abstract class Mapper implements IMapper, Serializable
             $this->soft_delete_column,
             $this->soft_delete_undeleted_value,
             self::CALLBACK_PRERESTORE,
-            self::CALLBACK_POSTRESTORE
+            self::CALLBACK_POSTRESTORE,
+            self::METHOD_CREATE
         );
     }
 
@@ -1356,11 +1356,18 @@ abstract class Mapper implements IMapper, Serializable
      *                             updating, if any.
      * @param string $post_trigger Event to trigger callbacks for after
      *                             updating, if any.
+     * @param string $action       The action to send to the notifier, if any.
      *
      * @return bool
      */
-    public function updateAll($object, $field, $value, $pre_trigger = null, $post_trigger = null)
-    {
+    protected function updateAll(
+        $object,
+        $field,
+        $value,
+        $pre_trigger = null,
+        $post_trigger = null,
+        $action = null
+    ) {
         $collection = $this->getModelAsCollection($object);
         if (count($collection) === 0) {
             // Nothing to update
@@ -1429,6 +1436,14 @@ abstract class Mapper implements IMapper, Serializable
                 $this->triggerCallbacks($post_trigger, $model);
             }
         }
+
+        // Send the notification action, if there is one.
+        if (isset($action)) {
+            foreach ($collection as $model) {
+                $this->raiseNotification($model, $action);
+            }
+        }
+
         return true;
     }
 

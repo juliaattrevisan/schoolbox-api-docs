@@ -32,10 +32,10 @@ use Schoolbox\UserMapper;
 class UserAccessNotifier extends AbstractModuleNotifier
 {
 
-    const TRIGGER_JOINED    = 'joined';
-    const TRIGGER_LEFT      = 'left';
+    const TRIGGER_JOINED = 'joined';
+    const TRIGGER_LEFT = 'left';
     const TRIGGER_REQUESTED = 'requested';
-    const TRIGGER_APPROVED  = 'approved';
+    const TRIGGER_APPROVED = 'approved';
 
 
     /**
@@ -106,7 +106,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
         // append system one too
         $method = 'notifySystem' . ucfirst($label);
         if (method_exists($this, $method)) {
-            $callbacks[] = array($this, $method);
+            $callbacks[] = [$this, $method];
         }
         return $callbacks;
     }
@@ -132,10 +132,10 @@ class UserAccessNotifier extends AbstractModuleNotifier
         $user = UserMapper::getInstance()->findById($userAccess->getUser()->getId());
 
         /** @var ParameterInterface[] $params */
-        $params = array(
+        $params = [
             'user'      => new UserParam($user),
             'groupname' => new CategoryParam($cat)
-        );
+        ];
 
         if ($effector) {
             $params['effector'] = new UserParam($effector, ParameterInterface::STACKING_REPLACE);
@@ -160,7 +160,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    public function notifyStaffJoined($userAccess, $user)
+    protected function notifyJoined($userAccess, $user)
     {
         if ($userAccess->getUser()->getId() == $user->getId()) {
             return $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
@@ -175,13 +175,91 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    public function notifyStaffLeft($userAccess, $user)
+    public function notifyStaffJoined($userAccess, $user)
+    {
+        return $this->notifyJoined($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyStudentJoined($userAccess, $user)
+    {
+        return $this->notifyJoined($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyParentJoined($userAccess, $user)
+    {
+        return $this->notifyJoined($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    protected function notifyLeft($userAccess, $user)
     {
         if ($userAccess->getUser()->getId() == $user->getId()) {
             return $this->notifyAdmin(':user left :groupname', self::TRIGGER_LEFT, $userAccess);
         } else {
-            return $this->notifyAdmin(':effector removed :user from :groupname', self::TRIGGER_LEFT, $userAccess, $user);
+            return $this->notifyAdmin(':effector removed :user from :groupname', self::TRIGGER_LEFT, $userAccess,
+                $user);
         }
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyStaffLeft($userAccess, $user)
+    {
+        return $this->notifyLeft($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyStudentLeft($userAccess, $user)
+    {
+        return $this->notifyLeft($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyParentLeft($userAccess, $user)
+    {
+        return $this->notifyLeft($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    protected function notifyRequested($userAccess, $user)
+    {
+        return $this->notifyAdmin(":user asked to join :groupname", self::TRIGGER_REQUESTED, $userAccess);
     }
 
 
@@ -192,7 +270,29 @@ class UserAccessNotifier extends AbstractModuleNotifier
      */
     public function notifyStaffRequested($userAccess, $user)
     {
-        return $this->notifyAdmin(":user asked to join :groupname", self::TRIGGER_REQUESTED, $userAccess);
+        return $this->notifyRequested($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyStudentRequested($userAccess, $user)
+    {
+        return $this->notifyRequested($userAccess, $user);
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @return Envelope
+     */
+    public function notifyParentRequested($userAccess, $user)
+    {
+        return $this->notifyRequested($userAccess, $user);
     }
 
 
