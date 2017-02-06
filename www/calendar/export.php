@@ -9,7 +9,8 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+
+$kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
@@ -90,7 +91,10 @@ try {
             break;
 
         case 'duework':
-            $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, array());
+
+            $page = new SitePage(false);
+            $page->setDi($kernel->getDependencyInjector());
+            $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, array(),  $page->getDi()->get('assessmentDataSource'));
             $filename = 'duework';
             break;
 
