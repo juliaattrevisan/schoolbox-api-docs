@@ -26,8 +26,7 @@ $.widget("ui.chat",  {
         send_el: 'input[type="submit"]',
         base_freq: 3,
         poll_freq: 6, // seconds,
-        recv_freq: 3,
-        max_height: '300px'
+        recv_freq: 3
     },
 
     _create: function () {
@@ -93,13 +92,6 @@ $.widget("ui.chat",  {
 				}
             }
         });
-
-        // apply some really specific styling
-        this.options.log_el.css({
-            'max-height' : this.options.max_height,
-            'overflow-y' : 'scroll'
-        });
-
     },
 
     _interval: function () {
@@ -219,7 +211,7 @@ $.widget("ui.chat",  {
         var scroll    = (Math.abs(scrollTop - height) === 0);
 
         if ($message.user_id == last.data('user')) {
-            last.find('.card').append('<p class="spaced">{0}</p>'.format($message.body));
+            last.find('.card').append('<p>{0}</p>'.format($message.body));
         } else {
 
             var $message_el = $('<li data-user="{0}" class="row"></li>'.format($message.user_id)).addClass('chat-message-' + $message.type);
@@ -230,10 +222,10 @@ $.widget("ui.chat",  {
             }
 
             var $tpl =
-                '<div class="card small-12">' +
+                '<div class="card small-12 wrap-down">' +
                 '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
                 '<h3>{0} <span class="meta">&bull; {2}</span></h3>' +
-                '<p class="spaced">{3}</p>' +
+                '<p>{3}</p>' +
                     //'<p class="chat-username">{2} {0}</p>' +
                 '</div>'
                 //'<div class="chat-message">' +
@@ -274,7 +266,7 @@ $.widget("ui.chat",  {
 
                     var $user_el = $('<li></li>');
 					var $tpl =
-                            '<div class="card small-12">' +
+                            '<div class="card small-12 wrap-down">' +
                                 '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
                                 '<h3>{0}</h3>' +
                             '</div>';
