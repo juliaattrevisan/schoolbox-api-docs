@@ -48,7 +48,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             JOIN submission_mark_type mt ON mt.mark_type_id = sb.mark_type
             LEFT JOIN rubric_level rl ON rl.box_id = sb.id
             LEFT JOIN rubric_descriptor rd ON rd.level_id = rl.id
-            WHERE sb.max_mark = 0
+            WHERE COALESCE(sb.max_mark, 0) = 0
             AND mt.slug = 'raw'
             AND rl.deleted_at IS NULL
             AND rd.deleted_at IS NULL
