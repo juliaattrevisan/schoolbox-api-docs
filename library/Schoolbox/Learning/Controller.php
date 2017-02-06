@@ -546,7 +546,7 @@ class Controller extends Base
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
         $folders = $this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term);
-        $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term));
+        $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
 
 
         // Grab the students conversation history

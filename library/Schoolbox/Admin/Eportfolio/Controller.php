@@ -192,7 +192,7 @@ class Controller extends Base
 
             if (is_array($post['role'])) {
                 foreach ($post['role'] as $roleId) {
-                    $destinationUsers = $destinationUsers->mergeUnique($this->userMapper->findByColumn('group_id', $roleId));
+                    $destinationUsers = $destinationUsers->mergeUnique($this->userMapper->findByColumn('group_id', $roleId),'id');
                 }
             }
 
@@ -202,7 +202,7 @@ class Controller extends Base
                 foreach ($post['campus'] as $campusId) {
                     $campus = new Campus();
                     $campus->setId($campusId);
-                    $destinationUsers = $destinationUsers->mergeUnique($this->campusMapper->findUsersInCampus($campus));
+                    $destinationUsers = $destinationUsers->mergeUnique($this->campusMapper->findUsersInCampus($campus),'id');
                 }
             }
 
