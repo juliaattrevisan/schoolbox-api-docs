@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <quiz>
+    <version>16.5</version>
     <title>{ASSESS_TITLE}</title>
     <description><![CDATA[
         {ASSESS_DESCRIPTION}
