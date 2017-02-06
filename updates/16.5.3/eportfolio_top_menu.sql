@@ -1,0 +1,1 @@
+UPDATE menu_top SET url = '/eportfolio' WHERE token = 'EPORTFOLIO';
