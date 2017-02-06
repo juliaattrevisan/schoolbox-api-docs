@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as ImplementationUnitModel;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -232,7 +233,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         /* Check permission and default to page based on access level of user */
 
-        $folder = $assessment->getBaseContext();
+        $baseContext = $assessment->getBaseContext();
+
+        if ($baseContext instanceof ImplementationUnitModel) {
+            /** @var ImplementationUnitModel $baseContext */
+            $folder = $baseContext->getFolder();
+        } else {
+            $folder = $baseContext;
+        }
+
         $perms = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
 
         /* If you're a staff, get redirected to a Status overview
