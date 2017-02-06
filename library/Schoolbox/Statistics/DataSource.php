@@ -357,12 +357,11 @@ class DataSource
         }
 
         $query = "
-            SELECT          {$this->userAccessMapper->getColumnString('ua')},
-                            {$this->userAccessMapper->getJoinColumnString('user', 'u')},
-                            {$this->userAccessMapper->getJoinColumnString('user.role', 'ur')}
+            SELECT          {$this->userMapper->getColumnString('u')},
+                            {$this->userMapper->getJoinColumnString('role', 'ur')}
             FROM            `{$this->userAccessMapper->getTable()}` AS ua
             LEFT JOIN       {$this->userAccessMapper->getJoinSql('user', 'ua', 'u')}
-            LEFT JOIN       {$this->userAccessMapper->getJoinSql('user.role', 'u', 'ur')}
+            LEFT JOIN       {$this->userMapper->getJoinSql('role', 'u', 'ur')}
             RIGHT JOIN      userGroups ug ON ug.cid = ua.sid
             LEFT JOIN       groups g ON u.group_id = g.id
             WHERE           ua.sid = :folderId
@@ -385,10 +384,8 @@ class DataSource
         $records = new Collection();
 
         foreach ($statement as $row) {
-            /** @var \Schoolbox\Permission\Access\UserAccess $record */
-            $record = clone $this->userAccessMapper->hydrate($row, 'ua');
-            $record->setUser($this->userAccessMapper->hydrateJoin($row, 'user', 'u'));
-            $record->getUser()->setRole($this->userAccessMapper->hydrateJoin($row, 'user.role', 'ur'));
+            $record = $this->userMapper->hydrate($row, 'u');
+            $record->setRole($this->userMapper->hydrateJoin($row, 'role', 'ur'));
             $records->add($record);
         }
 
