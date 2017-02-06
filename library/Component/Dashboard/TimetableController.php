@@ -237,7 +237,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     if(Cfg::get('external_type') == 'synergetic' && $class['AttendanceEnabled']) {
                                         $this->setVar(
                                             array(
-                                                'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . $class['code'] : '0/' . $class['code'],
+                                                'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . urlencode(urlencode($class['code'])) : '0/' . urlencode(urlencode($class['code'])),
                                                 'ATTENDANCE_ATTENDANCE_DATE'   => $now->getDatabaseDate(),
                                                 'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
                                                 'ATTENDANCE_TIMETABLE_CODE'    => $campus_list[$campus_id]->getExtTimetableCode(),

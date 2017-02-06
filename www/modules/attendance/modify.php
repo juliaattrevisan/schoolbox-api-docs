@@ -31,9 +31,9 @@ if (count($this->arg) < 3) {
  */
 $externalClass = new External_Synergetic_Class();
 if ($this->arg[0]) {
-    $class = $externalClass->getClass($this->arg[0] . '/' . $this->arg[1], $_SESSION['user']);
+    $class = $externalClass->getClass($this->arg[0] . '/' . urldecode(urldecode($this->arg[1])), $_SESSION['user']);
 } else {
-    $class = $externalClass->getClass($this->arg[1], $_SESSION['user']);
+    $class = $externalClass->getClass(urldecode(urldecode($this->arg[1])), $_SESSION['user']);
 }
 
 if (!$class) {
