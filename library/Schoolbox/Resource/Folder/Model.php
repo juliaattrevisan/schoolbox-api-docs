@@ -263,12 +263,16 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
             $codeCollection = $this->getCodes();
 
-            if ($codeCollection->count()) {
-                $externalIds = $DEPRECATED_EXTERNAL_CLASS->getTeacherName($codeCollection->first()->getCode());
+            $externalIds = [];
 
-                if(is_array($externalIds)) {
-                    $this->teacher_collection = UserMapper::getInstance()->findByColumn('synergy_id', $externalIds);
-                }
+            /** @var \Schoolbox\Resource\Folder\Code\Model $code */
+            foreach ($codeCollection as $code) {
+                $externalIds = array_merge($externalIds, $DEPRECATED_EXTERNAL_CLASS->getTeacherName($code->getCode()));
+            }
+
+            if (count($externalIds) > 0) {
+                $externalIds = array_unique($externalIds);
+                $this->teacher_collection = UserMapper::getInstance()->findByColumn('synergy_id', $externalIds);
             }
         }
 
