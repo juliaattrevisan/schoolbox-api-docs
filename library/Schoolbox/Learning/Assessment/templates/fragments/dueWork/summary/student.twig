@@ -33,7 +33,7 @@
         {% if submitRoute %}
             {% set submitText %}{% spaceless %}
                 Create submission
-                {% if currentUser.role.isStaff %}
+                {% if currentUser.id != participant.user.id %}
                     on behalf of {{ participant.user.fullname }}
                 {% endif %}
             {% endspaceless %}{% endset %}

@@ -1468,7 +1468,7 @@ class PendingFactory
         $pb = new PredicateBuilder($this->database, '');
         $pb->isNull('f.deleted_at');
         $pb->equals('ua.uid', $this->viewee->getId());
-        $pb->notLessThan('ua.type', UserAccess::ACCESS_READ);
+        $pb->greaterThan('ua.type', UserAccess::ACCESS_READ);
         $pb->equals('ua.service', UserAccess::SERVICE_HOMEPAGE);
         $query = "
             SELECT 
