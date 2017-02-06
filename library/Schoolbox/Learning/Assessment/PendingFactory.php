@@ -683,6 +683,7 @@ class PendingFactory
                         $assessment->setContext($this->projectCache[$projectId]);
                         $this->projectCache[$projectId]->setContext($this->foldersCache[$folderId]);
                         break;
+                    // Case 3 - Assessment in UnitImpl on Folder
                     case 3:
                         $this->cacheUnitImplementation($unitImplId);
                         $this->cacheUnitSpecification($unitSpecId);
@@ -692,16 +693,20 @@ class PendingFactory
                         $this->cacheFolder($folderId, $folderName);
                         $this->cacheFolder($courseSpecFolderId, $courseSpecFolderName);
 
-                        $assessment->setContext($this->unitImplsCache[$unitImplId]);
+                        $assessment
+                            ->setContext($this->unitImplsCache[$unitImplId]);
                         $this->unitImplsCache[$unitImplId]
                             ->setSpecification($this->unitSpecsCache[$unitSpecId])
                             ->setCourse($this->courseImplsCache[$courseImplId]);
-                        $this->unitSpecsCache[$unitSpecId]->setFolder($this->foldersCache[$unitSpecFolderId]);
+                        $this->unitSpecsCache[$unitSpecId]
+                            ->setFolder($this->foldersCache[$unitSpecFolderId]);
                         $this->courseImplsCache[$courseImplId]
                             ->setFolder($this->foldersCache[$folderId])
-                            ->setSpecification($this->courseSpecsCache[$courseSpecId])
+                            ->setSpecification($this->courseSpecsCache[$courseSpecId]);
+                        $this->courseSpecsCache[$courseSpecId]
                             ->setFolder($this->foldersCache[$courseSpecFolderId]);
                         break;
+                    // Case 4 - Assessment in Project in Unit Impl on Folder
                     case 4:
                         $this->cacheProject($projectId, $projectTitle);
                         $this->cacheUnitImplementation($unitImplId);
@@ -712,15 +717,19 @@ class PendingFactory
                         $this->cacheFolder($folderId, $folderName);
                         $this->cacheFolder($courseSpecFolderId, $courseSpecFolderName);
 
-                        $assessment->setContext($this->projectCache[$projectId]);
-                        $this->projectCache[$projectId]->setContext($this->unitImplsCache[$unitImplId]);
+                        $assessment
+                            ->setContext($this->projectCache[$projectId]);
+                        $this->projectCache[$projectId]
+                            ->setContext($this->unitImplsCache[$unitImplId]);
                         $this->unitImplsCache[$unitImplId]
                             ->setSpecification($this->unitSpecsCache[$unitSpecId])
                             ->setCourse($this->courseImplsCache[$courseImplId]);
-                        $this->unitSpecsCache[$unitSpecId]->setFolder($this->foldersCache[$unitSpecFolderId]);
+                        $this->unitSpecsCache[$unitSpecId]
+                            ->setFolder($this->foldersCache[$unitSpecFolderId]);
                         $this->courseImplsCache[$courseImplId]
                             ->setFolder($this->foldersCache[$folderId])
-                            ->setSpecification($this->courseSpecsCache[$courseSpecId])
+                            ->setSpecification($this->courseSpecsCache[$courseSpecId]);
+                        $this->courseSpecsCache[$courseSpecId]
                             ->setFolder($this->foldersCache[$courseSpecFolderId]);
                         break;
                     default:
