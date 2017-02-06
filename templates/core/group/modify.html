@@ -273,20 +273,26 @@ $(document).ready(function() {
                     <!-- END msg_enabled_followth -->
 
                     <ul class="information-list card-selectable">
-                        <li class="actions-small-4">
 
-                            <!-- BEGIN hide_no_members -->
+                        <!-- BEGIN hide_no_members -->
+                        <li>
                             <div class="selector">
                                 <input data-toggle-all id="delete-all" name="delete-all" type="checkbox" value="1">
                                 <label for="delete-all" class="checkbox-label"></label>
                             </div>
                             <div class="list-item">
-                                <div class="card small-12">
-                                </div>
+                                <div class="card small-12"></div>
                             </div>
-                            <!-- END hide_no_members -->
+                        </li>
+                        <!-- END hide_no_members -->
 
-                            <!-- BEGIN groupOwner -->
+                        <!-- BEGIN groupOwner -->
+                        <li class="actions-small-4">
+                            <!-- always disabled for group admin, purely here for visual reasons -->
+                            <div class="selector">
+                                <input id="group-admin-select" type="checkbox" disabled>
+                                <label for="group-admin-select" class="checkbox-label"></label>
+                            </div>
                             <div class="list-item">
                                 <div class="card small-12">
                                     <!-- BEGIN msg_enabled_followadmin -->
@@ -319,8 +325,9 @@ $(document).ready(function() {
                                     </label>
                                 </form>
                             </nav>
-                            <!-- END groupOwner -->
+
                         </li>
+                        <!-- END groupOwner -->
 
                         <!-- BEGIN member -->
                         <li data-relation="member" class="actions-small-4">
