@@ -211,7 +211,7 @@ $.widget("ui.chat",  {
         var scroll    = (Math.abs(scrollTop - height) === 0);
 
         if ($message.user_id == last.data('user')) {
-            last.find('.card').append('<p>{0}</p>'.format($message.body));
+            last.find('.card').append('<p class="spaced">{0}</p>'.format($message.body));
         } else {
 
             var $message_el = $('<li data-user="{0}" class="row"></li>'.format($message.user_id)).addClass('chat-message-' + $message.type);
@@ -225,7 +225,7 @@ $.widget("ui.chat",  {
                 '<div class="card small-12 wrap-down">' +
                 '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
                 '<h3>{0} <span class="meta">&bull; {2}</span></h3>' +
-                '<p>{3}</p>' +
+                '<p class="spaced">{3}</p>' +
                     //'<p class="chat-username">{2} {0}</p>' +
                 '</div>'
                 //'<div class="chat-message">' +
