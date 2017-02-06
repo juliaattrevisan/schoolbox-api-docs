@@ -251,7 +251,7 @@
                 <li>
                     <div class="card small-12">
                         <h3>
-                            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, studentId: student.id, assessment: upcoming}) %}
+                            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, student: student, studentId: student.id, assessment: upcoming}) %}
                             {% if route %}
                                 <a class="title" href="{{ route }}">{{ upcoming.title }}</a>
                             {% else %}
