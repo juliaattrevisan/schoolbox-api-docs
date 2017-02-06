@@ -75,9 +75,9 @@
                                 {% for subject in subjectTypes %}
                                     <li>
                                         {% if isStaff %}
-                                            <a href="/homepage/code/{{ subject.code }}">{{ subject.name }} ({{ subject.code }})</a>
+                                            <a href="/homepage/code/{{ subject.code|url_encode }}">{{ subject.name }} ({{ subject.code }})</a>
                                         {% else %}
-                                            <a href="/homepage/code/{{ subject.code }}">{{ subject.name }}</a>
+                                            <a href="/homepage/code/{{ subject.code|url_encode }}">{{ subject.name }}</a>
                                         {% endif %}
                                     </li>
                                 {% endfor %}
