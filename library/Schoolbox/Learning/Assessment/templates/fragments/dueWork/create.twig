@@ -29,13 +29,15 @@
             }
         }
 
+        var $acceptOnlineToggle = $('#acceptOnline');
+
         /* Initial state
          */
-        toggleDates($('#acceptOnline'));
+        toggleDates($acceptOnlineToggle);
 
         /* Update upon change
          */
-        $('#acceptOnline').change(function() {
+        $acceptOnlineToggle.change(function() {
             toggleDates($(this));
         });
     });
@@ -99,20 +101,21 @@
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
+{# Letter Grade enables Grading Scheme
+ # Total Mark enables Maximum Available Marks
+ #}
+{% set markTypeLetterGrade = 2 %}
+{% set markTypeTotalMark = 3 %}
+
 {% include '@learningAssessment/fragments/markType.twig' %}
 {% include '@learningAssessment/fragments/rubric.twig' with {
     rubric: rubric,
     rubricAttachZone: rubricAttachZone,
     resultSets: rubricResultSets,
     rubricHasMarks: rubricHasMarks,
-    assessment: assessment
+    assessment: assessment,
+    markTypeTotalMark: markTypeTotalMark
 } only %}
-
-{# Letter Grade enables Grading Scheme
- # Total Mark enables Maximum Available Marks
- #}
-{% set markTypeLetterGrade = 2 %}
-{% set markTypeTotalMark = 3 %}
 
 <script type="text/javascript">
     $(function () {
