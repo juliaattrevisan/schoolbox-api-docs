@@ -35,7 +35,7 @@ class DueWork
 
     public function returned(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
         $query = "SELECT COUNT(*) FROM submission_return
-                      WHERE returned >= :start AND returned <= :end ";
+                      WHERE created_at >= :start AND created_at <= :end ";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
@@ -47,7 +47,7 @@ class DueWork
 
     public function submitted(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
         $query = "SELECT COUNT(*) FROM student_submission
-                      WHERE submitted >= :start AND submitted <= :end ";
+                      WHERE submitted_at >= :start AND submitted_at <= :end ";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
