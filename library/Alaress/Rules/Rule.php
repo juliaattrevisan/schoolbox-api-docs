@@ -39,10 +39,12 @@ class Rule
 
 
     /**
-     * Accepts an arbitrary number of arguments
+     * Determine if this rule's conditions match a user.
      *
-     * @param mixed $_
-     * @return mixed
+     * If so, return an array of transformations, else return null.
+     *
+     * @param mixed $_ Accepts an arbitrary number of arguments
+     * @return \Alaress\Rules\Lang\Construct[]|string[]|null
      */
     public function apply($_ = null)
     {

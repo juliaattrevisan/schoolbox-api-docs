@@ -112,13 +112,12 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
             'nested multi-value'
                 => ['{:single.multi}', ['first', 'second', 'third', 'fourth']],
             'nested multi-value filter'
-                => ['{:single.multi|first}', ['f', 's', 't', 'f']],
+                => ['{:single.multi|first}', ['f', 's', 't']],
             'nested multi-value x multi-value'
                 => ['{:single.multi|first}y{:single.multi}', [
                         'fyfirst','fysecond','fythird','fyfourth',
                         'syfirst','sysecond','sythird','syfourth',
                         'tyfirst','tysecond','tythird','tyfourth',
-                        'fyfirst','fysecond','fythird','fyfourth',
                     ]],
             'nested multi-value x empty'
                 => ['{:single.multi}-{:empty}', ['first-', 'second-', 'third-', 'fourth-']],
@@ -141,13 +140,12 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
             'multi-multi value'
                 => ['{:multi.multi}', ['first', 'second', 'third', 'fourth']],
             'multi-multi value filter'
-                => ['{:multi.multi|first}', ['f','s','t','f']],
+                => ['{:multi.multi|first}', ['f','s','t']],
             'multi-multi x multi-multi'
                 => ['{:multi.multi|first}{:multi.multi}', [
                         'ffirst', 'fsecond', 'fthird', 'ffourth',
                         'sfirst', 'ssecond', 'sthird', 'sfourth',
                         'tfirst', 'tsecond', 'tthird', 'tfourth',
-                        'ffirst', 'fsecond', 'fthird', 'ffourth',
                     ]],
             'multi-multi mapped'
                 => [ new Map('{:multi.multi}', [
