@@ -1,21 +1,19 @@
 {% extends '@core/user/student.twig' %}
 
-{% block buttons_island %}
+{% block buttons %}
     {{ parent() }}
-    <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-3 large-block-grid-5" data-equalizer>
-        <li class="no-pad">
-            <a href="/synergetic/absences?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-user" data-equalizer-watch>Absences</a>
-        </li>
-        <li class="no-pad">
-            <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-info" data-equalizer-watch>My Details</a>
-        </li>
+    <li class="no-pad">
+        <a href="/synergetic/absences?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-user" data-equalizer-watch>Absences</a>
+    </li>
+    <li class="no-pad">
+        <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-info" data-equalizer-watch>My Details</a>
+    </li>
 
-        <li class="no-pad">
-            <a href="/synergetic/fin?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-itineraryitem" data-equalizer-watch>Finance</a>
-        </li>
+    <li class="no-pad">
+        <a href="/synergetic/fin?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-itineraryitem" data-equalizer-watch>Finance</a>
+    </li>
 
-        <li class="no-pad">
-            <a href="/homepage/2814" class="no-margin fat button icon-fat size-32 icon-forms" data-equalizer-watch>Permission Notes</a>
-        </li>
-    </ul>
-{% endblock buttons_island %}
+    <li class="no-pad">
+        <a href="/homepage/2814" class="no-margin fat button icon-fat size-32 icon-forms" data-equalizer-watch>Permission Notes</a>
+    </li>
+{% endblock buttons %}
