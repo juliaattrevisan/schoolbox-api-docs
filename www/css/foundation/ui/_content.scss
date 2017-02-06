@@ -780,7 +780,7 @@ $selector-width: 2.25rem;
 }
 %interaction-selector{
 	padding: 0 0.75rem;
-	width: $selector-width;
+	flex: 1 $selector-width;
 	&:before {
 		padding: 0;
 	}
@@ -788,6 +788,10 @@ $selector-width: 2.25rem;
 @mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
 	> li{
 		@extend %interaction-li;
+
+		ul.information-list{
+			flex: 1 100%;
+		}
 		.#{$selector} {
 			@if str-length($icon) > 0 {
 				@extend .icon-#{$icon};
@@ -832,13 +836,13 @@ $selector-width: 2.25rem;
 	&.expandable-card{
 		@include list-interaction(expander, pointer);
 		li .expander{
-			width: 2.5rem;
+			flex: 1 2.5rem;
 		}
 	}
 	&.card-selectable {
 		@include list-interaction(selector, pointer);
 		li .selector{
-			width: 3rem;
+			flex: 1 3rem;
 			label{
 				padding: 0 !important;
 			}
@@ -862,12 +866,11 @@ $selector-width: 2.25rem;
 		input[type=checkbox]:not(.plain)+label.checkbox-label {
 			margin-top: 0.5rem;
 		}
-
 		/**
 		 * Foundation kills margin-bottom on ul li ul
 		 * Restore it to normal for lists inside information & action lists
 		 */
-		ul,
+		ul:not(.information-list),
 		ol {
 			margin-#{$default-float}: $list-side-margin;
 			margin-bottom: $list-margin-bottom;
@@ -879,7 +882,9 @@ $selector-width: 2.25rem;
 	nav a:hover {
 		background-color: $row-action-hover-background;
 	}
-
+	.card{
+		flex: 1 100%;
+	}
 	/* <article> immediately follows <nav> has a special
 	 * layout rule to display content
 	 */
