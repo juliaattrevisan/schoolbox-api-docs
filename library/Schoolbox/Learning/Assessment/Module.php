@@ -12,6 +12,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -84,19 +85,13 @@ class Module extends BaseModule
 
                 return $ctx;
             },
-            Access::getInstance()
+            $this->getAccess()
         );
 
         $participantView = new Rule\Any(
             new Rule\IsSuperuser(),
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsUser('studentId')
+            new CanSeeAssessment($this->getAccess(), $this->getConfig())
         );
-
-        // if parent access is NOT restricted, allow for parents also
-        if ($this->getConfig()->get('restrict_parent_duework_access') == false) {
-            $participantView->addRule(new Rule\IsParentOfStudent());
-        }
 
         $canSubmit = new Rule\Any(
             new Rule\IsSuperuser(),
@@ -406,6 +401,16 @@ class Module extends BaseModule
     protected function getFolderMapper()
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
+    }
+
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getMapperFactory()->get(Access::class);
     }
 
 }
