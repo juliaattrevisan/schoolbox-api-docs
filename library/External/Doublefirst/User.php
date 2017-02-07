@@ -146,8 +146,8 @@ class External_Doublefirst_User implements External_UserInterface
                 c.Title                     AS Title,
                 cm.Greeting                 AS Preferred,
                 c.Surname                   AS Surname,
-                ce.HomeEmailAddress         AS Email,
-                ce.WorkEmailAddress         AS OccupEmail,
+                ceh.EmailID         AS Email,
+                cew.EmailID         AS OccupEmail,        
                 ''                          AS DefaultEmailCode,
                 ct.HomeTelephoneNumber      AS HomePhone,
                 
@@ -179,9 +179,10 @@ class External_Doublefirst_User implements External_UserInterface
             FROM        VLPupilContact      pc
             LEFT JOIN   VLContact           c on c.ContactID = pc.ContactID
             LEFT JOIN   ContactMaster       cm on c.ContactID = cm.ContactID
-            LEFT JOIN   VLContactEmail      ce on ce.ContactID = pc.ContactID
+            LEFT JOIN   ContactEmailInformation      ceh on ceh.ContactID = pc.ContactID AND ceh.EmailType = '001' AND ceh.PrimaryEmail = 1
+            LEFT JOIN   ContactEmailInformation      cew on cew.ContactID = pc.ContactID AND cew.EmailType = '002' AND cew.PrimaryEmail = 1
             LEFT JOIN   VLContactTelephone  ct on ct.ContactID = pc.ContactID 
-            
+                        
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile    ON ctPhoneMobile.ContactID = pc.ContactID AND ctPhoneMobile.TelephoneType = 'M'
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile2   ON ctPhoneMobile2.ContactID = pc.ContactID AND ctPhoneMobile2.TelephoneType = '003'
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile3   ON ctPhoneMobile3.ContactID = pc.ContactID AND ctPhoneMobile3.TelephoneType = '004'
@@ -483,7 +484,7 @@ class External_Doublefirst_User implements External_UserInterface
                         cm.Greeting AS StudentContactPreferred,
                         c.contactName AS StudentContactLegalFullName,
                         c.Surname StudentContactSurname,
-                        ce.HomeEmailAddress AS StudentContactDefaultEmail,
+                        ceh.EmailID AS StudentContactDefaultEmail,
                         1 AS ValidAddressFlag,
         
                         a.SubDwelling AS StudentContactAddress1,
@@ -554,7 +555,7 @@ class External_Doublefirst_User implements External_UserInterface
                         ) AS StudentContactSpouseOccupPhone, 
 
 
-                        '' AS StudentContactSpouseDefaultEmail,
+                        cew.EmailID AS StudentContactSpouseDefaultEmail,
                         'SC1' AS StudentContactType,
                         0 AS StudentContactSilentPhoneFlag,
                         0 AS StudentContactSilentMobilePhoneFlag,
@@ -582,6 +583,8 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation cmPhoneWork6   ON cmPhoneWork6.ContactID = pc.ContactID AND cmPhoneWork6.TelephoneType = '009'
             LEFT JOIN VLContactTelephone            cp ON cp.ContactID = pc.ContactID 
             LEFT JOIN VLContactEmail                ce ON ce.ContactID = pc.ContactID
+            LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype = '001' and ceh.primaryemail = 1
+            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype = '002' and cew.primaryemail = 1 
             WHERE
         ";
 

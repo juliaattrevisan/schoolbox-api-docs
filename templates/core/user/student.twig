@@ -482,11 +482,13 @@
                                                     {{ externalUser["StudentEmergency#{index}Phone"] }}
                                                 </a>
                                             </li>
-                                            <li class="full-width">
-                                                <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
-                                                    {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
-                                                </a>
-                                            </li>
+                                            {% if externalUser["StudentEmergency#{index}PhoneAlt"] is not empty %}
+                                                <li class="full-width">
+                                                    <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
+                                                        {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
+                                                    </a>
+                                                </li>
+                                            {% endif %}
                                         </ul>
                                     </li>
                                 {% endif %}
