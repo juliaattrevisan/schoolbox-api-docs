@@ -528,13 +528,13 @@
                         try {
                             var aComp = sorts[i].column(a);
                             var bComp = sorts[i].column(b);
+                            var comp  = sorts[i].comparator(aComp, bComp);
+                            if (comp != 0) {
+                                return comp;
+                            }
                         } catch (e) {
-                            // Something went wrong in fetching column - these items aren't comparable.
-                            continue;
-                        }
-                        var comp = sorts[i].comparator(aComp, bComp);
-                        if (comp != 0) {
-                            return comp;
+                            // Something went wrong in fetching column or comparing values:
+                            // consider these items not comparable. (Continue is implicit)
                         }
                     }
 
