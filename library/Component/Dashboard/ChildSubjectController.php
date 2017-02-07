@@ -51,8 +51,12 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         foreach ( $this->children as $child ) {
 
             // Check if the current childs timetable is viewable and hide if necessary
+            try {
+                $userChild = $userMapper->findById($child['id']);
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                continue;
+            }
 
-            $userChild = $userMapper->findById($child['id']);
 
             if ( !( Cfg::get('site_location') == 'wenona' && $child['gid'] == 3 ) ) {
                 $i++;
