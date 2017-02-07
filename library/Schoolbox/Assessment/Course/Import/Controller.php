@@ -920,20 +920,9 @@ class Controller extends Base\Base
         // Load UnitImpls
         $courseImpl->setUnits($this->getUnitImplementationMapper()->findAllByCourseId($courseImpl->getId()));
 
-        // Add un-imported UnitSpecs to CourseImpl
+        // Add un-imported UnitSpecs to CourseImpl, so user can select them for import
         foreach ($courseSpec->getUnits() as $unitSpec) {
-            // Has this UnitSpec been imported?
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                if ($unitImpl->getSpecification()->getId() == $unitSpec->getId()) {
-                    // unitSpec already imported, do nothing
-                    continue 2;
-                }
-            }
-            // unitSpec not imported, add it to CourseImpl as available for import
-            $unitImpl = new UnitImplementation();
-            $unitImpl->setSpecification($unitSpec);
-            $unitImpl->setTitle($unitSpec->getFolder()->getName());
-            $courseImpl->getUnits()->add($unitImpl);
+            $this->createProposedUnitImplementations($unitSpec, $courseImpl);
         }
 
         // Re-order UnitImpls alphabetically
@@ -980,6 +969,32 @@ class Controller extends Base\Base
             'returnUrlName'       => Redirect::RETURN_URL,
             'encodedReturnUrl'    => $this->getRequest()->query->get(Redirect::RETURN_URL),
         ]);
+    }
+
+    /**
+     * Determine if the specified UnitSpec has already been imported to the specified CourseImpl.
+     *
+     * If not, create a proposed UnitImpl with no ID, and add to the CourseImpl. The user will then
+     * be able to select that they wish to import the proposed UnitImpl.
+     *
+     * @param UnitSpecification $unitSpec
+     * @param CourseImplementation $courseImpl
+     */
+    protected function createProposedUnitImplementations(UnitSpecification $unitSpec, CourseImplementation $courseImpl)
+    {
+        // Has this UnitSpec been imported?
+        foreach ($courseImpl->getUnits() as $unitImpl) {
+            if ($unitImpl->getSpecification()->getId() == $unitSpec->getId()) {
+                // unitSpec already imported, do nothing
+                return;
+            }
+        }
+
+        // unitSpec not imported, add it to CourseImpl as available for import
+        $unitImpl = new UnitImplementation();
+        $unitImpl->setSpecification($unitSpec);
+        $unitImpl->setTitle($unitSpec->getFolder()->getName());
+        $courseImpl->getUnits()->add($unitImpl);
     }
 
     /**
