@@ -914,25 +914,15 @@ class Controller extends Base\Base
             $courseSpec = $e->getDeletedObject();
         }
 
+        // Load UnitSpecs that have not been soft-deleted (to make available for import)
         $courseSpec->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($courseSpec->getId()));
 
         // Load UnitImpls
         $courseImpl->setUnits($this->getUnitImplementationMapper()->findAllByCourseId($courseImpl->getId()));
 
-        // Add un-imported UnitSpecs to CourseImpl
+        // Add un-imported UnitSpecs to CourseImpl, so user can select them for import
         foreach ($courseSpec->getUnits() as $unitSpec) {
-            // Has this UnitSpec been imported?
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                if ($unitImpl->getSpecification()->getId() == $unitSpec->getId()) {
-                    // unitSpec already imported, do nothing
-                    continue 2;
-                }
-            }
-            // unitSpec not imported, add it to CourseImpl as available for import
-            $unitImpl = new UnitImplementation();
-            $unitImpl->setSpecification($unitSpec);
-            $unitImpl->setTitle($unitSpec->getFolder()->getName());
-            $courseImpl->getUnits()->add($unitImpl);
+            $this->createProposedUnitImplementations($unitSpec, $courseImpl);
         }
 
         // Re-order UnitImpls alphabetically
@@ -944,13 +934,7 @@ class Controller extends Base\Base
         // Find the owner of any Assessment so we can display, even though it is disabled
         $owner = null;
         try {
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $assessables = $this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId());
-                foreach ($assessables as $assessable) {
-                    $owner = $this->getUserMapper()->findById($assessable->getCreator()->getId());
-                    break 2;
-                }
-            }
+            $owner = $this->deriveOwnerFromCourseImplAssessables($courseImpl);
         } catch (MapperException $e) {
             // noop
         }
@@ -979,6 +963,55 @@ class Controller extends Base\Base
             'returnUrlName'       => Redirect::RETURN_URL,
             'encodedReturnUrl'    => $this->getRequest()->query->get(Redirect::RETURN_URL),
         ]);
+    }
+
+    /**
+     * Determine who owns the assessments already in a CourseImpl, so we can assign the same owner when
+     * we insert more Assessments.
+     *
+     * Return null if unable to determine a User.
+     *
+     * @param CourseImplementation $courseImpl
+     * @return null|\Schoolbox\User
+     */
+    protected function deriveOwnerFromCourseImplAssessables(CourseImplementation $courseImpl)
+    {
+        foreach ($courseImpl->getUnits() as $unitImpl) {
+            // Ensure this is not one of the Units merely proposed for import, rather than already imported.
+            if($unitImpl->getId()){
+                $assessables = $this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId());
+                foreach ($assessables as $assessable) {
+                    return $this->getUserMapper()->findById($assessable->getCreator()->getId());
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Determine if the specified UnitSpec has already been imported to the specified CourseImpl.
+     *
+     * If not, create a proposed UnitImpl with no ID, and add to the CourseImpl. The user will then
+     * be able to select that they wish to import the proposed UnitImpl.
+     *
+     * @param UnitSpecification $unitSpec
+     * @param CourseImplementation $courseImpl
+     */
+    protected function createProposedUnitImplementations(UnitSpecification $unitSpec, CourseImplementation $courseImpl)
+    {
+        // Has this UnitSpec been imported?
+        foreach ($courseImpl->getUnits() as $unitImpl) {
+            if ($unitImpl->getSpecification()->getId() == $unitSpec->getId()) {
+                // unitSpec already imported, do nothing
+                return;
+            }
+        }
+
+        // unitSpec not imported, add it to CourseImpl as available for import
+        $unitImpl = new UnitImplementation();
+        $unitImpl->setSpecification($unitSpec);
+        $unitImpl->setTitle($unitSpec->getFolder()->getName());
+        $courseImpl->getUnits()->add($unitImpl);
     }
 
     /**
