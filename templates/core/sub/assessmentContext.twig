@@ -21,14 +21,14 @@
         {% if projectContext is folder %}
             {{ crumbs.basic(
                 [ projectContext.folder.name,    '/homepage/' ~ projectContext.folder.id ],
-                [ context.title ]
+                [ context.title, routeLookup('learningAssessment.getStatus', { assessmentId: context.id }) ]
             ) }}
         {% elseif projectContext is unitImplementation %}
             {{ crumbs.basic(
                 [ projectContext.course.specification.folder.name,    '/homepage/' ~ projectContext.course.specification.folder.id ],
                 [ projectContext.specification.folder.name,    '/homepage/' ~ projectContext.specification.folder.id ],
                 [ projectContext.course.folder.name,    '/homepage/' ~ projectContext.course.folder.id ],
-                [ projectContext.title ]
+                [ context.title, routeLookup('learningAssessment.getStatus', { assessmentId: context.id }) ]
             ) }}
         {% endif %}
     {% endif %}
