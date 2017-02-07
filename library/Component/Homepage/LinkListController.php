@@ -30,13 +30,14 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      */
     public function execute()
     {
+        $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
+
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
         if(!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
         
-        $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
         return true;
     }
 
