@@ -165,9 +165,9 @@ class Controller extends Assessment\Controller
     {
         $this->assertParticipantAccess($participant);
 
-        /** @var Assessment\Project $assessment */
-        $assessment = $participant->getAssessable();
-        $student    = $participant->getUser();
+        /** @var Assessment\Project $project */
+        $project = $participant->getAssessable();
+        $student = $participant->getUser();
 
         $counts = [];
 
@@ -184,14 +184,14 @@ class Controller extends Assessment\Controller
         $counts['total']          = 0;
         $counts['totalCompleted'] = 0;
 
-        $assessables = $assessment->getAssessables();
+        $subActivities = $project->getAssessables();
 
         // obtain user access level
-        $access = $this->getAccess()->getFolderAccess($this->getUser(), [ $assessment->getBaseContext()->getFolder()->getId() ]);
+        $access = $this->getAccess()->getFolderAccess($this->getUser(), [ $project->getBaseContext()->getFolder()->getId() ]);
 
         if ($access < UserAccess::ACCESS_WRITE) {
             // if you have read or less, you have additional restrictions
-            if ($assessment->getPublishAt()->isFuture()) {
+            if ($project->getPublishAt()->isFuture()) {
                 // project is not
                 throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
             }
@@ -200,25 +200,25 @@ class Controller extends Assessment\Controller
             $now = Alaress_Date_Format::now();
 
             // filter out any sub-activities that have not yet been published
-            $assessables = $assessables->filter(function (IAssessable $activity) use ($now) {
+            $subActivities = $subActivities->filter(function (IAssessable $activity) use ($now) {
                 return $activity->getPublishAt()->lte($now);
             });
 
             // hack the project object for good measure
-            $assessment->setAssessables($assessables);
+            $project->setAssessables($subActivities);
         }
 
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
+        /** @var IAssessable $subActivity */
+        foreach ($subActivities as $subActivity) {
 
-            if (!$assessable->isParticipant($student)) {
+            if (!$subActivity->isParticipant($student)) {
                 // This student isn't a participant.
                 // This is fine - when PBL is implemented not all students
                 // will participate in all sub-assessments
                 continue;
             }
 
-            $type = Assessment\AssessmentType::objectToString($assessable);
+            $type = Assessment\AssessmentType::objectToString($subActivity);
 
             // If the student has submitted at least one response we will assume it is completed
             $counts[$type]++;
@@ -233,10 +233,10 @@ class Controller extends Assessment\Controller
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($project, $this->getUser())->add([ $project->getTitle(), '' ]),
             'currentUser' => $this->getUser(),
             'student'     => $student,
-            'assessment'  => $assessment,
+            'assessment'  => $project,
             'counts'      => $counts,
         ];
 
