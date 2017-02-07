@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Project;
 
+use Alaress_Date_Format;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -15,6 +16,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Assessment\Controller
 {
@@ -163,9 +165,9 @@ class Controller extends Assessment\Controller
     {
         $this->assertParticipantAccess($participant);
 
-        /** @var Assessment\Project $assessment */
-        $assessment = $participant->getAssessable();
-        $student    = $participant->getUser();
+        /** @var Assessment\Project $project */
+        $project = $participant->getAssessable();
+        $student = $participant->getUser();
 
         $counts = [];
 
@@ -182,21 +184,41 @@ class Controller extends Assessment\Controller
         $counts['total']          = 0;
         $counts['totalCompleted'] = 0;
 
-        $assessables = $assessment->getAssessables();
+        $subActivities = $project->getAssessables();
 
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
+        // obtain user access level
+        $access = $this->getAccess()->getFolderAccess($this->getUser(), [ $project->getBaseContext()->getFolder()->getId() ]);
 
-            try {
-                $participant = $assessable->getParticipant($student);
-            } catch (\UnexpectedValueException $e) {
+        if ($access < UserAccess::ACCESS_WRITE) {
+            // if you have read or less, you have additional restrictions
+            if ($project->getPublishAt()->isFuture()) {
+                // project is not
+                throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+            }
+
+            // this isn't cached in the factory method... for some reason...
+            $now = Alaress_Date_Format::now();
+
+            // filter out any sub-activities that have not yet been published
+            $subActivities = $subActivities->filter(function (IAssessable $activity) use ($now) {
+                return $activity->getPublishAt()->lte($now);
+            });
+
+            // hack the project object for good measure
+            $project->setAssessables($subActivities);
+        }
+
+        /** @var IAssessable $subActivity */
+        foreach ($subActivities as $subActivity) {
+
+            if (!$subActivity->isParticipant($student)) {
                 // This student isn't a participant.
                 // This is fine - when PBL is implemented not all students
                 // will participate in all sub-assessments
                 continue;
             }
 
-            $type = Assessment\AssessmentType::objectToString($assessable);
+            $type = Assessment\AssessmentType::objectToString($subActivity);
 
             // If the student has submitted at least one response we will assume it is completed
             $counts[$type]++;
@@ -211,10 +233,10 @@ class Controller extends Assessment\Controller
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($project, $this->getUser())->add([ $project->getTitle(), '' ]),
             'currentUser' => $this->getUser(),
             'student'     => $student,
-            'assessment'  => $assessment,
+            'assessment'  => $project,
             'counts'      => $counts,
         ];
 
