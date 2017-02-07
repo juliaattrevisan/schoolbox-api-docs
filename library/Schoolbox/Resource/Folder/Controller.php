@@ -265,7 +265,7 @@ class Controller extends BaseController
                     'breadcrumbs'       => $breadcrumbs,
                     'folder'            => $folder,
                     'parent'            => $parent,
-                    'templates'         => $homepageTemplateMapper->findAll(),
+                    'templates'         => $homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]),
                     'roles'             => $roleMapper->findAll(),
                     'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
