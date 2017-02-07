@@ -25,6 +25,7 @@ use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
@@ -274,6 +275,10 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
                 $externalIds = array_unique($externalIds);
                 $this->teacher_collection = UserMapper::getInstance()->findByColumn('synergy_id', $externalIds);
             }
+
+            $this->teacher_collection = $this->teacher_collection->filter(function($user) {
+                return $user->getRole()->getType() == Role::STAFF;
+            });
         }
 
         // do we include staff included in this category internally as well? for now, no.
