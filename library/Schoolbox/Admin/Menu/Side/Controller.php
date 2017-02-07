@@ -360,24 +360,31 @@ class Controller extends Base
             $item->setParent((new MenuSide())->setId($post['parentId']));
             $this->getMenuSideMapper()->save($item);
 
-            $parentChildren = $this->getMenuSideMapper()->findByColumn('parent_id', $post['parentId']);
+            $parentChildren = $this->getMenuSideMapper()->findByColumn('parent_id', $post['parentId'], ['order' => ['sort_order' => 'asc']]);
 
             $orderCurrent = 0;
 
             /** @var MenuSide $node */
             foreach ($parentChildren as $node) {
+
+                if ($orderCurrent == $post['position']) {
+                    $orderCurrent++;
+                }
+
                 if ($node->getId() == $post['id']) {
                     $node->setSortOrder($post['position']);
                 } else {
-                    if ($orderCurrent == $post['position']) {
-                        $orderCurrent++;
-                    }
                     $node->setSortOrder($orderCurrent++);
+
                 }
+
                 $this->getMenuSideMapper()->save($node);
             }
         } catch (\Exception $e) {
+            return $this->getResponse()->content->set($this->buildJsonOutput(['result' => 'Error']));
         }
+
+        return $this->getResponse()->content->set($this->buildJsonOutput(['result' => 'OK']));
     }
 
     /**
