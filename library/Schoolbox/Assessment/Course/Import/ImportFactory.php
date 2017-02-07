@@ -376,8 +376,8 @@ class ImportFactory
      */
     protected function loadProjectSpecAssessables(GenericCollection $assessmentSpecs, array $assessmentImplToSpecMap)
     {
-        // Put the specIds in the keys for O(1) lookup. Suppress warnings regarding null values.
-        $specToImplMap = @array_flip($assessmentImplToSpecMap);
+        // Put the specIds in the keys for O(1) lookup. Strip out values that equate to false (eg NULL)
+        $specToImplMap = array_flip(array_filter($assessmentImplToSpecMap));
 
         /** @var Project[] $projectSpecs */
         $projectSpecs = new GenericCollection(Project::class);
