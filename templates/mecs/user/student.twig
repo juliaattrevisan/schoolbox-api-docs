@@ -50,6 +50,7 @@
                             </div>
                         </div>
                         {% if (contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N')
+                        or (contact.StudentContactSpouseDefaultEmail and contact.StudentContactUseEmail != 'N')
                         or (contact.StudentContactMobilePhone)
                         or (contact.StudentContactOccupPhone)
                         or (contact.StudentContactSpouseMobilePhone) or (contact.StudentContactSpouseOccupPhone) %}
@@ -64,6 +65,11 @@
                                 {% if contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N' %}
                                     <li><a class="icon-email"
                                            href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a>
+                                    </li>
+                                {% endif %}
+                                {% if contact.StudentContactSpouseDefaultEmail and contact.StudentContactUseEmail != 'N' %}
+                                    <li><a class="icon-email"
+                                           href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a>
                                     </li>
                                 {% endif %}
                                 {% if contact.StudentContactMobilePhone %}
