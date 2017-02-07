@@ -491,6 +491,56 @@
                     }
                 },
 
+                eventOrder: function(a, b) {
+                    // Sort order:
+                    // 1. student start date
+                    // 2. student end date
+                    // 3. preset start date
+                    // 4. preset end date
+                    // 5. ordering within course outline
+                    var stringCompare = function(a,b) { return a.localeCompare(b); };
+                    var numCompare    = function(a,b) { return a - b; };
+                    var sorts         = [
+                        {
+                            column: function (item) { return item.start.toISOString(); },
+                            comparator: stringCompare
+                        },
+                        {
+                            column: function (item) { return item.end.toISOString(); },
+                            comparator: stringCompare
+                        },
+                        {
+                            column: function (item) { return item.meta.assessmentStart; },
+                            comparator: stringCompare
+                        },
+                        {
+                            column: function (item) { return item.meta.assessmentEnd; },
+                            comparator: stringCompare
+                        },
+                        {
+                            column: function (item) { return Number(item.meta.assessmentOrder); },
+                            comparator: numCompare
+                        }
+                    ];
+
+                    // Check each sort
+                    for (var i = 0; i < sorts.length; i++) {
+                        try {
+                            var aComp = sorts[i].column(a);
+                            var bComp = sorts[i].column(b);
+                        } catch (e) {
+                            // Something went wrong in fetching column - these items aren't comparable.
+                            continue;
+                        }
+                        var comp = sorts[i].comparator(aComp, bComp);
+                        if (comp != 0) {
+                            return comp;
+                        }
+                    }
+
+                    return 0;
+                },
+
                 customButtons: {
                     prevWindow: {
                         icon: 'left-single-arrow',
