@@ -114,7 +114,7 @@ if (!is_numeric($attempt['attempt_id'])) {
 /* Check if Attempt ran out of time
  */
 if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
-    error(122);
+    SitePage::localRedir('/assess/end/' . $assess['assess_id']);
 }
 
 /* Set up template
