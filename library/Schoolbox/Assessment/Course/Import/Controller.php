@@ -977,9 +977,12 @@ class Controller extends Base\Base
     protected function deriveOwnerFromCourseImplAssessables(CourseImplementation $courseImpl)
     {
         foreach ($courseImpl->getUnits() as $unitImpl) {
-            $assessables = $this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId());
-            foreach ($assessables as $assessable) {
-                return $this->getUserMapper()->findById($assessable->getCreator()->getId());
+            // Ensure this is not one of the Units merely proposed for import, rather than already imported.
+            if($unitImpl->getId()){
+                $assessables = $this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId());
+                foreach ($assessables as $assessable) {
+                    return $this->getUserMapper()->findById($assessable->getCreator()->getId());
+                }
             }
         }
         return null;
