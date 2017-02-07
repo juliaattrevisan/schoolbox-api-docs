@@ -527,6 +527,10 @@ class Session
                 }
                 $catList = array();
                 if (is_array($subjectList)) {
+
+                    // declare the array
+                    $_SESSION['subjects'] = [];
+
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = false;
