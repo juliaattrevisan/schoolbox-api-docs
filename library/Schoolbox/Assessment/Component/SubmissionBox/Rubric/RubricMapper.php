@@ -923,10 +923,15 @@ class RubricMapper
     {
         $pb = new PredicateBuilder($this->database, '');
 
-        $pb->equals('rc.parent_type', 'category')
-           ->equals('rc.parent_id', $subject->getId())
-           ->equals('rm.student_id', $student->getId())
-           ->isNull('rc.deleted_at');
+        $pb
+            ->equals('rc.parent_type', 'category')
+            ->equals('rc.parent_id', $subject->getId())
+            ->equals('rm.student_id', $student->getId())
+            ->isNull('rc.deleted_at')
+            ->isNull('rl.deleted_at')
+            ->isNull('rd.deleted_at')
+            ->notNull('rm.published_at')
+            ->isTrue('rm.valid');
 
         if ($noEarlierThan) {
             $pb->notLessThan('a.due_date', $noEarlierThan->getDatabase());
@@ -938,20 +943,43 @@ class RubricMapper
 
         $where = implode(' AND ', $pb->getWhere());
 
+        // While MariaDB appears to return the desired value in a column not in a group aggregate function, this
+        // behaviour is NOT guaranteed, the value in such cases is officially indeterminate.
+
+        // We have two implementation options here:
+        // 1. Get more results than we really want, sort in order so that the last per group is
+        //    the only one we want, then discard some results during processing, or
+        // 2. More complex query to only get results we want
+
+        // While the former is simpler, it's too fragile and will break if someone changes the sorting.
+        // The below query is complex, but is the standard pattern:
+        // see http://stackoverflow.com/questions/7745609/sql-select-only-rows-with-max-value-on-a-column
+
         $stmt = $this->database->prepare("
             SELECT rc.grouping, rc.name, a.id, a.title, rd.description
             FROM rubric_criterion rc
-            JOIN rubric_usage ru ON rc.id = ru.criterion_id
-            JOIN submission_box sb ON ru.submission_box_id = sb.id
-            JOIN assessment a ON sb.assessment_id = a.id
-            JOIN rubric_level rl ON sb.id = rl.box_id AND rl.deleted_at IS TRUE
-            JOIN rubric_descriptor rd ON rd.level_id = rl.id AND rd.criterion_id = rc.id AND rd.deleted_at IS TRUE
-            JOIN rubric_mark rm ON rm.descriptor_id = rd.id AND rm.valid IS TRUE
+            JOIN rubric_usage ru      ON rc.id                = ru.criterion_id
+            JOIN submission_box sb    ON ru.submission_box_id = sb.id
+            JOIN assessment a         ON sb.assessment_id     = a.id
+            JOIN rubric_level rl      ON sb.id                = rl.box_id
+            JOIN rubric_descriptor rd ON rd.level_id          = rl.id           AND rd.criterion_id = rc.id
+            JOIN rubric_mark rm       ON rm.descriptor_id     = rd.id
+            JOIN (
+                SELECT sb.id AS 'sb.id', rc.id as 'rc.id', max(rm.published_at) AS 'rm.max_published_at'
+                FROM rubric_mark rm
+                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+                JOIN rubric_criterion rc  ON rc.id = rd.criterion_id
+                JOIN rubric_usage ru      ON rc.id = ru.criterion_id
+                JOIN rubric_level rl      ON rl.id = rd.level_id
+                JOIN submission_box sb    ON sb.id = rl.box_id                  AND ru.submission_box_id = sb.id
+                JOIN assessment a         ON a.id = sb.assessment_id
+                WHERE {$where}
+                GROUP BY sb.id, rc.id
+            ) t
             WHERE {$where}
-            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC, rm.created_at
+            AND `sb`.`id` = `t`.`sb.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
+            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC;
         ");
-        // Note that this will return all marks for the given student and subject through time, but because we
-        // have ordered by mark.timestamp, the latter values will overwrite previous marks.
 
         $stmt->execute($pb->getParams());
 
@@ -968,7 +996,6 @@ class RubricMapper
                 'name'       => $assessmentTitle,
                 'descriptor' => $descriptor,
             ];
-
         }
 
         return $longitude;
