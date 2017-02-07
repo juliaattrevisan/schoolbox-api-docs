@@ -62,7 +62,7 @@
                                     {%- set markedTitleSuffix = 'been reviewed' -%}
                                 {%- elseif assessment is dueWork %}
                                     {%- set submitTitleSuffix = 'submitted work' -%}
-                                    {%- set markedTitleSuffix = 'recevied feedback' -%}
+                                    {%- set markedTitleSuffix = 'received feedback' -%}
                                 {%- elseif assessment is task -%}
                                     {% set submitTitleSuffix = 'completed this task' -%}
                                     {% set markedTitleSuffix = 'been teacher assessed' -%}
@@ -70,7 +70,7 @@
 
                                 <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
                                     <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have  {{ markedTitleSuffix }}"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
@@ -141,7 +141,7 @@
                         {%- set noResultsTitleSuffix = 'attempted this quiz' -%}
                     {%- elseif assessment is dueWork %}
                         {%- set submitTitleSuffix = 'submitted work' -%}
-                        {%- set markedTitleSuffix = 'recevied feedback' -%}
+                        {%- set markedTitleSuffix = 'received feedback' -%}
                         {%- set noResultsTitleSuffix = 'submitted work or received feedback' -%}
                     {%- elseif assessment is task %}
                         {%- set submitTitleSuffix = 'self-assessed this task' -%}
@@ -163,7 +163,7 @@
                             <div class="small-4 columns hide-for-small-only">
                                 <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
                                     <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have  {{ markedTitleSuffix }}"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
