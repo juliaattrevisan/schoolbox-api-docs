@@ -458,7 +458,7 @@ class UserMapper extends Mapper
             $pb->equals('g.group_type', $roleType);
         }
 
-        $user = $this->findByPredicates($pb, ['deleted' => true])->first();
+        $user = $this->findByPredicates($pb)->first();
 
         if (!$user instanceOf User) {
             throw new Schoolbox\Mapper\Exception('Instance of object not found');
