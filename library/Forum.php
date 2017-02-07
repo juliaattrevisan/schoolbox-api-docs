@@ -229,12 +229,14 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->query($query);
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score_title', $sort_dir = 'desc') {
         $keyword = $this->db->quote($keyword);
+        $sort_by_quote = Database::quoteIdentifier($sort_by);
 
         $query = "SELECT `forumThread`.*, `forumPost`.*, `forumThread`.title AS `threadTitle`,
                             `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
-                            MATCH(`body`) AGAINST ('$keyword') AS `score`
+                            MATCH(`body`) AGAINST ('$keyword') AS `score`,
+                            MATCH(`forumThread`.`title`) AGAINST ('$keyword') AS `score_title`
                         FROM `forumPost`
                         LEFT JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
                         LEFT JOIN `user` ON `forumPost`.userID = `user`.id
@@ -245,10 +247,13 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                             AND `userAccess`.service = 1
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
-                            AND MATCH(`body`) AGAINST ('$keyword')
+                            AND (
+                                MATCH(`body`) AGAINST ('$keyword') OR 
+                                MATCH(`forumThread`.`title`) AGAINST ('$keyword')
+                            )
                             AND `forumThread`.`deleted` = 'false'
                             AND `forumPost`.`deleted` = 'false'
-                        ORDER BY `$sort_by` $sort_dir
+                        ORDER BY {$sort_by_quote} $sort_dir, `score` $sort_dir
                         LIMIT $offset, $limit;
             ";
 
@@ -263,7 +268,10 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                             AND `userAccess`.service = 1
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
-                            AND MATCH(`body`) AGAINST ('$keyword')
+                            AND (
+                                MATCH(`body`) AGAINST ('$keyword') OR 
+                                MATCH(`forumThread`.`title`) AGAINST ('$keyword')
+                            )
                             AND `forumThread`.`deleted` = 'false'
                             AND `forumPost`.`deleted` = 'false'
             ";
