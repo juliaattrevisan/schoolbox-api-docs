@@ -445,14 +445,27 @@ class Mapper extends BaseMapper
         // The best I can do is to get all IDs and fetch a union.
         // TODO replace with an OR through the predicate builder
         $idQuery = "
-            SELECT DISTINCT a.id
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())} a
-            LEFT JOIN {$this->getJoinSql('assessment_folder', 'a', 'f')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', 'a', 'ui')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
-            WHERE f.id    IN {$placeholders}
-            OR    uicf.id IN {$placeholders}
+            SELECT a.id
+            FROM `folder` f
+            INNER JOIN `assessment_folder` AS `v_f`
+                ON `f`.`id` = `v_f`.`folder_id`
+            INNER JOIN `assessment` AS `a`
+                ON `a`.`id` = `v_f`.`assessment_id`
+            WHERE f.id IN {$placeholders}
+
+            UNION
+
+            SELECT af.id
+            FROM `folder` uicf
+            INNER JOIN `course_implementation` AS `uic`
+                ON `uicf`.`id` = `uic`.`folder_id` AND `uic`.`deleted_at` IS NULL
+            INNER JOIN `course_unit_implementation` AS `ui`
+                ON `uic`.`id` = `ui`.`course_implementation_id` AND `ui`.`deleted_at` IS NULL
+            INNER JOIN `assessment_course_unit_implementation` AS `v_ui`
+                ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
+            INNER JOIN `assessment` AS `af`
+                ON `af`.`id` = `v_ui`.`assessment_id`
+            WHERE uicf.id IN {$placeholders}
         ";
         $idStatement = $this->getDatabase()->prepare($idQuery);
         $idStatement->execute($params);
