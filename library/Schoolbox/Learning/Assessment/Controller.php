@@ -233,14 +233,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         /* Check permission and default to page based on access level of user */
 
-        $baseContext = $assessment->getBaseContext();
-
-        if ($baseContext instanceof ImplementationUnitModel) {
-            /** @var ImplementationUnitModel $baseContext */
-            $folder = $baseContext->getFolder();
-        } else {
-            $folder = $baseContext;
-        }
+        $folder = $assessment->getBaseContext()->getFolder();
 
         $perms = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
 
