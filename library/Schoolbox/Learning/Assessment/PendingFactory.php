@@ -557,7 +557,7 @@ class PendingFactory
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
-
+        // Assessment in Project in UnitImpl imported on Folder
         $folderClause = count($folderIds) ? " OR cif.id IN (" . implode(',', $folderIds) . ") " : '';
         $query4 = "
         SELECT 
@@ -608,6 +608,7 @@ class PendingFactory
             
             WHERE a.deleted_at IS NULL
             AND ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} $taskUser) $folderClause)
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
