@@ -273,12 +273,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
             if (count($externalIds) > 0) {
                 $externalIds = array_unique($externalIds);
-                $this->teacher_collection = UserMapper::getInstance()->findByColumn('synergy_id', $externalIds);
+                $this->teacher_collection = UserMapper::getInstance()->findByColumnList([
+                    'synergy_id' => $externalIds,
+                    'g.group_type' => Role::STAFF
+                ]);
             }
-
-            $this->teacher_collection = $this->teacher_collection->filter(function($user) {
-                return $user->getRole()->getType() == Role::STAFF;
-            });
         }
 
         // do we include staff included in this category internally as well? for now, no.
