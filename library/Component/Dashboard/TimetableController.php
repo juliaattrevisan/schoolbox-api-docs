@@ -235,7 +235,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     && Cfg::get('external_attendance')
                                     && $this->getUser()->getRole()->isStaff()
                                 ) {
+                                    $showAttendance = false;
                                     if(Cfg::get('external_type') == 'synergetic' && $class['AttendanceEnabled']) {
+                                        $showAttendance = true;
                                         $this->setVar(
                                             array(
                                                 'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . $class['code'] : '0/' . $class['code'],
@@ -247,6 +249,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                         );
                                     }
                                     else if(Cfg::get('external_type') == 'tass') {
+                                        $showAttendance = true;
                                         list($year, $subject, $class) = explode('-',$class['code']);
                                         list($cmp_code, $timetableCode) = explode('-',$campus_list[$campus_id]->getExtTimetableCode());
                                         $this->setVar(
@@ -261,12 +264,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                             )
                                         );
                                     }
-
-                                    if ($hasLink) {
-                                        $this->parse('period_class_link_attendance_block', 'period_class_link_attendance');
-                                    }
-                                    else {
-                                        $this->parse('period_class_attendance_block', 'period_class_attendance');
+                                    if($showAttendance) {
+                                        if ($hasLink) {
+                                            $this->parse('period_class_link_attendance_block', 'period_class_link_attendance');
+                                        } else {
+                                            $this->parse('period_class_attendance_block', 'period_class_attendance');
+                                        }
                                     }
                                 }
 
