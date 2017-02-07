@@ -13,8 +13,10 @@
 
 namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 
+use Alaress_Date_Format;
 use Component_Instance;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
@@ -38,29 +40,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @var CourseImplementation|null
      */
     private $courseImplementation;
-
-    /** @var int[] */
-    private $accessList = [];
-
-    /**
-     *
-     * @var Collection|User[]
-     */
-    private $userCollection;
-
-    /**
-     * A list of students who have completed the assessments within the courseImpl.
-     *
-     * @var Collection|TaskCompletion[]
-     */
-    private $completionList;
-
-    /**
-     * A list of students for this category.
-     *
-     * @var User[]
-     */
-    private $studentList = array();
 
     /**
      * @var bool
@@ -127,17 +106,24 @@ class Controller extends Component_Homepage_ControllerAbstract
                 if ($this->readOnly) {
                     // I might be a student, but can't be anything more.
                     // In any case, load only my participation - if I'm not a participant, there will be nothing.
+                    // also omit anything that is not yet published (there's no easy way to apply this filter to the query)
+
+                    // this isn't cached in the factory method... for some reason...
+                    $now = Alaress_Date_Format::now();
+
                     $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
                         $unitImpl->getId(),
                         $this->getUser()
-                    );
+                    )->filter(function (IAssessable $activity) use ($now) {
+                        return $activity->getPublishAt()->lte($now);
+                    });
                 } else {
                     // I'm a teacher - load all participants.
                     $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
                         $unitImpl->getId()
                     );
                 }
-                $unitImpl->setAssessables($assessments);
+                $unitImpl->setAssessables($this->getAssessmentMapperProxy()->createCollection($assessments->getAll()));
 
 //                $unitId = $unitImpl->getSpecification()->getFolder()->getId();
 //                $this->accessList[$unitId] = Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);

@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Project;
 
+use Alaress_Date_Format;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -15,6 +16,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Assessment\Controller
 {
@@ -184,12 +186,32 @@ class Controller extends Assessment\Controller
 
         $assessables = $assessment->getAssessables();
 
+        // obtain user access level
+        $access = $this->getAccess()->getFolderAccess($this->getUser(), [ $assessment->getBaseContext()->getFolder()->getId() ]);
+
+        if ($access < UserAccess::ACCESS_WRITE) {
+            // if you have read or less, you have additional restrictions
+            if ($assessment->getPublishAt()->isFuture()) {
+                // project is not
+                throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+            }
+
+            // this isn't cached in the factory method... for some reason...
+            $now = Alaress_Date_Format::now();
+
+            // filter out any sub-activities that have not yet been published
+            $assessables = $assessables->filter(function (IAssessable $activity) use ($now) {
+                return $activity->getPublishAt()->lte($now);
+            });
+
+            // hack the project object for good measure
+            $assessment->setAssessables($assessables);
+        }
+
         /** @var IAssessable $assessable */
         foreach ($assessables as $assessable) {
 
-            try {
-                $participant = $assessable->getParticipant($student);
-            } catch (\UnexpectedValueException $e) {
+            if (!$assessable->isParticipant($student)) {
                 // This student isn't a participant.
                 // This is fine - when PBL is implemented not all students
                 // will participate in all sub-assessments
