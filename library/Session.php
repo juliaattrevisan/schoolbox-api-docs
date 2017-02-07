@@ -564,6 +564,11 @@ class Session
                             }
                         }
                     }
+
+                    usort($_SESSION['subjects'], function($a, $b) {
+                        return strnatcmp($a['name'],$b['name']);
+                    });
+
                     $_SESSION['timetable'] = 1;
                 } else {
                     $_SESSION['timetable'] = 0;
