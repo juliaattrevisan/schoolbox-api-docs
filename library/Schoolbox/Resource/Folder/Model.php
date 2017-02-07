@@ -25,6 +25,7 @@ use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
@@ -263,12 +264,19 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
             $codeCollection = $this->getCodes();
 
-            if ($codeCollection->count()) {
-                $externalIds = $DEPRECATED_EXTERNAL_CLASS->getTeacherName($codeCollection->first()->getCode());
+            $externalIds = [];
 
-                if(is_array($externalIds)) {
-                    $this->teacher_collection = UserMapper::getInstance()->findByColumn('synergy_id', $externalIds);
-                }
+            /** @var \Schoolbox\Resource\Folder\Code\Model $code */
+            foreach ($codeCollection as $code) {
+                $externalIds = array_merge($externalIds, $DEPRECATED_EXTERNAL_CLASS->getTeacherName($code->getCode()));
+            }
+
+            if (count($externalIds) > 0) {
+                $externalIds = array_unique($externalIds);
+                $this->teacher_collection = UserMapper::getInstance()->findByColumnList([
+                    'synergy_id' => $externalIds,
+                    'g.group_type' => Role::STAFF
+                ]);
             }
         }
 
