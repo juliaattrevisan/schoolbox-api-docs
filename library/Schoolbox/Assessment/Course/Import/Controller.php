@@ -934,13 +934,7 @@ class Controller extends Base\Base
         // Find the owner of any Assessment so we can display, even though it is disabled
         $owner = null;
         try {
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $assessables = $this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId());
-                foreach ($assessables as $assessable) {
-                    $owner = $this->getUserMapper()->findById($assessable->getCreator()->getId());
-                    break 2;
-                }
-            }
+            $owner = $this->deriveOwnerFromCourseImplAssessables($courseImpl);
         } catch (MapperException $e) {
             // noop
         }
@@ -969,6 +963,26 @@ class Controller extends Base\Base
             'returnUrlName'       => Redirect::RETURN_URL,
             'encodedReturnUrl'    => $this->getRequest()->query->get(Redirect::RETURN_URL),
         ]);
+    }
+
+    /**
+     * Determine who owns the assessments already in a CourseImpl, so we can assign the same owner when
+     * we insert more Assessments.
+     *
+     * Return null if unable to determine a User.
+     *
+     * @param CourseImplementation $courseImpl
+     * @return null|\Schoolbox\User
+     */
+    protected function deriveOwnerFromCourseImplAssessables(CourseImplementation $courseImpl)
+    {
+        foreach ($courseImpl->getUnits() as $unitImpl) {
+            $assessables = $this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId());
+            foreach ($assessables as $assessable) {
+                return $this->getUserMapper()->findById($assessable->getCreator()->getId());
+            }
+        }
+        return null;
     }
 
     /**
