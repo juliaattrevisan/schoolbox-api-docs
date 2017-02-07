@@ -103,7 +103,6 @@ class Timetable extends AbstractImporter
         $timetablePeriodCache = [];
         $teacherCache         = [];
         foreach ($this->reader as $i => $row) {
-            $this->log->info("Parsing row $i...");
             $key = $row['Class Code'];
 
             if (!isset($key)) {
@@ -115,7 +114,6 @@ class Timetable extends AbstractImporter
 
             if (!isset($result[$key])) {
                 // Class
-                $this->log->info(sprintf('Class "%s" has not been parsed: parsing now', $key));
                 $class = new ClassEntry();
                 $class
                     ->setCode($key)
@@ -126,8 +124,6 @@ class Timetable extends AbstractImporter
                     'class'   => $class,
                     'periods' => new Collection(),
                 ];
-            } else {
-                $this->log->info(sprintf('Class "%s" has been parsed', $key));
             }
 
             // Load timetable campus from DB or cache
@@ -210,13 +206,6 @@ class Timetable extends AbstractImporter
                 ->setTeacher($teacher)
                 ->setPeriod($timetablePeriod);
             $result[$key]['periods']->add($classPeriod);
-            $this->log->info(
-                sprintf(
-                    'Period "%s", day "%s" has been parsed',
-                    $periodTitle,
-                    $periodDay
-                )
-            );
         }
         return $result;
     }
@@ -238,36 +227,22 @@ class Timetable extends AbstractImporter
         foreach ($this->parse() as $row) {
             /** @var ClassEntry $class */
             $class = $row['class'];
-            $code  = $class->getCode();
             if ($this->performUpdate) {
-                $this->log->info(sprintf('Saving class "%s"', $code));
                 if ($this->classMapper->save($class)) {
-                    $this->log->info(sprintf('Class saved (ID: #%d)', $class->getId()));
+
                 } else {
                     $this->log->error('Could not save class!');
                 }
-            } else {
-                $this->log->info(sprintf('Pretending to save class "%s"', $code));
             }
 
             // Class mapper now has an ID, hence the periods may now be saved
             foreach ($row['periods'] as $period) {
                 /** @var ClassPeriod $period */
-                $identifier = sprintf(
-                    '"%s" for day %d, period "%s"',
-                    $period->getTeacher()->getExternalId(),
-                    $period->getPeriod()->getDay(),
-                    $period->getPeriod()->getTitle()
-                );
                 if ($this->performUpdate) {
-                    $this->log->info('Saving class teacher ' . $identifier);
                     if ($this->classPeriodMapper->save($period)) {
-                        $this->log->info(sprintf('Class teacher entry saved (ID: #%d)', $period->getId()));
                     } else {
                         $this->log->error('Could not save class teacher!');
                     }
-                } else {
-                    $this->log->info('Pretending to save class teacher ' . $identifier);
                 }
             }
         }
