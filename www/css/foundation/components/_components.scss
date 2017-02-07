@@ -347,3 +347,10 @@ ul.tileList {
 .component-container .emptystatemessage {
     display: none;
 }
+
+[data-chat-log]{
+    .spaced:nth-child(n+4){
+        border-top: 1px solid $body-bg;
+        padding-top: 0.45rem;
+    }
+}

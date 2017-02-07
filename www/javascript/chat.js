@@ -26,7 +26,8 @@ $.widget("ui.chat",  {
         send_el: 'input[type="submit"]',
         base_freq: 3,
         poll_freq: 6, // seconds,
-        recv_freq: 3
+        recv_freq: 3,
+        max_height: '300px'
     },
 
     _create: function () {
@@ -91,6 +92,11 @@ $.widget("ui.chat",  {
                     $self._send($self);
 				}
             }
+        });
+        // apply some really specific styling
+        this.options.log_el.css({
+            'max-height' : this.options.max_height,
+            'overflow-x' : 'auto'
         });
     },
 
