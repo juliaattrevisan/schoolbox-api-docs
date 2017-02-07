@@ -137,7 +137,7 @@ class ImportFactory
         }
 
         // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
-        $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs);
+        $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, []);
         $dto = new DataTransferObject([], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
 
         return $dto;
