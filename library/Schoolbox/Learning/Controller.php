@@ -383,8 +383,6 @@ class Controller extends Base
 
         $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
 
-        $folders = new Collection();
-
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
@@ -394,7 +392,6 @@ class Controller extends Base
 
                     if (!isset($markbooksFolders[$folder->getId()])) {
                         $markbooksFolders[$folder->getId()] = new Collection();
-                        $folders->add($folder);
                     }
 
                     $markbooksFolders[$folder->getId()]->add($assessment);
@@ -402,11 +399,8 @@ class Controller extends Base
             }
         }
 
-        foreach ($markbooksFolders as $folderId => $assessments) {
-            $markbooks[$folderId] =
-                (new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()))
-                    ->getStudentStatistics()[$viewee->getId()];
-        }
+        $folders = $this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term);
+        $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
 
         // Squish this mess out
 
