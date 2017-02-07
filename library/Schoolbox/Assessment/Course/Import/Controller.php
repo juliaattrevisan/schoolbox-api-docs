@@ -914,6 +914,7 @@ class Controller extends Base\Base
             $courseSpec = $e->getDeletedObject();
         }
 
+        // Load UnitSpecs that have not been soft-deleted (to make available for import)
         $courseSpec->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($courseSpec->getId()));
 
         // Load UnitImpls
