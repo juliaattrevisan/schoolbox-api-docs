@@ -127,7 +127,7 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
      */
     public function getFolder()
     {
-        return $this->getAssessmentModel()->getContextFolder();
+        return $this->getAssessmentModel()->getAssessmentContext()->getFolder();
     }
 
     /**
@@ -136,7 +136,7 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
      */
     public function setFolder(FolderModel $folder)
     {
-        $this->getAssessmentModel()->setContextFolder($folder);
+        $this->getAssessmentModel()->getAssessmentContext()->setFolder($folder);
         return $this;
     }
 
