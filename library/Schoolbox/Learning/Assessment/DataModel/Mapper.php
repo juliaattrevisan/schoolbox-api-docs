@@ -450,7 +450,7 @@ class Mapper extends BaseMapper
             INNER JOIN `assessment_folder` AS `v_f`
                 ON `f`.`id` = `v_f`.`folder_id`
             INNER JOIN `assessment` AS `a`
-                ON `a`.`id` = `v_f`.`assessment_id` -- AND `a`.`deleted_at` IS NULL
+                ON `a`.`id` = `v_f`.`assessment_id`
             WHERE f.id IN {$placeholders}
 
             UNION
@@ -464,10 +464,8 @@ class Mapper extends BaseMapper
             INNER JOIN `assessment_course_unit_implementation` AS `v_ui`
                 ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
             INNER JOIN `assessment` AS `af`
-                ON `af`.`id` = `v_ui`.`assessment_id` -- AND `af`.`deleted_at` IS NULL
+                ON `af`.`id` = `v_ui`.`assessment_id`
             WHERE uicf.id IN {$placeholders}
-            
-            ORDER BY id ASC
         ";
         $idStatement = $this->getDatabase()->prepare($idQuery);
         $idStatement->execute($params);
