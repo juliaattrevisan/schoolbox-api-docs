@@ -118,9 +118,25 @@
                 $element.confirmDialog({
                     text: 'Are you sure you wish to delete this activity? Any student responses or feedback will also be deleted.',
                     confirmEvent: function() {
-                        $.post($element.attr('href'), {}, function() {
+                        var toaster = component.find('[data-alert]');
+                        toaster.toastActivate({text: 'Deleting activity...'});
+
+                        $.post($element.attr('href'))
+                        .done(function() {
+
+                            toaster.toastTimeout({
+                                text: 'Activity deleted.',
+                                css: 'pop success'
+                            });
+
                             $assessmentRow.fadeOut({
                                 done: $assessmentRow.remove
+                            });
+                        })
+                        .fail(function () {
+                            toaster.toastTimeout({
+                                text: 'Could not delete this activity.',
+                                css: 'pop alert'
                             });
                         });
                     }
