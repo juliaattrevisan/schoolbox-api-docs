@@ -19,9 +19,19 @@ $classes = [];
 
 $handle = fopen("classes.txt", "r");
 
+echo "\n";
+
 if ($handle) {
-    while (($line = fgets($handle)) !== false) {
-        $classes[] = trim($line);
+    while (($row = fgetcsv($handle)) !== false) {
+        if (count($row) > 1) {
+            if (!isset($classes[$row[0]])) {
+                $classes[$row[0]] = [];
+            }
+
+            for ($i = 1; $i < count($row); $i++) {
+                $classes[$row[0]][] = $row[$i];
+            }
+        }
     }
     fclose($handle);
 } else {
@@ -30,66 +40,91 @@ if ($handle) {
 }
 
 // Remove all parents from specified classes
-foreach ($classes as $code) {
+foreach ($classes as $folderId => $codes) {
     try {
-        $folders[$code] = $folderMapper->findByCode($code);
+        $folders[$folderId] = $folderMapper->findById($folderId);
 
-        $parents = $userAccessMapper->findUsersInCategory($folders[$code], \Schoolbox\Role::PARENT);
+        $parents = $userAccessMapper->findUsersInCategory($folders[$folderId], \Schoolbox\Role::PARENT);
+
+        echo "Removing parent access from '{$folders[$folderId]->getTitle()}'\n";
 
         foreach ($parents as $parent) {
             $userAccessMapper->deleteByColumnList([
                 'uid' => $parent->getId(),
-                'sid' => $folders[$code]->getId()
+                'sid' => $folderId
             ]);
         }
     } catch (MapperException $e) {
     }
 }
 
-// Add current parents to the specified classes
+// Add parents from class codes to the specified classes
 
-foreach ($classes as $code) {
-    $parents = $classHandler->getParents($code);
+foreach ($classes as $folderId => $codes) {
 
-    foreach ($parents as $parent) {
-        try {
+    $usersAdded = [];
 
-            // Get primary contact
+    foreach ($codes as $code) {
 
-            $userPrimary = $userMapper->findByExternalId($parent['StudentContactID']);
+        echo "\nAdding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'\n\n";
 
-            // Give primary access to the class
+        $parents = $classHandler->getParents($code);
 
-            $userAccess = new UserAccessModel();
-            $userAccess->setUser($userPrimary);
-            $userAccess->setServiceIdentifier($folders[$code]->getId());
-            $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
-            $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
-            $userAccessMapper->save($userAccess);
+        foreach ($parents as $parent) {
+            try {
 
-        } catch (MapperException $e) {
-        }
+                // Get primary contact
 
-        try {
+                $userPrimary = $userMapper->findByExternalId($parent['StudentContactID']);
 
-            // Check if there was a spouse
+                if (!isset($usersAdded[$userPrimary->getId()])) {
+                    // Give primary access to the class
 
-            if (!empty($parent['StudentContactSpouseID'])) {
+                    $userAccess = new UserAccessModel();
+                    $userAccess->setUser($userPrimary);
+                    $userAccess->setServiceIdentifier($folderId);
+                    $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
+                    $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
+                    $userAccessMapper->save($userAccess);
 
-                // Get spouse
-
-                $userSpouse = $userMapper->findByExternalId($parent['StudentContactSpouseID']);
-
-                // Give spouse access to the class
-
-                $userAccess = new UserAccessModel();
-                $userAccess->setUser($userSpouse);
-                $userAccess->setServiceIdentifier($folders[$code]->getId());
-                $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
-                $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
-                $userAccessMapper->save($userAccess);
+                    echo "\tAdded:    '{$userPrimary->getFirstname()} {$userPrimary->getLastname()}'\n";
+                    $usersAdded[$userPrimary->getId()] = true;
+                } else {
+                    echo "\tSkipping: '{$userPrimary->getFirstname()} {$userPrimary->getLastname()}' (Already Added To Folder)\n";
+                }
+            } catch (MapperException $e) {
             }
-        } catch (MapperException $e) {
+
+            try {
+
+                // Check if there was a spouse
+
+                if (!empty($parent['StudentContactSpouseID'])) {
+
+                    // Get spouse
+
+                    $userSpouse = $userMapper->findByExternalId($parent['StudentContactSpouseID']);
+
+                    if (!isset($usersAdded[$userSpouse->getId()])) {
+                        // Give spouse access to the class
+
+                        $userAccess = new UserAccessModel();
+                        $userAccess->setUser($userSpouse);
+                        $userAccess->setServiceIdentifier($folderId);
+                        $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
+                        $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
+                        $userAccessMapper->save($userAccess);
+
+                        echo "\tAdded:    '{$userSpouse->getFirstname()} {$userSpouse->getLastname()}'\n";
+                        $usersAdded[$userSpouse->getId()] = true;
+                    } else {
+                        echo "\tSkipping: '{$userSpouse->getFirstname()} {$userSpouse->getLastname()}' (Already Added To Folder)\n";
+                    }
+                }
+            } catch (MapperException $e) {
+            }
         }
     }
 }
+
+echo "\n";
