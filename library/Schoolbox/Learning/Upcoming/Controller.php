@@ -135,7 +135,6 @@ class Controller extends Base
         $subjects = [];
 
         // Student's work
-        // TODO add a findAllByStudentBetweenDates to findAllByStudentForTerm
         $allWork = $this->assessmentDataSource
             ->findAllByStudent($student, $term)
             ->sortBy('dueAt', 'asc');

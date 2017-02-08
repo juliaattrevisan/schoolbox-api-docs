@@ -28,6 +28,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
+use Alaress_Date_Format;
 
 /**
  * Class Mapper
@@ -332,6 +333,19 @@ class Mapper extends BaseMapper
      */
     public function findUniqueAssessmentIdsForStudent(User $student, Term $term)
     {
+        return $this->findUniqueAssessmentIdsForStudentBetweenDates($student, $term->getStart(), $term->getActualFinish());
+    }
+
+    /**
+     * Somewhat efficient query for retrieving the assessments which this student has participated in.
+     *
+     * @param User $student
+     * @param Alaress_Date_Format|null $start
+     * @param Alaress_Date_Format|null $end
+     * @return array|int[]
+     */
+    public function findUniqueAssessmentIdsForStudentBetweenDates(User $student, Alaress_Date_Format $start = null, Alaress_Date_Format $end = null)
+    {
         // Filter task/duework/quiz by term dates
         $params   = [
             'userId' => $student->getId(),
@@ -340,12 +354,12 @@ class Mapper extends BaseMapper
             'a.deleted_at IS NULL',
             '(tc.student_id IS NOT NULL OR ds.owner IS NOT NULL OR dr.owner IS NOT NULL OR qa.user_id IS NOT NULL)',
         ];
-        if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
-            $params['from'] = $term->getStart()->getDatabaseDate();
+        if ($start instanceof Alaress_Date_Format && !$start->isNull()) {
+            $params['from'] = $start->getDatabase();
             $whereParts[]   = 'DATE(a.due_date) >= :from';
         }
-        if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
-            $params['to'] = $term->getActualFinish()->getDatabaseDate();
+        if ($end instanceof Alaress_Date_Format && !$end->isNull()) {
+            $params['to'] = $end->getDatabase();
             $whereParts[]   = 'DATE(a.due_date) <= :to';
         }
 

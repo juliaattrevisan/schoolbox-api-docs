@@ -29,6 +29,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use \Alaress_Date_Format;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -440,6 +441,12 @@ class MapperProxy
      */
     public function findAllByStudent(User $student, Term $term)
     {
+        return $this->findAllByStudentBetweenDates($student, $term->getStart(), $term->getActualFinish());
+    }
+
+
+    public function findAllByStudentBetweenDates(User $student, Alaress_Date_Format $start = null, Alaress_Date_Format $end = null)
+    {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
@@ -453,15 +460,23 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
+        $columnList = [
+            'id' => $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $start, $end),
+        ];
+
+        if ($start instanceof Alaress_Date_Format && !$start->isNull()) {
+            $columnList['due_date >='] = $start->getDatabase();
+        }
+        if ($end instanceof Alaress_Date_Format && !$end->isNull()) {
+            $columnList['due_date <='] = $end->getDatabase();
+        }
 
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+                $this->baseMapper->findAllForFolderId($classFolderIds, $columnList)
             ),
             $student
         );
