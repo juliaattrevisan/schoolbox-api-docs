@@ -78,6 +78,57 @@ class External_Synergetic_Class implements External_ClassInterface
         return $this->getDatabase()->getRow($query);
     }
 
+    /**
+     * Retrieve all parents of students in the specified subject
+     * @param $subCode
+     */
+    public function getParents($subCode)
+    {
+        $students = $this->getStudents($subCode);
+
+        //TODO: Inject $_SESSION['user'], short term to get this working without arch changes
+        if (isset($_SESSION['user']) && $_SESSION['user'] instanceof \Schoolbox\User) {
+            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($_SESSION['user']->getExternalId()));
+            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($_SESSION['user']->getExternalId()));
+        } else {
+            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        }
+
+        $studentIds = "";
+
+        foreach ($students as $student) {
+
+            if ($studentIds != "") {
+                $studentIds .= ",";
+            }
+
+            $studentIds .= $student['synergy_id'];
+        }
+
+        $query = "
+            SELECT DISTINCT
+              StudentID, 
+              StudentGiven1,
+              StudentSurname,
+              StudentContactID,
+              StudentContactGiven1,
+              StudentContactSurname,
+              StudentContactSpouseID,
+              StudentContactSpouseGiven1,
+              StudentContactSpouseSurname
+            FROM 
+              vStudentContactAllAddress 
+            WHERE 
+              (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3') AND 
+              StudentID IN ({$studentIds}) AND
+              FileYear = {$fileYear} AND
+              FileSemester = $fileSemester              
+        ";
+
+        return $this->getDatabase()->getAll($query);
+    }
+
     public function getStudents($subCode)
     {
         if (!$subCode) {
