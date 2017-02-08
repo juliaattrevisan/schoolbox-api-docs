@@ -22,6 +22,13 @@ class Result extends Base
 {
 
     /**
+     * Effectively no limit
+     * This is used when a folder has multiple codes - the executeSearch()
+     * didn't take this into account
+     */
+    const NO_LIMIT = 999;
+
+    /**
      * Get all the search results
      *
      * @param User $user
@@ -56,13 +63,29 @@ class Result extends Base
 
         $results = new Collection();
 
-        foreach ($this->buildSearchResult($statement, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
+        /* Count folders manually, rather than leaving it to the buildSearchResult's iterator
+         * It can't tell that this is a 1:N join
+         */
+        $i = 0;
+
+        // Handle offset properly:
+        // any folders found after offset+limit get skipped,
+        // any before offset get sliced off the start
+        foreach ($this->buildSearchResult($statement, $user, 'c.id', 0, self::NO_LIMIT) as $row) {
+
+            // Not at offset + limit results yet? Skip
+            if (count($results) > ($sanitiser->getOffset() + $sanitiser->getLimit())) {
+                break;
+            }
+
             $folder = $mapper->hydrate($row, 'c');
 
             /* Accumulate folder codes here
              */
             if (!($results->getOffset($folder->getId()) instanceof Folder)) {
-                $results->setOFfset($folder->getId(), $folder);
+                $results->setOffset($folder->getId(), $folder);
+
+                $i++;
             }
 
             /* Reassign var
@@ -84,6 +107,7 @@ class Result extends Base
         /* What, it times out doing new Collection(array_values($results))
          */
         $results->reindex();
+        $results = $results->slice($sanitiser->getOffset(), $sanitiser->getLimit());
 
         return $results;
     }
@@ -99,7 +123,7 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-            SELECT id
+            SELECT DISTINCT id
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
