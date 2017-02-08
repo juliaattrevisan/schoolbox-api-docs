@@ -192,7 +192,7 @@ class Controller extends Assessment\Controller
     {
         $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
 
-        if ($sessionUser->getId() == $participantUser->getId()) {
+        if ($sessionUser->getId() == $participantUser->getId() && !$this->getUser()->getRole()->isStaff()) {
             // this is the special case: redirect to intro
             $this->getResponse()->redirect->afterPost(
                 $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
