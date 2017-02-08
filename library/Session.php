@@ -569,7 +569,7 @@ class Session
                         }
                     }
 
-                    if (is_array($_SESSION['subject'])) {
+                    if (is_array($_SESSION['subjects'])) {
                         usort($_SESSION['subjects'], function ($a, $b) {
                             return strnatcmp($a['name'], $b['name']);
                         });
