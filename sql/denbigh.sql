@@ -191,8 +191,7 @@ CREATE TABLE `Staff` (
   `username` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `peopleDenbighID` (`peopleDenbighID`),
-  KEY `staffCode` (`staffCode`),
-  CONSTRAINT `Staff_ibfk_1` FOREIGN KEY (`peopleDenbighID`) REFERENCES `People` (`denbighID`)
+  KEY `staffCode` (`staffCode`)
 ) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `Students` */
