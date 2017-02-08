@@ -138,7 +138,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	#search {
 		margin: 0;
 		position: absolute;
-		right: $tabbar-height;
+		right: $tabbar-menu-icon-width;
 		top: 0;
 		@include placeholder-color(transparent, $font-weight-normal);
 		input[type="text"]{
@@ -195,13 +195,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			&:before {
 				color: $navigation-background;
 			}
-		}
-	}
-	// When notifications are disabled
-	.disableNotifications #search {
-		right: 0;
-		&:hover, &.focus{
-			padding-left: 0;
 		}
 	}
 
@@ -268,6 +261,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
+// When notifications are disabled
+.disableNotifications .hybrid-bar #search {
+	right: 0;
+	&:hover, &.focus{
+		padding-left: 0;
+	}
+}
 
 
 .left-off-canvas-toggle,
@@ -584,7 +584,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			padding-left: 10rem;
 		}
 	}
-	.hybrid-bar .disableNotifications #search {
+	.disableNotifications .hybrid-bar #search {
 		&:hover, &.focus{
 			padding-left: 5rem;
 		}
@@ -616,7 +616,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 // Calculate the total widths of the possible views
 $offcanvas-width-used: ($tabbar-menu-icon-width * 4) + $tabbar-padding-left; // logo + menu + search + notifications
+$offcanvas-width-no-notif: $offcanvas-width-used - $tabbar-menu-icon-width; // same as above minus the notifications button
+
 $normal-width-used: $off-canvas-width + ($tabbar-menu-icon-width * 2) + $tabbar-padding-left; // sidebar + search + notifications
+$normal-width-no-notif: $normal-width-used - $tabbar-menu-icon-width; // same as above minus the notifications button
+
 $docking-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sidebars + the search button
 
 // Hide all top menu items as a starting point
@@ -635,21 +639,29 @@ $docking-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sideb
 		display: none;
 	}
 
-	// Allow up to 7 icons, showing an extra one each time there's space
-	@for $i from 5 through 7 {
+	// Allow up to 8 icons, showing an extra one each time there's space
+	@for $i from 5 through 8 {
 
 		$icon-width-needed: 5rem * $i;
 		$min-width: $offcanvas-width-used + $icon-width-needed;
+		$min-width-no-notif: $offcanvas-width-no-notif + $icon-width-needed;
 
 		@media screen and (min-width: $min-width) {
-
 			.hybrid-bar ul li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
+		}
 
+		@media screen and (min-width: $min-width-no-notif) {
+			.disableNotifications .hybrid-bar ul li:nth-child(-n+#{$i}) {
+				display: block;
+			}
+			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
+				display: none;
+			}
 		}
 	}
 }
@@ -665,21 +677,29 @@ $docking-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sideb
 		display: none;
 	}
 
-	// Allow up to 12, showing an extra one each time there's space
-	@for $i from 7 through 12 {
+	// Allow up to 13, showing an extra one each time there's space
+	@for $i from 7 through 13 {
 
 		$icon-width-needed: 5rem * $i;
 		$min-width: $normal-width-used + $icon-width-needed;
+		$min-width-no-notif: $normal-width-no-notif + $icon-width-needed;
 
 		@media screen and (min-width: $min-width) {
-
 			.hybrid-bar ul li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
+		}
 
+		@media screen and (min-width: $min-width-no-notif) {
+			.disableNotifications .hybrid-bar ul li:nth-child(-n+#{$i}) {
+				display: block;
+			}
+			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
+				display: none;
+			}
 		}
 	}
 }
@@ -688,8 +708,8 @@ $docking-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sideb
 // Have to deal with the possibility of a docked notifications sidebar in this view
 @media #{$xlarge-up} {
 
-	// Display 12 by default
-	.hybrid-bar ul li:nth-child(-n+12) {
+	// Display 11 by default
+	.hybrid-bar ul li:nth-child(-n+11) {
 		display: block;
 	}
 	.left-off-canvas-menu .second-nav li:nth-child(-n+12) {
@@ -697,34 +717,40 @@ $docking-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sideb
 	}
 
 	// Allow up to 40 (random number to max out), showing one each time there's space
-	// Expect the docked sidebar to be showing by default, then overwrite the style if that's not the case
-	@for $i from 13 through 40 {
+	// Expect the docked sidebar to be showing, then overwrite if that's not the case
+	@for $i from 12 through 40 {
 
 		$icon-width-needed: 5rem * $i;
 		$min-width: $normal-width-used + $icon-width-needed;
+		$min-width-no-notif: $normal-width-no-notif + $icon-width-needed;
 		$min-width-docking: $docking-width-used + $icon-width-needed;
 
 		@media screen and (min-width: $min-width-docking) {
-
 			.hybrid-bar ul li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
-
 		}
 
 		@media screen and (min-width: $min-width) {
 			.inner-wrap:not(.docking) {
-
 				.hybrid-bar ul li:nth-child(-n+#{$i}) {
 					display: block;
 				}
 				.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 					display: none;
 				}
+			}
+		}
 
+		@media screen and (min-width: $min-width-no-notif) {
+			.disableNotifications .hybrid-bar ul li:nth-child(-n+#{$i}) {
+				display: block;
+			}
+			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
+				display: none;
 			}
 		}
 	}
