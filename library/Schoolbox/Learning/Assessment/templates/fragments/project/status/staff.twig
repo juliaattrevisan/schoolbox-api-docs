@@ -1,7 +1,7 @@
 <script type="text/javascript">
     $(function() {
         // Setup sortable
-        var assessmentList = $('ul[data-assessment-list]');
+        var assessmentList = $('#assessment-list');
         assessmentList.sortable({
             handle: '.grip',
             axis:   'y'
@@ -28,8 +28,8 @@
                     var listItem = $(element).parents('[data-assessment]');
 
                     var assessmentId = $(element).attr('data-delete');
-
-                    var assessmentName = $('#assessment-list')
+                    var assessmentList = $('#assessment-list');
+                    var assessmentName = assessmentList
                             .find('[data-assessment='+assessmentId+']')
                             .attr('data-assessment-title');
 
@@ -41,7 +41,17 @@
                     $.post($(element).attr('href'), {assessmentId: assessmentId})
                     .success(function() {
                         toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
-                        listItem.fadeOut({ done: listItem.remove });
+                        listItem.fadeOut({
+                            done: function() {
+                                listItem.remove();
+
+                                {# Hide component actions and respawn empty state #}
+                                if (!assessmentList.find('li').length) {
+                                    $('#assessment-actions').remove();
+                                    $('#assessment-list-empty-state').removeClass('hide');
+                                }
+                            }
+                        });
                     })
                     .error(function() {
                         {# Toast alert #}
@@ -139,7 +149,7 @@
 
                     <div id="assessment-toast" class="toast"></div>
 
-                    <div class="component-action">
+                    <div id="assessment-actions" class="component-action">
                         <section>
                             <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}{{ returnUrlSuffix }}" class="button" title="Create a new activity">Create Activity</a>
                         </section>
@@ -147,7 +157,7 @@
                 </section>
                 {% endif %}
 
-                <div class="empty-state hide">
+                <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
                     <i class="icon-project"></i>
                     <p>You project currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}{{ returnUrlSuffix }}">create an activity</a> next.</p>
                 </div>
