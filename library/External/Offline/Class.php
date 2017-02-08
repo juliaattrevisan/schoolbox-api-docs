@@ -9,6 +9,10 @@
 
 class External_Offline_Class implements External_ClassInterface
 {
+    public function getParents($subCode) {
+        return [];
+    }
+
     public function getStudents($classCode)
     {
         // Noop

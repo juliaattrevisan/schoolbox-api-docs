@@ -15,7 +15,11 @@ class External_Schoolbox_Class implements External_ClassInterface {
 		$this->setdatabase( Database::getInstance() );
 	}
 
-	/**
+    public function getParents($subCode) {
+        return [];
+    }
+
+    /**
 	 * Gets a query for fetching a class's users out of the class_user table.
 	 *
 	 * This table should be used only to store students, but some schools use

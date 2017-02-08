@@ -22,8 +22,12 @@ class External_Tass_Class implements External_ClassInterface {
 		$this->setDatabase(MSSQL::getInstance());
         $this->externalUser = new External_User('tass');
 	}
-	
-	function getStudents($subCode) {
+
+    public function getParents($subCode) {
+        return [];
+    }
+
+    function getStudents($subCode) {
         $classQuery = '';
 		if(stristr($subCode, ',')) {
 			$subCodeArray = explode(',',$subCode);

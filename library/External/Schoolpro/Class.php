@@ -24,7 +24,11 @@ class External_Schoolpro_Class implements External_ClassInterface {
 		$this->setDb(MSSQL::getInstance());
 	}
 
-	/**
+    public function getParents($subCode) {
+        return [];
+    }
+
+    /**
 	 * Get a list of students that are in a particular class
 	 *
 	 * @param $classCode

@@ -10,6 +10,10 @@
  */
 class External_Edumate_Class extends External_Edumate_Connection implements External_ClassInterface {
 
+    public function getParents($subCode) {
+        return [];
+    }
+
     /**
      * Returns a list of students that are associated with a class
      *

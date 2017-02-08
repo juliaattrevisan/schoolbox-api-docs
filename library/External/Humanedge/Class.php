@@ -20,6 +20,10 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     protected $requireClassTeachersHaveRooms = true;
 
+    public function getParents($subCode) {
+        return [];
+    }
+
 //    /**
 //     * @var External_UserInterface
 //     */

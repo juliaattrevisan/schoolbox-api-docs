@@ -10,6 +10,13 @@
 interface External_ClassInterface {
 
     /**
+     * Get a list of parents whose children are in a particular subject
+     * @param $subCode
+     * @return mixed
+     */
+    public function getParents($subCode);
+
+    /**
      * Get a list of students in a particular $classCode
      *
      * lastname,
