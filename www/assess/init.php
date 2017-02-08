@@ -45,7 +45,7 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
  * online assessments unless you are a part of that category.
  */
 $assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
-if (!$assessment->isParticipant($_SESSION['user'])) {
+if (!$assessment->isParticipant($_SESSION['user']) && $groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS) {
 	error(19);
 }
 
