@@ -32,20 +32,17 @@ class Date extends Datetime implements IColumnType
     public function __construct($time = null)
     {
         parent::__construct();
-
-        if (empty($time)) {
-            $this->time = '';
-        } else {
-            $this->time = " $time";
-            $this->input_format = "$this->input_format H:i:s";
-        }
+        $this->time = $time;
     }
 
 
     public function hydrate($value, $mapper = null)
     {
-        $value = empty($value) ? $value : "$value{$this->time}";
-        return parent::hydrate($value, $mapper);
+        $hydrated = parent::hydrate($value, $mapper);
+        if (!empty($this->time)) {
+            $hydrated->modify($this->time);
+        }
+        return $hydrated;
     }
 
     /**
