@@ -66,11 +66,15 @@ class DateTest extends DatetimeTest {
     public function getTestHydrateWithTimeData()
     {
         return [
+            // Date only
             [new Date('00:00:00'), '2012-01-01', '2012-01-01 00:00:00'],
             [Date::startOfDay(),   '2012-01-01', '2012-01-01 00:00:00'],
             [new Date('12:00:00'), '2012-01-01', '2012-01-01 12:00:00'],
             [new Date('23:59:59'), '2012-01-01', '2012-01-01 23:59:59'],
             [Date::endOfDay(),     '2012-01-01', '2012-01-01 23:59:59'],
+            // Date and time - time component should be ignored
+            [new Date('00:00:00'), '2012-01-01 12:00:00', '2012-01-01 00:00:00'],
+            [new Date('23:59:59'), '2012-01-01 12:00:00', '2012-01-01 23:59:59'],
         ];
     }
 
