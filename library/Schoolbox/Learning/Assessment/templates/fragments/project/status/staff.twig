@@ -1,7 +1,7 @@
 <script type="text/javascript">
     $(function() {
         // Setup sortable
-        var assessmentList = $('ul[data-assessment-list]');
+        var assessmentList = $('#assessment-list');
         assessmentList.sortable({
             handle: '.grip',
             axis:   'y'
@@ -25,9 +25,37 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this item?',
                 confirmEvent: function() {
-                    $.post($(element).attr('href'), {assessmentId: $(element).attr('data-delete')}
-                    ).always(function() {
-                            window.location.reload();
+                    var listItem = $(element).parents('[data-assessment]');
+
+                    var assessmentId = $(element).attr('data-delete');
+                    var assessmentList = $('#assessment-list');
+                    var assessmentName = assessmentList
+                            .find('[data-assessment='+assessmentId+']')
+                            .attr('data-assessment-title');
+
+                    {# Toast success and remove row from template #}
+
+                    var toast = $('#assessment-toast');
+                    toast.toastActivate({text: 'Deleting ' + assessmentName + '...'});
+
+                    $.post($(element).attr('href'), {assessmentId: assessmentId})
+                    .success(function() {
+                        toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
+                        listItem.fadeOut({
+                            done: function() {
+                                listItem.remove();
+
+                                {# Hide component actions and respawn empty state #}
+                                if (!assessmentList.find('li').length) {
+                                    $('#assessment-actions').remove();
+                                    $('#assessment-list-empty-state').removeClass('hide');
+                                }
+                            }
+                        });
+                    })
+                    .error(function() {
+                        {# Toast alert #}
+                        toast.toastTimeout({text: 'Could not delete ' + assessmentName, css: 'alert'});
                     });
                 }
             });
@@ -62,14 +90,14 @@
 
                 {% if assessment.assessables | length %}
                 <section>
-                    <ul class="information-list sortable-card"
+                    <ul id='assessment-list' class="information-list sortable-card"
                         data-sortable
                         data-assessment-list
                         data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                         {% for assessable in assessment.assessables %}
                             {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
-                            <li class="actions-small-2" data-assessment="{{ assessable.id }}">
+                            <li class="actions-small-2" data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
                                 <div class="grip"></div>
                                 <div class="list-item">
                                     <div class="card small-12">
@@ -118,19 +146,21 @@
 
                         {% endfor %}
                     </ul>
-                    <div class="component-action">
+
+                    <div id="assessment-toast" class="toast"></div>
+
+                    <div id="assessment-actions" class="component-action">
                         <section>
                             <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}{{ returnUrlSuffix }}" class="button" title="Create a new activity">Create Activity</a>
                         </section>
                     </div>
                 </section>
+                {% endif %}
 
-                {% else %}
-                <div class="empty-state">
+                <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
                     <i class="icon-project"></i>
                     <p>You project currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}{{ returnUrlSuffix }}">create an activity</a> next.</p>
                 </div>
-                {% endif %}
             </div>
 
             {% if assessment.baseContext is not unitSpecification %}
@@ -185,4 +215,3 @@
         {% endif %}
     </div>
 </div>
-
