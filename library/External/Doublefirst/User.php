@@ -694,7 +694,7 @@ class External_Doublefirst_User implements External_UserInterface
                       c.Title AS StudentContactTitle,
                       cm.Greeting AS StudentContactPreferred,
                       c.Surname StudentContactSurname,
-                      ce.HomeEmailAddress AS StudentContactDefaultEmail,
+                      ceh.EmailID AS StudentContactDefaultEmail,
                       1 AS ValidAddressFlag,
                       a.SubDwelling AS StudentContactAddress1,
                       a.Street AS StudentContactAddress2,
@@ -755,7 +755,7 @@ class External_Doublefirst_User implements External_UserInterface
                         )
                       ) AS StudentContactSpouseOccupPhone, 
 
-                      '' AS StudentContactSpouseDefaultEmail,
+                      cew.EmailID AS StudentContactSpouseDefaultEmail,
                       '' AS StudentContactSpouseRelation
             
             FROM      V_PupilBasicInformation p
@@ -777,6 +777,9 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation cmPhoneWork6   ON cmPhoneWork6.ContactID = pc.ContactID AND cmPhoneWork6.TelephoneType = '009'
             LEFT JOIN   VLContactTelephone            cp ON cp.ContactID = pc.ContactID 
             LEFT JOIN   VLContactEmail                ce ON ce.ContactID = pc.ContactID
+            LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype = '001' and ceh.primaryemail = 1
+            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype = '002' and cew.primaryemail = 1 
+            
             WHERE p.PupilID = '{$externalUserId}'
             ORDER BY pc.Priority
         ";
@@ -865,7 +868,7 @@ class External_Doublefirst_User implements External_UserInterface
             // Get staff subjects
 
             $sql =
-            "
+                "
                 SELECT DISTINCT
                 ygsd.SubjectDivisionName AS ClassCode,
                 '' AS ClassCampus,
