@@ -123,7 +123,7 @@ class Controller extends Base
     /**
      * Displays upcoming work for the given user.
      *
-     * @api   GET /learning/due/:studentId
+     * @api   GET /learning/due/:studentId{/:date}
      * @param User                $student
      * @param Alaress_Date_Format $date    The date to show on the work calendar.
      */
