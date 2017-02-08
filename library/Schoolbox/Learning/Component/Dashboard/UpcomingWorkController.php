@@ -9,56 +9,44 @@
 
 namespace Schoolbox\Learning\Component\Dashboard;
 
-use Alaress_Date_Format;
-use Assess_Main;
 use Component_Dashboard_ControllerAbstract;
-use Config;
-use Group;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Submission;
-use User;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Visibility;
+use \Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
+/**
+ * Displays a list of upcoming Quiz + DueWork (but not task) for students only
+ */
 class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
 {
+    // Should match the DB value
+    const LIMIT_DEFAULT = 10;
+
     /**
-     * Stores the list of upcoming work returned and parsed from the database
-     * @var array
+     * The upcoming Quiz + DueWork that are visible to this Student
+     *
+     * @var IAssessable[]|Collection
      */
-    private $upcomingWork = array();
+    private $upcomingAssessments;
 
     /**
      * The maximum number of items to show
+     *
      * @var int
      */
-    private $limit = 0;
+    private $limit;
 
     /**
-     * The ID of the user being displayed
-     * @var int
+     * @var TermMapper
      */
-    private $userID;
+    private $termMapper;
 
     /**
-     * Determines whether or not the action buttons should be displayed on each list item
-     * @var bool
+     * @var AssessmentMapperProxy
      */
-    private $actionable;
-
-    /**
-     * Are links to quizzes shown? Currently always equal to $this->actionable
-     *
-     * @var bool
-     */
-    private $showQuizLink;
-
-    /**
-     * Are links to assessments shown? Currently equal to $actionable, unless
-     * user is a parent and restrict_student_submissions is off - then it's true
-     *
-     * @var bool
-     */
-    private $showAssessLink;
-
+    private $assessmentDataSource;
 
     /**
      * Business logic to collate data ready for output
@@ -67,202 +55,35 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
-        $this->userID = $this->getConfig('user') ? $this->getConfig('user') : $_SESSION['id'];
-        // if actionable is absent, then this is the dashboard component and restricted should be true.
-        // It should still be actionable though.
-        if ($this->hasConfig('actionable')) {
-            $this->actionable = $this->getConfig('actionable') ? true : false;
-        } else {
-            $this->actionable = true;
-        }
-
-        $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : 0;
-
-        // This component has access restrictions
-        // when displayed to a student, actions are available, otherwise not
-
-        if (!$this->getUser()->getRole()->isStudent()) {
-            $this->actionable = false;
-        }
-
-        $submissionHandler = new Submission();
-
-        // TODO SA-1307 - this next line breaks because it relies on Handlers which rely on the old schema
-        // Need to rewrite to use the new Mappers + Models
-        return false;
-
-        $upcoming = $submissionHandler->getAllUpcomingWorkAndAssessments($this->userID);
-
-        $now = time();
-        $j = 0;
-
-        if (!count($upcoming)) {
+        // Don't render if not a student
+        if(!$this->getUser()->getRole()->isStudent()){
             return false;
         }
 
-        // Show assess or quiz links? Depends on $actionable
-        $this->showAssessLink = $this->actionable || $this->getUser()->getRole()->isStaff();
-        $this->showQuizLink   = $this->actionable;
+        $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : self::LIMIT_DEFAULT;
 
-        $groupHandler = new Group;
-        // if this is a parent viewing their child's work
-        if ($groupHandler->isParentOfChild($this->userID)) {
-            // Check if system config restrict_student_submissions is on.
-            // Parents can view assess links if it's off.
-            $this->showAssessLink = !Config::get('restrict_student_submissions');
+        if(!$this->limit){
+            return false;
         }
 
-        $isStaff = $groupHandler->isStaff();
-        foreach ($upcoming as $item) {
-            unset($output);
-            // find out if we're actually showing this item
-            // Skip if I'm not a staff member and this isn't yet open
-            if (!$isStaff && $item['publish_date'] > $now) {
-                continue;
-            }
-            if ($item['kind'] == 0) {
-                // duework
-                if ($item['submittable']) {
-                    if ($item['multi_submit']) {
-                        if (!$item['item_count'] && $item['late_date'] < $now) {
-                            // if unsubmitted, hide if LATE date passed
-                            $output['HIDEME'] = 'hideme multi unsubmitted late-passed';
-                            $output['upcoming_work_actionable_block'] = 'hideme multi unsubmitted late-passed';
-                        } elseif ($item['submit_count'] && $item['date'] < $now) {
-                            // if submitted, hide if DUE date passed
-                            $output['HIDEME'] = 'hideme multi submitted due-passed';
-                            $output['upcoming_work_actionable_block'] = 'hideme multi submitted due-passed';
-                        }
-                    } else {
-                        // single submit: hide if completed or DUE date in past
-                        if ($item['date'] < $now || $item['submit_count']) {
-                            $output['HIDEME'] = 'hideme single due-passed-or-submitted';
-                            $output['upcoming_work_actionable_block'] = 'hideme single due-passed-or-submitted';
-                        }
-                    }
-                } else {
-                    // no submissions: hide if DUE date in past
-                    if ($item['date'] < $now) {
-                        $output['HIDEME'] = 'hideme nosubmit due-passed';
-                        $output['upcoming_work_actionable_block'] = 'hideme nosubmit due-passed';
-                    }
-                }
-            } else {
-                // assess
-                if ($item['max_attempts'] == 0) {
-                    // 0 max attempts is unlimited: hide if FINISH in past
-                    if ($item['date'] < $now) {
-                        $output['HIDEME'] = 'hideme unlimited due-passed';
-                        $output['upcoming_work_actionable_block'] = 'hideme unlimited due-passed';
-                    }
-                } elseif ($item['attempt_count'] >= $item['max_attempts']) {
-                    // if limited attempts, hide if limit has been reached
-                    $output['HIDEME'] = 'hideme attempts-exhausted';
-                    $output['upcoming_work_actionable_block'] = 'hideme attempts-exhausted';
-                } elseif ($item['date'] < $now) {
-                    $output['HIDEME'] = 'hideme due-passed';
-                    $output['upcoming_work_actionable_block'] = 'hideme due-passed';
-                }
-            }
+        $this->assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
+        $this->termMapper = $this->getMapperFactory()->get(TermMapper::class);
 
-            // skip if hideme was populated for some reason
-            if (isset($output['HIDEME'])) {
-                continue;
-            }
+        $term = $this->termMapper->findForToday();
+        $student = $this->getUser();
 
-            $adr = new Alaress_Date_Format($item['date'], 'U');
+        $allUpcomingAssessments = $this->assessmentDataSource
+            ->findAllByStudent($student, $term)
+            ->sortBy('dueAt', 'asc');
 
-            if ($item['kind'] == 0) {
-                $mapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-            } else {
-                $mapper = QuizMapper::getInstance();
-            }
+        $visibility = new Visibility($this->getAccess());
 
-            // how many days left, 0 <= x <= 10
-            $dueWork = $mapper->findById($item['id']);
-            $urgency = $dueWork->getGradientIndex();
+        // Only show work that isn't yet due
+        $this->upcomingAssessments = $allUpcomingAssessments->filter(function (IAssessable $assessable) use ($student, $visibility) {
+            return $visibility->isUpcomingVisibleToUser($assessable, $student);
+        });
 
-            // override the above manipulation of output (we don't need it)
-            $output = array(
-                'UPCOMING_ID'      => $item['id'],
-                'UPCOMING_UID'     => $this->userID,
-                'UPCOMING_TITLE'   => $item['title'],
-                'UPCOMING_TYPE'    => $item['type'],
-                'UPCOMING_DATE'    => $adr->getRelativeTime(),
-                'UPCOMING_TIME'    => $adr->isAtEndOfDay() ? $adr->getDateOnly() : $adr->getShort(),
-                'UPCOMING_URGENCY' => $urgency,
-
-                'UPCOMING_SUBJ_NAME' => $item['subj_name'],
-                'UPCOMING_SUBJ_ID'   => $item['subj_id'],
-
-                'ON_OFF' => ++$j % 2 ? '' : 'dark'
-            );
-
-            // determine actions available
-            if ($item['kind'] == 0) {
-                // duework
-                $output['UPCOMING_HREF'] = '/submission/submissionHistory/' . $item['id'] . '/' . $this->userID;
-                $output['upcoming_work_actionable_block'] = '';
-                $output['showLink'] = $this->showAssessLink;
-            } else {
-                // assess
-
-                /* Provide option to see previous attempts if any have been made
-                 * Otherwise people should use the link in the title to resit/resume
-                 * an attempt for this particular Quiz
-                 */
-                $attemptHandler = new \Assess_Attempt();
-                $attempt = $attemptHandler->getLatestForUser($item['id'], $this->userID);
-                $attemptStartTime = strtotime($attempt['start']);
-
-                $assessMapper = QuizMapper::getInstance();
-                $assess = $assessMapper->findById($item['id']);
-                $attemptTimeRemaining = $attemptStartTime + $assess->getDuration() - time();
-
-                $resumeAttempt = false;
-
-                if (is_array($attempt)) {
-                    if (!$attempt['finish']
-                        && ($attemptTimeRemaining < 0 || $assess->getDuration() == Assess_Main::UNLIMITED_DURATION)
-                    ) {
-                        $resumeAttempt = true;
-                    }
-                }
-
-                if ($item['attempt_count']) {
-                    if ($resumeAttempt) {
-                        $sectionHandler = new \Assess_Section();
-                        $firstSection = $sectionHandler->getFirst($assess->getId());
-
-                        $output['UPCOMING_HREF'] = '/assess/attempt/' . $item['id'] . '/' . $firstSection['section_id'];
-                    } else {
-                        $output['UPCOMING_HREF'] = '/assess/intro/' . $item['id'];
-                    }
-
-                    $output['UPCOMING_BUTTON_HREF'] = '/assess/attempts/' . $item['id'] . '/' . $this->userID;
-                    $output['UPCOMING_UID'] = '';
-                    $output['UPCOMING_BTN_ICON']  = 'list';
-                    $output['UPCOMING_BTN_LABEL'] = '';
-                } else {
-                    $output['UPCOMING_HREF'] = '/assess/intro/' . $item['id'];
-                    $output['upcoming_work_actionable_block'] = '';
-                }
-                $output['showLink'] = $this->showQuizLink;
-            }
-
-            // if the actionable flag is false, don't display the buttons
-            if (!$this->actionable) {
-                $output['upcoming_work_actionable_block'] = '';
-            }
-
-            $this->upcomingWork[] = $output;
-
-            if ($this->limit > 0 && count($this->upcomingWork) >= $this->limit) {
-                break;
-            }
-        }
-
-        return count($this->upcomingWork) ? true : false;
+        return count($this->upcomingAssessments) > 0;
     }
 
     /**
@@ -273,64 +94,14 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if (!$this->loadTemplate($templateHandle, 'upcomingWork')) {
-            return false;
-        }
-
-        $this->setBlock($templateHandle, 'no_upcoming_work', 'no_upcoming_work_block');
-        $this->setBlock($templateHandle, 'has_upcoming_work', 'has_upcoming_work_block');
-        $this->setBlock('has_upcoming_work', 'upcoming_work', 'upcoming_work_block');
-        $this->setBlock('upcoming_work', 'upcoming_work_actionable', 'upcoming_work_actionable_block');
-        $this->setBlock('upcoming_work', 'upcoming_work_link', 'upcoming_work_link_block');
-        $this->setBlock('upcoming_work', 'upcoming_work_nolink', 'upcoming_work_nolink_block');
-
-        if (count($this->upcomingWork)) {
-            foreach ($this->upcomingWork as $output) {
-                $this->setVar($output);
-                if (!isset($output['upcoming_work_actionable_block'])) {
-                    $this->parse('upcoming_work_actionable_block', 'upcoming_work_actionable');
-                }
-
-                // show link or no link depending on whether it's readonly
-                $this->setVar('upcoming_work_link_block', '');
-                $this->setVar('upcoming_work_nolink_block', '');
-                if ($output['showLink']) {
-                    $this->parse('upcoming_work_link_block', 'upcoming_work_link');
-                } else {
-                    $this->parse('upcoming_work_nolink_block', 'upcoming_work_nolink');
-                }
-                $this->parse('upcoming_work_block', 'upcoming_work', true);
-            }
-
-            $this->parse('has_upcoming_work_block', 'has_upcoming_work');
-            $this->setVar(array(
-                'no_upcoming_work_block' => ''
-            ));
-        } else {
-            $userHandler = new User();
-            $pronoun = ($this->userID == $_SESSION['id'])
-                ? 'You have'
-                : ($userHandler->formatName($userHandler->getByID($this->userID), '{firstname} has'));
-
-            $this->setVar(array(
-                'has_upcoming_work_block' => '',
-                'upcoming_work_block' => '',
-                'PRONOUN' => $pronoun
-            ));
-
-            $this->parse('no_upcoming_work_block', 'no_upcoming_work');
-        }
-
-        return true;
-    }
-
-    /**
-     * Retrieves upcoming work as populated by execute().
-     *
-     * @return array
-     */
-    public function getDataFromExecute()
-    {
-        return $this->upcomingWork;
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@learning/component/upcomingAssessments.twig',
+            [
+                'student'     => $this->getUser(),
+                'assessments' => $this->upcomingAssessments,
+                'limit'       => $this->limit,
+            ]
+        );
     }
 }
