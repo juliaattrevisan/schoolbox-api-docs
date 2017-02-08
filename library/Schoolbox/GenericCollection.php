@@ -134,7 +134,7 @@ class GenericCollection extends Collection
     {
         // short-circuit via generics if we can
         if ($collection instanceof static && $this->assertSameItemClass($collection)) {
-            $this->stack = $collection->getStack();
+            parent::setStack($collection->getStack());
 
         } else {
             // test every item individually
