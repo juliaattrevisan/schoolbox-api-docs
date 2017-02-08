@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
@@ -42,8 +43,8 @@ class Mapper extends AbstractUnitMapper
         $this->joins('course_implementation_id', CourseImplementationMapper::class, 'id', null, null, 'course', 'course');
         $this->joins('course_unit_specification_id', UnitSpecificationMapper::class, 'id', null, null, 'specification', 'specification');
         $this->uses('title', self::TYPE_STRING);
-        $this->uses('open_date', self::TYPE_DATETIME);
-        $this->uses('due_date', self::TYPE_DATETIME);
+        $this->uses('open_date', Date::startOfDay());
+        $this->uses('due_date', Date::endOfDay());
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

@@ -31,8 +31,8 @@ class Mapper extends BaseMapper
     public function mapping()
     {
         // DB stores date-only, but code-base includes time to simplify comparisons.
-        $startOfDay = new Date('00:00:00');
-        $endOfDay   = new Date('23:59:59');
+        $startOfDay = Date::startOfDay();
+        $endOfDay   = Date::endOfDay();
 
         $this->hasTable('term');
         $this->hasModel(Model::class);
