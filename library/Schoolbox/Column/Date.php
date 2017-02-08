@@ -47,4 +47,24 @@ class Date extends Datetime implements IColumnType
         $value = empty($value) ? $value : "$value{$this->time}";
         return parent::hydrate($value, $mapper);
     }
+
+    /**
+     * Return a hydrator that will generate dates with time component at start of day
+     *
+     * @return static
+     */
+    public static function startOfDay()
+    {
+        return new static('00:00:00');
+    }
+
+    /**
+     * Return a hydrator that will generate dates with time component at end of day
+     *
+     * @return static
+     */
+    public static function endOfDay()
+    {
+        return new static('23:59:59');
+    }
 }
