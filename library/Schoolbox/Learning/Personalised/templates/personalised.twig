@@ -331,6 +331,13 @@
             calendar.fullCalendar('gotoDate', calendarParams.date);
         });
 
+        // Keep expanded resources expanded until page is reloaded
+        var expandedResources = {};
+        calendar.on('click', '.fc-expander', function() {
+            var resourceId = $(this).closest('[data-resource-id]').data('resourceId');
+            expandedResources[resourceId] = !expandedResources[resourceId];
+        });
+
         var previousView   = {};
         var calendarParams = getCalendarParams(window.location.hash);
         var c = new Calendar('calendar', 'calendar-bubble', {
@@ -642,15 +649,7 @@
                 eventAfterAllRender: function(view) {
                     // Any resource whose children contain no events should be collapsed
                     $.each(view.resourceRowHash, function(key, resourceRow) {
-                        var hasChildren = false;
-                        for (var i in resourceRow.children) {
-                            var childId = resourceRow.children[i].resource.id;
-                            if (view.calendar.getResourceEvents(childId).length > 0) {
-                                hasChildren = true;
-                                break;
-                            }
-                        }
-                        if (hasChildren) {
+                        if (expandedResources[key]) {
                             resourceRow.expand();
                         } else {
                             resourceRow.collapse();
