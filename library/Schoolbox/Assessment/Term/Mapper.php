@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Term;
 use Alaress_Date_Format;
 use RangeException;
 use Schoolbox\Collection;
+use Schoolbox\Column\Date;
 use Schoolbox\Mapper as BaseMapper;
 use UnexpectedValueException;
 
@@ -29,14 +30,18 @@ class Mapper extends BaseMapper
      */
     public function mapping()
     {
+        // DB stores date-only, but code-base includes time to simplify comparisons.
+        $startOfDay = new Date('00:00:00');
+        $endOfDay   = new Date('23:59:59');
+
         $this->hasTable('term');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('code', self::TYPE_STRING);
-        $this->uses('start', self::TYPE_DATE);
-        $this->uses('display_finish', self::TYPE_DATE);
-        $this->uses('actual_finish', self::TYPE_DATE);
+        $this->uses('start', $startOfDay);
+        $this->uses('display_finish', $endOfDay);
+        $this->uses('actual_finish', $endOfDay);
         $this->uses('archived', self::TYPE_BOOLEAN);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyTitle']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyCode']);
