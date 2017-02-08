@@ -7,9 +7,18 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+namespace Schoolbox\Learning\Component\Dashboard;
 
-class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_ControllerAbstract
+use Alaress_Date_Format;
+use Assess_Main;
+use Component_Dashboard_ControllerAbstract;
+use Config;
+use Group;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Submission;
+use User;
+
+class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
 {
     /**
      * Stores the list of upcoming work returned and parsed from the database
