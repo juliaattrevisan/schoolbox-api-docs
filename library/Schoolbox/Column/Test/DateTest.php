@@ -16,7 +16,7 @@ use \Alaress_Date_Format as DateWrapper;
 class DateTest extends DatetimeTest {
 
 	/**
-	 * @var Datetime
+	 * @var Date
 	 */
 	protected $object;
 
@@ -59,4 +59,66 @@ class DateTest extends DatetimeTest {
 			array('2014-01-01T12:34:56EST', '2014-01-01'),
 		);
 	}
+
+    /**
+     * @return array|array[]
+     */
+    public function getTestHydrateWithTimeData()
+    {
+        return [
+            [new Date('00:00:00'), '2012-01-01', '2012-01-01 00:00:00'],
+            [Date::startOfDay(),   '2012-01-01', '2012-01-01 00:00:00'],
+            [new Date('12:00:00'), '2012-01-01', '2012-01-01 12:00:00'],
+            [new Date('23:59:59'), '2012-01-01', '2012-01-01 23:59:59'],
+            [Date::endOfDay(),     '2012-01-01', '2012-01-01 23:59:59'],
+        ];
+    }
+
+    /**
+     * @dataProvider getTestHydrateWithTimeData
+     *
+     * @param Date   $column
+     * @param string $input
+     * @param string $expectedHydratedValue
+     */
+    public function testHydrateWithTime(Date $column, $input, $expectedHydratedValue)
+    {
+        $this->assertEquals($expectedHydratedValue, $column->hydrate($input)->getDatabase());
+    }
+
+
+    /**
+     * @return array|array[]
+     */
+    public function getTestDehydrateWithTimeData()
+    {
+        return [
+            // Without a time at all
+            [new Date('00:00:00'), '2012-01-01',          '2012-01-01'],
+            // With a time that matches
+            [new Date('00:00:00'), '2012-01-01 00:00:00', '2012-01-01'],
+            [Date::startOfDay(),   '2012-01-01 00:00:00', '2012-01-01'],
+            [new Date('12:00:00'), '2012-01-01 12:00:00', '2012-01-01'],
+            [new Date('23:59:59'), '2012-01-01 23:59:59', '2012-01-01'],
+            [Date::endOfDay(),     '2012-01-01 23:59:59', '2012-01-01'],
+            // With a time that doesn't match
+            [new Date('00:00:00'), '2011-12-31 23:59:59', '2011-12-31'],
+            [new Date('23:59:59'), '2012-01-01 00:00:00', '2012-01-01'],
+        ];
+    }
+
+    /**
+     * Dehydrate with time should work exactly the same as without time, but
+     * let's verify that anyway.
+     *
+     * @dataProvider getTestDehydrateWithTimeData
+     *
+     * @param Date   $column
+     * @param string $input
+     * @param string $expectedDehydratedValue
+     */
+    public function testDehydrateWithTime(Date $column, $input, $expectedDehydratedValue)
+    {
+        $this->assertEquals($expectedDehydratedValue, $column->dehydrate($input));
+    }
 }
