@@ -86,47 +86,49 @@ class External_Synergetic_Class implements External_ClassInterface
     {
         $students = $this->getStudents($subCode);
 
-        //TODO: Inject $_SESSION['user'], short term to get this working without arch changes
-        if (isset($_SESSION['user']) && $_SESSION['user'] instanceof \Schoolbox\User) {
-            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($_SESSION['user']->getExternalId()));
-            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($_SESSION['user']->getExternalId()));
-        } else {
-            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-        }
-
         $studentIds = "";
 
-        foreach ($students as $student) {
+        if (is_array($students)) {
 
-            if ($studentIds != "") {
-                $studentIds .= ",";
+            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+            $fileYear = $this->database->quote($this->externalUser->getCurrentYear());
+
+            foreach ($students as $student) {
+
+                if ($studentIds != "") {
+                    $studentIds .= ",";
+                }
+
+                $studentIds .= $student['synergy_id'];
             }
 
-            $studentIds .= $student['synergy_id'];
+            if ($studentIds != '') {
+
+                $query = "
+                SELECT DISTINCT
+                  StudentID, 
+                  StudentGiven1,
+                  StudentSurname,
+                  StudentContactID,
+                  StudentContactGiven1,
+                  StudentContactSurname,
+                  StudentContactSpouseID,
+                  StudentContactSpouseGiven1,
+                  StudentContactSpouseSurname
+                FROM 
+                  vStudentContactAllAddress 
+                WHERE 
+                  StudentContactType IN ('SC1', 'SC2', 'SC3') AND 
+                  StudentID IN ({$studentIds}) AND
+                  FileYear = {$fileYear} AND
+                  FileSemester = {$fileSemester}
+            ";
+
+                return $this->getDatabase()->getAll($query);
+            }
         }
 
-        $query = "
-            SELECT DISTINCT
-              StudentID, 
-              StudentGiven1,
-              StudentSurname,
-              StudentContactID,
-              StudentContactGiven1,
-              StudentContactSurname,
-              StudentContactSpouseID,
-              StudentContactSpouseGiven1,
-              StudentContactSpouseSurname
-            FROM 
-              vStudentContactAllAddress 
-            WHERE 
-              (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3') AND 
-              StudentID IN ({$studentIds}) AND
-              FileYear = {$fileYear} AND
-              FileSemester = $fileSemester              
-        ";
-
-        return $this->getDatabase()->getAll($query);
+        return [];
     }
 
     public function getStudents($subCode)
