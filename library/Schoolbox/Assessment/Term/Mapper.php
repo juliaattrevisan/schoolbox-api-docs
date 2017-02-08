@@ -17,9 +17,9 @@ use UnexpectedValueException;
  * Mapper for terms.
  *
  * @package Schoolbox\Assessment\Term
- * @method Model createModel()
+ * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model findOneByColumn($columnName, $columnValue, $order = [])
+ * @method Model findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
  * @method Collection|Model[] findAll($options = array())
  */
 class Mapper extends BaseMapper
@@ -88,11 +88,10 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(['date' => $date->getDatabaseDate(),]);
         $result = $statement->fetch();
-        if ($result) {
-            return $this->hydrate($result);
-        }
+        /** @var Model $model */
         // Nothing? Either throw exception or return an empty item
-        return $this->createModel();
+        $model = $result ? $this->hydrate($result) : $this->createModel();
+        return $model;
     }
 
     /**
@@ -116,7 +115,9 @@ class Mapper extends BaseMapper
             $statement->execute(['date' => $endDate->getDatabaseDate(),]);
             $result = $statement->fetch();
             if ($result) {
-                return $this->hydrate($result);
+                /** @var Model $model */
+                $model = $this->hydrate($result);
+                return $model;
             }
         }
         return $this->createModel();
