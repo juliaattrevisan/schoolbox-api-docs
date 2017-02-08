@@ -9,56 +9,61 @@
 
 
 namespace Schoolbox\Column\Test;
+
+use Alaress_Date_Format as DateWrapper;
+use Datetime as DateObject;
 use Schoolbox\Column\Date;
-use \Datetime as DateObject;
-use \Alaress_Date_Format as DateWrapper;
 
-class DateTest extends DatetimeTest {
+class DateTest extends DatetimeTest
+{
 
-	/**
-	 * @var Date
-	 */
-	protected $object;
+    /**
+     * @var Date
+     */
+    protected $object;
 
-	public function setupObject() {
-		$this->object = new Date();
-	}
+    public function setupObject()
+    {
+        $this->object = new Date();
+    }
 
-	public function getTestHydrate() {
-		// Anything that can be parsed as Y-m-d will parse, even if there's
-		// trailing characters.
-		return array(
-			array(null, false),
-			array('2012-01-01 01:40:23', true),
-			array('2012-01-01',          true),
-			array('0000-01-01 01:40:23', true),
-			array('9999-01-01 01:40:23', true),
-			array('2012-01', false),
-		);
-	}
+    public function getTestHydrate()
+    {
+        // Anything that can be parsed as Y-m-d will parse, even if there's
+        // trailing characters.
+        return [
+            [null, false],
+            ['2012-01-01 01:40:23', true],
+            ['2012-01-01',          true],
+            ['0000-01-01 01:40:23', true],
+            ['9999-01-01 01:40:23', true],
+            ['2012-01', false],
+        ];
+    }
 
-	public function getTestDehydrate() {
-		return array(
-			array(null, null),
-			array(false, null),
-			array(DateObject::createFromFormat('!Y-m-d' ,'2012-01-01'), '2012-01-01'),
-			array(DateObject::createFromFormat('!Y-m-d\\TH:i:s' ,'2014-01-01T12:34:56'), '2014-01-01'),
-			//
-			// Timezone should be ignored for this class, whether or not it's supplied.
-			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56+00:00'), '2014-01-01'),
-			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56Z'),      '2014-01-01'),
-			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56+10:00'), '2014-01-01'),
-			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56-10:00'), '2014-01-01'),
-			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56EST'), '2014-01-01'),
-			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56Australia/Melbourne'), '2014-01-01'),
+    public function getTestDehydrate()
+    {
+        return [
+            [null, null],
+            [false, null],
+            [DateObject::createFromFormat('!Y-m-d', '2012-01-01'), '2012-01-01'],
+            [DateObject::createFromFormat('!Y-m-d\\TH:i:s', '2014-01-01T12:34:56'), '2014-01-01'],
+            //
+            // Timezone should be ignored for this class, whether or not it's supplied.
+            [DateObject::createFromFormat('!Y-m-d\\TH:i:sT', '2014-01-01T12:34:56+00:00'), '2014-01-01'],
+            [DateObject::createFromFormat('!Y-m-d\\TH:i:sT', '2014-01-01T12:34:56Z'), '2014-01-01'],
+            [DateObject::createFromFormat('!Y-m-d\\TH:i:sT', '2014-01-01T12:34:56+10:00'), '2014-01-01'],
+            [DateObject::createFromFormat('!Y-m-d\\TH:i:sT', '2014-01-01T12:34:56-10:00'), '2014-01-01'],
+            [DateObject::createFromFormat('!Y-m-d\\TH:i:sT', '2014-01-01T12:34:56EST'), '2014-01-01'],
+            [DateObject::createFromFormat('!Y-m-d\\TH:i:sT', '2014-01-01T12:34:56Australia/Melbourne'), '2014-01-01'],
 
-			array(new DateWrapper('2012-01-01', '!Y-m-d'), '2012-01-01'),
-			array(new DateWrapper('2014-01-01T12:34:56EST', '!Y-m-d\\TH:i:sT'), '2014-01-01'),
+            [new DateWrapper('2012-01-01', '!Y-m-d'), '2012-01-01'],
+            [new DateWrapper('2014-01-01T12:34:56EST', '!Y-m-d\\TH:i:sT'), '2014-01-01'],
 
-			array('2012-01-01', '2012-01-01'),
-			array('2014-01-01T12:34:56EST', '2014-01-01'),
-		);
-	}
+            ['2012-01-01', '2012-01-01'],
+            ['2014-01-01T12:34:56EST', '2014-01-01'],
+        ];
+    }
 
     /**
      * @return array|array[]
@@ -98,7 +103,7 @@ class DateTest extends DatetimeTest {
     {
         return [
             // Without a time at all
-            [new Date('00:00:00'), '2012-01-01',          '2012-01-01'],
+            [new Date('00:00:00'), '2012-01-01', '2012-01-01'],
             // With a time that matches
             [new Date('00:00:00'), '2012-01-01 00:00:00', '2012-01-01'],
             [Date::startOfDay(),   '2012-01-01 00:00:00', '2012-01-01'],
