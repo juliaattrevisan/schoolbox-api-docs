@@ -147,7 +147,7 @@ class AddParentToStudentClasses extends AbstractLoggableHydrator
      */
     public function getName()
     {
-        return 'Give parent read access to students class homepages';
+        return 'Give parents read access to their students\' class homepages';
     }
 
     /**
@@ -155,6 +155,6 @@ class AddParentToStudentClasses extends AbstractLoggableHydrator
      */
     public function getDescription()
     {
-        return 'This custom rule adds parent as a read only group member to all of their students class homepages.';
+        return 'This custom rule adds parents as read only group members to all of their students\' class homepages.';
     }
 }
