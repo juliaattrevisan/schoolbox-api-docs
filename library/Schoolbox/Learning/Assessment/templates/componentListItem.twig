@@ -10,7 +10,7 @@
 
 {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) + extraNavItemCount %}
 
-<li class="actions-small-{{ actionCount }}" data-assessment="{{ assessable.id }}">
+<li id="component-assessment-{{ assessable.id }}" class="actions-small-{{ actionCount }}" data-assessment="{{ assessable.id }}" data-assessment-title="{{  assessable.title }}">
     <div class="list-item">
         <div class="card small-12">
             {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
@@ -30,7 +30,7 @@
                     <a class="icon-modify" href="{{ modifyRoute }}" title="Modify"></a>
                 {% endif %}
                 {% if deleteRoute %}
-                    <a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" title="Delete"></a>
+                    <a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}" title="Delete"></a>
                 {% endif %}
             {% endspaceless %}</nav>
     {% endif %}
