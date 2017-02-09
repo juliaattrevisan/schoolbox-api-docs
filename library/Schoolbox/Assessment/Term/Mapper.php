@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Term;
 use Alaress_Date_Format;
 use RangeException;
 use Schoolbox\Collection;
+use Schoolbox\Column\Date;
 use Schoolbox\Mapper as BaseMapper;
 use UnexpectedValueException;
 
@@ -17,9 +18,9 @@ use UnexpectedValueException;
  * Mapper for terms.
  *
  * @package Schoolbox\Assessment\Term
- * @method Model createModel()
+ * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model findOneByColumn($columnName, $columnValue, $order = [])
+ * @method Model findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
  * @method Collection|Model[] findAll($options = array())
  */
 class Mapper extends BaseMapper
@@ -29,14 +30,18 @@ class Mapper extends BaseMapper
      */
     public function mapping()
     {
+        // DB stores date-only, but code-base includes time to simplify comparisons.
+        $startOfDay = Date::startOfDay();
+        $endOfDay   = Date::endOfDay();
+
         $this->hasTable('term');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('code', self::TYPE_STRING);
-        $this->uses('start', self::TYPE_DATE);
-        $this->uses('display_finish', self::TYPE_DATE);
-        $this->uses('actual_finish', self::TYPE_DATE);
+        $this->uses('start', $startOfDay);
+        $this->uses('display_finish', $endOfDay);
+        $this->uses('actual_finish', $endOfDay);
         $this->uses('archived', self::TYPE_BOOLEAN);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyTitle']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyCode']);
@@ -88,11 +93,10 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(['date' => $date->getDatabaseDate(),]);
         $result = $statement->fetch();
-        if ($result) {
-            return $this->hydrate($result);
-        }
+        /** @var Model $model */
         // Nothing? Either throw exception or return an empty item
-        return $this->createModel();
+        $model = $result ? $this->hydrate($result) : $this->createModel();
+        return $model;
     }
 
     /**
@@ -116,7 +120,9 @@ class Mapper extends BaseMapper
             $statement->execute(['date' => $endDate->getDatabaseDate(),]);
             $result = $statement->fetch();
             if ($result) {
-                return $this->hydrate($result);
+                /** @var Model $model */
+                $model = $this->hydrate($result);
+                return $model;
             }
         }
         return $this->createModel();

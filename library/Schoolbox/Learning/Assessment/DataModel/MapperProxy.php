@@ -737,12 +737,13 @@ class MapperProxy
     {
         $columnList = [];
         if ($options['term'] instanceof Term) {
+            /** @var Term $term */
             $term = $options['term'];
             if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
-                $columnList['due_date >='] = $term->getStart()->getDatabaseDate();
+                $columnList['due_date >='] = $term->getStart()->getDatabase();
             }
             if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
-                $columnList['due_date <='] = $term->getActualFinish()->getDatabaseDate();
+                $columnList['due_date <='] = $term->getActualFinish()->getDatabase();
             }
         }
         return $columnList;
