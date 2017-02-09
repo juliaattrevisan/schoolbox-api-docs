@@ -10,10 +10,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Role;
 use Twig_Loader_Chain;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -33,15 +32,6 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        // write access only
-        $access = new Rule\HasHomepageAccess(
-            UserAccess::ACCESS_WRITE,
-            function ($params) {
-                return $params['class']->getId();
-            },
-            Access::getInstance()
-        );
-
         $preload = function ($params) {
             $extraParams = [];
             try {
@@ -55,9 +45,14 @@ class Module extends BaseModule
             return $extraParams;
         };
 
-        $this->register('GET', '/{classId}', 'getMarkbook', $access, $preload);
-        $this->register('GET', '/{classId}/term/{termCode}', 'getMarkbookForTerm', $access, $preload);
-        $this->register('GET', '/{classId}/term/{termCode}/export', 'getMarkbookExport', $access, $preload);
+        $isStaffOrSuper = new Rule\Any(
+            new Rule\HasRole(Role::STAFF),
+            new Rule\IsSuperuser()
+        );
+
+        $this->register('GET', '/{classId}', 'getMarkbook', $isStaffOrSuper, $preload);
+        $this->register('GET', '/{classId}/term/{termCode}', 'getMarkbookForTerm', $isStaffOrSuper, $preload);
+        $this->register('GET', '/{classId}/term/{termCode}/export', 'getMarkbookExport', $isStaffOrSuper, $preload);
     }
 
     /**
