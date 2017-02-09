@@ -91,8 +91,9 @@
                                                 <div class="small-1 columns no-pad">
                                                     {# An icon that shows if the student has attempted the task or not #}
                                                     {% include '@learningAssessment/task/progressTickForm.twig' with {
-                                                        participant: participant
-                                                    } %}
+                                                        participant: participant,
+                                                        disabled: false
+                                                    } only %}
                                                 </div>
                                             {% else %}
                                                 <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">

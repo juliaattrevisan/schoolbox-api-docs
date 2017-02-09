@@ -77,8 +77,9 @@
             <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
             {% elseif isParticipant and assessment is task %}
                 {% include '@learningAssessment/task/progressTickForm.twig' with {
-                    participant: assessment.getParticipant(currentUser)
-                } %}
+                    participant: assessment.getParticipant(currentUser),
+                    disabled: false
+                } only %}
             {% endif %}
         </nav>
         {% if readOnly == false  %}

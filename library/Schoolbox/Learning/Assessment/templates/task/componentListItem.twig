@@ -6,7 +6,10 @@
 
     {% if assessable.isParticipant(user) %}
         {% set extraNavItemCount = 1 %}
-        {% include '@learningAssessment/task/progressTickForm.twig' with {participant: assessable.getParticipant(user)} %}
+        {% include '@learningAssessment/task/progressTickForm.twig' with {
+            participant: assessable.getParticipant(user),
+            disabled: false
+        } only %}
     {% endif %}
 
 {% endblock %}
