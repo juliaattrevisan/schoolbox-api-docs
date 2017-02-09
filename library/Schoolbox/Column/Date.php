@@ -15,9 +15,9 @@ class Date extends Datetime implements IColumnType
     protected $output_format = 'Y-m-d';
 
     /**
-     * Either an empty string or a time prefixed with a space char, eg " 00:00:00"
+     * Either null or a time format accepted by strtotime(), eg '00:00:00'
      *
-     * @var string
+     * @var string|null
      */
     private $time;
 
