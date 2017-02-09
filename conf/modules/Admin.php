@@ -94,5 +94,8 @@ class Admin implements ModuleConfigInterface
             $courseBuilder->init('/adminv2/import-pastoral');
         }
 
+        // Route list
+        $routes = new \Schoolbox\Admin\RouteSummary\Module($di);
+        $routes->init('/adminv2/routes');
     }
 } 
