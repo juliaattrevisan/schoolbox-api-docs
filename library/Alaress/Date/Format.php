@@ -27,6 +27,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     protected $locale;
 
+
+    /**
+     * The default/system timezone for daates
+     * @var defaultTimeZone
+     */
+    static private $defaultTimezone;
+
     /**
      * Any warnings that might have been raised in creation of this object.
      *
@@ -175,12 +182,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * What's the default timezone?
      * It should've been set by date_default_timezone_set.
+     * This is static so we only need to create it once per execution
      *
      * @return DateTimeZone
      */
     protected function getDefaultTimezone()
     {
-        return new DateTimeZone(date_default_timezone_get());
+        if(is_null(self::$defaultTimezone)) {
+            self::$defaultTimezone = new DateTimeZone(date_default_timezone_get());
+        }
+        return self::$defaultTimezone;
     }
 
     /**
@@ -202,10 +213,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             return LaravelDate::now($timezone ?: $this->getDefaultTimezone());
         } elseif ($dateTime instanceof DateTimeInterface) {
             // Build out of timestamp and timezone
-            return LaravelDate::createFromTimestamp(
-                $dateTime->getTimestamp(),
-                $timezone ?: clone $dateTime->getTimezone()
-            );
+            if(!is_null($timezone)) {
+                $dateTime->setTimezone($timezone);
+            }
+            return LaravelDate::instance($dateTime);
         } elseif ($dateTime instanceof Alaress_Date_Format) {
             // Build out of date object's timestamp/timezone
             return LaravelDate::createFromTimestamp(
@@ -248,9 +259,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             throw new InvalidArgumentException('$dateTime did not match any $inputDateFormat');
         }
 
-        $newDateTime = $this->buildLaravelDate($dateTime, $timezone);
-        if (isset($newDateTime)) {
-            $this->setDateTimeObject($newDateTime);
+        $laravelDate = $this->buildLaravelDate($dateTime, $timezone);
+        if (isset($laravelDate)) {
+            $this->setDateTimeObject($laravelDate);
         } else {
             if (!isset($inputDateFormat)) {
                 throw new InvalidArgumentException(
@@ -269,23 +280,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                     );
                 }
             } else {
-                $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
-                $errors      = DateTime::getLastErrors();
-                if ($errors['error_count']) {
+                try {
+                    $laravelDate = LaravelDate::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
+                } catch (InvalidArgumentException $e) {
                     // I don't have a datetime, try again with trailing data allowed
-                    $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
-                    if (!($newDateTime instanceof DateTime)) {
-                        // I still don't have a datetime, exception out
-                        $errors = DateTime::getLastErrors();
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'LaravelDate creation failed with %d errors: (%s)',
-                                $errors['error_count'],
-                                implode(', ', $errors['errors'])
-                            )
-                        );
-                    }
+                    // This can also throw an InvalidArgumentException - allow that to fall on carpet
+                    $laravelDate = LaravelDate::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
                 }
+
+                $errors = LaravelDate::getLastErrors();
                 if ($errors['warning_count']) {
                     // I have a datetime, but it's not what I expected. Warn the user.
                     // This date will also fail isValid()
@@ -299,7 +302,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                         E_USER_WARNING
                     );
                 }
-                $laravelDate = LaravelDate::instance($newDateTime);
 
                 // Did I specify a timezone? If not, set it to the default
                 if (!preg_match('/[eOPT]/', $inputDateFormat)) {
