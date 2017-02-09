@@ -96,7 +96,7 @@
             </ul>
         </section>
 
-        {% if assessment.isSelfAssessed %}
+        {% if isRouteAuthorized('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) %}
             <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
                   method="POST">
                 {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
