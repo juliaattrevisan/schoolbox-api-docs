@@ -80,6 +80,9 @@ class DateTest extends DatetimeTest
             // Date and time - time component should be ignored
             [new Date('00:00:00'), '2012-01-01 12:00:00', '2012-01-01 00:00:00'],
             [new Date('23:59:59'), '2012-01-01 12:00:00', '2012-01-01 23:59:59'],
+            // Null Date with time - should return empty string
+            [new Date('00:00:00'), '',   ''],
+            [new Date('00:00:00'), null, ''],
         ];
     }
 
