@@ -14,6 +14,8 @@ use \Schoolbox\Learning\Assessment\AbstractResponse;
 use Schoolbox\Learning\Assessment\Task\CompletionStatusTrait;
 use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Class Model
@@ -107,6 +109,13 @@ class Model extends AbstractResponse implements ICompletion
 
             if ($this->isMarkedAsSelfAssessed() && $this->getAssessable()->isTeacherAssessed()) {
                 throw new \UnexpectedValueException("Users may not self-assess a task themselves, if the task is teacher-assessed only");
+            }
+        }
+        // If a teacher is marking a student, the teacher must have write+ perm to the class
+        else {
+            $classFolderId = $this->getAssessable()->getBaseContext()->getId();
+            if(Access::getInstance()->getFolderAccess($currentUser, [$classFolderId]) < UserAccess::ACCESS_WRITE){
+                throw new \UnexpectedValueException("Teachers may only mark tasks on classes where they have write permissions.");
             }
         }
 
