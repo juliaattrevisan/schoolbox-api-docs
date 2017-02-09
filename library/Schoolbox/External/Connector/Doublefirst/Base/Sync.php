@@ -137,6 +137,7 @@ class Sync implements SyncInterface
                         spd.SurName           AS staff_surname,
                         'o'                   AS default_email_code,
                         CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS occup_email,
+                        CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS work_email,
                         ''                    AS email,
                         ''                    AS staff_campus,
                         
