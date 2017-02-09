@@ -39,7 +39,7 @@ class Date extends Datetime implements IColumnType
     public function hydrate($value, $mapper = null)
     {
         $hydrated = parent::hydrate($value, $mapper);
-        if (!empty($this->time)) {
+        if (!empty($this->time) && !$hydrated->isNull()) {
             $hydrated->modify($this->time);
         }
         return $hydrated;
