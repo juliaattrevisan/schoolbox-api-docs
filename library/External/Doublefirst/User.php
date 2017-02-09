@@ -583,8 +583,8 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation cmPhoneWork6   ON cmPhoneWork6.ContactID = pc.ContactID AND cmPhoneWork6.TelephoneType = '009'
             LEFT JOIN VLContactTelephone            cp ON cp.ContactID = pc.ContactID 
             LEFT JOIN VLContactEmail                ce ON ce.ContactID = pc.ContactID
-            LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype = '001' and ceh.primaryemail = 1
-            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype = '002' and cew.primaryemail = 1 
+            LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype IN ('001','1') and ceh.primaryemail = 1
+            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype IN ('002','2') and cew.primaryemail = 1 
             WHERE
         ";
 
@@ -777,8 +777,8 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation cmPhoneWork6   ON cmPhoneWork6.ContactID = pc.ContactID AND cmPhoneWork6.TelephoneType = '009'
             LEFT JOIN   VLContactTelephone            cp ON cp.ContactID = pc.ContactID 
             LEFT JOIN   VLContactEmail                ce ON ce.ContactID = pc.ContactID
-            LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype = '001' and ceh.primaryemail = 1
-            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype = '002' and cew.primaryemail = 1 
+            LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype IN ('001','1') and ceh.primaryemail = 1
+            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype IN ('002','2') and cew.primaryemail = 1 
             
             WHERE p.PupilID = '{$externalUserId}'
             ORDER BY pc.Priority
