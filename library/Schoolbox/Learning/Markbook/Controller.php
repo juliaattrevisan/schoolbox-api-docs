@@ -17,6 +17,8 @@ use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -140,6 +142,10 @@ class Controller extends Base
             }
         }
 
+        // Can the viewee mark Assessments in for this class ?
+        $writable = !$term->getArchived() &&
+            Access::getInstance()->getFolderAccess($this->getUser(), [$class->getId()]) >= UserAccess::ACCESS_WRITE;
+
         // And output
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -152,6 +158,7 @@ class Controller extends Base
                     'previousTerm' => $previousTerm,
                     'nextTerm'     => $nextTerm,
                     'courses'      => $courses,
+                    'writable'     => $writable,
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );

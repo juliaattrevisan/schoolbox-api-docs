@@ -156,7 +156,7 @@
                                     {# An icon that shows if the student has attempted the task or not #}
                                     {% include '@learningAssessment/task/progressTickForm.twig' with {
                                         participant: assessment.getParticipant(student),
-                                        disabled: false
+                                        disabled: not writable
                                     } only %}
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
