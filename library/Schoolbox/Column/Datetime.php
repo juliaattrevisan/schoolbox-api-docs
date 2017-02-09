@@ -10,13 +10,13 @@
 namespace Schoolbox\Column;
 use Alaress\Cache;
 use \DateTime as DateObject;
-use \Alaress_Date_Format as DateWrapper;
+use \Alaress_Date_Format;
 
 class Datetime implements IColumnType {
 	protected $input_format  = 'Y-m-d H:i:s';
 	protected $output_format = 'Y-m-d H:i:s';
 
-	/** @var Cache|DateWrapper[] */
+	/** @var Cache|Alaress_Date_Format[] */
 	private $cache = [];
 
 
@@ -25,7 +25,7 @@ class Datetime implements IColumnType {
     public function __construct()
     {
         $this->cache = new Cache(function ($value, $inputFormat) {
-            return new DateWrapper($value, $inputFormat);
+            return new Alaress_Date_Format($value, $inputFormat);
         });
     }
 
@@ -34,7 +34,7 @@ class Datetime implements IColumnType {
 	 * @param string            $value
 	 * @param \Schoolbox\Mapper $mapper
 	 *
-	 * @return DateWrapper
+	 * @return Alaress_Date_Format
 	 */
 	public function hydrate($value, $mapper = null) {
         if (!isset($value)) {
@@ -63,7 +63,7 @@ class Datetime implements IColumnType {
         if ($value instanceof \Alaress_Date_NullDate) {
             return null;
         }
-		if ($value instanceof DateWrapper) {
+		if ($value instanceof Alaress_Date_Format) {
 			return $value->getUsingFormat($this->output_format);
 		}
 		if (is_string($value)) {
