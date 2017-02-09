@@ -348,9 +348,8 @@ ul.tileList {
     display: none;
 }
 
-[data-chat-log]{
-    .spaced:nth-child(n+4){
-        border-top: 1px solid $body-bg;
-        padding-top: 0.45rem;
-    }
+// Chat message border and padding
+.chat-messages .spaced:nth-child(n+4){
+    border-top: 1px solid $body-bg;
+    padding-top: 0.45rem;
 }
