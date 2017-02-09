@@ -28,6 +28,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Timetable_ColourMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Model as AssessmentQuiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
@@ -456,7 +457,7 @@ class Controller extends Base
 
             // If this is a quiz we need to find out if the student has made any attempts so we can display a link to view them
 
-            if ($assessment instanceof Quiz)
+            if ($assessment instanceof AssessmentQuiz)
             {
                 try {
                     $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
