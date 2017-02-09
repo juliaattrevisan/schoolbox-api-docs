@@ -354,19 +354,19 @@
                 var numCompare    = function(a,b) { return a - b; };
                 var sorts         = [
                     {
-                        column: function (item) { return item.start.toISOString(); },
-                        comparator: stringCompare
-                    },
-                    {
-                        column: function (item) { return item.end.toISOString(); },
-                        comparator: stringCompare
-                    },
-                    {
                         column: function (item) { return item.meta.assessmentStart; },
                         comparator: stringCompare
                     },
                     {
                         column: function (item) { return item.meta.assessmentEnd; },
+                        comparator: stringCompare
+                    },
+                    {
+                        column: function (item) { return item.start.toISOString(); },
+                        comparator: stringCompare
+                    },
+                    {
+                        column: function (item) { return item.end.toISOString(); },
                         comparator: stringCompare
                     },
                     {
