@@ -161,7 +161,8 @@ class Module extends BaseModule
                 'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
                 'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
                 'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-
+                'externalClass'              => $this->getInjector()->get('externalClass'),
+                'database'                   => $this->getInjector()->get('database'),
             ])
         );
     }

@@ -20,7 +20,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -91,6 +90,14 @@ class Controller extends Base
     /** @var CourseImplementationMapper */
     private $courseImplementationMapper;
 
+    /** @var  \External_ClassInterface */
+    private $externalClass;
+
+    /**
+     * @var \Database
+     */
+    private $database;
+
     /**
      * Controller constructor.
      *
@@ -105,6 +112,8 @@ class Controller extends Base
      * @param QuizAttemptMapper          $quizAttemptMapper
      * @param Timetable_ColourMapper     $timetableColourMapper
      * @param CourseImplementationMapper $courseImplementationMapper
+     * @param \External_ClassInterface   $externalClass
+     * @param \Database                  $database
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -117,7 +126,9 @@ class Controller extends Base
         QuizMapper $quizMapper,
         QuizAttemptMapper $quizAttemptMapper,
         Timetable_ColourMapper $timetableColourMapper,
-        CourseImplementationMapper $courseImplementationMapper
+        CourseImplementationMapper $courseImplementationMapper,
+        \External_ClassInterface $externalClass,
+        \Database $database
     ) {
         $this->errorMapper                = $errorMapper;
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
@@ -130,6 +141,8 @@ class Controller extends Base
         $this->quizAttemptMapper          = $quizAttemptMapper;
         $this->timetableColourMapper      = $timetableColourMapper;
         $this->courseImplementationMapper = $courseImplementationMapper;
+        $this->externalClass              = $externalClass;
+        $this->database                   = $database;
     }
 
     /**
@@ -194,7 +207,7 @@ class Controller extends Base
         // Should we include tasks?
         $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
 
-        $factory = new PendingFactory($viewee, \Database::getInstance(), new \External_Class(), $term, $toChaseLimit, $includeTasks, $this->folderMapper);
+        $factory = new PendingFactory($viewee, $this->database, $this->externalClass, $term, $toChaseLimit, $includeTasks, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */
