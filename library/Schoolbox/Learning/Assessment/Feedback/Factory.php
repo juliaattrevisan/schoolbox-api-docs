@@ -149,12 +149,8 @@ class Factory
         /** @var IFeedback $feedback */
         $feedback
             ->setReviewer($this->getCurrentUser())
-            ->setUpdatedAt(\Alaress_Date_Format::now());
-
-        if ($postComment) {
-            // comment defined and non-empty
-            $feedback->setComment($postComment);
-        }
+            ->setUpdatedAt(\Alaress_Date_Format::now())
+            ->setComment($postComment);
 
         if ($postMark !== '') {
 
