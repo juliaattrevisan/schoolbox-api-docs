@@ -775,10 +775,10 @@ class MapperProxy
 
         // Due before / after filter (an ADF)
         if ($options['dueBefore'] instanceof \Alaress_Date_Format && !$options['dueBefore']->isNull()) {
-            $builder->notGreaterThan('due_date', $options['dueBefore']->getDatabaseDate());
+            $builder->notGreaterThan('due_date', $options['dueBefore']->getDatabase());
         }
         if ($options['dueAfter'] instanceof \Alaress_Date_Format && !$options['dueAfter']->isNull()) {
-            $builder->notLessThan('due_date', $options['dueAfter']->getDatabaseDate());
+            $builder->notLessThan('due_date', $options['dueAfter']->getDatabase());
         }
 
         // Assessment type filter
