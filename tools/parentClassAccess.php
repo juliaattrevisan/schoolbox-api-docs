@@ -18,7 +18,7 @@ $classHandler = new \External_Class();
 
 $log = new Logger(STDOUT, STDERR);
 
-$options = getopt("sf:", array('students'));
+$options = getopt("f:", array('students'));
 
 if (!isset($options['f'])) {
     $log->error("No import filename specified");
