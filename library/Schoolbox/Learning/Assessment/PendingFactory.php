@@ -46,7 +46,8 @@ class PendingFactory
 
     /**
      * Indexed by assessment.id
-     * Use a Collection rather than array as the this gets return to caller.
+     *
+     * A Collection object rather than array as objects are returned to caller.
      *
      * @var IAssessable[]|Collection $assessmentsCache
      */
