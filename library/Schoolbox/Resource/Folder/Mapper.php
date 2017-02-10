@@ -1719,12 +1719,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ':userId' => $student->getId(),
         ];
 
-        if($term instanceof Term){
-            $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
-            $whereParams = array_merge($whereParams, [
-                ':startDate' => $term->getStart(),
-                ':endDate' => $term->getActualFinish()->isNull() ? \Alaress_Date_Format::now() : $term->getActualFinish() ,
-            ]);
+        if ($term instanceof Term) {
+            $whereClause .= $this->buildWherePartForTerm($term);
+            $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
         return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
@@ -1752,13 +1749,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         ];
 
         if ($term instanceof Term) {
-            $whereParams[':startDate'] = $term->getStart();
-            if ($term->getActualFinish()->isNull()) {
-                $whereClause .= "\nAND (`a`.`due_date` >= :startDate)";
-            } else {
-                $whereParams[':endDate'] = $term->getActualFinish();
-                $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
-            }
+            $whereClause .= $this->buildWherePartForTerm($term);
+            $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
         return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
@@ -1868,5 +1860,41 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function getAncestry()
     {
         return $this->ancestry;
+    }
+
+    /**
+     * Builds a where part for a term.
+     *
+     * TODO replace with predicate builder
+     *
+     * @param Term $term
+     * @return string
+     */
+    private function buildWherePartForTerm(Term $term)
+    {
+        if ($term->getActualFinish()->isNull()) {
+            return "\nAND (`a`.`due_date` >= :startDate)";
+        } else {
+            return "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
+        }
+    }
+
+    /**
+     * Builds where params for a term.
+     *
+     * TODO replace with predicate builder
+     *
+     * @param Term $term
+     * @return array
+     */
+    private function buildWhereParamsForTerm(Term $term)
+    {
+        $whereParams = [
+            ':startDate' => $term->getStart(),
+        ];
+        if (!$term->getActualFinish()->isNull()) {
+            $whereParams[':endDate'] = $term->getActualFinish();
+        }
+        return $whereParams;
     }
 }
