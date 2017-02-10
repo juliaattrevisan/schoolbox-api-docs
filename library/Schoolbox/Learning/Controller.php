@@ -93,17 +93,17 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param FolderMapper $folderMapper
-     * @param TermMapper $termMapper
-     * @param GradeGroup $defaultGradeGroup
-     * @param ShowcaseMapper $showcaseMapper
-     * @param RubricMapper $rubricMapper
-     * @param QuizMapper $quizMapper
-     * @param QuizAttemptMapper $quizAttemptMapper
+     * @param ErrorMapper            $errorMapper
+     * @param AssessmentMapperProxy  $assessmentMapperProxy
+     * @param FolderMapper           $folderMapper
+     * @param TermMapper             $termMapper
+     * @param GradeGroup             $defaultGradeGroup
+     * @param ShowcaseMapper         $showcaseMapper
+     * @param RubricMapper           $rubricMapper
+     * @param QuizMapper             $quizMapper
+     * @param QuizAttemptMapper      $quizAttemptMapper
      * @param Timetable_ColourMapper $timetableColourMapper
-     * @param UserAccessMapper $userAccessMapper
+     * @param UserAccessMapper       $userAccessMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -118,17 +118,17 @@ class Controller extends Base
         Timetable_ColourMapper $timetableColourMapper,
         UserAccessMapper $userAccessMapper
     ) {
-        $this->setErrorMapper($errorMapper);
-        $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setTermMapper($termMapper);
-        $this->setFolderMapper($folderMapper);
-        $this->setDefaultGradeGroup($defaultGradeGroup);
-        $this->setShowcaseMapper($showcaseMapper);
-        $this->setRubricMapper($rubricMapper);
-        $this->quizMapper = $quizMapper;
-        $this->quizAttemptMapper = $quizAttemptMapper;
+        $this->errorMapper           = $errorMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->termMapper            = $termMapper;
+        $this->folderMapper          = $folderMapper;
+        $this->defaultGradeGroup     = $defaultGradeGroup;
+        $this->showcaseMapper        = $showcaseMapper;
+        $this->rubricMapper          = $rubricMapper;
+        $this->quizMapper            = $quizMapper;
+        $this->quizAttemptMapper     = $quizAttemptMapper;
         $this->timetableColourMapper = $timetableColourMapper;
-        $this->userAccessMapper = $userAccessMapper;
+        $this->userAccessMapper      = $userAccessMapper;
     }
 
     /**

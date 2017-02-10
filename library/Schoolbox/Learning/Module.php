@@ -9,11 +9,11 @@ namespace Schoolbox\Learning;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
@@ -151,11 +151,17 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+                'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
+                'showcaseMapper'        => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
                 'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
+                'quizAttemptMapper'     => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
                 'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
                 'userAccessMapper'      => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+
             ])
         );
     }
