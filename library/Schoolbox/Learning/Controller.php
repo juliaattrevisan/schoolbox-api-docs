@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -86,6 +87,9 @@ class Controller extends Base
     /** @var Timetable_ColourMapper */
     private $timetableColourMapper;
 
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
     /**
      * Controller constructor.
      *
@@ -99,6 +103,7 @@ class Controller extends Base
      * @param QuizMapper $quizMapper
      * @param QuizAttemptMapper $quizAttemptMapper
      * @param Timetable_ColourMapper $timetableColourMapper
+     * @param UserAccessMapper $userAccessMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -110,7 +115,8 @@ class Controller extends Base
         RubricMapper $rubricMapper,
         QuizMapper $quizMapper,
         QuizAttemptMapper $quizAttemptMapper,
-        Timetable_ColourMapper $timetableColourMapper
+        Timetable_ColourMapper $timetableColourMapper,
+        UserAccessMapper $userAccessMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -122,6 +128,7 @@ class Controller extends Base
         $this->quizMapper = $quizMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;
         $this->timetableColourMapper = $timetableColourMapper;
+        $this->userAccessMapper = $userAccessMapper;
     }
 
     /**
@@ -192,7 +199,7 @@ class Controller extends Base
         // Should we include tasks?
         $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
 
-        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks);
+        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks, $this->userAccessMapper);
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */

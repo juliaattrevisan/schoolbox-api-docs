@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
@@ -219,6 +220,11 @@ class PendingFactory
      */
     private $includeTasks;
 
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
 
     /**
      * @param User                         $viewee
@@ -227,6 +233,7 @@ class PendingFactory
      * @param Term                         $term
      * @param \Alaress_Date_Format         $toChaseLimit
      * @param bool                         $includeTasks
+     * @param UserAccessMapper             $userAccessMapper
      */
     public function __construct(
         User $viewee,
@@ -234,7 +241,8 @@ class PendingFactory
         \External_ClassInterface $externalClass,
         Term $term,
         \Alaress_Date_Format $toChaseLimit,
-        $includeTasks
+        $includeTasks,
+        UserAccessMapper $userAccessMapper
     ) {
         $this->viewee           = $viewee;
         $this->database         = \Database::getInstance();
@@ -245,6 +253,7 @@ class PendingFactory
         $this->toChaseLimit     = $toChaseLimit;
         $this->nullDate         = new \Alaress_Date_NullDate();
         $this->includeTasks     = $includeTasks;
+        $this->userAccessMapper = $userAccessMapper;
     }
 
 

@@ -14,6 +14,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -154,6 +155,7 @@ class Module extends BaseModule
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                 'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
+                'userAccessMapper'      => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
             ])
         );
     }
