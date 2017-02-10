@@ -507,7 +507,7 @@ class Mapper extends BaseMapper
         $idList = array_column($idStatement->fetchAll(), 'id');
 
         // Send IDs to findByColumnList
-        $builder = $builder->anyOf('id', array_merge($idList, $uniqueIds));
+        $builder = $builder->equals('id', array_merge($idList, $uniqueIds));
 
         return $this->findByPredicates($builder, $options);
     }
