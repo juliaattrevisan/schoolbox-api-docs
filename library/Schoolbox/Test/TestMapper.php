@@ -8,9 +8,8 @@
  */
  
 namespace Schoolbox\Test;
-use Schoolbox\Mapper;
 
-class TestMapper extends Mapper {
+class TestMapper extends AbstractTestMapper {
 
     /**
      * @var MapperTest

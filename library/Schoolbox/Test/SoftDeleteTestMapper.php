@@ -8,7 +8,6 @@
  */
  
 namespace Schoolbox\Test;
-use Schoolbox\Mapper;
 
 /**
  * Class SoftDeleteTestMapper
@@ -16,7 +15,7 @@ use Schoolbox\Mapper;
  * @package Schoolbox\Test
  * @method MockDatabase getDatabase()
  */
-class SoftDeleteTestMapper extends Mapper {
+class SoftDeleteTestMapper extends AbstractTestMapper {
 	protected function mapping() {
 		$this->hasModel(SoftDeleteTestModel::class);
 		$this->hasMap(array(
