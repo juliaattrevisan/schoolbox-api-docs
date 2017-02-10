@@ -33,7 +33,8 @@ use Schoolbox\Learning\Assessment\Quiz\Model as AssessmentQuiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 
 class Controller extends Base
 {
@@ -90,20 +91,24 @@ class Controller extends Base
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
+    /** @var CourseImplementationMapper */
+    private $courseImplementationMapper;
+
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper            $errorMapper
-     * @param AssessmentMapperProxy  $assessmentMapperProxy
-     * @param FolderMapper           $folderMapper
-     * @param TermMapper             $termMapper
-     * @param GradeGroup             $defaultGradeGroup
-     * @param ShowcaseMapper         $showcaseMapper
-     * @param RubricMapper           $rubricMapper
-     * @param QuizMapper             $quizMapper
-     * @param QuizAttemptMapper      $quizAttemptMapper
-     * @param Timetable_ColourMapper $timetableColourMapper
-     * @param UserAccessMapper       $userAccessMapper
+     * @param ErrorMapper                $errorMapper
+     * @param AssessmentMapperProxy      $assessmentMapperProxy
+     * @param FolderMapper               $folderMapper
+     * @param TermMapper                 $termMapper
+     * @param GradeGroup                 $defaultGradeGroup
+     * @param ShowcaseMapper             $showcaseMapper
+     * @param RubricMapper               $rubricMapper
+     * @param QuizMapper                 $quizMapper
+     * @param QuizAttemptMapper          $quizAttemptMapper
+     * @param Timetable_ColourMapper     $timetableColourMapper
+     * @param UserAccessMapper           $userAccessMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -116,19 +121,21 @@ class Controller extends Base
         QuizMapper $quizMapper,
         QuizAttemptMapper $quizAttemptMapper,
         Timetable_ColourMapper $timetableColourMapper,
-        UserAccessMapper $userAccessMapper
+        UserAccessMapper $userAccessMapper,
+        CourseImplementationMapper $courseImplementationMapper
     ) {
-        $this->errorMapper           = $errorMapper;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->termMapper            = $termMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->defaultGradeGroup     = $defaultGradeGroup;
-        $this->showcaseMapper        = $showcaseMapper;
-        $this->rubricMapper          = $rubricMapper;
-        $this->quizMapper            = $quizMapper;
-        $this->quizAttemptMapper     = $quizAttemptMapper;
-        $this->timetableColourMapper = $timetableColourMapper;
-        $this->userAccessMapper      = $userAccessMapper;
+        $this->errorMapper                = $errorMapper;
+        $this->assessmentMapperProxy      = $assessmentMapperProxy;
+        $this->termMapper                 = $termMapper;
+        $this->folderMapper               = $folderMapper;
+        $this->defaultGradeGroup          = $defaultGradeGroup;
+        $this->showcaseMapper             = $showcaseMapper;
+        $this->rubricMapper               = $rubricMapper;
+        $this->quizMapper                 = $quizMapper;
+        $this->quizAttemptMapper          = $quizAttemptMapper;
+        $this->timetableColourMapper      = $timetableColourMapper;
+        $this->userAccessMapper           = $userAccessMapper;
+        $this->courseImplementationMapper = $courseImplementationMapper;
     }
 
     /**
@@ -193,7 +200,7 @@ class Controller extends Base
             ? null
             : new \External_User();
 
-        $term = TermMapper::getInstance()->findForToday();
+        $term = $this->termMapper->findForToday();
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
         // Should we include tasks?
@@ -316,15 +323,15 @@ class Controller extends Base
             $courseSpecs = [];
 
             // Get CourseImpls, then group by Folder
-            $courseImpls = CourseImplementation\Mapper::getInstance()->findByFolderId($folderList->getColumnValues('id'));
-            $courseImplsPerClass = $courseImpls->groupByCallback(function (CourseImplementation\Model $courseImpl) {
+            $courseImpls = $this->courseImplementationMapper->findByFolderId($folderList->getColumnValues('id'));
+            $courseImplsPerClass = $courseImpls->groupByCallback(function (CourseImplementation $courseImpl) {
                 return $courseImpl->getFolder()->getId();
             });
 
             // If a course import has unit implementations that are within the specified
             // term, add the course spec to the folder.
             /**
-             * @var CourseImplementation\Model[] $courseImpls
+             * @var CourseImplementation[] $courseImpls
              */
             foreach ($courseImplsPerClass as $folderId => $courseImpls) {
                 $courseSpecs[$folderId] = [];

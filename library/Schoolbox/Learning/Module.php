@@ -26,6 +26,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 
 class Module extends BaseModule
 {
@@ -150,17 +151,18 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
-                'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
-                'showcaseMapper'        => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
-                'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
-                'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
-                'quizAttemptMapper'     => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
-                'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-                'userAccessMapper'      => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
+                'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
+                'showcaseMapper'             => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
+                'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
+                'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
+                'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
+                'userAccessMapper'           => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
 
             ])
         );
