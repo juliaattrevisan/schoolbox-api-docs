@@ -14,7 +14,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -161,7 +160,6 @@ class Module extends BaseModule
                 'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
                 'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
                 'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-                'userAccessMapper'           => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                 'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
 
             ])

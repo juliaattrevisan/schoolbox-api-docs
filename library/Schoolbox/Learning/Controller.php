@@ -88,9 +88,6 @@ class Controller extends Base
     /** @var Timetable_ColourMapper */
     private $timetableColourMapper;
 
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
-
     /** @var CourseImplementationMapper */
     private $courseImplementationMapper;
 
@@ -107,7 +104,6 @@ class Controller extends Base
      * @param QuizMapper                 $quizMapper
      * @param QuizAttemptMapper          $quizAttemptMapper
      * @param Timetable_ColourMapper     $timetableColourMapper
-     * @param UserAccessMapper           $userAccessMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      */
     public function __construct(
@@ -121,7 +117,6 @@ class Controller extends Base
         QuizMapper $quizMapper,
         QuizAttemptMapper $quizAttemptMapper,
         Timetable_ColourMapper $timetableColourMapper,
-        UserAccessMapper $userAccessMapper,
         CourseImplementationMapper $courseImplementationMapper
     ) {
         $this->errorMapper                = $errorMapper;
@@ -134,7 +129,6 @@ class Controller extends Base
         $this->quizMapper                 = $quizMapper;
         $this->quizAttemptMapper          = $quizAttemptMapper;
         $this->timetableColourMapper      = $timetableColourMapper;
-        $this->userAccessMapper           = $userAccessMapper;
         $this->courseImplementationMapper = $courseImplementationMapper;
     }
 
@@ -206,7 +200,7 @@ class Controller extends Base
         // Should we include tasks?
         $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
 
-        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks, $this->userAccessMapper);
+        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */
