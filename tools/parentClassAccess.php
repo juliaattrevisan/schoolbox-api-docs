@@ -10,6 +10,12 @@ use \Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Lumberjack\Logger;
 
+$userMapper = UserMapper::getInstance();
+$userAccessMapper = UserAccessMapper::getInstance();
+$folderMapper = FolderMapper::getInstance();
+$externalUser = new \External_User();
+$classHandler = new \External_Class();
+
 $loadStudents = false;
 
 foreach ($argv as $argument) {
@@ -18,13 +24,51 @@ foreach ($argv as $argument) {
     }
 }
 
-$userMapper = UserMapper::getInstance();
-$userAccessMapper = UserAccessMapper::getInstance();
-$folderMapper = FolderMapper::getInstance();
-$externalUser = new \External_User();
-$classHandler = new \External_Class();
-
 $log = new Logger(STDOUT, STDERR);
+
+/**
+ * @param int $externalId
+ * @param string $role
+ * @param int $folderId
+ */
+function loadUserAccess($externalId, $role, $folderId)
+{
+    // TODO: Apologize profusely...
+
+    global $userMapper;
+    global $userAccessMapper;
+    global $log;
+
+    // This would typically happen for a non-existent spouse, just do nothing in this case
+
+    if (empty($externalId)) {
+        return;
+    }
+
+    try {
+        // Get primary contact
+
+        $user = $userMapper->findByExternalId($externalId, $role);
+
+        if (!isset($usersAdded[$user->getId()])) {
+            // Give student access to the class
+
+            $userAccess = $userAccessMapper->createModel();
+            $userAccess->setUser($user);
+            $userAccess->setServiceIdentifier($folderId);
+            $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
+            $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
+            $userAccessMapper->save($userAccess);
+
+            $log->info("\tAdded:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
+            $usersAdded[$user->getId()] = true;
+        } else {
+            $log->info("\tSkipping: {$role} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
+        }
+    } catch (MapperException $e) {
+        $log->error("\tError:    External {$role} user ID not found {$externalId}");
+    }
+}
 
 $folders = [];
 $classes = [];
@@ -45,7 +89,8 @@ if ($handle) {
     }
     fclose($handle);
 } else {
-    // Couldnt read file
+    // Couldn't read file
+    $log->error("Could not locate file to import.");
     exit;
 }
 
@@ -107,90 +152,15 @@ foreach ($classes as $folderId => $codes) {
 
             if (is_array($students)) {
                 foreach ($students as $student) {
-                    try {
-
-                        // Get primary contact
-
-                        $userStudent = $userMapper->findByExternalId($student['synergy_id'], Role::STUDENT);
-
-                        if (!isset($usersAdded[$userStudent->getId()])) {
-                            // Give student access to the class
-
-                            $userAccess = $userAccessMapper->createModel();
-                            $userAccess->setUser($userStudent);
-                            $userAccess->setServiceIdentifier($folderId);
-                            $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
-                            $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
-                            $userAccessMapper->save($userAccess);
-
-                            $log->info("\tAdded:    Student '{$userStudent->getFirstname()} {$userStudent->getLastname()}'");
-                            $usersAdded[$userStudent->getId()] = true;
-                        } else {
-                            $log->info("\tSkipping: Student '{$userStudent->getFirstname()} {$userStudent->getLastname()}' (Already Added To Folder)");
-                        }
-                    } catch (MapperException $e) {
-                        $log->error("\tError:    External user ID not found {$student['synergy_id']}");
-                    }
+                    loadUserAccess($student['synergy_id'], Role::STUDENT, $folderId);
                 }
             }
         }
 
         if (is_array($parents)) {
             foreach ($parents as $parent) {
-                try {
-
-                    // Get primary contact
-
-                    $userPrimary = $userMapper->findByExternalId($parent['StudentContactID'], Role::PARENT);
-
-                    if (!isset($usersAdded[$userPrimary->getId()])) {
-                        // Give primary access to the class
-
-                        $userAccess = $userAccessMapper->createModel();
-                        $userAccess->setUser($userPrimary);
-                        $userAccess->setServiceIdentifier($folderId);
-                        $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
-                        $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
-                        $userAccessMapper->save($userAccess);
-
-                        $log->info("\tAdded:    Parent Primary '{$userPrimary->getFirstname()} {$userPrimary->getLastname()}'");
-                        $usersAdded[$userPrimary->getId()] = true;
-                    } else {
-                        $log->info("\tSkipping: Parent Primary '{$userPrimary->getFirstname()} {$userPrimary->getLastname()}' (Already Added To Folder)");
-                    }
-                } catch (MapperException $e) {
-                    $log->error("\tError:    External user ID not found {$parent['StudentContactID']}");
-                }
-
-                try {
-
-                    // Check if there was a spouse
-
-                    if (!empty($parent['StudentContactSpouseID'])) {
-
-                        // Get spouse
-
-                        $userSpouse = $userMapper->findByExternalId($parent['StudentContactSpouseID'], Role::PARENT);
-
-                        if (!isset($usersAdded[$userSpouse->getId()])) {
-                            // Give spouse access to the class
-
-                            $userAccess = $userAccessMapper->createModel();
-                            $userAccess->setUser($userSpouse);
-                            $userAccess->setServiceIdentifier($folderId);
-                            $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
-                            $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
-                            $userAccessMapper->save($userAccess);
-
-                            $log->info("\tAdded:    Parent Spouse '{$userSpouse->getFirstname()} {$userSpouse->getLastname()}'");
-                            $usersAdded[$userSpouse->getId()] = true;
-                        } else {
-                            $log->info("\tSkipping: Parent Spouse '{$userSpouse->getFirstname()} {$userSpouse->getLastname()}' (Already Added To Folder)");
-                        }
-                    }
-                } catch (MapperException $e) {
-                    $log->error("\tError:    External user ID not found {$parent['StudentContactSpouseID']}");
-                }
+                loadUserAccess($parent['StudentContactID'], Role::PARENT, $folderId);
+                loadUserAccess($parent['StudentContactSpouseID'], Role::PARENT, $folderId);
             }
         }
     }
