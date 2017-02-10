@@ -1751,12 +1751,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ':userId' => $teacher->getId(),
         ];
 
-        if($term instanceof Term){
-            $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
-            $whereParams = array_merge($whereParams, [
-                ':startDate' => $term->getStart(),
-                ':endDate' => $term->getActualFinish()->isNull() ? \Alaress_Date_Format::now() : $term->getActualFinish() ,
-            ]);
+        if ($term instanceof Term) {
+            $whereParams[':startDate'] = $term->getStart();
+            if ($term->getActualFinish()->isNull()) {
+                $whereClause .= "\nAND (`a`.`due_date` >= :startDate)";
+            } else {
+                $whereParams[':endDate'] = $term->getActualFinish();
+                $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
+            }
         }
 
         return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
