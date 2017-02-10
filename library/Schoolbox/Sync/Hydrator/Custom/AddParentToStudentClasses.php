@@ -19,6 +19,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
 use Schoolbox\External\Subject;
+use Schoolbox\Role;
 use Schoolbox\User as InternalUser;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccessMapper as UserAccessMapper;
@@ -92,7 +93,7 @@ class AddParentToStudentClasses extends AbstractLoggableHydrator
                     // Get schoolbox user for the child
 
                     try {
-                        $childUser = $this->userMapper->findByExternalId($childId['RelatedID']);
+                        $childUser = $this->userMapper->findByExternalId($childId['RelatedID'], Role::STUDENT);
                     } catch (MapperException $e) {
                         continue;
                     }
