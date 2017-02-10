@@ -188,19 +188,13 @@ class Controller extends Base
             $viewee = $this->getUser();
         }
 
-        // TODO - both this, External_Class() and all Mappers should be singletons pulled from the DI.
-        // TODO - see pattern applied to MapperFactory in Modules.
-        $externalUser = $viewee->getSubjectCollection()
-            ? null
-            : new \External_User();
-
         $term = $this->termMapper->findForToday();
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
         // Should we include tasks?
         $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
 
-        $factory = new PendingFactory($viewee, \Database::getInstance(), $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks, $this->folderMapper);
+        $factory = new PendingFactory($viewee, \Database::getInstance(), new \External_Class(), $term, $toChaseLimit, $includeTasks, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */

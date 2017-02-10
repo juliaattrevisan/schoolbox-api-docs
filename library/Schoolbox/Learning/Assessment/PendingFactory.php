@@ -39,9 +39,6 @@ class PendingFactory
     /** @var IDatabase */
     private $database;
 
-    /** @var \External_UserInterface */
-    private $externalUser;
-
     /** @var \External_ClassInterface */
     private $externalClass;
 
@@ -212,7 +209,6 @@ class PendingFactory
     /**
      * @param User                         $viewee
      * @param \Database                    $database
-     * @param \External_UserInterface|null $externalUser
      * @param \External_ClassInterface     $externalClass
      * @param Term                         $term
      * @param \Alaress_Date_Format         $toChaseLimit
@@ -222,7 +218,6 @@ class PendingFactory
     public function __construct(
         User $viewee,
         \Database $database,
-        \External_UserInterface $externalUser = null,
         \External_ClassInterface $externalClass,
         Term $term,
         \Alaress_Date_Format $toChaseLimit,
@@ -231,7 +226,6 @@ class PendingFactory
     ) {
         $this->viewee           = $viewee;
         $this->database         = $database;
-        $this->externalUser     = $externalUser;
         $this->externalClass    = $externalClass;
         $this->assessmentsCache = new GenericCollection(IAssessable::class);
         $this->term             = $term;
