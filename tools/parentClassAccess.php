@@ -16,15 +16,21 @@ $folderMapper = FolderMapper::getInstance();
 $externalUser = new \External_User();
 $classHandler = new \External_Class();
 
-$loadStudents = false;
+$log = new Logger(STDOUT, STDERR);
 
-foreach ($argv as $argument) {
-    if ($argument == '-students') {
-        $loadStudents = true;
-    }
+$options = getopt("sf:", array('students'));
+
+if (!isset($options['f'])) {
+    $log->error("No import filename specified");
+    exit;
 }
 
-$log = new Logger(STDOUT, STDERR);
+if (!file_exists($options['f'])) {
+    $log->error("Specified import file not found");
+    exit;
+}
+
+$loadStudents = isset($options['students']);
 
 /**
  * @param int $externalId
@@ -73,7 +79,7 @@ function loadUserAccess($externalId, $role, $folderId)
 $folders = [];
 $classes = [];
 
-$handle = fopen("classes.csv", "r");
+$handle = fopen($options['f'], "r");
 
 if ($handle) {
     while (($row = fgetcsv($handle)) !== false) {
