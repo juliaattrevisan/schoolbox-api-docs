@@ -200,7 +200,7 @@ class Controller extends Base
         // Should we include tasks?
         $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
 
-        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks, $this->folderMapper);
+        $factory = new PendingFactory($viewee, \Database::getInstance(), $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */

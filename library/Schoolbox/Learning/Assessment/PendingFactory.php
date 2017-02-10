@@ -211,6 +211,7 @@ class PendingFactory
 
     /**
      * @param User                         $viewee
+     * @param \Database                    $database
      * @param \External_UserInterface|null $externalUser
      * @param \External_ClassInterface     $externalClass
      * @param Term                         $term
@@ -220,6 +221,7 @@ class PendingFactory
      */
     public function __construct(
         User $viewee,
+        \Database $database,
         \External_UserInterface $externalUser = null,
         \External_ClassInterface $externalClass,
         Term $term,
@@ -228,7 +230,7 @@ class PendingFactory
         FolderMapper $folderMapper
     ) {
         $this->viewee           = $viewee;
-        $this->database         = \Database::getInstance(); // TODO inject this.
+        $this->database         = $database;
         $this->externalUser     = $externalUser;
         $this->externalClass    = $externalClass;
         $this->assessmentsCache = new GenericCollection(IAssessable::class);
