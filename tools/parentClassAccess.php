@@ -170,7 +170,7 @@ foreach ($classes as $folderId => $codes) {
 
                         // Get spouse
 
-                        $userSpouse = $userMapper->findByExternalId($parent['StudentContactSpouseID']);
+                        $userSpouse = $userMapper->findByExternalId($parent['StudentContactSpouseID'], Role::PARENT);
 
                         if (!isset($usersAdded[$userSpouse->getId()])) {
                             // Give spouse access to the class
