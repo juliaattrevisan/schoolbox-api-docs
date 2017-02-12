@@ -393,7 +393,8 @@ class PendingFactory
 
         $taskSelect = $this->includeTasks ? ",
              tk.id                    AS 'tk.id',
-             tk.requires_confirmation AS 'tk.requires_confirmation'," : '';
+             tk.requires_confirmation AS 'tk.requires_confirmation'
+        " : '';
         $taskJoin   = $this->includeTasks ? 'LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL' : '';
         $taskId     = $this->includeTasks ? "OR tk.id IS NOT NULL" : '';
 
