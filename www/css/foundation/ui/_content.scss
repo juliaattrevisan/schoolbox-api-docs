@@ -1573,6 +1573,18 @@ article {
   	@extend .clearfix;
 }
 
+article,
+.cke_editable {
+	h1, h2, h3, h4, h5, h6 {
+		margin-bottom: 0.75rem;
+		margin-top: 1.25rem;
+	}
+
+	>:first-child {
+		margin-top: 0;
+	}
+}
+
 /**
  * Foundation kills margins on lists inside lists (ul li ul)
  * We have cases where an article lives in a <li>, which then has ul's (e.g. forum)
