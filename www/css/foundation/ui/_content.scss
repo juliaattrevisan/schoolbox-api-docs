@@ -866,15 +866,6 @@ $selector-width: 2.25rem;
 		input[type=checkbox]:not(.plain)+label.checkbox-label {
 			margin-top: 0.5rem;
 		}
-		/**
-		 * Foundation kills margin-bottom on ul li ul
-		 * Restore it to normal for lists inside information & action lists
-		 */
-		ul:not(.information-list),
-		ol {
-			margin-#{$default-float}: $list-side-margin;
-			margin-bottom: $list-margin-bottom;
-		}
 	}
 	form {
 		margin: 0;
@@ -1582,6 +1573,17 @@ article {
   	@extend .clearfix;
 }
 
+/**
+ * Foundation kills margins on lists inside lists (ul li ul)
+ * We have cases where an article lives in a <li>, which then has ul's (e.g. forum)
+ * Remove the foundation margin kills in that situation
+ */
+li article ul,
+li article ol {
+	margin-#{$default-float}: $list-side-margin;
+	margin-bottom: $list-margin-bottom;
+}
+
 .wait-overlay {
 	position: absolute;
 	top: 0;
@@ -1600,4 +1602,3 @@ article {
 		}
 	}
 }
-
