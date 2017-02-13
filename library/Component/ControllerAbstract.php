@@ -513,7 +513,7 @@ abstract class Component_ControllerAbstract
                 if (!strlen($params['value'])) {
                     $componentname = $this->getComponentName();
                 } else {
-                    $componentname = $params['value'];
+                    $componentname = Scrub::text($params['value']);
                 }
 
                 $this->sitepage->setVar(array(
