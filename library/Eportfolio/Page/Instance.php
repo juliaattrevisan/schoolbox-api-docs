@@ -101,7 +101,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             'HEADING' => Scrub::text($this->getUserName()),
             'ID' => $this->getUserId(),
             'USER_TOKEN' => $_SESSION['key'],
-            'PAGE_TITLE' => $this->getEportfolioHandler()->getSettingsPageTitle(),
+            'PAGE_TITLE' => Scrub::text($this->getEportfolioHandler()->getSettingsPageTitle()),
             'PAGE_ID' => $this->getEportfolioHandler()->getSettingsPageId(),
         ));
 
