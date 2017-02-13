@@ -35,9 +35,9 @@ $getAttempt = function ($attemptId) use ($attemptHandler, $assessHandler, $group
         throw new NotFound();
     }
 
-    $assess = $attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
+    $assess = $assessHandler->getByID($attempt['assess_id']);
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
         throw Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
     }
 
