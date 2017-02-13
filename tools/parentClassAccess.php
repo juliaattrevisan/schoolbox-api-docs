@@ -33,18 +33,15 @@ if (!file_exists($options['f'])) {
 $loadStudents = isset($options['students']);
 
 /**
+ * @param UserMapper $userMapper
+ * @param UserAccessMapper $userAccessMapper
+ * @param Logger $log
  * @param int $externalId
  * @param string $role
  * @param int $folderId
  */
-function loadUserAccess($externalId, $role, $folderId)
+function loadUserAccess($userMapper, $userAccessMapper, $log, $externalId, $role, $folderId)
 {
-    // TODO: Apologize profusely...
-
-    global $userMapper;
-    global $userAccessMapper;
-    global $log;
-
     // This would typically happen for a non-existent spouse, just do nothing in this case
 
     if (empty($externalId)) {
@@ -158,15 +155,15 @@ foreach ($classes as $folderId => $codes) {
 
             if (is_array($students)) {
                 foreach ($students as $student) {
-                    loadUserAccess($student['synergy_id'], Role::STUDENT, $folderId);
+                    loadUserAccess($userMapper, $userAccessMapper, $log, $student['synergy_id'], Role::STUDENT, $folderId);
                 }
             }
         }
 
         if (is_array($parents)) {
             foreach ($parents as $parent) {
-                loadUserAccess($parent['StudentContactID'], Role::PARENT, $folderId);
-                loadUserAccess($parent['StudentContactSpouseID'], Role::PARENT, $folderId);
+                loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactID'], Role::PARENT, $folderId);
+                loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactSpouseID'], Role::PARENT, $folderId);
             }
         }
     }
