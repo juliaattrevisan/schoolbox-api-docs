@@ -606,11 +606,13 @@
                 },
 
                 viewRender: function() {
-                    // Only if the calendar view has changed
                     var currentView = calendar.fullCalendar('getView');
+                    var isTermView  = (currentView.type == 'timelineTerm');
+
+                    // Only if the calendar view has changed
                     if (previousView.type != currentView.type) {
                         // Timeline term view: skip back to the first day of the 6-month cycle
-                        if (currentView.type == 'timelineTerm') {
+                        if (isTermView) {
                             var date = calendar.fullCalendar('getDate').clone().date(1);
                             if (date.month() <= 6) {
                                 // Moment months start at 0 :/
@@ -624,6 +626,50 @@
                         pushCurrentCalendarState();
                     }
                     previousView = currentView;
+
+                    // Re-render the weeks bar
+                    // First: starts on start of span, until Sunday
+                    // Each one after: renders Monday
+                    if (isTermView) {
+                        var now         = moment();
+                        var anotherDate = currentView.start.clone();
+                        var datePiles   = {};
+                        while (anotherDate.isBefore(currentView.end)) {
+                            // Rewind to Monday
+                            var key = anotherDate.clone().startOf('week').format('YYYY-MM-DD');
+                            if (!(key in datePiles)) {
+                                datePiles[key] = [];
+                            }
+                            datePiles[key].push(anotherDate);
+                            anotherDate = anotherDate.clone().add({days: 1});
+                        }
+
+                        var columns = $();
+                        $.each(datePiles, function(i, v) {
+                            var firstDate = v[0];
+                            var head = $('<th class="fc-widget-header" />')
+                                .attr('data-date', firstDate.format('YYYY-MM-DD'))
+                                .attr('colspan', v.length)
+                                .addClass('fc-'+firstDate.format('ddd').toLowerCase());
+
+                            if (firstDate.isBefore(now)) {
+                                head.addClass('fc-past');
+
+                            } else if (firstDate.isAfter(now)) {
+                                head.addClass('fc-future');
+
+                            } else {
+                                head.addClass('fc-today');
+                            }
+
+                            // Contents
+                            var content = $('<span class="fc-cell-text" />')
+                                .text(firstDate.format('dd D'));
+                            head.append($('<div class="fc-cell-content">').append(content));
+                            columns = columns.add(head);
+                        });
+                        calendar.find('.fc-chrono').empty().append(columns);
+                    }
                 },
 
                 eventResize: updateAssessment,
