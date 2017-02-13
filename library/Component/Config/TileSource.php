@@ -37,7 +37,7 @@ class Component_Config_TileSource extends Component_Config_Abstract
                 $configs = $component->getConfigArray();
                 $page->setVar(
                     array(
-                        'COMPONENT_CONFIG_TILESELECT_NAME'     => $configs['componentname']['value'],
+                        'COMPONENT_CONFIG_TILESELECT_NAME'     => Scrub::text($configs['componentname']['value']),
                         'COMPONENT_CONFIG_TILESELECT_VALUE'    => $component->getId(),
                         'COMPONENT_CONFIG_TILESELECT_SELECTED' => $component->getId() == $configValue
                             ? 'selected' : '',
