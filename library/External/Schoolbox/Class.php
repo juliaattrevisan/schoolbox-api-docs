@@ -64,7 +64,7 @@ class External_Schoolbox_Class implements External_ClassInterface {
 			SELECT u.id, u.synergy_id, u.title, u.firstname, u.lastname, u.year, u.house
 			FROM class c
 			LEFT JOIN class_period cp ON c.id = cp.class_id
-			LEFT JOIN user u ON u.id = cp.teacher_id
+			INNER JOIN user u ON u.id = cp.teacher_id
 			WHERE c.code IN ({$this->getCodeParams($codes)})
 			ORDER BY u.lastname, u.firstname
 		");
