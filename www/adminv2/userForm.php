@@ -12,9 +12,9 @@ if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 
-/* Update existing user details
+/* Update or delete existing user details
  */
-if (is_numeric($_POST['userID']) && $_POST['modusername']) {
+if (is_numeric($_POST['userID'])) {
     try {
         $user = $userMapper->findById($_POST['userID']);
     } catch (\Schoolbox\Mapper\Exception $e) {
@@ -24,7 +24,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
     if ($_POST['type'] == 'delete') {
         $userMapper->delete($user);
         SitePage::localRedir('/adminv2/user/');
-    } else {
+    } elseif ($_POST['modusername']) {
         // Username check - if any other user has this username, abort
         foreach ($userMapper->findByColumn('username', $_POST['modusername']) as $userWithUsername) {
             if ($userWithUsername->getId() !=  $user->getId()) {
