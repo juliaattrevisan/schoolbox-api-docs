@@ -232,7 +232,7 @@ class Bootstrap extends AbstractBootstrap {
 
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
             if (
-                (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR))
+                (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
                 || $e instanceof \Exception
             ) {
                 // RedisException extends RuntimeException: occurs when Redis
