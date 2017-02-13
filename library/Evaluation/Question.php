@@ -294,9 +294,11 @@ abstract class Evaluation_Question extends DeprecatedModel
 
     /**
      * @param Evaluation_Section $sectionHandler
+     * @return static
      */
     public function setSectionHandler(Evaluation_Section $sectionHandler)
     {
         $this->sectionHandler = $sectionHandler;
+        return $this;
     }
 }
