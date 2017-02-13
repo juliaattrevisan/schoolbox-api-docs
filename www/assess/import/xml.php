@@ -11,7 +11,7 @@
  */
 
 
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
 $folderId = $this->arg[0];
 $contextType = $_POST['context_type'];
