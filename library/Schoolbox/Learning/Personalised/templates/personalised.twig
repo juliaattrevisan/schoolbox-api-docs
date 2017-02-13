@@ -138,6 +138,7 @@
 
 {# FullCalendar setup #}
 
+{% autoescape 'js' %}
 <script type="text/javascript">
     // Do stuff here
     $(function() {
@@ -271,7 +272,7 @@
 
             calEvent.className.push('loading');
             var post = $.post(
-                '{{ routeLookup('learningPersonalised.postUpdateParticipation', {studentId: student.id})|e('js') }}',
+                '{{ routeLookup('learningPersonalised.postUpdateParticipation', {studentId: student.id}) }}',
                 data,
                 null,
                 'json'
@@ -425,8 +426,8 @@
                 },
                 height: 'auto',
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
-                firstDay: Number({{ config.calendar_start_day }}),
-                schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
+                firstDay: Number('{{ config.calendar_start_day }}'),
+                schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
                 defaultView: calendarParams.view,
                 header: {
                     left: 'prevWindow,today,nextWindow',
@@ -436,7 +437,7 @@
                 events: function(start, end, timezone, callback) {
                     $.ajax({
                         dataType: 'json',
-                        url:      '{{ routeLookup('learningPersonalised.getCalendarForStudent', {studentId: student.id})|e('js') }}',
+                        url:      '{{ routeLookup('learningPersonalised.getCalendarForStudent', {studentId: student.id}) }}',
                         data: {
                             start: Calendar.reOffsetTimestamp(start.unix()),
                             end:   Calendar.reOffsetTimestamp(end.unix())
@@ -630,7 +631,7 @@
                 // Does FC support nested groups?
                 resources: {
                     dataType: 'json',
-                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id})|e('js') }}'
+                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}'
                 },
                 resourceOrder: 'folderTitle',
                 resourceColumns: [{
@@ -707,3 +708,4 @@
         }).init();
     });
 </script>
+{% endautoescape %}
