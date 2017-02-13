@@ -218,7 +218,7 @@
                                         <ul class="information-list">
                                             {% for activity in indicator.activities %}
                                             <li>
-                                                {%- set activityHref = routeLookupIfAuthorized('learningAssessment.getSummary', { assessmentId: activity.id, studentId: student.id, assessment: activity }) ~ returnUrlSuffix -%}
+                                                {%- set activityHref = routeLookupIfAuthorized('learningAssessment.getSummary', { assessmentId: activity.id, studentId: student.id, student: student, assessment: activity }) ~ returnUrlSuffix -%}
                                                 {%- if activityHref -%}
                                                 <a href="{{ activityHref }}">{{ activity.name }}</a>
                                                 {%- else -%}
