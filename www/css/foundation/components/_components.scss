@@ -349,7 +349,7 @@ ul.tileList {
 }
 
 // Chat message border and padding
-.chat-messages .spaced:nth-child(n+4){
+.chat-messages .spaced:nth-of-type(n+2) {
     border-top: 1px solid $body-bg;
     padding-top: 0.45rem;
 }
