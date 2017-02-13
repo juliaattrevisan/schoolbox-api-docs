@@ -813,7 +813,7 @@ class Mapper extends BaseMapper
                 // Broken assessment - not much I can do besides ignore
                 continue;
             }
-            if ($submodel instanceof SubmissionBox || $submodel instanceof Project) {
+            if ($submodel instanceof SubmissionBox || $submodel instanceof ProjectModel) {
                 $submodel->setGradeGroup(
                     $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
                 );
