@@ -273,7 +273,7 @@ if(typeof window.location.origin == 'undefined') {
      */
     ResourceAttach.prototype.rejectFile = function (file, errMsg) {
         var data, element, t,
-            errList = $(this.element).children('.az-error-list');
+            errList = $(this.element).find('.az-error-list');
 
         if (typeof errMsg == 'string') {
             try {
@@ -289,9 +289,9 @@ if(typeof window.location.origin == 'undefined') {
 
         element.appendTo(errList);
 
-        element.children('.dz-progress, input').detach();
-        t = element.children('[data-dz-name]').text();
-        element.children('[data-dz-name]').text(t + ' failed: ' + data).attr('title', data);
+        element.find('.dz-progress, input').detach();
+        t = element.find('[data-dz-name]').text();
+        element.find('[data-dz-name]').text(t + ' failed: ' + data).attr('title', data);
 
         if (this.dropzone) {
             this.dropzone.removeFile(file);

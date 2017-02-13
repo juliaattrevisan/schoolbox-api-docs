@@ -447,6 +447,9 @@ class Controller extends Assessment\Controller
 
         /* Pump into twig land
          */
+        // For some reason I can't use get/setFlash?
+        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
+        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
@@ -455,7 +458,8 @@ class Controller extends Assessment\Controller
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
-            'policy'         => $this->getConfigLoader()->get('lms_student_policy')
+            'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
+            'errorMessage'   => $errorMessage,
         ]));
     }
 
@@ -551,7 +555,36 @@ class Controller extends Assessment\Controller
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();
         if (!empty($rq->post['attachment'])) {
-            foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
+
+            // Validate attachment list can actually be built
+            try {
+                $attachments = $factory->build($rq->post['attachment'])->getAll();
+
+            } catch (\InvalidArgumentException $e) {
+                $errorMessage = 'One or more files were not able to be attached';
+                if ($this->getRequest()->isXhr()) {
+                    $result['success'] = false;
+                    $result['message'] = $errorMessage;
+
+                    $rs->status->setCode(403);
+                    $rs->content->set($this->buildJsonOutput($result));
+                } else {
+                    // Show some error message?
+                    $this->getSession()->getSegment(static::class)->set('errorMessage', $errorMessage);
+                    $rs->redirect->to(
+                        $this->getRouter()->generate(
+                            'learningAssessment.getCreateResponseForm',
+                            [
+                                'assessmentId' => $assessment->getId(),
+                                'studentId'    => $participant->getUser()->getId(),
+                            ]
+                        )
+                    );
+                }
+                return;
+            }
+
+            foreach ($attachments as $attachment) {
 
                 /* Don't stack the online-submission.html file here, it should never
                  * appear in the attached files list at all (it should always be
