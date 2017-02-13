@@ -12,6 +12,7 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 
@@ -30,7 +31,6 @@ $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
-
 if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
     $this->pageNotFound();
 }
@@ -51,8 +51,8 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
  * online assessments unless you are a part of that category.
  */
 $assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
-if (!$assessment->isParticipant($_SESSION['user'])) {
-    error(19);
+if (!$assessment->isParticipant($_SESSION['user']) && $groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE) {
+        error(19);
 }
 
 /* Check if this assessment can be started
@@ -64,7 +64,7 @@ if ($assessHandler->isExpired($assess['assess_id'])) {
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(143);
 }
 

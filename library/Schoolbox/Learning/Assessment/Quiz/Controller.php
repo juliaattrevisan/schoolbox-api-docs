@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -192,7 +193,10 @@ class Controller extends Assessment\Controller
     {
         $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
 
-        if ($sessionUser->getId() == $participantUser->getId()) {
+        $userPermission = $this->getAccess()->getFolderAccess($this->getUser(), [$assessment->getBaseContext()->getFolder()->getId()]);
+
+        // A user with write permission will be redirected to attempts, even he has completed the quiz
+        if ($sessionUser->getId() == $participantUser->getId() && $userPermission < UserAccess::ACCESS_WRITE) {
             // this is the special case: redirect to intro
             $this->getResponse()->redirect->afterPost(
                 $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
