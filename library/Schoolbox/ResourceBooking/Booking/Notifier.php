@@ -120,7 +120,7 @@ class Notifier extends AbstractModuleNotifier
      * @return Envelope
      * @throws \InvalidArgumentException if $event type isn't recognised
      */
-    protected function buildMessenger(Model $object, User $user, $event)
+    protected function buildEnvelope(Model $object, User $user, $event)
     {
         // Ensure that object is hydrated. Why does this happen?
         /** @var Model $object */
@@ -236,7 +236,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffCreated(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'created');
+        return $this->buildEnvelope($object, $user, 'created');
     }
 
 
@@ -248,7 +248,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffUpdated(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'updated');
+        return $this->buildEnvelope($object, $user, 'updated');
     }
 
 
@@ -260,7 +260,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffApproved(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'approved');
+        return $this->buildEnvelope($object, $user, 'approved');
     }
 
 
@@ -272,7 +272,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffPending(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'pending');
+        return $this->buildEnvelope($object, $user, 'pending');
     }
 
 
@@ -284,7 +284,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffRejected(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'rejected');
+        return $this->buildEnvelope($object, $user, 'rejected');
     }
 
 
@@ -296,7 +296,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentCreated(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'created');
+        return $this->buildEnvelope($object, $user, 'created');
     }
 
 
@@ -308,7 +308,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentUpdated(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'updated');
+        return $this->buildEnvelope($object, $user, 'updated');
     }
 
 
@@ -320,7 +320,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentApproved(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'approved');
+        return $this->buildEnvelope($object, $user, 'approved');
     }
 
 
@@ -332,7 +332,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentPending(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'pending');
+        return $this->buildEnvelope($object, $user, 'pending');
     }
 
 
@@ -344,7 +344,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentRejected(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'rejected');
+        return $this->buildEnvelope($object, $user, 'rejected');
     }
 
 
@@ -356,7 +356,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentCreated(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'created');
+        return $this->buildEnvelope($object, $user, 'created');
     }
 
 
@@ -368,7 +368,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentUpdated(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'updated');
+        return $this->buildEnvelope($object, $user, 'updated');
     }
 
 
@@ -380,7 +380,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentApproved(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'approved');
+        return $this->buildEnvelope($object, $user, 'approved');
     }
 
 
@@ -392,7 +392,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentPending(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'pending');
+        return $this->buildEnvelope($object, $user, 'pending');
     }
 
 
@@ -404,7 +404,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentRejected(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'rejected');
+        return $this->buildEnvelope($object, $user, 'rejected');
     }
 
 
@@ -416,6 +416,6 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffCancelled(Model $object, User $user /*, $diff*/)
     {
-        return $this->buildMessenger($object, $user, 'cancelled');
+        return $this->buildEnvelope($object, $user, 'cancelled');
     }
 }
