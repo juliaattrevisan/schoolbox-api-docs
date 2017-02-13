@@ -627,7 +627,7 @@
                         var datePiles   = {};
                         while (anotherDate.isBefore(currentView.end)) {
                             // Rewind to Monday
-                            var key = anotherDate.clone().startOf('week').format('YYYY-MM-DD');
+                            var key = anotherDate.clone().startOf('isoWeek').format('YYYY-MM-DD');
                             if (!(key in datePiles)) {
                                 datePiles[key] = [];
                             }
