@@ -20,77 +20,89 @@
 
 {% set indef = (assessmentType == 'dueWork' ? '' : 'a ') %}
 
-{% if assessables is empty %}
 
-    <div class="empty-state">
-        <i class="{{ icon }}"></i>
+<div id="assessment-empty-state-{{ component_id }}" class="empty-state {% if assessables is not empty %}hide{% endif %}">
+    <i class="{{ icon }}"></i>
 
-        {% if readOnly %}
+    {% if readOnly %}
 
-            <p>{{ studentMessage }}</p>
-            <p><a href="/learning/grades/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a>.</p>
-        {% else %}
+        <p>{{ studentMessage }}</p>
+        <p><a href="/learning/grades/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a>.</p>
 
-            <p><a href="{{ createRouteType }}">Create {{ indef }}{{ typeLabel | lower }}</a> that is not a part of your course {{ teacherMessage }}.</p>
+    {% else %}
 
-        {% endif %}
+        <p><a href="{{ createRouteType }}">Create {{ indef }}{{ typeLabel | lower }}</a> that is not a part of your course {{ teacherMessage }}.</p>
 
-    </div>
-
-{% else %}
-
-<section>
-    <ul class="action-list">
-        {% for assessable in assessables %}
-
-            {% block listItem %}
-                {% include '@learningAssessment/componentListItem.twig' with {extraNavItemCount: 0} %}
-            {% endblock %}
-
-        {% endfor %}
-    </ul>
-    {% if createRoute %}
-    <div class="component-action">
-        <section>
-                <a href="{{ createRouteType }}" class="button">Create {{ typeLabel }}</a>
-        </section>
-    </div>
     {% endif %}
-</section>
 
-<div class="toast" data-assessment-toast></div>
+</div>
 
-<script type="text/javascript">
-    $(function () {
-        $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
-            event.preventDefault();
 
-            var $item = $(this).closest('[data-assessment]');
-            var itemName = $item.find('[data-assessment-title]').text();
+{% if assessables is not empty %}
+    <section id="assessment-section-{{ component_id }}">
+        <ul id="assessment-list-{{ component_id }}" class="action-list">
+            {% for assessable in assessables %}
 
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete ' + itemName + '?',
-                confirmLabel: 'Yes, delete it',
-                cancelLabel: 'No, keep it',
-                confirmEvent: function (anchor) {
+                {% block listItem %}
+                    {% include '@learningAssessment/componentListItem.twig' with {extraNavItemCount: 0} %}
+                {% endblock %}
 
-                    var $toast = $('div[data-assessment-toast]');
-                    $toast.toastActivate({text: 'Deleting {{ typeLabel|lower }}...'});
+            {% endfor %}
+        </ul>
+        {% if createRoute %}
+        <div class="component-action">
+            <section>
+                    <a href="{{ createRouteType }}" class="button">Create {{ typeLabel }}</a>
+            </section>
+        </div>
+        {% endif %}
+    </section>
 
-                    $.post(anchor.attr('href'))
-                    .success(function () {
-                        $toast.toastTimeout({text: '{{ typeLabel|lower|capitalize  }} deleted.', css: 'success'});
-                        $item.fadeOut({ done: $item.remove });
-                    })
-                    .error(function() {
-                        $toast.toastTimeout({text: 'Deletion failed!', css: 'alert'});
-                    });
-                }
+    <div class="toast" data-assessment-toast="{{ component_id }}"></div>
+
+    <script type="text/javascript">
+        $(function () {
+            $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
+                event.preventDefault();
+
+                var assessmentList = $('#assessment-list-{{ component_id }}'),
+                    assessmentId = $(this).data('id'),
+                    assessmentListItem = $('#component-assessment-' + assessmentId),
+                    assessmentName = assessmentListItem.data('assessment-title');
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete ' + assessmentName + '?',
+                    confirmLabel: 'Yes, delete it',
+                    cancelLabel: 'No, keep it',
+                    confirmEvent: function (anchor) {
+
+                        var toast = $('div[data-assessment-toast={{ component_id }}]');
+                        toast.toastActivate({text: 'Deleting ' + assessmentName + '...'});
+
+                        $.post(anchor.attr('href'))
+                        .done(function () {
+                            toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
+                            assessmentListItem.fadeOut({
+                                done: function() {
+                                    assessmentListItem.remove();
+
+                                    {# Respawn empty state if that was the last one #}
+                                    if (assessmentList.find('li').length == 0) {
+                                        $('#assessment-section-{{ component_id }}').remove();
+                                        $('#assessment-empty-state-{{ component_id }}').removeClass('hide');
+                                    }
+                                }
+                            });
+
+                        })
+                        .fail(function() {
+                            toast.toastTimeout({text: 'Could not delete ' + assessmentName + '.', css: 'alert'});
+                        });
+                    }
+                });
             });
-        });
-    })
-</script>
-
+        })
+    </script>
 {% endif %}
 
 {% block scripts %}
