@@ -18,7 +18,6 @@ use InvalidArgumentException;
 use PhpAmqpLib\Connection\AMQPConnection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Message\External\TargetedConverter;
 
 class Connector extends AMQPConnector {
 
@@ -106,14 +105,7 @@ class Connector extends AMQPConnector {
 				$instance = Instance::jsonUnserialize($data['message']);
 			}
 			catch(InvalidArgumentException $e) {
-				// TODO once TargetedMessage has been fully deprecated, this catch can be removed
-				$conv = new TargetedConverter();
-				try {
-					$instance = $conv->convert($data['message']);
-				}
-				catch(InvalidArgumentException $e) {
-					// that just failed completely
-				}
+                // noop
 			}
 			if($instance instanceof Instance) {
 				return $instance->getBaseHash();
