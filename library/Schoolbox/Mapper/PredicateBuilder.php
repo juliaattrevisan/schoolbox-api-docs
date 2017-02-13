@@ -210,6 +210,49 @@ class PredicateBuilder
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
     }
 
+    /**
+     * Adds predicates for checking if this value is between two values.
+     *
+     * @param string $columnName
+     * @param mixed  $from If null, this value is excluded.
+     * @param mixed  $to   If null, this value is excluded.
+     * @return PredicateBuilder
+     */
+    public function between($columnName, $from, $to)
+    {
+        // Either is null: ignore
+        if (isset($from)) {
+            $this->addPredicate($columnName, $from, self::OPERATOR_GTE);
+        }
+        if (isset($to)) {
+            $this->addPredicate($columnName, $to, self::OPERATOR_LTE);
+        }
+        return $this;
+    }
+
+    /**
+     * Adds predicates for checking if this value is between two dates.
+     *
+     * @param string               $columnName
+     * @param \Alaress_Date_Format $from If null, this value is excluded.
+     * @param \Alaress_Date_Format $to   If null, this value is excluded.
+     * @param string               $compareFormat
+     * @return PredicateBuilder
+     */
+    public function betweenDates(
+        $columnName,
+        \Alaress_Date_Format $from = null,
+        \Alaress_Date_Format $to = null,
+        $compareFormat = \Alaress_Date_Format::DATABASE_FORMAT
+    ) {
+        if (isset($from) && !$from->isNull()) {
+            $this->addPredicate($columnName, $from->getUsingFormat($compareFormat), self::OPERATOR_GTE);
+        }
+        if (isset($to) && !$to->isNull()) {
+            $this->addPredicate($columnName, $to->getUsingFormat($compareFormat), self::OPERATOR_LTE);
+        }
+        return $this;
+    }
 
     /**
      * @param string $columnName

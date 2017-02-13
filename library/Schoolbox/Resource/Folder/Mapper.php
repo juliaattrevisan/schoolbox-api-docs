@@ -1638,6 +1638,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
 
+        $whereParams = [
+            ':studentId' => $student->getId(),
+        ];
+        $whereParams += $this->buildWhereParamsForTerm($term);
+
         $query = "
             SELECT
                 {$this->getColumnString('c')},
@@ -1663,19 +1668,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               LEFT JOIN `assess_attempt` AS `qa` ON `q`.`assess_id` = `qa`.`assess_id`
               LEFT JOIN `student_submission` AS `ss` ON `ss`.`box_id` = `d`.id
               WHERE 
-                (`tc`.`student_id` = :studentId OR `ss`.`owner` = :studentId OR `qa`.`user_id` = :studentId) AND
-                (`a`.`due_date` BETWEEN :startDate AND :endDate)
+                (`tc`.`student_id` = :studentId OR `ss`.`owner` = :studentId OR `qa`.`user_id` = :studentId)
+                {$this->buildWherePartForTerm($term)}
             )
             ORDER BY c.name
         ";
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute([
-            ':studentId' => $student->getId(),
-            ':startDate' => $term->getStart(),
-            ':endDate' => $term->getActualFinish()
-        ]);
+        $statement->execute($whereParams);
 
         $collection = new Collection();
         $category = null;
@@ -1719,12 +1720,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ':userId' => $student->getId(),
         ];
 
-        if($term instanceof Term){
-            $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
-            $whereParams = array_merge($whereParams, [
-                ':startDate' => $term->getStart(),
-                ':endDate' => $term->getActualFinish()->isNull() ? \Alaress_Date_Format::now() : $term->getActualFinish() ,
-            ]);
+        if ($term instanceof Term) {
+            $whereClause .= $this->buildWherePartForTerm($term);
+            $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
         return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
@@ -1751,12 +1749,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ':userId' => $teacher->getId(),
         ];
 
-        if($term instanceof Term){
-            $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
-            $whereParams = array_merge($whereParams, [
-                ':startDate' => $term->getStart(),
-                ':endDate' => $term->getActualFinish()->isNull() ? \Alaress_Date_Format::now() : $term->getActualFinish() ,
-            ]);
+        if ($term instanceof Term) {
+            $whereClause .= $this->buildWherePartForTerm($term);
+            $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
         return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
@@ -1866,5 +1861,41 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function getAncestry()
     {
         return $this->ancestry;
+    }
+
+    /**
+     * Builds a where part for a term.
+     *
+     * TODO replace with predicate builder
+     *
+     * @param Term $term
+     * @return string
+     */
+    private function buildWherePartForTerm(Term $term)
+    {
+        if ($term->getActualFinish()->isNull()) {
+            return "\nAND (`a`.`due_date` >= :startDate)";
+        } else {
+            return "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
+        }
+    }
+
+    /**
+     * Builds where params for a term.
+     *
+     * TODO replace with predicate builder
+     *
+     * @param Term $term
+     * @return array
+     */
+    private function buildWhereParamsForTerm(Term $term)
+    {
+        $whereParams = [
+            ':startDate' => $term->getStart(),
+        ];
+        if (!$term->getActualFinish()->isNull()) {
+            $whereParams[':endDate'] = $term->getActualFinish();
+        }
+        return $whereParams;
     }
 }
