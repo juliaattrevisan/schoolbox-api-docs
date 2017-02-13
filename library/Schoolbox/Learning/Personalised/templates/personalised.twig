@@ -394,6 +394,15 @@
             }
         });
 
+        // Custom view for grids
+        $.fullCalendar.views.customTimeline = $.fullCalendar.views.timeline.resourceClass.extend({
+            instantiateGrid: function() {
+                // Override the grid view
+                return $.fullCalendar.views.timeline.resourceClass.prototype.instantiateGrid.apply(this, arguments);
+                // Have the grid view build headers starting from Monday?
+            }
+        });
+
         var c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
                 enabled: false,
@@ -405,7 +414,7 @@
                 defaultDate: calendarParams.date,
                 views: {
                     timelineTerm: {
-                        type: 'timeline',
+                        type: 'customTimeline',
                         duration: { months: 6 },
                         slotDuration: { days: 1 },
                         slotLabelFormat: { weeks: 1 },
@@ -413,12 +422,12 @@
                         buttonText: 'Semester'
                     },
                     timelineTwoMonth: {
-                        type: 'timeline',
+                        type: 'customTimeline',
                         duration: { months: 2 },
                         buttonText: 'Month'
                     },
                     timelineTwoWeek: {
-                        type: 'timeline',
+                        type: 'customTimeline',
                         duration: { weeks: 2 },
                         slotLabelInterval: { days: 1 },
                         buttonText: 'Week'
