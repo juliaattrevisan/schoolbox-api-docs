@@ -2,7 +2,8 @@
  # @learningAssessment/task/progressTickForm.twig
  #
  # Params:
- # * participant: The participant object
+ # * participant: Participant       - The participant object
+ # * disabled:    bool              - whether the viewee cannot change the task's marking state
  #}
 
 {% set mostRecentResponse = participant.findMostRecentResponse %}
@@ -13,19 +14,19 @@
     {% if mostRecentResponse.isMarkedAsCompleted %}
         <a href="#"
            disabled
-           class="no-text progress-tick complete"
+           class="no-text progress-tick complete{% if disabled %} disabled{% endif %}"
            title="Completed"
            data-progress-tick-status="complete"></a>
     {% elseif mostRecentResponse.isMarkedAsSelfAssessed %}
         <a href="#"
            disabled
-           class="no-text progress-tick pending"
+           class="no-text progress-tick pending{% if disabled %} disabled{% endif %}"
            title="Self-assessed"
            data-progress-tick-status="selfAssessed"></a>
     {% else %}
         <a href="#"
            disabled
-           class="no-text progress-tick"
+           class="no-text progress-tick{% if disabled %} disabled{% endif %}"
            title="Not attempted"
            data-progress-tick-status="notAttempted"></a>
     {% endif %}
