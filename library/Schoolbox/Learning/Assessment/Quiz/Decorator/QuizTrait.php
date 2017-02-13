@@ -95,9 +95,11 @@ trait QuizTrait
 
     /**
      * @param string $completionMessage
+     * @return static
      */
     public function setCompletionMessage($completionMessage)
     {
         $this->completionMessage = $completionMessage;
+        return $this;
     }
 }
