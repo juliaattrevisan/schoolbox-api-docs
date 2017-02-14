@@ -9,26 +9,27 @@
 
 namespace Schoolbox\L10n;
 
-
-use ArrayObject;
 use OutOfBoundsException;
 
 class RosettaStone
 {
-    /** @var Term[] */
+    /** @var Model[] */
     protected $dictionary;
 
-
     /**
-     * @param array|ArrayObject $dictionary
+     * RosettaStone constructor.
+     * RosettaStone constructor.
+     * @param Mapper $l10nMapper
      */
-    public function __construct($dictionary)
+    public function __construct($l10nMapper)
     {
-        foreach ($dictionary as $term => $data) {
-            $this->dictionary[$term] = new Term($data['singular'], $data['plural'], $data['capitalise']);
+        $terms = $l10nMapper->findAll();
+
+        /** @var Model $term */
+        foreach ($terms as $term) {
+            $this->dictionary[$term->getTerm()] = $term;
         }
     }
-
 
     /**
      * @param string $term
@@ -41,7 +42,6 @@ class RosettaStone
         return $this->__get($term)->translate($plural, $capital);
     }
 
-
     /**
      * @return array
      */
@@ -50,28 +50,32 @@ class RosettaStone
         return array_keys($this->dictionary);
     }
 
-
     /**
      * This is for Twig access to translated words.
      * Example usages:
-     *   {{ l10n.news }} to return 'news'
-     *   {{ l10n.news.proper }} to return 'News'
-     *   {{ l10n.calendar.plural }} to return 'calendars'
-     *   {{ l10n.resource.properPlural }} to return 'Resources'
+     *   {{ locale.news }} to return 'news'
+     *   {{ locale.news.proper }} to return 'News'
+     *   {{ locale.calendar.plural }} to return 'calendars'
+     *   {{ locale.resource.properPlural }} to return 'Resources'
      *
      * @param $term string
-     * @return Term
-     * @link http://php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.members
+     * @return Model
      */
-    function __get($term)
+    public function __get($term)
     {
-        if (array_key_exists($term, $this->dictionary)) {
-            return $this->dictionary[$term];
+        if (!$this->__isset($term)) {
+            throw new OutOfBoundsException(sprintf('Term "%s" not in localisation table', $term), E_USER_WARNING);
         }
 
-        throw new OutOfBoundsException(sprintf('Term "%s" not in localisation table', $term), E_USER_WARNING);
-
+        return $this->dictionary[$term];
     }
 
-
+    /**
+     * @param string $term
+     * @return bool
+     */
+    public function __isset($term)
+    {
+        return array_key_exists($term, $this->dictionary);
+    }
 }

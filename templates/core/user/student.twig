@@ -235,7 +235,7 @@
                                 {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
                                     <li>
                                         <a href="/learning/grades/{{ user.getId() }}"
-                                           class="icon-tick">Grades</a>
+                                           class="icon-tick">{{ locale.grades.properPlural }}</a>
                                     </li>
                                 {% endif %}
                             {% endblock buttons_grades %}

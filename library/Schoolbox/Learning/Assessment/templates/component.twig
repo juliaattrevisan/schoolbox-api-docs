@@ -25,7 +25,7 @@
     {% if readOnly %}
 
         <p>{{ studentMessage }}</p>
-        <p><a href="/learning/grades/{{ USER.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a>.</p>
+        <p><a href="/learning/grades/{{ USER.id }}/{{ termCode }}/{{ folder.id }}">View your {{ locale.grades.plural }}</a>.</p>
 
     {% else %}
 

@@ -50,7 +50,7 @@ class Admin implements ModuleConfigInterface
         $lists = new \Schoolbox\Admin\Lists\Module($di);
         $lists->init('/adminv2/lists');
 
-        // Admin lists
+        // Eporfolio
 
         $lists = new \Schoolbox\Admin\Eportfolio\Module($di);
         $lists->init('/adminv2/eportfolio');
@@ -69,6 +69,11 @@ class Admin implements ModuleConfigInterface
 
         $courseBuilder = new \Schoolbox\Admin\CourseBuilder\Module($di);
         $courseBuilder->init('/adminv2/course-builder');
+
+        // Custom Terminology
+
+        $terminology = new \Schoolbox\Admin\Terminology\Module($di);
+        $terminology->init('/adminv2/terminology');
 
         // Admin course builder page
 

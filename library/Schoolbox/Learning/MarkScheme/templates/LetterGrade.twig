@@ -2,7 +2,7 @@
 
 {% block grading %}
     {% set humanReadableMark = participant.mostRecentHumanReadableMark %}
-    <label>Grade
+    <label>{{ locale.grades.proper }}
         <select data-mark-input name="mark" tabindex="{{ tabIndex.mark }}">
 
             {# Empty state #}
@@ -10,7 +10,7 @@
             <option value="" disabled {% if humanReadableMark is null %}selected{% endif %}>(no grade)</option>
 
             {# Grade levels #}
-            <optgroup label="Grades">
+            <optgroup label="{{ locale.grades.properPlural }}">
                 {% for level in markScheme.gradeGroup.gradeLevels %}
                     {% set selected = false %}
                     {% if not (humanReadableMark is null) and (humanReadableMark == level.caption) %}

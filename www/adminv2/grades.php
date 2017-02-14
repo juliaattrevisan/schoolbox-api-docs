@@ -26,6 +26,7 @@ $this->setBlock('submission_grade_group', 'submission_grade', 'submission_grade_
 
 // Load groups, with their grades
 $this->setVar('submission_grade_group_block', '');
+
 foreach (GradeLevel\Group\Mapper::getInstance()->findAllWithGradeLevels() as $group) {
     $this->setVar('submission_grade_block', '');
     foreach ($group->getGradeLevels() as $level) {

@@ -1,0 +1,58 @@
+{# Shared navigation menu #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+{# show each term #}
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                {% for term in terms %}
+                    {% include '@adminTerminology/listItem.twig' with {term: term} %}
+                {% endfor %}
+            </ul>
+        </section>
+
+    </div>
+</div>
+
+<div id="errorModal" class="reveal-modal" data-reveal aria-labelledby="errorModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="errorModalTitle">Error</h2>
+    <p class="alert alert-box icon-alert">Something went wrong - maybe try reloading your page and trying again?</p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<script type="text/javascript">
+    $(function(){
+
+        $('[data-collapser]').collapsable();
+
+        // Jellytot actions
+        $('#content').on('click', 'a[data-term-action]', function(event) {
+
+            event.preventDefault();
+
+            var button = $(this),
+                action = button.data('termAction'),
+                term   = button.closest('[data-term]');
+
+            button.confirmDialog({
+                confirmEvent: function(el) {
+                    // AJAX, then update DOM
+                    // Delete: remove completely
+                    $.post(el.data('postAction'))
+                            .done(function(data) {
+                                switch (action) {
+                                    case 'delete':
+                                        term.fadeOut({ done: term.remove });
+                                        break;
+                                }
+                            })
+                            .fail(function() {
+                                // ¯\_(ツ)_/¯
+                                $('#errorModal').foundation('reveal', 'open');
+                            });
+                }
+            })
+        });
+    });
+</script>

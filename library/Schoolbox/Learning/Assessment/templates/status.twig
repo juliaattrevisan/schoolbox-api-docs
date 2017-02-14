@@ -126,7 +126,7 @@
                             <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                                 {%- spaceless %}
                                     {% if pActionResponses %}
-                                        <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View and grade submission</a></li>
+                                        <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View and {{ locale.grades }} submission</a></li>
                                     {% endif %}
                                     {% if pActionSummary %}
                                         <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">Submission history</a></li>
