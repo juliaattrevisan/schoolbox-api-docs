@@ -26,7 +26,7 @@ use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
  *
  * @package Schoolbox\Permission\Access
  * @method UserAccess createModel($id = null)
- * @method UserAccess findOneByColumnList($columnList, $order = [])
+ * @method UserAccess findOneByColumnList($columnList, $order = [], $options = [])
  * @method GenericCollection|UserAccess[] findByColumnList($columnList, $order = [])
  */
 class UserAccessMapper extends Mapper
@@ -47,40 +47,10 @@ class UserAccessMapper extends Mapper
         $this->hasTable('userAccess');
         $this->hasModel(UserAccess::class);
 
-        $this->hasMap(array(
-            'column'     => 'uid',
-            'property'   => 'user',
-            'type'       => self::TYPE_MODEL,
-            'identifier' => true,
-            'join'       => 'user'
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'service',
-            'property'   => 'service',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'sid',
-            'property'   => 'serviceIdentifier',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'type',
-            'property'   => 'accessLevel',
-            'type'       => self::TYPE_INTEGER
-        ));
-
-        $this->hasJoin('user', array(
-            'mapper'    => UserMapper::class,
-            'this_key'  => 'uid',
-            'other_key' => 'id'
-        ));
-
+        $this->joins('uid', UserMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
+        $this->uses('service', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('sid', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'serviceIdentifier');
+        $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
     }
 
     /**

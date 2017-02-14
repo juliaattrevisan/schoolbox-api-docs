@@ -32,7 +32,8 @@ use Schoolbox\Learning\Assessment\Quiz\Model as AssessmentQuiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 
 class Controller extends Base
 {
@@ -86,19 +87,33 @@ class Controller extends Base
     /** @var Timetable_ColourMapper */
     private $timetableColourMapper;
 
+    /** @var CourseImplementationMapper */
+    private $courseImplementationMapper;
+
+    /** @var  \External_ClassInterface */
+    private $externalClass;
+
+    /**
+     * @var \Database
+     */
+    private $database;
+
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param FolderMapper $folderMapper
-     * @param TermMapper $termMapper
-     * @param GradeGroup $defaultGradeGroup
-     * @param ShowcaseMapper $showcaseMapper
-     * @param RubricMapper $rubricMapper
-     * @param QuizMapper $quizMapper
-     * @param QuizAttemptMapper $quizAttemptMapper
-     * @param Timetable_ColourMapper $timetableColourMapper
+     * @param ErrorMapper                $errorMapper
+     * @param AssessmentMapperProxy      $assessmentMapperProxy
+     * @param FolderMapper               $folderMapper
+     * @param TermMapper                 $termMapper
+     * @param GradeGroup                 $defaultGradeGroup
+     * @param ShowcaseMapper             $showcaseMapper
+     * @param RubricMapper               $rubricMapper
+     * @param QuizMapper                 $quizMapper
+     * @param QuizAttemptMapper          $quizAttemptMapper
+     * @param Timetable_ColourMapper     $timetableColourMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param \External_ClassInterface   $externalClass
+     * @param \Database                  $database
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -110,18 +125,24 @@ class Controller extends Base
         RubricMapper $rubricMapper,
         QuizMapper $quizMapper,
         QuizAttemptMapper $quizAttemptMapper,
-        Timetable_ColourMapper $timetableColourMapper
+        Timetable_ColourMapper $timetableColourMapper,
+        CourseImplementationMapper $courseImplementationMapper,
+        \External_ClassInterface $externalClass,
+        \Database $database
     ) {
-        $this->setErrorMapper($errorMapper);
-        $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setTermMapper($termMapper);
-        $this->setFolderMapper($folderMapper);
-        $this->setDefaultGradeGroup($defaultGradeGroup);
-        $this->setShowcaseMapper($showcaseMapper);
-        $this->setRubricMapper($rubricMapper);
-        $this->quizMapper = $quizMapper;
-        $this->quizAttemptMapper = $quizAttemptMapper;
-        $this->timetableColourMapper = $timetableColourMapper;
+        $this->errorMapper                = $errorMapper;
+        $this->assessmentMapperProxy      = $assessmentMapperProxy;
+        $this->termMapper                 = $termMapper;
+        $this->folderMapper               = $folderMapper;
+        $this->defaultGradeGroup          = $defaultGradeGroup;
+        $this->showcaseMapper             = $showcaseMapper;
+        $this->rubricMapper               = $rubricMapper;
+        $this->quizMapper                 = $quizMapper;
+        $this->quizAttemptMapper          = $quizAttemptMapper;
+        $this->timetableColourMapper      = $timetableColourMapper;
+        $this->courseImplementationMapper = $courseImplementationMapper;
+        $this->externalClass              = $externalClass;
+        $this->database                   = $database;
     }
 
     /**
@@ -180,19 +201,13 @@ class Controller extends Base
             $viewee = $this->getUser();
         }
 
-        // TODO - both this, External_Class() and all Mappers should be singletons pulled from the DI.
-        // TODO - see pattern applied to MapperFactory in Modules.
-        $externalUser = $viewee->getSubjectCollection()
-            ? null
-            : new \External_User();
-
-        $term = TermMapper::getInstance()->findForToday();
+        $term = $this->termMapper->findForToday();
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
         // Should we include tasks?
         $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
 
-        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term, $toChaseLimit, $includeTasks);
+        $factory = new PendingFactory($viewee, $this->database, $this->externalClass, $term, $toChaseLimit, $includeTasks, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
         /** @var Collection|IAssessable[] $assessmentsToMark */
@@ -309,15 +324,15 @@ class Controller extends Base
             $courseSpecs = [];
 
             // Get CourseImpls, then group by Folder
-            $courseImpls = CourseImplementation\Mapper::getInstance()->findByFolderId($folderList->getColumnValues('id'));
-            $courseImplsPerClass = $courseImpls->groupByCallback(function (CourseImplementation\Model $courseImpl) {
+            $courseImpls = $this->courseImplementationMapper->findByFolderId($folderList->getColumnValues('id'));
+            $courseImplsPerClass = $courseImpls->groupByCallback(function (CourseImplementation $courseImpl) {
                 return $courseImpl->getFolder()->getId();
             });
 
             // If a course import has unit implementations that are within the specified
             // term, add the course spec to the folder.
             /**
-             * @var CourseImplementation\Model[] $courseImpls
+             * @var CourseImplementation[] $courseImpls
              */
             foreach ($courseImplsPerClass as $folderId => $courseImpls) {
                 $courseSpecs[$folderId] = [];
