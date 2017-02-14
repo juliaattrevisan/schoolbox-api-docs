@@ -44,28 +44,13 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
      */
     public function testRelativeDayToday()
     {
-        $expected = 'Today at 2:00pm';
-
-        $now = new Alaress_Date_Format('2000-01-01 00:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
-        $eventDate = new Alaress_Date_Format('2000-01-01 14:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
-
-        $result = $eventDate->getRelativeDay(false, $now);
-
-        $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * Check lowercase works with the above
-     */
-    public function testRelativeDayTodayLowercase()
-    {
         $expected = 'today at 2:00pm';
 
         $now = new Alaress_Date_Format('2000-01-01 00:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2000-01-01 14:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
-        $result = $eventDate->getRelativeDay(true, $now);
+        $result = $eventDate->getRelativeDay($now);
+
         $this->assertEquals($expected, $result);
     }
 
@@ -77,29 +62,12 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
     {
         $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
 
-        $expected = 'Yesterday at ' . $now->getTimeOnly();
-
-        $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
-        $eventDate->addDays('-1');
-
-        $result = $eventDate->getRelativeDay(false, $now);
-        $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * Check lowercase works with the above
-     */
-    public function testRelativeDayYesterdayLowercase()
-    {
-        $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
-
         $expected = 'yesterday at ' . $now->getTimeOnly();
 
         $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
         $eventDate->addDays('-1');
 
-        $result = $eventDate->getRelativeDay(true, $now);
+        $result = $eventDate->getRelativeDay($now);
         $this->assertEquals($expected, $result);
     }
 
@@ -111,29 +79,12 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
     {
         $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
 
-        $expected = 'Tomorrow at ' . $now->getTimeOnly();
-
-        $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
-        $eventDate->addDays('1');
-
-        $result = $eventDate->getRelativeDay(false, $now);
-        $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * Check lowercase works with the above
-     */
-    public function testRelativeDayTomorrowLowercase()
-    {
-        $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
-
         $expected = 'tomorrow at ' . $now->getTimeOnly();
 
         $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
         $eventDate->addDays('1');
 
-        $result = $eventDate->getRelativeDay(true, $now);
+        $result = $eventDate->getRelativeDay($now);
         $this->assertEquals($expected, $result);
     }
 
@@ -148,7 +99,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $now = new Alaress_Date_Format('2017-02-14 12:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2017-02-08 22:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
-        $result = $eventDate->getRelativeDay(false, $now);
+        $result = $eventDate->getRelativeDay($now);
 
         $this->assertEquals($expected, $result);
     }
@@ -164,7 +115,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $now = new Alaress_Date_Format('2017-02-14 12:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2017-02-20 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
-        $result = $eventDate->getRelativeDay(false, $now);
+        $result = $eventDate->getRelativeDay($now);
 
         $this->assertEquals($expected, $result);
     }
@@ -182,7 +133,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $now = new Alaress_Date_Format('2017-02-14 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2017-02-07 23:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
-        $result = $eventDate->getRelativeDay(false, $now);
+        $result = $eventDate->getRelativeDay($now);
 
         $this->assertEquals($expected, $result);
     }
@@ -198,7 +149,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $now = new Alaress_Date_Format('2017-02-14 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2017-02-21 11:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
-        $result = $eventDate->getRelativeDay(false, $now);
+        $result = $eventDate->getRelativeDay($now);
 
         $this->assertEquals($expected, $result);
     }
@@ -214,7 +165,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $now = new Alaress_Date_Format('2000-02-02 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2000-01-01 11:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
-        $result = $eventDate->getRelativeDay(false, $now);
+        $result = $eventDate->getRelativeDay($now);
 
         $this->assertEquals($expected, $result);
     }
@@ -229,7 +180,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $now = new Alaress_Date_Format('2000-01-01 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2000-02-02 11:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
-        $result = $eventDate->getRelativeDay(false, $now);
+        $result = $eventDate->getRelativeDay($now);
 
         $this->assertEquals($expected, $result);
     }
@@ -240,12 +191,12 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
      */
     public function testRelativeDayElevenFiftyNine()
     {
-        $expected = 'Today';
+        $expected = 'today';
 
         $now = new Alaress_Date_Format('2000-01-01 00:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2000-01-01 23:59:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
-        $result = $eventDate->getRelativeDay(false, $now);
+        $result = $eventDate->getRelativeDay($now);
 
         $this->assertEquals($expected, $result);
     }
