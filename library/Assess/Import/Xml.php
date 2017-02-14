@@ -7,23 +7,32 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
 use \Schoolbox\Learning\Assessment\AssessmentContextType;
-use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
-use \Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use \Evaluation\Import\Parser\IParser;
 use Assess\Import\Parser\IParser as AssessParser;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Project;
+
+
 
 /**
  * Quiz-specific import-logic extension
  */
 class Assess_Import_Xml extends Evaluation_Import_Xml
 {
+
     /**
-     * @var AssessmentMapper
+     * @var AssessmentMapperProxy
      */
-    private $assessmentMapper;
+    private $assessmentMapperProxy;
 
     /**
      * The newly assigned assessment.id
@@ -55,7 +64,7 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
      * @param Evaluation_Factory $factory
      * @param string $data
      * @param SitePage $page
-     * @param AssessmentMapper $assessmentMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param string $contextType
      * @param int $contextId
      */
@@ -66,12 +75,12 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
         Evaluation_Factory $factory,
         $data,
         SitePage $page,
-        AssessmentMapper $assessmentMapper,
+        AssessmentMapperProxy $assessmentMapperProxy,
         $contextType,
         $contextId
     ) {
         parent::__construct($categoryId, $assessHandler, $sectionHandler, $factory, $data, $page);
-        $this->assessmentMapper = $assessmentMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->contextType = substr($contextType, 0, strlen($contextType) - 1);  // strip off trailing 's'
         $this->contextId = $contextId;
     }
@@ -111,7 +120,7 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
     /**
      * Creates the evaluation (without sections, questions or solutions)
      *
-     * Returns the newly assigned 'assess_id'
+     * Returns the newly assigned 'assess_id' (not assessment.id)
      *
      * Responsible for context-specific behaviour (the parser is not responsible for this - it knows nothing of context)
      *
@@ -120,40 +129,57 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
      */
     protected function createEvaluation(IParser $parser)
     {
+        $context = $this->getAssessmentContext();
+        $inUnitSpec = $context->getBaseContext() instanceof UnitSpec;
         $nullDate = new Alaress_Date_NullDate();
 
         // Create the IAssessable
-        $quizAssessable = $this->assessmentMapper->createModel()
-            ->setAssessmentContext(AssessmentContextType::stringToObject($this->contextType)->setId($this->contextId))
+        $quizAssessable = (new QuizAssessable())
+            ->setCreator($_SESSION['user'])
+            ->setCompletionMessage($parser->getCompletionMessage())
+            ->setDuration($parser->getDuration())
+            ->setContext($context)
             ->setTitle($parser->getTitle())
             ->setDescription($parser->getDescription())
-            ->setPublishDate(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $parser->getPublishDate())
-            ->setOpenDate(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $parser->getOpenDate())
-            ->setDueDate(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $parser->getDueDate())
-            ->setCloseDate(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $parser->getCloseDate())
+            ->setPublishAt($inUnitSpec ? $nullDate : $parser->getPublishDate())
+            ->setOpenAt($inUnitSpec ? $nullDate : $parser->getOpenDate())
+            ->setDueAt($inUnitSpec ? $nullDate : $parser->getDueDate())
+            ->setCloseAt($inUnitSpec ? $nullDate : $parser->getCloseDate())
             ->setWeight($parser->getWeight())
-            ->setDefaultOpenSpan($parser->getDefaultOpenSpan());
-
-        $this->assessmentId = $this->assessmentMapper->save($quizAssessable)[0];
-
-        $quiz = $this->getQuizMapper()->createModel()
-            ->setCategory($quizAssessable->getAssessmentContext()->getFolder())
-            ->setAssessmentModel((new Assessment())->setId($this->assessmentId))
-            ->setUser($_SESSION['user'])
-            ->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT))
-            ->setTitle($quizAssessable->getTitle())
-            ->setDescription($quizAssessable->getDescription())
-            ->setCompletionMessage($parser->getCompletionMessage())
-            ->setStart(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $quizAssessable->getPublishDate())
-            ->setFinish(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $quizAssessable->getDueDate())
-            ->setDuration($parser->getDuration())
+            ->setDefaultOpenSpan($parser->getDefaultOpenSpan())
             ->setMaxAttempts($parser->getMaxAttempts())
-            ->setWeight($quizAssessable->getWeight())
-            ->setAvailability($this->getAvailability())
             ->setMarkVisibility($parser->getMarkVisibility());
 
-        return $this->getQuizMapper()->save($quiz)[0];
+        $this->assessmentMapperProxy->save($quizAssessable);
+        $this->assessmentId = $quizAssessable->getId();
+        $this->assess_id = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $this->assessmentId)[0];
+        return $this->assess_id;
     }
+
+
+    /**
+     * Gets the data-model context
+     *
+     * @return AssessmentContext
+     */
+    protected function getAssessmentContext()
+    {
+        switch($this->contextType){
+            case AssessmentContextType::TYPE_FOLDER:
+                return FolderMapper::getInstance()->findById($this->contextId);
+            case AssessmentContextType::TYPE_UNIT_SPECIFICATION:
+                return UnitSpecMapper::getInstance()->findById($this->contextId);
+            case AssessmentContextType::TYPE_UNIT_IMPLEMENTATION:
+                return UnitImplMapper::getInstance()->findById($this->contextId);
+            case AssessmentContextType::TYPE_PROJECT:
+                /** @var Project $project */
+                $project = $this->assessmentMapperProxy->findById($this->contextId);
+                return $project;
+            default:
+                throw new DomainException('Unknown context type: ' . $this->contextType);
+        }
+    }
+
 
     /**
      * @inheritdoc

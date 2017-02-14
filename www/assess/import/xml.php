@@ -12,8 +12,8 @@
 
 
 use Aura\Router\Router;
-use Aura\Web\Response;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
 /** @var SitePage $this */
 $folderId = $this->arg[0];
@@ -32,7 +32,9 @@ if ($_FILES['importXML']['tmp_name']) {
 }
 
 SitePage::extendExecutionTime(300);
-$assessmentMapper = AssessmentMapper::getInstance();
+
+/** @var AssessmentMapperProxy $assessmentMapperProxy */
+$assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
 $import = new Assess_Import_Xml(
     $this->arg[0],
@@ -41,7 +43,7 @@ $import = new Assess_Import_Xml(
     new Assess_Factory(),
     $data,
     $this,
-    $assessmentMapper,
+    $assessmentMapperProxy,
     $contextType,
     $contextId
 );

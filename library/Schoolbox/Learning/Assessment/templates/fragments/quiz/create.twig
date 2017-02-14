@@ -10,8 +10,19 @@
         /* Description + Completion Message
          */
         $.fn.alaressEditor();
+
+        $(document).foundation();
     });
 </script>
+
+<div class="actions-small-1 row">
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content="">
+        <li><a href="#" id="import" data-reveal-id="import-modal" class="icon-upload">Import from XML file</a></li>
+    </ul>
+</div>
 
 <label>
     Title
@@ -124,3 +135,16 @@
 
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
+
+<div id="import-modal" class="reveal-modal" data-reveal="">
+    <form action="/assess/import/xml/{{ folder.id }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="context_type" value="{{ contextType }}">
+        <input type="hidden" name="context_id" value="{{ context.id }}">
+        <label>
+            <input name="importXML" type="file">
+        </label>
+        <label>
+            <input type="submit" value="Import from XML file">
+        </label>
+    </form>
+</div>

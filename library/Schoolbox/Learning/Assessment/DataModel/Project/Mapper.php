@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\Project;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
@@ -17,6 +18,8 @@ use Schoolbox\UserMapper;
  * Project Mapper
  *
  * @method Model createModel($id=null)
+ * @method Model findById($identifierValue)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {
