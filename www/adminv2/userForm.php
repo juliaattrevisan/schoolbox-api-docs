@@ -26,6 +26,8 @@ if ($_POST['modusername']) {
         $user = $userMapper->createModel();
     }
 
+    $newUser = empty($user->getId());
+
     // Username check - if any other user has this username, abort
     foreach ($userMapper->findByColumn('username', $_POST['modusername']) as $userWithUsername) {
         if ($userWithUsername->getId() != $user->getId()) {
@@ -47,6 +49,26 @@ if ($_POST['modusername']) {
     $user->getSchoolHouse()->setId($_POST['house']);
     $user->getResidentialHouse()->setId($_POST['residential_house']);
 
+    // Checkboxes of value='1' (NULL if unchecked)
+    $user->setEportfolioEnable(!empty($_POST['eportfolio']));
+    $user->setHideContacts(!empty($_POST['hide_contacts']));
+    $user->setHideTimetable(!empty($_POST['hide_timetable']));
+    $user->setLocalEmail(!empty($_POST['local_email']));
+    $user->setUseInternalMail(!empty($_POST['mail_handler']));
+    $user->setWebmail(!empty($_POST['webmail']));
+
+    // Fields that require confirmation
+    $user->setSuperuser(!empty($_POST['superuser']));
+    // Default new users enabled
+    $user->setEnabled($newUser || !empty($_POST['account_enabled']));
+
+    // Password - don't change if it's the default output value
+    if ($newUser || $_POST['modpassword'] != 'donotchange') {
+        $user
+            ->setRetrievablePassword($_POST['modpassword'])
+            ->setPassword($passwordService->hash($_POST['modpassword']));
+    }
+
     // Campuses
     $user->setCampusCollection(\Schoolbox\CampusMapper::getInstance()->createCollection());
     foreach ($_POST['campus'] as $campusId) {
@@ -58,35 +80,16 @@ if ($_POST['modusername']) {
         }
         $user->getCampusCollection()->add($campus);
     }
+
     /* Users require a campus array before they can be created successfully
      */
     if (is_array($_POST['campus']) && count($_POST['campus']) || $_POST['defaultCampus']) {
+        // Save and redirect back
         $userMapper->save($user);
+        SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
     } else {
         error(158);
     }
-
-    // Checkboxes of value='1' (NULL if unchecked)
-    $user->setEportfolioEnable(!empty($_POST['eportfolio']));
-    $user->setHideContacts(!empty($_POST['hide_contacts']));
-    $user->setHideTimetable(!empty($_POST['hide_timetable']));
-    $user->setLocalEmail(!empty($_POST['local_email']));
-    $user->setUseInternalMail(!empty($_POST['mail_handler']));
-    $user->setWebmail(!empty($_POST['webmail']));
-
-    $user->setSuperuser(isset($_POST['superuser']));
-    $user->setEnabled(isset($_POST['account_enabled']) ? $_POST['account_enabled'] : true);
-
-    // Password - don't change if it's the default output value
-    if (!$user->getId() || $_POST['modpassword'] != 'donotchange') {
-        $user
-            ->setRetrievablePassword($_POST['modpassword'])
-            ->setPassword($passwordService->hash($_POST['modpassword']));
-    }
-
-    // Save and redirect back
-    $userMapper->save($user);
-    SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
 
 } /* Delete user from group
  */
