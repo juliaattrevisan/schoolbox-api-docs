@@ -5,7 +5,6 @@
  # icon         a css class representing the assessable
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
-{% import '@learning/macro/urgency.twig' as urgency %}
 
 <ul class="meta">
     <li class="icon-calendar">{{ dueDate.dueDate(assessment, user) }}</li>
