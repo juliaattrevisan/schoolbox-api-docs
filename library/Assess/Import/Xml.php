@@ -33,7 +33,13 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
     private $assessmentId;
 
     /**
+     * One of the enumerated context types - without trailing 's'
+     *
      * @var string
+     * @see AssessmentContextType::TYPE_FOLDER
+     * @see AssessmentContextType::TYPE_PROJECT
+     * @see AssessmentContextType::TYPE_UNIT_IMPLEMENTATION
+     * @see AssessmentContextType::TYPE_UNIT_SPECIFICATION
      */
     private $contextType;
 
@@ -107,20 +113,24 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
      *
      * Returns the newly assigned 'assess_id'
      *
+     * Responsible for context-specific behaviour (the parser is not responsible for this - it knows nothing of context)
+     *
      * @param IParser|AssessParser $parser
      * @return int
      */
     protected function createEvaluation(IParser $parser)
     {
+        $nullDate = new Alaress_Date_NullDate();
+
         // Create the IAssessable
         $quizAssessable = $this->assessmentMapper->createModel()
             ->setAssessmentContext(AssessmentContextType::stringToObject($this->contextType)->setId($this->contextId))
             ->setTitle($parser->getTitle())
             ->setDescription($parser->getDescription())
-            ->setPublishDate($parser->getPublishDate())
-            ->setOpenDate($parser->getOpenDate())
-            ->setDueDate($parser->getDueDate())
-            ->setCloseDate($parser->getCloseDate())
+            ->setPublishDate(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $parser->getPublishDate())
+            ->setOpenDate(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $parser->getOpenDate())
+            ->setDueDate(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $parser->getDueDate())
+            ->setCloseDate(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $parser->getCloseDate())
             ->setWeight($parser->getWeight())
             ->setDefaultOpenSpan($parser->getDefaultOpenSpan());
 
@@ -134,8 +144,8 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setTitle($quizAssessable->getTitle())
             ->setDescription($quizAssessable->getDescription())
             ->setCompletionMessage($parser->getCompletionMessage())
-            ->setStart($quizAssessable->getPublishDate())
-            ->setFinish($quizAssessable->getDueDate())
+            ->setStart(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $quizAssessable->getPublishDate())
+            ->setFinish(AssessmentContextType::TYPE_UNIT_SPECIFICATION == $this->contextType ? $nullDate : $quizAssessable->getDueDate())
             ->setDuration($parser->getDuration())
             ->setMaxAttempts($parser->getMaxAttempts())
             ->setWeight($quizAssessable->getWeight())
