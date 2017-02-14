@@ -11,8 +11,11 @@
  */
 
 
+use Aura\Router\Router;
+use Aura\Web\Response;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
+/** @var SitePage $this */
 $folderId = $this->arg[0];
 $contextType = $_POST['context_type'];
 $contextId = $_POST['context_id'];
@@ -44,4 +47,8 @@ $import = new Assess_Import_Xml(
 );
 $import->import();
 
-SitePage::localRedir('/assess/summary/' . $import->getAssessId());
+/** @var Router $router */
+$router = $this->getDi()->get('router');
+$route = $router->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $import->getAssessmentId()]);
+SitePage::localRedir($route);
+

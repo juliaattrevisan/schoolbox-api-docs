@@ -26,6 +26,13 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
     private $assessmentMapper;
 
     /**
+     * The newly assigned assessment.id
+     *
+     * @var int|null
+     */
+    private $assessmentId;
+
+    /**
      * @var string
      */
     private $contextType;
@@ -61,6 +68,17 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
         $this->assessmentMapper = $assessmentMapper;
         $this->contextType = substr($contextType, 0, strlen($contextType) - 1);  // strip off trailing 's'
         $this->contextId = $contextId;
+    }
+
+
+    /**
+     * Return the newly assigned assessment.id
+     *
+     * @return int|null
+     */
+    public function getAssessmentId()
+    {
+        return $this->assessmentId;
     }
 
 
@@ -106,11 +124,11 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setWeight($parser->getWeight())
             ->setDefaultOpenSpan($parser->getDefaultOpenSpan());
 
-        $assessmentId = $this->assessmentMapper->save($quizAssessable)[0];
+        $this->assessmentId = $this->assessmentMapper->save($quizAssessable)[0];
 
         $quiz = $this->getQuizMapper()->createModel()
             ->setCategory($quizAssessable->getAssessmentContext()->getFolder())
-            ->setAssessmentModel((new Assessment())->setId($assessmentId))
+            ->setAssessmentModel((new Assessment())->setId($this->assessmentId))
             ->setUser($_SESSION['user'])
             ->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT))
             ->setTitle($quizAssessable->getTitle())

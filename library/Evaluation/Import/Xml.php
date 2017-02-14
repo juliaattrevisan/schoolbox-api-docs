@@ -96,6 +96,8 @@ abstract class Evaluation_Import_Xml
 
 	/**
 	 * Import data
+     *
+     * @return int - The newly assigned assess_id
 	 */
 	public function import()
     {
