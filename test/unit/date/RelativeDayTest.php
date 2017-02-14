@@ -5,3 +5,249 @@
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
+class RelativeDayTest extends PHPUnit_Framework_TestCase
+{
+    /**
+     * @var Alaress_Date_Locale_Config
+     */
+    protected $dateLocale;
+
+    /**
+     * Set up a mock config object.
+     */
+    public function setup()
+    {
+        $mockConfig = $this->getMock('\\Schoolbox\\Config\\Loader');
+        $mockConfig
+            ->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap([
+                    ['date_database', 'Y-m-d H:i:s',],
+                    ['date_local',    'd/m/Y',],
+                    ['date_long',     'l F jS Y',],
+                    ['date_notime',   'jS M Y',],
+                    ['date_only',     'jS M',],
+                    ['date_short',    'jS M Y',],
+                    ['date_time',     'g:ia',],
+                    ['date_timezone', 'Australia/Victoria',],
+                ])
+            );
+        $this->dateLocale = new Alaress_Date_Locale_Config();
+        $this->dateLocale->setConfig($mockConfig);
+    }
+
+
+    /**
+     * Check that an event in the same day displays 'Today'
+     */
+    public function testRelativeDayToday()
+    {
+        $expected = 'Today at 2:00pm';
+
+        $now = new Alaress_Date_Format('2000-01-01 00:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2000-01-01 14:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(false, $now);
+
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check lowercase works with the above
+     */
+    public function testRelativeDayTodayLowercase()
+    {
+        $expected = 'today at 2:00pm';
+
+        $now = new Alaress_Date_Format('2000-01-01 00:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2000-01-01 14:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(true, $now);
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check that an event the day before displays 'Yesterday'
+     */
+    public function testRelativeDayYesterday()
+    {
+        $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+
+        $expected = 'Yesterday at ' . $now->getTimeOnly();
+
+        $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+        $eventDate->addDays('-1');
+
+        $result = $eventDate->getRelativeDay(false, $now);
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check lowercase works with the above
+     */
+    public function testRelativeDayYesterdayLowercase()
+    {
+        $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+
+        $expected = 'yesterday at ' . $now->getTimeOnly();
+
+        $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+        $eventDate->addDays('-1');
+
+        $result = $eventDate->getRelativeDay(true, $now);
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check that an event the day after displays 'Tomorrow'
+     */
+    public function testRelativeDayTomorrow()
+    {
+        $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+
+        $expected = 'Tomorrow at ' . $now->getTimeOnly();
+
+        $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+        $eventDate->addDays('1');
+
+        $result = $eventDate->getRelativeDay(false, $now);
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check lowercase works with the above
+     */
+    public function testRelativeDayTomorrowLowercase()
+    {
+        $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+
+        $expected = 'tomorrow at ' . $now->getTimeOnly();
+
+        $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+        $eventDate->addDays('1');
+
+        $result = $eventDate->getRelativeDay(true, $now);
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check that an event in the past week displays 'Last {day name}'
+     */
+    public function testRelativeDayWithinSevenPast()
+    {
+        $expected = 'Wednesday at 10:00pm';
+
+        $now = new Alaress_Date_Format('2017-02-14 12:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2017-02-08 22:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(false, $now);
+
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check that an event happening within a week displays day name
+     */
+    public function testRelativeDayWithinSeven()
+    {
+        $expected = 'Monday at 4:00pm';
+
+        $now = new Alaress_Date_Format('2017-02-14 12:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2017-02-20 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(false, $now);
+
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check that if the event date is the same day next week
+     * (e.g. today is Wednesday and the event is next Wednesday..
+     * that is displays the date rather than the day name)
+     */
+    public function testRelativeDayOneWeekPast()
+    {
+        $expected = '7th Feb 2017 at 11:00pm';
+
+        $now = new Alaress_Date_Format('2017-02-14 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2017-02-07 23:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(false, $now);
+
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check the same as above but the event is the future rather than past
+     */
+    public function testRelativeDayOneWeek()
+    {
+        $expected = '21st Feb 2017 at 11:00am';
+
+        $now = new Alaress_Date_Format('2017-02-14 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2017-02-21 11:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(false, $now);
+
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check that a date beyond 30 days in the past just displays date, no time
+     */
+    public function testRelativeDayBeyondThirtyPast()
+    {
+        $expected = '1st Jan 2000';
+
+        $now = new Alaress_Date_Format('2000-02-02 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2000-01-01 11:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(false, $now);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Check that a date beyond 30 days in the past just displays date, no time
+     */
+    public function testRelativeDayBeyondThirty()
+    {
+        $expected = '2nd Feb 2000';
+
+        $now = new Alaress_Date_Format('2000-01-01 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2000-02-02 11:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(false, $now);
+
+        $this->assertEquals($expected, $result);
+    }
+
+
+    /**
+     * Check that an event with 11:59pm doesn't display the time
+     */
+    public function testRelativeDayElevenFiftyNine()
+    {
+        $expected = 'Today';
+
+        $now = new Alaress_Date_Format('2000-01-01 00:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2000-01-01 23:59:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+
+        $result = $eventDate->getRelativeDay(false, $now);
+
+        $this->assertEquals($expected, $result);
+    }
+
+}
