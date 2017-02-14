@@ -63,6 +63,13 @@ abstract class EventBase implements EventInterface
      */
     protected $detail = '';
 
+    /**
+     * Event location
+     *
+     * @var string
+     */
+    protected $location = '';
+
     /** Event type ID
      * @var int
      */
@@ -355,6 +362,26 @@ abstract class EventBase implements EventInterface
     public function getDetail()
     {
         return $this->detail;
+    }
+
+    /**
+     * Set detail
+     *
+     * @param $detail
+     */
+    public function setLocation($location)
+    {
+        $this->detail = $location;
+    }
+
+    /**
+     * Get detail
+     *
+     * @return null
+     */
+    public function getLocation()
+    {
+        return $this->location;
     }
 
     /**

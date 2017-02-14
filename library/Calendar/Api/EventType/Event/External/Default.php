@@ -6,6 +6,9 @@
  * @version	 SVN: $Id$
  */
 
+use Schoolbox\External\Connector\Synergetic\Base\ExternalEvents;
+use Calendar\Event\Collection;
+use Calendar\Event\Type\External\Event;
 
 //class Calendar_Api_External_Event_Default extends Calendar_Api_EventType_Abstract {
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
@@ -15,7 +18,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      *
      * @var Calendar
      */
-    private $calendarHandler;
+    private $externalEvents;
 
     /**
      * Constructor
@@ -25,7 +28,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function __construct($user, $config) {
         $this->setUser($user);
-        $this->setCalendarHandler(new Calendar());
+        $this->externalEvents = new ExternalEvents();
     }
 
     /**
@@ -37,35 +40,36 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @return \Calendar\Event\Collection
      */
     public function getEvents($startTimestamp, $endTimestamp) {
-        $collection = $this->getEventsFromCalendarHandler($startTimestamp, $endTimestamp);
 
-        /* Give the calendar_connector id so this event knows where it came from
-         * This allows you to create an event detail screen in Mobile
-         */
-        foreach ($collection as $current) {
-            $current->setConnectorId($this->getConnectorId());
+        $stack            = new Collection();
+        $externalEvents = $this->externalEvents->getExternalEvents();
+
+        // Figure out event type
+        try {
+            /** @var Calendar_Api_Config_Record $config */
+            $config        = $this->loadConnectorConfiguration();
+            $decodedConfig = $config->decodeConfig();
+            $eventType     = $decodedConfig->getLuEventType();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $eventType = 1;
         }
 
-        return $collection;
-    }
+        foreach ($externalEvents as $externalEvent) {
+            $event = new Event();
+            $event->setEventId(rand(0, 1000)); //Todo
+            $event->setEventType($eventType);
+            $event->setTitle($externalEvent['title']);
+            $event->setDetail($externalEvent['description']);
+            $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
+            $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+            $event->setEventType('external');
+            $event->setAllday(false);
+            $event->setAuthorId($externalEvent['owner']);
+            $event->setLocation($externalEvent['location']);
+            $stack->add($event);
+        }
+        return $stack;
 
-    /**
-     * Gets events out of the calendar handler.
-     *
-     * Can be overridden in subclasses - a filter can be set on
-     * Calendar->getDayEvents().
-     *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
-     * @return \Calendar\Event\Collection
-     */
-    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
-        return $this->getCalendarHandler()->getDayEvents(
-            $this->getUser(),
-            $startTimestamp,
-            $endTimestamp
-        );
     }
 
     /**
@@ -77,32 +81,18 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @return \Calendar\Event\Collection
      */
     public function getEvent($eventId) {
-        return $this->getCalendarHandler()->getDayEvents(
-            $this->getUser(),
-            null,
-            null,
-            array('id' => $eventId)
+        return '';
+    }
+
+    /**
+     * Helper method for loading this event type's calendar connector config.
+     *
+     * @return Calendar_Api_Config_Record|object
+     */
+    public function loadConnectorConfiguration()
+    {
+        return Calendar_Api_Config_Mapper::getInstance()->findById(
+            $this->getConnectorId()
         );
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set calendar handler
-     *
-     * @param Calendar $calendarHandler
-     */
-    public function setCalendarHandler($calendarHandler) {
-        $this->calendarHandler = $calendarHandler;
-    }
-
-    /**
-     * Get calendar handler
-     *
-     * @return Calendar
-     */
-    public function getCalendarHandler() {
-        return $this->calendarHandler;
     }
 }

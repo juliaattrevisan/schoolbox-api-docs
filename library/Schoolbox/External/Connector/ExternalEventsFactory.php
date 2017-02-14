@@ -20,13 +20,12 @@ class ExternalEvents
     public function build()
     {
         $prefix = '\Schoolbox\External\Connector\\' .  ucwords(\Config::get('external_type'));
-
         /* School-specific version of the Connector
          */
         $specific = ucwords(\Config::get('site_location'));
         $general = 'Base';
-        $specificClassname = "{$prefix}\\{$specific}\\Sync";
-        $generalClassname = "{$prefix}\\{$general}\\Sync";
+        $specificClassname = "{$prefix}\\{$specific}\\ExternalEvents";
+        $generalClassname = "{$prefix}\\{$general}\\ExternalEvents";
 
         // TODO move instantiation logic out of constructors, and into here
         if (class_exists($specificClassname)) {

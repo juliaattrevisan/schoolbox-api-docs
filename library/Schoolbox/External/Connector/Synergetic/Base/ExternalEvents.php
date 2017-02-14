@@ -13,7 +13,7 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress\DebugBar\Instance as DebugBar;
 use MSSQL;
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Schoolbox\External\Connector\ExternalEventsInterface;
 use UnexpectedValueException;
 
 class ExternalEvents implements ExternalEventsInterface
@@ -46,20 +46,24 @@ class ExternalEvents implements ExternalEventsInterface
      * @return bool
      * @throws UnexpectedValueException if either key or IV was not set
      */
-    public function getExternalEvents($user, $startDate, $endDate)
+    public function getExternalEvents($user='', $startDate='', $endDate='')
     {
         $query = "
 SELECT
-  Events.EventCode                  AS code,
-  Events.Description                AS title,
-  Events.Comment                    AS description
-FROM SynergyOne.dbo.Events
-WHERE Events.EventDate > '2017-01-01 00:00:00' AND Events.EventEndDate < '2017-03-03 00:00:00'
-ORDER BY Events.EventCode ASC
+  StaffSchedule.StaffID             AS owner,
+  StaffSchedule.Comment             AS description,
+  StaffSchedule.Room                AS room,
+  CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeFrom,120) AS start,
+  CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeTo,120)   AS finish,
+  luLocation.Description            AS location,
+  luTeam.Description                AS title
+FROM SynergyOne.dbo.StaffSchedule StaffSchedule
+  LEFT JOIN SynergyOne.dbo.luLocation ON luLocation.Code = StaffSchedule.LocationCode
+  LEFT JOIN SynergyOne.dbo.luTeam ON luTeam.Code = StaffSchedule.TeamCode
+WHERE StaffSchedule.ScheduleDateTimeFrom > '2016-01-01 00:00:00' AND StaffSchedule.ScheduleDateTimeTo < '2017-03-03 00:00:00'
+ORDER BY StaffSchedule.StaffScheduleSeq ASC
         ";
-        $this->database->query($query);
-        new \Alaress_Probe($this->getDatabase()->getAll($query));
-        return $this->getDatabase()->getAll($query);
+        return $this->database->getAll($query);
     }
 
  }
