@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<quiz>
+    <version>16.5</version>
+    <title>{ASSESS_TITLE}</title>
+    <description><![CDATA[
+        {ASSESS_DESCRIPTION}
+        ]]></description>
+    <completionmessage><![CDATA[
+        {ASSESS_COMPLETION_MESSAGE}
+        ]]></completionmessage>
+    <publishdate>{ASSESS_PUBLISH}</publishdate>
+    <opendate>{ASSESS_OPEN}</opendate>
+    <duedate>{ASSESS_DUE}</duedate>
+    <closedate>{ASSESS_CLOSE}</closedate>
+    <weight>{ASSESS_WEIGHT}</weight>
+    <duration>{ASSESS_DURATION}</duration>
+    <maxattempts>{ASSESS_MAX_ATTEMPTS}</maxattempts>
+    <availability>{ASSESS_AVAILABILITY}</availability>
+    <markvisibility>{ASSESS_MARK_VISIBILITY}</markvisibility>
+    <defaultopenspan>{ASSESS_DEFAULT_OPEN_SPAN}</defaultopenspan>
+    <!-- BEGIN section -->
+    <section>
+        <title>{SECTION_TITLE}</title>
+        <description><![CDATA[
+            {SECTION_DESCRIPTION}
+            ]]>
+        </description>
+        <random>{SECTION_RANDOM}</random>
+        <pool>{SECTION_POOL}</pool>
+        <!-- BEGIN question -->
+        <question type="{QUESTION_TYPE_MOODLE}">
+            <typeid>{QUESTION_TYPE_ID}</typeid>
+            <marks>{QUESTION_MARKS}</marks>
+            <configs>
+                <!-- BEGIN answer_configuration -->
+                <config>
+                    <name>{ANSWER_CONFIGURATION_NAME}</name>
+                    <value>{ANSWER_CONFIGURATION_VALUE}</value>
+                </config>
+                <!-- END answer_configuration -->
+            </configs>
+            <name>
+                <text>{QUESTION_MARKS} marks</text>
+            </name>
+            <questiontext format="html">
+                <text><![CDATA[
+                    {QUESTION_QUESTION}
+                    ]]>
+                </text>
+            </questiontext>
+            <penalty>1</penalty>
+            <answers>
+            <!-- BEGIN answerInputs -->
+            <!-- END answerInputs -->
+            </answers>
+        </question>
+        <!-- END question -->
+    </section>
+    <!-- END section -->
+</quiz>

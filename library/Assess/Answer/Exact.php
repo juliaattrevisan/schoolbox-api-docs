@@ -11,16 +11,6 @@
  */
 class Assess_Answer_Exact extends Evaluation_Answer_Exact
 {
-
-    /**
-    * Setup
-    */
-    protected function setup()
-    {
-        $this->setResponseHandler(new Assess_Response());
-    }
-
-
     /**
     * Automatically marks a response. Customised to be applicable to the way in
     * which the response is actually stored.

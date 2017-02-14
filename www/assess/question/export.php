@@ -35,7 +35,7 @@ if (!$assessHandler->isOwner($assess['assess_id'])
 
 /* Set up template
  */
-$this->setFile('xml', 'assess/question/exportToMoodle.html');
+$this->setFile('xml', 'assess/question/exportToMoodle.xml');
 $this->setBlock('xml', 'answerInputs', 'answerInputs_block');
 
 /* This if() clause allows for sections containing no questions.
@@ -48,7 +48,7 @@ if ($currentQuestion['type_id']) {
      */
     $this->setFile(
         'answerFormFragment',
-        'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html'
+        'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.xml'
     );
     $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 

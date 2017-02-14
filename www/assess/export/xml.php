@@ -36,5 +36,6 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 
 /* Export xml
  */
-$xml = new Assess_Export_Xml($assess, $factory, $sectionHandler, $questionHandler, $this);
+$assessmentMapper = \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance();
+$xml = new Assess_Export_Xml($assess, $factory, $sectionHandler, $questionHandler, $this, $assessmentMapper);
 $xml->render();

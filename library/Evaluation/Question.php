@@ -15,6 +15,8 @@ abstract class Evaluation_Question extends DeprecatedModel
     public $_table = 'assess_question';
     public $_index = 'question_id';
 
+    private $sectionHandler;
+
 	/**
 	 * Allowed fields to go into the db
 	 *
@@ -281,4 +283,22 @@ abstract class Evaluation_Question extends DeprecatedModel
 	public function getAllowedFields() {
 		return $this->allowedFields;
 	}
+
+    /**
+     * @return Evaluation_Section
+     */
+    public function getSectionHandler()
+    {
+        return $this->sectionHandler;
+    }
+
+    /**
+     * @param Evaluation_Section $sectionHandler
+     * @return static
+     */
+    public function setSectionHandler(Evaluation_Section $sectionHandler)
+    {
+        $this->sectionHandler = $sectionHandler;
+        return $this;
+    }
 }

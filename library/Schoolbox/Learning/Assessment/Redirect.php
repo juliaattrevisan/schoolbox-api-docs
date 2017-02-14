@@ -47,8 +47,8 @@ class Redirect
      * @param $url
      * @return string
      */
-    public function queryString($url)
+    public static function queryString($url)
     {
-        return '?' . self::RETURN_URL . '=' . $this->encode($url);
+        return '?' . self::RETURN_URL . '=' . self::encode($url);
     }
 }

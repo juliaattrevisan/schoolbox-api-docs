@@ -181,18 +181,11 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * @param int $question_id
      * @return void
      */
-    public function exportMoodleAnswer(SitePage $page, $question_id) {
+    public function exportMoodleAnswer(SitePage $page, $question_id)
+    {
         $currentAnswer = $this->getByQuestionID($question_id);
-
-        /* Show correct answer
-         */
-        $page->setVar(
-            array(
-                'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-            )
-        );
-
-        $page->parse('answerOption_block', 'answerOption', true);
+        $page->setVar('CORRECT_ANSWER', Scrub::text($currentAnswer['answer']));
+        $page->parse('answerOption_block', 'answerOption');
     }
 
     /**
@@ -200,11 +193,11 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * but we create the array specially because of the naming conventions and
      * structure of the original xml export.
      *
-     * @param  $xmlObj
+     * @param SimpleXMLElement $xmlObj
      * @param int $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id) {
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id) {
         $object = array(
             'answer_id' => '',
             'question_id' => $question_id,

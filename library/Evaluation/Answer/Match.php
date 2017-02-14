@@ -261,31 +261,28 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * Exports the answer to Moodle XML format. This is a modified version of
      * $this->reviewResponse()
      *
-     * @param  $page
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $question_id
      *
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id)
+    public function exportMoodleAnswer(SitePage $page, $question_id)
     {
         $page->setBlock('answerFormFragment', 'answerCorrect', 'answerCorrect_block');
-
+        $page->setVar('answerCorrect_block', '');
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
+            if(is_array($allAnswers)){
 
-            for ($i = 0; $i < count($allAnswers); $i++) {
-                $currentAnswer = $allAnswers[$i];
-
-                $page->setVar(
-                    array(
+                foreach ($allAnswers as $currentAnswer) {
+                    $page->setVar([
                         'ANSWER_LEFT_VALUE'  => Scrub::text($currentAnswer->answerLeft),
                         'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    )
-                );
-
-                $page->parse('answerCorrect_block', 'answerCorrect', true);
+                    ]);
+                    $page->parse('answerCorrect_block', 'answerCorrect', true);
+                }
             }
         }
     }
@@ -300,7 +297,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      *
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id)
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
         foreach ($xmlObj->subquestion as $currentAnswer) {
             /* Set up data object in accordance with $this->create();

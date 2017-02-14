@@ -288,39 +288,27 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * Exports the answer to Moodle XML format. This is a modified version of
      * $this->reviewResponse()
      *
-     * @param  $page
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id) {
+    public function exportMoodleAnswer(SitePage $page, $question_id)
+    {
         $answerGroup = $this->getByQuestionID($question_id);
+        $page->setVar('answerOption_block', '');
 
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-            foreach ($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
-                    $page->setVar(
-                        array(
-                            'ACTUAL_CORRECT_VALUE' => '100'
-                        )
-                    );
-                } else {
-                    $page->setVar(
-                        array(
-                            'ACTUAL_CORRECT_VALUE' => '0'
-                        )
-                    );
+            if(is_array($allAnswers)) {
+                foreach ($allAnswers as $currentAnswer) {
+                    $page->setVar([
+                        'ACTUAL_CORRECT_VALUE' => $currentAnswer->correct ? '100' : '0',
+                        'ANSWER_VALUE'         => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION'   => Scrub::text($currentAnswer->description),
+                    ]);
+                    $page->parse('answerOption_block', 'answerOption', true);
                 }
-
-                $page->setVar(
-                    array(
-                        'ANSWER_VALUE' => $currentAnswer->value,
-                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                    )
-                );
-
-                $page->parse('answerOption_block', 'answerOption', true);
             }
         }
     }
@@ -330,11 +318,11 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * but we create the array specially because of the naming conventions and
      * structure of the original xml export.
      *
-     * @param  $xmlObj
-     * @param  $question_id
+     * @param  SimpleXMLElement $xmlObj
+     * @param  int $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id) {
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id) {
         foreach ($xmlObj->answer as $currentAnswer) {
 
             /* Set up data object in accordance with $this->create();

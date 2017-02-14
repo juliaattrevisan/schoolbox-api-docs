@@ -25,15 +25,6 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
     private $ticks = 0;
 
     /**
-     * Setup
-     */
-    protected function setup()
-    {
-        $this->setResponseHandler(new Survey_Response());
-        $this->setQuestionHandler(new Survey_Question());
-    }
-
-    /**
      * Graph the results for this answer type
      *
      * @param  $page

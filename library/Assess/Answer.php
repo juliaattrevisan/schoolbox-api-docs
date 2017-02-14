@@ -10,17 +10,31 @@
  * @version     SVN: $Id$
  */
 class Assess_Answer extends Evaluation_Answer {
-    public $_table = 'assess_answer';
-    public $_index = 'answer_id';
 
-    protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */
     public function __construct() {
-        parent::__construct();
+        parent::__construct(new Assess_Response(), new Assess_Question());
+    }
 
-        $this->setResponseHandler(new Assess_Response());
+    /**
+     * Exports the answer to Moodle XML format.
+     *
+     * @param SitePage $page
+     * @param int $question_id
+     */
+    public function exportMoodleAnswer(SitePage $page, $question_id)
+    {
+        throw new BadMethodCallException('You need to call this on a concrete Answer type');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
+    {
+        throw new BadMethodCallException('You need to call this on a concrete Answer type');
     }
 }

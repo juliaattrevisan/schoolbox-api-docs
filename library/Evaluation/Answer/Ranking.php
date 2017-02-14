@@ -277,30 +277,25 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
      * Exports the answer to Moodle XML format. This is a modified version of
      * $this->reviewResponse()
      *
-     * @param  $page
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $question_id
      *
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id)
+    public function exportMoodleAnswer(SitePage $page, $question_id)
     {
         $page->setBlock('answerFormFragment', 'answerCorrect', 'answerCorrect_block');
+        $page->setVar('answerOption_block', '');
 
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
-
-            for ($i = 0; $i < count($allAnswers); $i++) {
-                $currentAnswer = $allAnswers[$i];
-
-                $page->setVar(
-                    array(
-                        'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    )
-                );
-
-                $page->parse('answerCorrect_block', 'answerCorrect', true);
+            if(is_array($allAnswers)){
+                foreach ($allAnswers as $currentAnswer) {
+                    $page->setVar('ANSWER_RIGHT_VALUE', Scrub::text($currentAnswer->answerRight));
+                    $page->parse('answerCorrect_block', 'answerCorrect', true);
+                }
             }
         }
     }
@@ -310,12 +305,12 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
      * but we create the array specially because of the naming conventions and
      * structure of the original xml export.
      *
-     * @param  $xmlObj
-     * @param  $question_id
+     * @param  SimpleXMLElement $xmlObj
+     * @param  int $question_id
      *
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id)
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
         foreach ($xmlObj->subquestion as $currentAnswer) {
             /* Set up data object in accordance with $this->create();

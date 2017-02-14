@@ -7,11 +7,38 @@
 <script type="text/javascript">
     $(function () {
 
-        /* Description
+        /* Description + Completion Message
          */
         $.fn.alaressEditor();
+
+        $(document).foundation();
     });
 </script>
+
+{# TODO 'stage' is a temp hack until this fragment gets refactored to use *extend* instead of *include* #}
+{% if not assessment.id and stage != 2 %}
+<div class="actions-small-1 row">
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content="">
+        <li><a href="#" id="import" data-reveal-id="import-modal" class="icon-upload">Import from XML file</a></li>
+    </ul>
+</div>
+
+<div id="import-modal" class="reveal-modal" data-reveal="">
+    <form action="/assess/import/xml/{{ folder.id }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="context_type" value="{{ contextType }}">
+        <input type="hidden" name="context_id" value="{{ context.id }}">
+        <label>
+            <input name="importXML" type="file">
+        </label>
+        <label>
+            <input type="submit" value="Import from XML file">
+        </label>
+    </form>
+</div>
+{% endif %}
 
 <label>
     Title
@@ -19,53 +46,48 @@
 </label>
 
 <label>
-    Description
+    Description<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
 
 <label>
-    Weight
-    <input type="number" name="weight" value="{{ assessment.weight }}">
+    Completion Message<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users when they complete the quiz.">?</span>
+    <textarea name="completion_message">{{ assessment.completionMessage }}</textarea>
 </label>
 
-{% import 'sub/visibility.twig' as visibility %}
-{{ visibility.dropdown(assessment.markVisibility) }}
+<div class="row">
+    <div class="small-12 columns">
+        <label>
+            Max Attempts<span class="hint has-tip tip-top" data-tooltip title="This is how many times a user can begin the quiz again.">?</span>
+            {% set maxAttempts = 10 %}
 
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
-{% if context.baseContext is not unitSpecification %}
-    {% include '@learningAssessment/fragments/dates.twig' %}
-{% endif %}
-<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+            <select name="maxAttempts">
 
-<label>
-    Max Attempts
-    {% set maxAttempts = 10 %}
+                {% for i in 0..maxAttempts %}
+                    {% if i == assessment.maxAttempts %}
+                        {% set selected = 'selected' %}
+                    {% else %}
+                        {% set selected = '' %}
+                    {% endif %}
 
-    <select name="maxAttempts">
+                    {% if i == 0 %}
+                        <option value="{{ i }}" {{ selected }}>Unlimited</option>
+                    {% else %}
+                        <option value="{{ i }}" {{ selected }}>{{ i }}</option>
+                    {% endif %}
+                {% endfor %}
 
-        {% for i in 0..maxAttempts %}
-        {% if i == assessment.maxAttempts %}
-            {% set selected = 'selected' %}
-        {% else %}
-            {% set selected = '' %}
-        {% endif %}
-
-        {% if i == 0 %}
-            <option value="{{ i }}" {{ selected }}>Unlimited</option>
-        {% else %}
-            <option value="{{ i }}" {{ selected }}>{{ i }}</option>
-        {% endif %}
-        {% endfor %}
-
-    </select>
-</label>
+            </select>
+        </label>
+    </div>
+</div>
 
 <script type="text/javascript">
     $(function() {
         var $durationPanel = $('#durationPanel');
         var $durationInputs = $durationPanel.find('input[type=text]');
 
-        $('#hasDuration').on('click', function(event) {
+        $('#hasDuration').on('click', function() {
             var $checkbox = $(this);
             if ($checkbox.is(':checked')) {
                 $('#durationPanel').stop().hide().removeClass('hide').fadeIn(400);
@@ -108,6 +130,25 @@
     </div>
 </div>
 
+{% if context.baseContext is not unitSpecification %}
+    {% include '@learningAssessment/fragments/dates.twig' %}
+{% endif %}
+
+<legend>Grading</legend>
+<label>
+    Weight
+    <input type="number" name="weight" value="{{ assessment.weight }}">
+</label>
+
+{% import 'sub/visibility.twig' as visibility %}
+{{ visibility.dropdown(assessment.markVisibility) }}
+
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
+
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+
+
 
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
+

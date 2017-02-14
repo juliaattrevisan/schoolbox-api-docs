@@ -156,15 +156,6 @@
             $('input[data-mage-next="end"]').mage({
                 validateOptions: validateOptions,
                 beforeSubmit: beforeSubmit,
-                setFormData: function(data) {
-                    if (CKEDITOR.instances['description'] != undefined) {
-                        data.push({
-                            name: 'description',
-                            value: CKEDITOR.instances['description'].getData()
-                        });
-                    }
-                },
-
                 onXhrDone: function (data) {
                     if('string' == typeof data.returnUrl){
                         window.location.href = data.returnUrl;
@@ -213,9 +204,24 @@
     });
 </script>
 
-<div class="row">
-    <div class="small-12 columns"><h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1></div>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1>
+        </div>
+    </div>
+    {# TODO - Quiz fragment should extend this template, not be included. This template should not know about Quizzes #}
+    {% if assessment is quiz %}
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content="">
+        <li><a href="#" id="import" data-reveal-id="import-modal" class="icon-upload">Import from XML file</a></li>
+    </ul>
+    {% endif %}
 </div>
+
 
 {% if assessmentType|length %}
     {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) %}
@@ -261,7 +267,7 @@
 
                     <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
                         {% if assessmentType|length %}
-                            {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' %}
+                            {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' with {stage: 2} %}
                         {% endif %}
                     </div>
                 </fieldset>
@@ -269,3 +275,22 @@
         </form>
     </div>
 </div>
+
+
+{# TODO - This should be in the quiz fragment, not the parent, but that doesn't work because you can't have a form
+in a form. The template hierachy should be refactored so that quiz EXTENDS the parent, rather than being included.
+#}
+{% if assessment is quiz %}
+    <div id="import-modal" class="reveal-modal" data-reveal="">
+        <form action="/assess/import/xml/{{ folder.id }}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="context_type" value="{{ contextType }}">
+            <input type="hidden" name="context_id" value="{{ context.id }}">
+            <label>
+                <input name="importXML" type="file">
+            </label>
+            <label>
+                <input type="submit" value="Import from XML file">
+            </label>
+        </form>
+    </div>
+{% endif %}

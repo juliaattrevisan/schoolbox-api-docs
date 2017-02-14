@@ -9,17 +9,30 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Survey_Answer extends Evaluation_Answer {
-    public $_table = 'assess_answer';
-    public $_index = 'answer_id';
+class Survey_Answer extends Evaluation_Answer
+{
+    public function __construct()
+    {
+        parent::__construct(new Survey_Response(), new Survey_Question());
+    }
 
-    protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
+    /**
+     * Exports the answer to Moodle XML format.
+     *
+     * @param SitePage $page
+     * @param int $question_id
+     */
+    public function exportMoodleAnswer(SitePage $page, $question_id)
+    {
+        throw new BadMethodCallException('You need to call this on a concrete Answer type');
+    }
 
-	/**
-	 * Setup
-	 */
-    protected function setup() {
-        $this->setResponseHandler(new Survey_Response());
+    /**
+     * @inheritdoc
+     */
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
+    {
+        throw new BadMethodCallException('You need to call this on a concrete Answer type');
     }
 }
 

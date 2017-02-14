@@ -313,6 +313,8 @@
         // call beforeSubmit
         self.options.beforeSubmit.call();
 
+        copyCkEditorValues.call(self, elem);
+
         /**
          * Validate the form
          * Will use alaressValidate if set on the form or any required attributes on fields
@@ -342,6 +344,28 @@
 
         // send it off
         xhrSend.call(self, method, action, target);
+    }
+
+    /**
+     * Called just before validation runs to copy any CK Editor values to their corresponding text area
+     */
+    function copyCkEditorValues(elem)
+    {
+        // Is CkEditor running on this page?
+        if(typeof CKEDITOR == 'undefined' || typeof CKEDITOR.instances == 'undefined'){
+            return;
+        }
+
+        var $textAreas = elem.closest(this.options.submittable).find('textarea[name]');
+        $textAreas.each(function(idx, elem){
+            var $textArea = $(elem);
+            var $ckEditor = CKEDITOR.instances[$textArea.attr('name')];
+
+            // Does there exist a CK Editor instance for this text area?
+            if ($ckEditor != undefined) {
+                $textArea.val($ckEditor.getData());
+            }
+        });
     }
 
 

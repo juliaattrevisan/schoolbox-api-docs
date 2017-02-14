@@ -9,15 +9,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Assess_Answer_Numeric extends Evaluation_Answer_Numeric {
-
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setResponseHandler(new Assess_Response());
-	}
-
+class Assess_Answer_Numeric extends Evaluation_Answer_Numeric
+{
 	/**
 	 * Automatically marks a response. Customised to be applicable to the way in
 	 * which the response is actually stored.

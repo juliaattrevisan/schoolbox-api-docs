@@ -217,21 +217,15 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
      *
      * NOTE: This question type has very little moodle documentation.
      *
-     * @param  $page
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id)
+    public function exportMoodleAnswer(SitePage $page, $question_id)
     {
         $currentAnswer = $this->getByQuestionID($question_id);
-
-        /* Show correct answer
-         */
-        $page->setVar(array(
-            'CORRECT_ANSWER' => Scrub::html($currentAnswer['answer'])
-        ));
-
-        $page->parse('answerOption_block', 'answerOption', true);
+        $page->setVar('CORRECT_ANSWER', Scrub::html($currentAnswer['answer']));
+        $page->parse('answerOption_block', 'answerOption');
     }
 
     /**
@@ -239,11 +233,11 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
      * but we create the array specially because of the naming conventions and
      * structure of the original xml export.
      *
-     * @param  $xmlObj
-     * @param  $question_id
+     * @param  SimpleXMLElement $xmlObj
+     * @param  int $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id)
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
         $object = array(
             'answer_id' => '',

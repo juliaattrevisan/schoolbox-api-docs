@@ -33,7 +33,7 @@ if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermiss
 
 /* Set up template
  */
-$this->setFile('xml', 'survey/question/exportToMoodle.html');
+$this->setFile('xml', 'survey/question/exportToMoodle.xml');
 $this->setBlock('xml', 'answerInputs', 'answerInputs_block');
 
 /* This if() clause allows for sections containing no questions.
@@ -44,7 +44,7 @@ if ($currentQuestion['type_id']) {
 
     /* Load answer template into answerOption block
       */
-    $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
+    $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.xml');
     $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
     $this->setVar(array(

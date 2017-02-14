@@ -2,47 +2,69 @@
 /**
  * Evaluation_Import_Xml
  *
- * Import entire Evaluation items including sections and questions
+ * Import entire Evaluation items including sections, questions and solutions
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Evaluation_Import_Xml {
-	protected $assessHandler = null;
-	protected $sectionHandler = null;
-	protected $factory = null;
-	protected $page = null;
+use \Schoolbox\Learning\Quiz\Model as Quiz;
+use \Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Evaluation\Import\Parser\IParser;
 
-	/* The homepage to create for
-	 */
-	protected $categoryId = null;
+abstract class Evaluation_Import_Xml
+{
+    /**
+     * @var QuizMapper
+     */
+    private $quizMapper;
 
-	/* Temp filename to load from
-	 */
-	protected $data = '';
+    /** @var Evaluation_Main */
+	protected $assessHandler;
 
-	/* Resultant assess id
-	 */
-	protected $assess_id = null;
+	/** @var Evaluation_Section */
+	protected $sectionHandler;
+
+	/** @var Evaluation_Factory */
+	protected $factory;
+
+	/** @var SitePage */
+	protected $page;
+
+    /** @var int */
+	protected $categoryId;
+
+	/**
+     * File contents sent from browser
+     *
+     * @var string
+     */
+	protected $data;
+
+    /**
+     * Newly assigned assess_id
+     *
+     * @var int
+     */
+	protected $assess_id;
 
 	/**
 	 * The title of the Evaluation being imported
 	 *
 	 * @var string
 	 */
-	protected $title = '';
+	protected $title;
 
 	/**
 	 * Constructor
 	 *
-	 * @param $categoryId
-	 * @param $assessHandler
-	 * @param $sectionHandler
-	 * @param $factory
-	 * @param $data
-	 * @param $page
+	 * @param int $categoryId
+	 * @param Evaluation_Main $assessHandler
+	 * @param Evaluation_Section $sectionHandler
+	 * @param Evaluation_Factory $factory
+	 * @param string $data
+	 * @param SitePage $page
 	 */
 	public function __construct($categoryId, $assessHandler, $sectionHandler, $factory, $data, $page) {
 		$this->setCategoryId($categoryId);
@@ -51,14 +73,8 @@ abstract class Evaluation_Import_Xml {
 		$this->setFactory($factory);
 		$this->setData($data);
 		$this->setPage($page);
+		$this->quizMapper = QuizMapper::getInstance();
 	}
-
-	/**
-	 * Returns whether this Evaluation can count towards final year mark
-	 *
-	 * @return boolean
-	 */
-	public abstract function hasWeighting();
 
 	/**
 	 * Load data from source
@@ -80,49 +96,19 @@ abstract class Evaluation_Import_Xml {
 
 	/**
 	 * Import data
+     *
+     * @return int - The newly assigned assess_id
 	 */
-	public function import() {
+	public function import()
+    {
 		$xml = $this->loadData();
 
-		//
-		// Try to get max attempts if it's there, otherwise fall back to
-		// allowresit (not allow_resit).
-		// if allowresit is true, or is not unspecified:
-		// max_attempts = 0 (unlimited), otherwise 1.
-		$max_attempts = (string)$xml->maxattempts;
-		if (strlen($max_attempts) === 0) {
-			$allow_resit  = (string)$xml->allowresit;
-			$max_attempts = ($allow_resit || strlen($allow_resit) === 0) ? 0 : 1;
-		}
+		$this->checkValidQuizType($xml);
 
-		// Build description and complete message
-		$description = $this->parseRichTextNode($xml, 'description');
-		$completionMessage = $this->parseRichTextNode($xml, 'completionmessage');
+		$version = $this->getVersion($xml);
+		$xmlFileParser = $this->getParser($xml, $version);
 
-		/* Remember the title, for the course builder
-		 */
-		$this->setTitle((string)$xml->title);
-
-		$dataArr = array(
-			'category_id' => $this->getCategoryId(),
-			'user_id' => $_SESSION['id'],
-			'title' => $this->getTitle(),
-			'description' => $description,
-			'completion_message' => $completionMessage,
-			'start' => $xml->start,
-			'finish' => $xml->finish,
-			'duration' => $xml->duration,
-			'max_attempts' => $max_attempts,
-			'availability' => $xml->availability,
-			'mark_visibility' => $xml->markvisibility,
-			'created_at' => 'NOW()',
-		);
-
-		if($this->hasWeighting()){
-			$dataArr['weight'] = $xml->weight ?: 0;
-		}
-
-		$assess_id = $this->getAssessHandler()->create($dataArr);
+		$assess_id = $this->createEvaluation($xmlFileParser);
 
 		if (!$assess_id) {
 			error(112);
@@ -135,15 +121,16 @@ abstract class Evaluation_Import_Xml {
 		for ($i=0; $i < count($xml->section); $i++) {
 			$currentSection = $xml->section[$i];
 
-			$section_id = $this->getSectionHandler()->create(array(
-				'section_id' => '',
-				'assess_id' => $assess_id,
-				'sequence' => $i+1,
-				'title' => $currentSection->title,
-				'description' => trim((string) $currentSection->description->text) ? trim((string) $currentSection->description->text) : $currentSection->description,
-				'random' => $currentSection->random,
-				'pool' => $currentSection->pool,
-			));
+			$sectionData = array(
+                'section_id'  => '',
+                'assess_id'   => $assess_id,
+                'sequence'    => $i + 1,
+                'title'       => trim($currentSection->title),
+                'description' => trim((string)$currentSection->description->text) ? trim((string)$currentSection->description->text) : trim($currentSection->description),
+                'random'      => $currentSection->random,
+                'pool'        => $currentSection->pool,
+            );
+			$section_id = $this->getSectionHandler()->create($sectionData);
 
 			/* Process each question in the section
 			 */
@@ -153,59 +140,130 @@ abstract class Evaluation_Import_Xml {
 				$questionHandler = $this->getFactory()->createQuestionModel((string)$currentQuestion->typeid);
 				$answerHandler = $this->getFactory()->createAnswerModel((string)$currentQuestion->typeid);
 
-				/* Only json-encode if there are config elements
-				 *
-				 * When you cast the std obj to an array, you can possibly
-				 * end up with an empty config if the tags are separated
-				 */
-				if (count(array_keys((array)$currentQuestion->config))) {
-					$config = json_encode((array)$currentQuestion->config);
-				}
-				else {
-
-					/* -_-
-					 */
-					$config = 'NULL';
-				}
+				$config = $this->getQuestionConfig($currentQuestion, $version);
 
 				$question_id = $questionHandler->create(array(
-					'question_id' => '',
-					'section_id' => $section_id,
-					'sequence' => $j+1,
-					'type_id' => $currentQuestion->typeid,
-					'marks' => $currentQuestion->marks,
-					'question' => trim((string) $currentQuestion->questiontext->text),
-					'config' => $config,
+                    'question_id' => '',
+                    'section_id'  => $section_id,
+                    'sequence'    => $j + 1,
+                    'type_id'     => $currentQuestion->typeid,
+                    'marks'       => $currentQuestion->marks,
+                    'question'    => trim((string)$currentQuestion->questiontext->text),
+                    'config'      => $config,
 				));
 
 				if (method_exists($answerHandler, 'importMoodleAnswer')) {
-					$answer_id = $answerHandler->importMoodleAnswer($currentQuestion->answers, $question_id);
+				    /** @var SimpleXMLElement $answers */
+				    $answers = $currentQuestion->answers;
+					$answerHandler->importMoodleAnswer($answers, $question_id);
 				}
 			}
 		}
 		return $assess_id;
 	}
 
-	/**
-	 * Parses a rich text node
-	 *
-	 * @param SimpleXMLElement $xml
-	 * @param string           $nodename
-	 *
-	 * @return string
-	 */
-	protected function parseRichTextNode(SimpleXMLElement $xml, $nodename)
-	{
-		// Value should just be a single node, but maybe it wasn't wrapped in
-		// <![CDATA[ ]]> tags.
-		$value = trim("{$xml->$nodename}");
-		if (!$xml->$nodename) {
-			foreach ($xml->xpath("/quiz/$nodename/*") as $desc_node) {
-				$value .= $desc_node->asXML();
-			};
-		}
-		return $value;
-	}
+    /**
+     * @param SimpleXMLElement $question
+     * @param string $version
+     * @return string
+     */
+	protected function getQuestionConfig(SimpleXMLElement $question, $version)
+    {
+        /* Only json-encode if there are config elements
+         *
+         * When you cast the std obj to an array, you can possibly
+         * end up with an empty config if the tags are separated
+         */
+
+        // Backwards compatibility for versions 16.0 -
+        if(IParser::FORMAT_VERSION_160 == $version){
+            if (count(array_keys((array)$question->config))) {
+                return json_encode((array)$question->config);
+            } else {
+                return 'NULL';
+            }
+        }
+        // 16.5 +
+        else {
+            /** @var SimpleXMLElement $configs */
+            $configs = $question->configs->children();
+            if($configs->count()){
+                $config = [];
+                foreach ($configs as $configSXE){
+                    $config[(string)$configSXE->name] = (string)$configSXE->value;
+                }
+                return json_encode($config);
+            } else {
+                return 'NULL';
+            }
+        }
+    }
+
+    /**
+     * Ensure not trying to load a quiz as survey or vice-versa
+     *
+     * @param SimpleXMLElement $xml
+     */
+    protected function checkValidQuizType(SimpleXMLElement $xml)
+    {
+        if($xml->availability != $this->getAvailability()){
+            // Rename 'assess' as 'quiz' for UI
+            $format   = $xml->availability == Quiz::AVAILABILITY_ASSESS ? 'quiz' : $xml->availability;
+            $importAs = $this->getAvailability() == Quiz::AVAILABILITY_ASSESS ? 'quiz' : $this->getAvailability();
+            error(null, "Cannot import {$format} as a {$importAs}");
+        }
+    }
+
+    /**
+     * Creates the evaluation (without sections, questions or solutions)
+     *
+     * Returns the newly assigned 'assess_id'
+     *
+     * @param IParser $parser
+     * @return int
+     */
+	abstract protected function createEvaluation(IParser $parser);
+
+
+    /**
+     * Gets a version-dependent parser that knows how to interpret a specific version format, but
+     * respect a consistent API of representing the file's data.
+     *
+     * @param SimpleXMLElement $xml
+     * @param string $fileFormatVersion
+     * @return IParser
+     */
+	abstract protected function getParser(SimpleXMLElement $xml, $fileFormatVersion);
+
+    /**
+     * Returns what version file the user is trying to import.
+     *
+     * Prior to 16.5, no version numbering existed, so assume 16.0
+     *
+     * @param SimpleXMLElement $xml
+     * @return string
+     */
+	protected function getVersion(SimpleXMLElement $xml)
+    {
+	    $fileVersion = (string)$xml->version;
+	    return $fileVersion ?: Evaluation\Import\Parser\Base::FORMAT_VERSION_160;
+    }
+
+    /**
+     * Is this import controller for 'assess' or 'survey' ?
+     *
+     * @return string
+     */
+    abstract protected function getAvailability();
+
+    /**
+     * @return QuizMapper
+     */
+    protected function getQuizMapper()
+    {
+        return $this->quizMapper;
+    }
+
 
 	/* Getters/Setters
 	 */
@@ -213,7 +271,7 @@ abstract class Evaluation_Import_Xml {
 	/**
 	 * Set section handler
 	 *
-	 * @param $sectionHandler
+	 * @param Evaluation_Section $sectionHandler
 	 */
 	protected function setSectionHandler($sectionHandler) {
 		$this->sectionHandler = $sectionHandler;
@@ -222,78 +280,62 @@ abstract class Evaluation_Import_Xml {
 	/**
 	 * Get section handler
 	 *
-	 * @return null
+	 * @return Evaluation_Section
 	 */
 	protected function getSectionHandler() {
 		return $this->sectionHandler;
 	}
 
 	/**
-	 * Set factory
-	 *
-	 * @param $factory
+	 * @param Evaluation_Factory $factory
 	 */
 	protected function setFactory($factory) {
 		$this->factory = $factory;
 	}
 
 	/**
-	 * Get factory
-	 *
-	 * @return null
+	 * @return Evaluation_Factory
 	 */
 	protected function getFactory() {
 		return $this->factory;
 	}
 
 	/**
-	 * Set page
-	 *
-	 * @param $page
+	 * @param SitePage $page
 	 */
 	protected function setPage($page) {
 		$this->page = $page;
 	}
 
 	/**
-	 * Get page
-	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;
 	}
 
 	/**
-	 * Set assess handler
-	 *
-	 * @param $assessHandler
+	 * @param Evaluation_Main $assessHandler
 	 */
 	protected function setAssessHandler($assessHandler) {
 		$this->assessHandler = $assessHandler;
 	}
 
 	/**
-	 * Get assess handler
-	 *
-	 * @return null
+	 * @return Evaluation_Main
 	 */
 	protected function getAssessHandler() {
 		return $this->assessHandler;
 	}
 
 	/**
-	 * Set data
-	 *
-	 * @param $data
+	 * @param string $data
 	 */
 	protected function setData($data) {
 		$this->data = $data;
 	}
 
 	/**
-	 * Get data
-	 *
 	 * @return string
 	 */
 	protected function getData() {
@@ -301,44 +343,34 @@ abstract class Evaluation_Import_Xml {
 	}
 
 	/**
-	 * Set category id
-	 *
-	 * @param $categoryId
+	 * @param int $categoryId
 	 */
 	protected function setCategoryId($categoryId) {
 		$this->categoryId = $categoryId;
 	}
 
 	/**
-	 * Get category id
-	 *
-	 * @return null
+	 * @return int
 	 */
 	protected function getCategoryId() {
 		return $this->categoryId;
 	}
 
 	/**
-	 * Set assess id
-	 *
-	 * @param $assess_id
+	 * @param int $assess_id
 	 */
 	protected function setAssessId($assess_id) {
 		$this->assess_id = $assess_id;
 	}
 
 	/**
-	 * Get assess id
-	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getAssessId() {
 		return $this->assess_id;
 	}
 
 	/**
-	 * Set title
-	 *
 	 * @param string $title
 	 */
 	protected function setTitle($title) {
@@ -346,8 +378,6 @@ abstract class Evaluation_Import_Xml {
 	}
 
 	/**
-	 * Get title
-	 *
 	 * @return string
 	 */
 	public function getTitle() {

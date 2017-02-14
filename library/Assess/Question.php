@@ -11,13 +11,11 @@
  * @version     SVN: $Id$
  */
 class Assess_Question extends Evaluation_Question {
-    public $_table = 'assess_question';
-    public $_index = 'question_id';
 
-	public function __construct() {
+	public function __construct()
+    {
 		parent::__construct();
-
-		$this->sectionHandler = new Assess_Section();
+		$this->setSectionHandler(new Assess_Section());
 	}
 
 	/**

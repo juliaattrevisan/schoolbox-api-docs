@@ -10,7 +10,43 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Survey_Factory extends Evaluation_Factory {
-	protected $factoryName = 'Survey';
+class Survey_Factory extends Evaluation_Factory
+{
+    private $responseHandler;
+    private $questionHandler;
+    private $sectionHandler;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->responseHandler = new Survey_Response();
+        $this->questionHandler = new Survey_Question();
+        $this->sectionHandler  = new Survey_Section();
+    }
+
+    /**
+     * @return string
+     */
+	protected function getFactoryName()
+    {
+        return 'Survey';
+    }
+
+    protected function getResponseHandler()
+    {
+        return $this->responseHandler;
+    }
+
+    protected function getQuestionHandler()
+    {
+        return $this->questionHandler;
+    }
+
+    /**
+     * @return Survey_Section
+     */
+    protected function getSectionHandler()
+    {
+        return $this->sectionHandler;
+    }
 }

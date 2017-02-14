@@ -23,22 +23,15 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
 	 * Exports the answer to Moodle XML format. This is a modified version of
 	 * $this->reviewResponse()
 	 *
-	 * @param  $page
-	 * @param  $question_id
+	 * @param SitePage $page
+	 * @param int $question_id
 	 * @return void
 	 */
-	public function exportMoodleAnswer($page, $question_id) {
+	public function exportMoodleAnswer(SitePage $page, $question_id)
+    {
 		$currentAnswer = $this->getByQuestionID($question_id);
-
-		/* Show correct answer
-		 */
-		$page->setVar(
-			array(
-				'CORRECT_ANSWER' => Scrub::html($currentAnswer['answer'])
-			)
-		);
-
-		$page->parse('answerOption_block', 'answerOption', true);
+		$page->setVar('CORRECT_ANSWER', Scrub::html($currentAnswer['answer']));
+		$page->parse('answerOption_block', 'answerOption');
 	}
 
 	/**

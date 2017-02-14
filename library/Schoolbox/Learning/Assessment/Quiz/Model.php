@@ -61,7 +61,7 @@ class Model extends AbstractAssessment
      *
      * @var string
      */
-    protected $completionMessage;
+    private $completionMessage;
 
     /**
      * @param GradeGroup|null $gradeGroup

@@ -29,18 +29,14 @@ abstract class Evaluation_Answer extends DeprecatedModel
     protected $useLongAnswers = false;
 
 	/**
-	 * An instance of Assess/Survey ResponseHandler
-	 *
-	 * @var Survey_Response
+	 * @var Evaluation_Response
 	 */
-	protected $responseHandler = null;
+	protected $responseHandler;
 
 	/**
-	 * An instance of Assess/Survey QuestionHandler
-	 *
-	 * @var null
+	 * @var Evaluation_Question
 	 */
-	protected $questionHandler = null;
+	protected $questionHandler;
 
     /**
      * Javascript plugin for reviewing
@@ -50,22 +46,15 @@ abstract class Evaluation_Answer extends DeprecatedModel
     protected $pluginReview = '';
 
     /**
-     * Constructor.
-     *
-     * Run parent constructor
+     * @param Evaluation_Response $responseHandler
+     * @param Evaluation_Question $questionHandler
      */
-    public function __construct()
+    public function __construct($responseHandler, $questionHandler)
     {
         parent::DeprecatedModel();
-
-		$this->setup();
+        $this->responseHandler = $responseHandler;
+        $this->questionHandler = $questionHandler;
     }
-
-	/**
-	 * Hook method
-	 */
-	protected function setup() {
-	}
 
     /**
      * Sets legendHTML
@@ -99,7 +88,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * Output configuration tags in xml
      *
      * @param SitePage $page
-     * @param $config
+     * @param string $config
      */
     public function configureXml(SitePage $page, $config) {
         if (strlen($config)) {
@@ -281,6 +270,21 @@ abstract class Evaluation_Answer extends DeprecatedModel
 
         return $data;
     }
+
+    /**
+     * Exports the answer to Moodle XML format.
+     *
+     * @param SitePage $page
+     * @param int $question_id
+     */
+    abstract public function exportMoodleAnswer(SitePage $page, $question_id);
+
+    /**
+     * @param SimpleXMLElement $xmlObj
+     * @param int $question_id
+     */
+    abstract public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id);
+
 
 	/* Getters/Setters
  	 */
