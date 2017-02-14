@@ -395,4 +395,34 @@ class DiffTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $a->compareDateOnly($b));
         $this->assertEquals($expected * -1, $b->compareDateOnly($a));
     }
+
+
+    public function getCompareYearOnlyData()
+    {
+        return [
+            [
+                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-23 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                0
+            ],
+            [
+                $this->buildDateObject('2014-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                -1
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getCompareYearOnlyData
+     *
+     * @param Alaress_Date_Format $a
+     * @param Alaress_Date_Format $b
+     * @param int                 $expected
+     */
+    public function testCompareYearOnly($a, $b, $expected)
+    {
+        $this->assertEquals($expected, $a->compareYearOnly($b));
+        $this->assertEquals($expected * -1, $b->compareYearOnly($a));
+    }
 }
