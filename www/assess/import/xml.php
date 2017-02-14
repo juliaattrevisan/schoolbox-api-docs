@@ -55,12 +55,11 @@ $route = $this->routeLookup('learningAssessment.getUpdateAssessmentForm', ['asse
 
 // Configure Update page to return to requested URL, or default to context homepage
 if(isset($_GET[Redirect::RETURN_URL]) ){
-    $encodedReturnUrl = $_GET[Redirect::RETURN_URL];
+    $returnUrl = Redirect::decode($_GET[Redirect::RETURN_URL]);
 } else {
     $returnUrl = $quiz->getContext() instanceof Project
         ? $this->routeLookup('learningAssessment.getStatus', ['assessmentId' => $quiz->getContext()->getId()])
         : "/homepage/{$quiz->getBaseContext()->getFolder()->getId()}";
-    $encodedReturnUrl = Redirect::encode($returnUrl);
 }
-SitePage::localRedir($route . '?' . Redirect::RETURN_URL . '=' . $encodedReturnUrl);
+SitePage::localRedir($route . Redirect::queryString($returnUrl));
 
