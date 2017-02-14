@@ -1380,7 +1380,7 @@ class PendingFactory
     private function getClassesTaughtAndAdministered()
     {
         $getSubjects = true;
-        $groupAccessLevel = UserAccess::ACCESS_FULL;
+        $groupAccessLevel = UserAccess::ACCESS_WRITE;
         $folders = $this->folderMapper->findForUser($this->viewee, $getSubjects, $groupAccessLevel);
 
         foreach($folders as $folder){
