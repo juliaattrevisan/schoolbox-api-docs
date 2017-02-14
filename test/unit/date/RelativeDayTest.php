@@ -65,7 +65,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $expected = 'yesterday at ' . $now->getTimeOnly();
 
         $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
-        $eventDate->addDays('-1');
+        $eventDate->addDays(-1);
 
         $result = $eventDate->getRelativeDay($now);
         $this->assertEquals($expected, $result);
@@ -82,7 +82,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $expected = 'tomorrow at ' . $now->getTimeOnly();
 
         $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
-        $eventDate->addDays('1');
+        $eventDate->addDays(1);
 
         $result = $eventDate->getRelativeDay($now);
         $this->assertEquals($expected, $result);
