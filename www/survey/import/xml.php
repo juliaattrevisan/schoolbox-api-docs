@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Learning\Assessment\Redirect;
+
 SitePage::extendExecutionTime(300);
 
 if (!is_numeric($this->arg[0])) {
@@ -24,4 +26,6 @@ if ($_FILES['importXML']['tmp_name']) {
 $import = new Survey_Import_Xml($this->arg[0], new Survey_Main(), new Survey_Section(), new Survey_Factory(), $data, $this);
 $import->import();
 
-SitePage::localRedir('/survey/summary/' . $import->getAssessId());
+$route = "/survey/modify/{$import->getAssessId()}" . Redirect::queryString("/survey/summary/{$import->getAssessId()}");
+
+SitePage::localRedir($route);
