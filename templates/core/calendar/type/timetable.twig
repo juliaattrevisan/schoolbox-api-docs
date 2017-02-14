@@ -16,7 +16,7 @@
 {% block eventBubbleButtons %}
 <div>
     {% if renderer.showAttendanceLink() %}
-    <a class="button icon-class-list" href="/modules/attendance/modify/{{ event.getCode() | url_encode }}/{{ event.getStartTime.getDatabaseDate() }}/{{ event.getPeriod() }}/{{ event.getTimetableCode() }}" title="Mark Attendance">Attendance</a>
+    <a class="button icon-class-list" href="/modules/attendance/modify/{{ event.getCode() | url_encode | url_encode }}/{{ event.getStartTime.getDatabaseDate() }}/{{ event.getPeriod() }}/{{ event.getTimetableCode() }}" title="Mark Attendance">Attendance</a>
     {% endif %}
     {% if event.categoryId > 0 %}
         <a class="button icon-home" href="/homepage/{{ event.categoryId }}">Homepage</a>
