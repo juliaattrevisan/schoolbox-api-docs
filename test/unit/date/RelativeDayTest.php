@@ -194,7 +194,7 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $expected = 'today';
 
         $now = new Alaress_Date_Format('2000-01-01 00:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
-        $eventDate = new Alaress_Date_Format('2000-01-01 23:59:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2000-01-01 23:59:59', 'Y-m-d H:i:s', null, $this->dateLocale);
 
         $result = $eventDate->getRelativeDay($now);
 
