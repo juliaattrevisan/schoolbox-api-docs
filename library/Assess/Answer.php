@@ -31,13 +31,6 @@ class Assess_Answer extends Evaluation_Answer {
     }
 
     /**
-     * Exports the answer to Moodle XML format.
-     *
-     * @param SitePage $page
-     * @param int $question_id
-     */
-
-    /**
      * @inheritdoc
      */
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
