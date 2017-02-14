@@ -9,6 +9,7 @@
 use Schoolbox\External\Connector\Synergetic\Base\ExternalEvents;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
+use Schoolbox\Calendar\EventTypeMapper;
 
 //class Calendar_Api_External_Event_Default extends Calendar_Api_EventType_Abstract {
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
@@ -21,6 +22,11 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     private $externalEvents;
 
     /**
+     * @var EventTypeMapper
+     */
+    protected $eventTypeMapper;
+
+    /**
      * Constructor
      *
      * @param $user
@@ -29,6 +35,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     public function __construct($user, $config) {
         $this->setUser($user);
         $this->externalEvents = new ExternalEvents();
+        $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 
     /**
@@ -54,6 +61,15 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $eventType = 1;
         }
 
+        $eventColor = null;
+        try {
+            /** @var EventType $eventTypeObject */
+            $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
+            $eventColor      = $eventTypeObject->getColor();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
+        }
+
         foreach ($externalEvents as $externalEvent) {
             $event = new Event();
             $event->setEventId(rand(0, 1000)); //Todo
@@ -66,6 +82,8 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $event->setAllday(false);
             $event->setAuthorId($externalEvent['owner']);
             $event->setLocation($externalEvent['location']);
+            $event->setColour($eventColor);
+
             $stack->add($event);
         }
         return $stack;
@@ -94,5 +112,23 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         return Calendar_Api_Config_Mapper::getInstance()->findById(
             $this->getConnectorId()
         );
+    }
+
+    /**
+     * @param  EventTypeMapper $eventTypeMapper
+     * @return $this
+     */
+    public function setEventTypeMapper($eventTypeMapper)
+    {
+        $this->eventTypeMapper = $eventTypeMapper;
+        return $this;
+    }
+
+    /**
+     * @return EventTypeMapper
+     */
+    public function getEventTypeMapper()
+    {
+        return $this->eventTypeMapper;
     }
 }

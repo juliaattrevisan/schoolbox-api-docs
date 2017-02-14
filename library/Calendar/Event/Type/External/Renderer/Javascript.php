@@ -40,7 +40,7 @@ class Javascript extends Base
 
                 /* Colour of the event
                  */
-//                'color'     => $this->event->getColour(),
+                'color'     => $this->event->getColour(),
 
                 /* Campus slug so you can filter events
                  */

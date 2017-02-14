@@ -1,6 +1,0 @@
-<?php
-echo "<pre>";
-print_r(unserialize(base64_decode('TzozODoiQ2FsZW5kYXJfQXBpX0NvbmZpZ19Db25uZWN0b3JfRXh0ZXJuYWwiOjY6e3M6NToiACoAaWQiO2k6LTE7czo4OiIAKgBsYWJlbCI7czo5OiJTb21ldGhpbmciO3M6MTI6IgAqAGV2ZW50VHlwZSI7czo1OiJFdmVudCI7czoxNzoiACoAY29ubmVjdG9yQ2xhc3MiO3M6ODoiRXh0ZXJuYWwiO3M6MTQ6IgAqAGx1RXZlbnRUeXBlIjtzOjE6IjQiO3M6MTc6IgAqAGhhc1Blcm1pc3Npb25zIjtiOjA7fQ==')));
-echo "</pre>";
-//print_r();
-?>
