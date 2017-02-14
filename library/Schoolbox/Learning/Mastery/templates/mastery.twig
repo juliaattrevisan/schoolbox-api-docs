@@ -144,7 +144,7 @@
 
                                         {% if participant is not empty %}
                                             {% if not isAwaiting %}
-                                                {% if false and assessment.dueAt.isPast %}
+                                                {% if assessment.dueAt.isPast %}
                                                     {# The assessment is past its due date and is not awaiting #}
 
                                                     {% set value = '<i class="icon-close" title="Past Due Date. No Response">' %}
