@@ -1697,7 +1697,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Get a relative day and time
      * e.g Today at 2:00pm, Tomorrow at 8:00am, Saturday at 3:30pm (if within a week)
-     * Defaults back to getDateOnly() at getTimeOnly() if date is a week or further from $now
+     * Defaults back to 'getDateOnly() at getTimeOnly()' if date is a week or further from $now
      *
      * @param bool $lowercase
      * @param Alaress_Date_Format $now
@@ -1709,24 +1709,24 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             $now = Alaress_Date_Format::now();
         }
 
-        $diffInDays = $this->diffInDays($now);
+        $nowFloored = clone $now;
+        $nowFloored->startOfDay();
+
+        $thisFloored = clone $this;
+        $thisFloored->startOfDay();
+
+        $diffInDays = $thisFloored->diffInDays($nowFloored);
 
         if ($this->isSameDay($now)) {
             $relativeTime = 'today';
+        } elseif ($this->isTomorrow()) {
+            $relativeTime = 'tomorrow';
+        } elseif ($this->isYesterday()) {
+            $relativeTime = 'yesterday';
+        } elseif ($diffInDays < 7) {
+            $relativeTime = $this->getUsingFormat('l');
         } else {
-            if ($this->isTomorrow()) {
-                $relativeTime = 'tomorrow';
-            } else {
-                if ($this->isYesterday()) {
-                    $relativeTime = 'yesterday';
-                } else {
-                    if ($diffInDays < 7) {
-                        $relativeTime = $this->getUsingFormat('l');
-                    } else {
-                        $relativeTime = $this->getDateOnly();
-                    }
-                }
-            }
+            $relativeTime = $this->getDateOnly();
         }
 
         if (!$lowercase) {
