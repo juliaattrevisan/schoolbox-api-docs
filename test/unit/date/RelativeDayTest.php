@@ -90,11 +90,11 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
 
 
     /**
-     * Check that an event in the past week displays 'Last {day name}'
+     * Check that an event in the past week displays 'last {day name}'
      */
     public function testRelativeDayWithinSevenPast()
     {
-        $expected = 'Wednesday at 10:00pm';
+        $expected = 'last Wednesday at 10:00pm';
 
         $now = new Alaress_Date_Format('2017-02-14 12:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
         $eventDate = new Alaress_Date_Format('2017-02-08 22:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);

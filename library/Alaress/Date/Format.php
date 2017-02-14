@@ -1733,7 +1733,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         } elseif ($this->isYesterday()) {
             $relativeTime = 'yesterday';
         } elseif ($diffInDays < 7) {
-            $relativeTime = $this->getUsingFormat('l');
+
+            $relativeTime = '';
+
+            if ($this->isPast()) {
+                $relativeTime = 'last ';
+            }
+
+            $relativeTime .= $this->getUsingFormat('l');
+
         } else {
             // TODO: Use getDateOnly here and only include year when not the current year
             $relativeTime = $this->getShortDateOnly();
