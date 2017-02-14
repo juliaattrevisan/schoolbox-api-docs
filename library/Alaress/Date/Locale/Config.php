@@ -96,6 +96,15 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
     }
 
     /**
+     * Get a short date only format
+     *
+     * @return string
+     */
+    public function shortDateOnlyFormat() {
+        return $this->getConfig()->get('date_short');
+    }
+
+    /**
      * Get the date-only format
      *
      * @return string

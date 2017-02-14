@@ -957,6 +957,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
+     * Use short format
+     *
+     * @return string
+     */
+    public function getShortDateOnly()
+    {
+        return $this->getUsingFormat($this->getLocale()->shortDateOnlyFormat());
+    }
+
+    /**
      * Get the date only
      *
      * @return string
@@ -1727,7 +1737,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             $relativeTime = $this->getUsingFormat('l');
         } else {
             // TODO: Use getDateOnly here and only include year when not the current year
-            $relativeTime = $this->getShort();
+            $relativeTime = $this->getShortDateOnly();
         }
 
         // Add the time if the date is within 30 days and isn't 11:59pm
