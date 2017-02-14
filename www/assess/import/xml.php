@@ -11,9 +11,9 @@
  */
 
 
-use Aura\Router\Router;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Redirect;
 
 /** @var SitePage $this */
 $folderId = $this->arg[0];
@@ -48,9 +48,19 @@ $import = new Assess_Import_Xml(
     $contextId
 );
 $import->import();
+$quiz = $import->getQuiz();
 
-/** @var Router $router */
-$router = $this->getDi()->get('router');
-$route = $router->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $import->getAssessmentId()]);
-SitePage::localRedir($route);
+// Redirect to Quiz Update page.
+$route = $this->routeLookup('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $quiz->getId()]);
+
+// Configure Update page to return to requested URL, or default to context homepage
+if(isset($_GET[Redirect::RETURN_URL]) ){
+    $encodedReturnUrl = $_GET[Redirect::RETURN_URL];
+} else {
+    $returnUrl = $quiz->getContext() instanceof Project
+        ? $this->routeLookup('learningAssessment.getStatus', ['assessmentId' => $quiz->getContext()->getId()])
+        : "/homepage/{$quiz->getBaseContext()->getFolder()->getId()}";
+    $encodedReturnUrl = Redirect::encode($returnUrl);
+}
+SitePage::localRedir($route . '?' . Redirect::RETURN_URL . '=' . $encodedReturnUrl);
 

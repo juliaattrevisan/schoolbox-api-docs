@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -35,11 +36,11 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
     private $assessmentMapperProxy;
 
     /**
-     * The newly assigned assessment.id
+     * The newly created quiz
      *
-     * @var int|null
+     * @var QuizAssessable|null
      */
-    private $assessmentId;
+    private $quiz;
 
     /**
      * One of the enumerated context types - without trailing 's'
@@ -87,13 +88,13 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
 
 
     /**
-     * Return the newly assigned assessment.id
+     * Return the newly created Quiz
      *
-     * @return int|null
+     * @return IAssessable|null
      */
-    public function getAssessmentId()
+    public function getQuiz()
     {
-        return $this->assessmentId;
+        return $this->quiz;
     }
 
 
@@ -151,8 +152,8 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setMarkVisibility($parser->getMarkVisibility());
 
         $this->assessmentMapperProxy->save($quizAssessable);
-        $this->assessmentId = $quizAssessable->getId();
-        $this->assess_id = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $this->assessmentId)[0];
+        $this->quiz = $quizAssessable;
+        $this->assess_id = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $this->quiz->getId())[0];
         return $this->assess_id;
     }
 

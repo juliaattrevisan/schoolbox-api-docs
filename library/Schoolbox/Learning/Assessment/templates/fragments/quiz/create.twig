@@ -15,7 +15,8 @@
     });
 </script>
 
-{% if not assessment.id %}
+{# TODO 'stage' is a temp hack until this fragment gets refactored to use *extend* instead of *include* #}
+{% if not assessment.id and stage != 2 %}
 <div class="actions-small-1 row">
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
