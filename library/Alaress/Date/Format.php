@@ -1747,8 +1747,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             $relativeTime = $this->getShortDateOnly();
         }
 
-        // Add the time if the date is within 30 days and isn't 11:59pm
-        if ($diffInDays <= 30 && $this->getUsingFormat('h:ia') != '11:59pm') {
+        // Add the time if the date is within 30 days and isn't 23:59:59
+        if ($diffInDays <= 30 && $this->getUsingFormat('H:i:s') != '23:59:59') {
             $relativeTime .= ' at ' . $this->getTimeOnly();
         }
 
