@@ -112,9 +112,14 @@ class CanSeeAssessment implements IAuthorizationRule
             throw new Unauthorized();
         }
 
-        foreach ($activity->getAllParticipants() as $participant) {
-            // wow. did not expect to have to do this...
-            if ($user->isParentOf($participant->getUser())) {
+        // if we got passed a participant there's one last check we can do...
+        if (isset($params['participant'])) {
+
+            /** @var User $learner */
+            $learner = $params['participant']->getUser();
+            // ...after we magically hit an external database
+            $learner->loadParents();
+            if ($user->isParentOf($learner)) {
                 return true;
             }
         }
