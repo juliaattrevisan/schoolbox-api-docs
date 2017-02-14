@@ -1726,15 +1726,17 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         } elseif ($diffInDays < 7) {
             $relativeTime = $this->getUsingFormat('l');
         } else {
-            $relativeTime = $this->getDateOnly();
+            // TODO: Use getDateOnly here and only include year when not the current year
+            $relativeTime = $this->getShort();
+        }
+
+        // Add the time if the date is within 30 days and isn't 11:59pm
+        if ($diffInDays <= 30 && $this->getUsingFormat('h:ia') != '11:59pm') {
+            $relativeTime .= ' at ' . $this->getTimeOnly();
         }
 
         if (!$lowercase) {
             $relativeTime = ucfirst($relativeTime);
-        }
-
-        if ($diffInDays <= 30 && $this->getUsingFormat('h:ia') != '11:59pm') {
-            $relativeTime .= ' at ' . $this->getTimeOnly();
         }
 
         return $relativeTime;
