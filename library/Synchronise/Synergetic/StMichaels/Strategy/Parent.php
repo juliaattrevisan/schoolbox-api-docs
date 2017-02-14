@@ -197,6 +197,10 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
             $this->getVerboseFilter()->skip();
             return;
         }
+        if($currentUser['campus'][0] == '') {
+            $this->getVerboseFilter()->skip();
+            return;
+        }
 
         // perform update if the user has an existing Schoolbox ID set
         if(isset($currentUser['id'])) {
