@@ -352,7 +352,7 @@
     function copyCkEditorValues(elem)
     {
         // Is CkEditor running on this page?
-        if(CKEDITOR == undefined || CKEDITOR.instances == undefined){
+        if(typeof CKEDITOR == 'undefined' || typeof CKEDITOR.instances == 'undefined'){
             return;
         }
 
