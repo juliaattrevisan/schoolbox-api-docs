@@ -28,4 +28,22 @@ class Event extends EventBase implements EventInterface {
                                         'csv'           => Renderer\Csv::class,
     );
 
+    /**
+     * Set room
+     *
+     * @param $room
+     */
+    public function setRoom($room) {
+        $this->attendance = $room;
+    }
+
+    /**
+     * Get room
+     *
+     * @return $room
+     */
+    public function getRoom() {
+        return $this->room;
+    }
+
 }
