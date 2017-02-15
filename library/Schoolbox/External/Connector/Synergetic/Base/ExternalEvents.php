@@ -62,7 +62,7 @@ class ExternalEvents implements ExternalEventsInterface
               CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeFrom,120) AS start,
               CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeTo,120)   AS finish,
               luLocation.Description            AS location,
-              luTeam.Description                AS team,
+              luTeam.Description                AS team
             FROM SynergyOne.dbo.StaffSchedule StaffSchedule
               LEFT JOIN SynergyOne.dbo.luLocation ON luLocation.Code = StaffSchedule.LocationCode
               LEFT JOIN SynergyOne.dbo.luTeam ON luTeam.Code = StaffSchedule.TeamCode
