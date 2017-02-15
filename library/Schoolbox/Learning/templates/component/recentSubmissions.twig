@@ -1,29 +1,22 @@
 {#
 Usage:
     assessments: IAssessable[],
-    limit:       int,
 #}
 <ul class="information-list">
-    {% set count = 0 %}
     {% for assessment in assessments %}
-        {% if not limit or count < limit %}
-            <li class="list-item" data-equalizer>
-                <div class="small-2 columns">
-                    {% set responseType = assessment is quiz ? 'attempt' : 'submission' %}
-                    <p class='counter' title="{{ assessment.responses | length }} new {{ responseType }}{% if assessment.responses | length > 1%}s{% endif %}">{{ assessment.responses | length }}</p>
-                </div>
-                <div class="card small-10" data-equalizer-watch>
-                    <h3><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></h3>
+        <li class="list-item" data-equalizer>
+            <div class="small-2 columns">
+                {% set responseType = assessment is quiz ? 'attempt' : 'submission' %}
+                <p class='counter' title="{{ assessment.responses | length }} new {{ responseType }}{% if assessment.responses | length > 1%}s{% endif %}">{{ assessment.responses | length }}</p>
+            </div>
+            <div class="card small-10" data-equalizer-watch>
+                <h3><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></h3>
 
-                    <p class="meta">
-                        Last {{ responseType }} {{ assessment.responses.first.submittedAt.relativeTime }} in
-                        <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a>
-                    </p>
-                </div>
-            </li>
-        {% endif %}
-
-        {% set count = count + 1 %}
-
+                <p class="meta">
+                    Last {{ responseType }} {{ assessment.responses.first.submittedAt.relativeTime }} in
+                    <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a>
+                </p>
+            </div>
+        </li>
     {% endfor %}
 </ul>
