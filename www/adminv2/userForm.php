@@ -91,7 +91,8 @@ if ($_POST['modusername']) {
         error(158);
     }
 
-} /* Delete user from group
+}
+/* Delete user
  */
 elseif ($_POST['type'] == 'delete') {
     try {
@@ -103,21 +104,24 @@ elseif ($_POST['type'] == 'delete') {
     $userMapper->delete($user);
     SitePage::localRedir('/adminv2/user/');
 
-} /* Add user to group
+}
+/* Add user to group
  */
 elseif (isset($_POST['groupSubmit']) && is_numeric($_POST['uid'])) {
     $groupHandler->setService(Scrub::text($_POST['service']));
     $groupHandler->addUser(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
 
     SitePage::localRedir('/adminv2/modify-user/' . Scrub::text($_POST['uid']) . '#permissions');
-} /* Add user to service
+}
+/* Add user to service
  */
 elseif (isset($_POST['addService']) && is_numeric($_POST['uid'])) {
     $groupHandler->setService(Scrub::text($_POST['service']));
     $groupHandler->addUser(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
 
     SitePage::localRedir('/adminv2/modify-user/' . Scrub::text($_POST['uid'] . '#permissions'));
-} /* Ajax Update Groups and their access permissions etc
+}
+/* Ajax Update Groups and their access permissions etc
  */
 elseif ($_POST['updateGroups'] == true) {
     $groupHandler->setService(Scrub::text($_POST['service']));
@@ -134,17 +138,20 @@ elseif ($_POST['updateGroups'] == true) {
     /* Update user access as normal
 	 */
     $groupHandler->setUserGroupType(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
-} /* Ajax Update Service Permissions (sid corresponds to campus)
+}
+/* Ajax Update Service Permissions (sid corresponds to campus)
  */
 elseif (Scrub::text($_POST['updateServices']) == true) {
     $groupHandler->setService(Scrub::text($_POST['service']));
     $groupHandler->setUserGroupType(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
-} /* Ajax Update SID values
+}
+/* Ajax Update SID values
  */
 elseif (Scrub::text($_POST['updateSID']) == true) {
     $groupHandler->setService(Scrub::text($_POST['service']));
     $groupHandler->setSID(Scrub::text($_POST['previousSid']), Scrub::text($_POST['sid']), Scrub::text($_POST['uid']));
-} /* Remove a service
+}
+/* Remove a service
  */
 elseif (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_numeric($_GET['uid'])) {
     $groupHandler->setService(Scrub::text($_GET['deleteService']));
@@ -207,7 +214,7 @@ elseif ($_POST['login']) {
     $sessionHandler = new Session();
 
     if ($sessionHandler->create($_POST['login'])) {
-/* Logging
+        /* Logging
 		 */
         $_SESSION['previous'] = $oldSession;
 
