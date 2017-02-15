@@ -61,6 +61,14 @@
                             {% endif %}
                         {% endblock medicalAlert %}
 
+                        {% block synergeticComments %}
+                            {% if externalUser.Comment is not empty %}
+                                <div class="alert-box highlight icon-info no-margin">
+                                    {{ externalUser.Comment }}
+                                </div>
+                            {% endif %}
+                        {% endblock synergeticComments %}
+
                         {% block details %}
                         <dl>
                             {% if showTitle %}

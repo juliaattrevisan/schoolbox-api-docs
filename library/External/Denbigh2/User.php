@@ -1120,5 +1120,4 @@ class External_Denbigh2_User implements External_UserInterface
     {
         return $this->groupHandler;
     }
-
 }

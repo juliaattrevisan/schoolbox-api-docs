@@ -82,6 +82,23 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
+     * Get a list of comments from the 'uStudentComments' table if it exists
+     * @param $externalUserId
+     * @return array
+     */
+    public function getStudentComments($externalUserId) {
+
+        if (!$this->isExternalIdValid($externalUserId)) {
+            return [];
+        }
+
+        $query = "SELECT Comment as comment FROM Students WHERE ID = {$externalUserId}";
+        $comments = $this->getDatabase()->getAll($query) ?: array();
+
+        return $comments;
+    }
+
+    /**
      * Retrieves the user's Synergetic image
      *
      * @param Integer $externalUserId
@@ -321,7 +338,8 @@ class External_Synergetic_User implements External_UserInterface
                     vStudents.StudentSpecialNeedsFlag,
                     vStudents.StudentStudiesCode,
                     AlertMessage,
-                    vStudents.StudentBoarder
+                    vStudents.StudentBoarder,
+                    vStudents.StudentsComment as Comment
                 FROM dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts
                         ON CommunityAlerts.ID = StudentID
