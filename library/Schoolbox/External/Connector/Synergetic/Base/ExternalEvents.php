@@ -15,6 +15,7 @@ use Alaress\DebugBar\Instance as DebugBar;
 use MSSQL;
 use Schoolbox\External\Connector\ExternalEventsInterface;
 use UnexpectedValueException;
+use \Alaress_Date_Format;
 
 class ExternalEvents implements ExternalEventsInterface
 {
@@ -46,8 +47,10 @@ class ExternalEvents implements ExternalEventsInterface
      * @return bool
      * @throws UnexpectedValueException if either key or IV was not set
      */
-    public function getExternalEvents($user='', $startDate='', $endDate='')
+    public function getExternalEvents($user, $startDate, $endDate)
     {
+        $start = new Alaress_Date_Format($startDate, 'U');
+        $finish = new Alaress_Date_Format($endDate, 'U');
         $query = "
 SELECT
   StaffSchedule.StaffID             AS owner,
@@ -60,7 +63,7 @@ SELECT
 FROM SynergyOne.dbo.StaffSchedule StaffSchedule
   LEFT JOIN SynergyOne.dbo.luLocation ON luLocation.Code = StaffSchedule.LocationCode
   LEFT JOIN SynergyOne.dbo.luTeam ON luTeam.Code = StaffSchedule.TeamCode
-WHERE StaffSchedule.ScheduleDateTimeFrom > '2016-01-01 00:00:00' AND StaffSchedule.ScheduleDateTimeTo < '2017-03-03 00:00:00'
+WHERE StaffSchedule.ScheduleDateTimeFrom > '{$start->getDatabase()}' AND StaffSchedule.ScheduleDateTimeTo < '{$finish->getDatabase()}'
 ORDER BY StaffSchedule.StaffScheduleSeq ASC
         ";
         return $this->database->getAll($query);

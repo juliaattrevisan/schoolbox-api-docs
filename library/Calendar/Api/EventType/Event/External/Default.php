@@ -49,42 +49,44 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     public function getEvents($startTimestamp, $endTimestamp) {
 
         $stack            = new Collection();
-        $externalEvents = $this->externalEvents->getExternalEvents();
+        $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
 
-        // Figure out event type
-        try {
-            /** @var Calendar_Api_Config_Record $config */
-            $config        = $this->loadConnectorConfiguration();
-            $decodedConfig = $config->decodeConfig();
-            $eventType     = $decodedConfig->getLuEventType();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $eventType = 1;
-        }
+        if($externalEvents) {
+            // Figure out event type
+            try {
+                /** @var Calendar_Api_Config_Record $config */
+                $config        = $this->loadConnectorConfiguration();
+                $decodedConfig = $config->decodeConfig();
+                $eventType     = $decodedConfig->getLuEventType();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $eventType = 1;
+            }
 
-        $eventColor = null;
-        try {
-            /** @var EventType $eventTypeObject */
-            $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
-            $eventColor      = $eventTypeObject->getColor();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
-        }
+            $eventColor = null;
+            try {
+                /** @var EventType $eventTypeObject */
+                $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
+                $eventColor      = $eventTypeObject->getColor();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
 
-        foreach ($externalEvents as $externalEvent) {
-            $event = new Event();
-            $event->setEventId(rand(0, 1000)); //Todo
-            $event->setEventType($eventType);
-            $event->setTitle($externalEvent['title']);
-            $event->setDetail($externalEvent['description']);
-            $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
-            $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
-            $event->setEventType('external');
-            $event->setAllday(false);
-            $event->setAuthorId($externalEvent['owner']);
-            $event->setLocation($externalEvent['location']);
-            $event->setColour($eventColor);
+            foreach ($externalEvents as $externalEvent) {
+                $event = new Event();
+                $event->setEventId(rand(0, 1000)); //Todo
+                $event->setEventType($eventType);
+                $event->setTitle($externalEvent['title']);
+                $event->setDetail($externalEvent['description']);
+                $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
+                $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+                $event->setEventType('external');
+                $event->setAllday(false);
+                $event->setAuthorId($externalEvent['owner']);
+                $event->setLocation($externalEvent['location']);
+                $event->setColour($eventColor);
 
-            $stack->add($event);
+                $stack->add($event);
+            }
         }
         return $stack;
 

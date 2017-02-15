@@ -20,5 +20,5 @@ interface ExternalEventsInterface
      * @param  string $endDate
      * @return array
      */
-    public function getExternalEvents($startDate, $endDate);
+    public function getExternalEvents($user, $startDate, $endDate);
 }
