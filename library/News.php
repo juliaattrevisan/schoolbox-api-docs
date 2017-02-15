@@ -659,8 +659,8 @@ class News extends DeprecatedModel
         if (!$userHandler->isSuperuser()) {
             $query = "
         SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
-            UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
-            UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
+            UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, item_datetime_published, news_items.item_datetime_posted, news_items.item_datetime_modified,
+            UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime, news_items.item_datetime_expires,
             user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID,
             MATCH(`item_heading`,`item_body`) AGAINST ('$keyword') AS `score`
         FROM `" . $this->_table . "`
@@ -681,7 +681,7 @@ class News extends DeprecatedModel
 
         $query = "
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
-			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, item_datetime_published news_items.item_datetime_posted, news_items.item_datetime_modified,
 			UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime, news_items.item_datetime_expires,
 			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID,
 		    MATCH(`item_heading`,`item_body`) AGAINST ('$keyword') AS `score`
