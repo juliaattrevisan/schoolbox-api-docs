@@ -138,8 +138,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
             $templateHandle,
             '@learning/component/recentSubmissions.twig',
             [
-                'assessments'         => $this->assessments,
-                'limit'               => $limit = $this->getConfig('size'),
+                'assessments' => $this->assessments,
             ]
         );
     }
