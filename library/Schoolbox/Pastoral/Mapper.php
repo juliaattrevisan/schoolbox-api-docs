@@ -568,29 +568,40 @@ class Mapper extends BaseMapper
         $record->setCommentList($this->getPastoralCommentMapper()->findByColumn("pastoral_id", $record->getId()));
         $record->setAttachmentList($this->getPastoralAttachmentMapper()->findByColumn("pastoral_id", $record->getId()));
 
-        // Grab users and roles
+        // Grab users and roles that have access to the record
 
-        $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
+        $accessList = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId());
 
-        foreach ($record->getAccessList() as $access) {
+        // We need to go through the access list, some users/system roles may have been deleted since the record was created
+        // so this takes them off the record. Also mark them as deleted in the database so it doesn't keep happening
+
+        $accessListAmended = new Collection();
+
+        foreach ($accessList as $access) {
             if ($access->getRole()->getId() != '') {
                 try {
                     /** @var \Schoolbox\Role $role */
                     $role = $this->getRoleMapper()->findById($access->getRole()->getId());
                     $access->setRole($role);
+                    $accessListAmended->add($access);
                 } catch (MapperException $e) {
-                    throw new MapperException('Instance of object not found');
+                    // System role has been deleted- cant do anything with this access record anymore, so mark it deleted
+                    $this->getPastoralAccessMapper()->deleteByColumn('id', $access->getId());
                 }
             } else {
                 if ($access->getUser()->getId() != '') {
                     try {
-                        $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
+                        $access->setUser($this->getUserMapper()->findById('id', $access->getUser()->getId()));
+                        $accessListAmended->add($access);
                     } catch (MapperException $e) {
-                        throw new MapperException('Instance of object not found');
+                        // User was deleted- cant do anything with this access record anymore, so mark it deleted
+                        $this->getPastoralAccessMapper()->deleteByColumn('id', $access->getId());
                     }
                 }
             }
         }
+
+        $record->setAccessList($accessListAmended);
 
         // Grab comment authors
 
