@@ -80,14 +80,13 @@ class ExternalEvents implements ExternalEventsInterface
               CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeFrom,120) AS start,
               CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeTo,120)   AS finish,
               luLocation.Description            AS location,
-              luTeam.Description                AS title,
-              StaffScheduleStudentClasses
+              luTeam.Description                AS title
             FROM SynergyOne.dbo.StaffSchedule StaffSchedule
               LEFT JOIN SynergyOne.dbo.luLocation ON luLocation.Code = StaffSchedule.LocationCode
               LEFT JOIN SynergyOne.dbo.luTeam ON luTeam.Code = StaffSchedule.TeamCode
               LEFT JOIN SynergyOne.dbo.StaffScheduleStudentClasses ON StaffScheduleStudentClasses.StaffScheduleSeq = StaffSchedule.StaffScheduleSeq
             WHERE StaffSchedule.ScheduleDateTimeFrom > '{$start->getDatabase()}' AND StaffSchedule.ScheduleDateTimeTo < '{$finish->getDatabase()}'
-            AND (StaffSchedule.StaffID = {$user->getExternalId()} OR StaffScheduleStudentClasses.ID = {$user->getExternalId()})
+            AND StaffScheduleStudentClasses.ID = {$user->getExternalId()}
             ORDER BY StaffSchedule.StaffScheduleSeq ASC
                     ";
         }
