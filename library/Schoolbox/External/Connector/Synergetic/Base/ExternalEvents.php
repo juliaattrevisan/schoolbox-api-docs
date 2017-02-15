@@ -53,43 +53,35 @@ class ExternalEvents implements ExternalEventsInterface
         $start = new Alaress_Date_Format($startDate, 'U');
         $finish = new Alaress_Date_Format($endDate, 'U');
 
-        if ($user->getRole()->isStaff()) {
             $query = "
-            SELECT
-              StaffSchedule.StaffID             AS owner,
-              StaffSchedule.Comment             AS comment,
-              StaffSchedule.Room                AS room,
-              CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeFrom,120) AS start,
-              CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeTo,120)   AS finish,
-              luLocation.Description            AS location,
-              luTeam.Description                AS team
-            FROM SynergyOne.dbo.StaffSchedule StaffSchedule
-              LEFT JOIN SynergyOne.dbo.luLocation ON luLocation.Code = StaffSchedule.LocationCode
-              LEFT JOIN SynergyOne.dbo.luTeam ON luTeam.Code = StaffSchedule.TeamCode
-            WHERE StaffSchedule.ScheduleDateTimeFrom > '{$start->getDatabase()}' AND StaffSchedule.ScheduleDateTimeTo < '{$finish->getDatabase()}'
-            AND StaffSchedule.StaffID = {$user->getExternalId()} 
-            ORDER BY StaffSchedule.StaffScheduleSeq ASC
-                    ";
-        }
-        else if ($user->getRole()->isStudent()) {
-            $query = "
-            SELECT
-              StaffSchedule.StaffID             AS owner,
-              StaffSchedule.Comment             AS description,
-              StaffSchedule.Room                AS room,
-              CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeFrom,120) AS start,
-              CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeTo,120)   AS finish,
-              luLocation.Description            AS location,
-              luTeam.Description                AS title
-            FROM SynergyOne.dbo.StaffSchedule StaffSchedule
-              LEFT JOIN SynergyOne.dbo.luLocation ON luLocation.Code = StaffSchedule.LocationCode
-              LEFT JOIN SynergyOne.dbo.luTeam ON luTeam.Code = StaffSchedule.TeamCode
-              LEFT JOIN SynergyOne.dbo.StaffScheduleStudentClasses ON StaffScheduleStudentClasses.StaffScheduleSeq = StaffSchedule.StaffScheduleSeq
-            WHERE StaffSchedule.ScheduleDateTimeFrom > '{$start->getDatabase()}' AND StaffSchedule.ScheduleDateTimeTo < '{$finish->getDatabase()}'
-            AND StaffScheduleStudentClasses.ID = {$user->getExternalId()}
-            ORDER BY StaffSchedule.StaffScheduleSeq ASC
-                    ";
-        }
+                SELECT
+                  StaffSchedule.StaffScheduleSeq    AS id,
+                  StaffSchedule.StaffID             AS owner,
+                  StaffSchedule.Comment             AS comment,
+                  StaffSchedule.Room                AS room,
+                  CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeFrom,120) AS start,
+                  CONVERT(VARCHAR(20),StaffSchedule.ScheduleDateTimeTo,120)   AS finish,
+                  luLocation.Description            AS location,
+                  luTeam.Description                AS team,
+                  SubjectClasses.Description        AS title
+                FROM SynergyOne.dbo.StaffSchedule StaffSchedule
+                  LEFT JOIN SynergyOne.dbo.luLocation ON luLocation.Code = StaffSchedule.LocationCode
+                  LEFT JOIN SynergyOne.dbo.luTeam ON luTeam.Code = StaffSchedule.TeamCode";
+            if (!$user->getRole()->isStaff()) {
+                $query .= " LEFT JOIN SynergyOne.dbo.StaffScheduleStudentClasses ON StaffSchedule.StaffScheduleSeq = StaffScheduleStudentClasses.StaffScheduleSeq";
+            }
+            $query .= " LEFT JOIN SynergyOne.dbo.SubjectClasses ON StaffSchedule.SubjectClassesSeq = SubjectClasses.SubjectClassesSeq
+                 WHERE StaffSchedule.ScheduleDateTimeFrom > '{$start->getDatabase()}' AND StaffSchedule.ScheduleDateTimeTo < '{$finish->getDatabase()}'";
+
+            if ($user->getRole()->isStaff()) {
+                $query .= " AND StaffSchedule.StaffID = {$user->getExternalId()}";
+            }
+            //Is this always a student...?
+            else {
+                $query .= " AND StaffScheduleStudentClasses.ID = {$user->getExternalId()}";
+            }
+            $query .= " ORDER BY StaffSchedule.StaffScheduleSeq ASC";
+
         return $this->database->getAll($query);
     }
  }

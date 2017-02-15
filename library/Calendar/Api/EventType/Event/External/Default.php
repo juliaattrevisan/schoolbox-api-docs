@@ -73,16 +73,29 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
             foreach ($externalEvents as $externalEvent) {
                 $event = new Event();
-                $event->setEventId(rand(0, 1000)); //Todo
+                $event->setEventId($externalEvent['id']);
                 $event->setEventType($eventType);
                 $event->setTitle($externalEvent['title']);
-                $event->setDetail($externalEvent['description']);
                 $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
                 $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+
+                $eventDetail = '';
+                if(strlen($externalEvent['description']) > 0) {
+                    $eventDetail = $externalEvents['description'];
+                }
+
+                if(strlen($externalEvent['team']) > 0) {
+                    $eventDetail .= $externalEvents['team'];
+                }
+
+                $event->setDetail($eventDetail);
+
+                $event->setLocation(strlen($externalEvent['location']) > 0 ? $externalEvent['room'] : $externalEvent['location']);
+
                 $event->setEventType('external');
                 $event->setAllday(false);
                 $event->setAuthorId($externalEvent['owner']);
-                $event->setLocation($externalEvent['location']);
+
                 $event->setColour($eventColor);
 
                 $stack->add($event);
