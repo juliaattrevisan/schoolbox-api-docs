@@ -426,13 +426,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 break;
 
             case IAssessable::MARK_VISIBILITY_STUDENT:
-                $availableVisibilities[] = [IAssessable::MARK_VISIBILITY_STUDENT,];
+                $availableVisibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
                 break;
 
             case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
             default:
-                $availableVisibilities[] = [IAssessable::MARK_VISIBILITY_STUDENT,];
-                $availableVisibilities[] = [IAssessable::MARK_VISIBILITY_PARENT_STUDENT,];
+                $availableVisibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
+                $availableVisibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
                 break;
         }
         return $availableVisibilities;
