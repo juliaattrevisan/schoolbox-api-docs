@@ -19,6 +19,7 @@ interface Alaress_Date_Locale_Interface {
 
 	public function localFormat();
 	public function longDateOnlyFormat();
+    public function shortDateOnlyFormat();
 
 	public function calendarDate();
 	public function calendarDateTime();

@@ -200,7 +200,6 @@ class Controller extends Base
                 '@learningUpcoming/upcoming.twig',
                 [
                     'student'      => $student,
-                    'currentUser'  => $this->getUser(),
                     'date'         => $date,
                     'subjects'     => $subjects,
                     'mailHandle'   => $this->getSession()->get('mailhandle'),

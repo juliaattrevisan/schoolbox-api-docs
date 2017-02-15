@@ -5,10 +5,10 @@
     <div class="small-12 large-6 columns">
         <div class="context-switch clearfix">
             {% include 'sub/semesterSelector.twig' with {
-                terms:       terms,
-                currentTerm: term,
-                route:       'learning.getClasses',
-                routeArgs:   {}
+            terms:       terms,
+            currentTerm: term,
+            route:       'learning.getClasses',
+            routeArgs:   {}
             } only %}
         </div>
     </div>
@@ -39,38 +39,38 @@
                         <div class="card-content actions-small-1">
                             <h3><a href="/homepage/{{ class.id }}">{{ class.title }}</a></h3>
                             <p class="meta">{{ classTypes[class.id] }}</p>
-                            {% if currentUser.getRole.isStaff == true %}
-                            <nav>
-                                <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                                {% if term.contains(now) %}
-                                    <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
-                                {% endif %}
-                                <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
+                            {% if USER.getRole.isStaff == true %}
+                                <nav>
+                                    <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
+                                </nav>
+                                <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
+                                    {% if term.contains(now) %}
+                                        <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
+                                    {% endif %}
+                                    <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
 
-                                {% for courseSpecId in courseSpecIds %}
-                                    <li><a href="{{ routeLookup('learningAnalytics.folderWithTerms', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) }}" class="icon-poll">Analytics</a></li>
-                                {% endfor %}
+                                    {% for courseSpecId in courseSpecIds %}
+                                        <li><a href="{{ routeLookup('learningAnalytics.folderWithTerms', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) }}" class="icon-poll">Analytics</a></li>
+                                    {% endfor %}
 
-                                {% if term.contains(now) %}
-                                    <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
-                                {% endif %}
-                            </ul>
+                                    {% if term.contains(now) %}
+                                        <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
+                                    {% endif %}
+                                </ul>
                             {% endif %}
-                            {%  if currentUser.getRole.isStudent == true %}
-                            <nav>
-                                <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                                <li><a href="{{ routeLookup('learning.getGradesForSubject', {userId: currentUser.id, termCode: term.code, subjectId: class.id}) }}" class="icon-approve">Grades</a></li>
-                            </ul>
+                            {%  if USER.getRole.isStudent == true %}
+                                <nav>
+                                    <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
+                                </nav>
+                                <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
+                                    <li><a href="{{ routeLookup('learning.getGradesForSubject', {userId: USER.id, termCode: term.code, subjectId: class.id}) }}" class="icon-approve">Grades</a></li>
+                                </ul>
                             {% endif %}
                         </div>
                     </div>
                 </section>
             </div>
-    {% endfor %}
+        {% endfor %}
 
     {% endif %}
 </div>

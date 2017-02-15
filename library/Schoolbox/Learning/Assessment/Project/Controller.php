@@ -20,7 +20,7 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Assessment\Controller
 {
-    
+
     /**
      * @param Assessment\Project|IAssessable $assessment
      * @return array
@@ -142,7 +142,6 @@ class Controller extends Assessment\Controller
             'assessment'        => $assessment,
             'participantCounts' => $participantCounts,
             'assessmentCounts'  => $assessmentCounts,
-            'currentUser'       => $this->getUser(),
             'returnUrl'         => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
         ];
 
@@ -234,7 +233,6 @@ class Controller extends Assessment\Controller
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($project, $this->getUser())->add([ $project->getTitle(), '' ]),
-            'currentUser' => $this->getUser(),
             'student'     => $student,
             'assessment'  => $project,
             'counts'      => $counts,

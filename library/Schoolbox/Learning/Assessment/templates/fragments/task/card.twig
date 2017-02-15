@@ -1,4 +1,5 @@
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <li class="actions-small-1">
     <div class="list-item">
@@ -9,9 +10,7 @@
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
             </a>
 
-            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
-                Due {{ assessable.getDueAt.getRelativeTime }}
-            </p>
+            <p class="meta">{{ dueDate.dueDate(assessable, student) }}</p>
             <p class="meta"><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id})}}" class="meta">{% include '@learningAssessment/fragments/statusLine.twig' with {assessable: assessable} %}</a></p>
         </div>
     </div>

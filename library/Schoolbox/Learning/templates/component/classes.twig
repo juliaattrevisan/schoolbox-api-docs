@@ -11,7 +11,7 @@
                         <h3><a href="/homepage/{{ class.id }}">{{ class.title }}</a></h3>
                         <p class="meta">{{ classTypes[class.id] }}</p>
                     </div>
-                    {% if currentUser.getRole.isStaff == true %}
+                    {% if USER.getRole.isStaff == true %}
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
                         </nav>
@@ -23,8 +23,8 @@
                         </ul>
                     {% endif %}
 
-                    {% set gradesRoute = routeLookupIfAuthorized('learning.getGradesForSubject', { viewee: currentUser, userId: currentUser.id, term: currentSemester, termCode: currentSemester.code, subject: class, subjectId: class.id }) %}
-                    {% if currentUser.getRole.isStudent == true and gradesRoute %}
+                    {% set gradesRoute = routeLookupIfAuthorized('learning.getGradesForSubject', { viewee: USER, userId: USER.id, term: currentSemester, termCode: currentSemester.code, subject: class, subjectId: class.id }) %}
+                    {% if USER.getRole.isStudent == true and gradesRoute %}
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
                         </nav>

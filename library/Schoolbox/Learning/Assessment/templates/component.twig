@@ -1,5 +1,3 @@
-{% import '@learning/macro/urgency.twig' as urgency %}
-
 {% set createRoute -%}
     {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType, context: context }) -}}
 {%- endset %}
@@ -27,7 +25,7 @@
     {% if readOnly %}
 
         <p>{{ studentMessage }}</p>
-        <p><a href="/learning/grades/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a>.</p>
+        <p><a href="/learning/grades/{{ USER.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a>.</p>
 
     {% else %}
 
@@ -50,11 +48,11 @@
             {% endfor %}
         </ul>
         {% if createRoute %}
-        <div class="component-action">
-            <section>
+            <div class="component-action">
+                <section>
                     <a href="{{ createRouteType }}" class="button">Create {{ typeLabel }}</a>
-            </section>
-        </div>
+                </section>
+            </div>
         {% endif %}
     </section>
 
@@ -66,9 +64,9 @@
                 event.preventDefault();
 
                 var assessmentList = $('#assessment-list-{{ component_id }}'),
-                    assessmentId = $(this).data('id'),
-                    assessmentListItem = $('#component-assessment-' + assessmentId),
-                    assessmentName = assessmentListItem.data('assessment-title');
+                        assessmentId = $(this).data('id'),
+                        assessmentListItem = $('#component-assessment-' + assessmentId),
+                        assessmentName = assessmentListItem.data('assessment-title');
 
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete ' + assessmentName + '?',
@@ -80,24 +78,24 @@
                         toast.toastActivate({text: 'Deleting ' + assessmentName + '...'});
 
                         $.post(anchor.attr('href'))
-                        .done(function () {
-                            toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
-                            assessmentListItem.fadeOut({
-                                done: function() {
-                                    assessmentListItem.remove();
+                                .done(function () {
+                                    toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
+                                    assessmentListItem.fadeOut({
+                                        done: function() {
+                                            assessmentListItem.remove();
 
-                                    {# Respawn empty state if that was the last one #}
-                                    if (assessmentList.find('li').length == 0) {
-                                        $('#assessment-section-{{ component_id }}').remove();
-                                        $('#assessment-empty-state-{{ component_id }}').removeClass('hide');
-                                    }
-                                }
-                            });
+                                            {# Respawn empty state if that was the last one #}
+                                            if (assessmentList.find('li').length == 0) {
+                                                $('#assessment-section-{{ component_id }}').remove();
+                                                $('#assessment-empty-state-{{ component_id }}').removeClass('hide');
+                                            }
+                                        }
+                                    });
 
-                        })
-                        .fail(function() {
-                            toast.toastTimeout({text: 'Could not delete ' + assessmentName + '.', css: 'alert'});
-                        });
+                                })
+                                .fail(function() {
+                                    toast.toastTimeout({text: 'Could not delete ' + assessmentName + '.', css: 'alert'});
+                                });
                     }
                 });
             });

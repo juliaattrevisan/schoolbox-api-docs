@@ -348,6 +348,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $dateFormats = new Alaress_Date_Locale_Config();
                     $dateFormats->setConfig($config);
                     $twig->addGlobal('dateFormats', $dateFormats);
+                    $twig->addGlobal('NOW', \Alaress_Date_Format::now());
+                    $twig->addGlobal('USER', $_SESSION['user']);
 
                     // Global access to returnUrl vars
                     $encodedUrl = Redirect::encode($_GET["page"]);

@@ -10,35 +10,35 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>{{ participant.assessable.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {assessment: participant.assessable, submissionsBlocked: submissionsBlocked, student: participant.user, user: currentUser, icon: 'icon-due-work'} %}
+        {% include '@learningAssessment/meta.twig' with {assessment: participant.assessable, submissionsBlocked: submissionsBlocked, student: participant.user, user: USER, icon: 'icon-due-work'} %}
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: participant.assessable, user: currentUser} %}
+        {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: participant.assessable, user: USER} %}
     </div>
 </div>
 
 {% if participant.assessable.useRubric %}
-{% include '@learningAssessment/fragments/dueWork/summary/rubric.twig' %}
+    {% include '@learningAssessment/fragments/dueWork/summary/rubric.twig' %}
 {% endif %}
 
 {% include '@learningAssessment/fragments/dueWork/history.twig' %}
 
 <div class="row">
     <div class="small-12 columns">
-    {% if not submissionsBlocked %}
-        {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable, participant: participant }) %}
-        {% if submitRoute %}
-            {% set submitText %}{% spaceless %}
-                Create submission
-                {% if currentUser.id != participant.user.id %}
-                    on behalf of {{ participant.user.fullname }}
-                {% endif %}
-            {% endspaceless %}{% endset %}
-            <a class="submit button expand" href="{{ submitRoute }}">{{ submitText }}</a>
+        {% if not submissionsBlocked %}
+            {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable, participant: participant }) %}
+            {% if submitRoute %}
+                {% set submitText %}{% spaceless %}
+                    Create submission
+                    {% if USER.id != participant.user.id %}
+                        on behalf of {{ participant.user.fullname }}
+                    {% endif %}
+                {% endspaceless %}{% endset %}
+                <a class="submit button expand" href="{{ submitRoute }}">{{ submitText }}</a>
+            {% endif %}
         {% endif %}
-    {% endif %}
     </div>
 </div>

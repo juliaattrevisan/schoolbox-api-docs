@@ -142,7 +142,6 @@ class Controller extends Assessment\Controller
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
             'assessment'  => $task,
             'preview'     => $previewFragment,
-            'currentUser' => $this->getUser(),
             'student'     => $participant->getUser(),
         ];
 

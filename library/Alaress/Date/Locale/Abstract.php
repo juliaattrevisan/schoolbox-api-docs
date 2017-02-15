@@ -68,6 +68,15 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 		return $this->short;
 	}
 
+    /**
+     * Get a long date only format
+     *
+     * @return string
+     */
+    public function shortDateOnlyFormat() {
+        return $this->shortDateOnly;
+    }
+
 	/**
 	 * Get the date-only format
 	 *

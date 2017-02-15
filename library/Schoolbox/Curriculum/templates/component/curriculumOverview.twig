@@ -45,7 +45,7 @@
 
             {% if not curriculumTagging %}
 
-                {% if currentUser.isSuperuser %}
+                {% if USER.isSuperuser %}
                     <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
                 {% else %}
                     <p>Ask your System Administrator to enable curriculum mapping to use this feature.</p>

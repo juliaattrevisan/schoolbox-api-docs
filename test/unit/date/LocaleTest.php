@@ -84,7 +84,7 @@ class LocaleTest extends PHPUnit_Framework_TestCase
     public function testGetDateOnly()
     {
         $date = $this->getTestDateObject();
-        $this->assertEquals('25th Mar 2015', $date->getDateOnly());
+        $this->assertEquals('25th Mar', $date->getDateOnly());
     }
 
     public function testGetTimeOnly()

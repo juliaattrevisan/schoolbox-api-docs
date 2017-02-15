@@ -10,13 +10,13 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {assessment: assessment, user: currentUser, icon: 'icon-task'} %}
+        {% include '@learningAssessment/meta.twig' with {assessment: assessment, user: USER, icon: 'icon-task'} %}
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/fragments/task/summary/description.twig' with {assessment: assessment, user: currentUser, preview: preview} %}
+        {% include '@learningAssessment/fragments/task/summary/description.twig' with {assessment: assessment, user: USER, preview: preview} %}
     </div>
 </div>
 
@@ -24,7 +24,7 @@
 {# student submit form #}
 {% set participant         = assessment.getParticipant(student) %}
 {% set mostRecentFeedback  = participant.findMostRecentPublishedFeedback %}
-{% set isViewingOwnSummary = participant.user.id == currentUser.id %}
+{% set isViewingOwnSummary = participant.user.id == USER.id %}
 
 <div class="row">
     <div class="small-12 island">

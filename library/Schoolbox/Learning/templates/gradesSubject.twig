@@ -1,5 +1,6 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
@@ -44,16 +45,16 @@
         <div class="content">
             <div class="context-switch clearfix">
                 {% include 'sub/semesterSelector.twig' with {
-                    currentTerm: term,
-                    terms: terms,
-                    route: 'learning.getGradesForSubject',
-                    routeArgs: {viewee: student, userId: student.id, subject: subject}
+                currentTerm: term,
+                terms: terms,
+                route: 'learning.getGradesForSubject',
+                routeArgs: {viewee: student, userId: student.id, subject: subject}
                 } only %}
                 {% include 'sub/subjectSelector.twig' with {
-                    currentSubject: subject,
-                    subjects: folders,
-                    route: 'learning.getGradesForSubject',
-                    routeArgs: {viewee: student, userId: student.id, term: term, termCode: term.code, subject: subject}
+                currentSubject: subject,
+                subjects: folders,
+                route: 'learning.getGradesForSubject',
+                routeArgs: {viewee: student, userId: student.id, term: term, termCode: term.code, subject: subject}
                 } only %}
             </div>
         </div>
@@ -193,52 +194,52 @@
         </div>
     </div>
     {% if longitudinalRubric %}
-    <div class="row">
-        <div class="small-12 column">
-            <h2 class="subheader">{{ locale.translate('rubricGroup', true, true) }}</h2>
-            <section>
-                <div class="row" id="rubric-table">
-                {% for capability in longitudinalRubric %}
-                    <div class="small-12 island">
-                        <section data-interaction="collapse" data-collapse-container>
-                            <ul class="information-list">
-                                <li class="list-item">
-                                    <div class="card small small-12">
-                                        <h3>
+        <div class="row">
+            <div class="small-12 column">
+                <h2 class="subheader">{{ locale.translate('rubricGroup', true, true) }}</h2>
+                <section>
+                    <div class="row" id="rubric-table">
+                        {% for capability in longitudinalRubric %}
+                            <div class="small-12 island">
+                                <section data-interaction="collapse" data-collapse-container>
+                                    <ul class="information-list">
+                                        <li class="list-item">
+                                            <div class="card small small-12">
+                                                <h3>
                                         <span data-collapser="true" class="icon-down-arrow" title="{{ capability.name }}">
                                             <a href="#">{{ capability.name }}</a>
                                         </span>
-                                        </h3>
-                                    </div>
-                                </li>
-                                {% for indicator in capability.indicators %}
-                                <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
-                                    <div class="content">
-                                        <h4>{{ indicator.name }}</h4>
-                                        <ul class="information-list">
-                                            {% for activity in indicator.activities %}
-                                            <li>
-                                                {%- set activityHref = routeLookupIfAuthorized('learningAssessment.getSummary', { assessmentId: activity.id, studentId: student.id, student: student, assessment: activity }) ~ returnUrlSuffix -%}
-                                                {%- if activityHref -%}
-                                                <a href="{{ activityHref }}">{{ activity.name }}</a>
-                                                {%- else -%}
-                                                    {{ activity.name }}
-                                                {%- endif -%}
-                                                : <em>{{ activity.descriptor }}</em>
+                                                </h3>
+                                            </div>
+                                        </li>
+                                        {% for indicator in capability.indicators %}
+                                            <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
+                                                <div class="content">
+                                                    <h4>{{ indicator.name }}</h4>
+                                                    <ul class="information-list">
+                                                        {% for activity in indicator.activities %}
+                                                            <li>
+                                                                {%- set activityHref = routeLookupIfAuthorized('learningAssessment.getSummary', { assessmentId: activity.id, studentId: student.id, student: student, assessment: activity }) ~ returnUrlSuffix -%}
+                                                                {%- if activityHref -%}
+                                                                    <a href="{{ activityHref }}">{{ activity.name }}</a>
+                                                                {%- else -%}
+                                                                    {{ activity.name }}
+                                                                {%- endif -%}
+                                                                : <em>{{ activity.descriptor }}</em>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
                                             </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </section>
+                                        {% endfor %}
+                                    </ul>
+                                </section>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
-    </div>
     {% endif %}
     <div class="row">
         <div class="small-12 island">
@@ -247,55 +248,54 @@
                 <ul class="action-list">
                     {% for assessment in markbook.assessments %}
                         {%  if assessment.isParticipant(student) %}
-                        <li class="actions-small-2">
-                            <div class="list-item clearfix content">
-                                <div class="row">
-                                    <div class="small-12 large-5 card column xl">
-                                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
-                                            <h3>{{ assessment.title }}</h3>
-                                        </a>
-                                        <p class="meta">
-                                            <a href="/homepage/{{ subject.id }}">{{ subject.name }}</a> {{ assessment.typeName }}
-                                        </p>
-                                    </div>
+                            <li class="actions-small-2">
+                                <div class="list-item clearfix content">
+                                    <div class="row">
+                                        <div class="small-12 large-5 card column xl">
+                                            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
+                                                <h3>{{ assessment.title }}</h3>
+                                            </a>
+                                            <p class="meta">
+                                                <a href="/homepage/{{ subject.id }}">{{ subject.name }}</a> {{ assessment.typeName }}
+                                            </p>
+                                        </div>
 
-                                    <div class="small-12 large-4 columns grade">
-                                        {% set feedback = assessment.participant(student).findMostRecentVisibleFeedback(currentUser) %}
-                                        {% if feedback %}
-                                            <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
-                                            <p class="comment">{{ feedback.comment | nl2br  }}</p>
-                                        {% endif %}
-                                    </div>
+                                        <div class="small-12 large-4 columns grade">
+                                            {% set feedback = assessment.participant(student).findMostRecentVisibleFeedback(USER) %}
+                                            {% if feedback %}
+                                                <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
+                                                <p class="comment">{{ feedback.comment | nl2br  }}</p>
+                                            {% endif %}
+                                        </div>
 
-                                    <div class="small-12 large-3 columns">
-                                        Due <span class="{{ urgency.datetime(assessment, student) }}">{{ assessment.dueAt.relativeTime }}</span>
-                                        on {{ assessment.dueAt.dateOnly }}
+                                        <div class="small-12 large-3 columns">
+                                            {{ dueDate.dueDate(assessment, student) }}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <nav>
-                                {% if quizzes[assessment.id] is not empty %}
-                                    <a class="icon-view" href="/assess/attempts/{{ quizzes[assessment.id].id }}/{{ student.id }}" title="View Attempts"></a>
-                                {% endif %}
-                                {% if assessment.getFamilyName == 'dueWork' and feedback %}
-                                    <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
-                                    <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
-                                        <input type="hidden" name="action" value="publish">
-                                        <input type="hidden" name="userId" value="{{ student.id }}">
-                                        <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
-                                    </form>
-                                    <script type="text/javascript">
-                                        $(function() {
-                                            {# Publish to ePortfolio #}
-                                            $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
-                                                activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
+                                <nav>
+                                    {% if quizzes[assessment.id] is not empty %}
+                                        <a class="icon-view" href="/assess/attempts/{{ quizzes[assessment.id].id }}/{{ student.id }}" title="View Attempts"></a>
+                                    {% endif %}
+                                    {% if assessment.getFamilyName == 'dueWork' and feedback %}
+                                        <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
+                                        <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
+                                            <input type="hidden" name="action" value="publish">
+                                            <input type="hidden" name="userId" value="{{ student.id }}">
+                                            <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
+                                        </form>
+                                        <script type="text/javascript">
+                                            $(function() {
+                                                {# Publish to ePortfolio #}
+                                                $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
+                                                    activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
+                                                });
                                             });
-                                        });
-                                    </script>
-                                {% endif %}
-                            </nav>
-                        </li>
-                    {%  endif %}
+                                        </script>
+                                    {% endif %}
+                                </nav>
+                            </li>
+                        {%  endif %}
                     {% endfor %}
                 </ul>
                 <div class="toast" data-alert="" id="publish-to-eportfolio-label">Activity showcased</div>
@@ -304,11 +304,11 @@
     </div>
 
     {% if comment|length or canComment %}
-    <div class="row">
-        <div class="small-12">
-            <h2 class="subheader">Comments</h2>
+        <div class="row">
+            <div class="small-12">
+                <h2 class="subheader">Comments</h2>
+            </div>
         </div>
-    </div>
     {% endif %}
 
     <div class="row">

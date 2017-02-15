@@ -253,7 +253,6 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
-            'viewer'             => $this->getUser(),
             'viewee'             => $viewee,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,
@@ -368,7 +367,6 @@ class Controller extends Base
         }
 
         $data = [
-            'currentUser' => $this->getUser(),
             'terms' => $this->getTermMapper()->findAll(),
             'now' => $now,
             'term' => $term,
@@ -581,7 +579,6 @@ class Controller extends Base
             'graphFeedback'     => $graphFeedback,
             'canComment'        => $conversation->canComment($this->getUser()),
             'comments'          => $conversation->getVisibleComments($this->getUser()),
-            'currentUser'       => $this->getUser(),
             'quizzes'           => $quizzes,
             'returnUrlSuffix'   => $returnUrlSuffix,
             'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term)

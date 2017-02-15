@@ -957,6 +957,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
+     * Use short format
+     *
+     * @return string
+     */
+    public function getShortDateOnly()
+    {
+        return $this->getUsingFormat($this->getLocale()->shortDateOnlyFormat());
+    }
+
+    /**
      * Get the date only
      *
      * @return string
@@ -1504,17 +1514,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * Compares dates of two Alaress_Date_Format objects, ignoring the time
-     * and timezone components completely.
+     * Compare two Alaress_Date_Format objects by a specified format
      *
      * @param Alaress_Date_Format $other
-     *
-     * @return int -1 if $this < $other, 0 if $this == $other, +1 if $this > $other
+     * @param string $format
+     * @return int
      */
-    public function compareDateOnly($other)
+    private function compareByFormat(Alaress_Date_Format $other, $format)
     {
-        $thisDate  = $this->getUsingFormat('Ymd');
-        $otherDate = $other->getUsingFormat('Ymd');
+        $thisDate  = $this->getUsingFormat($format);
+        $otherDate = $other->getUsingFormat($format);
         if ($thisDate === $otherDate) {
             return 0;
         }
@@ -1525,6 +1534,30 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * Compares dates of two Alaress_Date_Format objects, ignoring the time
+     * and timezone components completely.
+     *
+     * @param Alaress_Date_Format $other
+     *
+     * @return int -1 if $this < $other, 0 if $this == $other, +1 if $this > $other
+     */
+    public function compareDateOnly(Alaress_Date_Format $other)
+    {
+        return $this->compareByFormat($other, 'Ymd');
+    }
+
+    /**
+     * Compare the year of two Alaress_Date_Format objects.
+     *
+     * @param Alaress_Date_Format $other
+     * @return int
+     */
+    public function compareYearOnly(Alaress_Date_Format $other)
+    {
+        return $this->compareByFormat($other, 'Y');
     }
 
 
@@ -1669,6 +1702,57 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         }
         // Convert now to a carbon object, if I can, otherwise assume now
         return $this->getDateTimeObject()->diffForHumans($this->buildLaravelDate($now), $stripModifiers);
+    }
+
+    /**
+     * Get a relative day and time
+     * e.g today at 2:00pm, tomorrow at 8:00am, Saturday at 3:30pm (if within a week)
+     * Defaults back to short date if date is a week or further from $now
+     *
+     * @param Alaress_Date_Format $now
+     * @return string
+     */
+    public function getRelativeDay(Alaress_Date_Format $now = null)
+    {
+        if (!$now instanceof Alaress_Date_Format) {
+            $now = Alaress_Date_Format::now();
+        }
+
+        $nowFloored = clone $now;
+        $nowFloored->startOfDay();
+
+        $thisFloored = clone $this;
+        $thisFloored->startOfDay();
+
+        $diffInDays = $thisFloored->diffInDays($nowFloored);
+
+        if ($this->isSameDay($now)) {
+            $relativeTime = 'today';
+        } elseif ($this->isTomorrow()) {
+            $relativeTime = 'tomorrow';
+        } elseif ($this->isYesterday()) {
+            $relativeTime = 'yesterday';
+        } elseif ($diffInDays < 7) {
+
+            $relativeTime = '';
+
+            if ($this->isPast()) {
+                $relativeTime = 'last ';
+            }
+
+            $relativeTime .= $this->getUsingFormat('l');
+
+        } else {
+            // TODO: Use getDateOnly here and only include year when not the current year
+            $relativeTime = $this->getShortDateOnly();
+        }
+
+        // Add the time if the date is within 30 days and isn't 23:59:59
+        if ($diffInDays <= 30 && $this->getUsingFormat('H:i:s') != '23:59:59') {
+            $relativeTime .= ' at ' . $this->getTimeOnly();
+        }
+
+        return $relativeTime;
     }
 
     /**

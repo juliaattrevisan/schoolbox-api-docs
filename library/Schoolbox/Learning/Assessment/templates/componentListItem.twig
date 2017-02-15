@@ -1,4 +1,4 @@
-{% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
 {% if assessable is quiz %}
@@ -15,12 +15,8 @@
         <div class="card small-12">
             {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
-                {% if viewRoute %}</a>{% endif %}
-            <p class="meta">
-                <span class="{{ urgency.datetime(assessment, user) }}">
-                    Due {{ assessable.dueAt.relativeTime }} on {{ assessable.dueAt.dateOnly }}
-                </span>
-            </p>
+            {% if viewRoute %}</a>{% endif %}
+            <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
         </div>
     </div>
     {% if actionCount %}

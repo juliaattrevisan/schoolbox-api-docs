@@ -63,6 +63,7 @@
     });
 </script>
 
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
@@ -78,7 +79,7 @@
 <div class="row">
     <div class="small-12 island">
 
-        {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, user: currentUser} %}
+        {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, user: USER} %}
 
         <div class="row">
             {% if assessment.baseContext is unitSpecification %}
@@ -109,9 +110,7 @@
                                         </a>
 
                                         {% if assessable.getDueAt.isNull == false %}
-                                            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
-                                                Due {{ assessable.getDueAt.getRelativeTime }}
-                                            </p>
+                                            <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
                                         {% endif %}
 
                                         {% if assessable.weight %}
