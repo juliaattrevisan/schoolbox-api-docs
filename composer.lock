@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "112371fa07903b339c2f5038f0dd64d5",
+    "content-hash": "a8cd4c336291a8f736efb965e438fb5b",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -572,6 +572,50 @@
                 "sockets"
             ],
             "time": "2015-12-23T15:06:48+00:00"
+        },
+        {
+            "name": "clue/redis-protocol",
+            "version": "v0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/php-redis-protocol.git",
+                "reference": "2ffcdfa281b1084f666340e13f05a1d26d35ed26"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/php-redis-protocol/zipball/2ffcdfa281b1084f666340e13f05a1d26d35ed26",
+                "reference": "2ffcdfa281b1084f666340e13f05a1d26d35ed26",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Clue\\Redis\\Protocol": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@lueck.tv"
+                }
+            ],
+            "description": "A streaming redis wire protocol parser and serializer implementation in PHP",
+            "homepage": "https://github.com/clue/redis-protocol",
+            "keywords": [
+                "parser",
+                "protocol",
+                "redis",
+                "serializer",
+                "streaming"
+            ],
+            "time": "2014-01-26T23:49:05+00:00"
         },
         {
             "name": "djfm/cssin",
@@ -1739,23 +1783,23 @@
         },
         {
             "name": "predis/predis",
-            "version": "v0.8.7",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nrk/predis.git",
-                "reference": "4123fcd85d61354c6c9900db76c9597dbd129bf6"
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nrk/predis/zipball/4123fcd85d61354c6c9900db76c9597dbd129bf6",
-                "reference": "4123fcd85d61354c6c9900db76c9597dbd129bf6",
+                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2"
+                "php": ">=5.3.9"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": "~4.8"
             },
             "suggest": {
                 "ext-curl": "Allows access to Webdis when paired with phpiredis",
@@ -1763,8 +1807,8 @@
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Predis": "lib/"
+                "psr-4": {
+                    "Predis\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1778,14 +1822,71 @@
                     "homepage": "http://clorophilla.net"
                 }
             ],
-            "description": "Flexible and feature-complete PHP client library for Redis",
+            "description": "Flexible and feature-complete Redis client for PHP and HHVM",
             "homepage": "http://github.com/nrk/predis",
             "keywords": [
                 "nosql",
                 "predis",
                 "redis"
             ],
-            "time": "2014-08-01T09:43:10+00:00"
+            "time": "2016-06-16T16:22:20+00:00"
+        },
+        {
+            "name": "predis/predis-async",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nrk/predis-async.git",
+                "reference": "5cd854e83212c2c7745010631199c01051fe9b98"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nrk/predis-async/zipball/5cd854e83212c2c7745010631199c01051fe9b98",
+                "reference": "5cd854e83212c2c7745010631199c01051fe9b98",
+                "shasum": ""
+            },
+            "require": {
+                "clue/redis-protocol": "~0.3",
+                "php": ">=5.4.0",
+                "predis/predis": "^1.0",
+                "react/event-loop": "~0.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8"
+            },
+            "suggest": {
+                "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Predis\\Async\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniele Alessandri",
+                    "email": "suppakilla@gmail.com",
+                    "homepage": "http://clorophilla.net"
+                }
+            ],
+            "description": "Asynchronous version of Predis",
+            "homepage": "http://github.com/nrk/predis-async",
+            "keywords": [
+                "nosql",
+                "predis",
+                "redis"
+            ],
+            "time": "2016-06-13 10:40:03"
         },
         {
             "name": "psr/http-message",
@@ -5092,6 +5193,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "shareworks/xml-security": 20,
+        "predis/predis-async": 20,
         "react/stomp": 20,
         "0x46616c6b/etherpad-lite-client": 20,
         "imagine/imagine": 20,
