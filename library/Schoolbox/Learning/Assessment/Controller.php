@@ -6,15 +6,16 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress_Date_Format;
 use DomainException;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as ImplementationUnitModel;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -22,8 +23,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
-use \Alaress_Date_Format;
-use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
 abstract class Controller extends ListController implements IAssessmentController
 {
@@ -292,14 +291,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* The usual info everything requires
          */
         $data = [
-            'context'         => $context,
-            'contextType'     => $contextType,
-            'baseContextType' => AssessmentContextType::objectToString($context->getBaseContext()),
-            'breadcrumbs'     => $this->getBakery()->produceFromContext($context, $assessment),
-            'assessment'      => $assessment,
-            'folder'          => $context->getFolder(),
-            'assessmentType'  => AssessmentType::objectToString($assessment),
-            'visibility'      => $assessment->getMarkVisibility(),
+            'context'               => $context,
+            'contextType'           => $contextType,
+            'baseContextType'       => AssessmentContextType::objectToString($context->getBaseContext()),
+            'breadcrumbs'           => $this->getBakery()->produceFromContext($context, $assessment),
+            'assessment'            => $assessment,
+            'folder'                => $context->getFolder(),
+            'assessmentType'        => AssessmentType::objectToString($assessment),
+            'visibility'            => $assessment->getMarkVisibility(),
+            'availableVisibilities' => $this->getAvailableVisibilities(),
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
@@ -407,6 +407,35 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getBakery()
     {
         return $this->bakery;
+    }
+
+    /**
+     * Available visibilities for assessments
+     *
+     * TODO move this to a helper I guess? It's already in obsolete \Schoolbox\Assessment\Widgets::getAvailableOptions
+     *
+     * @return array
+     */
+    protected function getAvailableVisibilities()
+    {
+        $availableVisibilities = [
+            IAssessable::MARK_VISIBILITY_PRIVATE,
+        ];
+        switch ($this->getConfigLoader()->get('submission_visibility_max')) {
+            case IAssessable::MARK_VISIBILITY_PRIVATE:
+                break;
+
+            case IAssessable::MARK_VISIBILITY_STUDENT:
+                $availableVisibilities[] = [IAssessable::MARK_VISIBILITY_STUDENT,];
+                break;
+
+            case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
+            default:
+                $availableVisibilities[] = [IAssessable::MARK_VISIBILITY_STUDENT,];
+                $availableVisibilities[] = [IAssessable::MARK_VISIBILITY_PARENT_STUDENT,];
+                break;
+        }
+        return $availableVisibilities;
     }
 
     /**
