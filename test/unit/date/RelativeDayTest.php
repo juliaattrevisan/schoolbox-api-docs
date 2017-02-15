@@ -185,20 +185,4 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-
-    /**
-     * Check that an event with 11:59pm doesn't display the time
-     */
-    public function testRelativeDayElevenFiftyNine()
-    {
-        $expected = 'today';
-
-        $now = new Alaress_Date_Format('2000-01-01 00:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
-        $eventDate = new Alaress_Date_Format('2000-01-01 23:59:59', 'Y-m-d H:i:s', null, $this->dateLocale);
-
-        $result = $eventDate->getRelativeDay($now);
-
-        $this->assertEquals($expected, $result);
-    }
-
 }
