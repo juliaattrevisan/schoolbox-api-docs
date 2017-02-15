@@ -391,11 +391,14 @@ class UserMapper extends Mapper
 
             $userId = $row['id'];
 
-            /** @var Role $role */
-            $role = $this->hydrateJoin($row, 'role', 'g');
-            $users[$userId] = $this->hydrate($row)
-                ->setSuperuser($row['superuser'] == 1)
-                ->setRole($role);
+            // Don't override previous hydrations of this user: add to it instead
+            if (!isset($users[$userId])) {
+                /** @var Role $role */
+                $role = $this->hydrateJoin($row, 'role', 'g');
+                $users[$userId] = $this->hydrate($row)
+                                       ->setSuperuser($row['superuser'] == 1)
+                                       ->setRole($role);
+            }
 
             /** @var Campus $campus */
             $campus = $this->hydrateJoin($row, 'userCampus', 'c');
