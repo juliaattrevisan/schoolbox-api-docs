@@ -51,10 +51,13 @@
     {% set term = termFallback %}
 {% endif %}
 
+{% set count = 0 %}
+
 <div class="row">
     <div class="small-12 island">
         {% for folder in folders %}
             {% if assessmentTasks[folder.id] | length %}
+                {% set count = count + 1 %}
                 <div class="row">
                     <div class="small-12 medium-8 columns">
                         <h2 class="subheader no-margin">
@@ -130,7 +133,7 @@
     </div>
 </div>
 
-{% if folders | length == 0 %}
+{% if count == 0 %}
 
     <div class="row">
         <div class="small-12 island">
