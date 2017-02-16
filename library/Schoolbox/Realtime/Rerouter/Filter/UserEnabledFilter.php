@@ -12,7 +12,7 @@ namespace Schoolbox\Realtime\Rerouter\Filter;
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\User;
 
-class UserEnabledFilter extends ContextFilter
+class UserEnabledFilter implements FilterInterface
 {
 
     /**
