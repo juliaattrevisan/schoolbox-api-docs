@@ -16,6 +16,11 @@
 </script>
 
 {# TODO 'stage' is a temp hack until this fragment gets refactored to use *extend* instead of *include* #}
+{# This activates a modal stored in the parent create.twig
+ #
+ # jquery validator chucks a sad when you have nested forms
+ # parent create.twig includes this create.twig which causes nested forms
+ #}
 {% if not assessment.id and stage != 2 %}
 <div class="actions-small-1 row">
     <nav>
@@ -24,19 +29,6 @@
     <ul id="header-options" class="f-dropdown" data-dropdown-content="">
         <li><a href="#" id="import" data-reveal-id="import-modal" class="icon-upload">Import from XML file</a></li>
     </ul>
-</div>
-
-<div id="import-modal" class="reveal-modal" data-reveal="">
-    <form action="/assess/import/xml/{{ folder.id }}" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="context_type" value="{{ contextType }}">
-        <input type="hidden" name="context_id" value="{{ context.id }}">
-        <label>
-            <input name="importXML" type="file">
-        </label>
-        <label>
-            <input type="submit" value="Import from XML file">
-        </label>
-    </form>
 </div>
 {% endif %}
 
