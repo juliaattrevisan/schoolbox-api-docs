@@ -83,17 +83,6 @@ class Module extends BaseModule
 
 
     /**
-     * @param Twig_Loader_Chain $templateLoader
-     * @throws Twig_Error_Loader
-     */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
-    {
-        // TODO inherit from an Admin baseclass to setup subnav
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
      * @param ContainerInterface $injector
      */
     public function initControllers(ContainerInterface $injector)
