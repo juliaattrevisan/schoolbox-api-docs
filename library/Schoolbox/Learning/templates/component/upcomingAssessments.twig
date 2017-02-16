@@ -7,23 +7,19 @@ Usage:
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 <ul class="information-list">
-    {% set count = 0 %}
     {% for assessment in assessments %}
-        {% if not limit or count < limit %}
-            <li>
-                <div class="card small-12" data-equalizer>
+        <li>
+            <div class="card small-12" data-equalizer>
 
-                    <h3><a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}">{{ assessment.title }}</a></h3>
+                <h3><a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}">{{ assessment.title }}</a></h3>
 
-                    <p class="meta">
-                        <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}
-                    </p>
-                    <p class="meta">
-                        <span class="{{ urgency.datetime(assessment, student) }}">Due {{ assessment.dueAt.relativeTime }}</span> on {{ assessment.dueAt.local }}
-                    </p>
-                </div>
-            </li>
-        {% endif %}
-        {% set count = count + 1 %}
+                <p class="meta">
+                    <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}
+                </p>
+                <p class="meta">
+                    <span class="{{ urgency.datetime(assessment, student) }}">Due {{ assessment.dueAt.relativeTime }}</span> on {{ assessment.dueAt.local }}
+                </p>
+            </div>
+        </li>
     {% endfor %}
 </ul>

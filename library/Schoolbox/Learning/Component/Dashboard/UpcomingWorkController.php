@@ -67,7 +67,8 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
         $term = $this->termMapper->findForToday();
         $student = $this->getUser();
 
-        $allUpcomingAssessments = $this->assessmentDataSource
+        $visibility = new Visibility($this->getAccess());
+        $this->upcomingAssessments = $this->assessmentDataSource
             ->findAllByStudent($student, $term)
             ->sortByCallback(function(IAssessable $a, IAssessable $b) {
                 // Due date
@@ -84,14 +85,12 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
 
                 // Title
                 return strnatcasecmp($a->getTitle(), $b->getTitle());
-            });
-
-        $visibility = new Visibility($this->getAccess());
-
-        // Only show work that isn't yet due
-        $this->upcomingAssessments = $allUpcomingAssessments->filter(function (IAssessable $assessable) use ($student, $visibility) {
-            return $visibility->isUpcomingVisibleToUser($assessable, $student);
-        });
+            })
+            ->filter(function (IAssessable $assessable) use ($student, $visibility) {
+                // Only show work that isn't yet due
+                return $visibility->isUpcomingVisibleToUser($assessable, $student);
+            })
+            ->limit($this->limit);
 
         return count($this->upcomingAssessments) > 0;
     }
