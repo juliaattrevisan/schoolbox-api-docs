@@ -26,12 +26,17 @@ class Controller extends \Schoolbox\Learning\Controller
     public function getGradesYear(User $viewee, $year) {
 
         $assessments = new Collection();
-        $terms = $this->getTermMapper()->findForYear($year);
 
-        /** @var Term $term */
-        foreach ($terms as $term) {
-            $assessments = $assessments->merge($this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term));
-        }
+        $term = $this->getTermMapper()->createModel();
+
+        $termStart = new \Alaress_Date_Format("{$year}-01-01 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
+        $termFinish = new \Alaress_Date_Format("{$year}-12-31 23:59:59", \Alaress_Date_Format::DATABASE_FORMAT);
+
+        $term->setStart($termStart);
+        $term->setActualFinish($termFinish);
+        $term->setDisplayFinish($termFinish);
+
+        $assessments = $assessments->merge($this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term));
 
         $this->getGrades($viewee, $assessments, $year);
     }
