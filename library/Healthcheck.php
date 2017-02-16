@@ -563,6 +563,32 @@ class Healthcheck
         unset($list);
     }
 
+    private function SynergeticCheckSchedulerEvents()
+    {
+        //Scheduler Specific
+        $this->log .= "\nSynergetic Permission Check - Scheduler Events - Tables\n";
+        $list[] = 'StaffSchedule';
+        $list[] = 'StaffScheduleStudentClasses';
+        $list[] = 'SubjectClasses';
+        $list[] = 'luLocation';
+        $list[] = 'luTeam';
+        sort($list);
+
+        foreach ($list as $table) {
+            $this->log .= "  $table : ";
+            $db = new MSSQL();
+            $db->debug = true;
+            $result = $db->query("SELECT TOP 1 * FROM $table");
+            if ($result) {
+                $this->log .= "OK\n";
+            } else {
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db,$result);
+        }
+        unset($list);
+    }
+
     /**
     * Test chub
     */
