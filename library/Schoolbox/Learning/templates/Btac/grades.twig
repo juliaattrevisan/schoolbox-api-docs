@@ -36,8 +36,8 @@
                 terms:       terms,
                 year:        year,
                 currentTerm: term,
-                routeYear:   'customBtacGrades.getGradesYear',
-                route:       'customBtacGrades.getGrades',
+                routeYear:   'learning.getGradesYear',
+                route:       'learning.getGrades',
                 routeArgs:   {viewee: student, userId: student.id}
                 } only %}
             </div>
@@ -50,7 +50,6 @@
 {% if termFallback is not empty %}
     {% set term = termFallback %}
 {% endif %}
-
 
 <div class="row">
     <div class="small-12 island">

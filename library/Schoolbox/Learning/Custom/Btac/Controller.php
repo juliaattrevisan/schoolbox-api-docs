@@ -1,6 +1,6 @@
 <?php
 
-namespace Custom\Btac\Grades;
+namespace Schoolbox\Learning\Custom\Btac;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
@@ -17,25 +17,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 
-class Controller extends Base
+class Controller extends \Schoolbox\Learning\Controller
 {
-    /**
-     * Controller constructor.
-     *
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param TermMapper $termMapper
-     * @param GradeGroup $defaultGradeGroup
-     */
-    public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        TermMapper $termMapper,
-        GradeGroup $defaultGradeGroup
-    ) {
-        $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setTermMapper($termMapper);
-        $this->setDefaultGradeGroup($defaultGradeGroup);
-    }
-
     /**
      * @param User $viewee
      * @param $year
@@ -121,7 +104,7 @@ class Controller extends Base
 
         // Squish this mess out
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@customBtacGrades/grades.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/Btac/grades.twig', [
             'student'       => $viewee,
             'term'          => $term,
             'year'          => $year,
@@ -133,74 +116,4 @@ class Controller extends Base
             'currentUser'   => $this->getUser(),
         ]));
     }
-
-    /**
-     * @var TermMapper
-     */
-    private $termMapper;
-
-    /**
-     * @return TermMapper
-     */
-    protected function getTermMapper()
-    {
-        return $this->termMapper;
-    }
-
-    /**
-     * @param TermMapper $termMapper
-     * @return static
-     */
-    protected function setTermMapper(TermMapper $termMapper)
-    {
-        $this->termMapper = $termMapper;
-        return $this;
-    }
-
-    /**
-     * @var AssessmentMapperProxy
-     */
-    private $assessmentMapperProxy;
-
-    /**
-     * @return AssessmentMapperProxy
-     */
-    protected function getAssessmentMapperProxy()
-    {
-        return $this->assessmentMapperProxy;
-    }
-
-    /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @return static
-     */
-    protected function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
-    {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        return $this;
-    }
-
-    /**
-     * @var GradeGroup
-     */
-    private $defaultGradeGroup;
-
-    /**
-     * @return GradeGroup
-     */
-    protected function getDefaultGradeGroup()
-    {
-        return $this->defaultGradeGroup;
-    }
-
-    /**
-     * @param GradeGroup $defaultGradeGroup
-     * @return static
-     */
-    protected function setDefaultGradeGroup(GradeGroup $defaultGradeGroup)
-    {
-        $this->defaultGradeGroup = $defaultGradeGroup;
-        return $this;
-    }
-
 }

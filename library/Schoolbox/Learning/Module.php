@@ -9,9 +9,11 @@ namespace Schoolbox\Learning;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Permission\Access\Access;
@@ -26,7 +28,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 
 class Module extends BaseModule
 {
@@ -148,28 +149,36 @@ class Module extends BaseModule
     }
 
     /**
+     * This is a bit meh, need to find a better way to extend these services in descendant
+     * @return array
+     */
+    protected function getControllerServices()
+    {
+        return [
+            'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
+            'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
+            'showcaseMapper'             => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
+            'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
+            'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
+            'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
+            'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+            'externalClass'              => $this->getInjector()->get('externalClass'),
+            'database'                   => $this->getInjector()->get('database'),
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
-                'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
-                'defaultGradeGroup'          => $injector->lazyGet('defaultGradeGroup'),
-                'showcaseMapper'             => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
-                'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
-                'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
-                'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
-                'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-                'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                'externalClass'              => $injector->lazyGet('externalClass'),
-                'database'                   => $injector->lazyGet('database'),
-                'accessMapper'               => $this->getMapperFactory()->getLazy(Access::class),
-            ])
+            $injector->lazyNew(Controller::class, $this->getControllerServices())
         );
     }
 

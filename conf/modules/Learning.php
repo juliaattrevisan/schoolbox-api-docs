@@ -17,7 +17,7 @@ use Schoolbox\Learning\Response\Module as ResponseModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 
-class Learning implements ModuleConfigInterface
+class Learning extends ModuleLoader implements ModuleConfigInterface
 {
     /**
      * Run configuration for the given module
@@ -28,30 +28,14 @@ class Learning implements ModuleConfigInterface
     public function configure($kernel)
     {
         $namespace  = 'learning';
-        $di = $kernel->getDependencyInjector();
 
-        $learningModule = new LearningModule($di);
-        $learningModule->init("/$namespace");
-
-        $assessmentModule = new AssessmentModule($di);
-        $assessmentModule->init("/$namespace");
-
-        $feedbackModule = new FeedbackModule($di);
-        $feedbackModule->init("/$namespace");
-
-        $responseModule = new ResponseModule($di);
-        $responseModule->init("/$namespace");
-
-        $quizModule = new QuizModule($di);
-        $quizModule->init("/$namespace");
-
-        $markbookModule = new MarkbookModule($di);
-        $markbookModule ->init("/$namespace/markbook");
-
-        $upcomingModule = new UpcomingModule($di);
-        $upcomingModule->init("/$namespace/due");
-
-        $assessmentExporterModule = new AssessmentExporterModule($di);
-        $assessmentExporterModule->init("/$namespace/export");
+        $this->loadModule(LearningModule::class, "/{$namespace}", $kernel);
+        $this->loadModule(AssessmentModule::class, "/{$namespace}", $kernel);
+        $this->loadModule(FeedbackModule::class, "/{$namespace}", $kernel);
+        $this->loadModule(ResponseModule::class, "/{$namespace}", $kernel);
+        $this->loadModule(QuizModule::class, "/{$namespace}", $kernel);
+        $this->loadModule(MarkbookModule::class, "/{$namespace}/markbook", $kernel);
+        $this->loadModule(UpcomingModule::class, "/{$namespace}/due", $kernel);
+        $this->loadModule(AssessmentExporterModule::class, "/{$namespace}/export", $kernel);
     }
 }

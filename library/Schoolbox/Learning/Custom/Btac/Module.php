@@ -1,53 +1,72 @@
 <?php
-
-namespace Custom\Btac\Grades;
+/**
+ * @author    Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+namespace Schoolbox\Learning\Custom\Btac;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Mapper;
 use Schoolbox\Role;
-use Schoolbox\UserMapper;
-use Twig_Loader_Chain;
-use Alaress\Web\Router\PathMatcher;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use \Twig_Loader_Chain;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\UserMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use \Timetable_ColourMapper;
 
-class Module extends BaseModule
+class Module extends \Schoolbox\Learning\Module
 {
-    protected $basename = 'customBtacGrades';
-
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'getGrades', $basePath, '/{userId}{/termCode}');
-        $this->addGetRoute($router, 'getGradesYear', $basePath, '/{userId}/year/{year}');
+        $routes = [
+            'GET' => [
+                '/grades-year/{userId}/year/{year}'       => 'getGradesYear',                // student && year
+            ],
+            'POST' => []
+        ];
+
+        foreach ($routes['GET'] as $path => $alias) {
+            $this->addGetRoute($router, $alias, $basePath, $path);
+        }
+
+        foreach ($routes['POST'] as $path => $alias) {
+            $this->addPostRoute($router, $alias, $basePath, $path);
+        }
+
+        parent::initRoutes($router, $basePath);
     }
 
     /**
-     * These pages may be accessed by:
-     *
-     * * superusers
-     *
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this->addRoutePermission(
-            $authorizer,
-            '(?:getGrades|getGradesYear)',
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
-            )
-        );
+                $authorizer,
+                '(?:getGradesYear)',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+                )
+            );
+
+        parent::initRoutePermissions($authorizer);
     }
 
     /**
@@ -57,7 +76,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getGrades|getGradesYear)',
+            '(?:getGradesYear)',
             function ($params) {
                 if (array_key_exists('userId', $params)) {
                     try {
@@ -94,60 +113,26 @@ class Module extends BaseModule
                 return $args;
             }
         );
+
+        parent::initRoutePreloads($matcher);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
-                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource')
-            ])
-        );
-    }
 
     /**
      * @inheritdoc
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/../../templates');
     }
 
     /**
-     * @return Mapper|UserMapper
+     * @inheritdoc
      */
-    protected function getUserMapper()
+    public function initControllers(ContainerInterface $injector)
     {
-        return $this->getMapperFactory()->get(UserMapper::class);
-    }
-
-    /**
-     * @return Mapper|ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
-    }
-
-    /**
-     * @return Mapper|TermMapper
-     */
-    protected function getTermMapper()
-    {
-        return $this->getMapperFactory()->get(TermMapper::class);
-    }
-
-    /**
-     * @return Mapper|FolderMapper
-     */
-    protected function getFolderMapper()
-    {
-        return $this->getMapperFactory()->get(FolderMapper::class);
+        $injector->set('controller:' . $this->basename,
+            $injector->lazyNew(Controller::class, array_merge(parent::getControllerServices(), []))
+        );
     }
 }
