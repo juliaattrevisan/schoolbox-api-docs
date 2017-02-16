@@ -93,9 +93,14 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         $assessmentIds = [];
         $limit         = $this->getConfig('size');
+
+        // Hard-code limit to max of 30 for now - showing every assessment can still break stuff
+        if ($limit <= 0) {
+            $limit = 30;
+        }
         foreach($responses as $response){
             $assessmentIds[$response->getAssessable()->getId()] = $response->getAssessable()->getId();
-            if ($limit > 0 && count($assessmentIds) >= $limit) {
+            if (count($assessmentIds) >= $limit) {
                 break;
             }
         }
