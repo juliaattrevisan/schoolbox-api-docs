@@ -34,17 +34,17 @@ class ModuleLoader {
      */
     protected function loadModule($className, $path, $kernel) {
 
-        $configLoader = new ConfigLoader();
-        $schoolCode = $configLoader->get('site_location');
+        $di = $kernel->getDependencyInjector();
 
+        $schoolCode = $di->get('config')->get('site_location');
         $customModuleClass = str_replace('\\Module', '\\Custom\\' . ucfirst($schoolCode) . '\\Module', $className);
 
         /** @var Module $module */
 
         if (class_exists($customModuleClass)) {
-            $module = new $customModuleClass($kernel->getDependencyInjector());
+            $module = new $customModuleClass($di);
         } else {
-            $module = new $className($kernel->getDependencyInjector());
+            $module = new $className($di);
         }
         $module->init($path);
         return $module;
