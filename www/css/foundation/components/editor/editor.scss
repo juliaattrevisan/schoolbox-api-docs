@@ -118,3 +118,15 @@ a.cke_button {
 .cke_contents {
     padding: 1rem !important;
 }
+
+article,
+.cke_editable {
+    h1, h2, h3, h4, h5, h6 {
+        margin-bottom: 0.75rem;
+        margin-top: 1.25rem;
+    }
+
+    >:first-child {
+        margin-top: 0;
+    }
+}
