@@ -66,7 +66,7 @@
                         </h2>
                         {% for code in folder.codes %}
                             {% if loop.first %}<p class="meta">{% endif -%}
-                            {{ code.code }}{% if not loop.last %},{% endif %}
+                            {{ code.code }}{% if not loop.last and code.code is not empty %},{% endif %}
                             {%- if loop.last %}</p>{% endif %}
                         {% endfor %}
                     </div>

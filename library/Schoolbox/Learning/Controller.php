@@ -403,12 +403,14 @@ class Controller extends Base
         // Direct to custom BTAC page
 
         if ($this->getConfigLoader()->get('site_location') == 'btac') {
-            return $this->getResponse()->redirect->to(
+            $this->getResponse()->redirect->to(
                 $this->getRouter()->generate('customBtacGrades.getGrades', [
                     'userId' => $viewee->getId(),
                     'termCode' => $term->getCode()
                 ])
             );
+
+            return;
         }
 
         // Storage for each folders markbook

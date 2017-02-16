@@ -50,7 +50,7 @@ class Controller extends Base
             $assessments = $assessments->merge($this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term));
         }
 
-        $this->getGrades($viewee, null, $year, $assessments);
+        $this->getGrades($viewee, $assessments, $year);
     }
 
     /**
@@ -64,7 +64,7 @@ class Controller extends Base
      * @param int|null $year
      * @param Collection $assessments
      */
-    public function getGrades(User $viewee, Term $term, $year = null, Collection $assessments)
+    public function getGrades(User $viewee, Collection $assessments, $year = null, Term $term = null)
     {
         // Storage for each folders markbook
         $markbooks = [];
