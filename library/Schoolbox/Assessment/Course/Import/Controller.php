@@ -539,6 +539,14 @@ class Controller extends Base\Base
         /** @var AssessmentPair $assessmentPair */
         foreach ($assessmentPairs as $assessmentPair) {
             if ($assessmentPair->getSpecification() instanceof Project) {
+                // Adjust no dates if this project has already been implemented:
+                // this project already has dates
+                if ($assessmentPair->getImplementation() instanceof Project
+                    && $assessmentPair->getImplementation()->getId()
+                ) {
+                    continue;
+                }
+
                 // Get the projects due date, this will serve as the upper limit for any assessments inside it
                 $limit = $assessmentPair->getSpecification()->getDueAt();
 
