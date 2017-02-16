@@ -150,18 +150,32 @@ class Controller extends Base
             $response
         );
 
-        $feedback = $feedbackFactory->produce();
+        try {
+            $feedback = $feedbackFactory->produce();
+            $this->getFeedbackDataSource()->save($feedback);
 
-        $this->getFeedbackDataSource()->save($feedback);
+            $data = [
+                'success' => true,
+                'message' => 'OK',
+                'id'      => $feedback->getId()
+            ];
 
-        $template = '';
-        $data = [
-            'success' => true,
-            'message' => 'OK',
-            'id'      => $feedback->getId(),
-        ];
+        } catch (\InvalidArgumentException $e) {
 
-        $this->respond($template, $data, $feedbackFactory->getResponseCode());
+            if ($postVars['publish']) {
+                $error = 'No feedback to publish.';
+            } else {
+                $error = 'No content to save.';
+            }
+
+            $data = [
+                'success' => false,
+                'message' => 'Bad Request',
+                'error'   => $error
+            ];
+        }
+
+        $this->respond('', $data, $feedbackFactory->getResponseCode());
     }
 
     /**

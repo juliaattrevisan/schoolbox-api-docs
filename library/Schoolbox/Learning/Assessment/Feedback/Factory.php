@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Feedback;
 
+use Schoolbox\Application\Exception\Exception;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\IResponse;
@@ -145,6 +146,29 @@ class Factory
         $postMark    = trim($this->getMark());
         $postComment = trim($this->getComment());
         $postPublish = trim($this->getPublish());
+
+        /**
+         * Check if there's any content to this feedback
+         */
+        $hasContent = false;
+        if (strlen($postMark) || strlen($postComment) || !empty($this->getFiles())) {
+            $hasContent = true;
+        }
+
+        /**
+         * If content is all empty and they are trying to create a draft or publish then fail out.
+         * Otherwise it means they are updating an existing draft; if there's no content: delete the draft.
+         */
+        if (!$hasContent && ($postPublish == true || $this->getResponseCode() == 201)) {
+            $old_one = $this->getResponseCode();
+            $this->setResponseCode(400);
+            //throw new \InvalidArgumentException('One of mark, comment and files should not be empty.');
+            throw new \InvalidArgumentException($old_one);
+        } elseif (!$hasContent) {
+            $feedback->setDeletedAt(\Alaress_Date_Format::now());
+            $feedback->setResponse($this->getResponse());
+            return $feedback;
+        }
 
         /** @var IFeedback $feedback */
         $feedback
