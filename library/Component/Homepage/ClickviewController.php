@@ -36,37 +36,23 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setVar('CLICKVIEW_URL', 'online.clickview.com.au');
         }
 
-        if (!strlen(trim($this->getConfig('url'))) || !strlen($clickviewSchoolId)) {
+        if (!strlen(trim($this->getConfig('url')))) {
 
             $this->setBlock($templateHandle, 'clickview', 'clickview_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-            $this->setBlock('empty_state', 'empty_api', 'empty_api_block');
-            $this->setBlock('empty_state', 'empty_api_admin', 'empty_api_admin_block');
 
             $this->setVar([
                 'clickview_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
-                'empty_api_block' => '',
-                'empty_api_admin_block' => '',
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->parse('empty_read_block', 'empty_read');
             } else {
-
-                if (strlen($clickviewSchoolId) == 0) {
-                    if ($this->getUser()->isSuperuser()) {
-                        $this->parse('empty_api_admin_block', 'empty_api_admin');
-                    } else {
-                        $this->parse('empty_api_block', 'empty_api');
-                    }
-                } else {
-                    $this->parse('empty_write_block', 'empty_write');
-                }
-
+                $this->parse('empty_write_block', 'empty_write');
             }
 
             $this->parse('empty_state_block', 'empty_state');
