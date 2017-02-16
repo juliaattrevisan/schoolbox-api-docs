@@ -37,7 +37,11 @@ Usage: include 'sub/semesterSelector.twig
 </script>
 
 <nav>
-    <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
+    {% if year is not empty %}
+        <a data-semester-switch="previous" href="#"></a>
+    {% else %}
+        <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
+    {% endif %}
 </nav>
 <div class="semester">
     <select id="context-selector-semester" title="Select a {% if year is not empty %}Year/{% endif %}Term">
@@ -60,5 +64,9 @@ Usage: include 'sub/semesterSelector.twig
     </select>
 </div>
 <nav>
-    <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
+    {% if year is not empty %}
+        <a data-semester-switch="next" href="#"></a>
+    {% else %}
+        <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
+    {% endif %}
 </nav>
