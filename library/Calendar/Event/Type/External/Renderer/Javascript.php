@@ -55,7 +55,6 @@ class Javascript extends Base
                         'time'        => $this->event->getTime(),
                         'detail'      => \Scrub::html($this->event->getDetail()),
                         'location'    => $this->event->getLocation(),
-                        'room'        => $this->event->getRoom(),
                         'eventTypeId' => $this->event->getType(),
                         'eventType'   => 'type' . $this->event->getType(),
                         'type'        => $this->event->getEventType(),

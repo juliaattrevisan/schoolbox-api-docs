@@ -9,6 +9,7 @@ use Schoolbox\External\Connector\Synergetic\Base\ExternalEvents;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\UserMapper;
 
 //class Calendar_Api_External_Event_Default extends Calendar_Api_EventType_Abstract {
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
@@ -71,6 +72,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             }
 
             foreach ($externalEvents as $externalEvent) {
+
                 $event = new Event();
                 $event->setEventId($externalEvent['id']);
                 $event->setEventType($eventType);
@@ -78,25 +80,27 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
                 $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
                 $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
 
+                //Where is the best place to format this? TODO
                 $eventDetail = '';
-                if(strlen($externalEvent['description']) > 0) {
-                    $eventDetail = $externalEvents['description'];
+                if(strlen($externalEvent['comment']) > 0) {
+                    $eventDetail .= $externalEvent['comment'];
                 }
-
                 if(strlen($externalEvent['team']) > 0) {
-                    $eventDetail .= $externalEvents['team'];
+                    $eventDetail .= '<br />Team: '.$externalEvent['team'];
                 }
-
-                $event->setDetail($eventDetail);
-
+                if(strlen($eventDetail) > 0) {
+                    $event->setDetail('<p>'.$eventDetail.'</p>');
+                }
                 $event->setLocation(strlen($externalEvent['location']) > 0 ? $externalEvent['room'] : $externalEvent['location']);
 
                 $event->setEventType('external');
                 $event->setAllday(false);
+
+                $owner = UserMapper::getInstance()->findByExternalId($externalEvent['owner']);
                 $event->setAuthorId($externalEvent['owner']);
+                $event->setAuthorName($owner->formatName());
 
                 $event->setColour($eventColor);
-
                 $stack->add($event);
             }
         }

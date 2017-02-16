@@ -62,18 +62,18 @@ class ExternalEvents implements ExternalEventsInterface
               luTeam.Description                AS team,
               SubjectClasses.Description        AS title
             FROM SynergyOne.dbo.StaffSchedule StaffSchedule
-              LEFT JOIN SynergyOne.dbo.luLocation ON luLocation.Code = StaffSchedule.LocationCode
-              LEFT JOIN SynergyOne.dbo.luTeam ON luTeam.Code = StaffSchedule.TeamCode";
+              LEFT JOIN SynergyOne.dbo.luLocation ON StaffSchedule.LocationCode = luLocation.Code AND StaffSchedule.LocationCode IS NOT NULL AND StaffSchedule.LocationCode <> ''
+              LEFT JOIN SynergyOne.dbo.luTeam ON StaffSchedule.TeamCode = luTeam.Code AND StaffSchedule.TeamCode IS NOT NULL AND StaffSchedule.TeamCode <> ''";
         if (!$user->getRole()->isStaff()) {
             $query .= " LEFT JOIN SynergyOne.dbo.StaffScheduleStudentClasses ON StaffSchedule.StaffScheduleSeq = StaffScheduleStudentClasses.StaffScheduleSeq";
         }
-        $query .= " LEFT JOIN SynergyOne.dbo.SubjectClasses ON StaffSchedule.SubjectClassesSeq = SubjectClasses.SubjectClassesSeq
+        $query .= " LEFT JOIN SynergyOne.dbo.SubjectClasses ON StaffSchedule.SubjectClassesSeq = SubjectClasses.SubjectClassesSeq AND StaffSchedule.SubjectClassesSeq IS NOT NULL AND StaffSchedule.SubjectClassesSeq <> ''
              WHERE StaffSchedule.ScheduleDateTimeFrom > '{$start->getDatabase()}' AND StaffSchedule.ScheduleDateTimeTo < '{$finish->getDatabase()}'";
 
         if ($user->getRole()->isStaff()) {
             $query .= " AND StaffSchedule.StaffID = {$user->getExternalId()}";
         }
-        //Is this always a student...? /TODO
+        //Is this always a student...?
         else {
             $query .= " AND StaffScheduleStudentClasses.ID = {$user->getExternalId()}";
         }

@@ -23,6 +23,13 @@ class Event extends EventBase implements EventInterface {
     );
 
     /**
+     * Event location
+     *
+     * @var string
+     */
+    protected $location;
+
+    /**
      * Set location
      *
      * @param $location
@@ -40,24 +47,6 @@ class Event extends EventBase implements EventInterface {
     public function getLocation()
     {
         return $this->location;
-    }
-
-    /**
-     * Set room
-     *
-     * @param $room
-     */
-    public function setRoom($room) {
-        $this->room = $room;
-    }
-
-    /**
-     * Get room
-     *
-     * @return $room
-     */
-    public function getRoom() {
-        return $this->room;
     }
 
 }
