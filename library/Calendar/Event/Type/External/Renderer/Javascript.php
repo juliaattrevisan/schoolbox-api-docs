@@ -19,6 +19,7 @@ class Javascript extends Base
              */
             $hasIcon = false;
             $hasStatus = false;
+            $hasListButton = false;
             $hasAttendanceRequestButton = false;
 
 
@@ -76,6 +77,7 @@ class Javascript extends Base
                     'attendance' => array(
                         'icon'          => $hasIcon,
                         'status'        => $hasStatus,
+                        'listButton'    => $hasListButton,
                         'requestButton' => $hasAttendanceRequestButton,
                     )
                 )

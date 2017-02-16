@@ -29,7 +29,7 @@ class Event extends EventBase implements EventInterface {
      */
     public function setLocation($location)
     {
-        $this->detail = $location;
+        $this->location = $location;
     }
 
     /**
@@ -48,7 +48,7 @@ class Event extends EventBase implements EventInterface {
      * @param $room
      */
     public function setRoom($room) {
-        $this->attendance = $room;
+        $this->room = $room;
     }
 
     /**
