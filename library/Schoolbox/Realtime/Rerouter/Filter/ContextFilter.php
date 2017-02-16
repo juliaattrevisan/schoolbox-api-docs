@@ -33,4 +33,18 @@ abstract class ContextFilter implements FilterInterface {
 		return $contextValue == $comparisonValue;
 	}
 
+    /**
+     * @param string|array $expected
+     * @param string|array $actual
+     * @param string       $errorMessage
+     * @throws FilterException
+     * @return void
+     */
+    protected function assertContextValue($expected, $actual, $errorMessage)
+    {
+        if (!$this->testContextValue($expected, $actual)) {
+            throw new FilterException($errorMessage, $expected, $actual);
+        }
+    }
+
 } 
