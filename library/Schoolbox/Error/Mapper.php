@@ -164,8 +164,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     const ERROR_ZIP_EXTRACT = 188;
     const ERROR_NO_ANALYTICS_DATA = 198;
 
-    const ERROR_NO_CONTENT_PUBLISH = 199;
-    const ERROR_NO_CONTENT_SAVE = 200;
+    const ERROR_NO_FEEDBACK_TO_PUBLISH = 199;
 
     /**
      * Setup mapping

@@ -1,1 +1,0 @@
-INSERT INTO error (id, message) VALUES (200, 'There is no content to save.');

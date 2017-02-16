@@ -160,21 +160,11 @@ class Controller extends Base
                 'message' => 'OK',
                 'id'      => $feedback->getId()
             ];
-
         } catch (\InvalidArgumentException $e) {
-
-            $errorMapper = ErrorMapper::getInstance();
-
-            if ($postVars['publish']) {
-                $errorId = $errorMapper::ERROR_NO_CONTENT_PUBLISH;
-            } else {
-                $errorId = $errorMapper::ERROR_NO_CONTENT_SAVE;
-            }
-
             $data = [
                 'success' => false,
                 'message' => 'Bad Request',
-                'error'   => $errorMapper->findById($errorId)->getMessage()
+                'error'   => $errorMapper->findById($errorMapper::ERROR_NO_FEEDBACK_TO_PUBLISH)->getMessage()
             ];
         }
 

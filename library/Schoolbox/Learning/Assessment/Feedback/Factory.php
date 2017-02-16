@@ -155,15 +155,14 @@ class Factory
         }
 
         /**
-         * If content is all empty and they are trying to create a draft or publish then fail out.
-         * Otherwise it means they are updating an existing draft; if there's no content: delete the draft.
+         * If content is all empty and they are trying publish then fail out.
+         * Otherwise if they are updating an existing draft and if there's no content: delete the draft.
+         * I have purposefully allowed empty drafts when creating a new draft, otherwise it's just too confusing for users when going from a published feedback.
          */
-        if (!$hasContent && ($postPublish == true || $this->getResponseCode() == 201)) {
-            $old_one = $this->getResponseCode();
+        if (!$hasContent && $postPublish == true) {
             $this->setResponseCode(400);
-            //throw new \InvalidArgumentException('One of mark, comment and files should not be empty.');
-            throw new \InvalidArgumentException($old_one);
-        } elseif (!$hasContent) {
+            throw new \InvalidArgumentException('One of mark, comment and files should not be empty.');
+        } elseif (!$hasContent && $this->getResponseCode() == 204) {
             $feedback->setDeletedAt(\Alaress_Date_Format::now());
             $feedback->setResponse($this->getResponse());
             return $feedback;
