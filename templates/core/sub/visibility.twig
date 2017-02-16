@@ -1,4 +1,4 @@
-{% macro dropdown(selected) %}
+{% macro dropdown(selected, availableVisibilities) %}
 {% set allOptions = {
     0: 'Staff Only',
     1: 'Staff and Students',
@@ -10,7 +10,10 @@
 <label>Visibility
     <select name="visibility">
         {% for currentOption, label in allOptions %}
-            <option value="{{ currentOption }}" {% if currentOption == selected %}selected="selected"{% endif %}>&#xe66b;&nbsp;&nbsp;&nbsp;{{ label }}</option>
+            <option value="{{ currentOption }}"
+                    {% if currentOption == selected %}selected="selected"{% endif %}
+                    {% if currentOption not in availableVisibilities %}disabled="disabled"{% endif %}
+            >&#xe66b;&nbsp;&nbsp;&nbsp;{{ label }}</option>
         {% endfor %}
     </select>
 </label>
