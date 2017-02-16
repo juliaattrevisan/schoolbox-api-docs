@@ -9,10 +9,11 @@
 
 namespace Config\Modules;
 
+use Config\ModuleLoader;
 use Alaress\Application\Kernel;
-use Schoolbox\Pastoral\Module;
+use Schoolbox\Pastoral\Module as PastoralModule;
 
-class Pastoral implements ModuleConfigInterface
+class Pastoral extends ModuleLoader implements ModuleConfigInterface
 {
     /**
      * Run configuration for the given module
@@ -26,8 +27,7 @@ class Pastoral implements ModuleConfigInterface
         $di = $kernel->getDependencyInjector();
 
         if ($di->get('config')->get('pastoral_enabled')) {
-            $pastoralModule = new \Schoolbox\Pastoral\Module($di);
-            $pastoralModule->init('/pastoral');
+            $this->loadModule($kernel, PastoralModule::class, "/pastoral");
         }
     }
 }

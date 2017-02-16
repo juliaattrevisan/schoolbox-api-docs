@@ -7,6 +7,7 @@
 
 namespace Config\Modules;
 
+use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
@@ -29,13 +30,13 @@ class Learning extends ModuleLoader implements ModuleConfigInterface
     {
         $namespace  = 'learning';
 
-        $this->loadModule(LearningModule::class, "/{$namespace}", $kernel);
-        $this->loadModule(AssessmentModule::class, "/{$namespace}", $kernel);
-        $this->loadModule(FeedbackModule::class, "/{$namespace}", $kernel);
-        $this->loadModule(ResponseModule::class, "/{$namespace}", $kernel);
-        $this->loadModule(QuizModule::class, "/{$namespace}", $kernel);
-        $this->loadModule(MarkbookModule::class, "/{$namespace}/markbook", $kernel);
-        $this->loadModule(UpcomingModule::class, "/{$namespace}/due", $kernel);
-        $this->loadModule(AssessmentExporterModule::class, "/{$namespace}/export", $kernel);
+        $this->loadModule($kernel, LearningModule::class,           "/{$namespace}");
+        $this->loadModule($kernel, AssessmentModule::class,         "/{$namespace}");
+        $this->loadModule($kernel, FeedbackModule::class,           "/{$namespace}");
+        $this->loadModule($kernel, ResponseModule::class,           "/{$namespace}");
+        $this->loadModule($kernel, QuizModule::class,               "/{$namespace}");
+        $this->loadModule($kernel, MarkbookModule::class,           "/{$namespace}/markbook");
+        $this->loadModule($kernel, UpcomingModule::class,           "/{$namespace}/due");
+        $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
     }
 }

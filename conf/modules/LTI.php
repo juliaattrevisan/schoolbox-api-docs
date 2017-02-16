@@ -9,9 +9,12 @@
 
 namespace Config\Modules;
 
+use Config\ModuleLoader;
 use Alaress\Application\Kernel;
+use Schoolbox\LTI\Component\Homepage\Module as LTIComponent;
+use Schoolbox\LTI\Consumer\Module as LTIConsumer;
 
-class LTI implements ModuleConfigInterface
+class LTI extends ModuleLoader implements ModuleConfigInterface
 {
     /**
      * Run configuration for the given module
@@ -21,12 +24,7 @@ class LTI implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $di = $kernel->getDependencyInjector();
-
-        $componentModule = new \Schoolbox\LTI\Component\Homepage\Module($di);
-        $componentModule->init('/lti');
-
-        $consumerModule = new \Schoolbox\LTI\Consumer\Module($di);
-        $consumerModule->init('/lti-consumer');
+        $this->loadModule($kernel, LTIComponent::class,     "/lti");
+        $this->loadModule($kernel, LTIConsumer::class,      "/lti-consumer");
     }
 }

@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,13 +7,13 @@
 
 namespace Config\Modules;
 
+use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\Menu\Side\Module as MenuSideModule;
 use Schoolbox\Menu\Top\Module as MenuTopModule;
 
-class Menu implements ModuleConfigInterface
+class Menu extends ModuleLoader implements ModuleConfigInterface
 {
-
     /**
      * Run configuration for the given module
      *
@@ -23,9 +22,7 @@ class Menu implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $di = $kernel->getDependencyInjector();
-
-        (new MenuTopModule($di))->init(null);
-        (new MenuSideModule($di))->init(null);
+        $this->loadModule($kernel, MenuTopModule::class, null);
+        $this->loadModule($kernel, MenuSideModule::class, null);
     }
 }
