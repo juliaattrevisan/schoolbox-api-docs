@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Learning\Assessment\Feedback;
 
-use Schoolbox\Application\Exception\Exception;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\IResponse;

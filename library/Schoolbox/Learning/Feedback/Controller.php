@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Error\Mapper AS ErrorMapper;
 
 class Controller extends Base
 {
@@ -162,16 +163,18 @@ class Controller extends Base
 
         } catch (\InvalidArgumentException $e) {
 
+            $errorMapper = ErrorMapper::getInstance();
+
             if ($postVars['publish']) {
-                $error = 'No feedback to publish.';
+                $errorId = $errorMapper::ERROR_NO_CONTENT_PUBLISH;
             } else {
-                $error = 'No content to save.';
+                $errorId = $errorMapper::ERROR_NO_CONTENT_SAVE;
             }
 
             $data = [
                 'success' => false,
                 'message' => 'Bad Request',
-                'error'   => $error
+                'error'   => $errorMapper->findById($errorId)->getMessage()
             ];
         }
 

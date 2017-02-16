@@ -1,0 +1,1 @@
+INSERT INTO error (id, message) VALUES (199, 'There is no content to publish.');
