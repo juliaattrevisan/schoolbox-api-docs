@@ -1,0 +1,75 @@
+<script>
+    $(function () {
+        $('[data-submit]').click(function (e) {
+            e.preventDefault();
+            var formName = '#update' + $(this).data('submit');
+            var form = $(formName);
+            $(formName + ' input[name="videoAction"]').val('resubmit');
+            form.submit();
+        });
+        $('[data-delete]').click(function (e) {
+            e.preventDefault();
+            var deleteId = $(this).data('delete');
+            var row = $(this).closest('li');
+            $(this).confirmDialog({
+                text: 'Are you sure you want to remove this video from the queue?',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('adminVideo.postSubmit') }}', {
+                        videoId: deleteId,
+                        videoAction: 'delete'
+                    }).done(function() {
+                        $(row).remove();
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+{# Shared navigation menu #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+    <div class="small-12 island">
+        {% for status in statusOrder if queue[status] | length > 0 %}
+            <h2 class="subheader">
+                {{ status }} Videos
+            </h2>
+            <section>
+                <ul class="information-list">
+                    {% for video in queue[status] %}
+                        <li class="actions-small-2">
+                            <div class="list-item">
+                                <div class="compact card small-12">
+                                    <a href="#">
+                                        {% if video.status == 'pending' or video.status == 'processing' %}
+                                            {% set icon = 'clock' %}
+                                        {% elseif video.status == 'failed' %}
+                                            {% set icon = 'alert' %}
+                                        {% else %}
+                                            {% set icon = 'tick' %}
+                                        {% endif %}
+                                        <div class="icon-{{ icon }}" title="Video processing {{ video.status }}"></div>
+                                        <h3>{{ video.storage.filename | default('Unknown Filename') }}</h3>
+                                        <p class="meta">{{ video.created }}</p>
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                {% if video.status == 'failed' %}
+                                    <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
+                                        <input type="hidden" value="{{ video.id }}" name="videoId">
+                                        <input type="hidden" value="" name="videoAction">
+                                        <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
+                                        <a class="icon-close no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
+                                    </form>
+                                {% endif %}
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endfor %}
+    </div>
+</div>
+

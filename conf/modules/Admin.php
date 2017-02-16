@@ -101,5 +101,9 @@ class Admin implements ModuleConfigInterface
         // Route list
         $routes = new \Schoolbox\Admin\RouteSummary\Module($di);
         $routes->init('/adminv2/routes');
+
+        // Video Queue
+        $routes = new \Schoolbox\Admin\Video\Module($di);
+        $routes->init('/adminv2/video');
     }
 } 
