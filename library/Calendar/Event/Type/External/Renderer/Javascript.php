@@ -22,9 +22,14 @@ class Javascript extends Base
             $hasListButton = false;
             $hasAttendanceRequestButton = false;
 
+            $classes = Array();
 
-            // Add campus list to list of classes
-            $classes = $this->getEvent()->getEventClasses();
+            if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
+                $classes[] = 'source' . $connectorId;
+            }
+
+            $classes[] = 'type' . $this->event->getType();
+
             $event = array(
                 'title'     => $this->event->getTitle(),
                 'start'     => $this->event->getStartTime()->getDatabase(),
@@ -45,7 +50,7 @@ class Javascript extends Base
 
                 /* Campus slug so you can filter events
                  */
-//                'className' => $classes,
+                'className' => implode(' ', $classes),
 
                 /* Extra data that the Event Object doesn't directly support
                  */

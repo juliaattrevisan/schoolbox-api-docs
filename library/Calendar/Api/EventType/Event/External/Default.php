@@ -75,7 +75,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
                 $event = new Event();
                 $event->setEventId($externalEvent['id']);
-                $event->setEventType($eventType);
+                $event->setType($eventType);
                 $event->setTitle($externalEvent['title']);
                 $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
                 $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
@@ -101,6 +101,9 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
                 $event->setAuthorName($owner->formatName());
 
                 $event->setColour($eventColor);
+
+                $event->setConnectorId($this->getConnectorId());
+
                 $stack->add($event);
             }
         }
