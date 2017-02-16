@@ -129,6 +129,10 @@
 
                 $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
+                $(config.formSaveLabel).toastActivate({
+                    text: 'Publishing...'
+                });
+
                 // Publish submits everything
                 var formData = $form.serializeArray();
                 formData.push({name: 'publish', value: 1});
@@ -142,6 +146,7 @@
                         $btnDrafted.text('');
                     });
 
+                    toast.call($form, 'Feedback published!', true);
                     config.onPublishCallback();
 
                 }).fail(function (xhr) {
@@ -217,7 +222,9 @@
                     $(config.filters).find('[data-status="complete"]').prop('checked', true);
                     $form.find('[data-draft="drafted"]').text('Saved as Draft');
                 })
-                .fail(function (xhr) { toast.call($form, xhr.responseText, false); })
+                .fail(function (xhr) {
+                    toast.call($form, xhr.responseText, false);
+                })
                 .always(function () {
                     $form.find('[data-draft=publish]').removeAttr("disabled");
                 });
