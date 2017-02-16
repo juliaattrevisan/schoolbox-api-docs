@@ -55,11 +55,6 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
-        // Don't render if not a student
-        if(!$this->getUser()->getRole()->isStudent()){
-            return false;
-        }
-
         $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : self::LIMIT_DEFAULT;
 
         if(!$this->limit){
