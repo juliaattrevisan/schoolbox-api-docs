@@ -45,7 +45,7 @@
                     <tr>
                         <td>{{ recentVisitor.user.fullName }}</td>
                         <td>{{ recentVisitor.user.preferredTitle }}</td>
-                        <td>{{ recentVisitor.lastAccessTime.short }}</td>
+                        <td data-order="{{ recentVisitor.lastAccessTime.unixTimestamp }}">{{ recentVisitor.lastAccessTime.short }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
