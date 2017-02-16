@@ -1,9 +1,8 @@
 <?php
 /**
- * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 use Schoolbox\External\Connector\Synergetic\Base\ExternalEvents;
@@ -39,7 +38,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     }
 
     /**
-     * Get day events from this data source
+     * Get events from this data source
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
@@ -48,7 +47,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function getEvents($startTimestamp, $endTimestamp) {
 
-        $stack            = new Collection();
+        $stack          = new Collection();
         $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
 
         if($externalEvents) {
@@ -106,12 +105,8 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     }
 
     /**
-     * Find a particular event from this source
-     * This implementation of getEvent is actually used
-     * (by /www/calendar/ajax/create.php, to display a new event)
+     * Do we even need this? /TODO
      *
-     * @param $eventId
-     * @return \Calendar\Event\Collection
      */
     public function getEvent($eventId) {
         return '';
@@ -122,8 +117,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      *
      * @return Calendar_Api_Config_Record|object
      */
-    public function loadConnectorConfiguration()
-    {
+    public function loadConnectorConfiguration() {
         return Calendar_Api_Config_Mapper::getInstance()->findById(
             $this->getConnectorId()
         );
@@ -133,8 +127,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @param  EventTypeMapper $eventTypeMapper
      * @return $this
      */
-    public function setEventTypeMapper($eventTypeMapper)
-    {
+    public function setEventTypeMapper($eventTypeMapper) {
         $this->eventTypeMapper = $eventTypeMapper;
         return $this;
     }
@@ -142,8 +135,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     /**
      * @return EventTypeMapper
      */
-    public function getEventTypeMapper()
-    {
+    public function getEventTypeMapper() {
         return $this->eventTypeMapper;
     }
 }

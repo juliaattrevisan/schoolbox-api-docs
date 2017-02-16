@@ -1,21 +1,20 @@
 <?php
 /**
- * Interface for external database community portal classes.
+ * Interface for external database events.
  *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright 2016 Alaress Pty Ltd
- * @link      http://www.alaress.com.au
+ * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 namespace Schoolbox\External\Connector;
-
-use Schoolbox\External\Normalise\User;
 
 interface ExternalEventsInterface
 {
     /**
      * Get events from external database
      *
+     * @param  object $user
      * @param  string $startDate
      * @param  string $endDate
      * @return array

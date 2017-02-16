@@ -2,9 +2,9 @@
 /**
  * Renders out a JSON blob for day event objects, this is used by full calendar
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 namespace Calendar\Event\Type\External\Renderer;
 
@@ -36,7 +36,7 @@ class Javascript extends Base
                 /* Whether it's an all-day event or not
                  * If allDay is true, then you can't resize it
                  */
-                'allDay'    => $this->event->getAllday(),
+                'allDay'    => false,
 
                 /* Colour of the event
                  */
@@ -62,20 +62,21 @@ class Javascript extends Base
                         'authorId'    => $this->event->getAuthorId(),
                         'level'       => $this->event->getEventClasses(),
                     ),
+                    // Do I need this? TODO
+
 //                    'links'      => array(
-//                        'category' => array(
-//                            'id'   => $this->event->getCategoryId(),
-//                            'name' => $this->event->getCategoryName(),
+//                    'category' => array(
+//                    'id'   => $this->event->getCategoryId(),
+//                    'name' => $this->event->getCategoryName(),
 //                        )
 //                    ),
                     'styles'     => array(
-                        'visible' => $cssClass,
+                        'visible' => '',
                     ),
                     'attendance' => array(
                         'icon'          => $hasIcon,
                         'status'        => $hasStatus,
-                        'listButton' => $hasListButton,
-                        'requestButton'    => $hasAttendanceRequestButton,
+                        'requestButton' => $hasAttendanceRequestButton,
                     )
                 )
             );

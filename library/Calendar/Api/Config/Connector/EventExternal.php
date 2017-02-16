@@ -2,10 +2,8 @@
 /**
  * Event source configuration for the external database events.
  *
- * Currently, the timetable is the only event type that matches this.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 class Calendar_Api_Config_Connector_EventExternal extends Calendar_Api_Config_Connector_Abstract
