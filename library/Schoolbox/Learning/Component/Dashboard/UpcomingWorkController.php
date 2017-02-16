@@ -69,7 +69,22 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
 
         $allUpcomingAssessments = $this->assessmentDataSource
             ->findAllByStudent($student, $term)
-            ->sortBy('dueAt', 'asc');
+            ->sortByCallback(function(IAssessable $a, IAssessable $b) {
+                // Due date
+                $comp = $a->getDueAt()->compare($b->getDueAt());
+                if ($comp) {
+                    return $comp;
+                }
+
+                // Sequence
+                $comp = $a->getSequence() - $b->getSequence();
+                if ($comp) {
+                    return $comp;
+                }
+
+                // Title
+                return strnatcasecmp($a->getTitle(), $b->getTitle());
+            });
 
         $visibility = new Visibility($this->getAccess());
 
