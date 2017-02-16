@@ -339,12 +339,12 @@ class Mapper extends BaseMapper
     /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
-     * @param User $student
-     * @param Alaress_Date_Format|null $start
-     * @param Alaress_Date_Format|null $end
+     * @param User                $student
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      * @return array|int[]
      */
-    public function findUniqueAssessmentIdsForStudentBetweenDates(User $student, Alaress_Date_Format $start = null, Alaress_Date_Format $end = null)
+    public function findUniqueAssessmentIdsForStudentBetweenDates(User $student, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
     {
         // Filter task/duework/quiz by term dates
         $params   = [
@@ -354,12 +354,12 @@ class Mapper extends BaseMapper
             'a.deleted_at IS NULL',
             '(tc.student_id IS NOT NULL OR ds.owner IS NOT NULL OR dr.owner IS NOT NULL OR qa.user_id IS NOT NULL)',
         ];
-        if ($start instanceof Alaress_Date_Format && !$start->isNull()) {
-            $params['from'] = $start->getDatabase();
+        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
+            $params['from'] = $from->getDatabase();
             $whereParts[]   = 'DATE(a.due_date) >= :from';
         }
-        if ($end instanceof Alaress_Date_Format && !$end->isNull()) {
-            $params['to'] = $end->getDatabase();
+        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
+            $params['to'] = $to->getDatabase();
             $whereParts[]   = 'DATE(a.due_date) <= :to';
         }
 

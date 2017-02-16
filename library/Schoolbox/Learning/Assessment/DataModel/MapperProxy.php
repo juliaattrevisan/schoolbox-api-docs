@@ -444,8 +444,15 @@ class MapperProxy
         return $this->findAllByStudentBetweenDates($student, $term->getStart(), $term->getActualFinish());
     }
 
-
-    public function findAllByStudentBetweenDates(User $student, Alaress_Date_Format $start = null, Alaress_Date_Format $end = null)
+    /**
+     * Finds all assessables that this student is participating in, between the given dates.
+     *
+     * @param User                $student
+     * @param Alaress_Date_Format $from If provided, fetch only assessables due on or after this date
+     * @param Alaress_Date_Format $to   If provided, fetch only assessables due on or before this date
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByStudentBetweenDates(User $student, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
     {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
@@ -464,14 +471,14 @@ class MapperProxy
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
         $columnList = [
-            'id' => $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $start, $end),
+            'id' => $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to),
         ];
 
-        if ($start instanceof Alaress_Date_Format && !$start->isNull()) {
-            $columnList['due_date >='] = $start->getDatabase();
+        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
+            $columnList['due_date >='] = $from->getDatabase();
         }
-        if ($end instanceof Alaress_Date_Format && !$end->isNull()) {
-            $columnList['due_date <='] = $end->getDatabase();
+        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
+            $columnList['due_date <='] = $to->getDatabase();
         }
 
         return $this->loadParticipantsIntoAssessmentCollection(
