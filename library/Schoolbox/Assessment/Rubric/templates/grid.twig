@@ -36,7 +36,7 @@
 
                 {% if descriptor %}
 
-                    <td {% if descriptor.selected %}class="rb-selected"{% endif %}>
+                    <td {% if descriptor.selected  and markVisibility %}class="rb-selected"{% endif %}>
                         <p>
                             {{- descriptor.text|raw -}}
                         </p>
