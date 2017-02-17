@@ -447,6 +447,40 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
+     * Gets all Parents' account info from Doublefirst
+     *
+     * @return array|bool
+     */
+    public function getParentUserAccountInfo()
+    {
+        $query = "
+            SELECT      
+                        ''                                  AS StudentContactNetworkLogin,
+                        V_ParentMother.ParentID             AS StudentContactID,
+                        ''                                  AS StudentContactTitle,
+                        V_ParentMother.ParentFirstname      AS StudentContactPreferred,
+                        V_ParentMother.ParentSurname        AS StudentContactSurname,
+                        V_ParentMother.CISEmail             AS StudentContactDefaultEmail,
+                        ''                                  AS StudentContactSpouseNetworkLogin,
+                        V_ParentFather.ParentID             AS StudentContactSpouseID,
+                        ''                                  AS StudentContactSpouseTitle,
+                        V_ParentFather.ParentFirstname      AS StudentContactSpousePreferred,
+                        V_ParentFather.ParentSurname        AS StudentContactSpouseSurname,
+                        V_ParentFather.CISEmail             AS StudentContactSpouseDefaultEmail,
+                        V_Student.Grade                     AS StudentYearLevel,
+                        ''                                  AS StudentCampus,
+                        Gender                              AS StudentGender
+            FROM        V_Student
+            LEFT JOIN   V_Parent AS V_ParentMother ON V_ParentMother.StudentID = V_Student.StudentID AND V_ParentMother.Relationship = 'Mother'
+            LEFT JOIN   V_Parent AS V_ParentFather ON V_ParentFather.StudentID = V_Student.StudentID AND V_ParentFather.Relationship = 'Father'
+        ";
+
+        return $this->getDatabase()->getAll($query) ?: array();
+
+    }
+
+
+    /**
      * Gets all active Staff's account info from Doublefirst
      *
      * @return array|bool
