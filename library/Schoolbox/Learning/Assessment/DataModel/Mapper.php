@@ -471,7 +471,7 @@ class Mapper extends BaseMapper
         $folderList = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
         if (count($folderList) === 0) {
             // Exit early if empty
-            return new Collection();
+            return $this->createCollection();
         }
         $params       = BaseMapper\PredicateBuilder::getArrayParameters($folderList, 'folder');
         $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
