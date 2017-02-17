@@ -367,7 +367,7 @@ class Controller extends Base
         }
 
         $data = [
-            'terms' => $this->getTermMapper()->findAll(),
+            'terms' => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'now' => $now,
             'term' => $term,
             'classList' => $folderList,
