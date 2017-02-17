@@ -397,6 +397,10 @@ input[type=radio]{
 			display: block;
 			float: none;
 		}
+
+		[class^="icon-"]:before {
+			padding-right: 0;
+		}
 	}
 
 	&:hover {
@@ -414,6 +418,7 @@ input[type=radio]{
 			}
 		}
 	}
+
 }
 
 // Beautifully styled checkboxes - just use the "plain" class
