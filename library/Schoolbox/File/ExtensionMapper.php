@@ -33,7 +33,6 @@ class ExtensionMapper extends \Schoolbox\Mapper {
 			'column'     => 'fileTypeId',
 			'property'   => 'id',
 			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
 		));
 		$this->hasMap(array(
 			'column'     => 'extension',
