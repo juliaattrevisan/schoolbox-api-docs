@@ -185,20 +185,16 @@ class Generator implements GeneratorInterface
 
     /**
      * @param User $user
+     * @throws Mapper\Exception
      * @return array
      */
     public function generateBindingsForUser(User $user)
     {
-
-        $bindings = array(
-            // required user information
-            'user' => array(
-                // *.notify.user.{id}.#
-                'id' => $user->getId()
-            )
-        );
-
-        $roleType = $user->getRole()->getType();
+        $bindings = [
+            'user' => [
+                'id' => "{$user->getId()}.#"
+            ]
+        ];
 
         // superuser bindings
         if ($user->isSuperuser()) {
@@ -228,6 +224,8 @@ class Generator implements GeneratorInterface
                 "$resHouse.#"
             );
         }
+
+        $roleType = $user->getRole()->getType();
 
         // parental bindings TODO can this be more lightweight
         if ($roleType == Role::PARENT && strlen(trim($user->getExternalId())) > 0) {
