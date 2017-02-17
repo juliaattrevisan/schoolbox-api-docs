@@ -40,10 +40,6 @@
 				dataType: 'json',
 				success: function(datasets) {
 
-					/* Remove loader
-					 */
-					config.element.removeClass('loader');
-
 					/* Only manufacture a bar if there is data
 					 */
 					if (datasets.length) {

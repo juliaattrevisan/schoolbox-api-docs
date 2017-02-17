@@ -48,10 +48,6 @@
                 dataType: 'json',
                 success: function(datasets) {
 
-                    /* Remove loader
-                     */
-                    config.element.removeClass('loader');
-
                     /* Progress bars
                      */
                     var used = datasets[0].data;
@@ -133,10 +129,6 @@
 				method: 'GET',
 				dataType: 'json',
 				success: function(datasets) {
-
-					/* Remove loader
-					 */
-					config.element.removeClass('loader');
 
 					var html = '\
 						<div>\
