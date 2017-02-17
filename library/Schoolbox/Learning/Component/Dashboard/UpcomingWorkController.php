@@ -57,10 +57,6 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
     {
         $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : self::LIMIT_DEFAULT;
 
-        if(!$this->limit){
-            return false;
-        }
-
         $this->assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
         $this->termMapper = $this->getMapperFactory()->get(TermMapper::class);
 
@@ -90,7 +86,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
                 // Only show work that isn't yet due
                 return $visibility->isUpcomingVisibleToUser($assessable, $student);
             })
-            ->limit($this->limit);
+            ->limit($this->limit ?: null);
 
         return count($this->upcomingAssessments) > 0;
     }
