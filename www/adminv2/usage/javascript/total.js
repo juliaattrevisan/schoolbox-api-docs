@@ -17,7 +17,7 @@
          * @param element
          * @returns {*}
          */
-        function init(options, element) {console.log(options);
+        function init(options, element) {
             var defaults = {
                 element: element,
 
