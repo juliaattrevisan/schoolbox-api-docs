@@ -512,6 +512,12 @@ class Controller extends Base\Base
             throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
         }
 
+        // Iterate over all of the dates making sure that any assessments without a duration specified do not extend past the projects due date boundary
+
+        foreach ($dto->getAssessmentPairs() as $assessmentPairs) {
+            $this->recurseDueDates($assessmentPairs);
+        };
+
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [
             'action'           => $action,
@@ -523,6 +529,39 @@ class Controller extends Base\Base
             'ownerships'       => $post['ownerships'],
             'dto'              => $dto
         ]);
+    }
+
+    /**
+     * Recurse through a projects subasessables and make sure they are all within the parent projects due date, if not we clip the date
+     * @param $assessmentPairs
+     */
+    private function recurseDueDates($assessmentPairs) {
+        /** @var AssessmentPair $assessmentPair */
+        foreach ($assessmentPairs as $assessmentPair) {
+            if ($assessmentPair->getSpecification() instanceof Project) {
+                // Adjust no dates if this project has already been implemented:
+                // this project already has dates
+                if ($assessmentPair->getImplementation() instanceof Project
+                    && $assessmentPair->getImplementation()->getId()
+                ) {
+                    continue;
+                }
+
+                // Get the projects due date, this will serve as the upper limit for any assessments inside it
+                $limit = $assessmentPair->getSpecification()->getDueAt();
+
+                /** @var AssessmentPair $subPair */
+                foreach ($assessmentPair->getSubPairs() as $subPair) {
+                    if ($subPair->getSpecification()->getDueAt()->gt($limit)) {
+                        $subPair->getSpecification()->setDueAt(clone $limit);
+                    }
+                    // Round and round we go... http://3.imimg.com/data3/NN/OX/MY-2831061/mirror-maze-500x500.jpg
+                    if ($subPair->getSubPairs()->count()) {
+                        $this->recurseDueDates($subPair->getSubPairs());
+                    }
+                }
+            }
+        }
     }
 
 
