@@ -4,6 +4,11 @@
  # Params:
  # * participant: Participant       - The participant object
  # * disabled:    bool              - whether the viewee cannot change the task's marking state
+ #                                  - For participant, it should be disabled if:
+ #                                    * task is closed, or
+ #                                    * participant is already marked as teacher-complete, or
+ #                                    * task is not self-assessable
+ #                                  - For teacher, it should be disabled if teacher lacks write+ perm to class folder
  #}
 
 {% set mostRecentResponse = participant.findMostRecentResponse %}
@@ -11,12 +16,12 @@
       method="POST"
       class="progress-tick-form"
       data-progress-tick-form="{{ participant.assessable.isSelfAssessed ? 'selfAssessed' : 'teacherAssessed' }}">
-    {% if mostRecentResponse.isMarkedAsCompleted %}
+    {% if mostRecentResponse.isMarkedAsTeacherAssessed %}
         <a href="#"
            disabled
-           class="no-text progress-tick complete{% if disabled %} disabled{% endif %}"
+           class="no-text progress-tick reviewed{% if disabled %} disabled{% endif %}"
            title="Completed"
-           data-progress-tick-status="complete"></a>
+           data-progress-tick-status="teacherAssessed"></a>
     {% elseif mostRecentResponse.isMarkedAsSelfAssessed %}
         <a href="#"
            disabled
@@ -27,7 +32,7 @@
         <a href="#"
            disabled
            class="no-text progress-tick{% if disabled %} disabled{% endif %}"
-           title="Not attempted"
-           data-progress-tick-status="notAttempted"></a>
+           title="Incomplete"
+           data-progress-tick-status="incomplete"></a>
     {% endif %}
 </form>

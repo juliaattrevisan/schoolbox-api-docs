@@ -5,15 +5,19 @@
      - pTooltip:         a tooltip explaining the status marker
 
     available varaibles:
-     - routeArgs:   an array that represents a participant, to be pushed into a routeLookup
-     - assessment:  the assessment we're looking at
-     - participant: the current participant of the iteration
+     - routeArgs:        an array that represents a participant, to be pushed into a routeLookup
+     - assessment:       the assessment we're looking at
+     - participant:      the current participant of the iteration
      - statusIncomplete: a string representing the 'incomplete' state
-     - statusPending: a string representing the 'pending' state
-     - statusComplete: a string representing the 'complete' state
+     - statusPending:    a string representing the 'pending' state
+     - statusReviewed:   a string representing the 'complete' state
 
 #}
 {% extends '@learningAssessment/status.twig' %}
+
+{% set labelIncomplete = 'Not Attempted' %}
+{% set labelPending    = 'Review required' %}
+{% set labelReviewed   = 'Reviewed' %}
 
 {% block headerOptions %}
     <li>
@@ -57,25 +61,25 @@
                          # Published feedback is outdated - attempt was finished more recently
                          #}
                         {% set pStatusClass = statusPending %}
-                        {% set pTooltip = 'Review required' %}
+                        {% set pTooltip     = labelPending %}
                     {% else %}
                         {# No feedback required
                          # Published feedback is more recent than latest finished attempt
                          #}
-                        {% set pStatusClass = statusComplete %}
-                        {% set pTooltip = 'Reviewed' %}
+                        {% set pStatusClass = statusReviewed %}
+                        {% set pTooltip = labelReviewed %}
                     {% endif %}
                 {% else %}
                     {# Feedback Required
                      # No published feedback ever existed
                      #}
                     {% set pStatusClass = statusPending %}
-                    {% set pTooltip = 'Review required' %}
+                    {% set pTooltip = labelPending %}
                 {% endif %}
             {% else %}
                 {# Feedback Required
                  # Current attempt is being undertaken, and -will- require feedback or other kind
-                 # of teacher intervention (this situation is not Complete or Not Attempted which is
+                 # of teacher intervention (this situation is not Reviewed or Not Attempted which is
                  # where Bagius' light turns green)
                  #}
                 {% set pStatusClass = statusPending %}

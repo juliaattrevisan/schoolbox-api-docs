@@ -745,8 +745,8 @@ $project
 new \Alaress_Probe('ID, Title', '% of Project Marked', '% of Project Marked And Published');
 new \Alaress_Probe(
     "{$project->getId()} {$project->getTitle()}",
-    "{$project->numMarked()}/{$project->numParticipants()} = {$project->calculatePercentageMarked()}",
-    "{$project->numPublished()}/{$project->numParticipants()} = {$project->calculatePercentagePublished()}"
+    "{$project->getCountMarkedByTeacher()}/{$project->getCountParticipants()} = {$project->calculatePercentageMarked()}",
+    "{$project->getCountPublished()}/{$project->getCountParticipants()} = {$project->calculatePercentagePublished()}"
 );
 
 echo "<h1>Types and Visibility</h1>";

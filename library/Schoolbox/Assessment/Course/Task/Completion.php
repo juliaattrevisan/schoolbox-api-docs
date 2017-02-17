@@ -17,9 +17,9 @@ use Schoolbox\User;
 
 class Completion implements ISoftDeletable
 {
-    const COMPLETION_STATUS_INCOMPLETE            = 1;
-    const COMPLETION_STATUS_REQUIRES_CONFIRMATION = 2;
-    const COMPLETION_STATUS_COMPLETE              = 3;
+    const COMPLETION_STATUS_INCOMPLETE       = 1;
+    const COMPLETION_STATUS_SELF_ASSESSED    = 2;
+    const COMPLETION_STATUS_TEACHER_ASSESSED = 3;
 
     use Id;
     use DeletedAtDate;

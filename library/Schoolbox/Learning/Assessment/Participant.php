@@ -18,6 +18,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
+use Schoolbox\Learning\MarkScheme\Completion as CompletionMarkScheme;
 use \Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -98,96 +99,181 @@ class Participant
         $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
 
+
     /**
-     * Whether this Participant has unmarked Response
+     * Is this participant either:
+     * * implicitly incomplete (no submitted responses), or
+     * * explicitly incomplete (task marked as incomplete)
+     *
+     * Represented as GREY SQUARE
+     *
+     * @return bool
+     */
+    public function isResponseIncomplete()
+    {
+        return !$this->isResponseComplete();
+    }
+
+
+    /**
+     * Does the teacher need to mark this participant ?
+     *
+     * Represented in UI as ORANGE DIAMOND
+     *
+     * This is a teacher-perspective function. ie, does the teacher need to do anything?
+     * eg, Give a mark? Publish a draft? Mark off as 'complete' ?
      *
      * @return bool
      */
     public function isMarkingRequired()
     {
-        // No responses, or latest response has feedback already
-        $latestResponse = $this->findMostRecentSubmittedResponse();
-        if (!$latestResponse || $latestResponse->hasFeedback()) {
+        // No responses, or latest response has published feedback already ?
+        $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
+        if (!$latestSubmittedResponse || $latestSubmittedResponse->isMarkedByTeacher()) {
             return false;
         }
 
-        // No feedback
-        $latestFeedback = $this->findMostRecentFeedback();
-        if (!$latestFeedback) {
+        // One or more responses and no feedback ?
+        $latestPublishedFeedback = $this->findMostRecentPublishedFeedback();
+        if (!$latestPublishedFeedback) {
             return true;
         }
 
-        /* Otherwise determine based on the timeline of events
-         */
-        return $latestResponse->getUpdatedAt() > $latestFeedback->getUpdatedAt();
+        // Was the latest student response submitted after the latest mark was published?
+        return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
     }
 
-    /**
-     * @deprecated use isMarked()
-     * This Participant received a Feedback for the $assessable
-     *
-     * @return bool
-     */
-    public function isAssessableMarked()
-    {
-        return count($this->allFeedbacks) > 0;
-    }
 
     /**
-     * Has this participant received ANY (published) feedback for this assessment?
+     * Has the teacher marked this participant as not-explicitly-incomplete, and
+     * the student has not subsequently submitted/re-submitted.
      *
-     * @return bool
+     * Represented in UI as GREEN CIRCLE
      */
-    public function isMarked()
+    public function isReviewComplete()
     {
-        return $this->allFeedbacks->filter(function (IFeedback $feedback) { return $feedback->isPublished(); })->count() > 0;
+        // Special case for Task
+        if($this->assessable instanceof Task){
+            /** @var TaskFeedback $latestFeedback */
+            $latestFeedback = $this->findMostRecentPublishedFeedback();
+            return $latestFeedback && $latestFeedback->isMarkedAsTeacherAssessed() && !$this->isMarkingRequired();
+        }
+
+        return  $this->isMarkedByTeacher() && !$this->isMarkingRequired();
     }
+
 
     /**
      * Has this participant made ANY kind of (submitted) response to this assessment?
+     *
+     * Includes teacher Submitting-On-Behalf-Of
      *
      * @return bool
      */
     public function isResponded()
     {
-        return $this->allResponses->filter(function (IResponse $response) { return $response->isSubmitted(); })->count() > 0;
+        foreach($this->allResponses as $response){
+            if($response->isSubmitted()){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * Has this participant completed this assessment?
+     * Does the participant have a non-incomplete response to the assessment ?
      *
-     * The logic for whether an assessment is completed is determined by the
-     * feedback within this participant - if the latest feedback is marked
-     * completed, the assessment is.
+     * Includes submissions-on-behalf-of.
      *
+     * This does not relate to the concept of a teacher reviewing a student.
+     *
+     * @see $this->isMarkingRequired for the teacher persepective
      * @return bool
      */
-    public function isComplete()
+    public function isResponseComplete()
     {
-        $mostRecent = $this->findMostRecentPublishedFeedback();
-        return ($mostRecent instanceof IFeedback)
-            ? $mostRecent->isComplete()
-            : false;
+        // Special case for task
+        if($this->assessable instanceof Task){
+            /** @var TaskCompletion $latestResponse */
+            $latestResponse = $this->findMostRecentSubmittedResponse();
+
+            // Are there no responses (implicitly incomplete), or is latest response explicitly marked as incomplete?
+            if(!$latestResponse || $latestResponse->isMarkedAsIncomplete()){
+                return false;
+            }
+            return true;
+        }
+
+        // Has student attempted the quiz or submitted to the dueWork ?
+        return $this->isResponded();
     }
 
     /**
-     * @deprecated misnomer, use hasPublishedFeedback()
-     * This Participant received a Published Feedback for the $assessable
+     * Has a teacher given a mark to this participant.
+     *
+     * Does not include Submission-on-behalf-of,
+     *
+     * For clarity - a self-assessed task, while complete, is not marked by teacher
+     * @see $this->hasMark to include self-assessed marks.
      *
      * @return bool
      */
-    public function isAssessablePublished()
+    public function isMarkedByTeacher()
     {
-        return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
+        foreach($this->allFeedbacks as $feedback){
+            if($feedback->isPublished()){
+                return true;
+            }
+        }
+        return false;
     }
 
+
     /**
+     * Does this student have a mark for the assessment.
+     *
+     * This includes marks given by the teacher, and
+     * self-assessed marks for a task (even if self-assessed as 'Incomplete')
+     *
+     * @see $this->isMarkedByTeacher for teacher-assigned-only marks
      * @return bool
      */
-    public function hasPublishedFeedback()
+    public function hasMark()
     {
-        return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
+        // Special case for task - can be marked by student or teacher.
+        if($this->assessable instanceof Task){
+            // Has the task been marked ?
+            // Note this distinguishes between implicit 'Incomplete' and explicit 'Incomplete'.
+            // The former returns FALSE, while the latter returns TRUE
+            return $this->allResponses->count() > 0;
+        }
+
+        // Default case
+        return $this->isMarkedByTeacher();
     }
+
+
+    /**
+     * Does the student still need to submit a response ?
+     *
+     * No need if already responded and the response is not 'incomplete', or
+     * if marked by Teacher already as not 'incomplete'
+     *
+     * @return bool
+     */
+    public function isResponseRequired()
+    {
+        // Special case for Task
+        if($this->assessable instanceof Task){
+            /** @var TaskCompletion $mostRecentResponse */
+            $mostRecentResponse = $this->findMostRecentSubmittedResponse();
+            return !$mostRecentResponse || $mostRecentResponse->isMarkedAsIncomplete();
+        }
+
+        // All non-Task marks from teacher indicate the student requires no further action.
+        return !($this->isResponseComplete() || $this->isMarkedByTeacher());
+    }
+
 
     /**
      * @return IResponse|null
@@ -268,6 +354,16 @@ class Participant
      */
     public function getPublishedHumanReadableMark()
     {
+        // Special case for Completion MarkScheme (it derives the mark from the state of the latest response)
+        $markScheme = $this->assessable->getMarkScheme();
+        if($markScheme instanceof CompletionMarkScheme){
+            $mostRecentSubmittedResponse = $this->findMostRecentSubmittedResponse();
+
+            return $mostRecentSubmittedResponse
+                ? $markScheme->getHumanReadableMark(null, $mostRecentSubmittedResponse)
+                : null;
+        }
+
         $feedback = $this->findMostRecentPublishedFeedback();
         return $feedback ? $feedback->getHumanReadableMark() : null;
     }
@@ -386,28 +482,5 @@ class Participant
     {
         $this->allFeedbacks->replaceWith($allFeedbacks);
         return $this;
-    }
-
-    /**
-     * Get a little data structure of Unpublished marks in both Human Readable
-     * and Normalised formats
-     *
-     * Maybe this can be broken down into getMark(), getPublishedMark(), getUnpublishedMark()
-     * methods but for now, just throw them all together
-     *
-     * @return array
-     */
-    public function getMark()
-    {
-        return [
-            'published' => [
-                'humanReadable' => $this->getAssessable()->getHumanReadableMark($this->getUser(), true),
-                'normalised' => $this->getAssessable()->getNormalisedMark($this->getUser(), true)
-            ],
-            'unpublished' => [
-                'humanReadable' => $this->getAssessable()->getHumanReadableMark($this->getUser(), false),
-                'normalised' => $this->getAssessable()->getNormalisedMark($this->getUser(), false)
-            ]
-        ];
     }
 }

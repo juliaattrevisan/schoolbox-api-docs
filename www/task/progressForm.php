@@ -72,12 +72,12 @@ if (!$permissionDenied) {
     elseif (isset($_POST['current_status'])) {
         switch ($_POST['current_status']) {
             case Task\Completion::COMPLETION_STATUS_INCOMPLETE:
-                $newStatus = Task\Completion::COMPLETION_STATUS_COMPLETE;
+                $newStatus = Task\Completion::COMPLETION_STATUS_TEACHER_ASSESSED;
                 break;
-            case Task\Completion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                $newStatus = Task\Completion::COMPLETION_STATUS_COMPLETE;
+            case Task\Completion::COMPLETION_STATUS_SELF_ASSESSED:
+                $newStatus = Task\Completion::COMPLETION_STATUS_TEACHER_ASSESSED;
                 break;
-            case Task\Completion::COMPLETION_STATUS_COMPLETE:
+            case Task\Completion::COMPLETION_STATUS_TEACHER_ASSESSED:
                 $newStatus = Task\Completion::COMPLETION_STATUS_INCOMPLETE;
                 break;
             default:

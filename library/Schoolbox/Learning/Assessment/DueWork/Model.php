@@ -261,21 +261,30 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * Decide whether $user can create a response to this IAssessable
-     *
-     * @param User $user
-     * @return bool
+     * @inheritdoc
      */
-    public function canCreateResponse(User $user)
+    public function canStudentCreateResponse(User $student)
     {
-        if ($this->isParticipant($user)) {
-            if ($this->isAcceptSingle() && $this->getParticipant($user)->isResponded()) {
-                return false;
-            }
+        // Not open ?
+        if(!$this->isOpen()){
+            return false;
         }
 
-        /* What about isAcceptNone() - should students still be able to see it?
-         */
+        // Does this DueWork not accept online responses ?
+        if($this->isAcceptNone()){
+            return false;
+        }
+
+        // Not a participant ?
+        if(!$this->isParticipant($student)){
+            return false;
+        }
+
+        // Has the student already submitted their single permitted response ?
+        if($this->isAcceptSingle() && $this->getParticipant($student)->isResponded()) {
+            return false;
+        }
+
         return true;
     }
 

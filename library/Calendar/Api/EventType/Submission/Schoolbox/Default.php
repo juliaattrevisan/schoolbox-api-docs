@@ -78,11 +78,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         // Get a timeline of events
         // Use the assessment data source to get everything for this user
 
-
+        $assessables = [];
         if ($this->getUser()->getRole()->isStudent()) {
             /** @var Collection|IAssessable[] $assessables */
             $assessables = $this->assessmentDataSource->findAllByStudent($this->getUser(), $term);
-        } else {
+        } elseif ($this->getUser()->getRole()->isStaff()) {
             $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
         }
 
@@ -90,7 +90,13 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
         foreach ($assessables as $assessment) {
 
-            if (!$visibility->isVisibleToUser($assessment, $this->getUser())) {
+            // Permission check to see the assessment
+            if(!$visibility->isVisibleToUser($assessment, $this->getUser())){
+                continue;
+            }
+
+            // Hide if student, and student cannot submit
+            if($this->getUser()->getRole()->isStudent() && !$assessment->canStudentCreateResponse($this->getUser())){
                 continue;
             }
 

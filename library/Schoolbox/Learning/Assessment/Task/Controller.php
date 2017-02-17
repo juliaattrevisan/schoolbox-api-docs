@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy as TaskResponseDataSource;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -66,7 +67,15 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
+        // Ensure completions are sorted most recent first
+        foreach($assessment->getAllParticipants() as $participant){
+            $participant->getAllResponses()->sortByCallback(function(Assessment\IResponse $responseA, Assessment\IResponse $responseB){
+                return $responseB->getSubmittedAt()->compare($responseA->getSubmittedAt());
+            });
+        }
+
         $twigData = [
+            'user'        => $this->getUser(),
             'type'        => Assessment\AssessmentType::objectToString($assessment),
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
@@ -139,10 +148,11 @@ class Controller extends Assessment\Controller
         }
 
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
-            'assessment'  => $task,
-            'preview'     => $previewFragment,
-            'student'     => $participant->getUser(),
+            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
+            'assessment'   => $task,
+            'hasWritePerm' => $this->getAccess()->getFolderAccess($this->getUser(), [$task->getBaseContext()->getFolder()->getId()]) >= UserAccess::ACCESS_WRITE,
+            'preview'      => $previewFragment,
+            'student'      => $participant->getUser(),
         ];
 
         $this->getResponse()->content->set(
@@ -169,19 +179,21 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * Create a Task Completion with specified completion status.
+     *
+     * If the most recent task completion has the same status, this call will rejected.
+     *
      * @api   POST /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
      * @param Participant $participant
+     * @var string[] $_GET
+     * @var int      $_GET['status']    The proposed completion status
      * @return void
      */
     public function postCreateResponse(Participant $participant)
     {
-        // Don't redirect to /task/start/:oldTaskId - students must mark tasks complete themselves
-
-        // Params:
-        // status: the status they want to set response to
-        // and that's it - an existing response will never be updated
+        // Ensure the current session user is allowed to see the given participation
         $this->assertParticipantAccess($participant);
 
         $response = (new Completion\Model())
@@ -193,7 +205,17 @@ class Controller extends Assessment\Controller
             ->markAs($this->getRequest()->post->getInt('status'))
         ;
 
-        $response->assertSaveability();
+        try{
+            $this->assertSaveability($participant, $response);
+        } catch (\UnexpectedValueException $e){
+            $result['success'] = false;
+            $result['message'] = $e->getMessage();
+            $result['id']      = null;
+            $result['status']  = $this->getRequest()->post->getInt('status');
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput($result));
+            return;
+        }
 
         // And save
         $this->taskResponseDataSource->save($response);
@@ -220,6 +242,25 @@ class Controller extends Assessment\Controller
                 )
             );
         }
+    }
+
+    /**
+     * Ensure the current user has permission to create this completion and the completion state is valid
+     *
+     * @param Participant $participant
+     * @param Completion\Model  $completion
+     * @throws \UnexpectedValueException
+     */
+    protected function assertSaveability(Participant $participant, Completion\Model $completion)
+    {
+        // If not marking themselves, user must have write+ permission to class folder
+        if($participant->getUser()->getId() != $this->getUser()->getId()){
+            $classFolderId = $participant->getAssessable()->getBaseContext()->getId();
+            if(Access::getInstance()->getFolderAccess($this->getUser(), [$classFolderId]) < UserAccess::ACCESS_WRITE){
+                throw new \UnexpectedValueException("Teachers may only mark tasks on classes where they have write permissions.");
+            }
+        }
+        $completion->assertSaveability();
     }
 
 

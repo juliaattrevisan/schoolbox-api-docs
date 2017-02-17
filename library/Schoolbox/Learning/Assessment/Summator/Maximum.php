@@ -66,4 +66,12 @@ class Maximum extends AbstractSummator
     {
         return 'Maximum';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isAggregator()
+    {
+        return false;
+    }
 }

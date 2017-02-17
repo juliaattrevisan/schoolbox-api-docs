@@ -108,13 +108,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             // Set completion of this feedback
             $status = $completion->getCompletionStatus();
             if ($status == DataObject::COMPLETION_STATUS_INCOMPLETE) {
-                $taskFeedback->markAsNotAttempted();
+                $taskFeedback->markAsIncomplete();
 
-            } elseif ($status == DataObject::COMPLETION_STATUS_REQUIRES_CONFIRMATION) {
+            } elseif ($status == DataObject::COMPLETION_STATUS_SELF_ASSESSED) {
                 $taskFeedback->markAsSelfAssessed();
 
-            } elseif ($status == DataObject::COMPLETION_STATUS_COMPLETE) {
-                $taskFeedback->markAsCompleted();
+            } elseif ($status == DataObject::COMPLETION_STATUS_TEACHER_ASSESSED) {
+                $taskFeedback->markAsTeacherAssessed();
 
             }
 

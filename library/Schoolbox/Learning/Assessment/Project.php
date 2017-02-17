@@ -18,8 +18,10 @@
 namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
-use \Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
+use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\User;
@@ -64,13 +66,11 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
-     * Project containers never show
-     *
-     * @param User $user
-     * @return bool
+     * @inheritdoc
      */
-    public function canCreateResponse(User $user)
+    public function canStudentCreateResponse(User $student)
     {
+        // Project containers cannot have IResponses directly on them. Only their sub-assessments can.
         return false;
     }
 
@@ -84,108 +84,137 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function getNormalisedMark(User $user, $publishedOnly)
     {
-        // Get the Assessables that the Specified User has potential marks for
-        $markedAssessables = new Collection();
+        return $this->getSummator()->summate($this->assessables, $user, $publishedOnly);
+    }
 
-        foreach($this->getAssessables() as $assessable){
-            foreach($assessable->getAllParticipants() as $participant){
-                if($participant->getUser()->getId() == $user->getId()){
-                    $isMarked = $publishedOnly
-                        ? $participant->isAssessablePublished()
-                        : $participant->isAssessableMarked();
-                    if($isMarked){
-                        $markedAssessables[$assessable->getId()] = $assessable;
+
+    /**
+     * If a student requires marking on ANY project sub-assessment, the project requires marking
+     *
+     * @return int
+     */
+    public function getCountMarkingRequired()
+    {
+        $count = 0;
+
+        foreach($this->allParticipants as $participant){
+            foreach ($this->assessables as $subAssessable) {
+                $student = $participant->getUser();
+                if($subAssessable->isParticipant($student) && $subAssessable->getParticipant($student)->isMarkingRequired()){
+                    $count++;
+                    break;
+                }
+            }
+        }
+        return $count;
+    }
+
+
+    /**
+     * Whether a project can be considered reviewComplete (ie GREEN CIRCLE) depends on:
+     * * whether any sub-assessments require marking,
+     * * the summation method, and
+     * * the reviewComplete status of the project's sub-assessments
+     *
+     * If summation implies ALL, then all sub-assessments must be review-completed.
+     * If summation implies ANY, then any sub-assessment needs be review-completed.
+     *
+     * @return int
+     */
+    public function getCountReviewComplete()
+    {
+        // Would a single sub-review indicate the student has been reviewed ?
+        $reviewedIfAny = !$this->summator->isAggregator();
+
+        // Depending on ALL/ANY, tracks count of reviewed or un-reviewed (avoids extra loop)
+        $countReviewed   = 0;
+        $countUnReviewed = 0;
+
+        foreach($this->allParticipants as $participant) {
+            foreach ($this->assessables as $subAssessable) {
+                $student = $participant->getUser();
+                if($subAssessable->isParticipant($student)){
+                    $subParticipant    = $subAssessable->getParticipant($student);
+                    $isReviewed        = $subParticipant->isReviewComplete();
+                    $isMarkingRequired = $subParticipant->isMarkingRequired();
+
+                    if($reviewedIfAny){
+                        if($isReviewed)
                     }
                 }
             }
         }
 
-        return $this->getSummator()->summate($markedAssessables, $user, $publishedOnly);
+        return $reviewedIfAny
+            ? $count
+            : $this->allParticipants->count() - $count;
     }
 
+
+
     /**
-     * Calculate how many IAssessable instances are in this Project
+     * Returns the number of Participants who have a published mark for this IAssessable.
+     *
+     * This is a student-perspective function. Has the student see they have received some grade/outcome ?
+     *
+     * In the case of project, a student is marked if they have received a mark for ANY
+     * assessment inside the project.
+     */
+    public function getCountMarkedByTeacher()
+    {
+        $count = 0;
+
+        foreach($this->allParticipants as $participant){
+            foreach ($this->assessables as $subAssessable) {
+                $student = $participant->getUser();
+                if($subAssessable->isParticipant($student) && $subAssessable->getParticipant($student)->isMarkedByTeacher()){
+                    $count++;
+                    break;
+                }
+            }
+        }
+        return $count;
+    }
+
+
+    /**
+     * A student is considered to have 'completed' a project if they have completed some combination of sub-assessments.
+     *
+     * The combination depends on the summation method:
+     * * MAX: implies optionality         - student needs to complete ANY sub-assessment
+     * * MIN: implies optionality         - student needs to complete ANY sub-assessments
+     * * AVG: implies expected to do all  - student needs to complete ALL sub-assessment
      *
      * @return int
      */
-    public function numAssessables()
+    public function getCountResponseComplete()
     {
-        return $this->getAssessables()->count();
-    }
+        // Would a single sub-completion indicate the student requires no further action ?
+        $completeIfAny = !$this->summator->isAggregator();
 
-    /**
-     * @inheritdoc
-     */
-    public function numParticipants()
-    {
-        $denominator = 0;
+        // Depending on ALL/ANY, tracks count of complete or incomplete (avoids extra loop)
+        $count = 0;
 
-        foreach ($this->getAssessables() as $currentAssessable) {
-            $denominator += $currentAssessable->getAllParticipants()->count();
-        }
+        foreach($this->allParticipants as $participant) {
+            foreach ($this->assessables as $subAssessable) {
+                $student = $participant->getUser();
+                if($subAssessable->isParticipant($student)){
+                    $isComplete = $subAssessable->getParticipant($student)->isResponseComplete();
 
-        return $denominator;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function numMarked()
-    {
-        $num = 0;
-
-        /** @var IAssessable $currentAssessable */
-        foreach ($this->getAssessables() as $currentAssessable) {
-            $num += $currentAssessable->numMarked();
-        }
-
-        return $num;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function calculatePercentageMarked()
-    {
-        if ($this->numAssessables()) {
-            return 100 * ($this->numMarked() / $this->numParticipants());
-        }
-
-        return 0;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function numPublished()
-    {
-        $num = 0;
-
-        /** @var IAssessable $currentAssessable */
-        foreach ($this->getAssessables() as $currentAssessable) {
-
-            /** @var Participant $currentParticipant */
-            foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
-                if ($currentParticipant->isAssessablePublished()) {
-                    $num++;
+                    if($completeIfAny == $isComplete){
+                        $count++;
+                        break;
+                    }
                 }
             }
         }
 
-        return $num;
+        return $completeIfAny
+            ? $count
+            : $this->allParticipants->count() - $count;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function calculatePercentagePublished()
-    {
-        if ($this->numAssessables()) {
-            return 100 * ($this->numPublished() / $this->numParticipants());
-        }
 
-        return null;
-    }
 
     /**
      * Check the dates set on this model are valid

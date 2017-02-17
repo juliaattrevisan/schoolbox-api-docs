@@ -12,8 +12,8 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Learning\Assessment\Task\Completion\Model as Completion;
-use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -258,17 +258,17 @@ class Controller extends Base
 
                         if ($mostRecentResponse instanceof Completion) {
                             switch ($mostRecentResponse->getCompletionStatus()) {
-                                case ICompletion::STATUS_COMPLETED:
+                                case TaskCompletion::COMPLETION_STATUS_TEACHER_ASSESSED:
                                     $result = "Completed";
                                     break;
-                                case ICompletion::STATUS_SELF_ASSESSED:
-                                    if ($participant->getAssessable()->isSelfAssessed()) {
+                                case TaskCompletion::COMPLETION_STATUS_SELF_ASSESSED:
+                                    if ($assessment->isSelfAssessed()) {
                                         $result = "Self Assessed";
                                     } else {
                                         $result = "Teacher Assessed";
                                     }
                                     break;
-                                case ICompletion::STATUS_NOT_ATTEMPTED:
+                                case TaskCompletion::COMPLETION_STATUS_INCOMPLETE;
                                     $result = "Not Attempted";
                                     break;
                             }

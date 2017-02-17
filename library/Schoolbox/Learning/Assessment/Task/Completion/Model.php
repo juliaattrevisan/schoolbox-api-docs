@@ -49,7 +49,7 @@ class Model extends AbstractResponse implements ICompletion
      */
     public function hasFeedback()
     {
-        return $this->isMarkedAsCompleted();
+        return $this->isMarkedAsTeacherAssessed();
     }
 
     /* Tasks always return Null marks for Feedbacks
@@ -103,7 +103,7 @@ class Model extends AbstractResponse implements ICompletion
 
         // Can't set own work to completed, or self-assess if task doesn't allow it
         if ($currentUser->getId() == $taskUser->getId()) {
-            if ($this->isMarkedAsCompleted()) {
+            if ($this->isMarkedAsTeacherAssessed()) {
                 throw new \UnexpectedValueException("Users may not complete a task themselves");
             }
 

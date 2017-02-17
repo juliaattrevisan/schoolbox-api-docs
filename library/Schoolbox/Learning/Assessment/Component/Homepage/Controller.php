@@ -14,7 +14,6 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -25,7 +24,7 @@ use SitePage;
 abstract class Controller extends Component_Homepage_ControllerAbstract
 {
     /** @var IAssessable[]|Collection */
-    protected $assessments;
+    private $assessments;
 
     /** @var AssessmentMapperProxy $assessmentMapper */
     private $assessmentMapper;
@@ -65,8 +64,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         // TODO - this effectively hydrates all Assessment types in this Folder, then filters out
         // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
-            $visibility = new Visibility($this->getAccess());
-
             // Note: findAllByFolderIdForReview retrieves response+feedback for all
             // assessment types, not just tasks (as it did previously).
             $options = [
@@ -82,17 +79,13 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                     $options
                 )
                 ->filter(
-                    function (IAssessable $assessment) use ($visibility)
+                    function (IAssessable $assessment)
                     {
-                        return $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
+                        // Component must either be displaying closed or assessment is not closed
+                        return $this->getConfig('showClosed') || !$assessment->isClosed();
                     }
                 )
-            ;
-
-            if ($this->getConfig('size') > 0) {
-                $this->assessments->limit($this->getConfig('size'));
-            }
-
+                ->limit($this->getConfig('size') ?: null);
 
         } catch (\DomainException $e) {
             // if something goes wrong, this component will not be displayed

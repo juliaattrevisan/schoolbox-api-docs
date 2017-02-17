@@ -16,9 +16,9 @@
         $('form[data-progress-tick-form]').progressTickForm({
             label: $('[data-save-progress-state]'),
             transitions: {
-                notAttempted: 'complete',
-                selfAssessed: 'complete',
-                complete:     'notAttempted'
+                incomplete:      'teacherAssessed',
+                selfAssessed:    'teacherAssessed',
+                teacherAssessed: 'incomplete'
             }
         });
     });

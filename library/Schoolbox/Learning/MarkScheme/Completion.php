@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\MarkScheme;
 use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 
 class Completion extends AbstractMarkScheme
 {
@@ -30,21 +31,21 @@ class Completion extends AbstractMarkScheme
      * Returns a string representation of a normalised Mark
      *
      * @param mixed          $normalisedMark Ignored.
-     * @param IResponse|null $response
+     * @param IResponse|TaskCompletion|null $response
      * @throws RangeException if normalised mark is outside valid range
      * @throws InvalidArgumentException if enum not matched
      * @return string
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if(null === $response){
+        if (null === $response || $response->isMarkedAsIncomplete()) {
             return self::HUMAN_READABLE_INCOMPLETE;
-        } else if (count($response->getAllFeedback())){
-            return self::HUMAN_READABLE_TEACHER_COMPLETED;
-        } else if($response->getSubmittedBy()->getId() === $response->getSubmittedOnBehalfOf()->getId() ) {
+        } elseif ($response->isMarkedAsSelfAssessed()) {
             return self::HUMAN_READABLE_STUDENT_COMPLETED;
+        } elseif ($response->isMarkedAsTeacherAssessed()) {
+            return self::HUMAN_READABLE_TEACHER_COMPLETED;
         } else {
-            return self::HUMAN_READABLE_INCOMPLETE;
+            throw new \DomainException("Unable to determine Task's human-readable mark");
         }
     }
 

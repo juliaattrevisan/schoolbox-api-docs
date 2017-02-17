@@ -25,6 +25,8 @@
 {% set participant         = assessment.getParticipant(student) %}
 {% set mostRecentFeedback  = participant.findMostRecentPublishedFeedback %}
 {% set isViewingOwnSummary = participant.user.id == USER.id %}
+{% set reviewer            = mostRecentFeedback.submittedBy %}
+{% set reviewerName        = reviewer.id == student.id and student.id == USER.id ? 'You' : reviewer.fullName %}
 
 <div class="row">
     <div class="small-12 island">
@@ -40,21 +42,15 @@
                                      class="hide-for-small-only">
                                 <p>{{ participant.user.formatName }}</p>
 
-                                {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
-                                    <p class="meta">
-                                        {% if isViewingOwnSummary %}
-                                            You completed this task on {{ mostRecentFeedback.publishedAt.short }}.
-                                        {% else %}
-                                            completed this task on {{ mostRecentFeedback.publishedAt.short }}.
-                                        {% endif %}
-                                    </p>
-                                {% else %}
-                                    <p class="meta">
+                                <p class="meta">
+                                    {# No marks yet ? #}
+                                    {% if not participant.allResponses | length %}
+                                        {# Is this task self-assessable ? #}
                                         {% if assessment.isSelfAssessed %}
                                             {% if isViewingOwnSummary %}
-                                                You have not yet attempted this task.
+                                                You {% if assessment.isClosed %}did not complete{% else %}have not completed{% endif %} this task.
                                             {% else %}
-                                                has not yet attempted this task.
+                                                has not completed this task.
                                             {% endif %}
                                         {% else %}
                                             {% if isViewingOwnSummary %}
@@ -63,14 +59,20 @@
                                                 has not been verified as having completed this task.
                                             {% endif %}
                                         {% endif %}
-                                    </p>
-                                {% endif %}
+                                    {# Is it marked as incomplete ? #}
+                                    {% elseif mostRecentFeedback.isMarkedAsIncomplete %}
+                                        {{ reviewerName }} marked this task as incomplete on {{ mostRecentFeedback.publishedAt.short }}.
+                                        {# Marked as self-assessed or teacher-assessed #}
+                                    {% else %}
+                                        {{ reviewerName }} marked this task as complete on {{ mostRecentFeedback.publishedAt.short }}.
+                                    {% endif %}
+                                </p>
                             </a>
                         </div>
                     </div>
 
                     {# Has teacher confirmed this is complete? #}
-                    {% if mostRecentFeedback.isMarkedAsCompleted %}
+                    {% if mostRecentFeedback.isMarkedAsTeacherAssessed %}
                         <ul class="information-list reply">
                             <li class="list-item">
                                 <div class="card small-12">
@@ -96,21 +98,20 @@
             </ul>
         </section>
 
-
         {% set createResponseRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
             assessmentId: participant.assessable.id,
             studentId:    participant.user.id,
             participant:  participant
         }) %}
-        {% if createResponseRoute and  assessment.isSelfAssessed %}
-            <form action="{{ createResponseRoute }}"
-                  method="POST">
-                {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
-                    <input type="hidden" name="status" value="1" />
-                    <input type="submit" class="full-width" value="Mark Task as Not Attempted" />
+        {# If already marked as teacher-assessed, require WRITE+ perm to change. If student, ensure not closed #}
+        {% if createResponseRoute and (hasWritePerm or not mostRecentFeedback.isMarkedAsTeacherAssessed) and (hasWritePerm or not participant.assessable.isClosed) %}
+            <form action="{{ createResponseRoute }}" method="POST">
+                {% if mostRecentFeedback.isMarkedAsIncomplete %}
+                    <input type="hidden" name="status" value="{% if USER.id == student.id %}2{% else %}3{% endif %}" />
+                    <input type="submit" class="full-width" value="Complete task" />
                 {% else %}
-                    <input type="hidden" name="status" value="2" />
-                    <input type="submit" class="full-width" value="Complete Task" />
+                    <input type="hidden" name="status" value="1" />
+                    <input type="submit" class="full-width" value="Undo task completion" />
                 {% endif %}
             </form>
         {% endif %}

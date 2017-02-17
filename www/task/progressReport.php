@@ -323,15 +323,15 @@ $this->parse('subheader_unit_block', 'subheader_unit', true);
 
 // Placeholder icons
 $status_list = array(
-    Task\Completion::COMPLETION_STATUS_INCOMPLETE            => array(
+    Task\Completion::COMPLETION_STATUS_INCOMPLETE       => array(
         'text'  => 'Incomplete',
         'class' => 'progress-tick',
     ),
-    Task\Completion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => array(
+    Task\Completion::COMPLETION_STATUS_SELF_ASSESSED    => array(
         'text'  => 'Self Assessed',
         'class' => 'progress-tick pending',
     ),
-    Task\Completion::COMPLETION_STATUS_COMPLETE              => array(
+    Task\Completion::COMPLETION_STATUS_TEACHER_ASSESSED => array(
         'text'  => 'Complete',
         'class' => 'progress-tick complete',
     ),

@@ -23,16 +23,12 @@ interface IFeedback
     public function isPublished();
 
     /**
-     * Should the existence of this feedback specify that the participant has
-     * completed the assessment?
+     * Is the specified user the reviewee of this feedback?
      *
-     * Usually, this will be true if this feedback is published - in the future,
-     * I see us implementing a min mark that a participant must achieve for them
-     * to be marked completed?
-     *
+     * @param User $user
      * @return bool
      */
-    public function isComplete();
+    public function isReviewedFor(User $user);
 
     /**
      * $user is the reviewee of this Feedback

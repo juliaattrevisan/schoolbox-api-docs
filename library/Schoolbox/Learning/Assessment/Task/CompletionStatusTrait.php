@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use Schoolbox\Assessment\Course\Task\Completion;
+
 /**
  * Trait for setting and querying completion statuses.
  */
@@ -18,9 +20,9 @@ trait CompletionStatusTrait
      * @var array
      */
     protected $availableCompletionStatuses = [
-        ICompletion::STATUS_COMPLETED,
-        ICompletion::STATUS_SELF_ASSESSED,
-        ICompletion::STATUS_NOT_ATTEMPTED,
+        Completion::COMPLETION_STATUS_INCOMPLETE,
+        Completion::COMPLETION_STATUS_SELF_ASSESSED,
+        Completion::COMPLETION_STATUS_TEACHER_ASSESSED,
     ];
 
     /**
@@ -28,7 +30,7 @@ trait CompletionStatusTrait
      *
      * @var int
      */
-    protected $completionStatus = ICompletion::STATUS_NOT_ATTEMPTED;
+    protected $completionStatus = Completion::COMPLETION_STATUS_INCOMPLETE;
 
     /**
      * Compares this task's completion status against another input.
@@ -62,9 +64,9 @@ trait CompletionStatusTrait
      *
      * @return bool
      */
-    public function isMarkedAsCompleted()
+    public function isMarkedAsTeacherAssessed()
     {
-        return $this->isMarkedAs(ICompletion::STATUS_COMPLETED);
+        return $this->isMarkedAs(Completion::COMPLETION_STATUS_TEACHER_ASSESSED);
     }
 
     /**
@@ -72,9 +74,9 @@ trait CompletionStatusTrait
      *
      * @return static
      */
-    public function markAsCompleted()
+    public function markAsTeacherAssessed()
     {
-        return $this->markAs(ICompletion::STATUS_COMPLETED);
+        return $this->markAs(Completion::COMPLETION_STATUS_TEACHER_ASSESSED);
     }
 
     /**
@@ -84,7 +86,7 @@ trait CompletionStatusTrait
      */
     public function isMarkedAsSelfAssessed()
     {
-        return $this->isMarkedAs(ICompletion::STATUS_SELF_ASSESSED);
+        return $this->isMarkedAs(Completion::COMPLETION_STATUS_SELF_ASSESSED);
     }
 
     /**
@@ -94,7 +96,7 @@ trait CompletionStatusTrait
      */
     public function markAsSelfAssessed()
     {
-        return $this->markAs(ICompletion::STATUS_SELF_ASSESSED);
+        return $this->markAs(Completion::COMPLETION_STATUS_SELF_ASSESSED);
     }
 
     /**
@@ -102,9 +104,9 @@ trait CompletionStatusTrait
      *
      * @return bool
      */
-    public function isMarkedAsNotAttempted()
+    public function isMarkedAsIncomplete()
     {
-        return $this->isMarkedAs(ICompletion::STATUS_NOT_ATTEMPTED);
+        return $this->isMarkedAs(Completion::COMPLETION_STATUS_INCOMPLETE);
     }
 
     /**
@@ -112,9 +114,9 @@ trait CompletionStatusTrait
      *
      * @return static
      */
-    public function markAsNotAttempted()
+    public function markAsIncomplete()
     {
-        return $this->markAs(ICompletion::STATUS_NOT_ATTEMPTED);
+        return $this->markAs(Completion::COMPLETION_STATUS_INCOMPLETE);
     }
 
     /**

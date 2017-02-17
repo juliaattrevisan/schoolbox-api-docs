@@ -9,9 +9,9 @@
         // Save form for task completion
         $('form[data-progress-tick-form]').progressTickForm({
             transitions: {
-                notAttempted: 'complete',
-                selfAssessed: 'complete',
-                complete:     'notAttempted'
+                incomplete:      'teacherAssessed',
+                selfAssessed:    'teacherAssessed',
+                teacherAssessed: 'incomplete'
             }
         });
     });
@@ -60,22 +60,22 @@
 
                                 {%- if assessment is quiz -%}
                                     {%- set submitTitleSuffix = 'attempted this quiz' -%}
-                                    {%- set markedTitleSuffix = 'been reviewed' -%}
+                                    {%- set markedTitleSuffix = 'review' -%}
                                 {%- elseif assessment is dueWork %}
                                     {%- set submitTitleSuffix = 'submitted work' -%}
-                                    {%- set markedTitleSuffix = 'received feedback' -%}
+                                    {%- set markedTitleSuffix = 'marking' -%}
                                 {%- elseif assessment is task -%}
                                     {% set submitTitleSuffix = 'completed this task' -%}
-                                    {% set markedTitleSuffix = 'been teacher assessed' -%}
+                                    {% set markedTitleSuffix = 'teacher assessment' -%}
                                 {%- endif -%}
 
-                                <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
-                                    <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have {{ markedTitleSuffix }}"></span>
+                                <div class="progress" title="{{ assessment.countCompleted }} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
+                                    <span class="meter" style="width:{{ assessment.percentageCompleted }}%"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.percentageCompleted - assessment.percentageMarkingRequired }}%" title="{{ assessment.countMarkingRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
-                                <p title="{{ assessment.numMarkingRequired }} of {{ assessment.numParticipants }} students require marking">{{ assessment.numMarkingRequired }} unmarked</p>
+                                <p title="{{ assessment.countMarkingRequired }} of {{ assessment.countParticipants }} students require marking">{{ assessment.countMarkingRequired }} unmarked</p>
                             </div>
                             <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
                                 {% for participant in assessment.allParticipants %}
@@ -139,37 +139,39 @@
                     {%- set state = assessment is quiz ? 'unattempted' : 'unsubmitted' -%}
                     {%- if assessment is quiz %}
                         {%- set submitTitleSuffix = 'attempted this quiz' -%}
-                        {%- set markedTitleSuffix = 'been reviewed' -%}
+                        {%- set markedTitleSuffix = 'review' -%}
                         {%- set noResultsTitleSuffix = 'attempted this quiz' -%}
                     {%- elseif assessment is dueWork %}
                         {%- set submitTitleSuffix = 'submitted work' -%}
-                        {%- set markedTitleSuffix = 'received feedback' -%}
-                        {%- set noResultsTitleSuffix = 'submitted work or received feedback' -%}
+                        {%- set markedTitleSuffix = 'marking' -%}
+                        {%- set noResultsTitleSuffix = 'submitted work or been marked' -%}
                     {%- elseif assessment is task %}
-                        {%- set submitTitleSuffix = 'self-assessed this task' -%}
-                        {%- set markedTitleSuffix = 'been teacher assessed' -%}
+                        {%- set submitTitleSuffix = 'completed this task' -%}
+                        {%- set markedTitleSuffix = 'teacher assessment' -%}
                         {%- set noResultsTitleSuffix = 'completed this task' -%}
                     {%- endif -%}
                     <section>
                         <div class="content collapsible">
-                            <div class="small-6 columns no-pad">
+                            <div class="card small-6 columns no-pad">
+                                {#- Dessicator -#}
+                                <span data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"></span>
+                                <i class="size-32 icon-{{ icon }}"></i>
                                 <h3>
                                     {#- Dessicator -#}
-                                    <span data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"><span class="icon-{{ icon }}"></span>
-                                        {#- Dessicator -#}
-                                    </span><a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                                    <a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
                                     {#- Dessicator -#}
                                 </h3>
                                 {{ assessmentContext.crumbs(assessment) }}
+                                <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
                             </div>
                             <div class="small-4 columns hide-for-small-only">
-                                <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
-                                    <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have {{ markedTitleSuffix }}"></span>
+                                <div class="progress" title="{{ assessment.countCompleted }} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
+                                    <span class="meter" style="width:{{ assessment.percentageCompleted }}%"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.percentageCompleted - assessment.percentageMarkingRequired }}%" title="{{ assessment.countMarkingRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
-                                <p title="{{ assessment.numNoResponseOrFeedback }} of {{ assessment.numParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.numNoResponseOrFeedback }} {{ state }}</p>
+                                <p title="{{ assessment.countNoResponseOrFeedback }} of {{ assessment.countParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.countNoResponseOrFeedback }} {{ state }}</p>
                                 <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
                             </div>
                             <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">

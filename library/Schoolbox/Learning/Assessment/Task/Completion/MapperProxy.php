@@ -93,22 +93,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
                 ->setSubmittedBy($completion->getMarkingUser())
                 ->setSubmittedOnBehalfOf($completion->getStudent())
+                ->markAs($completion->getCompletionStatus())
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setUpdatedAt($completion->getCompletionDate())
                 ->setDeletedAt($completion->getDeletedAt());
-
-            // Set completion of this feedback
-            $status = $completion->getCompletionStatus();
-            if ($status == DataObject::COMPLETION_STATUS_INCOMPLETE) {
-                $taskCompletion->markAsNotAttempted();
-
-            } elseif ($status == DataObject::COMPLETION_STATUS_REQUIRES_CONFIRMATION) {
-                $taskCompletion->markAsSelfAssessed();
-
-            } elseif ($status == DataObject::COMPLETION_STATUS_COMPLETE) {
-                $taskCompletion->markAsCompleted();
-
-            }
 
             $taskCompletions->add($taskCompletion);
         }

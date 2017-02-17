@@ -5,15 +5,21 @@
      - pTooltip:         a tooltip explaining the status marker
 
     available varaibles:
-     - routeArgs:   an array that represents a participant, to be pushed into a routeLookup
-     - assessment:  the assessment we're looking at
-     - participant: the current participant of the iteration
+     - routeArgs:        an array that represents a participant, to be pushed into a routeLookup
+     - assessment:       the assessment we're looking at
+     - participant:      the current participant of the iteration
      - statusIncomplete: a string representing the 'incomplete' state
-     - statusPending: a string representing the 'pending' state
-     - statusComplete: a string representing the 'complete' state
+     - statusPending:    a string representing the 'pending/attempted' state
+     - statusReviewed:   a string representing the 'reviewed' state
 
 #}
 {% extends '@learningAssessment/status.twig' %}
+
+{% set labelIncomplete = 'Incomplete' %}
+{% set labelPending    = 'Self-Assessed' %}
+{% set labelReviewed   = 'Complete' %}
+
+{% set listClass = 'expandable-card' %}
 
 {% block config %}
     {% set latestFeedback    = participant.findMostRecentFeedback %}
@@ -28,66 +34,106 @@
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}
-        {% set pStatusClass = latestFeedback.isMarkedAsCompleted ? statusComplete : (latestFeedback.isMarkedAsSelfAssessed ? statusPending : statusIncomplete ) %}
-        {% set pTooltip     = latestFeedback.isMarkedAsCompleted ? 'Completed' : (latestFeedback.isMarkedAsSelfAssessed ? 'Self-Assessed' : 'Not Attempted') %}
+        {% set pStatusClass = latestFeedback.isMarkedAsTeacherAssessed ? statusReviewed : (latestFeedback.isMarkedAsSelfAssessed ? statusPending : statusIncomplete ) %}
+        {% set pTooltip     = latestFeedback.isMarkedAsTeacherAssessed ? labelReviewed : (latestFeedback.isMarkedAsSelfAssessed ? labelPending : labelIncomplete) %}
         {% set pStatusText = pTooltip %}
     {% endif %}
 
     <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
+        <div class="expander{% if participant.allResponses | length %} icon-down-arrow{% endif %}" data-collapser="user-completions-{{ participant.user.id }}"></div>
         {% include '@learningAssessment/fragments/participantStatus.twig' with {
-            user: participant.user,
+            user:        participant.user,
             statusClass: pStatusClass,
-            statusText: pStatusText,
-            statusTip: pTooltip,
-            cardSize: "small-9 medium-10 xlarge-11"
+            statusText:  pStatusText,
+            statusTip:   pTooltip,
+            cardSize:    "small-9 medium-10 xlarge-11"
         } only %}
-        <div class="small-3 medium-2 xlarge-1 card">
+        <div class="small-1">
             {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
         </div>
+        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="user-completions-{{ participant.user.id }}">
+            <ul data-responses class="information-list">
+                {% for completion in participant.allResponses %}
+                    {% if completion.completionStatus == 1 %}
+                        {% set completionLabel = labelIncomplete %}
+                        {% set completionClass = '' %}
+                    {% elseif completion.completionStatus == 2 %}
+                        {% set completionLabel = labelPending %}
+                        {% set completionClass = statusPending %}
+                    {% else %}
+                        {% set completionLabel = labelReviewed %}
+                        {% set completionClass = statusReviewed %}
+                    {% endif %}
+                    <li>{{ completion.submittedAt.local }} - {{ completion.submittedBy.fullName  }} marked as
+                        <span title="{{ completionLabel }}" class="progress-tick tiny {{ completionClass }}"></span>
+                        <span class="meta">{{ completionLabel }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     </li>
+{% endblock %}
+
+{% block extraNavItems %}
+    <a href="#" class="icon-down-arrow" data-collapser="course-2"></a>
 {% endblock %}
 
 {% block scripts %}
     <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
     <script type="text/javascript">
         $(function () {
+            $('[data-collapser]').collapsable();
+
             $('form[data-progress-tick-form]').progressTickForm({
                 transitions: {
-                    notAttempted: 'complete',
-                    selfAssessed: 'complete',
-                    complete:     'notAttempted'
+                    incomplete:      'teacherAssessed',
+                    selfAssessed:    'teacherAssessed',
+                    teacherAssessed: 'incomplete'
                 },
                 onChange: function(newStatus) {
                     // Update the light and the row's status
-                    var newClass,
-                        $a = $(this).find('a[data-progress-tick-status]'),
-                        $row = $(this).closest('[data-status]'),
-                        $light = $row.find('[data-status]'),
-                        newLabel;
+                    var $a         = $(this).find('a[data-progress-tick-status]'),
+                        $row       = $(this).closest('[data-status]'),
+                        $responses = $row.find('[data-responses]'),
+                        $light     = $row.find('[data-status]'),
+                        newLabel   = '',
+                        newClass   = '';
 
                     switch (newStatus) {
-                        case 'notAttempted':
-                            newClass = 'incomplete';
-                            newLabel = 'Not Attempted';
+                        case 'incomplete':
+                            newLabel = '{{ labelIncomplete }}';
+                            newClass = '';
                             break;
-
                         case 'selfAssessed':
+                            newLabel = '{{ labelPending }}';
                             newClass = 'pending';
-                            newLabel = 'Self-Assessed';
                             break;
 
-                        case 'complete':
-                            newClass = 'complete';
-                            newLabel = 'Complete';
+                        case 'teacherAssessed':
+                            newLabel = '{{ labelReviewed }}';
+                            newClass = 'reviewed';
                             break;
                     }
 
-                    $row.attr('data-status', newClass);
+                    $row.attr('data-status', newStatus);
 
-                    $a.removeClass('incomplete pending complete').addClass(newClass);
-                    $light.removeClass('incomplete pending complete').addClass(newClass);
+                    $a.removeClass('pending reviewed').addClass(newClass);
+                    $light.removeClass('pending reviewed').addClass(newClass);
 
                     $light.siblings('span').html(newLabel);
+
+                    // Insert the new completion in the list
+                    $responses.prepend(
+                        '<li>{{ user.fullName }} marked as ' +
+                        '<span title="' + newLabel + '" class="progress-tick tiny ' + newClass + '"></span>' +
+                        '<span class="meta">' + newLabel + '</span>' +
+                        '</li>'
+                    );
+                    // Ensure the expand/contract icon is now visible
+                    var $collapser = $row.find('[data-collapser]');
+                    if(!($collapser.hasClass('icon-down-arrow') || $collapser.hasClass('icon-up-arrow'))){
+                        $collapser.addClass('icon-down-arrow');
+                    }
                 }
             });
         });

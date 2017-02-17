@@ -75,4 +75,15 @@ interface ISummator
      * @return string
      */
     public static function getTitle();
+
+
+    /**
+     * If when determining the state of a project by its sub-assessments, the sub-states
+     * should be combined with UNION or INTERSECTION, ie ANY or ALL.
+     *
+     * This is derived from whether the final mark is derived from 1 or multiple sub-assessments.
+     *
+     * @return bool
+     */
+    public function isAggregator();
 }

@@ -2,9 +2,18 @@
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
+{# data-attributes (same for all assessment types) #}
 {% set statusIncomplete = 'incomplete' %}
-{% set statusPending    = 'pending'    %}
-{% set statusComplete   = 'complete'   %}
+{% set statusPending    = 'pending'  %}
+{% set statusReviewed   = 'reviewed'  %}
+
+{# Does the information list require an extra CSS class ? eg 'expandable-card', 'sortable-card', 'card-selectable' etc #}
+{% set listClass = listClass ?: '' %}
+
+{# child templates to override with assessment-specific terms #}
+{% set labelIncomplete  = labelIncomplete ?: 'Incomplete' %}
+{% set labelPending     = labelPending    ?: 'Review Required' %}
+{% set labelReviewed    = labelReviewed   ?: 'Reviewed' %}
 
 {% if assessment is quiz %}
 {% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) %}
@@ -61,19 +70,19 @@
             <li>
                 <input type="checkbox" id="filter-incom" checked="checked" data-status="{{ statusIncomplete }}" />
                 <label for="filter-incom">
-                    <span class="progress-tick tiny"></span> Not Attempted
+                    <span class="progress-tick tiny"></span> {{ labelIncomplete }}
                 </label>
             </li>
             <li>
                 <input type="checkbox" id="filter-act" checked="checked" data-status="{{ statusPending }}" />
                 <label for="filter-act">
-                    <span class="progress-tick tiny pending"></span> Action Required
+                    <span class="progress-tick tiny pending"></span> {{ labelPending }}
                 </label>
             </li>
             <li>
-                <input type="checkbox" id="filter-comp" checked="checked" data-status="{{ statusComplete }}" />
+                <input type="checkbox" id="filter-comp" checked="checked" data-status="{{ statusReviewed }}" />
                 <label for="filter-comp">
-                    <span class="progress-tick tiny complete"></span> Complete
+                    <span class="progress-tick tiny reviewed"></span> {{ labelReviewed }}
                 </label>
             </li>
         </ul>
@@ -83,7 +92,7 @@
     <div class="small-12 island">
         {% if assessment.allParticipants | length %}
         <section id="assessment-status">
-            <ul class="information-list">
+            <ul class="information-list {{ listClass }}">
             {% for participant in assessment.allParticipants %}
 
                 {% set routeArgs = { viewee: participant.user, assessmentId: assessment.id, assessment: assessment, student: participant.user, studentId: participant.user.id, participant: participant } %}

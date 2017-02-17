@@ -106,7 +106,7 @@ class CompletionMapper extends Mapper {
      */
     public function markAsCompleted($task_id, $student_id)
     {
-        return $this->mark($task_id, $student_id, Completion::COMPLETION_STATUS_REQUIRES_CONFIRMATION);
+        return $this->mark($task_id, $student_id, Completion::COMPLETION_STATUS_SELF_ASSESSED);
     }
 
     /**

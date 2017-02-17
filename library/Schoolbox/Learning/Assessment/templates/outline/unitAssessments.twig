@@ -17,7 +17,7 @@
 
         {# count students which have completed this #}
         {% for participant in assessment.allParticipants %}
-            {% if participant.isResponded %}
+            {% if not participant.responseRequired %}
                 {% set completionCount = completionCount + 1 %}
             {% endif %}
             {% set studentCount = studentCount + 1 %}
@@ -79,7 +79,7 @@
                 {% elseif isParticipant and assessment is task %}
                     {% include '@learningAssessment/task/progressTickForm.twig' with {
                     participant: assessment.getParticipant(USER),
-                    disabled: false
+                    disabled: assessment.closed or participant.findMostRecentPublishedFeedback.markedAsTeacherAssessed or assessment.isTeacherAssessed
                     } only %}
                 {% endif %}
             </nav>

@@ -199,7 +199,7 @@ class Factory
                 if ($assessable instanceof Task) {
                     $response = $participantObject->findMostRecentResponse();
                     if ($response instanceof TaskResponse) {
-                        if ($response->isMarkedAsCompleted()) {
+                        if ($response->isMarkedAsTeacherAssessed()) {
                             $className[] = 'mastered';
 
                         } elseif ($response->isMarkedAsSelfAssessed()) {
@@ -218,7 +218,7 @@ class Factory
 
             } else {
                 // No feedback yet. Is there a response?
-                if (!$participantObject->isMarked() && $participantObject->isResponded()) {
+                if (!$participantObject->isMarkedByTeacher() && $participantObject->isResponded()) {
                     $className[] = 'notmarked';
                 }
 

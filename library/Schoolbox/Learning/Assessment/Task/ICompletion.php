@@ -7,32 +7,13 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use Schoolbox\Assessment\Course\Task\Completion;
+
 /**
  * Interface for task completions.
  */
 interface ICompletion
 {
-    /**
-     * Status code for tasks not yet attempted.
-     *
-     * @var int
-     */
-    const STATUS_NOT_ATTEMPTED = 1;
-
-    /**
-     * Status code for tasks that a student has assessed themselves.
-     *
-     * @var int
-     */
-    const STATUS_SELF_ASSESSED = 2;
-
-    /**
-     * Status code for tasks that have been marked as completed.
-     *
-     * @var int
-     */
-    const STATUS_COMPLETED = 3;
-
     /**
      * Compares this task's completion status against another input.
      *
@@ -55,14 +36,14 @@ interface ICompletion
      *
      * @return bool
      */
-    public function isMarkedAsCompleted();
+    public function isMarkedAsTeacherCompleted();
 
     /**
      * Set this task as completed.
      *
      * @return static
      */
-    public function markAsCompleted();
+    public function markAsTeacherAssessed();
 
     /**
      * Is this task marked as self-assessed?
@@ -83,14 +64,14 @@ interface ICompletion
      *
      * @return bool
      */
-    public function isMarkedAsNotAttempted();
+    public function isMarkedAsIncomplete();
 
     /**
      * Set this task as not yet attempted
      *
      * @return static
      */
-    public function markAsNotAttempted();
+    public function markAsIncomplete();
 
     /**
      * Gets completion status

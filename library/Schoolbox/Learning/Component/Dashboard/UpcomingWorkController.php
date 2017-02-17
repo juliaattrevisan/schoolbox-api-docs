@@ -83,8 +83,8 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
                 return strnatcasecmp($a->getTitle(), $b->getTitle());
             })
             ->filter(function (IAssessable $assessable) use ($student, $visibility) {
-                // Only show work that isn't yet due
-                return $visibility->isUpcomingVisibleToUser($assessable, $student);
+                // Only show work that the student has permission to view, and is can accept their submission
+                return $visibility->isVisibleToUser($assessable, $student) && $assessable->canStudentCreateResponse($student);
             })
             ->limit($this->limit ?: null);
 

@@ -23,8 +23,12 @@ use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use \Schoolbox\Resource\Storage\Model as StorageFile;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
-
+/**
+ * When a student self-assesses a task, it will generate an IResponse only, with a mark of 'incomplete' or 'self-assessed'.
+ * When a teacher assesses a student, it will generate both an IResponse and an IFeedback, with a mark of 'incomplete' or 'teacher-assessed'.
+ */
 class Model extends AbstractAssessment
 {
     /**
@@ -193,30 +197,33 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * Decide whether $user can create a response to this IAssessable
-     *
-     * @param User $user
-     * @return bool
+     * @inheritdoc
      */
-    public function canCreateResponse(User $user)
+    public function canStudentCreateResponse(User $student)
     {
-        /* No Interactions - user can see this task
-         */
-        if ($this->isParticipant($user)) {
-            $participant = $this->getParticipant($user);
-
-            if (!$participant->isResponded() && !$participant->getAllFeedbacks()->count()) {
-                return true;
-            }
-
-            /* Some set of interactions exists, but the latest feedback isn't official yet
-             * This might require more finesse due to toggleability of Completions
-             */
-            if (!$participant->hasPublishedFeedback()) {
-                return true;
-            }
+        // Not open ?
+        if(!$this->isOpen()){
+            return false;
         }
 
+        // Must be self-assessable
+        if(!$this->isSelfAssessed()){
+            return false;
+        }
+
+        // Not a participant ?
+        if(!$this->isParticipant($student)){
+            return false;
+        }
+
+        // If 'teacher-assessed', then student cannot alter back to 'incomplete' or 'self-assessed'
+        /** @var TaskFeedback $latestFeedback */
+        $latestFeedback = $this->getParticipant($student)->findMostRecentPublishedFeedback();
+        if ($latestFeedback && $latestFeedback->isMarkedAsTeacherAssessed()) {
+            return false;
+        }
+
+        // Task is open, self-assessable, and not yet marked by the teacher as 'complete'
         return false;
     }
 

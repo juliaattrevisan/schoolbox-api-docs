@@ -33,13 +33,23 @@ interface IResponse
      */
     public function findMostRecentPublishedFeedback();
 
+
+
     /**
-     * $user is the author of this Response
+     * Did the specified user submit this response ?
      *
      * @param User $user
      * @return bool
      */
-    public function isAuthoredBy(User $user);
+    public function isSubmittedBy(User $user);
+
+
+    /**
+     * Does this IResponse have published feedback?
+     *
+     * @return bool
+     */
+    public function isMarkedByTeacher();
 
     /* Getters/Setters
      */

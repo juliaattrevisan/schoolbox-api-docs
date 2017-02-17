@@ -909,15 +909,20 @@ class PendingFactory
         $query = "
             SELECT 
                 t.assessment_id         AS 't.assessment_id',
-                t.requires_confirmation AS 't.requires_confirmation',
                 tc.id                   AS 'tc.id',
                 tc.student_id           AS 'tc.student_id',
-                tc.marking_user_id      AS 'tc.marking_user_id',
-                max(tc.completion_date) AS 'tc.completion_date'
+                tc.completion_date      AS 'tc.completion_date',
+                tc.completion_status    AS 'tc.completion_status'
             FROM task t
             JOIN task_completion tc ON tc.task_id = t.id
+            JOIN (
+              SELECT task_id, tc.student_id, max(tc.completion_date) as max_completion_date
+              FROM task t
+              JOIN task_completion tc ON tc.task_id = t.id              
+              WHERE " . implode(' AND ', $pb->getWhere()) . "
+              GROUP BY task_id, student_id
+            ) tc2 ON tc.task_id = tc2.task_id AND tc.student_id = tc2.student_id AND tc.completion_date = tc2.max_completion_date
             WHERE " . implode(' AND ', $pb->getWhere()) . "
-            GROUP BY t.assessment_id, tc.student_id" . "
             ORDER BY t.assessment_id";
 
         $statement = $this->database->prepare($query);
@@ -1135,7 +1140,7 @@ class PendingFactory
      */
     private function isMarkingRequired(IAssessable $assessment)
     {
-        return $assessment->numMarkingRequired() > 0;
+        return $assessment->getCountMarkingRequired() > 0;
     }
 
 
@@ -1147,7 +1152,7 @@ class PendingFactory
      */
     private function isChasingRequired(IAssessable $assessment)
     {
-        return $assessment->getDueAt()->lt($this->toChaseLimit) && $assessment->numNoResponseOrFeedback() > 0;
+        return $assessment->getDueAt()->lt($this->toChaseLimit) && $assessment->getCountResponseIncomplete() > 0;
     }
 
 
@@ -1156,11 +1161,11 @@ class PendingFactory
      *
      * @param string[][] $taskResults
      * @var string       $taskResults []['t.assessment_id']
-     * @var string       $taskResults []['t.requires_confirmation']
      * @var string       $taskResults []['tc.id']
      * @var string       $taskResults []['tc.student_id']
      * @var string       $taskResults []['tc.marking_user_id']
      * @var string       $taskResults []['tc.completion_date']
+     * @var string       $taskResults []['tc.completion_status']
      */
     private function hydrateTaskResults(array $taskResults)
     {
@@ -1180,12 +1185,7 @@ class PendingFactory
             $completedAt = $this->getDateFromString($row['tc.completion_date']);
             $response->setCreatedAt($completedAt);
             $response->setUpdatedAt($completedAt);
-
-            // TODO - sigh replace this with composition ASAP
-            $response->markAs($row['tc.student_id'] == $row['tc.marking_user_id']
-                ? ICompletion::STATUS_SELF_ASSESSED
-                : ICompletion::STATUS_COMPLETED
-            );
+            $response->markAs($row['tc.completion_status']);
 
             $task->getResponses()->setOffset($response->getId(), $response);
             $participants = $task->getAllParticipants();
@@ -1200,10 +1200,12 @@ class PendingFactory
             if ($userId != $row['tc.marking_user_id']) {
                 $feedback = new TaskFeedback();
                 $feedback->setId($row['tc.id']);
+                $feedback->setReviewee($response->getSubmittedOnBehalfOf());
                 $feedback->setPublishedAt($completedAt);
                 $feedback->setUpdatedAt($completedAt);
                 $feedback->setResponse($response);
                 $feedback->setAssessable($task);
+                $feedback->markAs($row['tc.completion_status']);
 
                 $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
                 $task->getFeedbacks()->setOffset($feedback->getId(), $feedback);

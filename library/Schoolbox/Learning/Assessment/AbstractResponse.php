@@ -32,7 +32,7 @@ abstract class AbstractResponse implements IResponse
     protected $assessable;
 
     /**
-     * @var Collection
+     * @var Collection|IFeedback[]
      */
     protected $allFeedback;
 
@@ -97,14 +97,14 @@ abstract class AbstractResponse implements IResponse
     }
 
     /**
-     * $user is the author of this Response
+     * Did the specified user submit this response ?
      *
      * @param User $user
      * @return bool
      */
-    public function isAuthoredBy(User $user)
+    public function isSubmittedBy(User $user)
     {
-        return $this->getSubmittedOnBehalfOf()->getId() == $user->getId();
+        return $this->getSubmittedBy()->getId() == $user->getId();
     }
 
     /* Getters/Setters
@@ -192,6 +192,20 @@ abstract class AbstractResponse implements IResponse
     {
         return $this->allFeedback->count() > 0;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isMarkedByTeacher()
+    {
+        foreach($this->allFeedback as $feedback){
+            if($feedback->isPublished()){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * @return IAssessable

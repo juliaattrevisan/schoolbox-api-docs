@@ -18,6 +18,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
+use Alaress_Date_Format;
 
 interface IAssessable extends ISoftDeletable
 {
@@ -60,6 +61,7 @@ interface IAssessable extends ISoftDeletable
      */
     public function getBaseContext();
 
+
     /**
      * Set the context within which this assessment belongs.
      *
@@ -68,13 +70,54 @@ interface IAssessable extends ISoftDeletable
      */
     public function setContext(AssessmentContext $assessmentContext);
 
+
     /**
-     * Decide whether $user can create a response to this IAssessable
+     * Is now after the published date?
      *
-     * @param User $user
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function canCreateResponse(User $user);
+    public function isPublished(Alaress_Date_Format $now = null);
+
+
+    /**
+     * Is the assessment between its open and close dates ?
+     *
+     * Note this includes the overdue period.
+     *
+     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @return bool
+     */
+    public function isOpen(Alaress_Date_Format $now = null);
+
+
+    /**
+     * Are we past the due date and before the close date?
+     *
+     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @return bool
+     */
+    public function isOverdue(Alaress_Date_Format $now = null);
+
+
+    /**
+     * Are we before the open date or after the close date?
+     *
+     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @return bool
+     */
+    public function isClosed(Alaress_Date_Format $now = null);
+
+
+    /**
+     * Can the specified student create a response ?
+     *
+     * In all cases, a student may only create a response if they are a participant.
+     *
+     * @param User $student    The student whom the response is created for
+     * @return bool
+     */
+    public function canStudentCreateResponse(User $student);
 
     /**
      * Retrieve the specification this assessment was created from, if any.
@@ -176,56 +219,39 @@ interface IAssessable extends ISoftDeletable
      *
      * @return int
      */
-    public function numParticipants();
+    public function getCountParticipants();
 
     /**
-     * Returns what percentage of Participants have Responses to this Assessment
+     * Returns the percentage of participants who have completed the assessment.
      *
-     * @return float
+     * @return float|null
      */
-    public function getPercentageSubmitted();
+    public function getPercentageCompleted();
 
     /**
-     * Returns the number of Participants who have neither Feedback nor Responses to this Assessment
+     * Returns the number of Participants who have no response to the assessment,
+     * or their latest response is explicitly marked as 'incomplete'.
      *
      * @return int
      */
-    public function numNoResponseOrFeedback();
+    public function getCountResponseIncomplete();
 
     /**
-     * Returns the number of Participants who have Responses to this Assessment
+     * How many participants have non-explicitly-incomplete responses to the assessment ?
+     *
+     * This does not relate to the concept of a teacher reviewing a student.
      *
      * @return int
      */
-    public function numSubmitted();
+    public function getCountResponseComplete();
 
     /**
-     * Calculate how many IAssessable instances have a non-null mark value
+     * Returns the number of Participants who have a published mark for this IAssessable.
      *
-     * The most recent action determines the marked/not-marked state of
-     * an Assessable. This accounts for a series of edge cases which really
-     * make you hate life
-     *
-     * For a particular Participant:
-     *
-     * If the Assessable contains zero Responses and zero Feedbacks:
-     *     >>> not marked
-     *
-     * If the Assessable contains at least one Response and zero Feedbacks:
-     *     >>> not marked
-     *
-     * If the Assessable contains zero Responses and at least one Feedback:
-     *     >>> marked
-     *
-     * If the Assessable contains at least one Response and at least one Feedback:
-     * Start traversing to find out what's going on.
-     *          If the most recent Response contains a Feedback -OR-
-     *          If a Feedback occurred more recently than the Response
-     *          (ie. Feedback is the most recent action) >>> marked
-     *
-     *          Otherwise >>> not marked
+     * This is a student-perspective function. For this assessment, would
+     * they see they have received some grade/outcome ?
      */
-    public function numMarked();
+    public function getCountMarkedByTeacher();
 
     /**
      * Calculate percentage of an IAssessable that has been marked
@@ -239,31 +265,17 @@ interface IAssessable extends ISoftDeletable
      *
      * @return int
      */
-    public function numMarkingRequired();
+    public function getCountMarkingRequired();
 
     /**
      * What percentage of Participants have Responses that require marking.
      *
      * This does not always equate to 100 - getPercentageMarked()
      *
-     * @return float
+     * @return float|null
      */
     public function getPercentageMarkingRequired();
 
-    /**
-     * Calculate the number of Feedbacks that have been Published
-     * to Students
-     *
-     * @return int
-     */
-    public function numPublished();
-
-    /**
-     * Calculate percentage of an IAssessable that has been Published
-     *
-     * @return float
-     */
-    public function getPercentagePublished();
 
     /**
      * The friendly, uninformative version of assertValidDates

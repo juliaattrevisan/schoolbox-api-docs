@@ -76,4 +76,12 @@ class Minimum extends AbstractSummator
     {
         return 'Minimum';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isAggregator()
+    {
+        return false;
+    }
 }

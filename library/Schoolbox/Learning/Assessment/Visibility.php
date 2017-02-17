@@ -34,12 +34,13 @@ class Visibility
 
 
     /**
-     * Determines whether this upcoming IAssessable is visible to $user
-     * at its most basic level. For students, the Publish Date must be
-     * in the past; for Staff, it is always visible and does not require
-     * a past Publish Date
+     * Determines if the specified user can see an IAssessable.
      *
-     * IAssessables won't appear if their due dates are in the past
+     * * Staff    - can see anytime
+     * * Students - can only see after publish date
+     *
+     * Staff is considered any user with WRITE+ perm to folder
+     * Student is considered any user with READ perm to folder
      *
      * @param IAssessable $assessment
      * @param User $user
@@ -47,42 +48,15 @@ class Visibility
      */
     public function isVisibleToUser(IAssessable $assessment, User $user)
     {
-        /* Folder perms
-         */
-        $folderAccessLevel = $this->getAccess()->getFolderAccess($user, [$assessment->getContext()->getFolder()->getId()]);
+        $folderAccessLevel = $this->getAccess()->getFolderAccess($user, [$assessment->getBaseContext()->getFolder()->getId()]);
 
-        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
+        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE || ($folderAccessLevel == UserAccess::ACCESS_READ && $assessment->isPublished())) {
             return true;
-
-        } elseif ($folderAccessLevel == UserAccess::ACCESS_READ) {
-            /* Unpublished IAssessables don't show
-             */
-            if ($assessment->getPublishAt()->isFuture()) {
-                return false;
-            }
-
-            /* Decide whether $user can create a response to this IAssessable
-             */
-            return $assessment->canCreateResponse($user);
         }
 
         return false;
     }
 
-    /**
-     * Determines if this is visible and has not passed its relevancy date, generally either close or due
-     *
-     * @param IAssessable $assessment
-     * @param User $user
-     * @return bool
-     */
-    public function isUpcomingVisibleToUser(IAssessable $assessment, User $user)
-    {
-        if ($assessment->getCloseAt()->isPast()) {
-            return false;
-        }
-        return $this->isVisibleToUser($assessment, $user);
-    }
 
     /* Getters/Setters
      */
