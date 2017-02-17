@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
+use Schoolbox\WebDav\Mapper as WebDavMapper;
 
 class Controller extends Base
 {
@@ -186,6 +187,36 @@ class Controller extends Base
      */
     private function getTableData()
     {
+        $luRole = [];
+        $roles = RoleMapper::getInstance()->findAll();
+
+        $luRole[] = [
+            'key' => '',
+            'value' => ''
+        ];
+
+        foreach ($roles as $role) {
+            $luRole[] = [
+                'key' => $role->getId(),
+                'value' => $role->getName()
+            ];
+        }
+
+        $luCampus = [];
+        $campuses = CampusMapper::getInstance()->findAll();
+
+        $luCampus[] = [
+            'key' => '',
+            'value' => ''
+        ];
+
+        foreach ($campuses as $campus) {
+            $luCampus[] = [
+                'key' => $campus->getId(),
+                'value' => $campus->getName()
+            ];
+        }
+
         // This array defines the tables that can be updated
         // Note that they are NOT indexed by actual table name, but by an arbitrary key.
 
@@ -246,6 +277,39 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 12,
                     ]
+                ]
+            ],
+            'webdav' => [
+                'title'             => 'WebDav',
+                'mapper'            => WebDavMapper::class,
+                'fields'            => [
+                    'uri'           => [
+                        'caption'   => 'Base URI',
+                        'width'     => 2,
+                    ],
+                    'path'           => [
+                        'caption'   => 'Path',
+                        'width'     => 2,
+                        'tooltip'   => 'The path underneath the base URI. Available tokens are [yearlevel] and [username].',
+                    ],
+                    'usernamePrefix' => [
+                        'caption'   => 'Username Prefix',
+                        'width'     => 2,
+                    ],
+                    'usernameSuffix' => [
+                        'caption'   => 'Username Suffix',
+                        'width'     => 2,
+                    ],
+                    'campus'        => [
+                        'caption'   => 'Campus (Optional)',
+                        'width'     => 2,
+                        'lookup'    => $luCampus
+                    ],
+                    'role'        => [
+                        'caption'   => 'Role (Optional)',
+                        'width'     => 2,
+                        'lookup'    => $luRole
+                    ],
                 ]
             ],
             'campus'    => [
