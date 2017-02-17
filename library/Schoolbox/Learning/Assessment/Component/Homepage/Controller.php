@@ -84,7 +84,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                 ->filter(
                     function (IAssessable $assessment) use ($visibility)
                     {
-                        return $this->filterAssessment($assessment) && $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
+                        return $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
                     }
                 )
             ;
