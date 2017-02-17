@@ -60,7 +60,7 @@ class External_Isams_Timetable implements External_TimetableInterface
     {
         // Get period information from database
 
-        $this->externalUser->getStudent($externalUserId)
+        $this->externalUser->getStudent($externalUserId);
 
         $query =
             "
