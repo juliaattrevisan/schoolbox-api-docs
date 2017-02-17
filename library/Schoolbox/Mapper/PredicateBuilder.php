@@ -372,7 +372,7 @@ class PredicateBuilder
     {
         $placeholders = [];
         foreach ($input as $i => $param) {
-            $placeholders[] = isset($prefix) ? (':' . $prefix . '_' . $i) : '?';
+            $placeholders[] = isset($prefix) ? (':' . $prefix . '_' . self::escapePlaceholder($i)) : '?';
         }
         return $placeholders;
     }
@@ -396,12 +396,24 @@ class PredicateBuilder
         $params = array();
         foreach ($input as $i => $param) {
             if (isset($prefix)) {
-                $params[$prefix . '_' . $i] = $param;
+                $params[$prefix . '_' . self::escapePlaceholder($i)] = $param;
             } else {
                 $params[] = $param;
             }
         }
         return $params;
+    }
+
+
+    /**
+     * Strips dis-allowed characters from placeholders.
+     *
+     * @param string $placeholder
+     * @return string
+     */
+    protected static function escapePlaceholder($placeholder)
+    {
+        return preg_replace('/[^a-zA-Z0-9_]/', '_', $placeholder);
     }
 
 
