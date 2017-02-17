@@ -9,7 +9,15 @@
 namespace Alaress\Routing;
 
 
-class Router
+use InvalidArgumentException;
+use OutOfBoundsException;
+
+/**
+ * Trie-based router. Worst case traversal should be O(log(n))
+ *
+ * @package Alaress\Routing
+ */
+class Router implements IRouter
 {
     /** @var Trie */
     protected $root;
@@ -53,9 +61,14 @@ class Router
 
 
     /**
-     * @param string     $path
+     * Add the given path as a known route, and a key-value pair to be stored at the end of that path.
+     * If the key already exists on this path, the new value will replace any existing value.
+     *
+     * @param string $path
      * @param string|int $key
-     * @param mixed      $value
+     * @param mixed $value
+     * @throws OutOfBoundsException
+     * @return $this
      */
     public function add($path, $key, $value = null)
     {
@@ -84,13 +97,15 @@ class Router
         }
 
         if (!preg_match("`$fullRegex`", $path, $matches)) {
-            throw new \OutOfBoundsException("How did this not match?? $fullRegex -> $path");
+            throw new OutOfBoundsException("How did this not match?? $fullRegex -> $path");
         }
 
         array_shift($matches);
 
         // $this->cache[$fullRegex] now points to the leaf node (any non-existent intermediate branches were created on the fly)
         $this->cache[$fullRegex]->set($matches, $key, $value);
+
+        return $this;
     }
 
 
@@ -105,8 +120,11 @@ class Router
 
 
     /**
-     * @param $path
-     * @throws \InvalidArgumentException
+     * Get the data stored at the end of this path. The return value is an array of key-value pairs as
+     * stored by static::add(), or throws an InvalidArgument exception if there is no data (ie. path not declared)
+     *
+     * @param string $path
+     * @throws InvalidArgumentException
      * @return array
      */
     public function get($path)
