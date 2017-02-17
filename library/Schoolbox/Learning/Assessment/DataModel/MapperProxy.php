@@ -481,7 +481,7 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $builder = $this->convertOptionsToPredicateBuilder(['dueAfter' => $from, 'dueBefore' => $to]);
+        $builder = $this->convertOptionsToPredicateBuilder(['from' => $from, 'to' => $to]);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
@@ -755,7 +755,7 @@ class MapperProxy
      *
      * Currently:
      * * converts "term" to a due date span
-     * * converts "dueBefore" and "dueAfter" to due date filters
+     * * converts "from" and "to" to due date filters
      * * converts "type" to a filter which matches only that assessment type
      *   (see AssessmentType::TYPE_* constants)
      *
@@ -769,16 +769,16 @@ class MapperProxy
         // Term filter (overrides due before/after)
         if ($options['term'] instanceof Term) {
             $term = $options['term'];
-            $options['dueAfter']  = $term->getStart();
-            $options['dueBefore'] = $term->getActualFinish();
+            $options['from'] = $term->getStart();
+            $options['to']   = $term->getActualFinish();
         }
 
         // Due before / after filter (an ADF)
-        if ($options['dueBefore'] instanceof \Alaress_Date_Format && !$options['dueBefore']->isNull()) {
-            $builder->notGreaterThan('due_date', $options['dueBefore']->getDatabase());
+        if ($options['from'] instanceof \Alaress_Date_Format && !$options['from']->isNull()) {
+            $builder->notLessThan('due_date', $options['from']->getDatabase());
         }
-        if ($options['dueAfter'] instanceof \Alaress_Date_Format && !$options['dueAfter']->isNull()) {
-            $builder->notLessThan('due_date', $options['dueAfter']->getDatabase());
+        if ($options['to'] instanceof \Alaress_Date_Format && !$options['to']->isNull()) {
+            $builder->notGreaterThan('due_date', $options['to']->getDatabase());
         }
 
         // Assessment type filter

@@ -70,9 +70,9 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             // Note: findAllByFolderIdForReview retrieves response+feedback for all
             // assessment types, not just tasks (as it did previously).
             $options = [
-                'type'     => $this->getAssessmentType(),
-                'dueAfter' => \Alaress_Date_Format::now(),
-                'order'    => ['due_date' => 'asc'],
+                'type'  => $this->getAssessmentType(),
+                'from'  => \Alaress_Date_Format::now(),
+                'order' => ['due_date' => 'asc'],
             ];
 
             $this->assessments = $this->getAssessmentMapper()
