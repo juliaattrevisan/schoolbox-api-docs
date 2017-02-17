@@ -84,7 +84,7 @@
             <ul class="information-list">
             {% for participant in assessment.allParticipants %}
 
-                {% set routeArgs = { viewee: participant.user, assessmentId: assessment.id, assessment: assessment, student: participant.user, studentId: participant.user.id } %}
+                {% set routeArgs = { viewee: participant.user, assessmentId: assessment.id, assessment: assessment, student: participant.user, studentId: participant.user.id, participant: participant } %}
 
                 {% set pActionSobo      = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', routeArgs) %}
                 {% set pActionSummary   = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
