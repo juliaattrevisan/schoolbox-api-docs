@@ -2,6 +2,9 @@
     <div class="small-12 island">
         <h2 class="subheader">Marking Guide</h2>
 
-        {% include '@rubric/grid.twig' with {rubric: rubricContext.rubric} only %}
+        {% include '@rubric/grid.twig' with {
+            rubric: rubricContext.rubric,
+            markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
+        } only %}
     </div>
 </div>
