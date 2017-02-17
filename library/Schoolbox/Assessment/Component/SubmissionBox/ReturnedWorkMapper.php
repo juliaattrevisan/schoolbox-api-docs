@@ -151,7 +151,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             // Try to streamline duework+assessment creation
             /** @var SubmissionBox $dueWork */
             $dueWork = $this->createJoinModel('submission_box', $row['b.id']);
-            $dueWork->setAssessmentModel($this->createJoinModel('submission_box.assessment_id', $row['b.assessment_id']));
+            $dueWork->setAssessmentModel($this->createJoinModel('submission_box.assessmentModel', $row['b.assessment_id']));
             $return->setSubmissionBox($dueWork);
 
             $collection->add($return);

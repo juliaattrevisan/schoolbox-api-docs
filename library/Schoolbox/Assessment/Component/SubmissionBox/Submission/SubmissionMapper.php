@@ -98,7 +98,7 @@ class SubmissionMapper extends BaseMapper
             // Try to streamline duework+assessment creation too
             /** @var SubmissionBox $dueWork */
             $dueWork = $this->createJoinModel('box_id', $row['b.id']);
-            $dueWork->setAssessmentModel($this->createJoinModel('box_id.assessment_id', $row['b.assessment_id']));
+            $dueWork->setAssessmentModel($this->createJoinModel('box_id.assessmentModel', $row['b.assessment_id']));
 
             $resultSet->add(
                 $result
