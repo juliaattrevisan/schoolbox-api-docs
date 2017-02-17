@@ -311,7 +311,7 @@ $selectedYear  = $targetDate->getYear();
 // create a custom instance of the upcoming work controller, and set it up for this context
 $chf        = new Component_Homepage_Factory($this->getDi()->get('session')->get('user'), $this);
 $cdm        = Component_DefinitionMapper::getInstance();
-$definition = $cdm->findOneByColumn('class', 'Component_Dashboard_UpcomingWorkController');
+$definition = $cdm->findOneByColumn('class', \Schoolbox\Learning\Component\Dashboard\UpcomingWorkController::class);
 $instance   = new Component_Instance();
 $instance->setDefinition($definition);
 

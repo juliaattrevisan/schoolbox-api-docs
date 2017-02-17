@@ -123,7 +123,7 @@ class Controller extends Base
     /**
      * Displays upcoming work for the given user.
      *
-     * @api   GET /learning/due/:studentId
+     * @api   GET /learning/due/:studentId{/:date}
      * @param User                $student
      * @param Alaress_Date_Format $date    The date to show on the work calendar.
      */
@@ -135,7 +135,6 @@ class Controller extends Base
         $subjects = [];
 
         // Student's work
-        // TODO add a findAllByStudentBetweenDates to findAllByStudentForTerm
         $allWork = $this->assessmentDataSource
             ->findAllByStudent($student, $term)
             ->sortBy('dueAt', 'asc');
