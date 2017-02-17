@@ -568,6 +568,14 @@ class Module {
     }
 
     /**
+     * @return IConfigLoader|object
+     */
+    protected function getConfig()
+    {
+        return $this->getInjector()->get('config');
+    }
+
+    /**
      * @param string $name
      * @throws \InvalidArgumentException
      * @return IAuthorizationRule

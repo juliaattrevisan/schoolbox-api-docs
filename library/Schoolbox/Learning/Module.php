@@ -81,7 +81,10 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+                    new Rule\All(
+                        new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),
+                        new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+                    )
                 )
             );
     }
