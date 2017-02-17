@@ -104,9 +104,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             $this->courseImplementation->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImplId));
 
             // Load all assessments in a single query
-            $uiIds = $this->courseImplementation->getUnits()->map(function (UnitImplementation $ui) {
-                return $ui->getId();
-            });
+            $uiIds = $this->courseImplementation->getUnits()->getColumnValues('id');
 
             if ($this->readOnly) {
                 // I might be a student, but can't be anything more.
