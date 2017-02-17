@@ -290,7 +290,7 @@ class Controller extends Base
                     'path'           => [
                         'caption'   => 'Path',
                         'width'     => 2,
-                        'tooltip'   => 'The path underneath the base URI. Available tokens are [yearlevel] and [username].',
+                        'tooltip'   => 'The path underneath the base URI. Available tokens are [yearlevel], [calendaryear] and [username].',
                     ],
                     'usernamePrefix' => [
                         'caption'   => 'Username Prefix',

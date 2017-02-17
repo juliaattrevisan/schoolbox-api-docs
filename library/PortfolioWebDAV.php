@@ -132,11 +132,13 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 // Replaceable tokens
                 // --------------------------------------------------------------------------------------------------------
                 // [yearlevel]      - Student year level
+                // [calendaryear]   - Current calendar year
                 // [username]       - Username
                 // --------------------------------------------------------------------------------------------------------
 
                 $path = $dav->getPath();
                 $path = str_replace("[yearlevel]", $user->getYear(), $path);
+                $path = str_replace("[calendaryear]", date("Y"), $path);
                 $path = str_replace("[username]", $user->getUsername(), $path);
 
                 $paths[] = $path;
