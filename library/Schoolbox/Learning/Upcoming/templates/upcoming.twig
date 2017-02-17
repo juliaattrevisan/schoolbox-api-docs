@@ -307,10 +307,10 @@
                                             <p class="meta">{{ subject.folder.codeString }}</p>
                                         </div>
 
-                                        {% if subject.grade %}
+                                        {% if subject.grade and config.show_overall_grade %}
                                             <div class="small-4 columns no-pad">
                                                 <div class="grade content">
-                                                    {% if gradePath %}
+                                                    {% if gradePath  %}
                                                     <a href="{{ gradePath }}">
                                                         <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
                                                             {{ subject.grade.weightedMean }}
