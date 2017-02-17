@@ -8,8 +8,9 @@
                 // Use the ClickView Events API to catch the cv-lms-addvideo event
                 var eventsApi = new CVEventsApi(document.getElementById('plugin-frame{COMPONENT_INSTANCE_ID}').contentWindow);
                 eventsApi.on("cv-lms-addvideo", function (event, args) {
-                    $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>');
+                    $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>').removeClass('hide');
                     $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
+                    $('#clickview-empty-state-{COMPONENT_INSTANCE_ID}').addClass('hide');
 
                     $.ajax({
                         url: '/homepage/configForm.php',
@@ -40,45 +41,41 @@
         <div class="small-12 island">
 
             <!-- BEGIN empty_state -->
-            <div class="empty-state">
+            <div id="clickview-empty-state-{COMPONENT_INSTANCE_ID}" class="empty-state">
                 <i class="icon-click-view"></i>
 
                 <!-- BEGIN empty_read -->
-                <p>There are no Clickview videos to watch at this time.</p>
+                <p>There are no ClickView videos to watch at this time.</p>
                 <!-- END empty_read -->
 
-                <!-- BEGIN empty_write -->
-                <p><a href="#" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Choose a Clickview video</a> to display and play in this component.</p>
-                <!-- END empty_write -->
+                <!-- BEGIN empty_config -->
+                <p><a href="#" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Choose a ClickView video</a> to display and play in this component.</p>
+                <!-- END empty_config -->
+
+                <!-- BEGIN empty_invalid -->
+                <p>We couldn't find a ClickView video with the URL provided. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">checking your URL is correct</a> or <a href="#" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">selecting the video</a> again.</p>
+                <!-- END empty_invalid -->
+
 
             </div>
             <!-- END empty_state -->
 
-            <!-- BEGIN clickview -->
             <section>
-                <div id="videohere{COMPONENT_INSTANCE_ID}">
-                <!-- BEGIN has_clickview -->
-                    <script type='text/javascript' src="//webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
-                <!-- END has_clickview -->
-                <!-- BEGIN online_clickview -->
-                    <script type="text/javascript" src="//{CLICKVIEW_URL}/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
-                <!-- END online_clickview -->
-                <!-- BEGIN iframe_clickview -->
-                    <div class="flex-video widescreen">
-                        <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="640" height="360" src="//{CLICKVIEW_URL}/share/embed?shareCode={VIDEO_ID}{START}{END}&a=false"></iframe>
-                    </div>
-                <!-- END iframe_clickview -->
-                <!-- BEGIN select_video -->
+                <div id="videohere{COMPONENT_INSTANCE_ID}" class="{HIDE_CLICKVIEW}">
+                    <!-- BEGIN has_clickview -->
+                        <script type='text/javascript' src="//webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
+                    <!-- END has_clickview -->
+                    <!-- BEGIN online_clickview -->
+                        <script type="text/javascript" src="//{CLICKVIEW_URL}/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
+                    <!-- END online_clickview -->
+                    <!-- BEGIN iframe_clickview -->
+                        <div class="flex-video widescreen">
+                            <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="640" height="360" src="//{CLICKVIEW_URL}/share/embed?shareCode={VIDEO_ID}{START}{END}&a=false"></iframe>
+                        </div>
+                    <!-- END iframe_clickview -->
                 </div>
-
-                <div class="component-action">
-                    <section>
-                        <a href="#" class="button" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Select Video</a>
-                    </section>
-                </div>
-                <!-- END select_video -->
             </section>
-            <!-- END clickview -->
+
 
         </div>
     </div>

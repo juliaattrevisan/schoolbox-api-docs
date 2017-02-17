@@ -361,3 +361,8 @@ ul.tileList {
     border-top: 1px solid $body-bg;
     padding-top: 0.45rem;
 }
+
+// Kill flex-video margin-bottom when it's inside a component
+.component-container .flex-video {
+    margin-bottom: 0;
+}
