@@ -476,9 +476,6 @@ class Mapper extends BaseMapper
         $params       = BaseMapper\PredicateBuilder::getArrayParameters($folderList, 'folder');
         $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
 
-        // There's no OR support in the predicate builder.
-        // The best I can do is to get all IDs and fetch a union.
-        // TODO replace with an OR through the predicate builder
         $idQuery = "
             SELECT a.id
             FROM `folder` f
