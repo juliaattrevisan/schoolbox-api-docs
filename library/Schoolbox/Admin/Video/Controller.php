@@ -41,22 +41,28 @@ class Controller extends Base
     {
         // Render this thing out
 
-        $queueAll = $this->videoQueueMapper->findAll(['order' => ['createdOn' => 'desc']]);
+        $statuses = ['failed', 'processing', 'pending'];
+
         $queue = [];
 
-        /** @var VideoQueue $video */
-        foreach ($queueAll as $video) {
-            try {
-                $storageObject = $this->getStorageMapper()->findByHash($video->getHash());
-                $video->setStorage($storageObject);
-            } catch (MapperException $e) {
-            }
+        foreach ($statuses as $status) {
 
-            if (!isset($queue[$video->getStatus()])) {
-                $queue[$video->getStatus()] = [];
-            }
+            $queueStatus = $this->videoQueueMapper->findByColumn('status', $status, ['order' => ['createdOn' => 'desc']]);
 
-            $queue[$video->getStatus()][] = $video;
+            /** @var VideoQueue $video */
+            foreach ($queueStatus as $video) {
+                try {
+                    $storageObject = $this->getStorageMapper()->findByHash($video->getHash());
+                    $video->setStorage($storageObject);
+                } catch (MapperException $e) {
+                }
+
+                if (!isset($queue[$video->getStatus()])) {
+                    $queue[$video->getStatus()] = [];
+                }
+
+                $queue[$status][] = $video;
+            }
         }
 
         $this->getResponse()->content->set([
@@ -64,7 +70,7 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => self::PAGE_CURRENT,
                 'queue' => $queue,
-                'statusOrder' => ['failed', 'processing', 'pending']
+                'statusOrder' => $statuses
             ],
             'title' => 'Admin - Video Queue'
         ]);
