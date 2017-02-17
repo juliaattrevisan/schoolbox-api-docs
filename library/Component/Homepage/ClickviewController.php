@@ -39,6 +39,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         }
 
         $showEmpty = false;
+        $emptyInvalid = false;
 
         if (!strlen(trim($this->getConfig('url')))) {
             $showEmpty = true;
@@ -122,6 +123,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 }
             } else {
                 $showEmpty = true;
+                $emptyInvalid = true;
             }
 
         }
@@ -130,21 +132,27 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
 
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
+            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+            $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
             $this->setVar([
                 'has_clickview' => '',
                 'online_clickview' => '',
                 'iframe_clickview' => '',
                 'empty_read_block' => '',
-                'empty_write_block' => '',
+                'empty_config_block' => '',
+                'empty_invalid_block' => '',
                 'HIDE_CLICKVIEW' => 'hide',
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->parse('empty_read_block', 'empty_read');
             } else {
-                $this->parse('empty_write_block', 'empty_write');
+                if ($emptyInvalid) {
+                    $this->parse('empty_invalid_block', 'empty_invalid');
+                } else {
+                    $this->parse('empty_config_block', 'empty_config');
+                }
             }
 
             $this->parse('empty_state_block', 'empty_state');
