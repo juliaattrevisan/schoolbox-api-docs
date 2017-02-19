@@ -585,8 +585,6 @@ class Mapper extends BaseMapper
                     $access->setRole($role);
                     $accessListAmended->add($access);
                 } catch (MapperException $e) {
-                    // System role has been deleted- cant do anything with this access record anymore, so mark it deleted
-                    $this->getPastoralAccessMapper()->deleteByColumn('id', $access->getId());
                 }
             } else {
                 if ($access->getUser()->getId() != '') {
@@ -594,8 +592,6 @@ class Mapper extends BaseMapper
                         $access->setUser($this->getUserMapper()->findById('id', $access->getUser()->getId()));
                         $accessListAmended->add($access);
                     } catch (MapperException $e) {
-                        // User was deleted- cant do anything with this access record anymore, so mark it deleted
-                        $this->getPastoralAccessMapper()->deleteByColumn('id', $access->getId());
                     }
                 }
             }

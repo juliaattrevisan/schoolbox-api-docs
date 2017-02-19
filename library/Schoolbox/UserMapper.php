@@ -13,6 +13,8 @@ use Alaress\Cache;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\External\Connector\CommunityPortalFactory;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use UnexpectedValueException;
 
 /**
@@ -325,8 +327,10 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeFromPastoralAccess']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeFromPastoralAccess']);
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
     }
@@ -706,6 +710,15 @@ class UserMapper extends Mapper
                 }
             }
         }
+    }
+
+    /**
+     * Remove deleted users from pastoral access
+     * @param User $user
+     */
+    public function removeFromPastoralAccess(User $user){
+        $pastoralAccessMapper = PastoralAccessMapper::getInstance();
+        $pastoralAccessMapper->deleteByColumn('user_id', $user->getId());
     }
 
     /**

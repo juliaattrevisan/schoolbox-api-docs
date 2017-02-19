@@ -6,6 +6,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
@@ -63,15 +64,19 @@ class Notifier extends AbstractModuleNotifier
             $roleId = $accessModel->getRole()->getId();
 
             if (!empty($roleId)) {
-                /** @var Role $role */
-                $role = $this->getRoleMapper()->findById($roleId);
+                try {
+                    /** @var Role $role */
+                    $role = $this->getRoleMapper()->findById($roleId);
 
-                if ($role->isStaff())
-                {
-                    /** @var User $teacher */
-                    foreach ($teachers as $teacher)
-                        if ($teacher->getRole()->getId() == $roleId)
-                            $envelope->targetToUser($teacher->getId(), $message);
+                    if ($role->isStaff()) {
+                        /** @var User $teacher */
+                        foreach ($teachers as $teacher) {
+                            if ($teacher->getRole()->getId() == $roleId) {
+                                $envelope->targetToUser($teacher->getId(), $message);
+                            }
+                        }
+                    }
+                } catch (MapperException $e) {
                 }
             } else {
                 $envelope->targetToUser($accessModel->getUser()->getId(), $message);

@@ -7,11 +7,9 @@
 
 namespace Schoolbox\Fixtures\School;
 
-
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Fixtures\School\Model as School;
 use Schoolbox\Mapper\Exception as MapperException;
-
 
 /**
  * Class Mapper
@@ -29,7 +27,6 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('sportsfixtures_school');
         $this->hasModel(School::class);
-
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

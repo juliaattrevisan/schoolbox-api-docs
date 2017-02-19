@@ -6,6 +6,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
@@ -69,22 +70,25 @@ class Notifier extends AbstractModuleNotifier
             if (!empty($roleId)) {
                 // Sending to a role
 
-                /** @var Role $role */
-                $role = $this->getRoleMapper()->findById($roleId);
+                try {
+                    /** @var Role $role */
+                    $role = $this->getRoleMapper()->findById($roleId);
 
-                // The system should only notify staff if they are a teacher of the student
+                    // The system should only notify staff if they are a teacher of the student
 
-                if ($role->isStaff()) {
-                    /** @var User $teacher */
-                    foreach ($teachers as $teacher) {
-                        if ($teacher->getRole()->getId() == $roleId) {
-                            $envelope->targetToUser($teacher->getId(), $message);
+                    if ($role->isStaff()) {
+                        /** @var User $teacher */
+                        foreach ($teachers as $teacher) {
+                            if ($teacher->getRole()->getId() == $roleId) {
+                                $envelope->targetToUser($teacher->getId(), $message);
+                            }
+                        }
+                    } else {
+                        if ($role->isParent()) {
+                            $sendToParents = true;
                         }
                     }
-                } else {
-                    if ($role->isParent()) {
-                        $sendToParents = true;
-                    }
+                } catch (MapperException $e) {
                 }
             } else {
                 // Sending to individual users
@@ -95,20 +99,24 @@ class Notifier extends AbstractModuleNotifier
 
                 // Get hydrated user so we can work out their role
 
-                /** @var \Schoolbox\User $user */
-                $user = $this->getUserMapper()->findOneByColumn("id", $accessModel->getUser()->getId());
+                try {
+                    /** @var \Schoolbox\User $user */
+                    $user = $this->getUserMapper()->findOneByColumn("id", $accessModel->getUser()->getId());
 
-                /** @var Role $role */
-                $role = $this->getRoleMapper()->findOneByColumn("id", $user->getRole()->getId());
+                    /** @var Role $role */
+                    $role = $this->getRoleMapper()->findOneByColumn("id", $user->getRole()->getId());
 
-                if ($role->isParent() && $pastoral->getPrivate()) {
-                    $skip = true;
-                }
+                    if ($role->isParent() && $pastoral->getPrivate()) {
+                        $skip = true;
+                    }
 
-                // Otherwise, send it to the user
+                    // Otherwise, send it to the user
 
-                if (!$skip) {
-                    $envelope->targetToUser($accessModel->getUser()->getId(), $message);
+                    if (!$skip) {
+                        $envelope->targetToUser($accessModel->getUser()->getId(), $message);
+                    }
+                } catch (MapperException $e) {
+
                 }
             }
         }
