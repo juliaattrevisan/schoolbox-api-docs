@@ -51,10 +51,12 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
          * If there's content and the heading isn't empty - use that as the component name
          * Otherwise use the one set in config
          */
-        if (strlen($textBoxHeading)) {
+        if (strlen(trim($textBoxHeading))) {
             $this->setComponentName($textBoxHeading);
-        } else {
+        } elseif (strlen(trim($this->getConfig('textBoxComponentName')))) {
             $this->setComponentName(Scrub::text($this->getConfig('textBoxComponentName')));
+        } else {
+            $this->getComponentName();
         }
 
         return true;
