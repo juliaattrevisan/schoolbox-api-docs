@@ -14,7 +14,6 @@ use PDOStatement;
 use Schoolbox;
 use Schoolbox\External\Connector\CommunityPortalFactory;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
-use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use UnexpectedValueException;
 
 /**

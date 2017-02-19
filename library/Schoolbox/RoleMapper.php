@@ -9,6 +9,8 @@
 
 namespace Schoolbox;
 
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+
 class RoleMapper extends Mapper {
 
     /* Enum in groups table
@@ -18,7 +20,10 @@ class RoleMapper extends Mapper {
     const ROLE_STUDENT = 'student';
     const ROLE_GUEST   = 'guest';
 
-    protected function mapping () {
+    /**
+     * Setup mapper
+     */
+    protected function mapping() {
 
         $this->hasTable('groups');
         $this->hasModel(Role::class);
@@ -29,5 +34,17 @@ class RoleMapper extends Mapper {
         $this->uses('can_change_password', self::TYPE_BOOLEAN);
         $this->uses('digest_schedule', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeFromPastoralAccess']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeFromPastoralAccess']);
+    }
+
+    /**
+     * Remove deleted users from pastoral access
+     * @param Role $role
+     */
+    public function removeFromPastoralAccess(Role $role){
+        $pastoralAccessMapper = PastoralAccessMapper::getInstance();
+        $pastoralAccessMapper->deleteByColumn('role_id', $role->getId());
     }
 }
