@@ -281,7 +281,7 @@ class Model extends AbstractAssessment
         }
 
         // Has the student already submitted their single permitted response ?
-        if($this->isAcceptSingle() && $this->getParticipant($student)->isResponded()) {
+        if($this->isAcceptSingle() && $this->getParticipant($student)->hasSubmittedResponse()) {
             return false;
         }
 

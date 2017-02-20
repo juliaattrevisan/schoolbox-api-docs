@@ -196,7 +196,7 @@ abstract class AbstractResponse implements IResponse
     /**
      * @inheritdoc
      */
-    public function isMarkedByTeacher()
+    public function hasPublishedFeedback()
     {
         foreach($this->allFeedback as $feedback){
             if($feedback->isPublished()){

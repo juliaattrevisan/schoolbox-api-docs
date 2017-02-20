@@ -7,8 +7,6 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
-use Schoolbox\Assessment\Course\Task\Completion;
-
 /**
  * Interface for task completions.
  */
@@ -36,7 +34,7 @@ interface ICompletion
      *
      * @return bool
      */
-    public function isMarkedAsTeacherCompleted();
+    public function isMarkedAsTeacherAssessed();
 
     /**
      * Set this task as completed.

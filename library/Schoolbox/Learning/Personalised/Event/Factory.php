@@ -218,7 +218,7 @@ class Factory
 
             } else {
                 // No feedback yet. Is there a response?
-                if (!$participantObject->isMarkedByTeacher() && $participantObject->isResponded()) {
+                if (!$participantObject->isFeedbackRequired()) {
                     $className[] = 'notmarked';
                 }
 

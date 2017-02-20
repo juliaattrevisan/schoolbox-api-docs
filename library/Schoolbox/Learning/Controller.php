@@ -224,7 +224,7 @@ class Controller extends Base
         /** @var Collection|IAssessable[] $assessmentsToMark */
         $assessmentsToMark = $this->assessmentMapperProxy->createCollection();
         foreach($assessments as $assessment){
-            if($assessment->getCountMarkingRequired()){
+            if($assessment->getCountFeedbackRequired()){
                 $assessmentsToMark->add($assessment);
             }
         }
@@ -234,7 +234,7 @@ class Controller extends Base
         $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
 
         foreach($assessments as $assessment){
-            if($assessment->getDueAt()->lt($toChaseLimit) && $assessment->getCountResponseIncomplete()){
+            if($assessment->getDueAt()->lt($toChaseLimit) && $assessment->getCountResponseRequired()){
                 $assessmentsToChase->add($assessment);
             }
         }

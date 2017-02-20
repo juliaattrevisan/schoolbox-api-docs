@@ -64,8 +64,8 @@ class Count extends AbstractSummator
     /**
      * @inheritdoc
      */
-    public function isAggregator()
+    public function impliesOptionality()
     {
-        return true;
+        return false;
     }
 }

@@ -49,7 +49,7 @@ interface IResponse
      *
      * @return bool
      */
-    public function isMarkedByTeacher();
+    public function hasPublishedFeedback();
 
     /* Getters/Setters
      */

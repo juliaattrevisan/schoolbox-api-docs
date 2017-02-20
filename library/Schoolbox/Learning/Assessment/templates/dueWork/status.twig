@@ -47,8 +47,8 @@
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}
-        {% set pStatusClass = participant.responseIncomplete ? statusIncomplete : (participant.markingRequired ? statusPending : statusReviewed ) %}
-        {% set pTooltip     = participant.responseIncomplete ? labelIncomplete  : (participant.markingRequired ? labelPending  : labelReviewed ) %}
+        {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.markingRequired ? statusPending : statusReviewed ) %}
+        {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.markingRequired ? labelPending  : labelReviewed ) %}
         {% set pSobo = true %}
 
         {% set pStatusText %}

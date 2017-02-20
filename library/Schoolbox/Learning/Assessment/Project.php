@@ -19,9 +19,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Summator\Average;
-use Schoolbox\Learning\Assessment\Summator\Maximum;
-use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\User;
@@ -87,23 +84,91 @@ class Project extends AbstractAssessment implements AssessmentContext
         return $this->getSummator()->summate($this->assessables, $user, $publishedOnly);
     }
 
-
     /**
-     * If a student requires marking on ANY project sub-assessment, the project requires marking
+     * Whether a project requires a student response depends on:
+     * * the summation method, and
+     * * the responseRequired status of the project's sub-assessments
+     *
+     * If summation implies ALL, then if ANY sub-assessment requires a response, the project requires a response
+     * If summation implies ANY, then if ANY sub-assessment not not require a response, the project does not require a response.
      *
      * @return int
      */
-    public function getCountMarkingRequired()
+    public function getCountResponseRequired()
+    {
+        // Would a single sub-review indicate the student has been reviewed ?
+        $respondedIfAny = $this->summator->impliesOptionality();
+
+        // Track either count, depending on whether requires ALL or ANY sub-assessment to match
+        $countResponseRequired    = 0;
+        $countResponseNotRequired = 0;
+
+        foreach($this->allParticipants as $participant) {
+            $student                      = $participant->getUser();
+            $studentFoundInSubAssessments = false;
+
+            foreach ($this->assessables as $subAssessable) {
+
+                if($subAssessable->isParticipant($student)) {
+                    $studentFoundInSubAssessments = true;
+                    $subParticipant               = $subAssessable->getParticipant($student);
+                    $responseRequired             = $subParticipant->isResponseRequired();
+
+                    // Does the project require all sub-assessables to be responded to, and this sub-assessment requires a response?
+                    if (!$respondedIfAny && $responseRequired) {
+                        // Project requires a response
+                        $countResponseRequired++;
+                        break;
+                    }
+                    // Else does the project require any sub-assessable to be responded to, and this sub-assessment does not require a response?
+                    elseif ($respondedIfAny && !$responseRequired) {
+                        // Project does not require a response
+                        $countResponseNotRequired++;
+                        break;
+                    }
+                }
+            }
+
+            // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessable
+            if(!$studentFoundInSubAssessments){
+                throw new \DomainException("Project (a.id: {$this->getId()}) participant (u.id: {$student->getId()}) not found in project's sub-assessments");
+            }
+        }
+
+        return $respondedIfAny
+            ? $this->allParticipants->count() - $countResponseNotRequired
+            : $countResponseRequired;
+    }
+
+
+
+    /**
+     * If a student requires marking on ANY project sub-assessment, the project requires marking.
+     *
+     * @return int
+     */
+    public function getCountFeedbackRequired()
     {
         $count = 0;
 
         foreach($this->allParticipants as $participant){
+            $student                      = $participant->getUser();
+            $studentFoundInSubAssessments = false;
+
             foreach ($this->assessables as $subAssessable) {
-                $student = $participant->getUser();
-                if($subAssessable->isParticipant($student) && $subAssessable->getParticipant($student)->isMarkingRequired()){
-                    $count++;
-                    break;
-                }
+
+                if($subAssessable->isParticipant($student)){
+                    $studentFoundInSubAssessments = true;
+                    if($subAssessable->getParticipant($student)->isFeedbackRequired()){
+                        $count++;
+                        break;
+                    }
+                 }
+            }
+
+            // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessable
+            if(!$studentFoundInSubAssessments){
+                throw new \DomainException("Project (a.id: {$this->getId()}) participant (u.id: {$student->getId()}) not found in project's sub-assessments");
             }
         }
         return $count;
@@ -112,108 +177,246 @@ class Project extends AbstractAssessment implements AssessmentContext
 
     /**
      * Whether a project can be considered reviewComplete (ie GREEN CIRCLE) depends on:
-     * * whether any sub-assessments require marking,
      * * the summation method, and
-     * * the reviewComplete status of the project's sub-assessments
+     * * the reviewComplete status of the project's sub-assessments, and
+     * * ALL sub-assessments not requiring feedback
      *
-     * If summation implies ALL, then all sub-assessments must be review-completed.
-     * If summation implies ANY, then any sub-assessment needs be review-completed.
+     * We need to examine all sub-assessments before we can conclude the project's overall state
+     *
+     * If any sub-assessment requires feedback, the project is NOT review-completed
+     * If summation implies ALL and any sub-assessment is not review-complete, then project is not review-complete
+     * If summation implies ANY and any sub-assessment is review-complete, then project is review-complete
      *
      * @return int
      */
     public function getCountReviewComplete()
     {
-        // Would a single sub-review indicate the student has been reviewed ?
-        $reviewedIfAny = !$this->summator->isAggregator();
-
-        // Depending on ALL/ANY, tracks count of reviewed or un-reviewed (avoids extra loop)
-        $countReviewed   = 0;
-        $countUnReviewed = 0;
+        // Would a single sub-assessment completion imply the project is complete ?
+        $requiresAny = $this->summator->impliesOptionality();
+        $requiresAll = !$requiresAny;
+        $countReviewComplete = 0;
 
         foreach($this->allParticipants as $participant) {
-            foreach ($this->assessables as $subAssessable) {
-                $student = $participant->getUser();
-                if($subAssessable->isParticipant($student)){
-                    $subParticipant    = $subAssessable->getParticipant($student);
-                    $isReviewed        = $subParticipant->isReviewComplete();
-                    $isMarkingRequired = $subParticipant->isMarkingRequired();
+            $student                      = $participant->getUser();
+            $studentFoundInSubAssessments = false;
+            $projectResultDetermined      = false;
+            $subReviewCompleteFound       = false;
 
-                    if($reviewedIfAny){
-                        if($isReviewed)
+            foreach ($this->assessables as $subAssessable) {
+
+                if($subAssessable->isParticipant($student)) {
+                    $studentFoundInSubAssessments = true;
+                    $subParticipant               = $subAssessable->getParticipant($student);
+                    $feedbackRequired             = $subParticipant->isFeedbackRequired();
+                    $reviewComplete               = $subParticipant->isReviewComplete();
+
+                    if($reviewComplete){
+                        $subReviewCompleteFound = true;
                     }
-                }
-            }
-        }
 
-        return $reviewedIfAny
-            ? $count
-            : $this->allParticipants->count() - $count;
-    }
-
-
-
-    /**
-     * Returns the number of Participants who have a published mark for this IAssessable.
-     *
-     * This is a student-perspective function. Has the student see they have received some grade/outcome ?
-     *
-     * In the case of project, a student is marked if they have received a mark for ANY
-     * assessment inside the project.
-     */
-    public function getCountMarkedByTeacher()
-    {
-        $count = 0;
-
-        foreach($this->allParticipants as $participant){
-            foreach ($this->assessables as $subAssessable) {
-                $student = $participant->getUser();
-                if($subAssessable->isParticipant($student) && $subAssessable->getParticipant($student)->isMarkedByTeacher()){
-                    $count++;
-                    break;
-                }
-            }
-        }
-        return $count;
-    }
-
-
-    /**
-     * A student is considered to have 'completed' a project if they have completed some combination of sub-assessments.
-     *
-     * The combination depends on the summation method:
-     * * MAX: implies optionality         - student needs to complete ANY sub-assessment
-     * * MIN: implies optionality         - student needs to complete ANY sub-assessments
-     * * AVG: implies expected to do all  - student needs to complete ALL sub-assessment
-     *
-     * @return int
-     */
-    public function getCountResponseComplete()
-    {
-        // Would a single sub-completion indicate the student requires no further action ?
-        $completeIfAny = !$this->summator->isAggregator();
-
-        // Depending on ALL/ANY, tracks count of complete or incomplete (avoids extra loop)
-        $count = 0;
-
-        foreach($this->allParticipants as $participant) {
-            foreach ($this->assessables as $subAssessable) {
-                $student = $participant->getUser();
-                if($subAssessable->isParticipant($student)){
-                    $isComplete = $subAssessable->getParticipant($student)->isResponseComplete();
-
-                    if($completeIfAny == $isComplete){
-                        $count++;
+                    // Does sub-assessment require feedback ? Or does project require all to be review-complete and the sub-assessment in not review-complete?
+                    if ($feedbackRequired || ($requiresAll && !$reviewComplete)) {
+                        // Conclude that project is not review-complete
+                        $projectResultDetermined = true;
                         break;
                     }
                 }
             }
+
+            // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessable
+            if(!$studentFoundInSubAssessments){
+                throw new \DomainException("Project (a.id: {$this->getId()}) participant (u.id: {$student->getId()}) not found in project's sub-assessments");
+            }
+
+            // Were we not able to conclude the project was not review-complete by examining the sub-assessments individually ?
+            if(!$projectResultDetermined){
+                // Does the project require just one sub-assessment to be review-completed, and 1 or more were review-completed?
+                if($requiresAny && $subReviewCompleteFound){
+                    // We can conclude the project is review-completed.
+                    $countReviewComplete++;
+                }
+            }
         }
 
-        return $completeIfAny
-            ? $count
-            : $this->allParticipants->count() - $count;
+        return $countReviewComplete;
     }
 
+
+    /**
+     * This treats the project holistically as an atomic entity.
+     *
+     * If a project requires ALL sub-assessments to be completed, then student has only
+     * submitted a response to the project once they have submitted to ALL sub-assessments.
+     *
+     * Else if a project requires any sub-assessment to be completed, then student has submitted once
+     * they have submitted a response to ANY sub-assessment.
+     *
+     * @return int
+     */
+    public function getCountHasSubmittedResponse()
+    {
+        // Would a single sub-assessment completion imply the project is complete ?
+        $requiresAny            = $this->summator->impliesOptionality();
+        $requiresAll            = !$requiresAny;
+        $countResponseSubmitted = 0;
+
+        foreach($this->allParticipants as $participant) {
+            $student                      = $participant->getUser();
+            $studentFoundInSubAssessments = false;
+            $projectResultDetermined      = false;
+            $hasNotSubmittedSubResponse   = false;
+
+            foreach ($this->assessables as $subAssessable) {
+
+                if ($subAssessable->isParticipant($student)) {
+                    $studentFoundInSubAssessments = true;
+                    $subParticipant               = $subAssessable->getParticipant($student);
+                    $hasSubmittedResponse         = $subParticipant->hasSubmittedResponse();
+
+                    // Has student not submitted to the sub-assessment ?
+                    if(!$hasSubmittedResponse){
+                        $hasNotSubmittedSubResponse = true;
+                    }
+
+                    // Does project require all sub-assessment to be completed, and student didn't respond ?
+                    if($requiresAll && !$hasSubmittedResponse){
+                        // We can conclude they have not responded to the project
+                        $projectResultDetermined = true;
+                        break;
+                    }
+                    // Else does project require any, and student has responded ?
+                    elseif ($requiresAny && $hasSubmittedResponse) {
+                        // We can conclude they have responded to the project
+                        $projectResultDetermined = true;
+                        $countResponseSubmitted++;
+                        break;
+                    }
+                }
+            }
+
+            // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessable
+            if(!$studentFoundInSubAssessments){
+                throw new \DomainException("Project (a.id: {$this->getId()}) participant (u.id: {$student->getId()}) not found in project's sub-assessments");
+            }
+
+            // Were we unable to determine a result by examining the sub-assessments individually ?
+            if(!$projectResultDetermined){
+                // Does project require all, and we didn't find a sub-assessment that the student did not respond to ?
+                if($requiresAll && !$hasNotSubmittedSubResponse){
+                    // We can conclude the student has responded to the project
+                    $countResponseSubmitted++;
+                }
+            }
+        }
+        return $countResponseSubmitted;
+    }
+
+    /**
+     * This treats the project holistically as an atomic entity.
+     *
+     * If a project requires ALL sub-assessments to be completed, then teacher has only
+     * given feedback to the project once they have given feedback to ALL sub-assessments.
+     *
+     * Else if a project requires any sub-assessment to be completed, then teacher has given feedback once
+     * they have given feedback to ANY sub-assessment.
+     *
+     * @return int
+     */
+    public function getCountHasPublishedFeedback()
+    {
+        // Would a single sub-assessment completion imply the project is complete ?
+        $requiresAny            = $this->summator->impliesOptionality();
+        $requiresAll            = !$requiresAny;
+        $countPublishedFeedback = 0;
+
+        foreach($this->allParticipants as $participant) {
+            $student                      = $participant->getUser();
+            $studentFoundInSubAssessments = false;
+            $projectResultDetermined      = false;
+            $hasNotPublishedFeedback      = false;
+
+            foreach ($this->assessables as $subAssessable) {
+
+                if ($subAssessable->isParticipant($student)) {
+                    $studentFoundInSubAssessments = true;
+                    $subParticipant               = $subAssessable->getParticipant($student);
+                    $hasPublishedFeedback         = $subParticipant->hasPublishedFeedback();
+
+                    // Has student not received published feedback for the sub-assessment ?
+                    if(!$hasPublishedFeedback){
+                        $hasNotPublishedFeedback = true;
+                    }
+
+                    // Does project require all sub-assessment to be completed, and student hasn't received published feedback ?
+                    if($requiresAll && !$hasPublishedFeedback){
+                        // We can conclude they have not received published feedback for the project
+                        $projectResultDetermined = true;
+                        break;
+                    }
+                    // Else does project require any, and student has received published feedback for a sub-assessment ?
+                    elseif ($requiresAny && $hasPublishedFeedback) {
+                        // We can conclude they have received published feedback to the project
+                        $projectResultDetermined = true;
+                        $countPublishedFeedback++;
+                        break;
+                    }
+                }
+            }
+
+            // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessable
+            if(!$studentFoundInSubAssessments){
+                throw new \DomainException("Project (a.id: {$this->getId()}) participant (u.id: {$student->getId()}) not found in project's sub-assessments");
+            }
+
+            // Were we unable to determine a result by examining the sub-assessments individually ?
+            if(!$projectResultDetermined){
+                // Does project require all, and we didn't find a sub-assessment that the student did not received published feedback for ?
+                if($requiresAll && !$hasNotPublishedFeedback){
+                    // We can conclude the student has received published feedback for the project
+                    $countPublishedFeedback++;
+                }
+            }
+        }
+        return $countPublishedFeedback;
+    }
+
+    /**
+     * This treats the project holistically as an atomic entity.
+     *
+     * A project has a mark if any of its sub-assessments have marks.
+     *
+     * @return int
+     */
+    public function getCountHasMark()
+    {
+        $countHasMark = 0;
+
+        foreach($this->allParticipants as $participant) {
+            $student                      = $participant->getUser();
+            $studentFoundInSubAssessments = false;
+
+            foreach ($this->assessables as $subAssessable) {
+
+                if ($subAssessable->isParticipant($student)) {
+                    $studentFoundInSubAssessments = true;
+                    $subParticipant               = $subAssessable->getParticipant($student);
+                    $hasMark                      = $subParticipant->hasMark();
+
+                    // Does student have a mark for the sub-assessment ?
+                    if($hasMark){
+                        $countHasMark++;
+                        break;
+                    }
+                }
+            }
+
+            // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessable
+            if(!$studentFoundInSubAssessments){
+                throw new \DomainException("Project (a.id: {$this->getId()}) participant (u.id: {$student->getId()}) not found in project's sub-assessments");
+            }
+        }
+        return $countHasMark;
+    }
 
 
     /**

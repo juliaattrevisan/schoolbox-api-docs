@@ -78,12 +78,10 @@ interface ISummator
 
 
     /**
-     * If when determining the state of a project by its sub-assessments, the sub-states
-     * should be combined with UNION or INTERSECTION, ie ANY or ALL.
-     *
-     * This is derived from whether the final mark is derived from 1 or multiple sub-assessments.
+     * Under normal circumstances, would this summator imply a student
+     * could complete just one of the sub-assessables and consider the project complete ?
      *
      * @return bool
      */
-    public function isAggregator();
+    public function impliesOptionality();
 }

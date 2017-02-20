@@ -74,13 +74,10 @@ class Average extends AbstractSummator
     }
 
     /**
-     * Average implies over time it is expected a student will complete multiple
-     * assessments, each contributing to the final mark.
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function isAggregator()
+    public function impliesOptionality()
     {
-        return true;
+        return false;
     }
 }

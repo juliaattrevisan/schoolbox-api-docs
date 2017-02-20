@@ -222,59 +222,97 @@ interface IAssessable extends ISoftDeletable
     public function getCountParticipants();
 
     /**
-     * Returns the percentage of participants who have completed the assessment.
-     *
-     * @return float|null
-     */
-    public function getPercentageCompleted();
-
-    /**
      * Returns the number of Participants who have no response to the assessment,
      * or their latest response is explicitly marked as 'incomplete'.
      *
      * @return int
      */
-    public function getCountResponseIncomplete();
+    public function getCountResponseRequired();
 
-    /**
-     * How many participants have non-explicitly-incomplete responses to the assessment ?
-     *
-     * This does not relate to the concept of a teacher reviewing a student.
-     *
-     * @return int
-     */
-    public function getCountResponseComplete();
-
-    /**
-     * Returns the number of Participants who have a published mark for this IAssessable.
-     *
-     * This is a student-perspective function. For this assessment, would
-     * they see they have received some grade/outcome ?
-     */
-    public function getCountMarkedByTeacher();
-
-    /**
-     * Calculate percentage of an IAssessable that has been marked
-     *
-     * @return float
-     */
-    public function getPercentageMarked();
 
     /**
      * How many Participants have Responses that require marking.
      *
      * @return int
      */
-    public function getCountMarkingRequired();
+    public function getCountFeedbackRequired();
+
+    
+    /**
+     * How many participants has the teacher marked as not-explicitly-incomplete, and
+     * the student has not subsequently submitted/re-submitted.
+     *
+     * @return int
+     */
+    public function getCountReviewComplete();
+
+
+    /**
+     * How many participants have submitted ANY kind of response to this assessment?
+     *
+     * Includes teacher Submitting-On-Behalf-Of
+     *
+     * @return int
+     */
+    public function getCountHasSubmittedResponse();
+
+
+    /**
+     * Return the number of participants which have published feedback for this assessment
+     *
+     * @return int
+     */
+    public function getCountHasPublishedFeedback();
+
+
+    /**
+     * Return the number of participants which have a mark for this assessment
+     *
+     * @return int
+     */
+    public function getCountHasMark();
+
+    /**
+     * What percentage of Participants still need to submit a response
+     *
+     * @return float|null
+     */
+    public function getPercentageResponseRequired();
 
     /**
      * What percentage of Participants have Responses that require marking.
      *
-     * This does not always equate to 100 - getPercentageMarked()
+     * @return float|null
+     */
+    public function getPercentageFeedbackRequired();
+
+    /**
+     * What percentage of Participants have been review-completed ?
      *
      * @return float|null
      */
-    public function getPercentageMarkingRequired();
+    public function getPercentageReviewComplete();
+
+    /**
+     * What percentage of Participants have submitted a response to this assessment ?
+     *
+     * @return float|null
+     */
+    public function getPercentageHasSubmittedResponse();
+
+    /**
+     * What percentage of Participants have received published feedback for this assessment ?
+     *
+     * @return float|null
+     */
+    public function getPercentageHasPublishedFeedback();
+
+    /**
+     * What percentage of Participants have a mark for this assessment ?
+     *
+     * @return float|null
+     */
+    public function getPercentageHasMark();
 
 
     /**

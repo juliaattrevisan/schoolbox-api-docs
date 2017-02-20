@@ -409,21 +409,11 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function getCountResponseIncomplete()
-    {
-        return $this->allParticipants->count() - $this->getCountResponseComplete();
-    }
-
-    /**
-     * How many Participants have Responses that require marking.
-     *
-     * @return int
-     */
-    public function getCountMarkingRequired()
+    public function getCountResponseRequired()
     {
         $count = 0;
         foreach ($this->getAllParticipants() as $participant) {
-            if ($participant->isMarkingRequired()) {
+            if ($participant->isResponseRequired()) {
                 $count++;
             }
         }
@@ -431,10 +421,23 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * How many participants has the teacher marked as not-explicitly-incomplete, and
-     * the student has not subsequently submitted/re-submitted.
+     * How many Participants have Responses that require marking.
      *
      * @return int
+     */
+    public function getCountFeedbackRequired()
+    {
+        $count = 0;
+        foreach ($this->getAllParticipants() as $participant) {
+            if ($participant->isFeedbackRequired()) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getCountReviewComplete()
     {
@@ -448,49 +451,36 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * Has this participant made ANY kind of (submitted) response to this assessment?
+     * @inheritdoc
+     */
+    public function getCountHasSubmittedResponse()
+    {
+        $count = 0;
+        foreach ($this->getAllParticipants() as $participant) {
+            if ($participant->hasSubmittedResponse()) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+
+    /**
+     * How many participants have received published feedback for this assessment
      *
-     * Includes teacher Submitting-On-Behalf-Of
+     * @return int
      */
-    public function getCountIsResponded()
+    public function getCountHasPublishedFeedback()
     {
         $count = 0;
         foreach ($this->getAllParticipants() as $participant) {
-            if ($participant->isResponded()) {
+            if ($participant->hasPublishedFeedback()) {
                 $count++;
             }
         }
         return $count;
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getCountResponseComplete()
-    {
-        $count = 0;
-        foreach ($this->allParticipants as $participant) {
-            if ($participant->isResponseComplete()) {
-                $count++;
-            }
-        }
-        return $count;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCountMarkedByTeacher()
-    {
-        $count = 0;
-        foreach ($this->getAllParticipants() as $participant) {
-            if ($participant->isMarkedByTeacher()) {
-                $count++;
-            }
-        }
-        return $count;
-    }
 
     /**
      * Get count of participants who have a mark for the assessment.
@@ -509,43 +499,77 @@ abstract class AbstractAssessment implements IAssessable
         return $count;
     }
 
-
-
     /**
      * @inheritdoc
      */
-    public function getPercentageCompleted()
+    public function getPercentageResponseRequired()
     {
         $countParticipants = $this->getCountParticipants();
         if(!$countParticipants){
             return null;
         }
-        return 100 * ($this->getCountResponseComplete() / $countParticipants);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPercentageMarked()
-    {
-        $countParticipants = $this->getCountParticipants();
-        if(!$countParticipants){
-            return null;
-        }
-        return 100 * ($this->getCountMarkedByTeacher() / $countParticipants);
+        return 100 * ($this->getCountResponseRequired() / $countParticipants);
     }
 
 
     /**
      * @inheritdoc
      */
-    public function getPercentageMarkingRequired()
+    public function getPercentageFeedbackRequired()
     {
         $countParticipants = $this->getCountParticipants();
         if(!$countParticipants){
             return null;
         }
-        return 100 * ($this->getCountMarkingRequired() / $countParticipants);
+        return 100 * ($this->getCountFeedbackRequired() / $countParticipants);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPercentageReviewComplete()
+    {
+        $countParticipants = $this->getCountParticipants();
+        if(!$countParticipants){
+            return null;
+        }
+        return 100 * ($this->getCountReviewComplete() / $countParticipants);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPercentageHasSubmittedResponse()
+    {
+        $countParticipants = $this->getCountParticipants();
+        if(!$countParticipants){
+            return null;
+        }
+        return 100 * ($this->getCountHasSubmittedResponse() / $countParticipants);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPercentageHasPublishedFeedback()
+    {
+        $countParticipants = $this->getCountParticipants();
+        if(!$countParticipants){
+            return null;
+        }
+        return 100 * ($this->getCountHasPublishedFeedback() / $countParticipants);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPercentageHasMark()
+    {
+        $countParticipants = $this->getCountParticipants();
+        if(!$countParticipants){
+            return null;
+        }
+        return 100 * ($this->getCountHasMark() / $countParticipants);
     }
 
 

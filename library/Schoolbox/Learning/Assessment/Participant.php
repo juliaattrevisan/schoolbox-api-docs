@@ -99,19 +99,37 @@ class Participant
         $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
 
-
     /**
-     * Is this participant either:
-     * * implicitly incomplete (no submitted responses), or
-     * * explicitly incomplete (task marked as incomplete)
+     * Does the student still need to submit a response ?
+     *
+     * No need if already responded and the response is not 'incomplete', or
+     * if marked by Teacher already as not 'incomplete'
      *
      * Represented as GREY SQUARE
      *
      * @return bool
      */
-    public function isResponseIncomplete()
+    public function isResponseRequired()
     {
-        return !$this->isResponseComplete();
+        // Special case for Task
+        if($this->assessable instanceof Task){
+            /** @var TaskCompletion $mostRecentResponse */
+            $mostRecentResponse = $this->findMostRecentSubmittedResponse();
+            return !$mostRecentResponse || $mostRecentResponse->isMarkedAsIncomplete();
+        }
+
+        $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
+        $latestPublishedFeedback = $this->findMostRecentPublishedFeedback();
+
+        // No Responses and No Feedback?
+        if(!$latestSubmittedResponse && !$latestPublishedFeedback){
+            // No interaction yet - waiting for student to submit or teacher to give mark
+            return true;
+        }
+
+        // We either have a submitted response, or a published feedback, or both.
+        // All these scenarios imply student does not need to respond.
+        return false;
     }
 
 
@@ -125,11 +143,18 @@ class Participant
      *
      * @return bool
      */
-    public function isMarkingRequired()
+    public function isFeedbackRequired()
     {
+        // Special case for Task.
+        if($this->assessable instanceof Task){
+            /** @var TaskCompletion $latestSubmittedResponse */
+            $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
+            return $latestSubmittedResponse && $latestSubmittedResponse->isMarkedAsSelfAssessed();
+        }
+
         // No responses, or latest response has published feedback already ?
         $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
-        if (!$latestSubmittedResponse || $latestSubmittedResponse->isMarkedByTeacher()) {
+        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
             return false;
         }
 
@@ -154,23 +179,25 @@ class Participant
     {
         // Special case for Task
         if($this->assessable instanceof Task){
-            /** @var TaskFeedback $latestFeedback */
-            $latestFeedback = $this->findMostRecentPublishedFeedback();
-            return $latestFeedback && $latestFeedback->isMarkedAsTeacherAssessed() && !$this->isMarkingRequired();
+            /** @var TaskCompletion $latestSubmittedResponse */
+            $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
+            return $latestSubmittedResponse && $latestSubmittedResponse->isMarkedAsTeacherAssessed();
         }
 
-        return  $this->isMarkedByTeacher() && !$this->isMarkingRequired();
+        return  $this->hasPublishedFeedback() && !$this->isFeedbackRequired();
     }
 
 
     /**
      * Has this participant made ANY kind of (submitted) response to this assessment?
      *
-     * Includes teacher Submitting-On-Behalf-Of
+     * Includes teacher Submitting-On-Behalf-Of (S-O-B-O)
+     *
+     * Important: This will still return TRUE if task has been marked as 'incomplete'.
      *
      * @return bool
      */
-    public function isResponded()
+    public function hasSubmittedResponse()
     {
         foreach($this->allResponses as $response){
             if($response->isSubmitted()){
@@ -180,45 +207,16 @@ class Participant
         return false;
     }
 
-    /**
-     * Does the participant have a non-incomplete response to the assessment ?
-     *
-     * Includes submissions-on-behalf-of.
-     *
-     * This does not relate to the concept of a teacher reviewing a student.
-     *
-     * @see $this->isMarkingRequired for the teacher persepective
-     * @return bool
-     */
-    public function isResponseComplete()
-    {
-        // Special case for task
-        if($this->assessable instanceof Task){
-            /** @var TaskCompletion $latestResponse */
-            $latestResponse = $this->findMostRecentSubmittedResponse();
-
-            // Are there no responses (implicitly incomplete), or is latest response explicitly marked as incomplete?
-            if(!$latestResponse || $latestResponse->isMarkedAsIncomplete()){
-                return false;
-            }
-            return true;
-        }
-
-        // Has student attempted the quiz or submitted to the dueWork ?
-        return $this->isResponded();
-    }
 
     /**
-     * Has a teacher given a mark to this participant.
-     *
-     * Does not include Submission-on-behalf-of,
+     * Has a teacher given a published mark to this participant.
      *
      * For clarity - a self-assessed task, while complete, is not marked by teacher
      * @see $this->hasMark to include self-assessed marks.
      *
      * @return bool
      */
-    public function isMarkedByTeacher()
+    public function hasPublishedFeedback()
     {
         foreach($this->allFeedbacks as $feedback){
             if($feedback->isPublished()){
@@ -249,29 +247,7 @@ class Participant
         }
 
         // Default case
-        return $this->isMarkedByTeacher();
-    }
-
-
-    /**
-     * Does the student still need to submit a response ?
-     *
-     * No need if already responded and the response is not 'incomplete', or
-     * if marked by Teacher already as not 'incomplete'
-     *
-     * @return bool
-     */
-    public function isResponseRequired()
-    {
-        // Special case for Task
-        if($this->assessable instanceof Task){
-            /** @var TaskCompletion $mostRecentResponse */
-            $mostRecentResponse = $this->findMostRecentSubmittedResponse();
-            return !$mostRecentResponse || $mostRecentResponse->isMarkedAsIncomplete();
-        }
-
-        // All non-Task marks from teacher indicate the student requires no further action.
-        return !($this->isResponseComplete() || $this->isMarkedByTeacher());
+        return $this->hasPublishedFeedback();
     }
 
 

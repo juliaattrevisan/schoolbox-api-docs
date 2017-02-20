@@ -285,7 +285,7 @@ class CohortAnalysis
                             continue;
                         }
 
-                        if ($specParticipant->isMarkedByTeacher()) {
+                        if ($specParticipant->hasPublishedFeedback()) {
                             // account for collision; keep the highest mark
                             if ($specParticipant->findMostRecentPublishedFeedback()->getNormalisedMark() < $implFeedback->getNormalisedMark()) {
                                 // replace

@@ -1140,7 +1140,7 @@ class PendingFactory
      */
     private function isMarkingRequired(IAssessable $assessment)
     {
-        return $assessment->getCountMarkingRequired() > 0;
+        return $assessment->getCountFeedbackRequired() > 0;
     }
 
 
@@ -1152,7 +1152,7 @@ class PendingFactory
      */
     private function isChasingRequired(IAssessable $assessment)
     {
-        return $assessment->getDueAt()->lt($this->toChaseLimit) && $assessment->getCountResponseIncomplete() > 0;
+        return $assessment->getDueAt()->lt($this->toChaseLimit) && $assessment->getCountResponseRequired() > 0;
     }
 
 

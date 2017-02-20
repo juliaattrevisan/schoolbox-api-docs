@@ -70,12 +70,12 @@
                                 {%- endif -%}
 
                                 <div class="progress" title="{{ assessment.countCompleted }} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
-                                    <span class="meter" style="width:{{ assessment.percentageCompleted }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.percentageCompleted - assessment.percentageMarkingRequired }}%" title="{{ assessment.countMarkingRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
+                                    <span class="meter" style="width:{{ 100 - assessment.percentageResponseRequired }}%"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.percentageResponseRequired - assessment.percentageMarkingRequired }}%" title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
-                                <p title="{{ assessment.countMarkingRequired }} of {{ assessment.countParticipants }} students require marking">{{ assessment.countMarkingRequired }} unmarked</p>
+                                <p title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require marking">{{ assessment.countFeedbaclRequired }} unmarked</p>
                             </div>
                             <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
                                 {% for participant in assessment.allParticipants %}
@@ -166,8 +166,8 @@
                             </div>
                             <div class="small-4 columns hide-for-small-only">
                                 <div class="progress" title="{{ assessment.countCompleted }} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
-                                    <span class="meter" style="width:{{ assessment.percentageCompleted }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.percentageCompleted - assessment.percentageMarkingRequired }}%" title="{{ assessment.countMarkingRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
+                                    <span class="meter" style="width:{{ assessment.percentageResponseRequired }}%"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.percentageResponseRequired - assessment.percentageMarkingRequired }}%" title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
