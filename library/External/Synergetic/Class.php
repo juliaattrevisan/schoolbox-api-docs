@@ -45,8 +45,10 @@ class External_Synergetic_Class implements External_ClassInterface
         $subCodeArray = explode(',', $subCode);
         foreach ($subCodeArray as $code) {
             if (strpos($code, '/') !== false) {
-                $codeArray = explode('/', $code);
-                $classQuery .= "( ClassCode = '{$this->database->quote($codeArray[1])}' AND ClassCampus = '{$this->database->quote($codeArray[0])}' ) OR ";
+                $slash = strpos($code, '/');
+                $campusCode = substr($code, 0, $slash);
+                $classCode = substr($code, $slash + 1);
+                $classQuery .= "( ClassCode = '{$this->database->quote($classCode)}' AND ClassCampus = '{$this->database->quote($campusCode)}' ) OR ";
             } else {
                 $classQuery .= "ClassCode = '{$this->database->quote($code)}' OR ";
             }
