@@ -566,22 +566,23 @@ class Controller extends Base
         $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER["REQUEST_URI"]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
-            'student'           => $viewee,
-            'term'              => $term,
-            'terms'             => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'           => $folders,
-            'subject'           => $subject,
-            'markbook'          => $markbook,
-            'graphInfo'         => json_encode($graphInfo),
-            'graphAssessments'  => json_encode($graphAssessments),
-            'graphData'         => json_encode($graphData),
-            'graphScatter'      => json_encode($graphScatter),
-            'graphFeedback'     => $graphFeedback,
-            'canComment'        => $conversation->canComment($this->getUser()),
-            'comments'          => $conversation->getVisibleComments($this->getUser()),
-            'quizzes'           => $quizzes,
-            'returnUrlSuffix'   => $returnUrlSuffix,
-            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term)
+            'student'            => $viewee,
+            'term'               => $term,
+            'terms'              => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
+            'folders'            => $folders,
+            'subject'            => $subject,
+            'markbook'           => $markbook,
+            'graphInfo'          => json_encode($graphInfo),
+            'graphAssessments'   => json_encode($graphAssessments),
+            'graphData'          => json_encode($graphData),
+            'graphScatter'       => json_encode($graphScatter),
+            'graphFeedback'      => $graphFeedback,
+            'canComment'         => $conversation->canComment($this->getUser()),
+            'comments'           => $conversation->getVisibleComments($this->getUser()),
+            'quizzes'            => $quizzes,
+            'returnUrlSuffix'    => $returnUrlSuffix,
+            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term),
+            'participant'        => $assessment->getParticipant($viewee)
         ]));
     }
 
