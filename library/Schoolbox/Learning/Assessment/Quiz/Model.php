@@ -159,24 +159,27 @@ class Model extends AbstractAssessment
             return true;
         }
 
-        $participant = $this->getParticipant($user);
+        if ($this->isParticipant($user)) {
 
-        /* Responses less than maximum allowed
-         */
-        if ($participant->getAllResponses()->count() < $this->getMaxAttempts()) {
-            return true;
-        }
+            $participant = $this->getParticipant($user);
 
-        /* Response count is the same as the maximum allowed
-         */
-        if ($participant->getAllResponses()->count() == $this->getMaxAttempts()) {
-            $mostRecentResponse = $participant->findMostRecentResponse();
-
-            /* Check whether the most recent response is officially submitted
-             * You should be allowed to resume the draft/in-progress attempt
+            /* Responses less than maximum allowed
              */
-            if (!$mostRecentResponse->isSubmitted()) {
+            if ($participant->getAllResponses()->count() < $this->getMaxAttempts()) {
                 return true;
+            }
+
+            /* Response count is the same as the maximum allowed
+             */
+            if ($participant->getAllResponses()->count() == $this->getMaxAttempts()) {
+                $mostRecentResponse = $participant->findMostRecentResponse();
+
+                /* Check whether the most recent response is officially submitted
+                 * You should be allowed to resume the draft/in-progress attempt
+                 */
+                if (!$mostRecentResponse->isSubmitted()) {
+                    return true;
+                }
             }
         }
 

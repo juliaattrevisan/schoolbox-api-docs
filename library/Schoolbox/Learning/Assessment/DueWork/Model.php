@@ -268,7 +268,12 @@ class Model extends AbstractAssessment
      */
     public function canCreateResponse(User $user)
     {
-        if ($this->isAcceptSingle() && $this->getParticipant($user)->isResponded()) {
+        if ($this->isParticipant($user)) {
+            if ($this->isAcceptSingle() && $this->getParticipant($user)->isResponded()) {
+                return false;
+            }
+        }
+        else {
             return false;
         }
 
