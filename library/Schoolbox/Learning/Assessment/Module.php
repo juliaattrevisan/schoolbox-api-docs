@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
@@ -180,7 +181,7 @@ class Module extends BaseModule
 
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
-            throw new NotFound();
+            throw new Forbidden();
 
         } catch (OutOfBoundsException $e) {
             // given user/assessment combination is invalid: not a participant
