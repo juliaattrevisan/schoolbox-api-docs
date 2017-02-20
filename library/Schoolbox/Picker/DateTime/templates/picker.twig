@@ -190,7 +190,6 @@
         altFormat: getValue($('#{{ element }}'), 'data-datepicker-format'), {# false|date|datetime #}
         allDay: getValue($('#{{ element }}'), 'data-datepicker-allday'), {# Show All Day switch #}
         allDayExt: getValue($('#{{ element }}'), 'data-datepicker-alldayext'),
-        {# allDateTime: 'start', //Set time to start or end of the day: start, finish #}
         type: getValue($('#{{ element }}'), 'data-datepicker-call'), {# Ajax call type: events, duework or nothing #}
 
     };
@@ -502,21 +501,21 @@
             {# Hide time picker if allday hidden field is set to 1 #}
             if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
                 checkAllday(true, {{ id }} );
-//                alert(1);
+                alert(1);
             }
             else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
                 checkAllday(false, {{ id }} );
-//                alert(2);
+                alert(2);
 
             }
             else if (hasTime(instance.input.value) === false ) {
                 checkAllday(true, {{ id }} );
-//                alert(3);
+                alert(3);
 
             }
             else {
                 checkAllday(false, {{ id }} );
-//                alert(4);
+                alert(4);
 
             }
 

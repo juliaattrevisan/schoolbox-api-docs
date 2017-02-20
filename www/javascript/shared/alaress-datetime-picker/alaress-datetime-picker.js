@@ -97,7 +97,7 @@ function setPickerFormats (allDayState, element) {
     }
     else {
         l = 2;
-        // If not overiding then looking at the enableTime option
+        // If not overriding then looking at the enableTime option
         if (refreshOptions.enableTime === false) {
             l = 22;
             pickerFormats.from = refreshOptions.displayFormatDate;

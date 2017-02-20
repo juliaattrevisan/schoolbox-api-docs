@@ -24,7 +24,6 @@ $eventAccess     = new Access();
 switch ($_REQUEST['action']) {
     case 'Add':
     case 'Update':
-
         $publishDate = null;
         $until       = null;
 
@@ -68,7 +67,7 @@ switch ($_REQUEST['action']) {
         // Ghetto validation
         try {
             if (strlen($_POST['publishDate'])) {
-                $pubDateObject = Alaress_Date_Format::newLocalShort($_POST['publishDate']);
+                $pubDateObject = Alaress_Date_Format::newLocal($_POST['publishDate']);
             }
             /* Events recur until this time
              */
