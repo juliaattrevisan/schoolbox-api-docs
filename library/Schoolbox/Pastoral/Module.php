@@ -18,7 +18,6 @@ use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsParentAccessAllowed;
-use Alaress\Authorizer\Rule\IsParentOfStudent;
 use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModerator;
 use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModeratorWrite;
 use Schoolbox\Role;
@@ -157,7 +156,7 @@ class Module extends BaseModule
                     (
                         new Rule\HasRole(Role::PARENT),
                         new IsParentAccessAllowed(),
-                        new IsParentOfStudent(),
+                        new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId'),
                         new IsInAudience()
                     )
                 )
@@ -197,7 +196,7 @@ class Module extends BaseModule
                 new Rule\All
                 (
                     new Rule\HasRole(Role::PARENT),
-                    new IsParentOfStudent(),
+                    new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId'),
 
                     // And parent access is allowed via config
                     new IsParentAccessAllowed()

@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
@@ -39,6 +40,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use UnexpectedValueException;
 
 class Module extends BaseModule
 {
@@ -165,6 +167,10 @@ class Module extends BaseModule
 
             /** @var IAssessable $assessment */
             $participant = $assessment->getParticipant($student);
+
+        } catch (UnexpectedValueException $e) {
+            // Student isn't a participant
+            throw new Forbidden();
 
         } catch (OutOfBoundsException $e) {
             // given user/assessment combination is invalid: not a participant

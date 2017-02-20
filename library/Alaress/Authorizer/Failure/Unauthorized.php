@@ -13,6 +13,8 @@
 
 namespace Alaress\Authorizer\Failure;
 
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 class Unauthorized extends Base
 {
     /**
@@ -20,5 +22,5 @@ class Unauthorized extends Base
      *
      * @var int
      */
-    protected $code = 19;
+    protected $code = ErrorMapper::ERROR_PERM_PAGE_VIEW;
 }

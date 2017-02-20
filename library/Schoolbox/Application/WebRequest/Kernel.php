@@ -18,6 +18,7 @@ use Aura\Di;
 use Aura\Router\Route;
 use ReflectionMethod;
 use RuntimeException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception\Deleted;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -214,6 +215,10 @@ class Kernel extends \Alaress\Application\Kernel
             catch (Forbidden $e) {
                 // TODO replace the call to Sitepage::error() method
                 error($e->getCode(), $e->getMessage(), 403);
+            }
+            catch (NotFound $e) {
+                // "That which you are looking for cannot be found"
+                error($e->getCode(), $e->getMessage(), 404);
             }
             catch (Unauthorized $e) {
                 // This seems to be the most appropriate error code for unauthorized calls.
