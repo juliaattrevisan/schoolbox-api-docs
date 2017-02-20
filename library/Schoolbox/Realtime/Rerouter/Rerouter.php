@@ -20,14 +20,14 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use Exception;
-use PDO;
+use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Mapper;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
+use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -282,6 +282,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 
     /**
+     * @throws OutOfBoundsException
      * @return void
      */
     protected function rebind()
@@ -306,10 +307,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
         // iterate the set and
         foreach ($subList->getAllQueueNames() as $queue) {
-            /** @var User $user */
-            $user = $subList->getQueueData($queue);
-
-            $this->rebindUser($user, $queue);
+            $this->rebindUser($subList->getQueueData($queue));
         }
 
         $this->log->debug("Full rebind complete; cleaning up stale queues");
@@ -372,6 +370,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
     /**
      * @param Frame $frame
+     * @throws CompressionException
      */
     public function onCommand(Frame $frame)
     {
