@@ -102,7 +102,7 @@
             studentId:    participant.user.id,
             participant:  participant
         }) %}
-        {% if createResponseRoute and  assessment.isSelfAssessable %}
+        {% if createResponseRoute and  assessment.isSelfAssessed %}
             <form action="{{ createResponseRoute }}"
                   method="POST">
                 {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
