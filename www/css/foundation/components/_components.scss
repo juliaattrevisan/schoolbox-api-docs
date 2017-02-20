@@ -35,14 +35,6 @@
  */
 .component-titlebar {
     @include information-list;
-
-    // Make sure the sortable handle is always filling the space, in case the title is empty
-    li {
-        @include flex;
-        .ui-sortable-handle {
-            height: 100%;
-        }
-    }
 }
 
 .component-action{
