@@ -14,6 +14,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -181,6 +182,9 @@ class Model implements ISoftDeletable
         $storageMapper = StorageMapper::getInstance();
         $storageObject = $storageMapper->findByHash($this->getHash());
 
+        $pastoralMapper = PastoralMapper::getInstance();
+        $pastoral = $pastoralMapper->findById($this->getPastoralId());
+
         // This whole thing is a bit of an ass, unfortunately Synergetic stores its DocMan files in
         // the actual database- which means we need to shove the file into a SQL query as a hex string
         // which is totally inefficient and very slow :(
@@ -200,6 +204,7 @@ class Model implements ISoftDeletable
         $date = date("Y-m-d H:i:s");
         $sourceDate = $storageObject->getCreatedAt()->getDatabase();
         $extension = strtoupper($storageObject->getExtension());
+        $pastoralExternalId = $pastoral->getExternalId();
 
         $filename = $database->quote($storageObject->getFilename());
 
@@ -235,18 +240,23 @@ class Model implements ISoftDeletable
 
         $query =
         "
-            INSERT INTO SynergyOneMedia.dbo.DocumentReferences
+            INSERT INTO SynergyOneMedia.dbo.tDocumentReferences
             (
-                ID,
-                DocumentReferencesSeq,
-                RelatedSeqModuleCore,
+                CommunityID,
+                tDocumentsSeq,
+                SynDatabaseCode,
+                RelatedSeqModuleCode,
+                SortOrder,
                 RelatedSeq
             )
             SELECT  
-                {$studentExternalId},
+                0,
                 {$documentReferencesSeq},
+                '',
                 'SPC',
-                MAX(SortOrder) + 1
+                COALESCE(MAX(SortOrder) + 1, 0),
+                {$pastoralExternalId}
+                
             FROM    SynergyOneMedia.dbo.tDocumentReferences 
             WHERE   tDocumentsSeq = {$documentReferencesSeq}
         ";
