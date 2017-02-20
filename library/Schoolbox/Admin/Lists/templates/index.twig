@@ -57,7 +57,7 @@
                     text: '{{ tables[table].deleteWarning }}',
                 confirmEvent: function () {
                     $.post('{{ routeLookup('adminLists.postDelete') }}', {
-                        mapper: '{{ tables[table].mapper | e('js')}}',
+                        table: '{{ table }}',
                         id: deleteId
                     })
                     .done(function (response) {
