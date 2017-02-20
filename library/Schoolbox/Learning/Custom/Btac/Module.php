@@ -56,6 +56,8 @@ class Module extends \Schoolbox\Learning\Module
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
+        parent::initRoutePermissions($authorizer);
+
         $this->addRoutePermission(
                 $authorizer,
                 '(?:getGradesYear)',
@@ -65,8 +67,6 @@ class Module extends \Schoolbox\Learning\Module
                     new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
                 )
             );
-
-        parent::initRoutePermissions($authorizer);
     }
 
     /**
