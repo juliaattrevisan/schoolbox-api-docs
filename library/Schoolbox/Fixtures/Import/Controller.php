@@ -1395,7 +1395,8 @@ class Controller extends Base
                                 'home_team_id' => $teamHome == null ? null : $teamHome->getId(),
                                 'away_team_id' => $teamAway == null ? null : $teamAway->getId(),
                                 'home_school_id' => $schoolHome == null ? null : $schoolHome->getId(),
-                                'away_school_id' => $schoolAway == null ? null : $schoolAway->getId()
+                                'away_school_id' => $schoolAway == null ? null : $schoolAway->getId(),
+                                'start_at' => $this->makeDateTime($row[5], $row[6])
                             ], [], $this->disableCache);
                             $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                         } catch (MapperException $e) {
