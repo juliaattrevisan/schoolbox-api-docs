@@ -501,22 +501,15 @@
             {# Hide time picker if allday hidden field is set to 1 #}
             if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
                 checkAllday(true, {{ id }} );
-                alert(1);
             }
             else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
                 checkAllday(false, {{ id }} );
-                alert(2);
-
             }
             else if (hasTime(instance.input.value) === false ) {
                 checkAllday(true, {{ id }} );
-                alert(3);
-
             }
             else {
                 checkAllday(false, {{ id }} );
-                alert(4);
-
             }
 
             if (pickerOptions.allDay === true) {
