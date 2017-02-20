@@ -236,7 +236,25 @@ class Model implements ISoftDeletable
         $database->query($query);
         $documentReferencesSeq = $database->getOne("SELECT @@IDENTITY");
 
-        // Add a document reference to the student so it shows up on their record
+        // Add a document reference to the student so it shows up on their normal community record
+
+        $query =
+            "
+            INSERT INTO SynergyOneMedia.dbo.DocumentReferences
+            (
+                ID,
+                DocumentReferencesSeq
+            )
+            VALUES
+            (
+                {$studentExternalId},
+                {$documentReferencesSeq}
+            );            
+        ";
+
+        $database->query($query);
+
+        // Specifically link it to their pastoral record as well
 
         $query =
         "
