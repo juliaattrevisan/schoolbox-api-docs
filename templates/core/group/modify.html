@@ -308,20 +308,20 @@ $(document).ready(function() {
                                 <form action="/group/modifyForm.php" method="post">
                                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                                     <input id="accessLevel-{OWNER_ID}-1" type="radio" name="accessLevel[{OWNER_ID}]" value="1" />
-                                    <label for="accessLevel-{OWNER_ID}-1" class="input-toggle">
-                                        <a class="icon-view" title="Grant Read Access"></a>
+                                    <label for="accessLevel-{OWNER_ID}-1" class="input-toggle" title="Grant Read Access">
+                                        <i class="icon-view"></i>
                                     </label>
                                     <input id="accessLevel-{OWNER_ID}-2" type="radio" name="accessLevel[{OWNER_ID}]" value="2" />
-                                    <label for="accessLevel-{OWNER_ID}-2" class="input-toggle">
-                                        <a class="icon-modify" title="Grant Write Access"></a>
+                                    <label for="accessLevel-{OWNER_ID}-2" class="input-toggle" title="Grant Write Access">
+                                        <i class="icon-modify"></i>
                                     </label>
                                     <input id="accessLevel-{OWNER_ID}-3" type="radio" name="accessLevel[{OWNER_ID}]" value="3" checked />
-                                    <label for="accessLevel-{OWNER_ID}-3" class="input-toggle">
-                                        <a class="icon-favourite" title="Make Admin"></a>
+                                    <label for="accessLevel-{OWNER_ID}-3" class="input-toggle" title="Make Admin">
+                                        <i class="icon-favourite"></i>
                                     </label>
                                     <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" disabled />
-                                    <label for="accessLevel-{OWNER_ID}-0" class="input-toggle">
-                                        <a class="icon-close alert" title="Remove From Group"></a>
+                                    <label for="accessLevel-{OWNER_ID}-0" class="input-toggle" title="Remove From Group">
+                                        <i class="icon-close alert"></i>
                                     </label>
                                 </form>
                             </nav>
@@ -357,20 +357,20 @@ $(document).ready(function() {
                                 <form action="/group/modifyForm.php" method="post" class="no-margin">
                                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                                     <input id="accessLevel-{USER_ID}-1" type="radio" name="accessLevel[{USER_ID}]" value="1" {READ_CHECKED} />
-                                    <label for="accessLevel-{USER_ID}-1" class="input-toggle">
-                                        <a class="icon-view" title="Grant Read Access"></a>
+                                    <label for="accessLevel-{USER_ID}-1" class="input-toggle" title="Grant Read Access">
+                                        <i class="icon-view"></i>
                                     </label>
                                     <input id="accessLevel-{USER_ID}-2" type="radio" name="accessLevel[{USER_ID}]" value="2" {WRITE_CHECKED} />
-                                    <label for="accessLevel-{USER_ID}-2" class="input-toggle">
-                                        <a class="icon-modify" title="Grant Write Access"></a>
+                                    <label for="accessLevel-{USER_ID}-2" class="input-toggle" title="Grant Write Access">
+                                        <i class="icon-modify"></i>
                                     </label>
                                     <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
-                                    <label for="accessLevel-{USER_ID}-3" class="input-toggle">
-                                        <a class="icon-favourite" title="Make Admin"></a>
+                                    <label for="accessLevel-{USER_ID}-3" class="input-toggle" title="Make Admin">
+                                        <i class="icon-favourite"></i>
                                     </label>
                                     <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
-                                    <label for="accessLevel-{USER_ID}-0" class="input-toggle">
-                                        <a class="icon-close alert" title="Remove From Group"></a>
+                                    <label for="accessLevel-{USER_ID}-0" class="input-toggle" title="Remove From Group">
+                                        <i class="icon-close alert"></i>
                                     </label>
                                 </form>
                             </nav>

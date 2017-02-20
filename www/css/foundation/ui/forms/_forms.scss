@@ -392,16 +392,19 @@ input[type=radio]{
 		width: $toggle-width;
 		text-align: center;
 		@include single-transition(background-color, 0.15s, linear);
+
+		&:hover {
+			background-color: $hover-background-color;
+		}
+
 		span:before{
 			@extend .no-text;
 			display: block;
 			float: none;
 		}
-	}
 
-	&:hover {
-		+ #{$label-selector} {
-			background-color: $hover-background-color;
+		[class^="icon-"]:before {
+			padding-right: 0;
 		}
 	}
 
@@ -414,6 +417,7 @@ input[type=radio]{
 			}
 		}
 	}
+
 }
 
 // Beautifully styled checkboxes - just use the "plain" class
