@@ -94,10 +94,10 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
      */
     public function testRelativeDayWithinSevenPast()
     {
-        $expected = 'last Wednesday at 10:00pm';
-
-        $now = new Alaress_Date_Format('2017-02-14 12:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
-        $eventDate = new Alaress_Date_Format('2017-02-08 22:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+        $eventDate->addDays(-5);
+        $expected = 'last ' . $eventDate->getUsingFormat('l') . ' at ' . $eventDate->getUsingFormat('g:ia');
 
         $result = $eventDate->getRelativeDay($now);
 
@@ -110,10 +110,10 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
      */
     public function testRelativeDayWithinSeven()
     {
-        $expected = 'Monday at 4:00pm';
-
-        $now = new Alaress_Date_Format('2017-02-14 12:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
-        $eventDate = new Alaress_Date_Format('2017-02-20 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $now = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format(null, null, null, $this->dateLocale);
+        $eventDate->addDays(+5);
+        $expected = $eventDate->getUsingFormat('l') . ' at ' . $eventDate->getUsingFormat('g:ia');
 
         $result = $eventDate->getRelativeDay($now);
 
@@ -128,10 +128,10 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
      */
     public function testRelativeDayOneWeekPast()
     {
-        $expected = '7th Feb 2017 at 11:00pm';
+        $expected = '7th Jan 2017 at 11:00pm';
 
-        $now = new Alaress_Date_Format('2017-02-14 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
-        $eventDate = new Alaress_Date_Format('2017-02-07 23:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $now = new Alaress_Date_Format('2017-01-14 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2017-01-07 23:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
         $result = $eventDate->getRelativeDay($now);
 
@@ -144,10 +144,10 @@ class RelativeDayTest extends PHPUnit_Framework_TestCase
      */
     public function testRelativeDayOneWeek()
     {
-        $expected = '21st Feb 2017 at 11:00am';
+        $expected = '8th Jan 2017 at 11:00am';
 
-        $now = new Alaress_Date_Format('2017-02-14 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
-        $eventDate = new Alaress_Date_Format('2017-02-21 11:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $now = new Alaress_Date_Format('2017-01-01 16:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
+        $eventDate = new Alaress_Date_Format('2017-01-08 11:00:00', 'Y-m-d H:i:s', null, $this->dateLocale);
 
         $result = $eventDate->getRelativeDay($now);
 
