@@ -62,6 +62,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	/** @var bool */
 	protected $running;
 
+	/** @var Transaction */
+    protected $transaction;
+
 
     /**
      * @param LoopInterface             $loop

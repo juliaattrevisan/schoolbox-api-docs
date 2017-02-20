@@ -22,7 +22,10 @@ use Schoolbox\Realtime\Rerouter\RerouterDispatchStrategy;
 
 class RerouteWorker extends AbstractProcess {
 
-	/**
+    /** @var QueueSorter */
+    protected $sorter;
+
+    /**
 	 * @param QueueSorter $queueSorter
 	 * @param LoopInterface $loop
      * @param LoggerInterface $log
