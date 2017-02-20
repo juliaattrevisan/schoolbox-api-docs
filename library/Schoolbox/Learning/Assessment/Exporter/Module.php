@@ -47,10 +47,12 @@ class Module extends BaseModule
 
         // rules in use
         $isStaff = $this->getAuthRule('isStaffOrSuper');
+        $isSuperuser = $this->getAuthRule('isSuperuser');
 
         // register the routes
         $route = '/assessment/{assessmentId:\d+}';
         $this->register('GET', $route, 'getExportForm', $isStaff, $preloadAssessment);
+        $this->register('GET', '/assessment/csv', 'getCSV', $isSuperuser);
         $this->register('POST', $route, 'postExport', $isStaff, $preloadAssessment);
     }
 

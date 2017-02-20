@@ -1,13 +1,13 @@
 <?php
 /**
- * CSV exporter for De La Salle's Accelerus import
+ * CSV exporter for Accelerus
  *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-namespace Custom\Dlsc\AssessmentCSV;
+namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Csv\Writer AS CsvWriter;
 
@@ -28,7 +28,7 @@ class Exporter
     }
 
     /**
-     * Generate a csv of assessment result data in a specific format for Accellerus importing
+     * Generate a csv of assessment result data in a specific format for Accelerus importing
      *
      * @param resource $file
      * @return resource
