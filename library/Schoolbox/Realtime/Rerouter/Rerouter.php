@@ -211,15 +211,11 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
             $this->log->debug("Importing user data");
 			$this->subscriber->getSubscriptionList()->importFromSource($this->userMapper, false);
-			$count = $this->subscriber->subscribeAll(function($frame, $data) use ($tx) {
-				/**
-				 * This closure is executed every time a message is sent to the client based on the given subscription
-				 * Adds the frame to a loop cache, and dispatches appropriately
-				 *
-				 * @var Frame $frame
-				 * @var User $data
-				 */
-				$tx->put(sha1($frame->dump()), array($data, $frame));
+			$count = $this->subscriber->subscribeAll(function(Frame $amqpFrame, User $user) use ($tx) {
+
+				// This closure is executed every time a message is sent to the client based on the given subscription
+				// Adds the frame to a loop cache, and dispatches appropriately
+				$tx->put(sha1($amqpFrame->dump()), array($user, $amqpFrame));
 			});
 
 			$this->log->notice("Added $count subscriptions", array('char' => '+'));

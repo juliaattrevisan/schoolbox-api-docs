@@ -40,24 +40,27 @@ class RerouteWorker extends AbstractProcess {
 
 	/**
 	 * @param string $command
-	 * @param array  $args
+	 * @param array  $messages
 	 * @throws RuntimeException
 	 * @throws InvalidArgumentException
 	 * @return mixed
 	 */
-	protected function process($command, $args) {
+	protected function process($command, $messages) {
 		if($command != RerouterDispatchStrategy::TASK_REROUTE) {
 			throw new InvalidArgumentException("Worker can only reroute");
 		}
+
 		$count = 0;
-		$this->log->debug("Iterating frames provided");
-		foreach($args as $v) {
-			list($user, $frame) = $v;
+		$this->log->debug("Iterating message frames provided");
+
+		foreach($messages as $message) {
+			list($user, $frame) = $message;
 			$count += $this->sorter->process($user, $frame) ? 1 : 0;
 		}
-		$this->log->info("Rerouted $count message".($count == 1 ? '' : 's'));
-		return $count;
 
+		$this->log->info("Rerouted $count message".($count == 1 ? '' : 's'));
+
+		return $count;
 	}
 
 } 
