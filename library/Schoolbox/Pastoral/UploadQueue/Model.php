@@ -192,12 +192,16 @@ class Model implements ISoftDeletable
 
         // Save the file into to the database
 
+        $database = \MSSQL::getInstance();
+
         $hex = "0x" . bin2hex($storageObject->read());
         $externalId = $this->getExternalId();
         $studentExternalId = $this->getStudentExternalId();
         $date = date("Y-m-d H:i:s");
         $sourceDate = $storageObject->getCreatedAt()->getDatabase();
         $extension = strtoupper($storageObject->getExtension());
+
+        $filename = $database->quote($storageObject->getFilename());
 
         $query = "
             INSERT INTO SynergyOneMedia.dbo.tDocuments
@@ -213,7 +217,7 @@ class Model implements ISoftDeletable
             )
             VALUES
             (
-                'Imported from Schoolbox',
+                '{$filename}',
                 {$externalId},
                 {$externalId},
                 {$hex},
@@ -224,7 +228,6 @@ class Model implements ISoftDeletable
             );            
         ";
 
-        $database = \MSSQL::getInstance();
         $database->query($query);
         $documentReferencesSeq = $database->getOne("SELECT @@IDENTITY");
 
