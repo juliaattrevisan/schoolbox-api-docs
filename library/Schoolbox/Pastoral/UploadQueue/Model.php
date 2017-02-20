@@ -235,13 +235,17 @@ class Model implements ISoftDeletable
             INSERT INTO SynergyOneMedia.dbo.DocumentReferences
             (
                 ID,
-                DocumentReferencesSeq
+                DocumentReferencesSeq,
+                RelatedSeqModuleCore,
+                RelatedSeq
             )
-            VALUES
-            (
+            SELECT  
                 {$studentExternalId},
-                {$documentReferencesSeq}
-            );            
+                {$documentReferencesSeq},
+                'SPC',
+                MAX(SortOrder) + 1
+            FROM    SynergyOneMedia.dbo.tDocumentReferences 
+            WHERE   tDocumentsSeq = {$documentReferencesSeq}
         ";
 
         $database->query($query);
