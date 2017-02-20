@@ -180,7 +180,7 @@ class Controller extends Base
             $subjects[] = [
                 'teachers' => $teachers,
                 'folder'   => $folder,
-                'grade'    => $markbook->getStudentStatistics()[$student->getId()],
+                'grade'    => $this->getConfigLoader()->get('show_overall_grade') ? $markbook->getStudentStatistics()[$student->getId()]: '',
             ];
         }
 

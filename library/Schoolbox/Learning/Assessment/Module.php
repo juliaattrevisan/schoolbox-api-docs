@@ -324,14 +324,6 @@ class Module extends BaseModule
      */
 
     /**
-     * @return IConfigLoader|object
-     */
-    protected function getConfig()
-    {
-        return $this->getInjector()->get('config');
-    }
-
-    /**
      * @return Mapper|UserMapper
      */
     protected function getUserMapper()

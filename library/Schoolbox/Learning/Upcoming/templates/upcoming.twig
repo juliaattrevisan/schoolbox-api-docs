@@ -293,23 +293,34 @@
                             <ul class="information-list">
                                 <li>
                                     <div class="list-item">
-                                        {% set gradePath = routeLookup('learning.getGradesForSubject', {viewee: student, userId: student.id, term: currentTerm, termCode: currentTerm.code, subject: subject, subjectId: subject.folder.id}) %}
+                                        {% set gradePath = routeLookupIfAuthorized('learning.getGradesForSubject', {viewee: student, userId: student.id, term: currentTerm, termCode: currentTerm.code, subject: subject, subjectId: subject.folder.id}) %}
                                         <div class="small-{{ subject.grade ? 8 : 12 }} card">
+                                            {% if gradePath %}
                                             <a href="{{ gradePath }}" title="View Grades">
                                                 <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
                                                 <p>{{ subject.folder.title }}</p>
                                             </a>
+                                            {% else %}
+                                            <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
+                                            <p>{{ subject.folder.title }}</p>
+                                            {% endif %}
                                             <p class="meta">{{ subject.folder.codeString }}</p>
                                         </div>
 
                                         {% if subject.grade %}
                                             <div class="small-4 columns no-pad">
                                                 <div class="grade content">
+                                                    {% if gradePath  %}
                                                     <a href="{{ gradePath }}">
-                                            <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
-                                                {{ subject.grade.weightedMean }}
-                                            </span>
+                                                        <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
+                                                            {{ subject.grade.weightedMean }}
+                                                        </span>
                                                     </a>
+                                                    {% else %}
+                                                    <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
+                                                        {{ subject.grade.weightedMean }}
+                                                    </span>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         {% endif %}
