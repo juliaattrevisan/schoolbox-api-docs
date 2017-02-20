@@ -268,13 +268,14 @@ class Model extends AbstractAssessment
      */
     public function canCreateResponse(User $user)
     {
-        if ($this->isAcceptSingle() && $this->getParticipant($user)->isResponded()) {
-            return false;
+        if ($this->isParticipant($user)) {
+            if ($this->isAcceptSingle() && $this->getParticipant($user)->isResponded()) {
+                return false;
+            }
         }
 
         /* What about isAcceptNone() - should students still be able to see it?
          */
-
         return true;
     }
 
