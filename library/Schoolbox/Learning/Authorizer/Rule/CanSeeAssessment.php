@@ -113,10 +113,14 @@ class CanSeeAssessment implements IAuthorizationRule
         }
 
         // if we got passed a participant there's one last check we can do...
-        if (isset($params['participant'])) {
-
-            /** @var User $learner */
+        if (isset($params['participant']) ) {
             $learner = $params['participant']->getUser();
+        }
+        else if (isset($params['student'])) {
+            $learner = $params['student'];
+        }
+
+        if($learner instanceof User) {
             // ...after we magically hit an external database
             $learner->loadParents();
             if ($user->isParentOf($learner)) {

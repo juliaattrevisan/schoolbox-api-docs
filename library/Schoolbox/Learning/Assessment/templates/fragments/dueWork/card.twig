@@ -5,14 +5,18 @@
     <div class="list-item">
         <div class="card wrap-down small-12">
             <div class="{{ icon.renderClass(assessable) }} size-64" title="{{ assessable.getTypeName }}"></div>
-
-            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id, studentId: student.id})}}">
+            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, activity: assessable}) %}
+            {% if route %}
+            <a href="{{ route }}">
                 <h3>{{ assessable.title }}</h3>
             </a>
+            {% else %}
+                <h3>{{ assessable.title }}</h3>
+            {% endif %}
             <p class="meta">
                 {{ dueDate.dueDate(assessable, student) }}
             </p>
-            <p><a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id, studentId: student.id})}}" class="meta">{% include '@learningAssessment/fragments/statusLine.twig' with {assessable: assessable} %}</a></p>
+            <p><a href="{% if route %}{{ route }}{% else %}#{% endif %}" class="meta">{% include '@learningAssessment/fragments/statusLine.twig' with {assessable: assessable} %}</a></p>
         </div>
     </div>
 </li>
