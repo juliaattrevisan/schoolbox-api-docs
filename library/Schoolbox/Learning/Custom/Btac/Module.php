@@ -74,6 +74,8 @@ class Module extends \Schoolbox\Learning\Module
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
+        parent::initRoutePreloads($matcher);
+
         $this->addRoutePreload(
             $matcher,
             '(?:getGradesYear)',
@@ -113,8 +115,6 @@ class Module extends \Schoolbox\Learning\Module
                 return $args;
             }
         );
-
-        parent::initRoutePreloads($matcher);
     }
 
 
@@ -124,15 +124,5 @@ class Module extends \Schoolbox\Learning\Module
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/../../templates');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, array_merge(parent::getControllerServices(), []))
-        );
     }
 }

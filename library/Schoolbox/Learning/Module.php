@@ -48,7 +48,6 @@ class Module extends BaseModule
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
                 '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
                 '/grades/{userId}{/termCode}'             => 'getGrades',                    // student && term && subject
-                '/grades-year/{userId}/year/{year}'       => 'getGradesYear',                // student && year
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',          // student && term && subject
             ],
             'POST' => []
@@ -150,36 +149,27 @@ class Module extends BaseModule
     }
 
     /**
-     * This is a bit meh, need to find a better way to extend these services in descendant
-     * @return array
-     */
-    protected function getControllerServices()
-    {
-        return [
-            'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'assessmentMapperProxy'      => $this->getMapperFactory()->get('assessmentDataSource'),
-            'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
-            'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
-            'showcaseMapper'             => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
-            'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
-            'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
-            'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
-            'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-            'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-            'externalClass'              => $this->getInjector()->get('externalClass'),
-            'database'                   => $this->getInjector()->get('database'),
-        ];
-    }
-
-    /**
      * @inheritdoc
      */
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, $this->getControllerServices())
+            $injector->lazyNew(Controller::class, [
+                'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
+                'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
+                'showcaseMapper'             => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
+                'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
+                'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
+                'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
+                'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                'externalClass'              => $this->getInjector()->get('externalClass'),
+                'database'                   => $this->getInjector()->get('database'),
+            ])
         );
     }
 

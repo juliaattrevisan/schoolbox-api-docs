@@ -20,6 +20,8 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 class Controller extends \Schoolbox\Learning\Controller
 {
     /**
+     * @api GET /learning/grades-year/{userId}/year/{year}
+     * @level 165
      * @param User $viewee
      * @param $year
      */
@@ -44,8 +46,7 @@ class Controller extends \Schoolbox\Learning\Controller
     /**
      * Displays a list of grades/results for the specified user and term for all subjects
      *
-     * @api   GET /learning/grades/{userId}{/termCode}
-     * @api GET /modules/custom/btac/grades
+     * @api GET /learning/grades/{userId}{/termCode}
      * @level 165
      * @param User $viewee
      * @param Term $term
