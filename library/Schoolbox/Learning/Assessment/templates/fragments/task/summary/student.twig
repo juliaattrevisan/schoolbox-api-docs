@@ -96,12 +96,13 @@
             </ul>
         </section>
 
+
         {% set createResponseRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
             assessmentId: participant.assessable.id,
             studentId:    participant.user.id,
             participant:  participant
         }) %}
-        {% if createResponseRoute %}
+        {% if createResponseRoute and  assessment.isSelfAssessable %}
             <form action="{{ createResponseRoute }}"
                   method="POST">
                 {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
