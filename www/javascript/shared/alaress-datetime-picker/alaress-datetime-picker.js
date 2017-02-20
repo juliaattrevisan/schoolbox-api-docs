@@ -71,7 +71,7 @@ var pickerFormats = {
 function setPickerFormats (allDayState, element) {
     // No matter what, we are overriding the format
     //Todo: decide if we need to check buddy elements formats or just use own formats
-    //Todo: Revrite this function, this is just one condition when we need to reformat the date
+    //Todo: Rewrite this function, this is just one condition when we need to reformat the date
     var refreshOptions = {
         displayFormat: 'd/m/Y h:iK', //Default display format
         displayFormatDate: 'd/m/Y',
@@ -161,15 +161,19 @@ function manageAllDay ( state, element, options ) {
         }
         // All Day is on
         if(state === true) {
-            //todo check doformat
-            var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
 
+            if(options.endDay) {
+                var v = moment(value, convertFormat(pickerFormats.from)).endOf('day').format(convertFormat(pickerFormats.to));
+            }
+            else {
+                var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
+            }
             if(window.pickerInstance[pId] !== undefined) {
                 // window.pickerInstance[pId].input.value = v;
                 window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.to)).format(convertFormat(options.databaseFormat)), true);
             }
             $(this).val(v);
-            ;
+
         }
         else {
             var v = moment(value, convertFormat(pickerFormats.from)).format(convertFormat(pickerFormats.to));
@@ -222,6 +226,8 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         altFormat: getValue(element, 'data-datepicker-format'), // false|date|datetime
         // allDateTime: 'start', //Set time to start or end of the day: start, finish
         type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
+        endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
+
     };
 
     // Override with user any options --- should this stay? Todo
