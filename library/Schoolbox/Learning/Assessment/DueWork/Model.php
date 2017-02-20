@@ -273,13 +273,9 @@ class Model extends AbstractAssessment
                 return false;
             }
         }
-        else {
-            return false;
-        }
 
         /* What about isAcceptNone() - should students still be able to see it?
          */
-
         return true;
     }
 

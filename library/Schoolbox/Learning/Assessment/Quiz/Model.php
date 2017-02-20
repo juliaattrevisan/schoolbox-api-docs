@@ -181,9 +181,11 @@ class Model extends AbstractAssessment
                     return true;
                 }
             }
+            return false;
         }
 
-        return false;
+        return true;
+
     }
 
     /* Getters/Setters
