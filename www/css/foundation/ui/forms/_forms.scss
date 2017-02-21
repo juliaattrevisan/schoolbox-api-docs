@@ -398,7 +398,7 @@ input[type=radio]{
 			pointer-events: none;
 		}
 
-		&:hover {
+		&:hover:enabled {
 			background-color: $hover-background-color;
 		}
 
