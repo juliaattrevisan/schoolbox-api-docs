@@ -195,6 +195,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	public function onResume() {
 		$this->log->info('SIGCONT', array('char' => '>'));
 		$this->resume();
+		$this->log->debug("Reload complete");
 	}
 
 
