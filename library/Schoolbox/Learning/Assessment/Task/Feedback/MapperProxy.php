@@ -89,6 +89,12 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $taskFeedbacks = new GenericCollection(DomainObject::class);
 
         foreach($mapperModels as $completion){
+
+            // Exclude completions that are self-assessed, these are not considered IFeedbacks
+            if($completion->getStudent()->getId() == $completion->getMarkingUser()->getId()){
+                continue;
+            }
+
             $taskFeedback = (new DomainObject())
                 ->setId($completion->getId())
                 ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
