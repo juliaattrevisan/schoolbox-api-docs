@@ -22,6 +22,7 @@ use \Schoolbox\CampusMapper;
 use \External_Synergetic_Timetable;
 use Schoolbox\Learning\Upcoming;
 use \Config;
+use Alaress_Date_Format;
 
 class Controller extends Base
 {
@@ -59,18 +60,12 @@ class Controller extends Base
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
         try {
-            $value = \Alaress_Date_Format::newLocal($value);
-            try {
-                $value = \Alaress_Date_Format::newLocalShort($value);
-            }
-            catch (\Exception $e) {
-                var_dump($e->getMessage());
-            }
+            $dateObject = new Alaress_Date_Format($value, array('d/m/Y h:iK', 'd/m/Y'));
         }
         catch (\Exception $e) {
             var_dump($e->getMessage());
         }
-        $timetableDayNumber = $this->getTimetableDay($value);
+        $timetableDayNumber = $this->getTimetableDay($dateObject);
         $displayFormatDate = strlen(Config::get('date_local')) > 0 ? Config::get('date_local'): 'd/m/Y';
         $displayFormatTime = strlen(Config::get('date_time')) > 0 ? Config::get('date_time'): 'h:iK';
 
@@ -82,7 +77,7 @@ class Controller extends Base
                 'data' => [
                     'id' => $id,
                     //Pass unix timestamp to flatpicker, it misinterprets day and month in d/m/Y format
-                    'value' => $value->geJSDate(),
+                    'value' => $dateObject->geJSDate(),
                     'element' => $element,
                     'type' => $type,
 //                    'enableTime' => $time,
