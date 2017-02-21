@@ -393,14 +393,13 @@ input[type=radio]{
 		text-align: center;
 		@include single-transition(background-color, 0.15s, linear);
 
-		&:hover {
-			background-color: $hover-background-color;
+		// Make sure elements inside the label don't hijack the label click
+		* {
+			pointer-events: none;
 		}
 
-		span:before{
-			@extend .no-text;
-			display: block;
-			float: none;
+		&:hover {
+			background-color: $hover-background-color;
 		}
 
 		[class^="icon-"]:before {
