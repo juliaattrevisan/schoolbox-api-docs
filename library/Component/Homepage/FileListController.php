@@ -5,7 +5,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 
 class Component_Homepage_FileListController extends Component_Homepage_ControllerAbstract
 {
@@ -43,10 +44,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     /**
      * Component_Homepage_FileListController constructor.
      * @param Component_Instance $instance
-     * @param \Schoolbox\User $user
+     * @param User $user
      * @param SitePage $sitepage
      */
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
 
