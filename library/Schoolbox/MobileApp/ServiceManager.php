@@ -88,6 +88,10 @@ class ServiceManager
      */
     public function push($userId, $data)
     {
+        if (count($this->services) == 0) {
+            return;
+        }
+
         $registered = $this->registryMapper->findByColumn('user_id', $userId)->groupBy('provider');
 
         if (count($registered) == 0) {
