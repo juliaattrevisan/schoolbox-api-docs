@@ -46,7 +46,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      * @param \Schoolbox\User $user
      * @param SitePage $sitepage
      */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
 
