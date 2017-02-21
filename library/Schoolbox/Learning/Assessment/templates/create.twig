@@ -40,40 +40,40 @@
              * Inject common details
              * Inject assessmentType-specific details
              */
-            $('input[data-mage-next="part-2"]').mage({
-                onXhrDone: function(data) {
-                    $('#assessmentForm')
-                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) }}')
-                        .find('[data-assessment-details]')
-                        .html(data);
+            {#$('input[data-mage-next="part-2"]').mage({#}
+                {#onXhrDone: function(data) {#}
+                    {#$('#assessmentForm')#}
+                        {#.attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) }}')#}
+                        {#.find('[data-assessment-details]')#}
+                        {#.html(data);#}
 
-                    /* Save everything when creating with Part 1
-                     */
-                    var assessmentType = $('input[name="type"]:checked').val();
-                    setupAssessmentEnd(assessmentType);
-                }
-            });
+                    {#/* Save everything when creating with Part 1#}
+                     {#*/#}
+                    {#var assessmentType = $('input[name="type"]:checked').val();#}
+                    {#setupAssessmentEnd(assessmentType);#}
+                {#}#}
+            {#});#}
 
-            /**
-             * Once they have clicked an activity type - trigger a click on the part-2 hidden input
-             * to send the user straight to the next section
-             */
-            $('input[name=type]').click(function() {
-                $('[data-mage-next=part-2]').trigger('click');
-            });
+            {#/**#}
+             {#* Once they have clicked an activity type - trigger a click on the part-2 hidden input#}
+             {#* to send the user straight to the next section#}
+             {#*/#}
+            {#$('input[name=type]').click(function() {#}
+                {#$('[data-mage-next=part-2]').trigger('click');#}
+            {#});#}
 
-        {% endif %}
-    });
-</script>
+        {#{% endif %}#}
+    {#});#}
+ </script>
 
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1>
-        </div>
-    </div>
-    {# TODO - Quiz fragment should extend this template, not be included. This template should not know about Quizzes #}
+ <div class="actions-small-1 row">
+     <div class="list-item">
+         <div class="small-12 column">
+             <h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1>
+         </div>
+     </div>
+     {# TODO - Quiz fragment should extend this template, not be included. This template should not know about Quizzes #}
     {% if assessment is quiz %}
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
