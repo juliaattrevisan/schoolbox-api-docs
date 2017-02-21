@@ -49,7 +49,7 @@ class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 					vStudents.StudentBoarder,
 					vStudents.StudentBoardingHouse,
 					NULLIF (CASE WHEN lub.Code = '' THEN '' ELSE lub.Description END, '') AS StudentBoardingHouseDescription 
-				FROM SynergyOne.dbo.vStudents vStudents
+				FROM dbo.vStudents vStudents
 					LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
 					LEFT JOIN luForm ON vStudents.StudentForm = luForm.Code
 					LEFT JOIN luTutor ON vStudents.StudentTutor = luTutor.Code
@@ -84,7 +84,7 @@ SELECT DISTINCT
 sc.StudentContactID, sc.StudentContactTitle, sc.StudentContactPreferred, sc.StudentContactSurname, sc.StudentContactDefaultEmail,
 scn.NetworkLogin,
 sc.StudentYearLevel, sc.StudentCampus, sc.StudentGender
-FROM SynergyOne.dbo.vStudentContactAllAddress sc
+FROM dbo.vStudentContactAllAddress sc
 INNER JOIN dbo.uvStudentContactNetworkAccounts scn on scn.pk_id = sc.StudentContactID
 WHERE (sc.StudentContactType = 'SC1' or sc.StudentContactType = 'SC2' or sc.StudentContactType = 'SC3')
 and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . "' and sc.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "' and sc.StudentCampus <> 'T'
@@ -96,7 +96,7 @@ sc.StudentContactSpouseID as StudentContactID, sc.StudentContactSpouseTitle as S
 sc.StudentContactSpousePreferred as StudentContactPreferred, 
 sc.StudentContactSpouseSurname as StudentContactSurname, sc.StudentContactSpouseDefaultEmail as StudentContactDefaultEmail, scn.NetworkLogin,
 sc.StudentYearLevel, sc.StudentCampus, sc.StudentGender
-FROM SynergyOne.dbo.vStudentContactAllAddress sc
+FROM dbo.vStudentContactAllAddress sc
 INNER JOIN dbo.uvStudentContactNetworkAccounts scn on scn.pk_id = sc.StudentContactSpouseID
 WHERE (sc.StudentContactType = 'SC1' or sc.StudentContactType = 'SC2' or sc.StudentContactType = 'SC3') and sc.StudentContactPrimaryOnlyFlag <> 1 and sc.StudentContactSpouseID is not null
 and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . "' and sc.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "' and sc.StudentCampus <> 'T'
@@ -111,7 +111,7 @@ and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester
 					vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname, StudentGender,
 					StudentEmail, StudentOccupEmail,
 					vStudents.StudentYearLevel, vStudents.StudentHouse, StudentCampus
-				FROM SynergyOne.dbo.vStudents vStudents
+				FROM dbo.vStudents vStudents
 				LEFT JOIN Community ON Community.ID = StudentID
 				WHERE vStudents.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . "'
 				AND vStudents.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "'

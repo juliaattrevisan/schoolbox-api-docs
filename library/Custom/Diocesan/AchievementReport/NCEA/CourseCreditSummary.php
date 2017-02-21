@@ -45,7 +45,7 @@ class CourseCreditSummary extends Base {
                 ResultCredits,
                 Endorsement
             FROM
-                SynergyOne.dbo.uvSchoolBoxNCEAResults
+                dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$this->getExternalUserId()}' AND
                 WithdrawnFlag = 0 AND

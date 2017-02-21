@@ -35,7 +35,7 @@ class Sync extends BaseSync
                 vStudents.StudentBoarder       AS student_boarder,
                 vStudents.StudentBoardingHouse AS student_boarding_house,
                 StudentCampus                  AS student_campus
-            FROM SynergyOne.dbo.vStudents vStudents
+            FROM dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = vStudents.StudentID
             LEFT JOIN CommunityAttributes ca ON ca.ID = vStudents.StudentID
                 AND ca.AttributeCode = '10'

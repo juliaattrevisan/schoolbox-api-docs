@@ -49,12 +49,12 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 				pl2.UserName StudentContactSpouseNetworkLogin, pl2.UserPassword StudentContactSpousePassword,
 
 				StudentYearLevel
-			FROM SynergyOne.dbo.vStudentContactAllAddress vscaa
+			FROM dbo.vStudentContactAllAddress vscaa
 
-			LEFT JOIN SynergyOne.dbo.Community c1 ON vscaa.StudentContactID = c1.ID
+			LEFT JOIN dbo.Community c1 ON vscaa.StudentContactID = c1.ID
 			LEFT JOIN uvParentLogin pl1 ON vscaa.StudentContactID = pl1.SynergeticID
 
-			LEFT JOIN SynergyOne.dbo.Community c2 ON vscaa.StudentContactSpouseID = c2.ID
+			LEFT JOIN dbo.Community c2 ON vscaa.StudentContactSpouseID = c2.ID
 			LEFT JOIN uvParentLogin pl2 ON vscaa.StudentContactSpouseID = pl2.SynergeticID
 
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')

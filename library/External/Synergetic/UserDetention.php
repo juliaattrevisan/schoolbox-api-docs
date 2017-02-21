@@ -94,7 +94,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 CONVERT(VARCHAR(12), AwardDate, 105) AS AwardDate,
                 AwardAchievement,
                 AwardComment
-            FROM SynergyOne.dbo.uvSchoLAward
+            FROM dbo.uvSchoLAward
             WHERE ID           = :externalId
             AND   FileYear     = :year
             AND   FileSemester = :semester
@@ -136,7 +136,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 CONVERT(VARCHAR(12), DetentionDate, 105) AS DetentionDate,
                 DetentionDescription,
                 Comments AS DetentionComment
-            FROM SynergyOne.dbo.uvSchoLDetention
+            FROM dbo.uvSchoLDetention
             %s
             ORDER BY DetentionDate DESC
         ";
@@ -180,7 +180,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 AttendancePeriod,
                 LateArrivalFlag,
                 CONVERT(VARCHAR(19), LatearrivalTime, 120) AS LateArrivalTime
-            FROM SynergyOne.dbo.uvSchoLAbsence
+            FROM dbo.uvSchoLAbsence
             %s
             -- AND AbsenceTypeCode != ''
             ORDER BY EventDateTime DESC

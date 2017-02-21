@@ -95,7 +95,7 @@ class Attendance_Synergetic_AttendanceMaster
 
     /**
      * The primary key associated with the selected class, date and period
-     * This is used in SynergyOne.dbo.AttendanceMaster
+     * This is used in dbo.AttendanceMaster
      *
      * @var int
      */
@@ -187,7 +187,7 @@ class Attendance_Synergetic_AttendanceMaster
     {
         $query = "
 			SELECT *
-			FROM SynergyOne.dbo.Timetable
+			FROM dbo.Timetable
 			WHERE FileType = '{$this->getClassFileType()}'
 			AND FileYear = '{$this->getFileYear()}'
 			AND FileSemester = '{$this->getFileSemester()}'

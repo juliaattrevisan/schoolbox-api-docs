@@ -44,7 +44,7 @@ class CourseCreditSummaryNavigation extends Base {
             SELECT
                 StudentYear
             FROM
-                SynergyOne.dbo.uvSchoolBoxNCEAResults
+                dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$this->getExternalUserId()}' AND
                 WithdrawnFlag = 0 AND

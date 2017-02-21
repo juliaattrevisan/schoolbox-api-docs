@@ -8,11 +8,11 @@
  *
  * Reset sql for admin:
  *
- * DELETE FROM SynergyOne.dbo.tAttendances WHERE AttendanceMasterSeq > 336;
- * DELETE FROM SynergyOne.dbo.AttendanceMaster WHERE AttendanceMasterSeq > 336;
+ * DELETE FROM dbo.tAttendances WHERE AttendanceMasterSeq > 336;
+ * DELETE FROM dbo.AttendanceMaster WHERE AttendanceMasterSeq > 336;
  *
- * SELECT * FROM SynergyOne.dbo.AttendanceMaster ORDER BY AttendanceMasterSeq DESC;
- * SELECT * FROM SynergyOne.dbo.tAttendances ORDER BY AttendanceMasterSeq DESC;
+ * SELECT * FROM dbo.AttendanceMaster ORDER BY AttendanceMasterSeq DESC;
+ * SELECT * FROM dbo.tAttendances ORDER BY AttendanceMasterSeq DESC;
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -158,7 +158,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     {
         $query = "
             SELECT Code, Description
-            FROM SynergyOne.dbo.luAbsenceType
+            FROM dbo.luAbsenceType
             WHERE ActiveFlag = 1
         ";
 
@@ -174,7 +174,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     {
         $query = "
             SELECT Code, Description
-            FROM SynergyOne.dbo.luAbsenceReason
+            FROM dbo.luAbsenceReason
             WHERE ActiveFlag = 1
         ";
 

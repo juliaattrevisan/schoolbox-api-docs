@@ -53,9 +53,9 @@ class External_Synergetic_User implements External_UserInterface
          */
         $query  = "
             SELECT COUNT(*) AS num
-            FROM SynergyOne.dbo.vCommunityAddresses
-            LEFT JOIN SynergyOne.dbo.CommunityAttributes
-              ON SynergyOne.dbo.CommunityAttributes.ID = vCommunityAddresses.id
+            FROM dbo.vCommunityAddresses
+            LEFT JOIN dbo.CommunityAttributes
+              ON dbo.CommunityAttributes.ID = vCommunityAddresses.id
             WHERE ConstitCodes LIKE '%@pc%'
             AND CommunityAttributes.AttributeCode = '{$attributeId}'
             AND vCommunityAddresses.id = '{$synergyId}'
@@ -63,7 +63,7 @@ class External_Synergetic_User implements External_UserInterface
         $result = $this->getDatabase()->getRow($query);
         if ((int)$result['num']) {
             $query = "
-                UPDATE SynergyOne.dbo.CommunityAttributes
+                UPDATE dbo.CommunityAttributes
                 SET AttributeValue = \"$newValue\"
                 WHERE ID = '{$synergyId}'
                 AND AttributeCode = '{$attributeId}'
@@ -73,7 +73,7 @@ class External_Synergetic_User implements External_UserInterface
 // Deliberately disabled
 //		else {
 //			$query = "
-//				INSERT INTO SynergyOne.dbo.CommunityAttributes (ID, AttributeCode, AttributeValue, AttributeCreatedDate, AttributeModifiedDate)
+//				INSERT INTO dbo.CommunityAttributes (ID, AttributeCode, AttributeValue, AttributeCreatedDate, AttributeModifiedDate)
 //				VALUES ('{$synergyId}', '{$attributeId}', '{$newValue}', NOW(), NOW())
 //			";
 //
@@ -105,7 +105,7 @@ class External_Synergetic_User implements External_UserInterface
         
         $query = "
             SELECT vPhotos.ModifiedDate
-            FROM SynergyOne.dbo.vPhotos vPhotos
+            FROM dbo.vPhotos vPhotos
             WHERE vPhotos.ID = '" . $this->getDatabase()->quote($externalUserId) . "'
         ";
 
@@ -123,7 +123,7 @@ class External_Synergetic_User implements External_UserInterface
             if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 $query = "
                     SELECT vPhotos.Photo, vPhotos.PhotoType
-                    FROM SynergyOne.dbo.vPhotos vPhotos
+                    FROM dbo.vPhotos vPhotos
                     WHERE vPhotos.ID = '" . $this->getDatabase()->quote($externalUserId) . "'
                 ";
                 $photo = $this->getDatabase()->getRow($query);
@@ -175,11 +175,11 @@ class External_Synergetic_User implements External_UserInterface
                 Spouse.MobilePhone SpouseMobilePhone,
                 Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
             FROM
-                SynergyOne.dbo.Community Contact
+                dbo.Community Contact
             LEFT JOIN
-                SynergyOne.dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
+                dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
             LEFT JOIN
-                SynergyOne.dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
+                dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
             WHERE
                 Contact.ID = '" . $this->database->quote($synID) . "'";
         $parent = $this->getDatabase()->getRow($query);
@@ -219,7 +219,7 @@ class External_Synergetic_User implements External_UserInterface
                 Preferred, Surname,
                 Email, OccupEmail, DefaultEmailCode,
                 DirectoryIncludeFlag
-            FROM SynergyOne.dbo.Community
+            FROM dbo.Community
             WHERE ID $assignation";
         if (is_array($synID)) {
             return $this->getDatabase()->getAll($query);
@@ -245,8 +245,8 @@ class External_Synergetic_User implements External_UserInterface
             SELECT
                 RelatedID,UseEmail,OccupEmail,Email,DefaultEmail
             FROM
-                SynergyOne.dbo.RelationShips r
-                JOIN SynergyOne.dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
+                dbo.RelationShips r
+                JOIN dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
             WHERE
                 r.ID IN ($id_list)";
         $this->getDatabase()->query($query);
@@ -322,7 +322,7 @@ class External_Synergetic_User implements External_UserInterface
                     vStudents.StudentStudiesCode,
                     AlertMessage,
                     vStudents.StudentBoarder
-                FROM SynergyOne.dbo.vStudents vStudents
+                FROM dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts
                         ON CommunityAlerts.ID = StudentID
                         AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS date))
@@ -392,9 +392,9 @@ class External_Synergetic_User implements External_UserInterface
                 StaffCategoryDescription,
                 luDepartment.Description AS StaffDepartment,
                 StaffVoiceMail
-             FROM SynergyOne.dbo.vStaff vStaff
-             LEFT JOIN SynergyOne.dbo.luBuilding ON StaffBuilding = luBuilding.Code
-             LEFT JOIN SynergyOne.dbo.luDepartment ON StaffDepartment = luDepartment.Code
+             FROM dbo.vStaff vStaff
+             LEFT JOIN dbo.luBuilding ON StaffBuilding = luBuilding.Code
+             LEFT JOIN dbo.luDepartment ON StaffDepartment = luDepartment.Code
              WHERE vStaff.StaffID = '" . $this->database->quote($synID) . "'";
         $staff = $this->getDatabase()->getRow($query);
         return $staff;
@@ -466,17 +466,17 @@ class External_Synergetic_User implements External_UserInterface
                 Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                 ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
                 StudentParentsSeparatedFlag
-            FROM SynergyOne.dbo.vStudentContactAllAddress
-            LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
-            LEFT JOIN SynergyOne.dbo.Addresses ContactAddress ON Contact.AddressID = ContactAddress.AddressID
-            LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-            LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus
+            FROM dbo.vStudentContactAllAddress
+            LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
+            LEFT JOIN dbo.Addresses ContactAddress ON Contact.AddressID = ContactAddress.AddressID
+            LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+            LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus
                 AND StudentHouse = House.Code
-            LEFT JOIN SynergyOne.dbo.luYearLevel Year ON StudentYearLevel = Year.Code
+            LEFT JOIN dbo.luYearLevel Year ON StudentYearLevel = Year.Code
                 AND StudentCampus = Year.Campus
-            LEFT JOIN SynergyOne.dbo.luCountry StudentCountry
+            LEFT JOIN dbo.luCountry StudentCountry
                 ON StudentContactCountryCode = StudentCountry.Code
-            LEFT JOIN SynergyOne.dbo.luCountry StudentHomeCountry
+            LEFT JOIN dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
@@ -613,10 +613,10 @@ class External_Synergetic_User implements External_UserInterface
                 Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
                 Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                 StudentParentsSeparatedFlag
-            FROM SynergyOne.dbo.vStudentContactAllAddress
-            LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
-            LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-            LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
+            FROM dbo.vStudentContactAllAddress
+            LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
+            LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+            LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
@@ -667,7 +667,7 @@ class External_Synergetic_User implements External_UserInterface
                 r.UseEmail as StudentContactUseEmail,
                 rs.UseEmail as StudentContactSpouseUseEmail
                 
-            FROM SynergyOne.dbo.vStudentContactAllAddress a
+            FROM dbo.vStudentContactAllAddress a
             LEFT JOIN Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
             LEFT JOIN Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID
             
@@ -848,9 +848,9 @@ class External_Synergetic_User implements External_UserInterface
         // HS/HSS:      Homestay/Homestay Student
         $query = "
             SELECT Relationships.RelatedID
-            FROM SynergyOne.dbo.Constituencies Constituencies
-            LEFT JOIN SynergyOne.dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
-            LEFT JOIN SynergyOne.dbo.Community Community ON Relationships.RelatedID = Community.ID
+            FROM dbo.Constituencies Constituencies
+            LEFT JOIN dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
+            LEFT JOIN dbo.Community Community ON Relationships.RelatedID = Community.ID
             WHERE Relationships.ID = '{$this->database->quote($synergyID)}'
             AND Constituencies.ConstitCode='@SC'
             AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS')
@@ -890,7 +890,7 @@ class External_Synergetic_User implements External_UserInterface
 				vStudents.StudentBoarder,
 				vStudents.StudentBoardingHouse,
                 StudentCampus
-            FROM SynergyOne.dbo.vStudents vStudents
+            FROM dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = StudentID
             WHERE
             FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
@@ -924,9 +924,9 @@ class External_Synergetic_User implements External_UserInterface
 				s.StudentYearLevel,
 				s.StudentCampus,
 				s.StudentGender
-			FROM SynergyOne.dbo.vStudentContactAllAddress s
-			LEFT JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
-			LEFT JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+			FROM dbo.vStudentContactAllAddress s
+			LEFT JOIN dbo.Community cp ON s.StudentContactID = cp.ID
+			LEFT JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
@@ -957,7 +957,7 @@ class External_Synergetic_User implements External_UserInterface
                 StaffCategoryType,
                 StaffCategory,
                 vStaff.StaffDepartment
-            FROM SynergyOne.dbo.vStaff vStaff
+            FROM dbo.vStaff vStaff
             LEFT JOIN Community ON Community.ID = StaffID
           WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
         ";
@@ -1011,10 +1011,10 @@ class External_Synergetic_User implements External_UserInterface
                     JobPositions.StaffJobPositionStartDate,
                     JobPositions.StaffJobPositionEndDate,
                     Community.OccupDesc AS JobPositionDescriptionAlternate                
-                FROM SynergyOne.dbo.vStaff vStaff
-            JOIN SynergyOne.dbo.Community ON Community.ID = vStaff.StaffID
-                LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-                LEFT JOIN SynergyOne.dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID
+                FROM dbo.vStaff vStaff
+            JOIN dbo.Community ON Community.ID = vStaff.StaffID
+                LEFT JOIN dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
+                LEFT JOIN dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID
                 WHERE vStaff.ActiveFlag = 1
                 AND StaffCategoryDescription != 'Staff on leave'
                 $scWhere
@@ -1047,9 +1047,9 @@ class External_Synergetic_User implements External_UserInterface
                 JobPositions.StaffJobPositionStartDate,
                 JobPositions.StaffJobPositionEndDate,
                 Community.OccupDesc AS JobPositionDescriptionAlternate                
-            FROM SynergyOne.dbo.vStaff vStaff
-            JOIN SynergyOne.dbo.Community ON Community.ID = vStaff.StaffID
-            LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
+            FROM dbo.vStaff vStaff
+            JOIN dbo.Community ON Community.ID = vStaff.StaffID
+            LEFT JOIN dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
             WHERE vStaff.ActiveFlag = 1
             AND StaffCategoryDescription != 'Staff on leave'
             $scWhere
@@ -1113,7 +1113,7 @@ class External_Synergetic_User implements External_UserInterface
     {
         $query = "
             SELECT Code, Description
-            FROM SynergyOne.dbo.luForm
+            FROM dbo.luForm
             WHERE ActiveFlag = 1
         ";
         return $this->getDatabase()->getAll($query);

@@ -64,7 +64,7 @@ class Sync implements SyncInterface
                 vStudents.StudentBoarder       AS student_boarder,
                 vStudents.StudentBoardingHouse AS student_boarding_house,
                 StudentCampus                  AS student_campus
-            FROM SynergyOne.dbo.vStudents vStudents
+            FROM dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = StudentID
             WHERE
             FileSemester = '" . $this->database->quote($this->semester) . "'
@@ -96,8 +96,8 @@ class Sync implements SyncInterface
                 s.StudentGender              AS student_gender,
                 s.StudentPreferred           AS student_preferred,
                 s.StudentSurname             AS student_surname
-            FROM SynergyOne.dbo.vStudentContactAllAddress s
-            INNER JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
+            FROM dbo.vStudentContactAllAddress s
+            INNER JOIN dbo.Community cp ON s.StudentContactID = cp.ID
             WHERE (s.StudentContactType IN ('SC1', 'SC2'))
             AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
             AND   s.FileYear = '" . $this->database->quote($this->year) . "'
@@ -120,8 +120,8 @@ class Sync implements SyncInterface
                 s.StudentGender                    AS student_gender,
                 s.StudentPreferred                 AS student_preferred,
                 s.StudentSurname                   AS student_surname
-            FROM SynergyOne.dbo.vStudentContactAllAddress s
-            INNER JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+            FROM dbo.vStudentContactAllAddress s
+            INNER JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE (s.StudentContactType IN ('SC1', 'SC2'))
             AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
             AND   s.FileYear = '" . $this->database->quote($this->year) . "'
@@ -155,15 +155,15 @@ class Sync implements SyncInterface
                 vStaff.StaffDepartment            AS staff_department,
                 vStaff.StaffYearLevel             AS staff_year_level,
                 luYearLevel.Description           AS staff_year_level_description
-            FROM SynergyOne.dbo.vStaff vStaff
-            LEFT JOIN SynergyOne.dbo.luYearLevel ON luYearLevel.Code = vStaff.StaffYearLevel AND luYearLevel.Campus = vStaff.StaffCampus
-            LEFT JOIN SynergyOne.dbo.Community ON Community.ID = vStaff.StaffID
-            LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
+            FROM dbo.vStaff vStaff
+            LEFT JOIN dbo.luYearLevel ON luYearLevel.Code = vStaff.StaffYearLevel AND luYearLevel.Campus = vStaff.StaffCampus
+            LEFT JOIN dbo.Community ON Community.ID = vStaff.StaffID
+            LEFT JOIN dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
                 AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
                 OR    JobPositions.StaffJobPositionStartDate IS NULL )
                 AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
                 OR    JobPositions.StaffJobPositionEndDate IS NULL )
-            LEFT JOIN SynergyOne.dbo.vCommunityAddresses vCommunity ON vStaff.StaffID = vCommunity.ID
+            LEFT JOIN dbo.vCommunityAddresses vCommunity ON vStaff.StaffID = vCommunity.ID
             WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
             ORDER BY vStaff.StaffID ASC
         ";

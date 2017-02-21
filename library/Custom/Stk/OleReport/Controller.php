@@ -55,8 +55,8 @@ class Controller extends Base
             SELECT StudentReportsArchiveLinkSeq, sral.FileYear, sral.FileSemester, Description
             FROM SynergyOneMedia.dbo.StudentReportsArchive sra
             JOIN SynergyOneMedia.dbo.StudentReportsArchiveLink sral ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
-            INNER JOIN SynergyOne.dbo.studentyears sy ON sy.id = sral.ID AND sy.fileyear = sral.FileYear
-            LEFT OUTER JOIN SynergyOne.dbo.uluStudentReports ulusr
+            INNER JOIN dbo.studentyears sy ON sy.id = sral.ID AND sy.fileyear = sral.FileYear
+            LEFT OUTER JOIN dbo.uluStudentReports ulusr
             ON sral.fileyear = ulusr.fileyear AND sral.FileSemester = ulusr.FileSemester AND sy.YearLevel = ulusr.YearLevel
             AND sy.StudentCampus =ulusr.Campus
             WHERE

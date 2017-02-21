@@ -43,7 +43,7 @@ class Attendance_Synergetic_AttendanceRecord
             unset($data['ID']);
             unset($data['AttendanceMasterSeq']);
 
-            $query = "UPDATE SynergyOne.dbo.wkAttendances SET";
+            $query = "UPDATE dbo.wkAttendances SET";
 
             /* Set through all the data contained in array and set it */
             foreach ($data as $key => $value) {

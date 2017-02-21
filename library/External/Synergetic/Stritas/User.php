@@ -60,7 +60,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                     uStudentProgressiveAbsenceCount.AbsenceFullDaysForYear,
                     uStudentProgressiveAbsenceCount.LateStartDaysForYear,
                     uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear
-                FROM SynergyOne.dbo.vStudents vStudents
+                FROM dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts
                         ON CommunityAlerts.ID = StudentID
                         AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS date))
