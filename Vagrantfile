@@ -14,6 +14,7 @@ download_url = default["download_url"]
 memory = default["memory"]
 external_db = default["external_db"]
 external_db_host = default["external_db_host"]
+external_db_db = default["external_db_db"]
 demo_data_version = default["demo_data_version"]
 public_network = default["public_network"]
 private_network_ip = default["private_network_ip"]
@@ -37,6 +38,9 @@ if File.file?('vagrant.yaml')
   end
   if !conf["external_db_host"].nil?
     external_db_host = conf["external_db_host"]
+  end
+  if !conf["external_db_host"].nil?
+    external_db_db = conf["external_db_db"]
   end
   if !conf["demo_data_version"].nil?
     demo_data_version = conf["demo_data_version"]
@@ -76,7 +80,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "#{provision_script}"
-    s.args = "#{download_url} #{demo_data_version} #{external_db} #{external_db_host}"
+    s.args = "#{download_url} #{demo_data_version} #{external_db} #{external_db_host} #{external_db_db}"
   end
 
 end

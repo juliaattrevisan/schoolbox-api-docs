@@ -7,12 +7,14 @@ cd $cachedir;
 download_url="vagrant.alaress-dev.com.au";
 external_db="synergetic";
 external_db_host="172.31.15.10";
+external_db_db="Synergetic_AUVIC_ALARESS_PRD";
 
 # Get options
 if [ ! -z $1 ]; then download_url=$1; fi;
 if [ ! -z $2 ]; then demo_data_version=$2; else echo "Please provide demo_data_version"; exit 1; fi;
 if [ ! -z $3 ]; then external_db=$3; fi;
 if [ ! -z $4 ]; then external_db_host=$4; fi;
+if [ ! -z $4 ]; then external_db_db=$5; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Provision Script: vagrant-provision-1404-php55.sh";
@@ -20,6 +22,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Download URL: $download_url";
 echo "[SB][`date +%Y-%m-%d\ %X`] Demo Data Version: $demo_data_version";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
+echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Demo Data files";
 curl http://$download_url/schoolboxdemo-$demo_data_version-sha1.txt > schoolboxdemo-$demo_data_version-sha1.txt 2>/dev/null
@@ -68,6 +71,7 @@ mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/schoolboxdemo-$d
 
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_db' WHERE name='external_db_db'";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox data directories";
 cd /vagrant;
