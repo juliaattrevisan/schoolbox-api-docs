@@ -60,7 +60,7 @@ class Controller extends Base
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
         try {
-            $dateObject = new Alaress_Date_Format($value, array('d/m/Y h:iK', 'd/m/Y'));
+            $dateObject = new Alaress_Date_Format($value, array('d/m/Y g:ia', 'd/m/Y'));
         }
         catch (\Exception $e) {
             var_dump($e->getMessage());
