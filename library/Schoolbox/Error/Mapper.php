@@ -9,10 +9,11 @@
 
 namespace Schoolbox\Error;
 
+use Alaress\Web\Controller\IExceptionGenerator;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper as BaseMapper;
 
-class Mapper extends BaseMapper
+class Mapper extends BaseMapper implements IExceptionGenerator
 {
     // Error codes- these match with the corresponding error messages in `error` table.
 
@@ -163,6 +164,9 @@ class Mapper extends BaseMapper
     const ERROR_ZIP_EXTRACT = 188;
     const ERROR_NO_ANALYTICS_DATA = 198;
 
+    /**
+     * Setup mapping
+     */
     public function mapping()
     {
         $this->hasTable('error');
@@ -173,18 +177,16 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Return a throwable
-     *
-     * @param int $id
-     * @param SchoolboxException $parent
-     * @param string $additionalInfo
-     * @return \Schoolbox\Application\Exception\Exception
+     * @param int        $errorCode
+     * @param \Exception $previousException
+     * @param string     $additionalInfo
+     * @return SchoolboxException
      */
-    public function generateException($id, $parent = null, $additionalInfo = '')
+    public function generateException($errorCode, \Exception $previousException = null, $additionalInfo = '')
     {
-        $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($id));
+        $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($errorCode));
 
-        return new SchoolboxException($msg, $id, $parent);
+        return new SchoolboxException($msg, $errorCode, $previousException);
     }
 
     /**
