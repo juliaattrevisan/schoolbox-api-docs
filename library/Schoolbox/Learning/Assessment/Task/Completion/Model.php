@@ -93,10 +93,8 @@ class Model extends AbstractResponse implements ICompletion
 
         // Can't create a new completion with the same status as most recent
         if (empty($this->getId())) {
-            $mostRecentResponse = $this->getAssessable()->getParticipant($taskUser);
-            if ($mostRecentResponse instanceof Model
-                && $mostRecentResponse->isMarkedAs($this->getCompletionStatus())
-            ) {
+            $mostRecentResponse = $this->getAssessable()->getParticipant($taskUser)->findMostRecentResponse();
+            if ($mostRecentResponse instanceof Model && $mostRecentResponse->isMarkedAs($this->getCompletionStatus()) ) {
                 throw new \UnexpectedValueException("This user already has this status for this task");
             }
         }

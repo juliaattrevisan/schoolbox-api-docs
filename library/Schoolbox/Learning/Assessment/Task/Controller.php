@@ -187,8 +187,8 @@ class Controller extends Assessment\Controller
      * @level 165
      *
      * @param Participant $participant
-     * @var string[] $_GET
-     * @var int      $_GET['status']    The proposed completion status
+     * @var string[] $_POST
+     * @var int      $_POST['status']    The proposed completion status
      * @return void
      */
     public function postCreateResponse(Participant $participant)
