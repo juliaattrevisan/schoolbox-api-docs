@@ -107,7 +107,7 @@ function processAttempt(
         'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-        'ATTEMPT_CHECKBOX' => '<input id="review-'.$currentAttempt['attempt_id'].'" name="review[]" type="checkbox" name=\'reviewAttemptIds[]\' value=\''.$currentAttempt['attempt_id'].'\'><label for="review-'.$currentAttempt['attempt_id'].'" class="input-toggle"><span class="icon-tick" title="Mark As Reviewed"></span></label>',
+        'ATTEMPT_CHECKBOX' => '<input id="review-'.$currentAttempt['attempt_id'].'" name="review[]" type="checkbox" name=\'reviewAttemptIds[]\' value=\''.$currentAttempt['attempt_id'].'\'><label for="review-'.$currentAttempt['attempt_id'].'" class="input-toggle" title="Mark As Reviewed"><span class="icon-tick"></span></label>',
         'ATTEMPT_GRADIENT'  => (int)($percentage / 10),
         'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
         'ATTEMPT_UNMARKED_RESPONSES' => $percentageReviewed,
