@@ -65,6 +65,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	/** @var Transaction */
     protected $transaction;
 
+    /** @var callable */
+    private $onFrame;
+
 
     /**
      * @param LoopInterface             $loop
@@ -113,6 +116,13 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 			$d->enqueue($timer, RerouterDispatchStrategy::TASK_REROUTE, $timer->getData());
 		}, self::TRANSACTION_CACHE_TIMEOUT, self::TRANSACTION_COUNT_LIMIT);
 
+		// define the callback to be used for subscription handling
+		$this->onFrame = function (Frame $amqpFrame, User $user) {
+
+            // This closure is executed every time a message is sent to the client based on the given subscription
+            // Adds the frame to a loop cache, and dispatches appropriately
+            $this->transaction->put(sha1($amqpFrame->dump()), array($user, $amqpFrame));
+        };
 	}
 
 
@@ -208,16 +218,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 		if(!$this->isRunning()) {
 			// pick up all subscriptions
-			$tx = $this->transaction;
-
             $this->log->debug("Importing user data");
 			$this->subscriber->getSubscriptionList()->importFromSource($this->userMapper, false);
-			$count = $this->subscriber->subscribeAll(function(Frame $amqpFrame, User $user) use ($tx) {
-
-				// This closure is executed every time a message is sent to the client based on the given subscription
-				// Adds the frame to a loop cache, and dispatches appropriately
-				$tx->put(sha1($amqpFrame->dump()), array($user, $amqpFrame));
-			});
+			$count = $this->subscriber->subscribeAll($this->onFrame);
 
 			$this->log->notice("Added $count subscriptions", array('char' => '+'));
 
@@ -236,7 +239,6 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
     {
         $this->log->debug("Subscribing user $userId");
 
-        $tx         = $this->transaction;
         $subscriber = $this->subscriber;
         $subList    = $subscriber->getSubscriptionList();
 
@@ -244,16 +246,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
             $subList->importFromSource($this->userMapper, false);
         }
 
-        return $subscriber->subscribe($subList->createQueueName($userId), function ($frame, $data) use ($tx) {
-            /**
-             * This closure is executed every time a message is sent to the client based on the given subscription
-             * Adds the frame to a loop cache, and dispatches appropriately
-             *
-             * @var Frame $frame
-             * @var User  $data
-             */
-            $tx->put(sha1($frame->dump()), array($data, $frame));
-        });
+        return $subscriber->subscribe($subList->createQueueName($userId), $this->onFrame);
     }
 
 
