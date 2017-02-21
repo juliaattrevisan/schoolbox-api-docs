@@ -10,6 +10,8 @@ set_time_limit(300);
 
 use Alaress\Routing\Router;
 
+ob_start();
+
 $router = new Router('.');
 
 echo "<h2>Add routes based on existing rabbit data</h2>";
@@ -89,9 +91,10 @@ foreach ($routes as $route) {
     echo "<pre>", json_encode(array_keys($data)), "</pre>\n";
 }
 
-exit;
 
-header('Content-Type: application/json');
+$buffered = ob_get_clean();
 
-die (json_encode($data));
 
+/** @var SitePage $this */
+$this->setFile(TEMPLATE_content, 'output.html');
+$this->setVar('OUTPUT', $buffered);
