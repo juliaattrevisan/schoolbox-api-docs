@@ -36,6 +36,12 @@ class CampusReassignment extends AbstractNotificationTest
     /** @var PDOStatement */
     private $checkCampusStmt;
 
+    /** @var int */
+    private $currentCampus;
+
+    /** @var int */
+    private $failureCount = 0;
+
 
     /**
      * Provide the list of daemons that need to be attached for this test
@@ -116,6 +122,18 @@ class CampusReassignment extends AbstractNotificationTest
         } elseif ($this->activeWorkers < 0) {
             $this->log->error("WTF?!");
             return;
+
+        } elseif ($this->currentCampus == self::CAMPUS_TWO) {
+            // this is the end of the test
+
+            if ($this->failureCount > 0) {
+                $this->log->alert("Test ended with failures");
+            } else {
+                $this->log->warning("Test ended, no failures recorded; manual check for success required");
+            }
+
+            $this->terminateDaemons();
+            return;
         }
 
         $this->log->warning("All roles processed; moving to new campus");
@@ -134,7 +152,7 @@ class CampusReassignment extends AbstractNotificationTest
      */
     public function onReloadComplete()
     {
-        $this->log->warning("Reload complete, broadcasting another article");
+        $this->log->notice("Reload complete, broadcasting another article", [ 'char' => '>' ]);
         $this->broadcast($this->roleFilter);
     }
 
@@ -151,12 +169,13 @@ class CampusReassignment extends AbstractNotificationTest
             $message = $this->fetchMessageInstance($messageId)->jsonSerialize();
 
         } catch (OutOfBoundsException $e) {
-            $this->log->error("Bad message ID: $messageId");
+            $this->log->warning("Bad message ID: $messageId, skipping");
             return;
         }
 
         if (!$this->verifyCampusMembership($message, $recipientId)) {
-            $this->log->alert("User $recipientId should NOT have received message $messageId");
+            $this->log->error("User $recipientId should NOT have received message $messageId");
+            ++$this->failureCount;
         }
     }
 
@@ -226,6 +245,7 @@ class CampusReassignment extends AbstractNotificationTest
     {
         Database::getInstance()->query("TRUNCATE `userCampus`");
         Database::getInstance()->query("INSERT INTO `userCampus` SELECT id, :c, :c FROM `user`", [ 'c' => (int)$destinationId ]);
+        $this->currentCampus = $destinationId;
         $this->log->notice("Everyone is now in campus $destinationId");
     }
 
