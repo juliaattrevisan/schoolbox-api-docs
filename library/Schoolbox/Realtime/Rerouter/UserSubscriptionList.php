@@ -58,6 +58,8 @@ class UserSubscriptionList extends SubscriptionList {
         if ($clear) {
             $this->log->debug("Dropping cache");
             $this->queues = array();
+        } else {
+            $this->log->debug("Retaining cache, only new users will be added");
         }
 
         $userIds = $source->findAllIds();
