@@ -10,6 +10,7 @@
 namespace Alaress\Async\Stomp;
 
 
+use LogicException;
 use React\Stomp\Client;
 use React\Stomp\Exception\ConnectionException;
 
@@ -78,12 +79,13 @@ class Subscriber {
 	}
 
 
-	/**
-	 * @param string $queue
-	 * @param callable $callback
-	 * @param string $mode
-	 * @return bool
-	 */
+    /**
+     * @param string   $queue
+     * @param callable $callback
+     * @param string   $mode
+     * @throws LogicException
+     * @return bool
+     */
 	public function subscribeAck($queue, $callback, $mode = 'client-individual') {
 		if(isset($this->subscriptions[$queue])) {
 			return false;
@@ -109,11 +111,12 @@ class Subscriber {
 	}
 
 
-	/**
-	 * @param callable $callback
-	 * @param string   $mode
-	 * @return int the number of successfully subscribed queues
-	 */
+    /**
+     * @param callable $callback
+     * @param string   $mode
+     * @throws LogicException
+     * @return int the number of successfully subscribed queues
+     */
 	public function subscribeAllAck($callback, $mode = 'client-individual') {
 		$i = 0;
 		foreach($this->subscriptionList->getAllQueueNames() as $q) {
