@@ -11,7 +11,7 @@
  #                                  - For teacher, it should be disabled if teacher lacks write+ perm to class folder
  #}
 
-{% set mostRecentResponse = participant.findMostRecentResponse %}
+{% set mostRecentResponse = participant.findMostRecentSubmittedResponse %}
 <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
       method="POST"
       class="progress-tick-form"

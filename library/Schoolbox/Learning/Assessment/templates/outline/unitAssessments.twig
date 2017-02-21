@@ -15,6 +15,7 @@
         {# Is this user particpating? #}
         {% set isParticipant = assessment.isParticipant(USER) %}
 
+        {# TODO skip this if not displaying counts, eg to teacher #}
         {# count students which have completed this #}
         {% for participant in assessment.allParticipants %}
             {% if not participant.responseRequired %}
@@ -77,9 +78,10 @@
                 {% if readOnly == false %}
                     <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
                 {% elseif isParticipant and assessment is task %}
+                    {% set participant = assessment.getParticipant(USER) %}
                     {% include '@learningAssessment/task/progressTickForm.twig' with {
-                    participant: assessment.getParticipant(USER),
-                    disabled: assessment.closed or participant.findMostRecentPublishedFeedback.markedAsTeacherAssessed or assessment.isTeacherAssessed
+                        participant: participant,
+                        disabled: assessment.closed or participant.findMostRecentSubmittedResponse.markedAsTeacherAssessed or assessment.isTeacherAssessed
                     } only %}
                 {% endif %}
             </nav>
