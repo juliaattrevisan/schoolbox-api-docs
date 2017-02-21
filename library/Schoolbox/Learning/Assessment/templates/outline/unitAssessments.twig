@@ -28,16 +28,6 @@
             {% set completionGradient = (completionCount / studentCount) * 100 %}
         {% endif %}
 
-        {# TODO: if unit.isopen and not task.requireConfirmation #}
-        {# TODO: if task.undoable #}
-        {% set taskAction = '/undo' %}
-        {# TODO elseif task.completable #}
-        {% set taskAction = '/complete' %}
-        {# TODO: endif #}
-        {# TODO: else #}
-        {% set taskAction = '' %}
-        {# TODO: endif #}
-
         <li class="actions-small-1 interact" data-unit-assessment="{{ assessment.id }}">
             {% if readOnly == false %}
                 <div class="grip compact"></div>
