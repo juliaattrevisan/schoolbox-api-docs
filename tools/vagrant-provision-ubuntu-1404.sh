@@ -14,7 +14,7 @@ if [ ! -z $1 ]; then download_url=$1; fi;
 if [ ! -z $2 ]; then demo_data_version=$2; else echo "Please provide demo_data_version"; exit 1; fi;
 if [ ! -z $3 ]; then external_db=$3; fi;
 if [ ! -z $4 ]; then external_db_host=$4; fi;
-if [ ! -z $4 ]; then external_db_db=$5; fi;
+if [ ! -z $5 ]; then external_db_db=$5; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Provision Script: vagrant-provision-1404-php55.sh";
