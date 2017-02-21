@@ -64,15 +64,16 @@ class Router implements IRouter
      * Add the given path as a known route, and a key-value pair to be stored at the end of that path.
      * If the key already exists on this path, the new value will replace any existing value.
      *
-     * @param string $path
+     * @param string     $path
      * @param string|int $key
-     * @param mixed $value
-     * @throws OutOfBoundsException
+     * @param mixed      $value
      * @return $this
+     * @throws InvalidArgumentException
+     * @throws OutOfBoundsException
      */
     public function add($path, $key, $value = null)
     {
-        $fullRegex = $this->transformWhole($path);
+        $fullRegex = $this->transform(str_replace('.', '\.', $path), $this->wholeDictionary);
 
         // let's not do work we don't have to, eh?
         if (empty($this->cache[$fullRegex])) {
@@ -83,11 +84,11 @@ class Router implements IRouter
             foreach (explode($this->delimiter, $path) as $shard) {
 
                 // translate the shard to regex according to our dictionary
-                $pattern = $this->transformShard($shard);
+                $pattern = $this->transform($shard, $this->shardDictionary);
 
-                try {
+                if ($trie->has($pattern)) {
                     $trie = $trie->get($pattern);
-                } catch (\InvalidArgumentException $e) {
+                } else {
                     // no wuzzes - just pop it in
                     $trie = $trie->put($pattern);
                 }
@@ -142,40 +143,26 @@ class Router implements IRouter
     {
         foreach ($dictionary as $pattern => $transform) {
             $this->shardDictionary["`^$pattern$`"] = $transform;
-            $this->wholeDictionary["`$pattern`"] = $transform;
+            $this->wholeDictionary["`$pattern`"]   = $transform;
         }
-    }
 
-
-    /**
-     * @param string $shard
-     * @return string
-     */
-    private function transformShard($shard)
-    {
-        return $this->transform($shard, $this->shardDictionary);
-    }
-
-
-    /**
-     * @param string $whole
-     * @return string
-     */
-    private function transformWhole($whole)
-    {
-        // regex-ise periods
-        $whole = str_replace('.', '\.', $whole);
-        return $this->transform($whole, $this->wholeDictionary);
+        // pre-cache this transformation into the format we will need
+        $this->shardDictionary = [
+            array_keys($this->shardDictionary), array_values($this->shardDictionary)
+        ];
+        $this->wholeDictionary = [
+            array_keys($this->wholeDictionary), array_values($this->wholeDictionary)
+        ];
     }
 
 
     /**
      * @param string $string
-     * @param array $dictionary
+     * @param array  &$dictionary
      * @return string
      */
-    private function transform($string, array $dictionary)
+    private function transform($string, array &$dictionary)
     {
-        return preg_replace(array_keys($dictionary), array_values($dictionary), $string);
+        return preg_replace($dictionary[0], $dictionary[1], $string);
     }
 }

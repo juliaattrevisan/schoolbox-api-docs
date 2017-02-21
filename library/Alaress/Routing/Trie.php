@@ -9,6 +9,8 @@
 namespace Alaress\Routing;
 
 
+use InvalidArgumentException;
+
 class Trie
 {
     /** @var array */
@@ -43,13 +45,13 @@ class Trie
 
     /**
      * @param string $key
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function get($key)
     {
         if (empty($this->tries)) {
-            throw new \InvalidArgumentException("Set is empty");
+            throw new InvalidArgumentException("Set is empty");
         }
 
         // try for a string literal first
@@ -64,7 +66,27 @@ class Trie
             }
         }
 
-        throw new \InvalidArgumentException("Key '$key' not found");
+        throw new InvalidArgumentException("Key '$key' not found");
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        // try for a string literal first
+        if (isset($this->tries[$key])) {
+            return true;
+        }
+
+        foreach ($this->tries as $pattern => $trie) {
+            if (preg_match("`^$pattern$`", $key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -103,7 +125,7 @@ class Trie
 
     /**
      * @param array $params
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return array
      */
     public function fetch(array $params)
@@ -112,7 +134,7 @@ class Trie
 
         foreach ($params as $p) {
             if (empty($node[$p])) {
-                throw new \InvalidArgumentException("No data match");
+                throw new InvalidArgumentException("No data match");
             }
             $node =& $node[$p];
         }
