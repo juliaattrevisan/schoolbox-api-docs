@@ -22,6 +22,9 @@ abstract class AbstractTest extends PHPUnit_Framework_TestCase implements TestCa
     /** @var LoopInterface */
     private $loop;
 
+    /** @var callable */
+    private $buffy;
+
 
     /**
      * @param LoopInterface $loop
@@ -49,6 +52,31 @@ abstract class AbstractTest extends PHPUnit_Framework_TestCase implements TestCa
     protected function markTestComplete()
     {
         $this->log->notice("Test complete");
+    }
+
+
+    /**
+     * Install a mechanism to slay the daemons you invoked as part of the test
+     *
+     * @param callable $daemonSlayer
+     * @return void
+     */
+    public function setBuffy(callable $daemonSlayer)
+    {
+        $this->buffy = $daemonSlayer;
+    }
+
+
+    /**
+     * Kills the daemons IF a Buffy was installed
+     *
+     * @return void
+     */
+    protected function terminateDaemons()
+    {
+        if (is_callable($this->buffy)) {
+            call_user_func($this->buffy);
+        }
     }
 
 }

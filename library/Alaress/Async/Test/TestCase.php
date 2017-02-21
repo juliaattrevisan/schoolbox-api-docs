@@ -47,4 +47,12 @@ interface TestCase
      */
     public function attachLogger(LoggerInterface $log);
 
+    /**
+     * Install a mechanism to slay the daemons you invoked as part of the test
+     *
+     * @param callable $daemonSlayer
+     * @return void
+     */
+    public function setBuffy(callable $daemonSlayer);
+
 }
