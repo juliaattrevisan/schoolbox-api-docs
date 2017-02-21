@@ -285,6 +285,15 @@ class Framework
             }
         }
 
+        // it's dangerous to go alone - take this
+        $testCase->setBuffy(function () {
+            foreach (array_keys($this->daemonInstances) as $name) {
+                // face your daemons
+                $this->slayDaemon($name);
+            }
+            // now they're out of the picture, we can stop
+            $this->loop->stop();
+        });
     }
 
 
