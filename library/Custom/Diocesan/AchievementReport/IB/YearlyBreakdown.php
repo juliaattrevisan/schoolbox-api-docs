@@ -82,7 +82,7 @@ class YearlyBreakdown extends Base {
                 Level,
                 ProgressGrade
             FROM
-                SynergyOne.dbo.uvSchoolBoxIBResults
+                dbo.uvSchoolBoxIBResults
             WHERE
                 ID = '{$this->getExternalUserId()}'
             ORDER BY

@@ -187,7 +187,7 @@ class NavigationSelector {
             SELECT
                 TOP 1 COUNT(*)
             FROM
-                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+                dbo.uvSchoolBoxSchoolGradeResults
             WHERE
                 ID = '{$externalUserId}'
         ";
@@ -208,7 +208,7 @@ class NavigationSelector {
             SELECT
                 TOP 1 COUNT(*)
             FROM
-                SynergyOne.dbo.uvSchoolBoxNCEAResults
+                dbo.uvSchoolBoxNCEAResults
             WHERE
                 ID = '{$externalUserId}'
         ";
@@ -229,7 +229,7 @@ class NavigationSelector {
             SELECT
                 TOP 1 COUNT(*)
             FROM
-                SynergyOne.dbo.uvSchoolBoxIBResults
+                dbo.uvSchoolBoxIBResults
             WHERE
                 ID = '{$externalUserId}'
         ";

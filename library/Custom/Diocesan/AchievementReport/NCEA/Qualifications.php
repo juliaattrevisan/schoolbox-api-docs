@@ -37,7 +37,7 @@ class Qualifications extends Base {
             SELECT
                 *
             FROM
-                SynergyOne.dbo.uvSchoolBoxNCEAResults
+                dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$this->getExternalUserId()}'
             ORDER BY

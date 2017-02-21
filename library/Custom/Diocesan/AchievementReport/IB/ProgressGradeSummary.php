@@ -126,7 +126,7 @@ class ProgressGradeSummary extends Base {
     private function findAllProgressGrades() {
         $query = "
             SELECT *
-            FROM SynergyOne.dbo.uvSchoolBoxIBResults
+            FROM dbo.uvSchoolBoxIBResults
             WHERE ID = '{$this->getExternalUserId()}'
             ORDER BY classyear DESC, Term DESC
         ";

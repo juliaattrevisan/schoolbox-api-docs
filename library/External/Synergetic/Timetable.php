@@ -56,7 +56,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
         $query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
 					TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
-					FROM SynergyOne.dbo.TimetableDefinition TimetableDefinition
+					FROM dbo.TimetableDefinition TimetableDefinition
 					WHERE TimetableDefinition.FileYear='{$fileYear}' AND
 						TimetableDefinition.FileSemester='{$fileSemester}' AND
 						TimetableDefinition.TimetableGroup='{$campus->getExtTimetableCode()}' AND
@@ -255,7 +255,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         /* First attempt to get calendar dates based on campus */
 
         $query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
-			FROM SynergyOne.dbo.CalendarEvents CalendarEvents
+			FROM dbo.CalendarEvents CalendarEvents
 			WHERE (CalendarEvents.CalendarType LIKE '" . $campus->getExtTimetableCode() . "_D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
 			ORDER BY CalendarEvents.CalendarDate DESC";
 
@@ -277,7 +277,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         } else {
             /*  Else get calendar dates from the general pool   */
             $query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) AS startDate, CalendarEvents.CalendarType AS type
-                FROM SynergyOne.dbo.CalendarEvents CalendarEvents
+                FROM dbo.CalendarEvents CalendarEvents
                 WHERE (CalendarEvents.CalendarType LIKE 'D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
                 ORDER BY CalendarEvents.CalendarDate DESC";
 
@@ -503,9 +503,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $query = "SELECT
 				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode, StaffID
 				FROM
-				SynergyOne.dbo.StudentClasses StudentClasses,
-				SynergyOne.dbo.SubjectClasses SubjectClasses,
-				SynergyOne.dbo.Timetable Timetable
+				dbo.StudentClasses StudentClasses,
+				dbo.SubjectClasses SubjectClasses,
+				dbo.Timetable Timetable
 				WHERE
 				Timetable.ClassCampus = SubjectClasses.ClassCampus AND
 				Timetable.ClassCode = SubjectClasses.ClassCode AND
@@ -528,8 +528,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         } else {
             $query = "SELECT Timetable.Room, SubjectClasses.Description,
 				Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode
-				FROM SynergyOne.dbo.SubjectClasses SubjectClasses,
-				SynergyOne.dbo.Timetable Timetable
+				FROM dbo.SubjectClasses SubjectClasses,
+				dbo.Timetable Timetable
 				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
 				Timetable.ClassCode = SubjectClasses.ClassCode AND
 				Timetable.FileSemester = SubjectClasses.FileSemester AND
@@ -610,11 +610,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						Timetable.ClassCampus, Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
 						vStaff.StaffSurname
 					FROM
-						SynergyOne.dbo.StudentClasses StudentClasses,
-						SynergyOne.dbo.SubjectClasses SubjectClasses,
-						SynergyOne.dbo.Timetable Timetable
+						dbo.StudentClasses StudentClasses,
+						dbo.SubjectClasses SubjectClasses,
+						dbo.Timetable Timetable
 					LEFT JOIN
-						SynergyOne.dbo.vStaff vStaff ON Timetable.StaffID = vStaff.StaffID
+						dbo.vStaff vStaff ON Timetable.StaffID = vStaff.StaffID
 					WHERE
 						Timetable.ClassCampus = SubjectClasses.ClassCampus AND
 						Timetable.ClassCode = SubjectClasses.ClassCode AND
@@ -643,8 +643,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
 						Timetable.ClassCampus, Timetable.ClassCode
 					FROM
-						SynergyOne.dbo.SubjectClasses SubjectClasses,
-						SynergyOne.dbo.Timetable Timetable
+						dbo.SubjectClasses SubjectClasses,
+						dbo.Timetable Timetable
 					WHERE
 						Timetable.ClassCampus = SubjectClasses.ClassCampus AND
 						Timetable.ClassCode = SubjectClasses.ClassCode AND
@@ -764,9 +764,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				vStaff.StaffTitle,
 				vStaff.StaffPreferredName,
 				vStaff.StaffSurname
-			FROM SynergyOne.dbo.Timetable Timetable
-			LEFT JOIN SynergyOne.dbo.vStaff vStaff ON Timetable.StaffID = vStaff.StaffID
-			LEFT JOIN SynergyOne.dbo.SubjectClasses SubjectClasses ON
+			FROM dbo.Timetable Timetable
+			LEFT JOIN dbo.vStaff vStaff ON Timetable.StaffID = vStaff.StaffID
+			LEFT JOIN dbo.SubjectClasses SubjectClasses ON
 				Timetable.ClassCampus = SubjectClasses.ClassCampus AND
 				Timetable.ClassCode = SubjectClasses.ClassCode AND
 				Timetable.FileSemester = SubjectClasses.FileSemester AND

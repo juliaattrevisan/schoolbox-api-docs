@@ -69,7 +69,7 @@ class External_Synergetic_Class implements External_ClassInterface
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($user->getExternalId()));
         $query = "
             SELECT *
-            FROM SynergyOne.dbo.SubjectClasses
+            FROM dbo.SubjectClasses
             WHERE $classQuery
             AND FileYear='" . $fileYear . "'
             AND FileSemester='" . $fileSemester . "'
@@ -101,8 +101,8 @@ class External_Synergetic_Class implements External_ClassInterface
                         StudentClasses.StudentHouseDescription as house,
                         vStudents.StudentMedicalAlert, vStudents.StudentSpecialNeedsFlag,
                         StudentClasses.StudentID as synergy_id, StudentClasses.ClassCampus
-        FROM    SynergyOne.dbo.vStudentClasses StudentClasses
-        JOIN SynergyOne.dbo.vStudents vStudents ON (
+        FROM    dbo.vStudentClasses StudentClasses
+        JOIN dbo.vStudents vStudents ON (
             vStudents.FileYear = StudentClasses.FileYear AND
             vStudents.FileSemester = StudentClasses.FileSemester AND
             vStudents.ID = StudentClasses.StudentID)
@@ -162,7 +162,7 @@ class External_Synergetic_Class implements External_ClassInterface
     {
         $query = "
             SELECT *
-            FROM SynergyOne.dbo.luFileType
+            FROM dbo.luFileType
             WHERE Code != ''
         ";
         return $this->getDatabase()->getAll($query);
@@ -187,7 +187,7 @@ class External_Synergetic_Class implements External_ClassInterface
         if (empty($timetableCode)) {
             $query = "
                 SELECT ClassCode
-                FROM SynergyOne.dbo.StudentClasses
+                FROM dbo.StudentClasses
                 WHERE FileType = :type
                 AND FileYear = :year
                 AND FileSemester = :semester
@@ -197,8 +197,8 @@ class External_Synergetic_Class implements External_ClassInterface
         } else {
             $query                 = "
                 SELECT sc.ClassCode
-                FROM SynergyOne.dbo.StudentClasses sc
-                INNER JOIN SynergyOne.dbo.Timetable t on sc.ClassCampus = t.ClassCampus
+                FROM dbo.StudentClasses sc
+                INNER JOIN dbo.Timetable t on sc.ClassCampus = t.ClassCampus
                 WHERE sc.FileType = :type
                 AND sc.FileYear = :year
                 AND sc.FileSemester = :semester

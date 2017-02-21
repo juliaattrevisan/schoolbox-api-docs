@@ -99,7 +99,7 @@ abstract class Base extends AchievementReportBase {
                 Result,
                 StrippedResult
             FROM
-                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+                dbo.uvSchoolBoxSchoolGradeResults
             WHERE
                 ID = '{$externalUserId}'
                 AND classyear = '{$this->getCurrentYear()}'
@@ -144,7 +144,7 @@ abstract class Base extends AchievementReportBase {
                 Result,
                 StrippedResult
             FROM
-                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+                dbo.uvSchoolBoxSchoolGradeResults
             WHERE
                 ID = '{$externalUserId}'
                 AND classyear < '{$this->getCurrentYear()}'
@@ -173,7 +173,7 @@ abstract class Base extends AchievementReportBase {
     protected function explorerReporting() {
         $explorer = $this->getDb()->getAll("
             SELECT TOP 5 *
-            FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+            FROM dbo.uvSchoolBoxSchoolGradeResults
         ");
 
 //        $explorer = $this->getDb()->getAll("

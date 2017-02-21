@@ -64,7 +64,7 @@ class CreditSummary extends Base {
                 StandardType,
                 StudentYear
             FROM
-                SynergyOne.dbo.uvSchoolBoxNCEAResults
+                dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$this->getExternalUserId()}' AND
                 WithdrawnFlag = 0

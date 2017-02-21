@@ -161,9 +161,9 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
                     s.StudentYearLevel,
                     s.StudentCampus,
                     s.StudentGender
-                FROM SynergyOne.dbo.vStudentContactAllAddress s
-                LEFT JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
-                LEFT JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+                FROM dbo.vStudentContactAllAddress s
+                LEFT JOIN dbo.Community cp ON s.StudentContactID = cp.ID
+                LEFT JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
                 WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3' OR StudentContactType = 'SC4' OR StudentContactType = 'SC5' OR StudentContactType = 'SC6')
                 AND FileSemester = '{$semester['FileSemester']}'
                 AND FileYear = '{$semester['FileYear']}'

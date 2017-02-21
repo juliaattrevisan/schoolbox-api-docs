@@ -38,31 +38,31 @@ class LiteracyNumeracyCheckbox extends Base {
         $query = "
             SELECT
                 (SELECT TOP 1 COUNT(*)
-                 FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
+                 FROM dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$this->getExternalUserId()}'
                  AND UELiteracyMet = 'Y'
                  GROUP BY UELiteracyMet
                 ) AS 'UE Literacy',
                 (SELECT TOP 1 COUNT(*)
-                 FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
+                 FROM dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$this->getExternalUserId()}'
                  AND UENumeracyMet = 'Y'
                  GROUP BY UENumeracyMet
                 ) AS 'UE Numeracy',
                 (SELECT TOP 1 COUNT(*)
-                 FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
+                 FROM dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$this->getExternalUserId()}'
                  AND Level1LiteracyMet = 'Y'
                  GROUP BY Level1LiteracyMet
                 ) AS 'Level 1 Literacy',
                 (SELECT TOP 1 COUNT(*)
-                 FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
+                 FROM dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$this->getExternalUserId()}'
                  AND Level1NumeracyMet = 'Y'
                  GROUP BY Level1NumeracyMet
                 ) AS 'Level 1 Numeracy'
             FROM
-                SynergyOne.dbo.uvSchoolBoxNCEAResults
+                dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$this->getExternalUserId()}'
         ";

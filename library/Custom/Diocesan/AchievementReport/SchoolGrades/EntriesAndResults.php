@@ -135,7 +135,7 @@ class EntriesAndResults extends Base {
                 ClassTeacher3,
                 ClassTeacher3Email
             FROM
-                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+                dbo.uvSchoolBoxSchoolGradeResults
             WHERE
                 ID = '{$this->getExternalUserId()}'
                 AND Result != 'SNA'

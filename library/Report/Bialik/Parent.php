@@ -135,17 +135,17 @@ class Report_Bialik_Parent extends \Report_Parent
                 Addresses.UserFlag3 AddressUserFlag3,
                 Addresses.UserFlag4 AddressUserFlag4,
                 Addresses.UserFlag5 AddressUserFlag5
-            FROM SynergyOne.dbo.vStudentContactAllAddress
-            LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
-            LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-            LEFT JOIN SynergyOne.dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
-            LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus
+            FROM dbo.vStudentContactAllAddress
+            LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
+            LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+            LEFT JOIN dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
+            LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus
                 AND StudentHouse = House.Code
-            LEFT JOIN SynergyOne.dbo.luYearLevel Year ON StudentYearLevel = Year.Code
+            LEFT JOIN dbo.luYearLevel Year ON StudentYearLevel = Year.Code
                 AND StudentCampus = Year.Campus
-            LEFT JOIN SynergyOne.dbo.luCountry StudentCountry
+            LEFT JOIN dbo.luCountry StudentCountry
                 ON StudentContactCountryCode = StudentCountry.Code
-            LEFT JOIN SynergyOne.dbo.luCountry StudentHomeCountry
+            LEFT JOIN dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
             AND FileSemester = '" . $db->quote($fileSemester) . "'
