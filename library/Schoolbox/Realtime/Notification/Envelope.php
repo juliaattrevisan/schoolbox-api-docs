@@ -21,8 +21,6 @@ use Schoolbox\Permission\Access\UserAccess;
  * An envelope contains notifications...right?
  * Why is naming things so hard -_-
  *
- * This class supersedes Messenger
- *
  * Class Envelope
  *
  * @package Schoolbox\Realtime\Notification

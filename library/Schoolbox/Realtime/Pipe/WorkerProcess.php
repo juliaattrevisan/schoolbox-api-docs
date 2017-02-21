@@ -159,7 +159,7 @@ class WorkerProcess extends AbstractProcess
 
         $this->log->debug("Executing " . $this->callable2string($callback));
 
-        // this call SHOULD return an instance of InstanceBundle (be that Messenger or Envelope)
+        // this call SHOULD return an instance of InstanceBundle
         $return = call_user_func($callback, $model, $user, $diff);
         $this->log->debug("Callback complete");
 
