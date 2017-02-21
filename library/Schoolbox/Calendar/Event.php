@@ -319,11 +319,23 @@ class Event
                 if ($userId) {
                     $return .= '/' . $userId;
                 }
-
+                return $return;
+            }
+            elseif ($returnView === 'list') {
+                $return = "/calendar/list";
+                if ($userId) {
+                    $return .= '/'.$userId;
+                }
+                if ($returnDate) {
+                    $return .= '/'.$returnDate;
+                }
                 return $return;
             }
         }
-
+        //Assuming the complete url has been passed over
+        if(strlen(urldecode($returnView)) > 0){
+            return urldecode($returnView);
+        }
         // Otherwise - guess using Back to the future!
         return '';
     }

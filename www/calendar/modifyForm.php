@@ -232,14 +232,11 @@ switch ($_REQUEST['action']) {
         } else {
             $eventMapper->delete($event);
         }
-        // GET: from full calendar
-        // POST: from calendar event modify page
-        // TODO figure out a global method for redirecting!
-        if (isset($_GET['id'])) {
-            $page->backToTheFuture(1);
-        } else {
-            $page->backToTheFuture(2);
-        }
+        SitePage::localRedir($event->setupRedirect(
+            urldecode($_GET['returnTo']),
+            ($_GET['returnDate']?$_GET['returnDate']:$event->getStartDateTime()->getURLDate()),
+            $_GET['homepageId'],
+            $_GET['userId']));
         break;
 
     default:

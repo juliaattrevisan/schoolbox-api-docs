@@ -130,13 +130,17 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_LOCATION'       => Scrub::text($event->getLocation()),
             'EVENT_DETAIL'         => Scrub::text($event->getDetail()),
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                $_GET['returnTo'],
+                urldecode($_GET['returnTo']),
                 $event->getStartDateTime()->getURLDate(),
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
             'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
             'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
+            'RETURN_STR' => '&returnTo='.$_GET['returnTo'].
+                ($_GET['userId']?"&userId=".$_GET['userId']:"").
+                ($_GET['homepageId']?"&homepageId=".$_GET['homepageId']:"").
+                ($_GET['returnDate']?"&returnDate=".$_GET['returnDate']:"")
         )
     );
 
@@ -229,7 +233,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(
                 $_GET['returnTo'],
-                $event->getStartDateTime()->getURLDate(),
+                ($_GET['returnDate']?$_GET['returnDate']:$event->getStartDateTime()->getURLDate()),
                 $_GET['homepageId'],
                 $_GET['userId']
             ),

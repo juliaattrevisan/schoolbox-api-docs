@@ -70,8 +70,8 @@
                     {% endif %}
                 {% endif %}
                 {% if event.isEditable %}
-                <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}&returnTo=calendar">Modify</a>
-                <a class="button icon-delete" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}&returnTo=calendar" onclick="return(confirm('Are you sure you wish to delete this event?'))">Delete</a>
+                <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
+                <a class="button icon-delete" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{  returnStr }}" onclick="return(confirm('Are you sure you wish to delete this event?'))">Delete</a>
                 {% endif %}
             </div>
             {% endblock eventBubbleButtons %}
