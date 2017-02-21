@@ -264,14 +264,14 @@ class Factory
             );
 
         } else {
-            throw new \DomainException('Select a valid assessment type');
+            throw new \DomainException('Please select an assessment type.');
         }
 
         /* Check required data
          */
         if (!strlen(trim($this->getTitle()))) {
-            $typeName = $assessment->getTypeName();
-            throw new InvalidArgumentException("set a title for this $typeName");
+            $typeName = strtolower($assessment->getTypeName());
+            throw new InvalidArgumentException("Please set a title for this {$typeName}.");
         }
 
         /* Start manufacturing
