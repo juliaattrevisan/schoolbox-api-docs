@@ -26,7 +26,7 @@ trait CompletionStatusTrait
     ];
 
     /**
-     * What is the status of this completion? By default, it's not attempted.
+     * What is the status of this completion? By default, it's incomplete.
      *
      * @var int
      */

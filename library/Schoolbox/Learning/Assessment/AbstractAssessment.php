@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
@@ -339,7 +340,7 @@ abstract class AbstractAssessment implements IAssessable
                     if($publishedOnly){
                         // Ignore any unpublished teacher feedback
                         $response = clone $response;
-                        $response->setAllFeedback(new Collection());
+                        $response->setAllFeedback(new GenericCollection(IFeedback::class));
                     }
                 } else {
                     $response = null;
