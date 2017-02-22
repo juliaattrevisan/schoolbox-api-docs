@@ -27,7 +27,7 @@ use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 /**
@@ -891,7 +891,7 @@ class PendingFactory
 
 
     /**
-     * Get any TaskCompletions or TaskFeedbacks related to selected Tasks
+     * Get any TaskResponses or TaskFeedbacks related to selected Tasks
      *
      * @return array
      */
@@ -1178,7 +1178,7 @@ class PendingFactory
         foreach ($taskResults as $rowIdx => $row) {
             $task     = $this->assessmentsCache[$row['t.assessment_id']];
             $userId   = $row['tc.student_id'];
-            $response = new TaskCompletion();
+            $response = new TaskResponse();
             $response->setId($row['tc.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setAssessable($task);

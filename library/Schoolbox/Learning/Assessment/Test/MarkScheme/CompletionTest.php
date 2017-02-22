@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Completion;
@@ -47,9 +47,9 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider_normalised
      * @param mixed $normalised
-     * @param TaskCompletion $response
+     * @param TaskResponse $response
      */
-    public function test_getHumanReadable_StudentCompleted($normalised, TaskCompletion $response)
+    public function test_getHumanReadable_StudentCompleted($normalised, TaskResponse $response)
     {
         $expected = Completion::HUMAN_READABLE_STUDENT_COMPLETED;
 
@@ -64,7 +64,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getHumanReadable_TeacherCompleted($normalised)
     {
-        $response = new TaskCompletion();
+        $response = new TaskResponse();
         $response->getAllFeedback()->add(new TaskFeedback());
         $expected = Completion::HUMAN_READABLE_TEACHER_COMPLETED;
 
@@ -107,7 +107,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getNormalised_StudentCompleted($normalised)
     {
-        $response = new TaskCompletion();
+        $response = new TaskResponse();
         $expected = null;
 
         $markScheme = new Completion();
@@ -122,7 +122,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getNormalised_TeacherCompleted($normalised)
     {
-        $response = new TaskCompletion();
+        $response = new TaskResponse();
         $response->getAllFeedback()->add(new TaskFeedback());
         $expected = null;
 
@@ -136,7 +136,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
     public function provider_normalised()
     {
         // Self-assessed response
-        $response = new TaskCompletion();
+        $response = new TaskResponse();
         $response->setSubmittedBy((new User())->setId(1));
         $response->setSubmittedOnBehalfOf((new User())->setId(1));
 

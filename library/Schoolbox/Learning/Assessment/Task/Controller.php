@@ -14,7 +14,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy as TaskResponseDataSource;
+use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;

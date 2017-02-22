@@ -13,7 +13,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as Completion;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -256,7 +256,7 @@ class Controller extends Base
 
                         $mostRecentResponse = $participant->findMostRecentResponse();
 
-                        if ($mostRecentResponse instanceof Completion) {
+                        if ($mostRecentResponse instanceof TaskResponse) {
                             switch ($mostRecentResponse->getCompletionStatus()) {
                                 case TaskCompletion::COMPLETION_STATUS_TEACHER_ASSESSED:
                                     $result = "Completed";

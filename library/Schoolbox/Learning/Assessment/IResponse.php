@@ -122,7 +122,7 @@ interface IResponse
      * This is the when:
      * * DueWorkSubmission: transitioned from "draft" to "submitted"
      * * QuizAttempt:       student finished
-     * * TaskCompletion:    creation
+     * * TaskResponse:      creation
      *
      * @return Alaress_Date_Format
      */

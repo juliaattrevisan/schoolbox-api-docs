@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\MarkScheme;
 use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Learning\Assessment\IResponse;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 
 class Completion extends AbstractMarkScheme
 {
@@ -31,7 +31,7 @@ class Completion extends AbstractMarkScheme
      * Returns a string representation of a normalised Mark
      *
      * @param mixed          $normalisedMark Ignored.
-     * @param IResponse|TaskCompletion|null $response
+     * @param IResponse|TaskResponse|null $response
      * @throws RangeException if normalised mark is outside valid range
      * @throws InvalidArgumentException if enum not matched
      * @return string

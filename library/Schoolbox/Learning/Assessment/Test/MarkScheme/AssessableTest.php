@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -2115,7 +2115,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // user1: no Response or Feedback
 
         // user2: self-assessed
-        $response2 = new TaskCompletion();
+        $response2 = new TaskResponse();
         $response2->setId(2);
         $response2->setAssessable($task);
         $response2->setSubmittedBy($student2);
@@ -2127,7 +2127,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
 
         // user3: teacher-assessed
-        $response3 = new TaskCompletion();
+        $response3 = new TaskResponse();
         $response3->setId(3);
         $response3->setAssessable($task);
         $response3->setSubmittedBy($teacher);
@@ -2150,7 +2150,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $response3->getAllFeedback()->add($feedback3);
 
         // user4: student-assessed then teacher-assessed
-        $response4a = new TaskCompletion();
+        $response4a = new TaskResponse();
         $response4a->setId(4);
         $response4a->setAssessable($task);
         $response4a->setSubmittedBy($student4);
@@ -2160,7 +2160,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $participant4->getAllResponses()->add($response4a);
         $task->getResponses()->add($response4a);
 
-        $response4b = new TaskCompletion();
+        $response4b = new TaskResponse();
         $response4b->setId(4);
         $response4b->setAssessable($task);
         $response4b->setSubmittedBy($student4);
@@ -2767,6 +2767,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $userId
+     * @param IAssessable $assessable
      * @return Participant
      */
     private function getDummyParticipant($userId, IAssessable $assessable)

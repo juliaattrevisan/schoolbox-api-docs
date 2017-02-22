@@ -13,7 +13,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion as DataObject;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskResponseDomainObject;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponseDomainObject;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as DomainObject;
 use Schoolbox\Mapper;
 

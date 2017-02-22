@@ -27,7 +27,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 class Participant
@@ -113,7 +113,7 @@ class Participant
     {
         // Special case for Task
         if($this->assessable instanceof Task){
-            /** @var TaskCompletion $mostRecentResponse */
+            /** @var TaskResponse $mostRecentResponse */
             $mostRecentResponse = $this->findMostRecentSubmittedResponse();
             return !$mostRecentResponse || $mostRecentResponse->isMarkedAsIncomplete();
         }
@@ -147,7 +147,7 @@ class Participant
     {
         // Special case for Task.
         if($this->assessable instanceof Task){
-            /** @var TaskCompletion $latestSubmittedResponse */
+            /** @var TaskResponse $latestSubmittedResponse */
             $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
             return $latestSubmittedResponse && $latestSubmittedResponse->isMarkedAsSelfAssessed();
         }
@@ -179,7 +179,7 @@ class Participant
     {
         // Special case for Task
         if($this->assessable instanceof Task){
-            /** @var TaskCompletion $latestSubmittedResponse */
+            /** @var TaskResponse $latestSubmittedResponse */
             $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
             return $latestSubmittedResponse && $latestSubmittedResponse->isMarkedAsTeacherAssessed();
         }
@@ -357,7 +357,7 @@ class Participant
         } elseif ($this->assessable instanceof DueWork) {
             return DueWorkSubmission::class;
         } elseif ($this->assessable instanceof Task) {
-            return TaskCompletion::class;
+            return TaskResponse::class;
         } elseif ($this->assessable instanceof Project) {
             return null;
         } else {

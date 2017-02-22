@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Assessment\Task\Completion;
+namespace Schoolbox\Learning\Assessment\Task\Response;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 use Schoolbox\Learning\Assessment\Task\CompletionStatusTrait;
@@ -18,8 +18,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
- * Class Model
- *
  * @method TaskModel getAssessable()
  */
 class Model extends AbstractResponse implements ICompletion
