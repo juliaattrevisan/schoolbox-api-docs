@@ -5,7 +5,7 @@
     <div class="list-item">
         <div class="card wrap-down small-12">
             <div class="{{ icon.renderClass(assessable) }} size-64" title="{{ assessable.getTypeName }}"></div>
-            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, activity: assessable}) %}
+            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, assessment: assessable}) %}
             {% if route %}
             <a href="{{ route }}">
                 <h3>{{ assessable.title }}</h3>
