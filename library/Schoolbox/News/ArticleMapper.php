@@ -684,11 +684,7 @@ class ArticleMapper extends Mapper implements Searchable
              * Otherwise leave empty
              */
             if (strlen(trim($currentRecord['i.hash']))) {
-                $image = $imageMapper->hydrate($currentRecord, 'i');
-
-                if ($image->getHash()) {
-                    $article->setImage($image);
-                }
+                $article->setImage($imageMapper->hydrate($currentRecord, 'i'));
             }
 
             $allArticles->add($article);
