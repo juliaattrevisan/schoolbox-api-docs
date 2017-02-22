@@ -50,13 +50,13 @@ class External_Isams_Class implements External_ClassInterface
         $classQuery = $this->getClassCodeQuery($subCode);
 
         $query = "
-            SELECT    StudentSurname      as lastname, 
-                      StudentFirstname    as firstname, 
-                      Grade               as yearlevel, 
+            SELECT    V_Student.StudentSurname      as lastname, 
+                      V_Student.StudentFirstname    as firstname, 
+                      V_Student.Grade               as yearlevel, 
                       ''                  as house, 
-                      MedicalFlag         as StudentMedicalAlert, 
-                      txtadditionalHealth as StudentSpecialNeedsFlag, 
-                      StudentID           as synergy_id, 
+                      V_Student.MedicalFlag         as StudentMedicalAlert, 
+                      V_Student.txtadditionalHealth as StudentSpecialNeedsFlag, 
+                      V_Student.StudentID as synergy_id, 
                       null                as ClassCampus 
             FROM      V_Student 
             JOIN      V_Class ON V_Class.StudentID = V_Student.StudentID

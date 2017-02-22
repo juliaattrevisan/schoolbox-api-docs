@@ -111,7 +111,7 @@ class Sync implements SyncInterface
                         V_Student.Grade                 AS student_year_level,
                         V_Student.Grade                 AS student_year_level_description            
             FROM        V_Parent
-            JOIN        V_Student ON V_Student.StudentId = V_Parent.StudentID
+            JOIN        V_Student ON V_Student.StudentID = V_Parent.StudentID
             WHERE       V_Parent.Relationship IN ('Caregiver', 'Father', 'Guardian', 'Legal Guardian', 'Mother', 'Primary Contact')
         ";
 
