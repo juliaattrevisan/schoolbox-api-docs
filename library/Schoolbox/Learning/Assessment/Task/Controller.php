@@ -200,7 +200,6 @@ class Controller extends Assessment\Controller
 
         // And redirect somewhere
         if ($this->getRequest()->isXhr()) {
-            exit('asd');
             $result['success'] = true;
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
@@ -210,7 +209,6 @@ class Controller extends Assessment\Controller
             $this->getResponse()->content->set($this->buildJsonOutput($result));
 
         } else {
-            exit('qwe');
             // redirect after saving to Due Work Summary For Particular Student
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate(
