@@ -3,7 +3,6 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="action-list sortable-card ui-sortable task-list {% if expanded==false %}hide{% endif %}" data-task-list>
     {% for assessment in unit.assessables %}
-        {% set preview    = assessment is task ? 'data-plugin="preview"' : '' %}
 
         {# TODO hook these vars up to data once available #}
         {% set taskClass   = 'incomplete' %}
@@ -79,12 +78,8 @@
             </nav>
             {% if readOnly == false  %}
                 <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
-                    {% if assessment is quiz %}
-                        <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Results</a></li>
-                    {% endif %}
-                    {% if assessment is dueWork %}
-                        <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Results</a></li>
-                    {% endif %}
+                    <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Results</a></li>
+
                     {% if assessment is quiz %}
                         <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify this assessment">Modify</a></li>
                     {% else %}
