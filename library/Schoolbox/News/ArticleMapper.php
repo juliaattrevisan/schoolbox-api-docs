@@ -686,7 +686,7 @@ class ArticleMapper extends Mapper implements Searchable
 
                 /** @var Storage\IStorage $image */
                 $image = $imageMapper->hydrate($currentRecord, 'i');
-                new \Alaress_Probe($image);
+
                 $article->setImage($image);
             }
             else {
