@@ -18,29 +18,33 @@ class Loader
     /** @var LoggerInterface */
     protected $log;
 
-    /** @var IRouter */
-    private $router;
+    /** @var GeneratorInterface */
+    private $generator;
 
-
-    /**
-     * @param IRouter          $router
-     * @param LoggerInterface $log
-     */
-    public function __construct(IRouter $router, LoggerInterface $log)
-    {
-        $this->router = $router;
-        $this->log    = $log;
-    }
+    /** @var UserMapper */
+    private $userMapper;
 
 
     /**
      * @param GeneratorInterface $generator
      * @param UserMapper         $userMapper
+     * @param LoggerInterface    $log
+     */
+    public function __construct(GeneratorInterface $generator, UserMapper $userMapper, LoggerInterface $log)
+    {
+        $this->log        = $log;
+        $this->generator  = $generator;
+        $this->userMapper = $userMapper;
+    }
+
+
+    /**
+     * @param IRouter $router
      * @return void
      */
-    public function loadSubscriptions(GeneratorInterface $generator, UserMapper $userMapper)
+    public function loadSubscriptions(IRouter $router)
     {
-        $userIds = $userMapper->findAllIds();
+        $userIds = $this->userMapper->findAllIds();
         // $userIds = [ 230, 151 ];
 
         $userCount       = count($userIds);
@@ -53,15 +57,15 @@ class Loader
         $a = microtime(true);
 
         foreach ($userIds as $i => $userId) {
-            $user       = $userMapper->findById($userId);
-            $routes     = $generator->generateBindingsForUser($user);
+            $user       = $this->userMapper->findById($userId);
+            $routes     = $this->generator->generateBindingsForUser($user);
             $routeCount = 0;
 
             foreach ($routes as $prefix => $bindings) {
                 foreach ($bindings as $binding) {
                     // $route = "*.notify.$instanceId.$prefix.$binding";
                     $route = "*.notify.$prefix.$binding";
-                    $this->router->add($route, $userId, true);
+                    $router->add($route, $userId, true);
                     ++$routeCount;
                     ++$totalRoutes;
                 }
