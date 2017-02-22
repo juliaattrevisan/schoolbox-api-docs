@@ -10,14 +10,37 @@
  */
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
+use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use Schoolbox\Learning\MarkScheme\Completion;
+use Schoolbox\User;
 
 /**
  * @method TaskResponse getResponse()
  */
 class Model extends AbstractFeedback
 {
+
+    /**
+     * @return Task
+     */
+    public function getAssessable()
+    {
+        return $this->getResponse()->getAssessable();
+    }
+
+    /**
+     * @param IAssessable $assessable
+     * @return $this
+     */
+    public function setAssessable($assessable)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback Assessable. It is derived from the TaskResponse.');
+    }
+
     /**
      * Intentionally no setter(). The value is derive from the IResponse object.
      *
@@ -30,6 +53,86 @@ class Model extends AbstractFeedback
         return $this->getResponse()->getMarkedComplete();
     }
 
+    /**
+     * Convenience method.
+     *
+     * Intentionally no setter(). That would potentially require implicit mutation of the submittedBy and submittedFor values.
+     *
+     * @return int
+     */
+    public function getCompletionStatus()
+    {
+        return $this->getResponse()->getCompletionStatus();
+    }
+
+
+    /**
+     * Determine whether this Feedback has been published.
+     * If the publish date is null, it's a draft
+     *
+     * @return bool
+     */
+    public function isPublished()
+    {
+        return true;
+    }
+
+
+    /**
+     * Is the specified user the reviewee of this feedback?
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isReviewedFor(User $user)
+    {
+        return $this->getResponse()->getSubmittedOnBehalfOf()->getId() == $user->getId();
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->getResponse()->getId();
+    }
+
+
+    /**
+     * @param  int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback Id. It is derived from the TaskResponse.');
+    }
+
+
+    /**
+     * Get the human-readable representation of the Normalised Mark
+     *
+     * This returns a string which could be something like "Not Submitted"
+     * or "B+" or "32/36"
+     *
+     * @return string
+     */
+    public function getHumanReadableMark()
+    {
+        return Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
+    }
+
+
+    /**
+     * Set the human-readable representation of the Normalised Mark
+     *
+     * @param string $humanReadableMark
+     * @return $this
+     */
+    public function setHumanReadableMark($humanReadableMark)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback HumanReadable Mark.');
+    }
 
     /**
      * Calculate the final mark for this IAssessable
@@ -46,15 +149,183 @@ class Model extends AbstractFeedback
         return null;
     }
 
+
     /**
-     * Convenience method.
+     * Set the Normalised Mark for an IFeedback
      *
-     * Intentionally no setter(). That would potentially require implicit mutation of the submittedBy and submittedFor values.
-     *
-     * @return int
+     * @param float $normalisedMark
+     * @return $this
      */
-    public function getCompletionStatus()
+    public function setNormalisedMark($normalisedMark)
     {
-        return $this->getResponse()->getCompletionStatus();
+        throw new \BadMethodCallException('You cannot set a TaskFeedback Normalised Mark.');
+    }
+
+
+    /**
+     * Get the comment associated with this IFeedback
+     *
+     * @return string
+     */
+    public function getComment()
+    {
+        // Tasks do not support comments for now
+        return '';
+    }
+
+
+    /**
+     * Set the comment associated with this IFeedback
+     *
+     * @param string $comment
+     * @return $this
+     */
+    public function setComment($comment)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback Comment.');
+    }
+
+
+    /**
+     * Get the person for whom this IFeedback was created
+     *
+     * Typically a student
+     *
+     * @return User
+     */
+    public function getReviewee()
+    {
+        return $this->getResponse()->getSubmittedOnBehalfOf();
+    }
+
+
+    /**
+     * Set the person for whom this IFeedback was created
+     *
+     * @param User $reviewee
+     * @return $this
+     */
+    public function setReviewee($reviewee)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback Reviewee. It is derived from the TaskResponse.');
+    }
+
+
+    /**
+     * Get the person who created this IFeedback
+     *
+     * Typically a teacher
+     *
+     * @return User
+     */
+    public function getReviewer()
+    {
+        return $this->getResponse()->getSubmittedBy();
+    }
+
+
+    /**
+     * Set the person who created this IFeedback
+     *
+     * @param User $reviewer
+     * @return $this
+     */
+    public function setReviewer($reviewer)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback Reviewer. It is derived from the TaskResponse.');
+    }
+
+    /**
+     * @param IResponse|TaskResponse $response
+     * @return static
+     */
+    public function setResponse(IResponse $response = null)
+    {
+        if(is_null($response)){
+            throw new \InvalidArgumentException('TaskFeedbacks must always link to a TaskResponse');
+        }
+        parent::setResponse($response);
+        return $this;
+    }
+
+
+    /**
+     * TaskFeedback is published when the TaskResponse was created.
+     *
+     * @return \Alaress_Date_Format
+     */
+    public function getPublishedAt()
+    {
+        return $this->getResponse()->getCreatedAt();
+    }
+
+
+    /**
+     * Set the date when this IFeedback was made accessible to respondents
+     *
+     * @param \Alaress_Date_Format $publishedAt
+     * @return $this
+     */
+    public function setPublishedAt($publishedAt)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback PublishedAt value. It is derived from the TaskResponse.');
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCreatedAt()
+    {
+        return $this->getResponse()->getCreatedAt();
+    }
+
+    /**
+     * @param  \Alaress_Date_Format $createdAt
+     *
+     * @return $this
+     */
+    public function setCreatedAt(\Alaress_Date_Format $createdAt = null)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback CreatedAt value. It is derived from the TaskResponse.');
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getUpdatedAt()
+    {
+        return $this->getResponse()->getUpdatedAt();
+    }
+
+
+    /**
+     * @param  \Alaress_Date_Format $updatedAt
+     *
+     * @return $this
+     */
+    public function setUpdatedAt(\Alaress_Date_Format $updatedAt = null)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback UpdatedAt value. It is derived from the TaskResponse.');
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDeletedAt()
+    {
+        return $this->getResponse()->getDeletedAt();
+    }
+
+
+    /**
+     * @param  \Alaress_Date_Format $deletedAt
+     * @return $this
+     */
+    public function setDeletedAt(\Alaress_Date_Format $deletedAt = null)
+    {
+        throw new \BadMethodCallException('You cannot set a TaskFeedback DeletedAt value. It is derived from the TaskResponse.');
     }
 }

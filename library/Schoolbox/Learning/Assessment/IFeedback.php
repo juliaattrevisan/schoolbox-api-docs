@@ -42,7 +42,7 @@ interface IFeedback
      */
 
     /**
-     * @var string
+     * @return int
      */
     public function getId();
 
@@ -159,10 +159,10 @@ interface IFeedback
     public function getResponse();
 
     /**
-     * @param IResponse $response
+     * @param IResponse|null $response
      * @return static
      */
-    public function setResponse($response);
+    public function setResponse(IResponse $response = null);
 
     /**
      * Get the date when this IFeedback was made accessible to respondents

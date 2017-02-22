@@ -1198,13 +1198,8 @@ class PendingFactory
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
             if ($userId != $row['tc.marking_user_id']) {
-                $feedback = new TaskFeedback();
-                $feedback->setId($row['tc.id']);
-                $feedback->setReviewee($response->getSubmittedOnBehalfOf());
-                $feedback->setPublishedAt($completedAt);
-                $feedback->setUpdatedAt($completedAt);
-                $feedback->setResponse($response);
-                $feedback->setAssessable($task);
+                $feedback = (new TaskFeedback())
+                    ->setResponse($response);
 
                 $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
                 $task->getFeedbacks()->setOffset($feedback->getId(), $feedback);

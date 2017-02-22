@@ -96,20 +96,12 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             }
 
             $taskFeedback = (new DomainObject())
-                ->setId($completion->getId())
-                ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
                 // The completion serves as both a response and a feedback.
-                // Add a corresponding stub response.
+                // Add a corresponding stub response that needs to be replaced by caller.
                 ->setResponse(
                     (new TaskResponseDomainObject())
                         ->setId($completion->getId())
-                )
-                ->setReviewee($completion->getStudent())
-                ->setReviewer($completion->getMarkingUser())
-                ->setCreatedAt($completion->getCompletionDate())
-                ->setUpdatedAt($completion->getCompletionDate())
-                ->setPublishedAt($completion->getCompletionDate())
-                ->setDeletedAt($completion->getDeletedAt());
+                );
 
             $taskFeedbacks->add($taskFeedback);
         }

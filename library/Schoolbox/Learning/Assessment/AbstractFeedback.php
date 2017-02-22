@@ -258,7 +258,7 @@ abstract class AbstractFeedback implements IFeedback
      * @param IResponse $response
      * @return static
      */
-    public function setResponse($response)
+    public function setResponse(IResponse $response = null)
     {
         $this->response = $response;
         return $this;

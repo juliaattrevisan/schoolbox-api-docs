@@ -2137,13 +2137,8 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $participant3->getAllResponses()->add($response3);
         $task->getResponses()->add($response3);
 
-        $feedback3 = new TaskFeedback();
-        $feedback3->setId(3);
-        $feedback3->setAssessable($task);
-        $feedback3->setResponse($response3);
-        $feedback3->setReviewer($teacher);
-        $feedback3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
-        $feedback3->setPublishedAt($this->getDummyDate(null));
+        $feedback3 = (new TaskFeedback())
+            ->setResponse($response3);
         $participant3->getAllFeedbacks()->add($feedback3);
         $task->getFeedbacks()->add($feedback3);
         $response3->getAllFeedback()->add($feedback3);
@@ -2169,13 +2164,8 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $participant4->getAllResponses()->add($response4b);
         $task->getResponses()->add($response4b);
 
-        $feedback4b = new TaskFeedback();
-        $feedback4b->setId(4);
-        $feedback4b->setAssessable($task);
-        $feedback4b->setResponse($response4b);
-        $feedback4b->setReviewer($teacher);
-        $feedback4b->setUpdatedAt($this->getDummyDate('2016-10-10 21:03:19'));
-        $feedback4b->setPublishedAt($this->getDummyDate('2016-10-10 21:03:19'));
+        $feedback4b = (new TaskFeedback())
+            ->setResponse($response4b);
         $participant4->getAllFeedbacks()->add($feedback4b);
         $task->getFeedbacks()->add($feedback4b);
         $response4b->getAllFeedback()->add($feedback4b);

@@ -148,14 +148,13 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     {
         $task = $this->spawnTask();
 
-        $feedback = new TaskFeedback();
-        $feedback
+        $response = (new TaskResponse())
             ->setId(87)
             ->setAssessable($task)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
         $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
 
@@ -193,14 +192,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback = new TaskFeedback();
-        $feedback
-            ->setId(87)
-            ->setAssessable($task)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
         $response->getAllFeedback()->add($feedback);
 
@@ -245,14 +238,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback = new TaskFeedback();
-        $feedback
-            ->setId(87)
-            ->setAssessable($task)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
         $response->getAllFeedback()->add($feedback);
 
@@ -282,32 +269,13 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback = new TaskFeedback();
-        $feedback
-            ->setId(87)
-            ->setAssessable($task)
-            ->setComment('This is the most recently published feedback')
-            ->setNormalisedMark(999999)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $floatingFeedback = new TaskFeedback();
-        $floatingFeedback
-            ->setId(89)
-            ->setAssessable($task)
-            ->setComment('This is the most recent feedback (ignoring published-status)')
-            ->setNormalisedMark(8888888)
-            ->setReviewer($this->celia)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT));
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
         $response->getAllFeedback()->add($feedback);
 
         $task->getParticipant($this->hodes)->getAllResponses()->add($response);
         $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
@@ -337,32 +305,13 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback = new TaskFeedback();
-        $feedback
-            ->setId(87)
-            ->setAssessable($task)
-            ->setComment('This is the most recently published feedback, updated after publishing')
-            ->setNormalisedMark(999999)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2017-08-27 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $floatingFeedback = new TaskFeedback();
-        $floatingFeedback
-            ->setId(89)
-            ->setAssessable($task)
-            ->setComment('Helly was here')
-            ->setNormalisedMark(8888888)
-            ->setReviewer($this->celia)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT));
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
         $response->getAllFeedback()->add($feedback);
 
         $task->getParticipant($this->hodes)->getAllResponses()->add($response);
         $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
