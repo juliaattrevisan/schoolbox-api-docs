@@ -22,15 +22,6 @@ class Controller extends Base
     const PAGE_CURRENT = 'video';
 
     /**
-     * Controller constructor.
-     */
-    public function __construct()
-    {
-        $this->setVideoQueueMapper(VideoQueueMapper::getInstance());
-        $this->setStorageMapper(StorageMapper::getInstance());
-    }
-
-    /**
      * Display tree
      *
      * @api   GET /adminv2/video
@@ -40,7 +31,11 @@ class Controller extends Base
     {
         // Render this thing out
 
-        $statuses = ['failed', 'processing', 'pending'];
+        $statuses = [
+            VideoQueueMapper::STATUS_FAILED,
+            VideoQueueMapper::STATUS_PROCESSING,
+            VideoQueueMapper::STATUS_PENDING
+        ];
 
         $queue = [];
 
@@ -105,37 +100,14 @@ class Controller extends Base
      */
     public function getVideoQueueMapper()
     {
-        return $this->videoQueueMapper;
+        $this->getDi()->get('mapperFactory')->getLazy(VideoQueueMapper::class);
     }
-
-    /**
-     * @param $mapper
-     * @return $this
-     */
-    public function setVideoQueueMapper($mapper)
-    {
-        $this->videoQueueMapper = $mapper;
-        return $this;
-    }
-
-    /** @var StorageMapper $storageMapper */
-    private $storageMapper;
 
     /**
      * @return StorageMapper
      */
     public function getStorageMapper()
     {
-        return $this->storageMapper;
-    }
-
-    /**
-     * @param $mapper
-     * @return $this
-     */
-    public function setStorageMapper($mapper)
-    {
-        $this->storageMapper = $mapper;
-        return $this;
+        $this->getDi()->get('mapperFactory')->getLazy(StorageMapper::class);
     }
 }
