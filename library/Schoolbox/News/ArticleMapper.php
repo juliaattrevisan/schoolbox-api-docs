@@ -679,10 +679,16 @@ class ArticleMapper extends Mapper implements Searchable
          */
         foreach ($allRecords as $currentRecord) {
             $article = $this->hydrate($currentRecord, 'a');
-            $image   = $imageMapper->hydrate($currentRecord, 'i');
 
-            if ($image->getHash()) {
-                $article->setImage($image);
+            /* Only ram in a hydrated image if there's an actual image there to use
+             * Otherwise leave empty
+             */
+            if (strlen(trim($currentRecord['i.hash']))) {
+                $image = $imageMapper->hydrate($currentRecord, 'i');
+
+                if ($image->getHash()) {
+                    $article->setImage($image);
+                }
             }
 
             $allArticles->add($article);
