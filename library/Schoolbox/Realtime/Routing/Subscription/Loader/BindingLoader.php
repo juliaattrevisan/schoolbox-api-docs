@@ -6,14 +6,14 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Realtime\Routing\Subscription;
+namespace Schoolbox\Realtime\Routing\Subscription\Loader;
 
 use Alaress\Routing\IRouter;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
 use Schoolbox\UserMapper;
 
-class Loader
+class BindingLoader implements ILoader
 {
     /** @var LoggerInterface */
     protected $log;
@@ -40,7 +40,7 @@ class Loader
 
     /**
      * @param IRouter $router
-     * @return void
+     * @return $this
      */
     public function loadSubscriptions(IRouter $router)
     {
@@ -76,6 +76,8 @@ class Loader
         $b = microtime(true);
 
         $this->log->debug(sprintf("%d subscriptions loaded for %d users in %0.3f seconds", $totalRoutes, $userCount, ($b - $a)));
+
+        return $this;
     }
 
 }

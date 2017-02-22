@@ -54,7 +54,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         $router = new Router('.');
 
         // skipping this step is not advised ;)
-        (new Subscription\Loader(new Generator(/* just use defaults... */), UserMapper::getInstance(), $log))->loadSubscriptions($router);
+        (new Subscription\Loader\BindingLoader(new Generator(/* just use defaults... */), UserMapper::getInstance(), $log))->loadSubscriptions($router);
 
         // subscribe to the
         $handler    = new Subscription\Handler(new Subscription\Manager($router), $client, $log);
