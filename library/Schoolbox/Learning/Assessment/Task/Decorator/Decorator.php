@@ -37,12 +37,7 @@ class Decorator implements DecoratorInterface
      */
     public function decorate($assessment)
     {
-        if ($this->getHasSelfAssessed()) {
-            $assessment->selfAssessed();
-        }
-        else {
-            $assessment->teacherAssessed();
-        }
+        $assessment->setIsSelfAssessable($this->getHasSelfAssessed());
 
         // Build URL out of either URL from form or attachment list from form
         // (ripped out of old task save form)

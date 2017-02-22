@@ -105,8 +105,8 @@ class Model extends AbstractResponse implements ICompletion
                 throw new \UnexpectedValueException("Users may not complete a task themselves");
             }
 
-            if ($this->isMarkedAsSelfAssessed() && $this->getAssessable()->isTeacherAssessed()) {
-                throw new \UnexpectedValueException("Users may not self-assess a task themselves, if the task is teacher-assessed only");
+            if ($this->isMarkedAsSelfAssessed() && !$this->getAssessable()->isSelfAssessable()) {
+                throw new \UnexpectedValueException("Users may not self-assess a task themselves, if the task is not self-assessable");
             }
         }
         // If a teacher is marking a student, the teacher must have write+ perm to the class

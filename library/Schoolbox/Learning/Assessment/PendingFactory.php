@@ -601,7 +601,7 @@ class PendingFactory
                     $this->assessmentsCache[$assessmentId]     = new DueWork();
                 } elseif (!is_null($row['tk.id'])) {
                     $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
-                    $this->assessmentsCache[$assessmentId]  = (new Task())->setIsSelfAssessed(!$row['tk.requires_confirmation']);
+                    $this->assessmentsCache[$assessmentId]  = (new Task())->setIsSelfAssessable(!$row['tk.requires_confirmation']);
                 } else {
                     throw new \LogicException('Assessment must be Quiz, DueWork or Task. row: ' . print_r($row, true));
                 }

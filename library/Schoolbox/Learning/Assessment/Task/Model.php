@@ -36,7 +36,7 @@ class Model extends AbstractAssessment
      *
      * @var bool
      */
-    protected $isSelfAssessed = false;
+    protected $isSelfAssessable = false;
 
     /**
      * The content this task links to (if any).
@@ -141,42 +141,11 @@ class Model extends AbstractAssessment
      *
      * @return boolean
      */
-    public function isSelfAssessed()
+    public function isSelfAssessable()
     {
-        return $this->isSelfAssessed == true;
+        return $this->isSelfAssessable;
     }
 
-    /**
-     * This task is teacher-assessed
-     *
-     * @return bool
-     */
-    public function isTeacherAssessed()
-    {
-        return $this->isSelfAssessed == false;
-    }
-
-    /**
-     * Set this task to be teacher-assessed
-     *
-     * @return $this
-     */
-    public function teacherAssessed()
-    {
-        $this->setIsSelfAssessed(false);
-        return $this;
-    }
-
-    /**
-     * Set this task to be self-assessed
-     *
-     * @return $this
-     */
-    public function selfAssessed()
-    {
-        $this->setIsSelfAssessed(true);
-        return $this;
-    }
 
     /**
      * Check the dates set on this model are valid
@@ -207,7 +176,7 @@ class Model extends AbstractAssessment
         }
 
         // Must be self-assessable
-        if(!$this->isSelfAssessed()){
+        if(!$this->isSelfAssessable()){
             return false;
         }
 
@@ -231,12 +200,20 @@ class Model extends AbstractAssessment
      */
 
     /**
-     * @param boolean $isSelfAssessed
+     * @return boolean
+     */
+    public function getIsSelfAssessable()
+    {
+        return $this->isSelfAssessable;
+    }
+
+    /**
+     * @param boolean $isSelfAssessable
      * @return $this;
      */
-    public function setIsSelfAssessed($isSelfAssessed)
+    public function setIsSelfAssessable($isSelfAssessable)
     {
-        $this->isSelfAssessed = $isSelfAssessed;
+        $this->isSelfAssessable = $isSelfAssessable;
         return $this;
     }
 

@@ -71,7 +71,7 @@
                     {% set participant = assessment.getParticipant(USER) %}
                     {% include '@learningAssessment/task/progressTickForm.twig' with {
                         participant: participant,
-                        disabled: assessment.closed or participant.findMostRecentSubmittedResponse.markedAsTeacherAssessed or assessment.isTeacherAssessed
+                        disabled: assessment.closed or participant.findMostRecentSubmittedResponse.markedAsTeacherAssessed or not assessment.isSelfAssessable
                     } only %}
                 {% endif %}
             </nav>

@@ -262,7 +262,7 @@ class Controller extends Base
                                     $result = "Completed";
                                     break;
                                 case TaskCompletion::COMPLETION_STATUS_SELF_ASSESSED:
-                                    if ($assessment->isSelfAssessed()) {
+                                    if ($assessment->isSelfAssessable()) {
                                         $result = "Self Assessed";
                                     } else {
                                         $result = "Teacher Assessed";
