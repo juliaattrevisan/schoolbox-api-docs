@@ -39,7 +39,7 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * Retrieves the user's Doublefirst image
+     * Retrieves the user's image
      *
      * @param Integer $externalUserId
      * @return Bool|String
@@ -135,7 +135,7 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * Get a students info from Doublefirst
+     * Get a students info
      *
      * @param  $externalUserId
      * @return array|bool
@@ -417,7 +417,7 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * Gets all Students' account info from Doublefirst
+     * Gets all Students' account info
      *
      * @return array|bool
      */
@@ -447,7 +447,7 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * Gets all Parents' account info from Doublefirst
+     * Gets all Parents' account info
      *
      * @return array|bool
      */
@@ -481,7 +481,7 @@ class External_Isams_User implements External_UserInterface
 
 
     /**
-     * Gets all active Staff's account info from Doublefirst
+     * Gets all active Staff's account info
      *
      * @return array|bool
      */
@@ -554,7 +554,7 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * List of campuses a staff member is involved in based on timetable. No such thing in Doublefirst.
+     * List of campuses a staff member is involved in based on timetable
      *
      * @param int $staffID
      * @return array|bool

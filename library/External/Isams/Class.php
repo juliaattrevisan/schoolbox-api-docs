@@ -37,7 +37,7 @@ class External_Isams_Class implements External_ClassInterface
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->externalUser = new External_User('Doublefirst');
+        $this->externalUser = new External_User('isams');
     }
 
     /**

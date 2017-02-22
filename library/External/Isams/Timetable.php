@@ -42,7 +42,7 @@ class External_Isams_Timetable implements External_TimetableInterface
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->externalUser = new External_User('doublefirst');
+        $this->externalUser = new External_User('isams');
         $this->groupHandler = new Group();
         $this->campusMapper = new CampusMapper();
     }
