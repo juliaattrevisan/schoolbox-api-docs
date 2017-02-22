@@ -39,6 +39,12 @@ class Dispatcher implements DispatcherInterface
     /** @var DispatchStrategyInterface */
     protected $strat;
 
+    /** @var LoggerInterface */
+    private $log;
+
+    /** @var TaskResponseHandlerInterface */
+    private $msgHandler;
+
 
     /**
      * @param LoopInterface                $loop
@@ -98,7 +104,7 @@ class Dispatcher implements DispatcherInterface
         }
 
         // call for persistence
-        $this->strat->penqueue($identifier, $command, $data);
+        $this->strat->penqueue($identifier, $command, [ $data ]);
 
         // store the element locally
         $this->q->enqueue(array($identifier, $command, $data));
@@ -115,6 +121,8 @@ class Dispatcher implements DispatcherInterface
     /**
      * Attempts to dequeue and dispatch all elements in the queue.
      * Nothing will happen if the queue is empty.
+     *
+     * @param int $rate
      */
     public function attach($rate = null)
     {

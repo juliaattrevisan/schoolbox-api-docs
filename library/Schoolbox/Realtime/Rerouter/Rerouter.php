@@ -111,8 +111,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 		$this->on(SIGINT,  array($this, 'onInterrupt'));
 		$this->on(SIGTERM, array($this, 'onTerminate'));
 
-		$this->transaction = new Transaction($loop, function($timer) use ($d) {
-			/** @var $timer TimerInterface */
+		$this->transaction = new Transaction($loop, function(TimerInterface $timer) use ($d) {
 			$d->enqueue($timer, RerouterDispatchStrategy::TASK_REROUTE, $timer->getData());
 		}, self::TRANSACTION_CACHE_TIMEOUT, self::TRANSACTION_COUNT_LIMIT);
 
