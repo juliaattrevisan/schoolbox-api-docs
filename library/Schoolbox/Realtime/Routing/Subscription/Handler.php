@@ -20,7 +20,6 @@ use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Realtime\Rerouter\RerouterDispatchStrategy;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 
 class Handler implements TaskResponseHandlerInterface
@@ -78,7 +77,6 @@ class Handler implements TaskResponseHandlerInterface
 
             } catch (InvalidArgumentException $e) {
                 $this->log->warning($e->getMessage());
-                exit;
                 $resolver->ack();
                 return;
 
