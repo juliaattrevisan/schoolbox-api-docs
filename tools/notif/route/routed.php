@@ -14,6 +14,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
+use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\Subscription;
@@ -36,6 +37,19 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
     $di->get('stomp')->connect()->then(function (Client $client) use ($loop, $log, $opts) {
 
+        // the list of instances this particular daemon will listen for
+        $instances = [ INSTANCE_ID ];
+
+        // ensure endpoints exist
+        foreach ($instances as $instance) {
+            $r = '*.notify.#';
+            $q = "$instance.route";
+            $x = "sb.$instance.tx";
+            // TODO make the queues and exchanges instance-agnostic
+            $log->info("Ensuring binding exists: '$x' -> ($r) -> '$q'", [ 'char' => '>' ]);
+            Connector::getInstance()->declareQueue($q)->bindQueue($q, $r, $x);
+        }
+
         // this holds and traverses all our subscription data
         $router = new Router('.');
 
@@ -46,9 +60,6 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         $handler    = new Subscription\Handler(new Subscription\Manager($router), $client, $log);
 
         $dispatcher = new Dispatcher($loop, $handler, $log, new DispatchStrategy($opts['flags']));
-
-        // the list of instances this particular daemon will listen for
-        $instances = [ INSTANCE_ID ];
 
         foreach ($instances as $instance) {
             $handler->listen($instance, $loop, $dispatcher);
