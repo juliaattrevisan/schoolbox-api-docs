@@ -25,6 +25,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
@@ -207,6 +208,24 @@ class Mapper extends BaseMapper
             $options['order']['sequence'] = 'asc';
         }
         return parent::findByColumnList($columnList, $options);
+    }
+
+    /**
+     * Override findByColumnList to always order by sequence.
+     *
+     * If another order is defined, the sequence ordering will apply as a lower
+     * priority to that order.
+     *
+     * @param PredicateBuilder $pb
+     * @param array $options
+     * @return Collection
+     */
+    public function findByPredicates(PredicateBuilder $pb, array $options = [])
+    {
+        if (empty($options['order']['sequence'])) {
+            $options['order']['sequence'] = 'asc';
+        }
+        return parent::findByPredicates($pb, $options);
     }
 
     /**
@@ -438,26 +457,25 @@ class Mapper extends BaseMapper
      * are attached directly to this folder or through a course implementation
      * that is attached to this folder.
      *
-     * @param int|array $folderId   A folder ID or list thereof
-     * @param array     $columnList Any other columns to query on
-     *                              If "id" is one, these assessments are added to the final search.
-     * @param array     $options    Any other options to pass to the final search to `findByColumnList`.
+     * @param int|array        $folderId  A folder ID or list thereof
+     * @param PredicateBuilder $builder   A PredicateBuilder which contains columns to query on.
+     * @param array            $uniqueIds IDs of any assessables that should also be included
+     * @param array            $options   Any other options to pass to the final search to `findByColumnList`.
+
+     *
      * @return Collection|Model[]
      */
-    public function findAllForFolderId($folderId, $columnList, $options = [])
+    public function findAllForFolderId($folderId, PredicateBuilder $builder, $uniqueIds = [], $options = [])
     {
         // Support stuff for query
         $folderList = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
         if (count($folderList) === 0) {
             // Exit early if empty
-            return new Collection();
+            return $this->createCollection();
         }
         $params       = BaseMapper\PredicateBuilder::getArrayParameters($folderList, 'folder');
         $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
 
-        // There's no OR support in the predicate builder.
-        // The best I can do is to get all IDs and fetch a union.
-        // TODO replace with an OR through the predicate builder
         $idQuery = "
             SELECT a.id
             FROM `folder` f
@@ -486,16 +504,9 @@ class Mapper extends BaseMapper
         $idList = array_column($idStatement->fetchAll(), 'id');
 
         // Send IDs to findByColumnList
-        $params = $columnList;
-        if (isset($params['id'])) {
-            if (!is_array($params['id'])) {
-                $params['id'] = [$params['id']];
-            }
-            $params['id'] = array_unique(array_merge($params['id'], $idList));
-        } else {
-            $params['id'] = $idList;
-        }
-        return $this->findByColumnList($params, $options);
+        $builder = $builder->equals('id', array_merge($idList, $uniqueIds));
+
+        return $this->findByPredicates($builder, $options);
     }
 
     /**

@@ -65,31 +65,6 @@ class GenericCollection extends Collection
     }
 
     /**
-     * Groups results by the return value of $callback.
-     *
-     * @param  callable $callback A callback which takes each item within $this
-     *                            as its only parameter, and returns a key.
-     * @return static|static[]
-     *   A collection of collections.
-     *   * key:   result of $item->$callback()
-     *   * value: a collection of all items in $this where $item->$callback() = $key
-     */
-    public function groupByCallback($callback)
-    {
-        $result = array();
-
-        foreach ($this as $item) {
-            $key = call_user_func($callback, $item);
-            if (!array_key_exists($key, $result)) {
-                $result[$key] = new static(get_class($item));
-            }
-            $result[$key]->add($item);
-        }
-
-        return new static(static::class, $result);
-    }
-
-    /**
      * Set stack
      *
      * @param $stack

@@ -110,7 +110,7 @@ class ImportFactory
         ";
 
         $pb = new PredicateBuilder($this->database, '');
-        $pb->anyOf('us.id', array_keys($unitSpecCache));
+        $pb->equals('us.id', array_keys($unitSpecCache));
         $pb->isNull('sa.deleted_at');
         $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
@@ -224,7 +224,7 @@ class ImportFactory
         ";
 
         $pbInner1 = new PredicateBuilder($this->database, '');
-        $pbInner1->anyOf('ui_inner.id', $unitImplIds);
+        $pbInner1->equals('ui_inner.id', $unitImplIds);
         $pbInner1->isNull('ia.deleted_at');
         $innerQuery1 .= 'WHERE ' . implode(' AND ', $pbInner1->getWhere());
 
@@ -273,7 +273,7 @@ class ImportFactory
             LEFT JOIN project ipr                         ON ipr.assessment_id = ia.id
         ";
         $pbOuter1 = new PredicateBuilder($this->database, '');
-        $pbOuter1->anyOf('us.id', array_keys($unitSpecCache));
+        $pbOuter1->equals('us.id', array_keys($unitSpecCache));
         $query1 .= ' WHERE ' . implode(' AND ', $pbOuter1->getWhere());
 
         // Get the following Assessments:
@@ -320,7 +320,7 @@ class ImportFactory
         $pbOuter2 = new PredicateBuilder($this->database, '');
         $pbOuter2->isNull('ia.deleted_at');
         $pbOuter2->isNull('asi.implementation_assessment_id');
-        $pbOuter2->anyOf('ui.id', $unitImplIds);
+        $pbOuter2->equals('ui.id', $unitImplIds);
         $query2 .= ' WHERE ' . implode(' AND ', $pbOuter2->getWhere());
 
         $query = "$query1 UNION $query2";

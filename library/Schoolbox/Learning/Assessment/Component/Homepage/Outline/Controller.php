@@ -17,8 +17,10 @@ use Alaress_Date_Format;
 use Component_Instance;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -102,29 +104,38 @@ class Controller extends Component_Homepage_ControllerAbstract
             $this->courseImplementation = $this->courseImplementationMapper->findById($courseImplId);
             $this->courseImplementation->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImplId));
 
+            // Load all assessments in a single query
+            $uiIds = $this->courseImplementation->getUnits()->getColumnValues('id');
+
+            if ($this->readOnly) {
+                // I might be a student, but can't be anything more.
+                // In any case, load only my participation - if I'm not a participant, there will be nothing.
+                // also omit anything that is not yet published (there's no easy way to apply this filter to the query)
+
+                // this isn't cached in the factory method... for some reason...
+                $now = Alaress_Date_Format::now();
+
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
+                    $uiIds,
+                    $this->getUser()
+                )->filter(function (IAssessable $activity) use ($now) {
+                    return $activity->getPublishAt()->lte($now);
+                });
+            } else {
+                // I'm a teacher - load all participants.
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline($uiIds);
+            }
+
+            // And then add them to the displayed course impl
+            $assessments = $assessments
+                ->groupByCallback(function (IAssessable $assessment) {
+                    return $assessment->getContext()->getId();
+                });
+
             foreach ($this->courseImplementation->getUnits() as $unitImpl) {
-                if ($this->readOnly) {
-                    // I might be a student, but can't be anything more.
-                    // In any case, load only my participation - if I'm not a participant, there will be nothing.
-                    // also omit anything that is not yet published (there's no easy way to apply this filter to the query)
-
-                    // this isn't cached in the factory method... for some reason...
-                    $now = Alaress_Date_Format::now();
-
-                    $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
-                        $unitImpl->getId(),
-                        $this->getUser()
-                    )->filter(function (IAssessable $activity) use ($now) {
-                        return $activity->getPublishAt()->lte($now);
-                    });
-                } else {
-                    // I'm a teacher - load all participants.
-                    $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
-                        $unitImpl->getId()
-                    );
+                if (isset($assessments[$unitImpl->getId()])) {
+                    $unitImpl->setAssessables($assessments[$unitImpl->getId()]);
                 }
-                $unitImpl->setAssessables($this->getAssessmentMapperProxy()->createCollection($assessments->getAll()));
-
 //                $unitId = $unitImpl->getSpecification()->getFolder()->getId();
 //                $this->accessList[$unitId] = Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
             }

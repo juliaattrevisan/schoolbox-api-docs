@@ -23,6 +23,8 @@ class PredicateBuilder
     const OPERATOR_LTE        = '<=';
     const OPERATOR_GT         = '>';
     const OPERATOR_GTE        = '>=';
+    const OPERATOR_INTERSECT  = 'AND';
+    const OPERATOR_UNION      = 'OR';
 
     /** @var IDatabase */
     protected $database;
@@ -46,6 +48,46 @@ class PredicateBuilder
     {
         $this->setTable($table);
         $this->database = $db;
+    }
+
+    /**
+     * Query the intersection (AND) of the conditions in the given predicate builder
+     *
+     * @param PredicateBuilder $predicate
+     * @return $this
+     */
+    public function all(self $predicate)
+    {
+        return $this->addSubPredicate(self::OPERATOR_INTERSECT, $predicate);
+    }
+
+    /**
+     * Query the union (OR) of the conditions in the given predicate builder
+     *
+     * @param PredicateBuilder $predicate
+     * @return $this
+     */
+    public function any(self $predicate)
+    {
+        return $this->addSubPredicate(self::OPERATOR_UNION, $predicate);
+    }
+
+    /**
+     * Helper function for adding multiple predicates to this object.
+     *
+     * @param string             $glue
+     * @param PredicateBuilder $predicate
+     * @return $this
+     */
+    protected function addSubPredicate($glue, self $predicate)
+    {
+        // Extract this object's where and params
+        $this->params  = array_merge($this->getParams(), $predicate->getParams());
+
+        // Set the new where into action
+        $this->where[] = '('.implode(" $glue ", $predicate->getWhere()).')';
+
+        return $this;
     }
 
     /**
@@ -102,16 +144,6 @@ class PredicateBuilder
     public function isFalse($columnName)
     {
         return $this->addPredicate($columnName, false);
-    }
-
-    /**
-     * @param string $columnName
-     * @param array  $columnValues
-     * @return PredicateBuilder
-     */
-    public function anyOf($columnName, array $columnValues)
-    {
-        return $this->addPredicate($columnName, $columnValues);
     }
 
     /**

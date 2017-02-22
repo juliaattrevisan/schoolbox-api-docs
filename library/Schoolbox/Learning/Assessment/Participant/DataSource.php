@@ -11,6 +11,7 @@ use External_ClassInterface;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
@@ -108,12 +109,52 @@ class DataSource
      */
     public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null, $includeResponses = true, $includeFeedbacks = true)
     {
-        $assessment->setAllParticipants($this->findForAssessment($assessment, $user, $includeResponses, $includeFeedbacks));
+        $this->loadParticipationIntoAssessmentCollection(
+            new Collection([$assessment]),
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        );
+    }
 
-        if ($assessment instanceof Project) {
-            foreach ($assessment->getAssessables() as $currentAssessment) {
-                // recurse
-                $this->loadParticipationIntoAssessment($currentAssessment, $user, $includeResponses, $includeFeedbacks);
+    /**
+     * Loads participation into all assessments.
+     *
+     * This includes records for responses and feedbacks for every participant in each assessment.
+     *
+     * @param Collection|IAssessable[] $assessments
+     * @param User                     $user
+     * @param bool                     $includeResponses
+     * @param bool                     $includeFeedbacks
+     */
+    public function loadParticipationIntoAssessmentCollection(
+        Collection $assessments,
+        User $user = null,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        /** @var Collection|IAssessable[] $assessmentsWithProjectActivities */
+        $assessmentsWithProjectActivities = new Collection();
+        foreach ($assessments as $assessment) {
+            $assessmentsWithProjectActivities->add($assessment);
+
+            if ($assessment instanceof Project) {
+                $assessmentsWithProjectActivities->merge($assessment->getAssessables());
+            }
+        }
+
+        // Load stack of participants for all assessments, plus activities in projects
+        $participantStack = $this->findForAssessmentCollection(
+            $assessmentsWithProjectActivities,
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        );
+
+        // Set participants for all of them
+        foreach ($assessmentsWithProjectActivities as $assessment) {
+            if (isset($participantStack[$assessment->getId()])) {
+                $assessment->setAllParticipants($participantStack[$assessment->getId()]);
             }
         }
     }
@@ -138,96 +179,137 @@ class DataSource
      */
     protected function findForAssessment(IAssessable $assessment, User $user = null, $includeResponses = true, $includeFeedbacks = true)
     {
-        // Build a participant list
-        $participants = new Collection();
-        foreach ($this->findAllStudentsForAssessment($assessment) as $currentUser) {
-            $participants->add(
-                new Participant($currentUser, $assessment)
-            );
+        return $this->findForAssessmentCollection(
+            new Collection([$assessment]),
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        )->first();
+    }
+
+    /**
+     * @param Collection|IAssessable[] $assessments
+     * @param User                     $user
+     * @param bool                     $includeResponses
+     * @param bool                     $includeFeedbacks
+     * @return Collection|\Schoolbox\Learning\Assessment\Participant[][]
+     *         A collection of collections of participants
+     */
+    protected function findForAssessmentCollection(
+        Collection $assessments,
+        User $user = null,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        $participantCollection = new Collection();
+
+        // Short-circuit if no assessments
+        if (count($assessments) === 0) {
+            return $participantCollection;
         }
 
-        // Need to add them into the assessment
-        $assessment->setAllParticipants($participants);
+        // Load basic list
+        foreach ($assessments as $assessment) {
+            $assessmentParticipants = new Collection();
+
+            // It's acceptable to findAllStudents in a loop for now, because the list is cached
+            foreach ($this->findAllStudentsForAssessment($assessment) as $currentUser) {
+                $assessmentParticipants->add(
+                    new Participant($currentUser, $assessment)
+                );
+            }
+
+            // Need to add participants into the assessment
+            $assessment->setAllParticipants($assessmentParticipants);
+
+            $participantCollection[$assessment->getId()] = $assessmentParticipants;
+        }
 
         /* Add responses
          *
-         * If if you've specified a particular user to accumulate information about,
-         * ensure that they are the submitter of the Response before adding it
-         *
-         * Otherwise just add all of them
-         *
-         * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
+         * findForAssessmentCollection now can filter by user
          */
         if ($includeResponses) {
-            foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
-                if ($user === null || ($user instanceof User && $response->isAuthoredBy($user))) {
-                    $responseUser = $response->getSubmittedOnBehalfOf();
 
-                    // Find participant, creating if required
-                    try {
-                        $responseParticipant = $assessment->getParticipant($responseUser);
+            $allResponses = $this->responseDataSource->findForAssessmentCollection($assessments, $user);
 
-                    } catch (\UnexpectedValueException $e) {
-                        // Not a participant: add them
-                        $responseParticipant = new Participant($responseUser, $assessment);
-                        $assessment->getAllParticipants()->add($responseParticipant);
+            // Load into each assessment
+            foreach ($assessments as $assessment) {
+                if (isset($allResponses[$assessment->getId()])) {
+                    foreach ($allResponses[$assessment->getId()] as $response) {
+                        /** @var IResponse $response */
+                        $responseUser = $response->getSubmittedOnBehalfOf();
+
+                        // Find participant, creating if required
+                        if ($assessment->isParticipant($responseUser)) {
+                            $responseParticipant = $assessment->getParticipant($responseUser);
+
+                        } else {
+                            // Add them
+                            $responseParticipant = new Participant($responseUser, $assessment);
+                            $assessment->getAllParticipants()->add($responseParticipant);
+                        }
+
+                        $responseParticipant->getAllResponses()->add($response);
                     }
-
-                    $responseParticipant->getAllResponses()->add($response);
                 }
             }
         }
 
         /* Add feedback
          *
-         * If if you've specified a particular user to accumulate information about,
-         * ensure that they are the reviewee of the Feedback before adding it
-         *
-         * Otherwise just add all of them
-         *
-         * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
+         * findForAssessmentCollection now can filter by user
          */
         if ($includeFeedbacks) {
-            foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
-                if ($user === null || ($user instanceof User && $feedback->isReviewedFor($user))) {
-                    $feedbackUser = $feedback->getReviewee();
 
-                    // Find participant, creating if required
-                    try {
-                        $responseParticipant = $assessment->getParticipant($feedbackUser);
+            $allFeedback = $this->feedbackDataSource->findForAssessmentCollection($assessments, $user);
 
-                    } catch (\UnexpectedValueException $e) {
-                        // Not a participant: add them
-                        $responseParticipant = new Participant($feedbackUser, $assessment);
-                        $assessment->getAllParticipants()->add($responseParticipant);
-                    }
+            foreach ($assessments as $assessment) {
+                if (isset($allFeedback[$assessment->getId()])) {
+                    foreach ($allFeedback[$assessment->getId()] as $feedback) {
+                        /** @var IFeedback $feedback */
+                        $feedbackUser = $feedback->getReviewee();
 
-                    // Feedbacks may have a stub response.
-                    // If so, use it to find the actual response, and associate them together.
-                    $stubResponse = $feedback->getResponse();
-                    if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
-                        $stubResponseId = $stubResponse->getId();
+                        // Find participant, creating if required
+                        if ($assessment->isParticipant($feedbackUser)) {
+                            $responseParticipant = $assessment->getParticipant($feedbackUser);
 
-                        foreach ($responseParticipant->getAllResponses() as $response) {
-                            // For now assume that the types of response and feedback match
-                            if ($stubResponseId == $response->getId()) {
-                                $response->getAllFeedback()->add($feedback);
-                                $feedback->setResponse($response);
-                                break;
+                        } else {
+                            // Add them
+                            $responseParticipant = new Participant($feedbackUser, $assessment);
+                            $assessment->getAllParticipants()->add($responseParticipant);
+                        }
+
+                        // Feedbacks may have a stub response.
+                        // If so, use it to find the actual response, and associate them together.
+                        // (Assume that the stub response lives in the same assessment!)
+                        $stubResponse = $feedback->getResponse();
+                        if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                            $stubResponseId = $stubResponse->getId();
+
+                            foreach ($responseParticipant->getAllResponses() as $response) {
+                                // For now assume that the types of response and feedback match
+                                if ($stubResponseId == $response->getId()) {
+                                    $response->getAllFeedback()->add($feedback);
+                                    $feedback->setResponse($response);
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    $responseParticipant->getAllFeedbacks()->add($feedback);
+                        $responseParticipant->getAllFeedbacks()->add($feedback);
+                    }
                 }
             }
         }
 
         // Sort by name after all that
-        $participants = $assessment->getAllParticipants()->sortByCallback([$this, 'sortCallback']);
-        $assessment->setAllParticipants($participants);
+        foreach ($assessments as $assessment) {
+            $participants = $assessment->getAllParticipants()->sortByCallback([$this, 'sortCallback']);
+            $assessment->setAllParticipants($participants);
+        }
 
-        return $participants;
+        return $participantCollection;
     }
 
     /**

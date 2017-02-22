@@ -504,6 +504,23 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         return $merged;
     }
 
+    /**
+     * Performs a union on the contents of the two collections, preserving keys.
+     *
+     * This behaves like the array union operator ($array1 + $array2).
+     *
+     * Does NOT mutate either this or the other Collection.
+     *
+     * @param Collection $other
+     * @return static
+     */
+    public function union(Collection $other)
+    {
+        $merged = $this->emptyClone($this);
+        $merged->setStack($this->getStack() + $other->getStack());
+        return $merged;
+    }
+
 
     /**
      * Returns a new collection containing this collection's items, plus any

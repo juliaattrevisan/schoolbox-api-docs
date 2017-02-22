@@ -1889,16 +1889,16 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // If this underflows, someone passed an empty column value - return an empty set.
-        $where = $this->buildWherePart($predicate, $columnList, $options);
+        $this->buildWherePart($predicate, $columnList, $options);
 
         $this->monitor->assessPredicate($predicate, $query);
 
         // capture this regardless of emptiness
-        $params = $where['params'];
+        $params = $predicate->getParams();
 
         // only actually add a where clause if there are predicates to test
         if ($predicate->count()) {
-            $query .= ' WHERE ' . implode(' AND ', $where['where']);
+            $query .= ' WHERE ' . $this->getPredicateBuilder()->all($predicate)->getWhere()[0];
         }
 
         // Build ORDER part (in an injection-safe way)
@@ -2917,6 +2917,18 @@ abstract class Mapper implements IMapper, Serializable
 
         // create a new, blank model
         return new $this->model;
+    }
+
+    /**
+     * Creates a model from the given join.
+     *
+     * @param string $join
+     * @param int    $idValue
+     * @return object
+     */
+    public function createJoinModel($join, $idValue = null)
+    {
+        return $this->getJoinMapper($join)->createModel($idValue);
     }
 
     /**

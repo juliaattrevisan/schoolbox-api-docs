@@ -69,15 +69,30 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
 
             // Note: findAllByFolderIdForReview retrieves response+feedback for all
             // assessment types, not just tasks (as it did previously).
+            $options = [
+                'type'  => $this->getAssessmentType(),
+                'from'  => \Alaress_Date_Format::now(),
+                'order' => ['due_date' => 'asc'],
+            ];
+
             $this->assessments = $this->getAssessmentMapper()
-                ->findAllByFolderIdForReview($this->getSource()->getId(), $this->getUser())
+                ->findAllByFolderIdForReview(
+                    $this->getSource()->getId(),
+                    $this->getUser(),
+                    $options
+                )
                 ->filter(
                     function (IAssessable $assessment) use ($visibility)
                     {
-                        return $this->filterAssessment($assessment) && $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
+                        return $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
                     }
                 )
-                ->limit($this->getConfig('size') ?: null);
+            ;
+
+            if ($this->getConfig('size') > 0) {
+                $this->assessments->limit($this->getConfig('size'));
+            }
+
 
         } catch (\DomainException $e) {
             // if something goes wrong, this component will not be displayed
@@ -129,13 +144,11 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     protected abstract function getTwigTemplate();
 
     /**
-     * Return whether or not this assessment is of the relevant type for the current controller
+     * Return the type of assessment to retrieve
      *
-     * @param IAssessable $assessment
-     * @return bool
+     * @return string
      */
-    protected abstract function filterAssessment(IAssessable $assessment);
-
+    protected abstract function getAssessmentType();
 
     /**
      * @param AssessmentMapperProxy $assessmentDataMapper

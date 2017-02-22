@@ -29,9 +29,19 @@ interface IFeedbackDataSource
      * Returns feedback for this assessment.
      *
      * @param IAssessable $assessment
+     * @param User        $student If set, only return this student's responses
      * @return Collection|IFeedback[]
      */
-    public function findForAssessment(IAssessable $assessment);
+    public function findForAssessment(IAssessable $assessment, User $student = null);
+
+    /**
+     * Returns feedback for all these assessments.
+     *
+     * @param Collection|IAssessable[] $assessments
+     * @param User                     $student If set, only return this student's responses
+     * @return Collection|IFeedback[][]
+     */
+    public function findForAssessmentCollection(Collection $assessments, User $student = null);
 
     /**
      * Returns feedback for work that this student has submitted.

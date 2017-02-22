@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -25,6 +26,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -87,7 +89,7 @@ class MapperProxy
     /**
      * Finds an assessable by ID.
      *
-     * This method does not load participants.
+     * This method does not load participants, but does load the rubric grid.
      *
      * @param int $id
      * @return IAssessable
@@ -102,7 +104,7 @@ class MapperProxy
     /**
      * Find by ID for modification.
      *
-     * This method does not load participants.
+     * This method does not load participants, but does load the rubric grid.
      *
      * @param int $id
      * @return IAssessable
@@ -115,7 +117,7 @@ class MapperProxy
     /**
      * Find by ID for review, either of a single student or all in the class.
      *
-     * This method loads participants, responses and feedback.
+     * This method loads participants, responses, feedback and rubric grid.
      *
      * @param int  $id
      * @param User $student If provided, load only this student's participation
@@ -148,6 +150,7 @@ class MapperProxy
      * Eventually, this will be deprecated.
      *
      * This method loads participants, responses and feedback.
+     * It does not load the rubric grid, because quizzes don't have rubrics.
      *
      * @param int  $quizId
      * @param User $student If provided, load only this student's participation
@@ -167,6 +170,8 @@ class MapperProxy
      * Eventually, this will be deprecated.
      *
      * This method loads participants, responses and feedback.
+     * It does not load the rubric grid, because rubrics shouldn't be used
+     * in any context where this method is used.
      *
      * @param int  $dueWorkId
      * @param User $student If provided, load only this student's participation
@@ -186,6 +191,7 @@ class MapperProxy
      * Eventually, this will be deprecated.
      *
      * This method loads participants, responses and feedback.
+     * It does not load the rubric grid, because tasks don't have rubrics.
      *
      * @param int  $taskId
      * @param User $student If provided, load only this student's participation
@@ -202,6 +208,7 @@ class MapperProxy
      *
      * This method does not load participants, because assessments in a unit spec
      * do not have participants.
+     * It does load the rubric grid.
      *
      * @param int $assessmentId
      * @return IAssessable
@@ -219,8 +226,8 @@ class MapperProxy
     /**
      * Finds the specification assessment for a implementation assessment.
      *
-     * Currently, this does not load participants - I am not yet sure which
-     * context this method will be used.
+     * Currently, this does not load participants or the rubric grid - I am not
+     * yet sure which context this method will be used.
      *
      * @param int $assessmentId
      * @param array $options
@@ -229,9 +236,9 @@ class MapperProxy
     public function findAllImplementationsBySpecificationId($assessmentId, $options = [])
     {
         // Get all assessables which have this assessment as a spec
-        $params            = $this->convertOptionsToColumnList($options);
-        $params['spec.id'] = $assessmentId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('spec.id', $assessmentId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
@@ -240,7 +247,7 @@ class MapperProxy
      * If $context is a Folder, this method does not retrieve assessables that
      * are within a course implementation that has been created on that folder.
      *
-     * This method does not load participants.
+     * This method does not load participants or the rubric grid.
      *
      * @param AssessmentContext $context
      * @param array             $options
@@ -268,6 +275,8 @@ class MapperProxy
      *
      * This method does not load participants, because assessments in a unit spec
      * do not have participants.
+     * Currently, this does not load the rubric grid - a variant which does load
+     * the grid may need to be implemented.
      *
      * @param int   $unitSpecId
      * @param array $options
@@ -275,15 +284,15 @@ class MapperProxy
      */
     public function findAllByUnitSpecificationId($unitSpecId, $options = [])
     {
-        $params          = $this->convertOptionsToColumnList($options);
-        $params['us.id'] = $unitSpecId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('us.id', $unitSpecId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
      * Finds all assessables for a unit implementation.
      *
-     * This method does not currently load participants.
+     * This method does not currently load participants or the rubric grid.
      *
      * @param int   $unitImplId
      * @param array $options
@@ -291,9 +300,9 @@ class MapperProxy
      */
     public function findAllByUnitImplementationId($unitImplId, $options = [])
     {
-        $params          = $this->convertOptionsToColumnList($options);
-        $params['ui.id'] = $unitImplId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('ui.id', $unitImplId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
@@ -321,7 +330,7 @@ class MapperProxy
      * implementation of the given folder.
      * This is more likely to be the expected behavior of this method.
      *
-     * This method does not currently load participants.
+     * This method does not currently load participants or the rubric grid.
      *
      * @param int   $folderId A folder or list of folders
      * @param array $options
@@ -332,7 +341,8 @@ class MapperProxy
         return $this->translateToDomainModelCollection(
             $this->baseMapper->findAllForFolderId(
                 $folderId,
-                $this->convertOptionsToColumnList($options),
+                $this->convertOptionsToPredicateBuilder($options),
+                [],
                 $options
             )
         );
@@ -340,6 +350,8 @@ class MapperProxy
 
     /**
      * Finds all assessables for a folder for review.
+     *
+     * This method loads participants, responses, feedback and rubric grids.
      *
      * @param int   $folderId A folder or list of folders
      * @param User  $student If provided, load only this student's participation
@@ -352,7 +364,8 @@ class MapperProxy
             $this->translateToDomainModelCollection(
                 $this->baseMapper->findAllForFolderId(
                     $folderId,
-                    $this->convertOptionsToColumnList($options),
+                    $this->convertOptionsToPredicateBuilder($options),
+                    [],
                     $options
                 )
             ),
@@ -364,7 +377,7 @@ class MapperProxy
      * Finds all assessables for a folder, not including course implementation
      * assessables.
      *
-     * This method does not currently load participants.
+     * This method does not currently load participants or the rubric grid.
      *
      * @param int   $folderId
      * @param array $options
@@ -372,16 +385,16 @@ class MapperProxy
      */
     public function findAllByFolderIdExclusively($folderId, $options = [])
     {
-        $params         = $this->convertOptionsToColumnList($options);
-        $params['f.id'] = $folderId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('f.id', $folderId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
      * Finds all assessables that have been imported into a folder through a
      * course import.
      *
-     * This method does not currently load participants.
+     * This method does not currently load participants or the rubric grid.
      *
      * @deprecated Use `findAllForFolderId` to find assessables in a folder,
      *             along with any that are in a unit import on that folder.
@@ -392,17 +405,17 @@ class MapperProxy
      */
     public function findAllByCourseImplementationFolderId($folderId, $options = [])
     {
-        $params            = $this->convertOptionsToColumnList($options);
         // uicf.id = Unit Implementation Course Folder ID
-        $params['uicf.id'] = $folderId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('uicf.id', $folderId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
      * Finds all assessables that are part of the given project.
      *
-     * This method does not load participants - see `$this->findAllByProjectIdForReview`
-     * for a version which does.
+     * This method does not load participants or the rubric grid - see
+     * `$this->findAllByProjectIdForReview` for a version which does.
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param array $options
@@ -410,14 +423,14 @@ class MapperProxy
      */
     public function findAllByProjectId($projectId, $options = [])
     {
-        $params                     = $this->convertOptionsToColumnList($options);
-        $params['pa.assessment_id'] = $projectId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('pa.assessment_id', $projectId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
      * Finds all assessables that are part of the given project, along with
-     * all participation.
+     * all participation and rubric grids.
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param User  $student If provided, load only this student's participation
@@ -433,7 +446,8 @@ class MapperProxy
     /**
      * Finds all assessables that this student is participating in.
      *
-     * This method loads participation for $student only.
+     * This method loads participation for $student only, and does not load the
+     * rubric grid.
      *
      * @param User $student
      * @param Term $term    Restrict results to this term
@@ -467,23 +481,19 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
+        $builder = $this->convertOptionsToPredicateBuilder(['from' => $from, 'to' => $to]);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $columnList = [
-            'id' => $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to),
-        ];
-
-        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
-            $columnList['due_date >='] = $from->getDatabase();
-        }
-        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
-            $columnList['due_date <='] = $to->getDatabase();
-        }
+        $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to);
 
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId($classFolderIds, $columnList)
+                $this->baseMapper->findAllForFolderId(
+                    $classFolderIds,
+                    $builder,
+                    $uniqueAssessmentIds
+                )
             ),
             $student
         );
@@ -492,7 +502,7 @@ class MapperProxy
     /**
      * Finds all assessables for a staff member.
      *
-     * This method loads participation for $staff only.
+     * This method does not loads participation.
      *
      * @param User $staff
      * @param Term $term    Restrict results to this term
@@ -512,17 +522,10 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
-        $extraParams['id'] = [];
-
-        foreach ($classFolderIds as $id) {
-            foreach ($this->baseMapper->findAllForFolderId($id, []) as $assessable) {
-                $extraParams['id'][] = $assessable->getId();
-            }
-        }
+        $predicate = $this->convertOptionsToPredicateBuilder(['term' => $term,]);
 
         return $this->translateToDomainModelCollection(
-            $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+            $this->baseMapper->findAllForFolderId($classFolderIds, $predicate)
         );
     }
 
@@ -748,27 +751,59 @@ class MapperProxy
     }
 
     /**
-     * Helper function for converting a list of options into a column list.
+     * Helper function for converting a list of options into a predicate builder.
      *
-     * Currently, only converts "term" to a due date span.
+     * Currently:
+     * * converts "term" to a due date span
+     * * converts "from" and "to" to due date filters
+     * * converts "type" to a filter which matches only that assessment type
+     *   (see AssessmentType::TYPE_* constants)
      *
      * @param array $options
-     * @return array
+     * @return PredicateBuilder
      */
-    protected function convertOptionsToColumnList($options)
+    protected function convertOptionsToPredicateBuilder($options)
     {
-        $columnList = [];
+        $builder = $this->baseMapper->getPredicateBuilder();
+
+        // Term filter (overrides due before/after)
         if ($options['term'] instanceof Term) {
-            /** @var Term $term */
             $term = $options['term'];
-            if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
-                $columnList['due_date >='] = $term->getStart()->getDatabase();
-            }
-            if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
-                $columnList['due_date <='] = $term->getActualFinish()->getDatabase();
-            }
+            $options['from'] = $term->getStart();
+            $options['to']   = $term->getActualFinish();
         }
-        return $columnList;
+
+        // Due before / after filter (an ADF)
+        if ($options['from'] instanceof \Alaress_Date_Format && !$options['from']->isNull()) {
+            $builder->notLessThan('due_date', $options['from']->getDatabase());
+        }
+        if ($options['to'] instanceof \Alaress_Date_Format && !$options['to']->isNull()) {
+            $builder->notGreaterThan('due_date', $options['to']->getDatabase());
+        }
+
+        // Assessment type filter
+        switch ($options['type']) {
+            case AssessmentType::TYPE_DUE_WORK:
+                $builder->notNull('d.id');
+                break;
+
+            case AssessmentType::TYPE_TASK:
+                $builder->notNull('t.id');
+                break;
+
+            case AssessmentType::TYPE_QUIZ:
+                $builder->notNull('q.assess_id');
+                break;
+
+            case AssessmentType::TYPE_PROJECT:
+                $builder->notNull('p.id');
+                break;
+
+            default:
+                break;
+        }
+
+        return $builder;
     }
 
     /**
@@ -810,9 +845,13 @@ class MapperProxy
         $includeResponses = true,
         $includeFeedbacks = true
     ) {
-        return $collection->map(function(IAssessable $assessable) use ($user, $includeResponses, $includeFeedbacks) {
-            return $this->loadParticipantsIntoAssessment($assessable, $user, $includeResponses, $includeFeedbacks);
-        });
+        $this->participantDataSource->loadParticipationIntoAssessmentCollection(
+            $collection,
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        );
+        return $collection;
     }
 
     /**
