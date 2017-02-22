@@ -215,6 +215,66 @@ interface IAssessable extends ISoftDeletable
      */
 
     /**
+     * Does the specified Participant need to submit a response?
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isResponseRequired(User $user);
+
+    /**
+     * Does the teacher need to give feedback to a student response?
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isFeedbackRequired(User $user);
+
+    /**
+     * Has the participant been marked as not-incomplete, and has not subsequently re-submitted ?
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isReviewComplete(User $user);
+
+
+    /**
+     * Has the participant made ANY kind of (submitted) response to the assessment?
+     *
+     * Includes teacher Submitting-On-Behalf-Of (S-O-B-O)
+     *
+     * Important: This will still return TRUE if task has been marked as 'incomplete'.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function hasSubmittedResponse(User $user);
+
+    /**
+     * Has a teacher given a published mark to the participant.
+     *
+     * For clarity - a self-assessed task, while complete, is not marked by teacher
+     * @see $this->hasMark to include self-assessed marks.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function hasPublishedFeedback(User $user);
+
+    /**
+     * Does this student have a mark for the assessment.
+     *
+     * This includes marks given by the teacher, and
+     * self-assessed marks for a task (even if self-assessed as 'Incomplete')
+     *
+     * @see $this->isMarkedByTeacher for teacher-assigned-only marks
+     * @param User $user
+     * @return bool
+     */
+    public function hasMark(User $user);
+
+    /**
      * Calculate how many Participant instances are in this IAssessable
      *
      * @return int

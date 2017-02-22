@@ -18,6 +18,7 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -196,6 +197,54 @@ class Model extends AbstractAssessment
         // Task is open, self-assessable, and not yet marked by the teacher as 'complete'
         return false;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isResponseRequired(User $user)
+    {
+        /** @var TaskResponse $mostRecentResponse */
+        $mostRecentResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        return !$mostRecentResponse || !$mostRecentResponse->getMarkedComplete();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isFeedbackRequired(User $user)
+    {
+        /** @var TaskResponse $latestSubmittedResponse */
+        $latestSubmittedResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        return $latestSubmittedResponse
+            && $latestSubmittedResponse->isSelfAssessed()
+            && $latestSubmittedResponse->getMarkedComplete();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isReviewComplete(User $user)
+    {
+        /** @var TaskResponse $latestSubmittedResponse */
+        $latestSubmittedResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        return $latestSubmittedResponse
+            && $latestSubmittedResponse->getMarkedComplete()
+            && !$latestSubmittedResponse->isSelfAssessed();
+    }
+
+    /**
+     * Special case for task - can be 'marked' by student or teacher.
+     *
+     * @inheritdoc
+     */
+    public function hasMark(User $user)
+    {
+        // Has the task been marked ?
+        // Note this distinguishes between implicit 'Incomplete' and explicit 'Incomplete'.
+        // The former returns FALSE, while the latter returns TRUE
+        return $this->getParticipant($user)->getAllResponses()->count() > 0;
+    }
+
 
     /* Getters/Setters
      */

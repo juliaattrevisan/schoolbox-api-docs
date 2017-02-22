@@ -111,25 +111,7 @@ class Participant
      */
     public function isResponseRequired()
     {
-        // Special case for Task
-        if($this->assessable instanceof Task){
-            /** @var TaskResponse $mostRecentResponse */
-            $mostRecentResponse = $this->findMostRecentSubmittedResponse();
-            return !$mostRecentResponse || !$mostRecentResponse->getMarkedComplete();
-        }
-
-        $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
-        $latestPublishedFeedback = $this->findMostRecentPublishedFeedback();
-
-        // No Responses and No Feedback?
-        if(!$latestSubmittedResponse && !$latestPublishedFeedback){
-            // No interaction yet - waiting for student to submit or teacher to give mark
-            return true;
-        }
-
-        // We either have a submitted response, or a published feedback, or both.
-        // All these scenarios imply student does not need to respond.
-        return false;
+        return $this->assessable->isResponseRequired($this->user);
     }
 
 
@@ -145,29 +127,7 @@ class Participant
      */
     public function isFeedbackRequired()
     {
-        // Special case for Task.
-        if($this->assessable instanceof Task){
-            /** @var TaskResponse $latestSubmittedResponse */
-            $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
-            return $latestSubmittedResponse
-                && $latestSubmittedResponse->isSelfAssessed()
-                && $latestSubmittedResponse->getMarkedComplete();
-        }
-
-        // No responses, or latest response has published feedback already ?
-        $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
-        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
-            return false;
-        }
-
-        // One or more responses and no feedback ?
-        $latestPublishedFeedback = $this->findMostRecentPublishedFeedback();
-        if (!$latestPublishedFeedback) {
-            return true;
-        }
-
-        // Was the latest student response submitted after the latest mark was published?
-        return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
+        return $this->assessable->isFeedbackRequired($this->user);
     }
 
 
@@ -179,16 +139,7 @@ class Participant
      */
     public function isReviewComplete()
     {
-        // Special case for Task
-        if($this->assessable instanceof Task){
-            /** @var TaskResponse $latestSubmittedResponse */
-            $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
-            return $latestSubmittedResponse
-                && $latestSubmittedResponse->getMarkedComplete()
-                && !$latestSubmittedResponse->isSelfAssessed();
-        }
-
-        return  $this->hasPublishedFeedback() && !$this->isFeedbackRequired();
+        return $this->assessable->isReviewComplete($this->user);
     }
 
 
@@ -203,12 +154,7 @@ class Participant
      */
     public function hasSubmittedResponse()
     {
-        foreach($this->allResponses as $response){
-            if($response->isSubmitted()){
-                return true;
-            }
-        }
-        return false;
+        return $this->assessable->hasSubmittedResponse($this->user);
     }
 
 
@@ -222,12 +168,7 @@ class Participant
      */
     public function hasPublishedFeedback()
     {
-        foreach($this->allFeedbacks as $feedback){
-            if($feedback->isPublished()){
-                return true;
-            }
-        }
-        return false;
+        return $this->assessable->hasPublishedFeedback($this->user);
     }
 
 
@@ -242,16 +183,7 @@ class Participant
      */
     public function hasMark()
     {
-        // Special case for task - can be marked by student or teacher.
-        if($this->assessable instanceof Task){
-            // Has the task been marked ?
-            // Note this distinguishes between implicit 'Incomplete' and explicit 'Incomplete'.
-            // The former returns FALSE, while the latter returns TRUE
-            return $this->allResponses->count() > 0;
-        }
-
-        // Default case
-        return $this->hasPublishedFeedback();
+        return $this->assessable->hasMark($this->user);
     }
 
 

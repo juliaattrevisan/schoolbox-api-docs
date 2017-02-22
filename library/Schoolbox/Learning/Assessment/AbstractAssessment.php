@@ -397,6 +397,95 @@ abstract class AbstractAssessment implements IAssessable
     /* Traversals
      */
 
+
+    /**
+     * @inheritdoc
+     */
+    public function isResponseRequired(User $user)
+    {
+        $participant = $this->getParticipant($user);
+
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
+        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
+
+        // No Responses and No Feedback?
+        if(!$latestSubmittedResponse && !$latestPublishedFeedback){
+            // No interaction yet - waiting for student to submit or teacher to give mark
+            return true;
+        }
+
+        // We either have a submitted response, or a published feedback, or both.
+        // All these scenarios imply student does not need to respond.
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isFeedbackRequired(User $user)
+    {
+        $participant = $this->getParticipant($user);
+
+        // No responses, or latest response has published feedback already ?
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
+        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
+            return false;
+        }
+
+        // One or more responses and no feedback ?
+        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
+        if (!$latestPublishedFeedback) {
+            return true;
+        }
+
+        // Was the latest student response submitted after the latest mark was published?
+        return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isReviewComplete(User $user)
+    {
+        $participant = $this->getParticipant($user);
+        return  $participant->hasPublishedFeedback() && !$participant->isFeedbackRequired();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasSubmittedResponse(User $user)
+    {
+        foreach($this->getParticipant($user)->getAllResponses() as $response){
+            if($response->isSubmitted()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasPublishedFeedback(User $user)
+    {
+        foreach($this->getParticipant($user)->getAllFeedbacks() as $feedback){
+            if($feedback->isPublished()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasMark(User $user)
+    {
+        // Default case
+        return $this->hasPublishedFeedback($user);
+    }
+
     /**
      * @inheritdoc
      *
