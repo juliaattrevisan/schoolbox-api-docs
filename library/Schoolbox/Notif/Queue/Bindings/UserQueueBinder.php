@@ -20,6 +20,12 @@ use RuntimeException;
 use Schoolbox\Notif\AbstractQueueFactory;
 use Schoolbox\User;
 
+/**
+ * Class UserQueueBinder
+ *
+ * @deprecated
+ * @package Schoolbox\Notif\Queue\Bindings
+ */
 class UserQueueBinder
 {
 
@@ -46,6 +52,8 @@ class UserQueueBinder
 
 
     /**
+     * @deprecated
+     *
      * @param AMQPInterface        $amqp
      * @param ControlInterface     $rabbitCtrl
      * @param AbstractQueueFactory $qFactory

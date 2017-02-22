@@ -25,12 +25,18 @@ use OutOfBoundsException;
 abstract class UserQueue {
 
     // queue of messages that have been accepted by broadcast, but need to be filtered onto the other queues
+    /**
+     * @deprecated
+     */
     const Q_TOSORT = 'tosort';
 
     // queue of messages that have been received by Instant but have not yet expired
     const Q_LISTED = 'listed';
 
     // queue of messages that have been received by Instant and have not yet been read
+    /**
+     * @deprecated
+     */
     const Q_UNREAD = 'unread';
 
     // queue of messages that are pending to be sent by Digest

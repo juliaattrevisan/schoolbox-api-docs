@@ -14,10 +14,17 @@ use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Queue\AMQPQueue;
 use Alaress\Async\UserQueue\UserQueue;
 
+/**
+ * Class ToSortQueue
+ *
+ * @deprecated
+ * @package Schoolbox\Notif\Queue
+ */
 class ToSortQueue extends AMQPQueue {
 
 
     /**
+     * @deprecated
      * @param AMQPInterface $connector
      * @param int          $userId
      */

@@ -12,6 +12,12 @@ namespace Alaress\Async\Stomp;
 
 use OutOfBoundsException;
 
+/**
+ * Class SubscriptionList
+ *
+ * @deprecated
+ * @package Alaress\Async\Stomp
+ */
 abstract class SubscriptionList {
 
 	/**
@@ -23,6 +29,7 @@ abstract class SubscriptionList {
 
 
 	/**
+     * @deprecated
 	 * @return array
 	 */
 	public function getAllQueueNames() {
@@ -31,6 +38,7 @@ abstract class SubscriptionList {
 
 
 	/**
+     * @deprecated
 	 * @param string $regex
 	 * @return array
 	 */
@@ -40,6 +48,7 @@ abstract class SubscriptionList {
 
 
 	/**
+     * @deprecated
 	 * @param string $queue
 	 * @return mixed
 	 * @throws OutOfBoundsException
@@ -54,6 +63,7 @@ abstract class SubscriptionList {
 
 
 	/**
+     * @deprecated
 	 * @param mixed $source
 	 * @param bool  $clear
 	 * @return void
@@ -62,6 +72,7 @@ abstract class SubscriptionList {
 
 
     /**
+     * @deprecated
      * @param int $userId
      * @return string
      */

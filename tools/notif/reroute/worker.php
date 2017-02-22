@@ -14,6 +14,7 @@ use Schoolbox\Realtime\Worker\RerouteWorker;
 use Schoolbox\Realtime\Rerouter\Filter;
 
 /**
+ * @deprecated
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd

@@ -16,10 +16,19 @@ use Exception;
 use InvalidArgumentException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 
+/**
+ * Class AMQPQueue
+ *
+ * @deprecated
+ * @package Alaress\Async\Queue
+ */
 class AMQPQueue implements QueueInterface
 {
 
-    /** @var AMQPInterface */
+    /**
+     * @deprecated
+     * @var AMQPInterface
+     */
     protected $conn;
 
     /** @var string */
@@ -30,6 +39,8 @@ class AMQPQueue implements QueueInterface
 
 
     /**
+     * @deprecated
+     *
      * @param AMQPInterface $connector   the connector to use for AMQP transactions
      * @param string        $name        the unique name to be used for this queue in AMQP
      * @param string        $routingKey  the routing key used to bind this queue to its parent exchange

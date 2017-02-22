@@ -20,12 +20,19 @@ use RuntimeException;
 use Schoolbox\Realtime\Rerouter\QueueSorter;
 use Schoolbox\Realtime\Rerouter\RerouterDispatchStrategy;
 
+/**
+ * Class RerouteWorker
+ *
+ * @deprecated
+ * @package Schoolbox\Realtime\Worker
+ */
 class RerouteWorker extends AbstractProcess {
 
     /** @var QueueSorter */
     private $sorter;
 
     /**
+     * @deprecated
 	 * @param QueueSorter $queueSorter
 	 * @param LoopInterface $loop
      * @param LoggerInterface $log

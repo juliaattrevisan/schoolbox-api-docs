@@ -12,12 +12,19 @@ namespace Schoolbox\Realtime\Command;
 
 use Schoolbox\Notif\Notifactory;
 
+/**
+ * Class AbstractCommander
+ *
+ * @deprecated
+ * @package Schoolbox\Realtime\Command
+ */
 abstract class AbstractCommander implements CommanderInterface {
 
 	/** @var string */
 	protected $topic;
 
 	/**
+     * @deprecated
 	 * @param string $topic
 	 */
 	public function __construct($topic) {

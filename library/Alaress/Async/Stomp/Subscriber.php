@@ -14,6 +14,12 @@ use LogicException;
 use React\Stomp\Client;
 use React\Stomp\Exception\ConnectionException;
 
+/**
+ * Class Subscriber
+ *
+ * @deprecated
+ * @package Alaress\Async\Stomp
+ */
 class Subscriber {
 
 	/** @var Client */
@@ -22,11 +28,15 @@ class Subscriber {
 	/** @var array */
 	protected $subscriptions;
 
-	/** @var SubscriptionList */
+    /**
+     * @deprecated
+     * @var SubscriptionList
+     */
 	protected $subscriptionList;
 
 
 	/**
+     * @deprecated
 	 * @param Client           $stomp
 	 * @param SubscriptionList $subscriptionList
 	 */

@@ -37,11 +37,12 @@ class QueueFactory extends AbstractQueueFactory
 
             case UserQueue::Q_UNREAD:
                 $this->getAMQP();
+                // TODO replace with REDIS
                 return new UnreadQueue($this->getAMQP(),  $userId);
 
-            case UserQueue::Q_TOSORT:
-                $this->getAMQP();
-                return new ToSortQueue($this->getAMQP(),  $userId);
+//            case UserQueue::Q_TOSORT:
+//                $this->getAMQP();
+//                return new ToSortQueue($this->getAMQP(),  $userId);
 
         }
         throw new UnexpectedValueException("Unknown queue '$this->kind'");

@@ -12,11 +12,18 @@ namespace Schoolbox\Realtime\Digest;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Command\AbstractCommander;
 
+/**
+ * Class DigestCommander
+ *
+ * @deprecated
+ * @package Schoolbox\Realtime\Digest
+ */
 class DigestCommander extends AbstractCommander {
 
 	const CMD_RELOAD = 'reload';
 
 	/**
+     * @deprecated
 	 */
 	public function __construct() {
 		parent::__construct(Notif::TOPIC_CMD_DIGEST);

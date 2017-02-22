@@ -12,6 +12,12 @@ namespace Schoolbox\Realtime\Command;
 
 use Alaress\Scheduler\CommandableInterface;
 
+/**
+ * Interface CommanderInterface
+ *
+ * @deprecated
+ * @package Schoolbox\Realtime\Command
+ */
 interface CommanderInterface {
 
 	/**

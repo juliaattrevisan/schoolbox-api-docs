@@ -18,7 +18,10 @@ use UnexpectedValueException;
 
 abstract class AbstractQueueFactory implements IQueueFactory {
 
-    /** @var AMQPInterface */
+    /**
+     * @deprecated
+     * @var AMQPInterface
+     */
     private $amqp  = null;
 
     /** @var ClientInterface */
@@ -29,6 +32,7 @@ abstract class AbstractQueueFactory implements IQueueFactory {
 
 
     /**
+     * @deprecated
      * @param AMQPInterface $amqp
      * @return static
      */
@@ -62,6 +66,7 @@ abstract class AbstractQueueFactory implements IQueueFactory {
 
 
     /**
+     * @deprecated
      * @return AMQPInterface
      * @throws InvalidArgumentException
      */

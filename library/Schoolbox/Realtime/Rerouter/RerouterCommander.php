@@ -14,6 +14,12 @@ use Schoolbox\Mapper;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Command\AbstractCommander;
 
+/**
+ * Class RerouterCommander
+ *
+ * @deprecated
+ * @package Schoolbox\Realtime\Rerouter
+ */
 class RerouterCommander extends AbstractCommander {
 
 	const CMD_RELOAD        = 'reload';

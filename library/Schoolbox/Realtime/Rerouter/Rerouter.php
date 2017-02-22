@@ -32,6 +32,12 @@ use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Rerouter
+ *
+ * @deprecated
+ * @package Schoolbox\Realtime\Rerouter
+ */
 class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
     const QUEUE_COMMAND             = '.sb.cmd.reroute';
@@ -53,10 +59,16 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
     /** @var ControlInterface */
     protected $bunny;
 
-    /** @var UserQueueBinder */
+    /**
+     * @deprecated
+     * @var UserQueueBinder
+     */
     protected $binder;
 
-	/** @var Subscriber */
+    /**
+     * @deprecated
+     * @var Subscriber
+     */
 	protected $subscriber;
 
 	/** @var bool */
@@ -70,6 +82,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 
     /**
+     * @deprecated
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param Subscriber                $subscriber

@@ -18,6 +18,7 @@ class UserQueueFactory extends AbstractQueueFactory
 {
     const UQ_DIGEST  = 1;
     const UQ_INSTANT = 2;
+    /** @deprecated */
     const UQ_TO_SORT = 3;
     const UQ_REROUTE = 4;
 

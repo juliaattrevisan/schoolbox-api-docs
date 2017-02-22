@@ -17,6 +17,12 @@ use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use UnexpectedValueException;
 
+/**
+ * Class UserSubscriptionList
+ *
+ * @deprecated
+ * @package Schoolbox\Realtime\Rerouter
+ */
 class UserSubscriptionList extends SubscriptionList {
 
     /** @var QueueFactory */
@@ -26,6 +32,7 @@ class UserSubscriptionList extends SubscriptionList {
     protected $log;
 
     /**
+     * @deprecated
      * @param QueueFactory $qf
      * @param LoggerInterface $log
      */
@@ -37,6 +44,7 @@ class UserSubscriptionList extends SubscriptionList {
 
 
     /**
+     * @deprecated
      * @param int $userId
      * @throws UnexpectedValueException
      * @return string
@@ -48,6 +56,7 @@ class UserSubscriptionList extends SubscriptionList {
 
 
     /**
+     * @deprecated
      * @param UserMapper $source
      * @param bool       $clear
      * @throws UnexpectedValueException
@@ -119,6 +128,7 @@ class UserSubscriptionList extends SubscriptionList {
 
 
     /**
+     * @deprecated
      * @param string $name
      * @return bool
      */

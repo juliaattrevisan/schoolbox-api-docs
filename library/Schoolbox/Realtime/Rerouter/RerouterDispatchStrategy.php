@@ -12,6 +12,12 @@ namespace Schoolbox\Realtime\Rerouter;
 
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 
+/**
+ * Class RerouterDispatchStrategy
+ *
+ * @deprecated
+ * @package Schoolbox\Realtime\Rerouter
+ */
 class RerouterDispatchStrategy extends DefaultDispatchStrategy {
 
 	/**
