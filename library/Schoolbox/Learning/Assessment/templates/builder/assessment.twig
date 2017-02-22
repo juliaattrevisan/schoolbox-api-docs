@@ -11,10 +11,8 @@ Usage:
     <div class="grip compact"></div>
     <div class="list-item">
         <div class="card small-12 compact wrap-down">
-            <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
-                <span class="{{ icon.renderClass(assessment) }}"></span>
-                <p>{{ assessment.title }}</p>
-            </a>
+            <span class="{{ icon.renderClass(assessment) }}"></span>
+            <p>{{ assessment.title }}</p>
         </div>
     </div>
     <nav>
