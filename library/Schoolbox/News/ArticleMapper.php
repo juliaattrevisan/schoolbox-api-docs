@@ -623,10 +623,7 @@ class ArticleMapper extends Mapper implements Searchable
 
         /* Find all the news relevant to roles and campuses
          */
-        $userMapper   = $this->getJoinMapper('users');
         $imageMapper  = $this->getJoinMapper('image');
-        $campusMapper = $this->getJoinMapper('campuses');
-        $roleMapper   = $this->getJoinMapper('roles');
 
         /* Find all the news relevant to you specifically by id,
          * or by role type in your campus
@@ -678,13 +675,22 @@ class ArticleMapper extends Mapper implements Searchable
         /* Hydrate
          */
         foreach ($allRecords as $currentRecord) {
+
+            /** @var Article $article */
             $article = $this->hydrate($currentRecord, 'a');
 
             /* Only ram in a hydrated image if there's an actual image there to use
              * Otherwise leave empty
              */
             if (strlen(trim($currentRecord['i.hash']))) {
-                $article->setImage($imageMapper->hydrate($currentRecord, 'i'));
+
+                /** @var Storage\IStorage $image */
+                $image = $imageMapper->hydrate($currentRecord, 'i');
+                new \Alaress_Probe($image);
+                $article->setImage($image);
+            }
+            else {
+                $article->setImage(null);
             }
 
             $allArticles->add($article);
@@ -708,7 +714,7 @@ class ArticleMapper extends Mapper implements Searchable
     public function findForTopic(Topic $topic, $limit, $offset = 0, $time = 0)
     {
         $time = date('Y-m-d H:i:s', $time ? : time());
-        $now  = Alaress_Date_Format::now();
+        $now  = \Alaress_Date_Format::now();
 
         $limit  = (int)$limit;
         $offset = (int)$offset;

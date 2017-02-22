@@ -12,7 +12,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 use Schoolbox\News\ArticleMapper;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\News\Topic;
-
+error_reporting(E_ALL);
 $page = new SitePage(false);
 
 $user = null;
@@ -84,7 +84,7 @@ if (strlen($userKey)) {
                  */
                 $imageStr = '';
 
-                if ($currentNews->getImage()->getHash()) {
+                if ($currentNews->getImage() != null) {
                     $imageStr = "<img src=\"" . $page->conType(
                         ) . $_SERVER['HTTP_HOST'] . "/storage/image.php?hash={$currentNews->getImage()->getHash(
                         )}&size=constrain200\">";
