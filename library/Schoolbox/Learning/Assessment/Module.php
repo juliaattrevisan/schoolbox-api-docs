@@ -184,7 +184,7 @@ class Module extends BaseModule
             $student     = $this->getUserMapper()->findById($params['studentId']);
             $assessment  = $this->preloadAssessment($params, $student)['assessment'];
 
-            $access = $this->getAccess()->getFolderAccess($student, [$assessment->getContext()->getId()]);
+            $access = $this->getAccess()->getFolderAccess($student, [$assessment->getContext()->getFolder()->getId()]);
 
             /* Allow the currently logged in user to accesss the student's Assessment Summary
              *
