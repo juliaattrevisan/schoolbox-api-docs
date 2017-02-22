@@ -115,7 +115,7 @@ class Participant
         if($this->assessable instanceof Task){
             /** @var TaskResponse $mostRecentResponse */
             $mostRecentResponse = $this->findMostRecentSubmittedResponse();
-            return !$mostRecentResponse || $mostRecentResponse->isMarkedAsIncomplete();
+            return !$mostRecentResponse || !$mostRecentResponse->getMarkedComplete();
         }
 
         $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
@@ -149,7 +149,9 @@ class Participant
         if($this->assessable instanceof Task){
             /** @var TaskResponse $latestSubmittedResponse */
             $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
-            return $latestSubmittedResponse && $latestSubmittedResponse->isMarkedAsSelfAssessed();
+            return $latestSubmittedResponse
+                && $latestSubmittedResponse->isSelfAssessed()
+                && $latestSubmittedResponse->getMarkedComplete();
         }
 
         // No responses, or latest response has published feedback already ?
@@ -181,7 +183,9 @@ class Participant
         if($this->assessable instanceof Task){
             /** @var TaskResponse $latestSubmittedResponse */
             $latestSubmittedResponse = $this->findMostRecentSubmittedResponse();
-            return $latestSubmittedResponse && $latestSubmittedResponse->isMarkedAsTeacherAssessed();
+            return $latestSubmittedResponse
+                && $latestSubmittedResponse->getMarkedComplete()
+                && !$latestSubmittedResponse->isSelfAssessed();
         }
 
         return  $this->hasPublishedFeedback() && !$this->isFeedbackRequired();

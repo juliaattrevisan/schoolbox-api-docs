@@ -10,48 +10,41 @@
  */
 namespace Schoolbox\Learning\Assessment\Task\Response;
 
+use Schoolbox\Assessment\Course\Task\Completion;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
-use Schoolbox\Learning\Assessment\Task\CompletionStatusTrait;
-use Schoolbox\Learning\Assessment\Task\ICompletion;
-use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 
 /**
- * @method TaskModel getAssessable()
+ * @method Task getAssessable()
  */
-class Model extends AbstractResponse implements ICompletion
+class Model extends AbstractResponse
 {
-    use CompletionStatusTrait;
-
     /**
-     * Completions are submitted at the updatedAt value
-     * in case the Completion is modified by the Student
+     * Was the task marked as 'complete' or 'incomplete' ? (Regardless of who marked it)
      *
-     * @return \Alaress_Date_Format
+     * @var bool
      */
-    public function getSubmittedAt()
-    {
-        return $this->getCreatedAt();
-    }
+    private $markedComplete;
 
     /**
-     * Does this IResponse have feedback?
-     *
-     * Special case for task completion - a teacher has given feedback if they've marked as completed.
-     *
-     * TODO this separate implementation should be removed when SA-1667 is implemented
-     *      (SA-1667 is the refactor of the task completion/feedback stack)
+     * Did the student self-assess or is this a teacher submission-on-behalf-of ?
      *
      * @return bool
      */
-    public function hasFeedback()
+    public function isSelfAssessed()
     {
-        return $this->isMarkedAsTeacherAssessed();
+        return $this->getSubmittedBy()->getId() == $this->getSubmittedOnBehalfOf()->getId();
     }
 
-    /* Tasks always return Null marks for Feedbacks
+    /**
+     * Did a teacher submission-on-behalf-of the student ?
+     *
+     * @return bool
      */
+    public function isTeacherAssessed()
+    {
+        return !$this->isSelfAssessed();
+    }
 
     /**
      * This response is submitted (no longer a draft)
@@ -62,6 +55,28 @@ class Model extends AbstractResponse implements ICompletion
     {
         return true;
     }
+
+
+    /**
+     * Convenience method.
+     *
+     * Intentionally no setter(). That would potentially require implicit mutation of the submittedBy and submittedFor values.
+     *
+     * @return int
+     */
+    public function getCompletionStatus()
+    {
+        if(!$this->getMarkedComplete()){
+            return Completion::STATUS_INCOMPLETE;
+        }
+
+        return $this->isSelfAssessed()
+            ? Completion::STATUS_SELF_ASSESSED_COMPLETE
+            : Completion::STATUS_SELF_ASSESSED_COMPLETE;
+    }
+
+
+
 
     /**
      * Is this completion saveable in its current state?
@@ -82,40 +97,72 @@ class Model extends AbstractResponse implements ICompletion
     public function assertSaveability()
     {
         $currentUser = $this->getSubmittedBy();
-        $taskUser    = $this->getSubmittedOnBehalfOf();
+        $student     = $this->getSubmittedOnBehalfOf();
 
         // Only participants in task
-        if (!$this->getAssessable()->isParticipant($taskUser)) {
-            throw new \UnexpectedValueException("User is not a participant in this task");
+        if (!$this->getAssessable()->isParticipant($student)) {
+            throw new \UnexpectedValueException("Student is not a participant in this task");
         }
 
         // Can't create a new completion with the same status as most recent
         if (empty($this->getId())) {
-            $mostRecentResponse = $this->getAssessable()->getParticipant($taskUser)->findMostRecentResponse();
-            if ($mostRecentResponse instanceof Model && $mostRecentResponse->isMarkedAs($this->getCompletionStatus()) ) {
-                throw new \UnexpectedValueException("This user already has this status for this task");
+            $mostRecentResponse = $this->getAssessable()->getParticipant($student)->findMostRecentResponse();
+            if ($mostRecentResponse instanceof static
+                && $mostRecentResponse->getMarkedComplete() == $this->getMarkedComplete()
+                && $mostRecentResponse->isSelfAssessed() == $this->isSelfAssessed()
+            ) {
+                 throw new \UnexpectedValueException("This student already has this status ({$mostRecentResponse->getCompletionStatus()}) for this task");
             }
         }
 
-        // Can't set own work to completed, or self-assess if task doesn't allow it
-        if ($currentUser->getId() == $taskUser->getId()) {
-            if ($this->isMarkedAsTeacherAssessed()) {
-                throw new \UnexpectedValueException("Users may not complete a task themselves");
-            }
+        // Is the student self-assessing ?
+        if ($currentUser->getId() == $student->getId()) {
 
-            if ($this->isMarkedAsSelfAssessed() && !$this->getAssessable()->isSelfAssessable()) {
+            // Is the task self-assessable ?
+            if (!$this->getAssessable()->isSelfAssessable()) {
                 throw new \UnexpectedValueException("Users may not self-assess a task themselves, if the task is not self-assessable");
             }
-        }
-        // If a teacher is marking a student, the teacher must have write+ perm to the class
-        else {
-            $classFolderId = $this->getAssessable()->getBaseContext()->getId();
-            if(Access::getInstance()->getFolderAccess($currentUser, [$classFolderId]) < UserAccess::ACCESS_WRITE){
-                throw new \UnexpectedValueException("Teachers may only mark tasks on classes where they have write permissions.");
+
+            // Is the task already marked by the teacher as complete ?
+            if (!$this->isSelfAssessed() && $this->getMarkedComplete()) {
+                throw new \UnexpectedValueException("Students may not change a task completion status if the teacher has marked it complete.");
             }
         }
 
         // Anything else is fine
         return true;
     }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return bool
+     */
+    public function getMarkedComplete()
+    {
+        return $this->markedComplete;
+    }
+
+    /**
+     * @param bool $markedComplete
+     * @return $this
+     */
+    public function setMarkedComplete($markedComplete)
+    {
+        $this->markedComplete = $markedComplete;
+        return $this;
+    }
+
+    /**
+     * Completions are submitted at the updatedAt value
+     * in case the Completion is modified by the Student
+     *
+     * @return \Alaress_Date_Format
+     */
+    public function getSubmittedAt()
+    {
+        return $this->getCreatedAt();
+    }
+
 }

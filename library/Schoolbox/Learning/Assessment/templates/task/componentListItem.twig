@@ -7,10 +7,11 @@
     {% if assessable.isParticipant(USER) %}
         {% set extraNavItemCount = 1 %}
         {% set participant = assessable.getParticipant(USER) %}
+        {% set latestResponse = participant.findMostRecentSubmittedResponse %}
 
         {% include '@learningAssessment/task/progressTickForm.twig' with {
             participant: participant,
-            disabled: assessable.closed or participant.findMostRecentPublishedFeedback.markedAsTeacherAssessed or assessable.isTeacherAssessed
+            disabled: assessable.closed or not assessable.isSelfAssessable or (latestResponse.teacherAssessed and latestResponse.markedComplete )
         } only %}
     {% endif %}
 

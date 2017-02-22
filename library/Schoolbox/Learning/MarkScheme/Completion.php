@@ -16,9 +16,9 @@ class Completion extends AbstractMarkScheme
 {
     const TITLE = 'Completion';
 
-    const HUMAN_READABLE_INCOMPLETE        = 'Not Completed';
-    const HUMAN_READABLE_STUDENT_COMPLETED = 'Student-Assessed';
-    const HUMAN_READABLE_TEACHER_COMPLETED = 'Teacher-Assessed';
+    const HUMAN_READABLE_INCOMPLETE = 'Incomplete';
+    const HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT  = 'Complete';
+    const HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER  = 'Complete';
 
     /**
      * This type is not comparable numerically.
@@ -30,22 +30,18 @@ class Completion extends AbstractMarkScheme
     /**
      * Returns a string representation of a normalised Mark
      *
-     * @param mixed          $normalisedMark Ignored.
+     * @param mixed                       $normalisedMark Ignored.
      * @param IResponse|TaskResponse|null $response
-     * @throws RangeException if normalised mark is outside valid range
-     * @throws InvalidArgumentException if enum not matched
      * @return string
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if (null === $response || $response->isMarkedAsIncomplete()) {
+        if (null === $response || !$response->getMarkedComplete()) {
             return self::HUMAN_READABLE_INCOMPLETE;
-        } elseif ($response->isMarkedAsSelfAssessed()) {
-            return self::HUMAN_READABLE_STUDENT_COMPLETED;
-        } elseif ($response->isMarkedAsTeacherAssessed()) {
-            return self::HUMAN_READABLE_TEACHER_COMPLETED;
+        } elseif($response->isSelfAssessed()) {
+            return self::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT;
         } else {
-            throw new \DomainException("Unable to determine Task's human-readable mark");
+            return self::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
         }
     }
 

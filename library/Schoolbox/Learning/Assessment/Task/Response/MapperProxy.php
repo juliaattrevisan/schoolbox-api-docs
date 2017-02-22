@@ -93,7 +93,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
                 ->setSubmittedBy($completion->getMarkingUser())
                 ->setSubmittedOnBehalfOf($completion->getStudent())
-                ->markAs($completion->getCompletionStatus())
+                ->setMarkedComplete($completion->getCompletionStatus() != DataObject::STATUS_INCOMPLETE)
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setUpdatedAt($completion->getCompletionDate())
                 ->setDeletedAt($completion->getDeletedAt());

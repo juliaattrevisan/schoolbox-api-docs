@@ -16,13 +16,13 @@
       method="POST"
       class="progress-tick-form"
       data-progress-tick-form="{{ participant.assessable.isSelfAssessed ? 'selfAssessed' : 'teacherAssessed' }}">
-    {% if mostRecentResponse.isMarkedAsTeacherAssessed %}
+    {% if not mostRecentResponse.markedComplete %}
         <a href="#"
            disabled
-           class="no-text progress-tick reviewed{% if disabled %} disabled{% endif %}"
-           title="Completed"
-           data-progress-tick-status="teacherAssessed"></a>
-    {% elseif mostRecentResponse.isMarkedAsSelfAssessed %}
+           class="no-text progress-tick{% if disabled %} disabled{% endif %}"
+           title="Incomplete"
+           data-progress-tick-status="incomplete"></a>
+    {% elseif mostRecentResponse.selfAssessed %}
         <a href="#"
            disabled
            class="no-text progress-tick pending{% if disabled %} disabled{% endif %}"
@@ -31,8 +31,8 @@
     {% else %}
         <a href="#"
            disabled
-           class="no-text progress-tick{% if disabled %} disabled{% endif %}"
-           title="Incomplete"
-           data-progress-tick-status="incomplete"></a>
+           class="no-text progress-tick reviewed{% if disabled %} disabled{% endif %}"
+           title="Completed"
+           data-progress-tick-status="teacherAssessed"></a>
     {% endif %}
 </form>

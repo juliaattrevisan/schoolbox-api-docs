@@ -323,15 +323,15 @@ $this->parse('subheader_unit_block', 'subheader_unit', true);
 
 // Placeholder icons
 $status_list = array(
-    Task\Completion::COMPLETION_STATUS_INCOMPLETE       => array(
+    Task\Completion::STATUS_INCOMPLETE                => array(
         'text'  => 'Incomplete',
         'class' => 'progress-tick',
     ),
-    Task\Completion::COMPLETION_STATUS_SELF_ASSESSED    => array(
+    Task\Completion::STATUS_SELF_ASSESSED_COMPLETE    => array(
         'text'  => 'Self Assessed',
         'class' => 'progress-tick pending',
     ),
-    Task\Completion::COMPLETION_STATUS_TEACHER_ASSESSED => array(
+    Task\Completion::STATUS_TEACHER_ASSESSED_COMPLETE => array(
         'text'  => 'Complete',
         'class' => 'progress-tick complete',
     ),
@@ -355,7 +355,7 @@ foreach ($student_list as $student) {
     $this->setVar('student_unit_task_block', '');
     foreach ($current_unit->getTasks() as $task) {
 // Get the completion status for this student.
-        $student_status = Task\Completion::COMPLETION_STATUS_INCOMPLETE;
+        $student_status = Task\Completion::STATUS_INCOMPLETE;
         foreach ($task->getCompletionList() as $completion) {
             if ($completion->getStudent()->getId() == $student['uid']) {
                 $student_status = $completion->getCompletionStatus();

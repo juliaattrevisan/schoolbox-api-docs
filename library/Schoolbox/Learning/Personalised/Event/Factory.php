@@ -199,11 +199,12 @@ class Factory
                 if ($assessable instanceof Task) {
                     $response = $participantObject->findMostRecentResponse();
                     if ($response instanceof TaskResponse) {
-                        if ($response->isMarkedAsTeacherAssessed()) {
-                            $className[] = 'mastered';
-
-                        } elseif ($response->isMarkedAsSelfAssessed()) {
-                            $className[] = 'notmarked';
+                        if($response->getMarkedComplete()){
+                            if ($response->isSelfAssessed()) {
+                                $className[] = 'notmarked';
+                            } else {
+                                $className[] = 'mastered';
+                            }
                         }
                     }
 

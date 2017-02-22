@@ -7,12 +7,13 @@
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
-    {% if assessment.acceptsNone %}
-        {% set pStatusClass = '' %}
-        {% set pTooltip     = '' %}
-    {% else %}
-        {% set pStatusClass = participant.isMarkingRequired or latestFeedback.isMarkedAsSelfAssessed ? 'pending' : (latestResponse or latestFeedback ? 'complete' : 'incomplete') %}
-        {% set pTooltip     = participant.isMarkingRequired ? 'Mark required' : (latestResponse or latestFeedback ? 'Marked' : 'No submission') %}
+        {% if assessment.acceptsNone %}
+            {% set pStatusClass = '' %}
+            {% set pTooltip     = '' %}
+        {% else %}
+
+            {% set pStatusClass = participant.isResponseRequired ? 'incomplete' : (participant.isFeedbackRequired ? 'pending' : 'reviewed') %}
+            {% set pTooltip     = participant.isResponseRequired ? 'Submission Required' : (participant.isFeedbackRequired ? 'Mark required' : 'Reviewed') %}
 
         {% set pStatusText %}
             {%- spaceless %}
@@ -20,8 +21,14 @@
                     Not submitted
                 {% else %}
 
-                    {% if latestFeedback.isMarkedAsSelfAssessed  %}
-                        Self-assessed
+                    {% if assessable is task %}
+                        {% if not latestResponse.isMarkedComplete %}
+                            Incomplete
+                        {% elseif latestResponse.isSelfAssessed %}
+                            Self-Assessed
+                        {% else %}
+                            Teacher-Assessed
+                        {% endif %}
                     {% else %}
                         {% if multipleResponses %}
                             Resubmitted

@@ -125,8 +125,8 @@
                                 {% set isAttempted = normalisedMark is not null %}
                                 {% if assessment is task %}
                                     {% set mostRecentResponse = participant.findMostRecentResponse %}
-                                    {% set isAwaiting = mostRecentResponse.isMarkedAsSelfAssessed %}
-                                    {% set isMastered = mostRecentResponse.isMarkedAsTeacherAssessed %}
+                                    {% set isAwaiting = mostRecentResponse.isSelfAssessed and mostRecentResponse.markedComplete %}
+                                    {% set isMastered = mostRecentResponse.isTeacherAssessed and mostRecentResponse.markedComplete %}
                                 {% else %}
                                     {% set mostRecentResponse = null %}
                                     {% set isAwaiting = participant.isMarkingRequired %}

@@ -9,6 +9,8 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
+use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -22,7 +24,6 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Redirect;
 
 class Controller extends Assessment\Controller
 {
@@ -179,9 +180,9 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Create a Task Completion with specified completion status.
+     * Create a Task Response with specified completion status.
      *
-     * If the most recent task completion has the same status, this call will rejected.
+     * If the most recent task response has the same status, this call will rejected.
      *
      * @api   POST /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
@@ -196,28 +197,29 @@ class Controller extends Assessment\Controller
         // Ensure the current session user is allowed to see the given participation
         $this->assertParticipantAccess($participant);
 
-        $response = (new Completion\Model())
+        // Did user mark (regardless of who they are) the task as incomplete ?
+        $isMarkedComplete = $this->getRequest()->post->getInt('status') != TaskCompletion::STATUS_INCOMPLETE;
+
+        $response = (new Response\Model())
             ->setAssessable($participant->getAssessable())
             ->setSubmittedOnBehalfOf($participant->getUser())
             ->setSubmittedBy($this->getUser())
             // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
             ->setCreatedAt(\Alaress_Date_Format::now())
-            ->markAs($this->getRequest()->post->getInt('status'))
-        ;
+            ->setMarkedComplete($isMarkedComplete);
 
         try{
             $this->assertSaveability($participant, $response);
         } catch (\UnexpectedValueException $e){
-            $result['success'] = false;
-            $result['message'] = $e->getMessage();
-            $result['id']      = null;
-            $result['status']  = $this->getRequest()->post->getInt('status');
+            $result['success']   = false;
+            $result['message']   = $e->getMessage();
+            $result['id']        = null;
             $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set($this->buildJsonOutput($result));
             return;
         }
 
-        // And save
+        // And save (no need to save a feedback - it will be built automatically from this response on DB retrieval)
         $this->taskResponseDataSource->save($response);
 
         // And redirect somewhere
@@ -226,7 +228,6 @@ class Controller extends Assessment\Controller
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
             $result['status']  = $response->getCompletionStatus();
-
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set($this->buildJsonOutput($result));
 
@@ -245,13 +246,13 @@ class Controller extends Assessment\Controller
     }
 
     /**
-     * Ensure the current user has permission to create this completion and the completion state is valid
+     * Ensure the current user has permission to create this response and the response state is valid
      *
-     * @param Participant $participant
-     * @param Completion\Model  $completion
+     * @param Participant    $participant
+     * @param Response\Model $response
      * @throws \UnexpectedValueException
      */
-    protected function assertSaveability(Participant $participant, Completion\Model $completion)
+    protected function assertSaveability(Participant $participant, Response\Model $response)
     {
         // If not marking themselves, user must have write+ permission to class folder
         if($participant->getUser()->getId() != $this->getUser()->getId()){
@@ -260,7 +261,7 @@ class Controller extends Assessment\Controller
                 throw new \UnexpectedValueException("Teachers may only mark tasks on classes where they have write permissions.");
             }
         }
-        $completion->assertSaveability();
+        $response->assertSaveability();
     }
 
 

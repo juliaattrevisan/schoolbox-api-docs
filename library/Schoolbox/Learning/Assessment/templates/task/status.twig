@@ -34,8 +34,8 @@
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}
-        {% set pStatusClass = latestFeedback.isMarkedAsTeacherAssessed ? statusReviewed : (latestFeedback.isMarkedAsSelfAssessed ? statusPending : statusIncomplete ) %}
-        {% set pTooltip     = latestFeedback.isMarkedAsTeacherAssessed ? labelReviewed : (latestFeedback.isMarkedAsSelfAssessed ? labelPending : labelIncomplete) %}
+        {% set pStatusClass = not latestResponse.markedComplete ? statusIncomplete : (latestResponse.selfAssessed ? statusPending : statusReviewed) %}
+        {% set pTooltip     = not latestResponse.markedComplete ? labelIncomplete : (latestResponse.selfAssessed ? labelPending : labelReviewed) %}
         {% set pStatusText = pTooltip %}
     {% endif %}
 

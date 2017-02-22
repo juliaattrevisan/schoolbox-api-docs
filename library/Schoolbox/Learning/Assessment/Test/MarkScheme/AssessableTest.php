@@ -1108,9 +1108,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $task = $this->getDummyTask();
         return [
             [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_STUDENT_COMPLETED],
-            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_TEACHER_COMPLETED],
-            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_TEACHER_COMPLETED],
+            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT],
+            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
+            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
         ];
     }
 
@@ -1119,9 +1119,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $task = $this->getDummyTask();
         return [
             [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_STUDENT_COMPLETED],
-            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_TEACHER_COMPLETED],
+            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT],
+            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
+            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
         ];
     }
 
@@ -2120,7 +2120,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $response2->setAssessable($task);
         $response2->setSubmittedBy($student2);
         $response2->setSubmittedOnBehalfOf($student2);
-        $response2->markAsSelfAssessed();
+        $response2->setMarkedComplete(true);
         $response2->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant2->getAllResponses()->add($response2);
         $task->getResponses()->add($response2);
@@ -2132,7 +2132,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $response3->setAssessable($task);
         $response3->setSubmittedBy($teacher);
         $response3->setSubmittedOnBehalfOf($student3);
-        $response3->markAsTeacherAssessed();
+        $response3->setMarkedComplete(true);
         $response3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant3->getAllResponses()->add($response3);
         $task->getResponses()->add($response3);
@@ -2142,7 +2142,6 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $feedback3->setAssessable($task);
         $feedback3->setResponse($response3);
         $feedback3->setReviewer($teacher);
-        $feedback3->markAsTeacherAssessed();
         $feedback3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $feedback3->setPublishedAt($this->getDummyDate(null));
         $participant3->getAllFeedbacks()->add($feedback3);
@@ -2155,7 +2154,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $response4a->setAssessable($task);
         $response4a->setSubmittedBy($student4);
         $response4a->setSubmittedOnBehalfOf($student4);
-        $response4a->markAsSelfAssessed();
+        $response4a->setMarkedComplete(true);
         $response4a->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant4->getAllResponses()->add($response4a);
         $task->getResponses()->add($response4a);
@@ -2165,7 +2164,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $response4b->setAssessable($task);
         $response4b->setSubmittedBy($student4);
         $response4b->setSubmittedOnBehalfOf($student4);
-        $response4b->markAsTeacherAssessed();
+        $response4b->setMarkedComplete(true);
         $response4b->setUpdatedAt($this->getDummyDate('2016-10-10 21:03:19'));
         $participant4->getAllResponses()->add($response4b);
         $task->getResponses()->add($response4b);
@@ -2175,7 +2174,6 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $feedback4b->setAssessable($task);
         $feedback4b->setResponse($response4b);
         $feedback4b->setReviewer($teacher);
-        $feedback4b->markAsTeacherAssessed();
         $feedback4b->setUpdatedAt($this->getDummyDate('2016-10-10 21:03:19'));
         $feedback4b->setPublishedAt($this->getDummyDate('2016-10-10 21:03:19'));
         $participant4->getAllFeedbacks()->add($feedback4b);

@@ -91,7 +91,7 @@ class CompletionMapper extends Mapper {
      */
     public function unmarkAsCompleted($task_id, $student_id)
     {
-        return $this->mark($task_id, $student_id, Completion::COMPLETION_STATUS_INCOMPLETE);
+        return $this->mark($task_id, $student_id, Completion::STATUS_INCOMPLETE);
     }
 
     /**
@@ -106,7 +106,7 @@ class CompletionMapper extends Mapper {
      */
     public function markAsCompleted($task_id, $student_id)
     {
-        return $this->mark($task_id, $student_id, Completion::COMPLETION_STATUS_SELF_ASSESSED);
+        return $this->mark($task_id, $student_id, Completion::STATUS_SELF_ASSESSED_COMPLETE);
     }
 
     /**
@@ -200,7 +200,7 @@ class CompletionMapper extends Mapper {
             $params['student'] = $student_id;
         }
         $where_parts[]            = 'ti.completion_status != :exclude_status';
-        $params['exclude_status'] = Completion::COMPLETION_STATUS_INCOMPLETE;
+        $params['exclude_status'] = Completion::STATUS_INCOMPLETE;
 
         $statement = $this->getDatabase()->prepare($query . ' WHERE ' . implode(' AND ', $where_parts));
         $statement->execute($params);

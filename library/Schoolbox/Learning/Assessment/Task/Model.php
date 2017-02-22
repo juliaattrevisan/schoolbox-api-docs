@@ -24,6 +24,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use \Schoolbox\Resource\Storage\Model as StorageFile;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 
 /**
  * When a student self-assesses a task, it will generate an IResponse only, with a mark of 'incomplete' or 'self-assessed'.
@@ -185,10 +186,10 @@ class Model extends AbstractAssessment
             return false;
         }
 
-        // If 'teacher-assessed', then student cannot alter back to 'incomplete' or 'self-assessed'
-        /** @var TaskFeedback $latestFeedback */
-        $latestFeedback = $this->getParticipant($student)->findMostRecentPublishedFeedback();
-        if ($latestFeedback && $latestFeedback->isMarkedAsTeacherAssessed()) {
+        // If teacher has marked as complete, then student cannot alter back to 'incomplete'
+        /** @var TaskResponse $latestResponse */
+        $latestResponse = $this->getParticipant($student)->findMostRecentSubmittedResponse();
+        if ($latestResponse && $latestResponse->isTeacherAssessed() && $latestResponse->getMarkedComplete()) {
             return false;
         }
 

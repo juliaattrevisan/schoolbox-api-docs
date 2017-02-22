@@ -17,9 +17,9 @@ use Schoolbox\User;
 
 class Completion implements ISoftDeletable
 {
-    const COMPLETION_STATUS_INCOMPLETE       = 1;
-    const COMPLETION_STATUS_SELF_ASSESSED    = 2;
-    const COMPLETION_STATUS_TEACHER_ASSESSED = 3;
+    const STATUS_INCOMPLETE       = 1;
+    const STATUS_SELF_ASSESSED_COMPLETE    = 2;
+    const STATUS_TEACHER_ASSESSED_COMPLETE = 3;
 
     use Id;
     use DeletedAtDate;
@@ -46,7 +46,7 @@ class Completion implements ISoftDeletable
     /**
      * @var int
      */
-    private $completion_status = self::COMPLETION_STATUS_INCOMPLETE;
+    private $completion_status = self::STATUS_INCOMPLETE;
 
 
     private $completionDate;

@@ -111,19 +111,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setPublishedAt($completion->getCompletionDate())
                 ->setDeletedAt($completion->getDeletedAt());
 
-            // Set completion of this feedback
-            $status = $completion->getCompletionStatus();
-            if ($status == DataObject::COMPLETION_STATUS_INCOMPLETE) {
-                $taskFeedback->markAsIncomplete();
-
-            } elseif ($status == DataObject::COMPLETION_STATUS_SELF_ASSESSED) {
-                $taskFeedback->markAsSelfAssessed();
-
-            } elseif ($status == DataObject::COMPLETION_STATUS_TEACHER_ASSESSED) {
-                $taskFeedback->markAsTeacherAssessed();
-
-            }
-
             $taskFeedbacks->add($taskFeedback);
         }
 
@@ -141,10 +128,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($domainObjects as $domainObject) {
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
-                ->setTask(
-                    (new TaskDataObject())
-                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
-                )
+                ->setTask((new TaskDataObject())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
                 ->setStudent($domainObject->getReviewee())
                 ->setMarkingUser($domainObject->getReviewer())
                 ->setCompletionDate($domainObject->getCreatedAt())

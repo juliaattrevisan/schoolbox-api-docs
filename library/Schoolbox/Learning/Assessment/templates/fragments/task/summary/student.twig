@@ -23,9 +23,9 @@
 
 {# student submit form #}
 {% set participant         = assessment.getParticipant(student) %}
-{% set mostRecentFeedback  = participant.findMostRecentPublishedFeedback %}
+{% set mostRecentResponse  = participant.findMostRecentSubmittedResponse %}
 {% set isViewingOwnSummary = participant.user.id == USER.id %}
-{% set reviewer            = mostRecentFeedback.submittedBy %}
+{% set reviewer            = mostRecentResponse.submittedBy %}
 {% set reviewerName        = reviewer.id == student.id and student.id == USER.id ? 'You' : reviewer.fullName %}
 
 <div class="row">
@@ -60,11 +60,11 @@
                                             {% endif %}
                                         {% endif %}
                                     {# Is it marked as incomplete ? #}
-                                    {% elseif mostRecentFeedback.isMarkedAsIncomplete %}
-                                        {{ reviewerName }} marked this task as incomplete on {{ mostRecentFeedback.publishedAt.short }}.
-                                        {# Marked as self-assessed or teacher-assessed #}
+                                    {% elseif mostRecentResponse.markedComplete %}
+                                        {{ reviewerName }} marked this task as complete on {{ mostRecentResponse.publishedAt.short }}.
                                     {% else %}
-                                        {{ reviewerName }} marked this task as complete on {{ mostRecentFeedback.publishedAt.short }}.
+                                        {{ reviewerName }} marked this task as incomplete on {{ mostRecentResponse.publishedAt.short }}.
+                                        {# Marked as self-assessed or teacher-assessed #}
                                     {% endif %}
                                 </p>
                             </a>
@@ -72,15 +72,15 @@
                     </div>
 
                     {# Has teacher confirmed this is complete? #}
-                    {% if mostRecentFeedback.isMarkedAsTeacherAssessed %}
+                    {% if not mostRecentResponse.selfAssessed %}
                         <ul class="information-list reply">
                             <li class="list-item">
                                 <div class="card small-12">
-                                    <a href="/search/user/{{ mostRecentFeedback.reviewer.id }}" title="View Profile">
-                                        <img src="/portrait.php?userId={{ mostRecentFeedback.reviewer.externalId }}&amp;size=square64"
-                                             alt="{{ mostRecentFeedback.reviewer.formatName }}"
+                                    <a href="/search/user/{{ mostRecentResponse.submittedBy.id }}" title="View Profile">
+                                        <img src="/portrait.php?userId={{ mostRecentResponse.submittedBy.externalId }}&amp;size=square64"
+                                             alt="{{ mostRecentResponse.submittedBy.formatName }}"
                                              class="hide-for-small-only">
-                                        <p>{{ mostRecentFeedback.reviewer.formatName }}</p>
+                                        <p>{{ mostRecentResponse.submittedBy.formatName }}</p>
 
                                         <p class="meta">
                                             {% if isViewingOwnSummary %}
@@ -104,14 +104,15 @@
             participant:  participant
         }) %}
         {# If already marked as teacher-assessed, require WRITE+ perm to change. If student, ensure not closed #}
-        {% if createResponseRoute and (hasWritePerm or not mostRecentFeedback.isMarkedAsTeacherAssessed) and (hasWritePerm or not participant.assessable.isClosed) %}
+        {% set isMarkedByTeacherAsComplete = mostRecentResponse.teacherAssessed and mostRecentResponse.markedComplete %}
+        {% if createResponseRoute and (hasWritePerm or not isMarkedByTeacherAsComplete) and (hasWritePerm or not participant.assessable.isClosed) %}
             <form action="{{ createResponseRoute }}" method="POST">
-                {% if mostRecentFeedback.isMarkedAsIncomplete %}
-                    <input type="hidden" name="status" value="{% if USER.id == student.id %}2{% else %}3{% endif %}" />
-                    <input type="submit" class="full-width" value="Complete task" />
-                {% else %}
+                {% if mostRecentResponse.markedComplete %}
                     <input type="hidden" name="status" value="1" />
                     <input type="submit" class="full-width" value="Undo task completion" />
+                {% else %}
+                    <input type="hidden" name="status" value="{% if USER.id == student.id %}2{% else %}3{% endif %}" />
+                    <input type="submit" class="full-width" value="Complete task" />
                 {% endif %}
             </form>
         {% endif %}

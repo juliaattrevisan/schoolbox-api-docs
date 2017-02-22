@@ -7,8 +7,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\IDatabase;
+use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -1185,7 +1185,7 @@ class PendingFactory
             $completedAt = $this->getDateFromString($row['tc.completion_date']);
             $response->setCreatedAt($completedAt);
             $response->setUpdatedAt($completedAt);
-            $response->markAs($row['tc.completion_status']);
+            $response->setMarkedComplete($row['tc.completion_status'] != Completion::STATUS_INCOMPLETE);
 
             $task->getResponses()->setOffset($response->getId(), $response);
             $participants = $task->getAllParticipants();
@@ -1205,7 +1205,6 @@ class PendingFactory
                 $feedback->setUpdatedAt($completedAt);
                 $feedback->setResponse($response);
                 $feedback->setAssessable($task);
-                $feedback->markAs($row['tc.completion_status']);
 
                 $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
                 $task->getFeedbacks()->setOffset($feedback->getId(), $feedback);

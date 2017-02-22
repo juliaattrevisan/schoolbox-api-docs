@@ -250,39 +250,9 @@ class Controller extends Base
                         $comment = '';
                     }
 
-                    if ($assessment instanceof Task) {
-
-                        $result = '';
-
-                        $mostRecentResponse = $participant->findMostRecentResponse();
-
-                        if ($mostRecentResponse instanceof TaskResponse) {
-                            switch ($mostRecentResponse->getCompletionStatus()) {
-                                case TaskCompletion::COMPLETION_STATUS_TEACHER_ASSESSED:
-                                    $result = "Completed";
-                                    break;
-                                case TaskCompletion::COMPLETION_STATUS_SELF_ASSESSED:
-                                    if ($assessment->isSelfAssessable()) {
-                                        $result = "Self Assessed";
-                                    } else {
-                                        $result = "Teacher Assessed";
-                                    }
-                                    break;
-                                case TaskCompletion::COMPLETION_STATUS_INCOMPLETE;
-                                    $result = "Not Attempted";
-                                    break;
-                            }
-
-                        }
-
-                        $data[$title] = $result;
-                        $data[$title . " (Normalized)"] = '';
-                        $data[$title . " (Comment)"] = $comment;
-                    } else {
-                        $data[$title] = $assessment->getHumanReadableMark($student, true);
-                        $data[$title . " (Normalized)"] = $assessment->getNormalisedMark($student, true);
-                        $data[$title . " (Comment)"] = $comment;
-                    }
+                    $data[$title] = $assessment->getHumanReadableMark($student, true);
+                    $data[$title . " (Normalized)"] = $assessment->getNormalisedMark($student, true);
+                    $data[$title . " (Comment)"] = $comment;
                 }
                 else
                 {
