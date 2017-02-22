@@ -91,24 +91,6 @@ class Controller extends Assessment\Controller
         );
     }
 
-
-    /**
-     * Allow the currently logged in user to accesss the student's Assessment Summary
-     *
-     * This allows write-accessors to view a typically read-access page ie. when a teacher
-     * wants to preview a task's summary screen (see SA-2193)
-     *
-     * This pretends the teacher is a participant
-     *
-     * @param IAssessable $assessment
-     */
-    public function getSummaryDetail(IAssessable $assessment)
-    {
-        $participant = new Participant($this->getUser(), $assessment);
-
-        $this->getSummary($participant);
-    }
-
     /**
      * Display appropriate landing page based on role
      *
