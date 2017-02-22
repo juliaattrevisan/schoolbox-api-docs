@@ -22,11 +22,7 @@ Usage:
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
         <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
-        {% if assessment is quiz %}
-        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-modify">Modify</a></li>
-        {% else %}
-        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-modify">Modify</a></li>
-        {% endif %}
+        <li><a href="{{ routeLookup(assessment is quiz ? 'learningQuiz.getQuizSummary' : 'learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-modify">Modify</a></li>
         <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
     </ul>
     <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
