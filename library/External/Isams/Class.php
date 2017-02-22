@@ -107,7 +107,7 @@ class External_Isams_Class implements External_ClassInterface
             UNION 
             SELECT DISTINCT   Tutor2ID AS tutorID
             FROM              V_Class
-            WHERE             ISNULL(NULLIF(LTRIM(RTRIM(Tutor2name)), ''), '') <> '' AND 
+            WHERE             NULLIF(LTRIM(RTRIM(Tutor2name)), '') IS NOT NULL AND 
                               $classQuery
         ";
 
