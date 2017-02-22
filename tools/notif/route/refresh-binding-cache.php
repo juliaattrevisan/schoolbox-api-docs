@@ -15,11 +15,14 @@
 
 use Alaress\Routing\FlatRouter;
 use Aura\Di;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Realtime\Routing\Subscription;
 use Schoolbox\UserMapper;
+
+$fields = [ 'userId:' ];
 
 $opts = require_once __DIR__ . '/../../../conf/core/require-cli.php';
 
@@ -32,7 +35,8 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel('Binding Calculator', [
     'verbose'  => isset($opts['v']) ? $opts['v'] : null,
     'fields'   => array_keys($opts),
-    'instance' => $opts['instance']
+    'instance' => $opts['instance'],
+    'userId'   => isset($opts['userId']) ? $opts['userId'] : null
 ]);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
@@ -43,20 +47,96 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
 
     $router = new FlatRouter();
 
-    // this will calculate and load all subscriptions into the router
-    (new Subscription\Loader\BindingLoader(new Generator(/* just use defaults... */), UserMapper::getInstance(), $log))->loadSubscriptions($router);
+    $generator = new Generator(/* just use defaults... */);
+    $routeStorageKey = "m:$instanceId:routes";
+
+    if ($opts['userId']) {
+        $userId = $opts['userId'];
+        // we're affecting just one user here
+
+        /** @var ClientInterface $redis */
+        $redis = $di->get('redis');
+
+        // TODO SEMAPHORE!!!
+        $log->error("[TODO] Cache lock obtained");
+
+        // start by loading from cache
+        (new Subscription\Loader\Factory($redis, $log))->get($routeStorageKey)->loadSubscriptions($router);
+
+        // use the generator to compute new bindings for the user
+        $userBindings = $generator->generateBindingsForUser(UserMapper::getInstance()->findById($userId));
+
+        // extract the list and reset the router
+        $allRoutes = $router->getAll();
+        $router = new FlatRouter();
+
+        // compile user routes
+        $userRoutes  = [];
+        $changeCount = 0;
+
+        foreach ($userBindings as $prefix => $data) {
+            foreach ($data as $target) {
+                $binding = "*.notify.$prefix.$target";
+                $userRoutes[$binding] = true;
+            }
+        }
+
+        // remove any bindings no longer applicable to this user
+        foreach ($allRoutes as $path => $pathData) {
+            if (isset($pathData[$userId])) {
+                if (empty($userRoutes[$path])) {
+                    $log->info("User $userId - `$path`", [ 'char' => '-' ]);
+                    unset ($allRoutes[$path][$userId]);
+                    ++$changeCount;
+                }
+            }
+        }
+
+        // reinsert all remaining routes
+        foreach ($allRoutes as $path => $pathData) {
+            foreach ($pathData as $key => $value) {
+                $router->add($path, $key, $value);
+            }
+        }
+
+        // overlay this user's bindings to account for any new ones
+        foreach (array_keys($userRoutes) as $path) {
+            $a = count($router->getAll());
+            $router->add($path, $userId, true);
+            $b = count($router->getAll());
+            if ($b != $a) {
+                $log->info("User $userId + `$path`", [ 'char' => '+' ]);
+                ++$changeCount;
+            }
+        }
+
+        if ($changeCount == 0) {
+            $log->notice("No changes made to bindings for user $userId");
+            // TODO release semaphore
+            $log->error("[TODO] Cache lock released");
+            return;
+        }
+
+    } else {
+        // this will calculate and load all subscriptions into the router
+        (new Subscription\Loader\BindingLoader($generator, UserMapper::getInstance(), $log))->loadSubscriptions($router);
+    }
 
     $json = json_encode($router->getAll());
     $gz = gzcompress($json, 9);
 
     $log->info(sprintf("Compressing route tree: %s => %s", Alaress_Byte_Format::bytesToString(strlen($json)), Alaress_Byte_Format::bytesToString(strlen($gz))));
 
-    $routeStorageKey = "m:$instanceId:routes";
 
     /** @var \Redis $redis */
     $redis = $di->get('redis');
 
     $redis->set($routeStorageKey, $gz);
+
+    if ($opts['userId']) {
+        // TODO release semaphore
+        $log->error("[TODO] Cache lock released");
+    }
 
     $log->info("Route tree stored in `$routeStorageKey`", [ 'char' => '+' ]);
 
