@@ -41,7 +41,7 @@ class Controller extends Base
 
         foreach ($statuses as $status) {
 
-            $queueStatus = $this->videoQueueMapper->findByColumn('status', $status, ['order' => ['createdOn' => 'desc']]);
+            $queueStatus = $this->getVideoQueueMapper()->findByColumn('status', $status, ['order' => ['createdOn' => 'desc']]);
 
             /** @var VideoQueue $video */
             foreach ($queueStatus as $video) {
@@ -70,6 +70,9 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * Resubmit video to, or remove it from processing queue
+     */
     public function postSubmit()
     {
         $post = $this->getRequest()->post;
@@ -92,15 +95,12 @@ class Controller extends Base
 
     /** Here be mappers and stuff */
 
-    /** @var VideoQueueMapper $videoQueueMapper */
-    private $videoQueueMapper;
-
     /**
      * @return VideoQueueMapper
      */
     public function getVideoQueueMapper()
     {
-        $this->getDi()->get('mapperFactory')->getLazy(VideoQueueMapper::class);
+        return $this->getDi()->get('mapperFactory')->get(VideoQueueMapper::class);
     }
 
     /**
@@ -108,6 +108,6 @@ class Controller extends Base
      */
     public function getStorageMapper()
     {
-        $this->getDi()->get('mapperFactory')->getLazy(StorageMapper::class);
+        return $this->getDi()->get('mapperFactory')->get(StorageMapper::class);
     }
 }
