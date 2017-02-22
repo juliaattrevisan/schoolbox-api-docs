@@ -30,7 +30,7 @@ class Completion extends AbstractMarkScheme
     /**
      * Returns a string representation of a normalised Mark
      *
-     * @param mixed                       $normalisedMark Ignored.
+     * @param mixed                       $normalisedMark  - ignored, even if invalid
      * @param IResponse|TaskResponse|null $response
      * @return string
      */

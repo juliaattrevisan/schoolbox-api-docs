@@ -138,12 +138,21 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                $currentFeedback->setPublishedAt(null);
+                if($currentAssessable instanceof Task){
+                    $currentFeedback->getResponse()->setCreatedAt(null);
+                } else {
+                    $currentFeedback->setPublishedAt(null);
+                }
+
             }
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    $currentFeedback->setPublishedAt(null);
+                    if($currentAssessable instanceof Task){
+                        $currentFeedback->getResponse()->setCreatedAt(null);
+                    } else {
+                        $currentFeedback->setPublishedAt(null);
+                    }
                 }
             }
         }
@@ -320,12 +329,20 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                $currentFeedback->setPublishedAt(null);
+                if($currentAssessable instanceof Task){
+                    $currentFeedback->getResponse()->setCreatedAt(null);
+                } else {
+                    $currentFeedback->setPublishedAt(null);
+                }
             }
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    $currentFeedback->setPublishedAt(null);
+                    if($currentAssessable instanceof Task){
+                        $currentFeedback->getResponse()->setCreatedAt(null);
+                    } else {
+                        $currentFeedback->setPublishedAt(null);
+                    }
                 }
             }
         }
@@ -680,12 +697,20 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                $currentFeedback->setPublishedAt(null);
+                if($currentAssessable instanceof Task){
+                    $currentFeedback->getResponse()->setCreatedAt(null);
+                } else {
+                    $currentFeedback->setPublishedAt(null);
+                }
             }
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    $currentFeedback->setPublishedAt(null);
+                    if($currentAssessable instanceof Task){
+                        $currentFeedback->getResponse()->setCreatedAt(null);
+                    } else {
+                        $currentFeedback->setPublishedAt(null);
+                    }
                 }
             }
         }
@@ -1217,12 +1242,20 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                $currentFeedback->setPublishedAt(null);
+                if($currentAssessable instanceof Task){
+                    $currentFeedback->getResponse()->setCreatedAt(null);
+                } else {
+                    $currentFeedback->setPublishedAt(null);
+                }
             }
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    $currentFeedback->setPublishedAt(null);
+                    if($currentAssessable instanceof Task){
+                        $currentFeedback->getResponse()->setCreatedAt(null);
+                    } else {
+                        $currentFeedback->setPublishedAt(null);
+                    }
                 }
             }
         }

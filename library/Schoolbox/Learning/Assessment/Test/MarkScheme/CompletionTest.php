@@ -11,8 +11,6 @@ use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Completion;
-use \InvalidArgumentException;
-use \RangeException;
 use Schoolbox\User;
 
 class CompletionTest extends \PHPUnit_Framework_TestCase
@@ -30,130 +28,155 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+
     /**
      * @dataProvider provider_normalised
      * @param mixed $normalised
      */
-    public function test_getHumanReadable_IncompleteExplicit($normalised)
+    public function test_getHumanReadable_IncompleteAsNull($normalised)
     {
-        $response = null;
         $expected = Completion::HUMAN_READABLE_INCOMPLETE;
 
         $markScheme = new Completion();
+        $actual = $markScheme->getHumanReadableMark($normalised, null);
+        $this->assertEquals($expected, $actual);
+    }
+
+
+    /**
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
+     */
+    public function test_getHumanReadable_studentMarkedResponseIncomplete($normalised)
+    {
+        $response = $this->getSelfAssessedResponseMarkedAsIncomplete();
+        $markScheme = new Completion();
+
+        $expected = Completion::HUMAN_READABLE_INCOMPLETE;
         $actual = $markScheme->getHumanReadableMark($normalised, $response);
+
         $this->assertEquals($expected, $actual);
     }
 
     /**
      * @dataProvider provider_normalised
      * @param mixed $normalised
+     */
+    public function test_getHumanReadable_studentMarkedResponseComplete($normalised)
+    {
+        $response = $this->getSelfAssessedResponseMarkedAsComplete();
+        $markScheme = new Completion();
+
+        $expected = Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT;
+        $actual = $markScheme->getHumanReadableMark($normalised, $response);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
+     */
+    public function test_getHumanReadable_teacherMarkedResponseIncomplete($normalised)
+    {
+        $response = $this->getTeacherAssessedResponseMarkedAsIncomplete();
+        $markScheme = new Completion();
+
+        $expected = Completion::HUMAN_READABLE_INCOMPLETE;
+        $actual = $markScheme->getHumanReadableMark($normalised, $response);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+
+    /**
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
+     */
+    public function test_getHumanReadable_teacherMarkedResponseComplete($normalised)
+    {
+        $response = $this->getTeacherAssessedResponseMarkedAsComplete();
+        $markScheme = new Completion();
+
+        $expected = Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
+        $actual = $markScheme->getHumanReadableMark($normalised, $response);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provider_humanReadable_noResponse
+     * @param mixed $humanReadable
+     */
+    public function test_getNormalised_noResponse($humanReadable)
+    {
+        $expected = null;
+        $markScheme = new Completion();
+        $actual = $markScheme->getNormalisedMark($humanReadable);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provider_humanReadable_withResponse
+     * @param mixed $humanReadable
      * @param TaskResponse $response
      */
-    public function test_getHumanReadable_StudentCompleted($normalised, TaskResponse $response)
-    {
-        $expected = Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT;
-
-        $markScheme = new Completion();
-        $actual = $markScheme->getHumanReadableMark($normalised, $response);
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @dataProvider provider_normalised
-     * @param mixed $normalised
-     */
-    public function test_getHumanReadable_TeacherCompleted($normalised)
-    {
-        $response = new TaskResponse();
-        $response->getAllFeedback()->add(new TaskFeedback());
-        $expected = Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
-
-        $markScheme = new Completion();
-        $actual = $markScheme->getHumanReadableMark($normalised, $response);
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @dataProvider provider_normalised
-     * @param mixed $normalised
-     */
-    public function test_getNormalised_IncompleteImplicit($normalised)
+    public function test_getNormalised_withResponse($humanReadable, TaskResponse $response = null)
     {
         $expected = null;
-
         $markScheme = new Completion();
-        $actual = $markScheme->getNormalisedMark($normalised);
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @dataProvider provider_normalised
-     * @param mixed $normalised
-     */
-    public function test_getNormalised_IncompleteExplicit($normalised)
-    {
-        $response = null;
-        $expected = null;
-
-        $markScheme = new Completion();
-        $actual = $markScheme->getNormalisedMark($normalised, $response);
+        $actual = $markScheme->getNormalisedMark($humanReadable, $response);
         $this->assertEquals($expected, $actual);
     }
 
 
-    /**
-     * @dataProvider provider_normalised
-     * @param mixed $normalised
-     */
-    public function test_getNormalised_StudentCompleted($normalised)
-    {
-        $response = new TaskResponse();
-        $expected = null;
-
-        $markScheme = new Completion();
-        $actual = $markScheme->getNormalisedMark($normalised, $response);
-        $this->assertEquals($expected, $actual);
-    }
-
-
-    /**
-     * @dataProvider provider_humanReadable
-     * @param mixed $normalised
-     */
-    public function test_getNormalised_TeacherCompleted($normalised)
-    {
-        $response = new TaskResponse();
-        $response->getAllFeedback()->add(new TaskFeedback());
-        $expected = null;
-
-        $markScheme = new Completion();
-        $actual = $markScheme->getNormalisedMark($normalised, $response);
-        $this->assertEquals($expected, $actual);
-    }
 
     // ==================== Data Providers ====================
 
-    public function provider_normalised()
+    /**
+     * @return int[][]
+     */
+    public function provider_normalised_valid()
     {
-        // Self-assessed response
-        $response = new TaskResponse();
-        $response->setSubmittedBy((new User())->setId(1));
-        $response->setSubmittedOnBehalfOf((new User())->setId(1));
-
         return [
-            [null, $response],
-            [-1, $response],
-            [10, $response],
-            [50, $response],
-            [200, $response],
-            ['   ', $response],
-            ['some random string', $response],
-            [IMarkScheme::NORMALISED_MARK_MIN, $response],
-            [IMarkScheme::NORMALISED_MARK_MAX, $response],
+            [0],
+            [10],
+            [50],
+            [99],
+            [100],
+            [IMarkScheme::NORMALISED_MARK_MIN],
+            [IMarkScheme::NORMALISED_MARK_MAX],
         ];
     }
 
-    public function provider_humanReadable()
+    /**
+     * @return mixed[][]
+     */
+    public function provider_normalised_invalid()
+    {
+        return [
+            [null],
+            [''],
+            ['   '],
+            [-1],
+            [101],
+            ['a random string'],
+            [[1]],
+        ];
+    }
+
+    /**
+     * @return mixed[][]
+     */
+    public function provider_normalised()
+    {
+        return array_merge($this->provider_normalised_valid(), $this->provider_normalised_invalid());
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function provider_humanReadable_valid()
     {
         return [
             [Completion::HUMAN_READABLE_INCOMPLETE],
@@ -162,5 +185,111 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return mixed[][]
+     */
+    public function provider_humanReadable_invalid()
+    {
+        return [
+            [null],
+            ['  '],
+            [33],
+            ['An unknown string'],
+        ];
+    }
 
+    /**
+     * @return mixed[][]
+     */
+    public function provider_humanReadable_noResponse()
+    {
+        return array_merge($this->provider_humanReadable_valid(), $this->provider_humanReadable_invalid());
+    }
+
+
+    /**
+     * @return mixed[][]
+     */
+    public function provider_humanReadable_withResponse()
+    {
+        $humanReadableValues = array_merge($this->provider_humanReadable_valid(), $this->provider_humanReadable_invalid());
+        $responses = [
+            null,
+            $this->getSelfAssessedResponseMarkedAsIncomplete(),
+            $this->getSelfAssessedResponseMarkedAsComplete(),
+            $this->getTeacherAssessedResponseMarkedAsIncomplete(),
+            $this->getTeacherAssessedResponseMarkedAsComplete(),
+        ];
+
+        $data = [];
+
+        foreach($humanReadableValues as $humanReadable){
+            foreach($responses as $response){
+                $data[] = [$humanReadable[0], $response];
+            }
+        }
+        return $data;
+    }
+
+
+    // Private helpers for data providers
+
+    /**
+     * @return TaskResponse
+     */
+    private function getSelfAssessedResponseMarkedAsIncomplete()
+    {
+        $student = (new User())->setId(1);
+
+        return (new TaskResponse())
+            ->setId(1)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
+            ->setMarkedComplete(false);
+    }
+
+    /**
+     * @return TaskResponse
+     */
+    private function getSelfAssessedResponseMarkedAsComplete()
+    {
+        $student = (new User())->setId(1);
+
+        return (new TaskResponse())
+            ->setId(1)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
+            ->setMarkedComplete(true);
+    }
+
+    /**
+     * @return TaskResponse
+     */
+    private function getTeacherAssessedResponseMarkedAsIncomplete()
+    {
+        $student = (new User())->setId(1);
+        $teacher = (new User())->setId(2);
+
+        $response = (new TaskResponse())
+            ->setId(1)
+            ->setSubmittedBy($teacher)
+            ->setSubmittedOnBehalfOf($student)
+            ->setMarkedComplete(false);
+
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
+
+        $response->getAllFeedback()->add($feedback);
+
+        return $response;
+    }
+
+    /**
+     * @return TaskResponse
+     */
+    private function getTeacherAssessedResponseMarkedAsComplete()
+    {
+        return $this->getTeacherAssessedResponseMarkedAsIncomplete()->setMarkedComplete(true);
+
+    }
 }
