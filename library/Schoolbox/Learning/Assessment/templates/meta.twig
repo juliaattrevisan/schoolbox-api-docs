@@ -9,10 +9,8 @@
 <ul class="meta">
     <li class="icon-calendar">{{ dueDate.dueDate(assessment, user) }}</li>
     <li class="{{ icon }}">{{ assessment.typeName }}</li>
+    <li class="icon-staff-students">{{ user.fullname }}</li>
 
-    {% if user.role.isStaff %}
-        <li class="icon-staff-students">{{ student.fullname }}</li>
-    {% endif %}
     {% if submissionsBlocked %}
     <li class="icon-upload">{{ submissionsBlocked }}</li>
     {% endif %}
