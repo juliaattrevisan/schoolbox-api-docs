@@ -22,13 +22,6 @@ interface IFeedback
      */
     public function isPublished();
 
-    /**
-     * Is the specified user the reviewee of this feedback?
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isReviewedFor(User $user);
 
     /**
      * $user is the reviewee of this Feedback
