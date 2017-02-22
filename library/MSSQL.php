@@ -162,7 +162,8 @@ class MSSQL {
      */
     protected function changeDatabaseIfRequired($db)
     {
-        if (self::$lastDatabase[$this->getConnectionHash()] != $db) {
+        $hash = $this->getConnectionHash();
+        if (isset(self::$lastDatabase[$hash]) && self::$lastDatabase[$hash] != $db) {
             $this->changeDB($db);
         }
     }
