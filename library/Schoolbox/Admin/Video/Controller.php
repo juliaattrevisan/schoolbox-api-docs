@@ -14,9 +14,8 @@ use Schoolbox\Video\Queue as VideoQueue;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
- * Controller for managing school terms through the admin section.
- *
- * @package Schoolbox\Admin\Terms
+ * Controller for managing failed video transcoding through the admin section.
+ * @package Schoolbox\Admin\Video
  */
 class Controller extends Base
 {
@@ -34,7 +33,7 @@ class Controller extends Base
     /**
      * Display tree
      *
-     * @api   GET /adminv2/menu-side
+     * @api   GET /adminv2/video
      * @level 165
      */
     public function getIndex()
