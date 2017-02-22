@@ -69,18 +69,18 @@ class CanSeeAssessment implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        if (empty($params['activity'])) {
+        if (empty($params['assessment'])) {
             if (empty($params['participant'])) {
-                throw new InvalidArgumentException("Cannot check auth, need an assessable param of 'activity' or participant of 'participant'");
+                throw new InvalidArgumentException("Cannot check auth, need an assessable param of 'assessment' or participant of 'participant'");
             }
 
             $activity = $params['participant']->getAssessable();
         } else {
-            $activity = $params['activity'];
+            $activity = $params['assessment'];
         }
 
         if (!$activity instanceof IAssessable) {
-            throw new InvalidArgumentException("Cannot check auth, need an assessable param of 'activity' or participant of 'participant'");
+            throw new InvalidArgumentException("Cannot check auth, need an assessable param of 'assessment' or participant of 'participant'");
         }
 
         $folderId = $activity->getBaseContext()->getFolder()->getId();
