@@ -11,14 +11,13 @@
 use Alaress\Routing\Router;
 use Alaress\WorkerCrew\Dispatcher;
 use Aura\Di;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
 use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\Subscription;
-use Schoolbox\UserMapper;
 
 $flags = implode(' ', array_slice($argv, 1));
 $opts = require_once __DIR__ . '/../../../conf/core/require-cli.php';
@@ -35,7 +34,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Routing', array(
 // ROUTING APP
 $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
 
-    $di->get('stomp')->connect()->then(function (Client $client) use ($loop, $log, $opts) {
+    $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts) {
 
         // the list of instances this particular daemon will listen for
         $instances = [ INSTANCE_ID ];
@@ -53,8 +52,10 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         // this holds and traverses all our subscription data
         $router = new Router('.');
 
-        // skipping this step is not advised ;)
-        (new Subscription\Loader\BindingLoader(new Generator(/* just use defaults... */), UserMapper::getInstance(), $log))->loadSubscriptions($router);
+        /** @var Redis|ClientInterface $redis */
+        $redis = $di->get('redis');
+
+        (new Subscription\Loader\Factory($redis, $log))->get('m:vagrantx:routes')->loadSubscriptions($router);
 
         // subscribe to the
         $handler    = new Subscription\Handler(new Subscription\Manager($router), $client, $log);
