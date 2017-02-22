@@ -25,7 +25,7 @@ Usage:
         {% if assessment is quiz %}
         <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-modify">Modify</a></li>
         {% else %}
-        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" {{ doReveal }} class="icon-modify">Modify</a></li>
+        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-modify">Modify</a></li>
         {% endif %}
         <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
     </ul>
