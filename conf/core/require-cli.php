@@ -8,7 +8,10 @@
  * @link        http://www.alaress.com.au/
  */
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid', 'instance:');
+// merge values
+$f = [ 'porcelain', 'mem', 'truemem', 'pid', 'instance:' ];
+$fields = isset($fields) ? array_merge($fields, $f) : $f;
+unset ($f);
 
 $opts = getopt('v', $fields);
 
