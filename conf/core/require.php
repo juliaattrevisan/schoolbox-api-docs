@@ -11,7 +11,12 @@
 
 // kernel definitions
 
-// register a special autoloader for loading a kernel
+/**
+ * Register a special autoloader for loading a kernel
+ *
+ * @param string $name
+ * @return bool
+ */
 function kernel_load($name) {
 	// abstraction dependencies
 	require_once __DIR__ . '/../../library/Alaress/Application/Kernel.php';
