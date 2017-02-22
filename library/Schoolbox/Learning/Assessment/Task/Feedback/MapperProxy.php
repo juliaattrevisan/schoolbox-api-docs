@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
 use Schoolbox\Assessment\Course\Task as TaskDataObject;
+use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion as DataObject;
@@ -95,13 +96,20 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 continue;
             }
 
-            $taskFeedback = (new DomainObject())
-                // The completion serves as both a response and a feedback.
-                // Add a corresponding stub response that needs to be replaced by caller.
-                ->setResponse(
-                    (new TaskResponseDomainObject())
-                        ->setId($completion->getId())
-                );
+            // The completion serves as both a response and a feedback.
+            // Add stub objects to be replaced by caller.
+
+            $taskResponse = (new TaskResponseDomainObject())
+                ->setId($completion->getId())
+                ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
+                ->setSubmittedBy($completion->getMarkingUser())
+                ->setSubmittedOnBehalfOf($completion->getStudent())
+                ->setCreatedAt($completion->getCompletionDate())
+                ->setUpdatedAt($completion->getCompletionDate())
+                ->setMarkedComplete($completion->getCompletionStatus() != Completion::STATUS_INCOMPLETE)
+                ->setDeletedAt($completion->getDeletedAt());
+
+            $taskFeedback = (new DomainObject())->setResponse($taskResponse);
 
             $taskFeedbacks->add($taskFeedback);
         }

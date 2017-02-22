@@ -7,7 +7,9 @@
 
 namespace Schoolbox\Learning\Assessment\Feedback\SubSource;
 
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
 
@@ -37,5 +39,18 @@ class Task extends AbstractSubSource
     public function recognizes(IAssessable $assessment)
     {
         return $assessment instanceof TaskObject;
+    }
+
+
+    /**
+     * @param IAssessable $assessment
+     * @return Collection|IFeedback[]
+     */
+    public function findForAssessment(IAssessable $assessment)
+    {
+        if ($this->recognizes($assessment)) {
+            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()]);
+        }
+        return new Collection();
     }
 }
