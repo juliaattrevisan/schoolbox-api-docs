@@ -12,7 +12,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 use Schoolbox\News\ArticleMapper;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\News\Topic;
-error_reporting(E_ALL);
+
 $page = new SitePage(false);
 
 $user = null;
