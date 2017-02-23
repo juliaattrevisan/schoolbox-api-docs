@@ -23,14 +23,6 @@ interface IFeedback
     public function isPublished();
 
 
-    /**
-     * $user is the reviewee of this Feedback
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isReviewedFor(User $user);
-
     /* Getters/Setters
      */
 

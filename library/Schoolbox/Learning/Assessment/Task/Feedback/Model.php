@@ -79,18 +79,6 @@ class Model extends AbstractFeedback
 
 
     /**
-     * Is the specified user the reviewee of this feedback?
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isReviewedFor(User $user)
-    {
-        return $this->getResponse()->getSubmittedOnBehalfOf()->getId() == $user->getId();
-    }
-
-
-    /**
      * @return int
      */
     public function getId()

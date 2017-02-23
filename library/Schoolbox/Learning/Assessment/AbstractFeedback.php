@@ -106,17 +106,6 @@ abstract class AbstractFeedback implements IFeedback
     }
 
 
-    /**
-     * $user is the reviewee of this Feedback
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isReviewedFor(User $user)
-    {
-        return $this->getReviewee()->getId() == $user->getId();
-    }
-
     /* Getters/Setters
      */
 
