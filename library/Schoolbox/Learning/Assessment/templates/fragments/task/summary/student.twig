@@ -48,7 +48,7 @@
                                         {# Is this task self-assessable ? #}
                                         {% if assessment.isSelfAssessed %}
                                             {% if isViewingOwnSummary %}
-                                                You {% if assessment.isClosed %}did not complete{% else %}have not completed{% endif %} this task.
+                                                You {% if assessment.isPastClose %}did not complete{% else %}have not completed{% endif %} this task.
                                             {% else %}
                                                 has not completed this task.
                                             {% endif %}
@@ -105,7 +105,7 @@
         }) %}
         {# If already marked as teacher-assessed, require WRITE+ perm to change. If student, ensure not closed #}
         {% set isMarkedByTeacherAsComplete = mostRecentResponse.teacherAssessed and mostRecentResponse.markedComplete %}
-        {% if createResponseRoute and (hasWritePerm or not isMarkedByTeacherAsComplete) and (hasWritePerm or not participant.assessable.isClosed) %}
+        {% if createResponseRoute and (hasWritePerm or not isMarkedByTeacherAsComplete) and (hasWritePerm or participant.assessable.isOpen) %}
             <form action="{{ createResponseRoute }}" method="POST">
                 {% if mostRecentResponse.markedComplete %}
                     <input type="hidden" name="status" value="1" />
