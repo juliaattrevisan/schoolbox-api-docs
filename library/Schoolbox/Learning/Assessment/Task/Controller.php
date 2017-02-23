@@ -256,7 +256,7 @@ class Controller extends Assessment\Controller
         // If not marking themselves, user must have write+ permission to class folder
         if($participant->getUser()->getId() != $this->getUser()->getId()){
             $classFolderId = $participant->getAssessable()->getBaseContext()->getId();
-            if(Access::getInstance()->getFolderAccess($this->getUser(), [$classFolderId]) < UserAccess::ACCESS_WRITE){
+            if($this->getAccess()->getFolderAccess($this->getUser(), [$classFolderId]) < UserAccess::ACCESS_WRITE){
                 throw new \UnexpectedValueException("Teachers may only mark tasks on classes where they have write permissions.");
             }
         }
