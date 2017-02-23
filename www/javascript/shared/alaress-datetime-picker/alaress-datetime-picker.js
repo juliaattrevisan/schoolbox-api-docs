@@ -68,75 +68,140 @@ var pickerFormats = {
     to: ''
 }
 
-function setPickerFormats (allDayState, element) {
+function getPickerFormats (allDayState, options) {
     // No matter what, we are overriding the format
-    //Todo: decide if we need to check buddy elements formats or just use own formats
-    //Todo: Rewrite this function, this is just one condition when we need to reformat the date
-    var refreshOptions = {
-        displayFormat: 'd/m/Y h:iK', //Default display format
-        displayFormatDate: 'd/m/Y',
-        databaseFormat: 'Y-m-d H:i:s',
-        enableTime: getValue(element, 'data-datepicker-time'),
-        allDay: getValue(element, 'data-datepicker-allday'), //Show All Day switch
-        allDayExt: getValue(element, 'data-datepicker-alldayext'), //Sync with external AllDay input hidden field
-        altFormat: getValue(element, 'data-datepicker-format'), // false|date|datetime
-    };
-    console.log(refreshOptions);
-    if (refreshOptions.altFormat !== false ){
+    var from, to;
+    if (options.altFormat !== false ){
         var l = 1;
-        if (refreshOptions.altFormat == 'date') {
+        if (options.altFormat == 'date') {
             l = 11;
-            pickerFormats.from = refreshOptions.displayFormatDate;
-            pickerFormats.to = refreshOptions.displayFormatDate;
+            from = options.displayFormatDate;
+            to = options.displayFormatDate;
         }
-        else if (pickerOptions.altFormat == 'datetime') {
+        else if (options.altFormat == 'datetime') {
             l = 12;
-            pickerFormats.from  = refreshOptions.displayFormat;
-            pickerFormats.to = refreshOptions.displayFormat;
+            from  = options.displayFormat;
+            to = options.displayFormat;
         }
     }
     else {
         l = 2;
         // If not overriding then looking at the enableTime option
-        if (refreshOptions.enableTime === false) {
+        if (options.enableTime === false) {
             l = 22;
-            pickerFormats.from = refreshOptions.displayFormatDate;
-            pickerFormats.to = refreshOptions.displayFormatDate;
+            from = options.displayFormatDate;
+            to = options.displayFormatDate;
         }
         else {
             l = 3;
             // It depends again...
             // Looking at the allDay option
-            if (refreshOptions.allDay === true) {
+            if (options.allDay === true) {
                 l = 4;
                 // Ok, the allDay changed, changing the format accordingly
                 if (allDayState) {
                     l = 41;
-                    pickerFormats.from = refreshOptions.displayFormat;
-                    pickerFormats.to = refreshOptions.displayFormatDate;
+                    from = options.displayFormat;
+                    to = options.displayFormatDate;
                 }
                 else {
                     l = 42;
-                    // pickerFormats.from = refreshOptions.displayFormatDate;
-                    pickerFormats.from = refreshOptions.displayFormat;
-                    pickerFormats.to = refreshOptions.displayFormat;
+                    from = options.displayFormat;
+                    to = options.displayFormat;
                 }
             }
             else {
                 l = 5;
-                pickerFormats.from = refreshOptions.displayFormat;
-                pickerFormats.to = refreshOptions.displayFormat;
+                from = options.displayFormat;
+                to = options.displayFormat;
             }
         }
-    }
 
-    console.log('format set: '+l);
+    }
+    var formats;
+    return formats = {
+        convertFrom: from,
+        convertTo: to
+    };
+    console.log(formats);
 }
 
-function manageAllDay ( state, element, options ) {
-       console.log(options);
-//        console.log("manageAllDay>>> state: " + state + ' > doFormat: ' + doFormat );
+function getLinkedElements (element, options) {
+    // Get all linked inputs, e.g. startDate, endDate
+    var elements = $('[data-datepicker-alldayext = '+ options.allDayExt +']');
+    var linkedElements = [];
+    elements.each( function() {
+       if($(this)[0] !== element[0]) {
+           linkedElements.push($(this));
+       }
+    });
+    return linkedElements;
+}
 
+function getOptions (element) {
+    var elementOptions = {
+        displayFormat: options.displayFormat,
+        displayFormatDate: options.displayFormatDate,
+        databaseFormat: options.databaseFormat,
+        enableTime: getValue(element, 'data-datepicker-time'),
+        allDay: getValue(element, 'data-datepicker-allday'), //Show All Day switch
+        allDayExt: getValue(element, 'data-datepicker-alldayext'), //Sync with external AllDay input hidden field
+        altFormat: getValue(element, 'data-datepicker-format'), // false|date|datetime
+    };
+    return elementOptions;
+}
+
+function setValue ( element, options, state, date ) {
+
+    // Get their pickerIds
+    var pId = element.attr('data-datepicker-id');
+
+    // Get the format
+    var pickerFormats = getPickerFormats(state, options);
+    console.log(pickerFormats);
+
+    if(date !== undefined) {
+        // :P
+        var value = date;
+    }
+    else if(window.pickerInstance[pId] !== undefined) {
+        var value = window.pickerInstance[pId].input.value;
+    }
+    else {
+        var value = element.val();
+    }
+    // All Day is on
+    if(state === true) {
+
+        if(options.endDay) {
+            var v = moment(value, convertFormat(pickerFormats.from)).endOf('day').format(convertFormat(pickerFormats.to));
+        }
+        else {
+            var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
+        }
+        if(window.pickerInstance[pId] !== undefined) {
+            // window.pickerInstance[pId].input.value = v;
+            window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.to)).format(convertFormat(options.databaseFormat)), true);
+        }
+        element.val(v);
+
+    }
+    else {
+        var v = moment(value, convertFormat(pickerFormats.from)).format(convertFormat(pickerFormats.to));
+        if(window.pickerInstance[pId] !== undefined) {
+            // window.pickerInstance[pId].input.value = v;
+            window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.to)).format(convertFormat(options.databaseFormat)), true);
+        }
+        element.val(v);
+    }
+    if(pickerOptions.allDayExt !== false) {
+        $('#'+pickerOptions.allDayExt).val(state?1:0);
+    }
+    console.log(value+' '+v+' '+state+' '+pickerFormats.from+' '+pickerFormats.to);
+
+}
+
+function manageAllDay ( state, element, options, date ) {
     if(options.allDayExt !==false) {
         // Get all linked inputs, e.g. startDate, endDate
         var selector = $('[data-datepicker-alldayext = '+ options.allDayExt +']');
@@ -144,7 +209,6 @@ function manageAllDay ( state, element, options ) {
     else {
         var selector = element;
     }
-
     // Change either the elememt itself of the element and it's AllDay buddy
     selector.each( function() {
         // Get their pickerIds
@@ -153,7 +217,11 @@ function manageAllDay ( state, element, options ) {
         // Get the format
         setPickerFormats(state, $(this));
 
-        if(window.pickerInstance[pId] !== undefined) {
+        if(date !== undefined) {
+            // :P
+            var value = date;
+        }
+        else if(window.pickerInstance[pId] !== undefined) {
             var value = window.pickerInstance[pId].input.value;
         }
         else {
@@ -317,6 +385,21 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                     // element.val(window.pickerInstance[pickerId].input.value);
                     picker.foundation('reveal', 'close');
 
+                });
+
+                $('#byTimetable-'+pickerId).find('.timetable-submit').click(function() {
+                    var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
+                    var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'h:mma');
+                    var newDate = moment($(this).attr('data-timetable-value'), convertFormat(options.displayFormatDate)).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+                    setValue( element, pickerOptions, false, newDate);
+
+                    if (options.allDayExt !== false) {
+                        var linkedElements = getLinkedElements( element, options );
+                        linkedElements.each(setValue($(this)), getOptions($(this)), false )
+                    }
+
+                    // manageAllDay(false, element, options, newDate);
+                    picker.foundation('reveal', 'close');
                 });
 
             });

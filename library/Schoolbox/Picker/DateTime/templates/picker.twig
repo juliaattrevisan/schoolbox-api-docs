@@ -169,7 +169,7 @@
                 {% endif %}
             </div>
             <div class="small-12 medium-12 columns">
-                <a class="button submit timetable-submit">Update</a>
+                <a class="button submit timetable-submit" data-timetable-value="{{ value }}">Update</a>
             </div>
         </div>
     </div>
@@ -223,6 +223,7 @@
 
         {# Ajax returned date #}
         timetableDate = moment(data.date, convertFormat('{{ displayFormat }}')).format(convertFormat('F d, Y'));
+        $('.timetable-submit').attr('data-timetable-value', data.date);
         if (template == 'duework') {
 
             if (data.students.length == 0) {
@@ -451,19 +452,6 @@
         {% else %}
         {# Don't fetch anything#}
         {% endif %}
-    });
-
-    {# Submit timetable datetime #}
-    $('.timetable-submit').click(function() {
-        var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
-        var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'h:mma');
-        var newDate = moment(timetableDate).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0).format(convertFormat('Y-m-d H:i:s'));
-        {# Turn AllDay off #}
-        manageAllDay(false, true);
-        window.pickerInstance[{{ id }}].setDate(newDate);
-        $('#{{ element }}').val(window.pickerInstance[{{ id }}].input.value);
-        $('#picker{{ id }}').foundation('reveal', 'close');
-
     });
 
     {# Setup calendar #}
