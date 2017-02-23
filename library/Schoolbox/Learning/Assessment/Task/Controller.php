@@ -76,7 +76,6 @@ class Controller extends Assessment\Controller
         }
 
         $twigData = [
-            'user'        => $this->getUser(),
             'type'        => Assessment\AssessmentType::objectToString($assessment),
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
