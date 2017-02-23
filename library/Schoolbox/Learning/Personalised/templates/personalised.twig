@@ -4,6 +4,7 @@
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery.scrollTo/jquery.scrollTo.min.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 
@@ -137,6 +138,7 @@
 
 {# FullCalendar setup #}
 
+{% autoescape 'js' %}
 <script type="text/javascript">
     // Do stuff here
     $(function() {
@@ -270,7 +272,7 @@
 
             calEvent.className.push('loading');
             var post = $.post(
-                '{{ routeLookup('learningPersonalised.postUpdateParticipation', {studentId: student.id})|e('js') }}',
+                '{{ routeLookup('learningPersonalised.postUpdateParticipation', {studentId: student.id}) }}',
                 data,
                 null,
                 'json'
@@ -424,8 +426,8 @@
                 },
                 height: 'auto',
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
-                firstDay: Number({{ config.calendar_start_day }}),
-                schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
+                firstDay: Number('{{ config.calendar_start_day }}'),
+                schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
                 defaultView: calendarParams.view,
                 header: {
                     left: 'prevWindow,today,nextWindow',
@@ -435,7 +437,7 @@
                 events: function(start, end, timezone, callback) {
                     $.ajax({
                         dataType: 'json',
-                        url:      '{{ routeLookup('learningPersonalised.getCalendarForStudent', {studentId: student.id})|e('js') }}',
+                        url:      '{{ routeLookup('learningPersonalised.getCalendarForStudent', {studentId: student.id}) }}',
                         data: {
                             start: Calendar.reOffsetTimestamp(start.unix()),
                             end:   Calendar.reOffsetTimestamp(end.unix())
@@ -595,11 +597,13 @@
                 },
 
                 viewRender: function() {
-                    // Only if the calendar view has changed
                     var currentView = calendar.fullCalendar('getView');
+                    var isTermView  = (currentView.type == 'timelineTerm');
+
+                    // Only if the calendar view has changed
                     if (previousView.type != currentView.type) {
                         // Timeline term view: skip back to the first day of the 6-month cycle
-                        if (currentView.type == 'timelineTerm') {
+                        if (isTermView) {
                             var date = calendar.fullCalendar('getDate').clone().date(1);
                             if (date.month() <= 6) {
                                 // Moment months start at 0 :/
@@ -613,6 +617,50 @@
                         pushCurrentCalendarState();
                     }
                     previousView = currentView;
+
+                    // Re-render the weeks bar
+                    // First: starts on start of span, until Sunday
+                    // Each one after: renders Monday
+                    if (isTermView) {
+                        var now         = moment();
+                        var anotherDate = currentView.start.clone();
+                        var datePiles   = {};
+                        while (anotherDate.isBefore(currentView.end)) {
+                            // Rewind to Monday
+                            var key = anotherDate.clone().startOf('isoWeek').format('YYYY-MM-DD');
+                            if (!(key in datePiles)) {
+                                datePiles[key] = [];
+                            }
+                            datePiles[key].push(anotherDate);
+                            anotherDate = anotherDate.clone().add({days: 1});
+                        }
+
+                        var columns = $();
+                        $.each(datePiles, function(i, v) {
+                            var firstDate = v[0];
+                            var head = $('<th class="fc-widget-header" />')
+                                .attr('data-date', firstDate.format('YYYY-MM-DD'))
+                                .attr('colspan', v.length)
+                                .addClass('fc-'+firstDate.format('ddd').toLowerCase());
+
+                            if (firstDate.isBefore(now)) {
+                                head.addClass('fc-past');
+
+                            } else if (firstDate.isAfter(now)) {
+                                head.addClass('fc-future');
+
+                            } else {
+                                head.addClass('fc-today');
+                            }
+
+                            // Contents
+                            var content = $('<span class="fc-cell-text" />')
+                                .text(firstDate.format('dd D'));
+                            head.append($('<div class="fc-cell-content">').append(content));
+                            columns = columns.add(head);
+                        });
+                        calendar.find('.fc-chrono').empty().append(columns);
+                    }
                 },
 
                 eventResize: updateAssessment,
@@ -629,7 +677,7 @@
                 // Does FC support nested groups?
                 resources: {
                     dataType: 'json',
-                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id})|e('js') }}'
+                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}'
                 },
                 resourceOrder: 'folderTitle',
                 resourceColumns: [{
@@ -673,6 +721,12 @@
                             }
                         }
                     }
+
+                    // Scroll to today if it's there
+                    var scrollTo = calendar.find('.fc-widget-header .fc-today');
+                    if (scrollTo.length) {
+                        scrollTo.closest('.fc-scroller').scrollTo(scrollTo);
+                    }
                 },
 
                 loading: function(isLoading) {
@@ -700,3 +754,4 @@
         }).init();
     });
 </script>
+{% endautoescape %}

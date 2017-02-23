@@ -43,7 +43,7 @@
         button {
             color: $content-ui-foreground;
             background-color: $content-ui-background;
-            &:hover {
+            &:hover, &.fc-state-active {
                 color: $content-ui-foreground;
                 background-color: $content-ui-hover;
             }
