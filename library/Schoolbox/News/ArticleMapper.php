@@ -762,10 +762,15 @@ class ArticleMapper extends Mapper implements Searchable
             $news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
             $news->setTopic($this->hydrateJoin($r, 'topic', 't'));
 
-            $image   = $imageMapper->hydrate($r, 'i');
-
-            if (is_numeric($image->getId())) {
+            /* Only ram in a hydrated image if there's an actual image there to use
+             * Otherwise set to null (Article sets an empty IStorage object by default)
+             */
+            if (strlen(trim($r['i.hash']))) {
+                /** @var Storage\IStorage $image */
+                $image = $imageMapper->hydrate($r, 'i');
                 $news->setImage($image);
+            } else {
+                $news->setImage(null);
             }
 
             $c->add($news);
