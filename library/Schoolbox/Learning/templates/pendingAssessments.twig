@@ -69,17 +69,18 @@
                                     {% set markedTitleSuffix = 'teacher assessment' -%}
                                 {%- endif -%}
 
-                                <div class="progress" title="{{ assessment.countCompleted }} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
+                                <div class="progress" title="{{ assessment.countParticipants - assessment.countResponseRequired }} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
                                     <span class="meter" style="width:{{ 100 - assessment.percentageResponseRequired }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.percentageResponseRequired - assessment.percentageMarkingRequired }}%" title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.percentageReviewComplete }}%" title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
-                                <p title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require marking">{{ assessment.countFeedbaclRequired }} unmarked</p>
+                                <p title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require marking">{{ assessment.countFeedbackRequired }} unmarked</p>
                             </div>
                             <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
                                 {% for participant in assessment.allParticipants %}
-                                    {% if participant.isMarkingRequired %}
+                                    {% if participant.isFeedbackRequired %}
+                                        <li>
                                         {% set response = participant.findMostRecentResponse %}
                                         {% if assessment is task %}
                                             <div class="compact card small-6">
@@ -165,14 +166,13 @@
                                 <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
                             </div>
                             <div class="small-4 columns hide-for-small-only">
-                                <div class="progress" title="{{ assessment.countCompleted }} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
-                                    <span class="meter" style="width:{{ assessment.percentageResponseRequired }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.percentageResponseRequired - assessment.percentageMarkingRequired }}%" title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
+                                <div class="progress" title="{{ assessment.countParticipants - assessment.countResponseRequired}} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
+                                    <span class="meter" style="width:{{ 100 - assessment.percentageResponseRequired }}%"></span>
+                                    <span class="pipe-meter" style="left: {{ assessment.percentageReviewComplete }}%" title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
-                                <p title="{{ assessment.countNoResponseOrFeedback }} of {{ assessment.countParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.countNoResponseOrFeedback }} {{ state }}</p>
-                                <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
+                                <p title="{{ assessment.countNoResponseOrFeedback }} of {{ assessment.countParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.countResponseRequired }} {{ state }}</p>
                             </div>
                             <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
                                 {% set studentEmails = [] %}

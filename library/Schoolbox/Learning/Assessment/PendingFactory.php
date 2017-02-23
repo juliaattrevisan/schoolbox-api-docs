@@ -154,6 +154,15 @@ class PendingFactory
     private $studentIntCache = [];
 
     /**
+     * Contains stub teachers, typically used as the 'submittedBy' for SOBO responses, or for feedbacks.
+     *
+     * Indexed by user.id so we can find O(1) when generating Participants
+     *
+     * @var User[]
+     */
+    private $teacherCache;
+
+    /**
      * @var Term $term
      */
     private $term;
@@ -293,6 +302,24 @@ class PendingFactory
         if (!$this->foldersCache[$id] instanceof Folder) {
             $this->foldersCache[$id] = (new Folder())->setId($id)->setName($name);
         }
+    }
+
+
+    /**
+     * Returns a User object that may be partially hydrated, but at the least contains the user.id.
+     *
+     * @param $id
+     * @return User
+     */
+    private function getStubUser($id)
+    {
+        if($this->studentIntCache[$id] instanceof User){
+            return $this->studentIntCache[$id];
+        }
+        if(!$this->teacherCache[$id] instanceof User){
+            $this->teacherCache[$id] = (new User())->setId($id);
+        }
+        return $this->teacherCache[$id];
     }
 
 
@@ -1126,7 +1153,7 @@ class PendingFactory
     private function checkAssessmentRelevance(IAssessable $assessment)
     {
         // Does this assessment require marking or chasing ?
-        if (!$this->isMarkingRequired($assessment) && !$this->isChasingRequired($assessment)) {
+        if (!$this->isFeedbackRequired($assessment) && !$this->isChasingRequired($assessment)) {
             unset($this->assessmentsCache[$assessment->getId()]);
         }
     }
@@ -1138,7 +1165,7 @@ class PendingFactory
      * @param IAssessable $assessment
      * @return bool
      */
-    private function isMarkingRequired(IAssessable $assessment)
+    private function isFeedbackRequired(IAssessable $assessment)
     {
         return $assessment->getCountFeedbackRequired() > 0;
     }
@@ -1176,11 +1203,14 @@ class PendingFactory
         $lastIdx = $countRows - 1;
 
         foreach ($taskResults as $rowIdx => $row) {
-            $task     = $this->assessmentsCache[$row['t.assessment_id']];
-            $userId   = $row['tc.student_id'];
+            $task          = $this->assessmentsCache[$row['t.assessment_id']];
+            $userId        = $row['tc.student_id'];
+            $markingUserId = $row['tc.marking_user_id'];
+
             $response = new TaskResponse();
             $response->setId($row['tc.id']);
-            $response->setSubmittedBy($this->studentIntCache[$userId]);
+            $response->setSubmittedBy($this->getStubUser($markingUserId));
+            $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
             $response->setAssessable($task);
             $completedAt = $this->getDateFromString($row['tc.completion_date']);
             $response->setCreatedAt($completedAt);
@@ -1197,7 +1227,7 @@ class PendingFactory
             $participants[$userId]->getAllResponses()->setOffset($response->getId(), $response);
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
-            if ($userId != $row['tc.marking_user_id']) {
+            if ($userId != $markingUserId) {
                 $feedback = (new TaskFeedback())
                     ->setResponse($response);
 

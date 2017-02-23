@@ -28,7 +28,6 @@ use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
 use Timetable_ColourMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Model as AssessmentQuiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -167,7 +166,7 @@ class Controller extends Base
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', [
-                'studentId' => $this->getUser()->getId()
+                'studentId' => $this->getUser()->getId(),
             ]));
         }
 
@@ -198,7 +197,7 @@ class Controller extends Base
             if($viewee->getRole()->isStudent() || $viewee->getRole()->isParent()) {
                 // Redirect to 'Due Assessments' page
                 $this->getResponse()->redirect->to($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', [
-                    'studentId' => $viewee->getId()
+                    'studentId' => $viewee->getId(),
                 ]));
                 return;
             }
@@ -516,7 +515,7 @@ class Controller extends Base
                     $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
                     $attempts = $this->quizAttemptMapper->findByColumnList([
                         'assess_id' =>$quiz->getId(),
-                        'user_id' => $viewee->getId()
+                        'user_id' => $viewee->getId(),
                     ]);
 
                     if ($attempts->count() > 0) {
@@ -541,7 +540,7 @@ class Controller extends Base
                     $graphInfo[] = [
                         'displayMark' => $feedback->getHumanReadableMark(),
                         'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
-                        'info' => $feedback->getComment() == null ? '' : $feedback->getComment()
+                        'info' => $feedback->getComment() == null ? '' : $feedback->getComment(),
                     ];
                 } else {
                     $graphInfo[] = [];
@@ -559,7 +558,7 @@ class Controller extends Base
                     [
                         'info' => null,
                         'uid' => null,
-                        'value' => $statistics[$assessment->getId()]['minNormalized']
+                        'value' => $statistics[$assessment->getId()]['minNormalized'],
                     ],
                     // 1st Quartile
                     [
@@ -572,7 +571,7 @@ class Controller extends Base
                     [
                         'info' => null,
                         'uid' => null,
-                        'value' => $statistics[$assessment->getId()]['meanNormalized']
+                        'value' => $statistics[$assessment->getId()]['meanNormalized'],
                     ],
                     // 3rd Quartile
                     [
@@ -585,7 +584,7 @@ class Controller extends Base
                     [
                         'info' => null,
                         'uid' => null,
-                        'value' => $statistics[$assessment->getId()]['maxNormalized']
+                        'value' => $statistics[$assessment->getId()]['maxNormalized'],
                     ],
                 ];
             } else {
