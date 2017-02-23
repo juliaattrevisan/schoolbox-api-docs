@@ -92,9 +92,8 @@ class Participant
         $this->setUser($user);
         $this->setAssessable($assessable);
 
-        $this->allResponses = new GenericCollection($this->getAllowedResponseType() ?: IResponse::class);
-
-        $this->allFeedbacks = new GenericCollection($this->getAllowedFeedbackType() ?: IFeedback::class);
+        $this->allResponses = new GenericCollection($assessable->getResponseClass());
+        $this->allFeedbacks = new GenericCollection($assessable->getFeedbackClass());
 
         $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
@@ -275,46 +274,6 @@ class Participant
         return $this->assessable->getMarkScheme()->getPublishedHumanReadableMark($this);
     }
 
-
-    /**
-     * Determine what sort of objects are permitted in the Response collection
-     *
-     * @return string|null
-     */
-    protected function getAllowedResponseType()
-    {
-        if ($this->assessable instanceof Quiz) {
-            return QuizAttempt::class;
-        } elseif ($this->assessable instanceof DueWork) {
-            return DueWorkSubmission::class;
-        } elseif ($this->assessable instanceof Task) {
-            return TaskResponse::class;
-        } elseif ($this->assessable instanceof Project) {
-            return null;
-        } else {
-            throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($this->assessable));
-        }
-    }
-
-    /**
-     * Determine what sort of objects are permitted in the Feedback collection
-     *
-     * @return string|null
-     */
-    protected function getAllowedFeedbackType()
-    {
-        if ($this->assessable instanceof Quiz) {
-            return QuizReview::class;
-        } elseif ($this->assessable instanceof DueWork) {
-            return DueWorkFeedback::class;
-        } elseif ($this->assessable instanceof Task) {
-            return TaskFeedback::class;
-        } elseif ($this->assessable instanceof Project) {
-            return null;
-        } else {
-            throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($this->assessable));
-        }
-    }
 
     /* Getters/Setters
      */

@@ -340,4 +340,20 @@ class Model extends AbstractAssessment
         // noop
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseClass()
+    {
+        return TaskResponse::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFeedbackClass()
+    {
+        return TaskFeedback::class;
+    }
 }

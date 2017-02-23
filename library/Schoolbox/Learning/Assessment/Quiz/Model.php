@@ -20,6 +20,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class Model extends AbstractAssessment
 {
@@ -271,5 +273,21 @@ class Model extends AbstractAssessment
     {
         $this->completionMessage = $completionMessage;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseClass()
+    {
+        return QuizAttempt::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFeedbackClass()
+    {
+        return QuizReview::class;
     }
 }

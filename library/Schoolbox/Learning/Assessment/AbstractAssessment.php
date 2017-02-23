@@ -942,4 +942,20 @@ abstract class AbstractAssessment implements IAssessable
         $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseClass()
+    {
+        return IResponse::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFeedbackClass()
+    {
+        return IFeedback::class;
+    }
 }
