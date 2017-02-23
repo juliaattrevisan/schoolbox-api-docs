@@ -308,7 +308,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->foldersCache[$id] instanceof Folder) {
-            $this->foldersCache[$id] = (new Folder())->setId($id)->setName($name);
+            $this->foldersCache[$id] = $this->folderMapper->createModel($id)->setName($name);
         }
     }
 
