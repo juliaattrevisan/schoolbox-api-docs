@@ -18,7 +18,7 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
-use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\GenericCollection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -30,6 +30,9 @@ use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 /**
  * When a student self-assesses a task, it will generate an IResponse only, with a mark of 'incomplete' or 'self-assessed'.
  * When a teacher assesses a student, it will generate both an IResponse and an IFeedback, with a mark of 'incomplete' or 'teacher-assessed'.
+ *
+ * @method TaskFeedback[]|GenericCollection getFeedbacks()
+ * @method TaskResponse[]|GenericCollection getResponses()
  */
 class Model extends AbstractAssessment
 {
@@ -138,16 +141,6 @@ class Model extends AbstractAssessment
         return 0;
     }
 
-    /**
-     * This task is student self-assessed
-     *
-     * @return boolean
-     */
-    public function isSelfAssessable()
-    {
-        return $this->isSelfAssessable;
-    }
-
 
     /**
      * Check the dates set on this model are valid
@@ -178,7 +171,7 @@ class Model extends AbstractAssessment
         }
 
         // Must be self-assessable
-        if(!$this->isSelfAssessable()){
+        if(!$this->getIsSelfAssessable()){
             return false;
         }
 

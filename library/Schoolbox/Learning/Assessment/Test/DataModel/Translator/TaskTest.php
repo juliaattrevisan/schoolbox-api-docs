@@ -111,7 +111,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals($link, $task->getUrl());
-        $this->assertEquals($selfMarkable, $task->isSelfAssessable());
+        $this->assertEquals($selfMarkable, $task->getIsSelfAssessable());
         $this->assertEquals($creatorId, $task->getCreator()->getId());
     }
 }

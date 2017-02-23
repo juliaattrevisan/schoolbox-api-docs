@@ -119,7 +119,7 @@ class Model extends AbstractResponse
         if ($currentUser->getId() == $student->getId()) {
 
             // Is the task self-assessable ?
-            if (!$this->getAssessable()->isSelfAssessable()) {
+            if (!$this->getAssessable()->getIsSelfAssessable()) {
                 throw new \UnexpectedValueException("Users may not self-assess a task themselves, if the task is not self-assessable");
             }
 
