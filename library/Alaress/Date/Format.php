@@ -68,15 +68,23 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         if ($clock) {
             $time = $clock->time();
+
+        } elseif (php_sapi_name() == 'cli') {
+            return new static(time(), 'U');
+
+        } elseif (isset(static::$now)) {
+            return clone static::$now;
+
         } elseif (isset($_SERVER['REQUEST_TIME'])) {
             $time = $_SERVER['REQUEST_TIME'];
+
         } else {
             // @codeCoverageIgnoreStart
             $time = time();
             // @codeCoverageIgnoreEnd
         }
 
-        return new static($time, 'U');
+        return static::$now = new static($time, 'U');
     }
 
     /**
