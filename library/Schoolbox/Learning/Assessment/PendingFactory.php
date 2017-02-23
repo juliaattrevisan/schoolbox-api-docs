@@ -214,6 +214,13 @@ class PendingFactory
      */
     private $folderMapper;
 
+    /**
+     * Indexed by studentSubmission.id so we can link non-floating feedback to their response
+     *
+     * @var DueWorkSubmission[]
+     */
+    private $dueWorkSubmissionCache = [];
+
 
     /**
      * @param User                         $viewee
@@ -232,6 +239,7 @@ class PendingFactory
         \Alaress_Date_Format $toChaseLimit,
         $includeTasks,
         FolderMapper $folderMapper
+
     ) {
         $this->viewee           = $viewee;
         $this->database         = $database;
@@ -1021,13 +1029,11 @@ class PendingFactory
         $query = "
             SELECT
                 sb.assessment_id                 AS 'sb.assessment_id',
-                sb.mark_visibility               AS 'sb.mark_visibility',
                 sr.id                            AS 'sr.id',
-                sr.marker                        AS 'sr.marker',
                 sr.owner                         AS 'sr.owner',
+                sr.student_submission_id         AS 'sr.student_submission_id',
                 sr.updated_at                    AS 'sr.updated_at',
-                sr.published_at                  AS 'sr.published_at',
-                sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
+                sr.published_at                  AS 'sr.published_at'
             FROM submission_box sb
             JOIN submission_return sr ON sr.box_id = sb.id
             WHERE " . implode(' AND ', $pb->getWhere()) . "
@@ -1271,6 +1277,10 @@ class PendingFactory
             $response->setUpdatedAt($this->getDateFromString($row['ss.updated_at']));
 
             $dueWork->getResponses()->setOffset($response->getId(), $response);
+
+            // Add to cache so we can later link non-floating feedbacks to responses
+            $this->dueWorkSubmissionCache[$response->getId()] = $response;
+
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
@@ -1286,6 +1296,13 @@ class PendingFactory
      * Create DueWorkFeedbacks from DB results
      *
      * @param array $dueWorkFeedbackResults
+     * @var int    $dueWorkFeedbackResults['sb.assessment_id']
+     * @var string $dueWorkFeedbackResults['sr.owner']
+     * @var int    $dueWorkFeedbackResults['sr.id']
+     * @var int    $dueWorkFeedbackResults['sr.student_submission_id']
+     * @var int    $dueWorkFeedbackResults['sr.updated_at']
+     * @var int    $dueWorkFeedbackResults['sr.published_at']
+     * @var int    $dueWorkFeedbackResults['sb.assessment_id']
      */
     private function hydrateDueWorkFeedbacks(array $dueWorkFeedbackResults)
     {
@@ -1312,6 +1329,13 @@ class PendingFactory
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
             $participants[$userId]->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
+
+            // Does this feedback relate to a specific response ?
+            $studentSubmissionId = $row['sr.student_submission_id'];
+            if($studentSubmissionId && $this->dueWorkSubmissionCache[$studentSubmissionId] instanceof DueWorkSubmission){
+                $feedback->setResponse($this->dueWorkSubmissionCache[$studentSubmissionId]);
+                $this->dueWorkSubmissionCache[$studentSubmissionId]->getAllFeedback()->add($feedback);
+            }
 
             // Have we reached the last row for an Assessment ?
             if ($rowIdx == $lastIdx || $dueWork->getId() != $dueWorkFeedbackResults[$rowIdx + 1]['sb.assessment_id']) {
