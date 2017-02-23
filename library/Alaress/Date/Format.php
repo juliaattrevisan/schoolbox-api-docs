@@ -20,7 +20,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * @var static
      */
-    static $now;
+    static private $now;
 
     /**
      * @var LaravelDate
