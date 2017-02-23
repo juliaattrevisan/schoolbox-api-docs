@@ -93,10 +93,13 @@ class SubjectMapper extends Schoolbox\External\Mapper
 			SELECT c.id, GROUP_CONCAT(co.code) AS code
 			FROM folder c
 			LEFT JOIN folder_code co ON co.folder_id = c.id AND co.deleted_at IS NULL
-			WHERE co.code=?
+			WHERE (co.code=? OR co.code=?)
 		');
         $add_id_map = function($subject) use ($category_statement) {
-            $category_statement->execute(array($subject['code']));
+            $category_statement->execute([
+                $subject['code'],
+                $subject['campusCode'] . "/" . $subject['code']
+            ]);
             if ($row = $category_statement->fetch()) {
                 $subject['id']   = $row['id'];
 //				$subject['code'] = $row['code'];
