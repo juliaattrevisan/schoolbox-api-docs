@@ -80,7 +80,7 @@ class Controller extends Base
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      */
-    public function getParticularResponse(IAssessable $assessment, Participant $participant, Submission $response)
+    public function getParticularResponse(IAssessable $assessment, Participant $participant, Submission $response = null)
     {
         /* Module doesn't have access to $this->getUser()
          *
