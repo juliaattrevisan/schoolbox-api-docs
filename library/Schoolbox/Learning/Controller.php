@@ -565,6 +565,12 @@ class Controller extends Base
 
         $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER["REQUEST_URI"]);
 
+        // Don't display class average data if disabled by LMS policy- this just leaves the scatter plot
+
+        if (!$this->getConfigLoader()->get('display_grade_average')) {
+            $graphData = [];
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
             'student'            => $viewee,
             'term'               => $term,
@@ -572,6 +578,7 @@ class Controller extends Base
             'folders'            => $folders,
             'subject'            => $subject,
             'markbook'           => $markbook,
+            'graphShow'          => $this->getConfigLoader()->get('display_grade_graph'),
             'graphInfo'          => json_encode($graphInfo),
             'graphAssessments'   => json_encode($graphAssessments),
             'graphData'          => json_encode($graphData),
