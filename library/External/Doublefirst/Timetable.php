@@ -92,8 +92,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         }
         // Get period information from database
 
-        $query =
-            "
+        $query = "
             SELECT DISTINCT
             p.PeriodID as PeriodNumber, 
             1 AS PeriodNumberSeq, 
@@ -101,16 +100,26 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             1 AS DayNumber, 
             p.PeriodDuration,
             b.BreakDuration
-            FROM AttendancePeriods p
-            LEFT JOIN PeriodNames n ON p.AcademicYear = n.AcademicYear AND p.DayOfWeek = 1 AND p.PeriodID = n.PeriodNumber and n.yeargroupid = p.yeargroup
-            LEFT JOIN AttendanceBreaks b ON b.AcademicYear = p.AcademicYear AND b.DayOfWeek = 1 AND b.BreakPeriodID = p.PeriodID  AND b.YearGroup = p.yeargroup 
+
+            FROM AttendancePeriods p 
+            LEFT JOIN PeriodNames n ON 
+            p.AcademicYear = n.AcademicYear AND 
+            p.PeriodID = n.PeriodNumber AND
+            n.yeargroupid = p.yeargroup 
+
+            LEFT JOIN AttendanceBreaks b ON 
+            b.AcademicYear = p.AcademicYear AND 
+            b.DayOfWeek = p.DayOfWeek AND 
+            b.BreakPeriodID = p.PeriodID AND 
+            b.YearGroup = p.yeargroup 
 	    ";
 
         if ($type == 'student') {
             $query .= "   
 	            WHERE
 	            p.AcademicYear = '{$fileYear}' AND
-	            p.YearGroup = '{$studentDetails['YearGroupID']}'
+	            p.YearGroup = '{$studentDetails['YearGroupID']}' AND
+                p.DayOfWeek = 1
 	        ";
         } else {
 
@@ -122,7 +131,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 "
 		        WHERE
                     p.AcademicYear = '{$fileYear}' AND
-                    p.YearGroup IN ({$yearGroups})            
+                    p.YearGroup IN ({$yearGroups}) AND
+                    p.DayOfWeek = 1           
     		";
         }
 
@@ -139,8 +149,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         // Get start of day time information from the database
 
-        $queryTimes =
-            "
+        $queryTimes = "
             SELECT TOP 1 SchoolStartTime, NoOfPeriods
             FROM AttendancePeriodStructure 
             WHERE YearGroup = '{$studentDetails['YearGroupID']}'
