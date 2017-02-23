@@ -36,10 +36,6 @@ class External_Doublefirst_Class implements External_ClassInterface
         $this->externalUser = new External_User('Doublefirst');
     }
 
-    public function getParents($subCode) {
-        return [];
-    }
-
     /**
      * Get all student in class
      * @param $subCode

@@ -3,12 +3,38 @@
 require_once('../library/Bootstrap.php');
 
 use \Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Role;
+use \Schoolbox\Role;
 use \Schoolbox\UserMapper as UserMapper;
 use \Schoolbox\Permission\Access\UserAccessMapper as UserAccessMapper;
 use \Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Alaress\Lumberjack\Logger;
+use \Alaress\Lumberjack\Logger;
+
+/**
+ * Retrieve all parents of students in the specified subject
+ * @param $subCode
+ * @return array|bool
+ */
+function getParents($subCode)
+{
+    $class = new \External_Class();
+    $externalUser = new \External_User();
+
+    $students = $class->getStudents($subCode);
+
+    $contacts = [];
+
+    if (is_array($students)) {
+        foreach ($students as $student) {
+            $contactsCurrent = $externalUser->getStudentContactList($student['synergy_id']);
+            foreach ($contactsCurrent as $contactCurrent) {
+                $contacts[$contactCurrent['StudentContactID']] = $contactCurrent;
+            }
+        }
+    }
+
+    return $contacts;
+}
 
 $userMapper = UserMapper::getInstance();
 $userAccessMapper = UserAccessMapper::getInstance();
@@ -18,7 +44,7 @@ $classHandler = new \External_Class();
 
 $log = new Logger(STDOUT, STDERR);
 
-$options = getopt("f:", array('students'));
+$options = getopt("f:", ['students']);
 
 if (!isset($options['f'])) {
     $log->error("No import filename specified");
@@ -145,25 +171,26 @@ foreach ($classes as $folderId => $codes) {
     $usersAdded = [];
 
     foreach ($codes as $code) {
+        if (!empty($code)) {
+            $log->info("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
 
-        $log->info("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
+            $parents = getParents($code);
 
-        $parents = $classHandler->getParents($code);
+            if ($loadStudents) {
+                $students = $classHandler->getStudents($code);
 
-        if ($loadStudents) {
-            $students = $classHandler->getStudents($code);
-
-            if (is_array($students)) {
-                foreach ($students as $student) {
-                    loadUserAccess($userMapper, $userAccessMapper, $log, $student['synergy_id'], Role::STUDENT, $folderId);
+                if (is_array($students)) {
+                    foreach ($students as $student) {
+                        loadUserAccess($userMapper, $userAccessMapper, $log, $student['synergy_id'], Role::STUDENT, $folderId);
+                    }
                 }
             }
-        }
 
-        if (is_array($parents)) {
-            foreach ($parents as $parent) {
-                loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactID'], Role::PARENT, $folderId);
-                loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactSpouseID'], Role::PARENT, $folderId);
+            if (is_array($parents)) {
+                foreach ($parents as $parent) {
+                    loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactID'], Role::PARENT, $folderId);
+                    loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactSpouseID'], Role::PARENT, $folderId);
+                }
             }
         }
     }

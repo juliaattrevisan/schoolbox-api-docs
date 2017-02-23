@@ -23,10 +23,6 @@ class External_Tass_Class implements External_ClassInterface {
         $this->externalUser = new External_User('tass');
 	}
 
-    public function getParents($subCode) {
-        return [];
-    }
-
     function getStudents($subCode) {
         $classQuery = '';
 		if(stristr($subCode, ',')) {

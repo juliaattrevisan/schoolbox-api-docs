@@ -78,60 +78,6 @@ class External_Synergetic_Class implements External_ClassInterface
         return $this->getDatabase()->getRow($query);
     }
 
-    /**
-     * Retrieve all parents of students in the specified subject
-     * @param $subCode
-     * @return array|bool
-     */
-    public function getParents($subCode)
-    {
-        $students = $this->getStudents($subCode);
-
-        $studentIds = "";
-
-        if (is_array($students)) {
-
-            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-            $fileYear = $this->database->quote($this->externalUser->getCurrentYear());
-
-            foreach ($students as $student) {
-
-                if ($studentIds != "") {
-                    $studentIds .= ",";
-                }
-
-                $studentIds .= $student['synergy_id'];
-            }
-
-            if ($studentIds != '') {
-
-                $query = "
-                    SELECT DISTINCT
-                      StudentID, 
-                      StudentGiven1,
-                      StudentSurname,
-                      StudentContactID,
-                      StudentContactGiven1,
-                      StudentContactSurname,
-                      StudentContactSpouseID,
-                      StudentContactSpouseGiven1,
-                      StudentContactSpouseSurname
-                    FROM 
-                      vStudentContactAllAddress 
-                    WHERE 
-                      StudentContactType IN ('SC1', 'SC2', 'SC3') AND 
-                      StudentID IN ({$studentIds}) AND
-                      FileYear = {$fileYear} AND
-                      FileSemester = {$fileSemester}
-                ";
-
-                return $this->getDatabase()->getAll($query);
-            }
-        }
-
-        return [];
-    }
-
     public function getStudents($subCode)
     {
         if (!$subCode) {

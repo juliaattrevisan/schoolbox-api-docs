@@ -21,10 +21,6 @@ class External_Pcschools_Class implements External_ClassInterface
         $this->setDatabase(MSSQL::getInstance());
     }
 
-    public function getParents($subCode) {
-        return [];
-    }
-
     /**
      * Get a list of students in a particular $classCode
      * lastname,

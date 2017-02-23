@@ -33,10 +33,6 @@ class External_Class implements External_ClassInterface{
         $this->setTimeout(Config::get('external_cache_timeout'));
 	}
 
-    public function getParents($subCode) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-    }
-
     public function getStudents($classCode)
     {
         $result = $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());

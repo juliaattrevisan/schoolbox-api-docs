@@ -30,10 +30,6 @@ class External_Denbigh_Class implements External_ClassInterface {
 		$this->setExternalDatabase($database);
 	}
 
-	public function getParents($subCode) {
-	    return [];
-    }
-
 	public function getStudents ($classCode) {
 
         if(!$classCode) {

@@ -10,10 +10,6 @@
 
 class External_Denbigh2_Class implements External_ClassInterface {
 
-    public function getParents($subCode) {
-        return [];
-    }
-
     /**
      * Get a list of students in a particular $classCode
      *
