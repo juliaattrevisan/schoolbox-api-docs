@@ -155,14 +155,13 @@ class Factory
         }
 
         /**
-         * If content is all empty and they are trying publish then fail out.
-         * Otherwise if they are updating an existing draft and if there's no content: delete the draft.
-         * I have purposefully allowed empty drafts when creating a new draft, otherwise it's just too confusing for users when going from a published feedback.
+         * If they are updating an existing draft and there's no content: delete the draft.
+         * I have purposefully allowed empty drafts when creating a new draft, otherwise it's just
+         * too confusing for users when going from a published feedback.
+         * I've also purposefully allowed publishing of empty feedback, in order for teachers to overwrite a mistake
+         * (teachers are not allowed to delete from the feedback history).
          */
-        if (!$hasContent && $postPublish == true) {
-            $this->setResponseCode(400);
-            throw new \InvalidArgumentException('One of mark, comment and files should not be empty.');
-        } elseif (!$hasContent && $this->getResponseCode() == 204) {
+        if (!$hasContent && !$postPublish && $this->getResponseCode() == 204) {
             $feedback->setDeletedAt(\Alaress_Date_Format::now());
             $feedback->setResponse($this->getResponse());
             return $feedback;

@@ -27,22 +27,15 @@ class Controller extends Base
      */
     protected $feedbackDataSource;
 
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
 
     /**
      * Controller constructor.
      *
      * @param IFeedbackDataSource $feedbackDataSource
-     * @param ErrorMapper $errorMapper
      */
-    public function __construct(IFeedbackDataSource $feedbackDataSource, ErrorMapper $errorMapper)
+    public function __construct(IFeedbackDataSource $feedbackDataSource)
     {
         $this->feedbackDataSource = $feedbackDataSource;
-        $this->errorMapper = $errorMapper;
     }
 
     /**
@@ -158,22 +151,14 @@ class Controller extends Base
             $response
         );
 
-        try {
-            $feedback = $feedbackFactory->produce();
-            $this->getFeedbackDataSource()->save($feedback);
+        $feedback = $feedbackFactory->produce();
+        $this->getFeedbackDataSource()->save($feedback);
 
-            $data = [
-                'success' => true,
-                'message' => 'OK',
-                'id'      => $feedback->getId()
-            ];
-        } catch (\InvalidArgumentException $e) {
-            $data = [
-                'success' => false,
-                'message' => 'Bad Request',
-                'error'   => $this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_NO_FEEDBACK_TO_PUBLISH)
-            ];
-        }
+        $data = [
+            'success' => true,
+            'message' => 'OK',
+            'id'      => $feedback->getId(),
+        ];
 
         $this->respond('', $data, $feedbackFactory->getResponseCode());
     }
@@ -246,15 +231,6 @@ class Controller extends Base
     protected function getFeedbackDataSource()
     {
         return $this->feedbackDataSource;
-    }
-
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
     }
 
 }

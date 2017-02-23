@@ -150,7 +150,7 @@
                     config.onPublishCallback();
 
                 }).fail(function (xhr) {
-                    toast.call($form, xhr.responseJSON.error, false);
+                    toast.call($form, xhr.responseText, false);
                     $btnPublish.removeAttr('disabled').text(config.publishText);
 
                 }).always(function () {
@@ -223,7 +223,7 @@
                     $form.find('[data-draft="drafted"]').text('Saved as draft');
                 })
                 .fail(function (xhr) {
-                    toast.call($form, xhr.responseJSON.error, false);
+                    toast.call($form, xhr.responseText, false);
                 })
                 .always(function () {
                     $form.find('[data-draft=publish]').removeAttr("disabled");
