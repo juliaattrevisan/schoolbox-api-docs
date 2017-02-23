@@ -30,6 +30,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Alaress_Date_Format;
+use UnderflowException;
 
 /**
  * Class Mapper
@@ -504,9 +505,13 @@ class Mapper extends BaseMapper
         $idList = array_column($idStatement->fetchAll(), 'id');
 
         // Send IDs to findByColumnList
-        $builder = $builder->equals('id', array_merge($idList, $uniqueIds));
 
-        return $this->findByPredicates($builder, $options);
+        try {
+            $builder = $builder->equals('id', array_merge($idList, $uniqueIds));
+            return $this->findByPredicates($builder, $options);
+        } catch (\UnderflowException $e) {
+            return new Collection();
+        }
     }
 
     /**
