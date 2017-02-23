@@ -268,8 +268,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle('A self-assessable task')
             ->setIsSelfAssessable(true)
-            ->setPublishAt((clone Alaress_Date_Format::now())->addDays(-7))
-            ->setDueAt((clone Alaress_Date_Format::now())->addDays(+7));
+            ->setPublishAt(Alaress_Date_Format::now()->addDays(-7))
+            ->setDueAt(Alaress_Date_Format::now()->addDays(+7));
 
 
         // Student A - no response
@@ -287,8 +287,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantB->getUser())
             ->setSubmittedBy($participantB->getUser())
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseB);
         $participantB->getAllResponses()->add($responseB);
@@ -304,8 +304,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantC->getUser())
             ->setSubmittedBy($participantC->getUser())
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseC);
         $participantC->getAllResponses()->add($responseC);
@@ -321,8 +321,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantC->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseD);
         $participantD->getAllResponses()->add($responseD);
@@ -342,8 +342,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantE->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseE);
         $participantE->getAllResponses()->add($responseE);
@@ -363,8 +363,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantF->getUser())
             ->setSubmittedBy($participantF->getUser())
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseF1);
         $participantF->getAllResponses()->add($responseF1);
@@ -375,8 +375,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantF->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseF2);
         $participantF->getAllResponses()->add($responseF2);
@@ -396,8 +396,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantG->getUser())
             ->setSubmittedBy($participantG->getUser())
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseG1);
         $participantG->getAllResponses()->add($responseG1);
@@ -408,8 +408,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantG->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseG2);
         $participantG->getAllResponses()->add($responseG2);
@@ -428,8 +428,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantH->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseH1);
         $participantH->getAllResponses()->add($responseH1);
@@ -444,8 +444,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantH->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseH2);
         $participantH->getAllResponses()->add($responseH2);
@@ -465,8 +465,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantI->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseI1);
         $participantI->getAllResponses()->add($responseI1);
@@ -481,8 +481,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantI->getUser())
             ->setSubmittedBy($participantI->getUser())
-            ->setCreatedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseI2);
         $participantI->getAllResponses()->add($responseI2);
@@ -509,8 +509,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle('A task that is NOT self-assessable.')
             ->setIsSelfAssessable(false)
-            ->setPublishAt((clone Alaress_Date_Format::now())->addDays(-7))
-            ->setDueAt((clone Alaress_Date_Format::now())->addDays(+7));
+            ->setPublishAt(Alaress_Date_Format::now()->addDays(-7))
+            ->setDueAt(Alaress_Date_Format::now()->addDays(+7));
 
 
         // Student A - no response
@@ -528,8 +528,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantB->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseB);
         $participantB->getAllResponses()->add($responseB);
@@ -548,8 +548,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantC->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseC);
         $participantC->getAllResponses()->add($responseC);
@@ -569,8 +569,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantD->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseD1);
         $participantD->getAllResponses()->add($responseD1);
@@ -585,8 +585,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantD->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseD2);
         $participantD->getAllResponses()->add($responseD2);
@@ -605,8 +605,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(false)
             ->setSubmittedOnBehalfOf($participantE->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseE1);
         $participantE->getAllResponses()->add($responseE1);
@@ -621,8 +621,8 @@ class TaskStatus extends PHPUnit_Framework_TestCase
             ->setMarkedComplete(true)
             ->setSubmittedOnBehalfOf($participantE->getUser())
             ->setSubmittedBy(self::getDemoTeacher('T'))
-            ->setCreatedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
         $task->getResponses()->add($responseE2);
         $participantE->getAllResponses()->add($responseE2);

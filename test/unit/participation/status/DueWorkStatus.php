@@ -218,12 +218,12 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
             ->setId($id)
             ->setAcceptOnline(true)
             ->setAcceptsMultiple()
-            ->setPublishAt((clone Alaress_Date_Format::now())->addDays(-14))
-            ->setOpenAt((clone Alaress_Date_Format::now())->addDays(-7))
-            ->setDueAt((clone Alaress_Date_Format::now())->addDays(+7))
-            ->setCloseAt((clone Alaress_Date_Format::now())->addDays(+14))
-            ->setCreatedAt((clone Alaress_Date_Format::now())->addDays(-21))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(-21))
+            ->setPublishAt(Alaress_Date_Format::now()->addDays(-14))
+            ->setOpenAt(Alaress_Date_Format::now()->addDays(-7))
+            ->setDueAt(Alaress_Date_Format::now()->addDays(+7))
+            ->setCloseAt(Alaress_Date_Format::now()->addDays(+14))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(-21))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(-21))
             ->setDeletedAt(new Alaress_Date_NullDate());
 
 
@@ -238,7 +238,7 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
 
         $responseB = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantB->getAllResponses()->add($responseB);
         $dueWork->getResponses()->add($responseB);
 
@@ -248,8 +248,8 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantC);
 
         $responseC = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantC->getAllResponses()->add($responseC);
         $dueWork->getResponses()->add($responseC);
 
@@ -259,14 +259,14 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantD);
 
         $responseD1 = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantD->getAllResponses()->add($responseD1);
         $dueWork->getResponses()->add($responseD1);
 
         $responseD2 = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(1));
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
         $participantD->getAllResponses()->add($responseD2);
         $dueWork->getResponses()->add($responseD2);
 
@@ -277,7 +277,7 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
 
         $feedbackE = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantE->getAllFeedbacks()->add($feedbackE);
         $dueWork->getFeedbacks()->add($feedbackE);
 
@@ -287,8 +287,8 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantF);
 
         $feedbackF = (new Feedback())
-            ->setPublishedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantF->getAllFeedbacks()->add($feedbackF);
         $dueWork->getFeedbacks()->add($feedbackF);
 
@@ -298,14 +298,14 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantG);
 
         $feedbackG1 = (new Feedback())
-            ->setPublishedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantG->getAllFeedbacks()->add($feedbackG1);
         $dueWork->getFeedbacks()->add($feedbackG1);
 
         $feedbackG2 = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantG->getAllFeedbacks()->add($feedbackG2);
         $dueWork->getFeedbacks()->add($feedbackG2);
 
@@ -315,14 +315,14 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantH);
 
         $responseH = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantH->getAllResponses()->add($responseH);
         $dueWork->getResponses()->add($responseH);
 
         $feedbackH = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantG->getAllFeedbacks()->add($feedbackH);
         $dueWork->getFeedbacks()->add($feedbackH);
 
@@ -332,14 +332,14 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantI);
 
         $responseI = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantI->getAllResponses()->add($responseI);
         $dueWork->getResponses()->add($responseI);
 
         $feedbackI = (new Feedback())
-            ->setPublishedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantI->getAllFeedbacks()->add($feedbackI);
         $dueWork->getFeedbacks()->add($feedbackI);
 
@@ -349,15 +349,15 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantJ);
 
         $responseJ = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantJ->getAllResponses()->add($responseJ);
         $dueWork->getResponses()->add($responseJ);
 
         $feedbackJ = (new Feedback())
             ->setResponse($responseJ)
             ->setPublishedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantJ->getAllFeedbacks()->add($feedbackJ);
         $dueWork->getFeedbacks()->add($feedbackJ);
         $responseJ->getAllFeedback()->add($feedbackJ);
@@ -368,15 +368,15 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantK);
 
         $responseK = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantK->getAllResponses()->add($responseK);
         $dueWork->getResponses()->add($responseK);
 
         $feedbackK = (new Feedback())
             ->setResponse($responseK)
-            ->setPublishedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantK->getAllFeedbacks()->add($feedbackK);
         $dueWork->getFeedbacks()->add($feedbackK);
         $responseK->getAllFeedback()->add($feedbackK);
@@ -387,22 +387,22 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantL);
 
         $responseL1 = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantL->getAllResponses()->add($responseL1);
         $dueWork->getResponses()->add($responseL1);
 
         $feedbackL1 = (new Feedback())
             ->setResponse($responseL1)
-            ->setPublishedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantL->getAllFeedbacks()->add($feedbackL1);
         $dueWork->getFeedbacks()->add($feedbackL1);
         $responseL1->getAllFeedback()->add($feedbackL1);
 
         $responseL2 = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+2));
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+2));
         $participantL->getAllResponses()->add($responseL2);
         $dueWork->getResponses()->add($responseL2);
 
@@ -412,20 +412,20 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantM);
 
         $responseM1 = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantM->getAllResponses()->add($responseM1);
         $dueWork->getResponses()->add($responseM1);
 
         $feedbackM1 = (new Feedback())
-            ->setPublishedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantM->getAllFeedbacks()->add($feedbackM1);
         $dueWork->getFeedbacks()->add($feedbackM1);
 
         $responseM2 = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+2));
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+2));
         $participantM->getAllResponses()->add($responseM2);
         $dueWork->getResponses()->add($responseM2);
 
@@ -435,20 +435,20 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantN);
 
         $responseN1 = (new Response())
-            ->setSubmittedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantN->getAllResponses()->add($responseN1);
         $dueWork->getResponses()->add($responseN1);
 
         $feedbackN1 = (new Feedback())
-            ->setPublishedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantN->getAllFeedbacks()->add($feedbackN1);
         $dueWork->getFeedbacks()->add($feedbackN1);
 
         $responseN2 = (new Response())
-            ->setSubmittedAt((clone Alaress_Date_Format::now())->addDays(+2))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+2));
+            ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+2))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+2));
         $participantN->getAllResponses()->add($responseN2);
         $dueWork->getResponses()->add($responseN2);
 
@@ -458,13 +458,13 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
 
         $feedbackO = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantO->getAllFeedbacks()->add($feedbackO);
         $dueWork->getFeedbacks()->add($feedbackO);
 
         $responseO = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantO->getAllResponses()->add($responseO);
         $dueWork->getResponses()->add($responseO);
 
@@ -475,13 +475,13 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
 
         $feedbackP = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantP->getAllFeedbacks()->add($feedbackP);
         $dueWork->getFeedbacks()->add($feedbackP);
 
         $responseP = (new Response())
-            ->setSubmittedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantP->getAllResponses()->add($responseP);
         $dueWork->getResponses()->add($responseP);
 
@@ -491,14 +491,14 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantQ);
 
         $feedbackQ = (new Feedback())
-            ->setPublishedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantQ->getAllFeedbacks()->add($feedbackQ);
         $dueWork->getFeedbacks()->add($feedbackQ);
 
         $responseQ = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantQ->getAllResponses()->add($responseQ);
         $dueWork->getResponses()->add($responseQ);
 
@@ -508,14 +508,14 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork->getAllParticipants()->add($participantR);
 
         $feedbackR = (new Feedback())
-            ->setPublishedAt(clone Alaress_Date_Format::now())
-            ->setUpdatedAt(clone Alaress_Date_Format::now());
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $participantR->getAllFeedbacks()->add($feedbackR);
         $dueWork->getFeedbacks()->add($feedbackR);
 
         $responseR = (new Response())
-            ->setSubmittedAt((clone Alaress_Date_Format::now())->addDays(+1))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(+1));
+            ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantR->getAllResponses()->add($responseR);
         $dueWork->getResponses()->add($responseR);
 

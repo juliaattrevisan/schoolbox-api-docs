@@ -174,12 +174,12 @@ class QuizStatus extends PHPUnit_Framework_TestCase
     {
         $quiz = (new Quiz())
             ->setId($id)
-            ->setPublishAt((clone Alaress_Date_Format::now())->addDays(-14))
-            ->setOpenAt((clone Alaress_Date_Format::now())->addDays(-7))
-            ->setDueAt((clone Alaress_Date_Format::now())->addDays(+7))
-            ->setCloseAt((clone Alaress_Date_Format::now())->addDays(+14))
-            ->setCreatedAt((clone Alaress_Date_Format::now())->addDays(-21))
-            ->setUpdatedAt((clone Alaress_Date_Format::now())->addDays(-21))
+            ->setPublishAt(Alaress_Date_Format::now()->addDays(-14))
+            ->setOpenAt(Alaress_Date_Format::now()->addDays(-7))
+            ->setDueAt(Alaress_Date_Format::now()->addDays(+7))
+            ->setCloseAt(Alaress_Date_Format::now()->addDays(+14))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(-21))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(-21))
             ->setDeletedAt(new Alaress_Date_NullDate());
 
 
@@ -203,7 +203,7 @@ class QuizStatus extends PHPUnit_Framework_TestCase
         $quiz->getAllParticipants()->add($participantC);
 
         $responseC = (new Attempt())
-            ->setSubmittedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now());
         $participantC->getAllResponses()->add($responseC);
         $quiz->getResponses()->add($responseC);
 
@@ -213,12 +213,12 @@ class QuizStatus extends PHPUnit_Framework_TestCase
         $quiz->getAllParticipants()->add($participantD);
 
         $responseD = (new Attempt())
-            ->setSubmittedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now());
         $participantD->getAllResponses()->add($responseD);
         $quiz->getResponses()->add($responseD);
 
         $feedbackD = (new Review())
-            ->setPublishedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setResponse($responseD);
         $responseD->getAllFeedback()->add($feedbackD);
         $participantD->getAllFeedbacks()->add($feedbackD);
@@ -230,12 +230,12 @@ class QuizStatus extends PHPUnit_Framework_TestCase
         $quiz->getAllParticipants()->add($participantE);
 
         $responseE1 = (new Attempt())
-            ->setSubmittedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now());
         $participantE->getAllResponses()->add($responseE1);
         $quiz->getResponses()->add($responseE1);
 
         $feedbackE1 = (new Review())
-            ->setPublishedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setResponse($responseE1);
         $responseE1->getAllFeedback()->add($feedbackE1);
         $participantE->getAllFeedbacks()->add($feedbackE1);
@@ -252,19 +252,19 @@ class QuizStatus extends PHPUnit_Framework_TestCase
         $quiz->getAllParticipants()->add($participantF);
 
         $responseF1 = (new Attempt())
-            ->setSubmittedAt(clone Alaress_Date_Format::now());
+            ->setSubmittedAt(Alaress_Date_Format::now());
         $participantF->getAllResponses()->add($responseF1);
         $quiz->getResponses()->add($responseF1);
 
         $feedbackF1 = (new Review())
-            ->setPublishedAt((clone Alaress_Date_Format::now())->addDays(+1))
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setResponse($responseF1);
         $responseF1->getAllFeedback()->add($feedbackF1);
         $participantF->getAllFeedbacks()->add($feedbackF1);
         $quiz->getFeedbacks()->add($feedbackF1);
 
         $responseF2 = (new Attempt())
-            ->setSubmittedAt((clone Alaress_Date_Format::now())->addDays(+2));
+            ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+2));
         $participantF->getAllResponses()->add($responseF2);
         $quiz->getResponses()->add($responseF2);
 
