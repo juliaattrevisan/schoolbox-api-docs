@@ -105,10 +105,6 @@
 				dataType: 'text',
 				success: function(datasets) {
 
-					/* Remove loader
-					 */
-					config.element.removeClass('loader');
-
 					/* Manufacture a table only if there is data
 					 */
 					if (datasets.length) {

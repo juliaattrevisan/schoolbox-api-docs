@@ -40,10 +40,7 @@
 				dataType: 'json',
 				success: function(datasets) {
 
-					/* Remove loader
-					 */
 					config.element.html('<div data-type-graph></div>');
-                    config.element.removeClass('loader');
 
 					/* Only manufacture a pie if there is data
 					 */

@@ -17,7 +17,7 @@
          * @param element
          * @returns {*}
          */
-        function init(options, element) {console.log(options);
+        function init(options, element) {
             var defaults = {
                 element: element,
 
@@ -47,10 +47,6 @@
                 method: 'GET',
                 dataType: 'json',
                 success: function(datasets) {
-
-                    /* Remove loader
-                     */
-                    config.element.removeClass('loader');
 
                     /* Progress bars
                      */
@@ -133,10 +129,6 @@
 				method: 'GET',
 				dataType: 'json',
 				success: function(datasets) {
-
-					/* Remove loader
-					 */
-					config.element.removeClass('loader');
 
 					var html = '\
 						<div>\
