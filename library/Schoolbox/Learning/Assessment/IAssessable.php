@@ -19,6 +19,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 use Alaress_Date_Format;
+use \DomainException;
 
 interface IAssessable extends ISoftDeletable
 {
@@ -229,6 +230,7 @@ interface IAssessable extends ISoftDeletable
      * Does the specified Participant need to submit a response?
      *
      * @param User $user
+     * @throws DomainException if $user is not a participant
      * @return bool
      */
     public function isResponseRequired(User $user);
@@ -237,6 +239,7 @@ interface IAssessable extends ISoftDeletable
      * Does the teacher need to give feedback to a student response?
      *
      * @param User $user
+     * @throws DomainException if $user is not a participant
      * @return bool
      */
     public function isFeedbackRequired(User $user);
@@ -245,6 +248,7 @@ interface IAssessable extends ISoftDeletable
      * Has the participant been marked as not-incomplete, and has not subsequently re-submitted ?
      *
      * @param User $user
+     * @throws DomainException if $user is not a participant
      * @return bool
      */
     public function isReviewComplete(User $user);
@@ -258,6 +262,7 @@ interface IAssessable extends ISoftDeletable
      * Important: This will still return TRUE if task has been marked as 'incomplete'.
      *
      * @param User $user
+     * @throws DomainException if $user is not a participant
      * @return bool
      */
     public function hasSubmittedResponse(User $user);
@@ -269,6 +274,7 @@ interface IAssessable extends ISoftDeletable
      * @see $this->hasMark to include self-assessed marks.
      *
      * @param User $user
+     * @throws DomainException if $user is not a participant
      * @return bool
      */
     public function hasPublishedFeedback(User $user);
@@ -281,6 +287,7 @@ interface IAssessable extends ISoftDeletable
      *
      * @see $this->isMarkedByTeacher for teacher-assigned-only marks
      * @param User $user
+     * @throws DomainException if $user is not a participant
      * @return bool
      */
     public function hasMark(User $user);

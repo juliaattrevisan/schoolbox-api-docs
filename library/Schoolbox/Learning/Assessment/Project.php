@@ -24,7 +24,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Resource\Folder\Model as Folder;
-
+use \DomainException;
 
 class Project extends AbstractAssessment implements AssessmentContext
 {
@@ -103,6 +103,7 @@ class Project extends AbstractAssessment implements AssessmentContext
      * If summation implies ANY, then if ANY sub-assessment not not require a response, the project does not require a response.
      *
      * @param User $user
+     * @throws DomainException if $user is not a participant
      * @return bool
      */
     public function isResponseRequired(User $user)
