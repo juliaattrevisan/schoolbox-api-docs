@@ -84,7 +84,7 @@ if (strlen($userKey)) {
                  */
                 $imageStr = '';
 
-                if ($currentNews->getImage()->getHash()) {
+                if (!is_null($currentNews->getImage())) {
                     $imageStr = "<img src=\"" . $page->conType(
                         ) . $_SERVER['HTTP_HOST'] . "/storage/image.php?hash={$currentNews->getImage()->getHash(
                         )}&size=constrain200\">";
