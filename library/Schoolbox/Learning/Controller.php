@@ -14,11 +14,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Statistics;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -220,10 +222,18 @@ class Controller extends Base
         $factory = new PendingFactory($viewee, $this->database, $this->externalClass, $term, $toChaseLimit, $includeTasks, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
+        /**
+         * Indexed by assessment.id
+         *
+         * @var Statistics[]|GenericCollection $assessmentStatistics
+         */
+        $assessmentStatistics = new GenericCollection(Statistics::class);
+
         /** @var Collection|IAssessable[] $assessmentsToMark */
         $assessmentsToMark = $this->assessmentMapperProxy->createCollection();
         foreach($assessments as $assessment){
-            if($assessment->getCountFeedbackRequired()){
+            $assessmentStatistics[$assessment->getId()] = new Statistics($assessment);
+            if($assessmentStatistics[$assessment->getId()]->getCountFeedbackRequired()){
                 $assessmentsToMark->add($assessment);
             }
         }
@@ -233,7 +243,7 @@ class Controller extends Base
         $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
 
         foreach($assessments as $assessment){
-            if($assessment->getDueAt()->lt($toChaseLimit) && $assessment->getCountResponseRequired()){
+            if($assessment->getDueAt()->lt($toChaseLimit) && $assessmentStatistics[$assessment->getId()]->getCountResponseRequired()){
                 $assessmentsToChase->add($assessment);
             }
         }
@@ -264,6 +274,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
             'viewee'             => $viewee,
+            'statistics'         => $assessmentStatistics,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,
             'partOnePaginator'   => $partOnePaginator,

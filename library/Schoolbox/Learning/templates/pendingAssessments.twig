@@ -38,6 +38,7 @@
 
             {% for assessment in assessmentsToMark %}
 
+                {% set stats = statistics[assessment.id] %}
                 {% set loopIdx = loopIdx + 1 %}
                 {% if loopIdx >= firstIdx and loopIdx <= lastIdx %}
 
@@ -69,13 +70,13 @@
                                     {% set markedTitleSuffix = 'teacher assessment' -%}
                                 {%- endif -%}
 
-                                <div class="progress" title="{{ assessment.countParticipants - assessment.countResponseRequired }} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
-                                    <span class="meter" style="width:{{ 100 - assessment.percentageResponseRequired }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.percentageReviewComplete }}%" title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
+                                <div class="progress" title="{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}">
+                                    <span class="meter" style="width:{{ 100 - stats.percentageResponseRequired }}%"></span>
+                                    <span class="pipe-meter" style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
-                                <p title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require marking">{{ assessment.countFeedbackRequired }} unmarked</p>
+                                <p title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require marking">{{ stats.countFeedbackRequired }} unmarked</p>
                             </div>
                             <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
                                 {% for participant in assessment.allParticipants %}
@@ -133,6 +134,7 @@
 
             {% for assessment in assessmentsToChase %}
 
+                {% set stats = statistics[assessment.id] %}
                 {% set loopIdx = loopIdx + 1 %}
                 {% if loopIdx >= firstIdx and loopIdx <= lastIdx %}
 
@@ -166,13 +168,13 @@
                                 <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
                             </div>
                             <div class="small-4 columns hide-for-small-only">
-                                <div class="progress" title="{{ assessment.countParticipants - assessment.countResponseRequired}} of {{ assessment.countParticipants }} students have {{ submitTitleSuffix }}">
-                                    <span class="meter" style="width:{{ 100 - assessment.percentageResponseRequired }}%"></span>
-                                    <span class="pipe-meter" style="left: {{ assessment.percentageReviewComplete }}%" title="{{ assessment.countFeedbackRequired }} of {{ assessment.countParticipants }} students require {{ markedTitleSuffix }}"></span>
+                                <div class="progress" title="{{ stats.countParticipants - stats.countResponseRequired}} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}">
+                                    <span class="meter" style="width:{{ 100 - stats.percentageResponseRequired }}%"></span>
+                                    <span class="pipe-meter" style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}"></span>
                                 </div>
                             </div>
                             <div class="small-6 medium-2 columns text-right">
-                                <p title="{{ assessment.countNoResponseOrFeedback }} of {{ assessment.countParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.countResponseRequired }} {{ state }}</p>
+                                <p title="{{ stats.countNoResponseOrFeedback }} of {{ stats.countParticipants }} students have not {{ noResultsTitleSuffix }}">{{ stats.countResponseRequired }} {{ state }}</p>
                             </div>
                             <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
                                 {% set studentEmails = [] %}
