@@ -36,15 +36,6 @@ class Model extends AbstractResponse
         return $this->getSubmittedBy()->getId() == $this->getSubmittedOnBehalfOf()->getId();
     }
 
-    /**
-     * Did a teacher submission-on-behalf-of the student ?
-     *
-     * @return bool
-     */
-    public function isTeacherAssessed()
-    {
-        return !$this->isSelfAssessed();
-    }
 
     /**
      * This response is submitted (no longer a draft)

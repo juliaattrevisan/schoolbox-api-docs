@@ -183,7 +183,7 @@ class Model extends AbstractAssessment
         // If teacher has marked as complete, then student cannot alter back to 'incomplete'
         /** @var TaskResponse $latestResponse */
         $latestResponse = $this->getParticipant($student)->findMostRecentSubmittedResponse();
-        if ($latestResponse && $latestResponse->isTeacherAssessed() && $latestResponse->getMarkedComplete()) {
+        if ($latestResponse && !$latestResponse->isSelfAssessed() && $latestResponse->getMarkedComplete()) {
             return false;
         }
 
