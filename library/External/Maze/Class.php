@@ -32,7 +32,7 @@ class External_Maze_Class implements External_ClassInterface {
 		$this->setHelper(new External_Maze_Helper());
 	}
 
-	/**
+    /**
 	 * Returns a list of students that are associated with a class
 	 *
 	 * @param $classCode
