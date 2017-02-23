@@ -129,6 +129,10 @@
 
                 $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
+                $(config.formSaveLabel).toastActivate({
+                    text: 'Publishing...'
+                });
+
                 // Publish submits everything
                 var formData = $form.serializeArray();
                 formData.push({name: 'publish', value: 1});
@@ -142,6 +146,7 @@
                         $btnDrafted.text('');
                     });
 
+                    toast.call($form, 'Feedback published', true);
                     config.onPublishCallback();
 
                 }).fail(function (xhr) {
@@ -199,7 +204,7 @@
             $form.find('[data-draft="drafted"]').text('Saving...');
 
             $(config.formSaveLabel).toastActivate({
-                text: 'Autosaving'
+                text: 'Autosaving...'
             });
 
             $.ajax($form.attr('action'), data)
@@ -215,9 +220,11 @@
                         .addClass(config.statusComplete);
 
                     $(config.filters).find('[data-status="complete"]').prop('checked', true);
-                    $form.find('[data-draft="drafted"]').text('Saved as Draft');
+                    $form.find('[data-draft="drafted"]').text('Saved as draft');
                 })
-                .fail(function (xhr) { toast.call($form, xhr.responseText, false); })
+                .fail(function (xhr) {
+                    toast.call($form, xhr.responseText, false);
+                })
                 .always(function () {
                     $form.find('[data-draft=publish]').removeAttr("disabled");
                 });
@@ -232,7 +239,7 @@
         function toast(text, success) {
 
             $(config.formSaveLabel).toastTimeout({
-                text: text || 'Draft Saved',
+                text: text || 'Draft saved',
                 css: (success == false) ? 'alert' : 'success'
             });
 

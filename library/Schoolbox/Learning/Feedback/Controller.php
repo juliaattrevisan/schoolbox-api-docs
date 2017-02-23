@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Error\Mapper AS ErrorMapper;
 
 class Controller extends Base
 {
@@ -151,17 +152,15 @@ class Controller extends Base
         );
 
         $feedback = $feedbackFactory->produce();
-
         $this->getFeedbackDataSource()->save($feedback);
 
-        $template = '';
         $data = [
             'success' => true,
             'message' => 'OK',
             'id'      => $feedback->getId(),
         ];
 
-        $this->respond($template, $data, $feedbackFactory->getResponseCode());
+        $this->respond('', $data, $feedbackFactory->getResponseCode());
     }
 
     /**

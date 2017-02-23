@@ -146,15 +146,32 @@ class Factory
         $postComment = trim($this->getComment());
         $postPublish = trim($this->getPublish());
 
+        /**
+         * Check if there's any content to this feedback
+         */
+        $hasContent = false;
+        if (strlen($postMark) || strlen($postComment) || !empty($this->getFiles())) {
+            $hasContent = true;
+        }
+
+        /**
+         * If they are updating an existing draft and there's no content: delete the draft.
+         * I have purposefully allowed empty drafts when creating a new draft, otherwise it's just
+         * too confusing for users when going from a published feedback.
+         * I've also purposefully allowed publishing of empty feedback, in order for teachers to overwrite a mistake
+         * (teachers are not allowed to delete from the feedback history).
+         */
+        if (!$hasContent && !$postPublish && $this->getResponseCode() == 204) {
+            $feedback->setDeletedAt(\Alaress_Date_Format::now());
+            $feedback->setResponse($this->getResponse());
+            return $feedback;
+        }
+
         /** @var IFeedback $feedback */
         $feedback
             ->setReviewer($this->getCurrentUser())
-            ->setUpdatedAt(\Alaress_Date_Format::now());
-
-        if ($postComment) {
-            // comment defined and non-empty
-            $feedback->setComment($postComment);
-        }
+            ->setUpdatedAt(\Alaress_Date_Format::now())
+            ->setComment($postComment);
 
         if ($postMark !== '') {
 
