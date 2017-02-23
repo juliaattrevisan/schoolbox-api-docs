@@ -342,10 +342,9 @@ class Project extends AbstractAssessment implements AssessmentContext
                 continue;
             }
             $studentFoundInSubAssessments = true;
-            $hasSubMark                   = $subAssessment->getParticipant($user)->hasMark();
 
             // Does student have a mark for the sub-assessment ?
-            if ($hasSubMark) {
+            if ($subAssessment->getParticipant($user)->hasMark()) {
                 return true;
             }
         }
