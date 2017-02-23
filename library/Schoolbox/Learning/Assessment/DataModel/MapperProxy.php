@@ -549,15 +549,22 @@ class MapperProxy
             true
         )->getColumnValues('id');
 
-        // Build a list of parameters to pass to findAllForFolderId
-        $extraParams = $this->convertOptionsToColumnList(['due_date' => $dueDate,]);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
+        $uniques = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
+
+        $from = new Alaress_Date_Format($dueDate, 'd/m/Y');
+        $from = $from->startOfDay();
+        $to = new Alaress_Date_Format($dueDate, 'd/m/Y');
+        $to = $to->endOfDay();
+
+        // Build a list of parameters to pass to findAllForFolderId
+        $extraParams = $this->convertOptionsToPredicateBuilder(['from' => $from, 'to' => $to]);
+
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams, $uniques)
             ),
             $student
         );
@@ -849,11 +856,6 @@ class MapperProxy
         if(array_key_exists('due_after', $options) && array_key_exists('closed_after', $options) ){
             throw new \InvalidArgumentException('Cannot filter to after both due and close dates.');
         }
-        elseif ($options['due_date']) {
-            $options['from'] =  \Alaress_Date_Format::newLocalShort($options['due_date'])->startOfDay()->getDatabase();
-            $options['to']= \Alaress_Date_Format::newLocalShort($options['due_date'])->endOfDay()->getDatabase();
-        }
-
         // Due before / after filter (an ADF)
         if ($options['due_after'] instanceof \Alaress_Date_Format && !$options['due_after']->isNull()) {
             $builder->notLessThan('due_date', $options['due_after']->getDatabase());
