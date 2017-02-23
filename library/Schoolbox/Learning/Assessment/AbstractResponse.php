@@ -96,17 +96,6 @@ abstract class AbstractResponse implements IResponse
         return $mostRecentFeedback;
     }
 
-    /**
-     * Did the specified user submit this response ?
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isSubmittedBy(User $user)
-    {
-        return $this->getSubmittedBy()->getId() == $user->getId();
-    }
-
     /* Getters/Setters
      */
 

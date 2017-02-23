@@ -34,16 +34,6 @@ interface IResponse
     public function findMostRecentPublishedFeedback();
 
 
-
-    /**
-     * Did the specified user submit this response ?
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isSubmittedBy(User $user);
-
-
     /**
      * Does this IResponse have published feedback?
      *
