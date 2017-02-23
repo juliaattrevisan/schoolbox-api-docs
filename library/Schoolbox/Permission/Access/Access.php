@@ -11,6 +11,7 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Access
 {
@@ -50,6 +51,35 @@ class Access
             self::$instance[$class_name] = new static();
         }
         return self::$instance[$class_name];
+    }
+
+
+    /**
+     * Is the specified user an instructor for the specified folder ?
+     *
+     * An instructor is any user with WRITE+ permission to a folder
+     *
+     * @param User   $user
+     * @param Folder $folder
+     * @return bool
+     */
+    public function isInstructor(User $user, Folder $folder)
+    {
+        return $this->getFolderAccess($user, [$folder->getId()]) >= UserAccess::ACCESS_WRITE;
+    }
+
+    /**
+     * Is the specified user a learner of the specified folder ?
+     *
+     * A learner is any user with READ permission to a folder
+     *
+     * @param User   $user
+     * @param Folder $folder
+     * @return bool
+     */
+    public function isLearner(User $user, Folder $folder)
+    {
+        return $this->getFolderAccess($user, [$folder->getId()]) == UserAccess::ACCESS_READ;
     }
 
 

@@ -65,7 +65,16 @@ class Project extends AbstractAssessment implements AssessmentContext
     /**
      * @inheritdoc
      */
-    public function canStudentCreateResponse(User $student)
+    public function canLearnerCreateResponse(User $learner)
+    {
+        // Project containers cannot have IResponses directly on them. Only their sub-assessments can.
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner)
     {
         // Project containers cannot have IResponses directly on them. Only their sub-assessments can.
         return false;

@@ -263,7 +263,7 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function canStudentCreateResponse(User $student)
+    public function canLearnerCreateResponse(User $learner)
     {
         // Not open ?
         if(!$this->isOpen()){
@@ -276,12 +276,36 @@ class Model extends AbstractAssessment
         }
 
         // Not a participant ?
-        if(!$this->isParticipant($student)){
+        if(!$this->isParticipant($learner)){
             return false;
         }
 
         // Has the student already submitted their single permitted response ?
-        if($this->isAcceptSingle() && $this->getParticipant($student)->hasSubmittedResponse()) {
+        if($this->isAcceptSingle() && $this->getParticipant($learner)->hasSubmittedResponse()) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner)
+    {
+        // Does this DueWork not accept online responses ?
+        if($this->isAcceptNone()){
+            return false;
+        }
+
+        // Not a participant ?
+        if(!$this->isParticipant($learner)){
+            return false;
+        }
+
+        // Has the student already submitted their single permitted response ?
+        if($this->isAcceptSingle() && $this->getParticipant($learner)->hasSubmittedResponse()) {
             return false;
         }
 

@@ -110,14 +110,25 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
-     * Can the specified student create a response ?
+     * Can the specified learner (a user with READ perm only) create a response for themself ?
      *
-     * In all cases, a student may only create a response if they are a participant.
+     * In all cases, a learner may only create a response if they are a participant.
      *
-     * @param User $student    The student whom the response is created for
+     * @param User $learner A user with WRITE+ perm to this assessment's folder context
      * @return bool
      */
-    public function canStudentCreateResponse(User $student);
+    public function canLearnerCreateResponse(User $learner);
+
+
+    /**
+     * Can the specified instructor (a user with WRITE+ perms) create a submission-on-behalf-of response ?
+     *
+     * @param User $instructor A user with WRITE+ perm to this assessment's folder context
+     * @param User $learner    The user who the response will be created for
+     * @return bool
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner);
+
 
     /**
      * Retrieve the specification this assessment was created from, if any.

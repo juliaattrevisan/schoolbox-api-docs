@@ -163,7 +163,7 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function canStudentCreateResponse(User $student)
+    public function canLearnerCreateResponse(User $learner)
     {
         // Not open ?
         if(!$this->isOpen()){
@@ -176,19 +176,28 @@ class Model extends AbstractAssessment
         }
 
         // Not a participant ?
-        if(!$this->isParticipant($student)){
+        if(!$this->isParticipant($learner)){
             return false;
         }
 
         // If teacher has marked as complete, then student cannot alter back to 'incomplete'
         /** @var TaskResponse $latestResponse */
-        $latestResponse = $this->getParticipant($student)->findMostRecentSubmittedResponse();
+        $latestResponse = $this->getParticipant($learner)->findMostRecentSubmittedResponse();
         if ($latestResponse && !$latestResponse->isSelfAssessed() && $latestResponse->getMarkedComplete()) {
             return false;
         }
 
         // Task is open, self-assessable, and not yet marked by the teacher as 'complete'
         return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner)
+    {
+        // Instructor can mark the task as long as the learner is a participant
+        return $this->isParticipant($learner);
     }
 
     /**

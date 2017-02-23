@@ -148,7 +148,7 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function canStudentCreateResponse(User $student)
+    public function canLearnerCreateResponse(User $learner)
     {
         // Not open ?
         if(!$this->isOpen()){
@@ -156,7 +156,7 @@ class Model extends AbstractAssessment
         }
 
         // Not a participant ?
-        if(!$this->isParticipant($student)){
+        if(!$this->isParticipant($learner)){
             return false;
         }
 
@@ -164,7 +164,7 @@ class Model extends AbstractAssessment
             return true;
         }
 
-        $participant = $this->getParticipant($student);
+        $participant = $this->getParticipant($learner);
 
         /* Responses less than maximum allowed
          */
@@ -186,6 +186,15 @@ class Model extends AbstractAssessment
         }
 
         // Participant has exceeded attempt count
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner)
+    {
+        // Quiz does not currently support submission-on-behalf-of
         return false;
     }
 
