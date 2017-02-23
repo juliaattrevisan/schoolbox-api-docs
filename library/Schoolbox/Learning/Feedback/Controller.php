@@ -161,6 +161,7 @@ class Controller extends Base
                 'id'      => $feedback->getId()
             ];
         } catch (\InvalidArgumentException $e) {
+            $errorMapper = new ErrorMapper();
             $data = [
                 'success' => false,
                 'message' => 'Bad Request',
