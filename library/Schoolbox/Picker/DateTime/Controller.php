@@ -314,7 +314,8 @@ class Controller extends Base
                     $assessmentList[] = [
                         'id' => $assessment->getId(),
                         'title' => $assessment->getTitle(),
-                        'duetime' => $assessment->getDueAt()->getTimeOnly()
+                        'duetime' => $assessment->getDueAt()->getTimeOnly(),
+                        'context' => $assessment->getBaseContext()->getFolder()->getName()
                         ];
             }
             if ($assessmentsDue > 0) {
