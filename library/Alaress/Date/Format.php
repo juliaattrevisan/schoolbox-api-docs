@@ -18,6 +18,11 @@ use Jenssegers\Date\Date as LaravelDate;
 class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable
 {
     /**
+     * @var static
+     */
+    static $now;
+
+    /**
      * @var LaravelDate
      */
     protected $datetime;
@@ -30,7 +35,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 
     /**
      * The default/system timezone for daates
-     * @var defaultTimeZone
+     * @var DateTimeZone
      */
     static private $defaultTimezone;
 
