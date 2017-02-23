@@ -592,10 +592,16 @@ class ArticleMapper extends Mapper implements Searchable
              */
             foreach ($allRecords as $currentRecord) {
                 $article = $this->hydrate($currentRecord, 'a');
-                $image   = $imageMapper->hydrate($currentRecord, 'i');
 
-                if (is_numeric($image->getId())) {
+                /* Only ram in a hydrated image if there's an actual image there to use
+                 * Otherwise set to null (Article sets an empty IStorage object by default)
+                 */
+                if (strlen(trim($currentRecord['i.hash']))) {
+                    /** @var Storage\IStorage $image */
+                    $image = $imageMapper->hydrate($currentRecord, 'i');
                     $article->setImage($image);
+                } else {
+                    $article->setImage(null);
                 }
 
                 $allArticles->add($article);
@@ -680,16 +686,13 @@ class ArticleMapper extends Mapper implements Searchable
             $article = $this->hydrate($currentRecord, 'a');
 
             /* Only ram in a hydrated image if there's an actual image there to use
-             * Otherwise leave empty
+             * Otherwise set to null (Article sets an empty IStorage object by default)
              */
             if (strlen(trim($currentRecord['i.hash']))) {
-
                 /** @var Storage\IStorage $image */
                 $image = $imageMapper->hydrate($currentRecord, 'i');
-
                 $article->setImage($image);
-            }
-            else {
+            } else {
                 $article->setImage(null);
             }
 
