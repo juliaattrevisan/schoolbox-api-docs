@@ -44,22 +44,16 @@ class Task extends AbstractSubSource
 
 
     /**
+     * Link IFeedback back to IAssessable
+     *
+     * @param Collection|IFeedback[] $feedbacks
      * @param IAssessable $assessment
-     * @param User        $student If set, only return this student's responses
-     * @return Collection|IFeedback[]
+     * @return Collection
      */
-    public function findForAssessment(IAssessable $assessment, User $student = null)
+    protected function linkFeedbacksToAssessment(Collection $feedbacks, IAssessable $assessment)
     {
-        if ($this->recognizes($assessment)) {
-            // Only fetch for student if provided
-            $columns = ['assessment_id' => $assessment->getId(),];
-            if ($student instanceof User) {
-                $columns[$this->studentField] = $student->getId();
-            }
-
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()]);
-        }
-        return new Collection();
+        // You cannot set a TaskFeedback's Task, it is derived from the TaskResponse
+        return $feedbacks;
     }
 
     /**

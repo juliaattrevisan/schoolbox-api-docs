@@ -55,13 +55,27 @@ abstract class AbstractSubSource implements IFeedbackDataSource
                 $columns[$this->studentField] = $student->getId();
             }
 
-            return $this->mapperProxy->findByColumnList($columns)
-                                     ->map(function ($item) use ($assessment) {
-                                         /** @var IFeedback $item */
-                                         return $item->setAssessable($assessment);
-                                     });
+            $feedbacks = $this->mapperProxy->findByColumnList($columns);
+
+            return $this->linkFeedbacksToAssessment($feedbacks, $assessment);
         }
         return new Collection();
+    }
+
+
+    /**
+     * Link IFeedback back to IAssessable
+     *
+     * @param Collection|IFeedback[] $feedbacks
+     * @param IAssessable $assessment
+     * @return Collection
+     */
+    protected function linkFeedbacksToAssessment(Collection $feedbacks, IAssessable $assessment)
+    {
+        return $feedbacks->map(function ($item) use ($assessment) {
+            /** @var IFeedback $item */
+            return $item->setAssessable($assessment);
+        });
     }
 
     /**
