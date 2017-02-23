@@ -96,7 +96,7 @@ interface IResponse
      * @param User $submittedBy
      * @return $this
      */
-    public function setSubmittedBy($submittedBy);
+    public function setSubmittedBy(User $submittedBy);
 
     /**
      * Get the person for whom the IResponse was created. This is used when
@@ -114,7 +114,7 @@ interface IResponse
      * @param User $submittedOnBehalfOf
      * @return $this
      */
-    public function setSubmittedOnBehalfOf($submittedOnBehalfOf);
+    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf);
 
     /**
      * Get the datetime at which this response was submitted.
