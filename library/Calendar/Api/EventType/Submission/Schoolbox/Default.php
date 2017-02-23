@@ -97,7 +97,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
                 continue;
             }
 
-            // Hide if learner, and student cannot submit
+            // Hide if user is a learner and unable to submit
             if($access->isLearner($this->getUser(), $assessment->getBaseContext()->getFolder())
                 && !$assessment->canLearnerCreateResponse($this->getUser())){
                 continue;
