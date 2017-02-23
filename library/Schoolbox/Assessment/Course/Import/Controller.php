@@ -688,7 +688,7 @@ class Controller extends Base\Base
                         $unitSpec = $e->getDeletedObject();
                     }
                     $unitImplOpenDate = \Alaress_Date_Format::newLocalShort($unitPair['open_date']);
-                    $unitImplCloseDate = \Alaress_Date_Format::newLocalShort($unitPair['close_date']);
+                    $unitImplCloseDate = \Alaress_Date_Format::newLocalShort($unitPair['close_date'])->endOfDay();
 
                     // Does the CourseImpl already contain this Unit ?
                     $unitSpecId = $unitSpec->getId();
