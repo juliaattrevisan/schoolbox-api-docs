@@ -78,11 +78,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         // Get a timeline of events
         // Use the assessment data source to get everything for this user
 
-        $assessables = [];
+
         if ($this->getUser()->getRole()->isStudent()) {
             /** @var Collection|IAssessable[] $assessables */
             $assessables = $this->assessmentDataSource->findAllByStudent($this->getUser(), $term);
-        } elseif ($this->getUser()->getRole()->isStaff()) {
+        } else {
             $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
         }
 
