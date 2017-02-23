@@ -150,7 +150,7 @@ class Controller extends Assessment\Controller
         $twigData = [
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
             'assessment'   => $task,
-            'hasWritePerm' => $this->getAccess()->getFolderAccess($this->getUser(), [$task->getBaseContext()->getFolder()->getId()]) >= UserAccess::ACCESS_WRITE,
+            'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $task->getBaseContext()->getFolder()),
             'preview'      => $previewFragment,
             'student'      => $participant->getUser(),
         ];
