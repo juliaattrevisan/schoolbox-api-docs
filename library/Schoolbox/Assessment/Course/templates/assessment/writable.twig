@@ -6,18 +6,26 @@ Usage:
     ]
 #}
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+{% if assessment is quiz %}
+    {% set textLinkRoute = 'learningQuiz.getQuizSummary' %}
+{% elseif assessment is project %}
+    {% set textLinkRoute = 'learningAssessment.getStatus' %}
+{% else %}
+    {% set textLinkRoute = '' %}
+{% endif %}
+
 <li class="actions-small-1 actions-large-3" data-assessment="{{ assessment.id }}">
     <div class="grip"></div>
     <div class="list-item">
         <div class="compact card small-11 wrap-down">
-            {% if assessment is project %}
-                <a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}">
-                    <span class="{{ icon.renderClass(assessment) }}"></span>
-                    <p>{{ assessment.title }}</p>
-                </a>
-            {% else %}
+            {% if textLinkRoute %}
+            <a href="{{ routeLookup(textLinkRoute, {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}">
+            {% endif %}
                 <span class="{{ icon.renderClass(assessment) }}"></span>
                 <p>{{ assessment.title }}</p>
+            {% if textLinkRoute %}
+            </a>
             {% endif %}
         </div>
     </div>
@@ -37,11 +45,7 @@ Usage:
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
         <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes">Export</a></li>
-        {% if assessment is quiz %}
-        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-modify">Modify</a></li>
-        {% else %}
         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" class="icon-modify">Modify</a></li>
-        {% endif %}
         <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
     </ul>
 </li>
