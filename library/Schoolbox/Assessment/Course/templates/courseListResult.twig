@@ -14,7 +14,6 @@ Usage:
          component.id:      int | null
          cparents:          Folder[]
          hasTot:            bool
-         user:              User
          collapsePrefix:    string | null
          returnUrlKey:      returnUrlKey
          encodedReturnUrl:  encodedReturnUrl
@@ -95,9 +94,9 @@ Usage:
         <li><a href="{{ routeLookup('course.modifyCourse', {id: courseSpec.id}) }}" class="icon-modify">Modify</a></li>
 
             {# Course delete: standard folder delete -#}
-            {% if user.isSuperuser() %}
+        {% if USER.isSuperuser() %}
         <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: courseSpec.id}) }}" class="icon-delete" data-course-delete-id="{{ courseSpec.id }}" data-action="course-delete">Delete</a></li>
-            {% endif %}
+        {% endif %}
 
     </ul>
         {% endif %}

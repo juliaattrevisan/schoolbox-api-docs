@@ -7,7 +7,6 @@
          component.id:     int | null,
          lineage:          Folder[courseSpec.id][]
          hasTot:           bool,
-         user:             User,
          search:           string | null
          returnUrlKey:     string
          encodedReturnUrl: string
@@ -29,7 +28,6 @@
                         component:      component,
                         cparents:       lineage[course.id],
                         hasTot:         hasTot,
-                        user:           user,
                         collapsePrefix: 'suggest'
                     } only %}
                 {% endfor %}
@@ -51,7 +49,6 @@
                         component:         component,
                         cparents:          lineage[course.id],
                         hasTot:            hasTot,
-                        user:              user,
                         linkTitleToModify: linkTitleToModify,
                         returnUrlKey:      returnUrlKey,
                         encodedReturnUrl:  encodedReturnUrl
