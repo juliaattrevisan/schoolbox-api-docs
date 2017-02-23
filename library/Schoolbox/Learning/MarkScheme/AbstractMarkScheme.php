@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use RangeException;
+use Schoolbox\Learning\Assessment\Participant;
 
 abstract class AbstractMarkScheme implements IMarkScheme
 {
@@ -85,5 +86,15 @@ abstract class AbstractMarkScheme implements IMarkScheme
     public function isQualitative()
     {
         return !$this->quantitative;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getPublishedHumanReadableMark(Participant $participant)
+    {
+        $feedback = $participant->findMostRecentPublishedFeedback();
+        return $feedback ? $feedback->getHumanReadableMark() : null;
     }
 }

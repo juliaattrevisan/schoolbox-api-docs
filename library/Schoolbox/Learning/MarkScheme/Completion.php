@@ -7,9 +7,8 @@
 
 namespace Schoolbox\Learning\MarkScheme;
 
-use InvalidArgumentException;
-use RangeException;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 
 class Completion extends AbstractMarkScheme
@@ -55,5 +54,14 @@ class Completion extends AbstractMarkScheme
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         return null;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getPublishedHumanReadableMark(Participant $participant)
+    {
+        return $this->getHumanReadableMark(null, $participant->findMostRecentSubmittedResponse());
     }
 }

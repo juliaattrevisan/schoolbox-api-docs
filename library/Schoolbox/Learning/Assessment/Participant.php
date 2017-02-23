@@ -18,7 +18,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
-use Schoolbox\Learning\MarkScheme\Completion as CompletionMarkScheme;
 use \Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -273,18 +272,7 @@ class Participant
      */
     public function getPublishedHumanReadableMark()
     {
-        // Special case for Completion MarkScheme (it derives the mark from the state of the latest response)
-        $markScheme = $this->assessable->getMarkScheme();
-        if($markScheme instanceof CompletionMarkScheme){
-            $mostRecentSubmittedResponse = $this->findMostRecentSubmittedResponse();
-
-            return $mostRecentSubmittedResponse
-                ? $markScheme->getHumanReadableMark(null, $mostRecentSubmittedResponse)
-                : null;
-        }
-
-        $feedback = $this->findMostRecentPublishedFeedback();
-        return $feedback ? $feedback->getHumanReadableMark() : null;
+        return $this->assessable->getMarkScheme()->getPublishedHumanReadableMark($this);
     }
 
 
