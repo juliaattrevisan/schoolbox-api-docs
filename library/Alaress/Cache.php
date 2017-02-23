@@ -46,6 +46,7 @@ class Cache
      * @param array      $fetchArgs        must be an array that matches the signature provided in the fetch callback and contains
      *                                     the data required to execute said callback in the event of a cache-miss for the given key
      * @param bool       $invalidateCache  if true, any cached value for the given key will be deleted and re-fetched
+     * @throws InvalidArgumentException    if the given key is not registered
      * @return mixed
      */
     public function get($key, array $fetchArgs = [], $invalidateCache = false)

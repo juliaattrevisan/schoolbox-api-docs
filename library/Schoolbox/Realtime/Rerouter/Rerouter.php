@@ -20,14 +20,14 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use Exception;
-use PDO;
+use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Mapper;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
+use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -61,6 +61,12 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 	/** @var bool */
 	protected $running;
+
+	/** @var Transaction */
+    protected $transaction;
+
+    /** @var callable */
+    private $onFrame;
 
 
     /**
@@ -110,6 +116,12 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 			$d->enqueue($timer, RerouterDispatchStrategy::TASK_REROUTE, $timer->getData());
 		}, self::TRANSACTION_CACHE_TIMEOUT, self::TRANSACTION_COUNT_LIMIT);
 
+		// define the callback to be used for subscription handling
+		$this->onFrame = function (Frame $amqpFrame, User $user) {
+            // This closure is executed every time a message is sent to the client based on the given subscription
+            // Adds the frame to a loop cache, and dispatches appropriately
+            $this->transaction->put(sha1($amqpFrame->dump()), array($user, $amqpFrame));
+        };
 	}
 
 
@@ -192,6 +204,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	public function onResume() {
 		$this->log->info('SIGCONT', array('char' => '>'));
 		$this->resume();
+		$this->log->debug("Reload complete");
 	}
 
 
@@ -204,20 +217,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 		if(!$this->isRunning()) {
 			// pick up all subscriptions
-			$tx = $this->transaction;
-
             $this->log->debug("Importing user data");
-			$this->subscriber->getSubscriptionList()->importFromSource($this->userMapper, false);
-			$count = $this->subscriber->subscribeAll(function($frame, $data) use ($tx) {
-				/**
-				 * This closure is executed every time a message is sent to the client based on the given subscription
-				 * Adds the frame to a loop cache, and dispatches appropriately
-				 *
-				 * @var Frame $frame
-				 * @var User $data
-				 */
-				$tx->put(sha1($frame->dump()), array($data, $frame));
-			});
+			$this->subscriber->getSubscriptionList()->importFromSource($this->userMapper);
+			$count = $this->subscriber->subscribeAll($this->onFrame);
 
 			$this->log->notice("Added $count subscriptions", array('char' => '+'));
 
@@ -236,24 +238,14 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
     {
         $this->log->debug("Subscribing user $userId");
 
-        $tx         = $this->transaction;
         $subscriber = $this->subscriber;
         $subList    = $subscriber->getSubscriptionList();
 
         if ($refreshCache) {
-            $subList->importFromSource($this->userMapper, false);
+            $subList->importFromSource($this->userMapper);
         }
 
-        return $subscriber->subscribe($subList->createQueueName($userId), function ($frame, $data) use ($tx) {
-            /**
-             * This closure is executed every time a message is sent to the client based on the given subscription
-             * Adds the frame to a loop cache, and dispatches appropriately
-             *
-             * @var Frame $frame
-             * @var User  $data
-             */
-            $tx->put(sha1($frame->dump()), array($data, $frame));
-        });
+        return $subscriber->subscribe($subList->createQueueName($userId), $this->onFrame);
     }
 
 
@@ -283,6 +275,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 
     /**
+     * @throws OutOfBoundsException
      * @return void
      */
     protected function rebind()
@@ -307,10 +300,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
         // iterate the set and
         foreach ($subList->getAllQueueNames() as $queue) {
-            /** @var User $user */
-            $user = $subList->getQueueData($queue);
-
-            $this->rebindUser($user, $queue);
+            $this->rebindUser($subList->getQueueData($queue));
         }
 
         $this->log->debug("Full rebind complete; cleaning up stale queues");
@@ -373,6 +363,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
     /**
      * @param Frame $frame
+     * @throws CompressionException
      */
     public function onCommand(Frame $frame)
     {

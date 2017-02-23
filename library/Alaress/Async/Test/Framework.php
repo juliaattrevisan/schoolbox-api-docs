@@ -59,7 +59,6 @@ class Framework
 
         // obtain absolute directory reference
         $this->logdir  = realpath(empty($flags['logdir']) ? $rootDir . '/data' : $flags['logdir']);
-
     }
 
 
@@ -68,16 +67,18 @@ class Framework
      *
      * @return void
      */
-    function __destruct()
+    public function __destruct()
     {
-        foreach ($this->daemonInstances as $instance) {
+        foreach (array_keys($this->daemonInstances) as $name) {
             // kill it
             try {
-                proc_close($instance[0]);
+                $this->slayDaemon($name);
             } catch (\Exception $e) {
                 // noop - destructors must not throw exceptions
             }
         }
+        // and finish off with removing this altogether
+        unset ($this->daemonInstances);
     }
 
 
@@ -260,6 +261,7 @@ class Framework
 
     /**
      * @param TestCase $testCase
+     * @throws InvalidArgumentException
      * @return void
      */
     public function launch(TestCase $testCase)
@@ -283,6 +285,15 @@ class Framework
             }
         }
 
+        // it's dangerous to go alone - take this
+        $testCase->setBuffy(function () {
+            foreach (array_keys($this->daemonInstances) as $name) {
+                // face your daemons
+                $this->slayDaemon($name);
+            }
+            // now they're out of the picture, we can stop
+            $this->loop->stop();
+        });
     }
 
 
@@ -350,6 +361,55 @@ class Framework
         });
 
         return [ $process, $pipes ];
+    }
+
+
+    /**
+     * @param string $name  the daemon to slay
+     * @return int          child process exit code
+     */
+    protected function slayDaemon($name)
+    {
+        // the sequence here is important - we want to de-register the
+        // daemon BEFORE we actually kill it in case it dodges the blow
+        list ($pp, $pipes) = $this->daemonInstances[$name];
+        unset ($this->daemonInstances[$name]);
+
+        $status = proc_get_status($pp);
+
+        if ($status['running']) {
+            foreach ($pipes as $pipe) {
+                // SILENCE, FOUL BEAST!
+                fclose($pipe);
+            }
+
+            // still running: recursively terminate the ancestry
+            $this->terminateProcess($status['pid']);
+        }
+
+        // now we can close the pointer
+        return proc_close($pp);
+    }
+
+
+    /**
+     * @param int $ppid  the process ID to terminate
+     * @return void
+     */
+    private function terminateProcess($ppid)
+    {
+        // check for children
+        $pids = preg_split('/\s+/', `ps -o pid --no-heading --ppid $ppid`);
+
+        foreach ($pids as $pid) {
+            if (is_numeric($pid)) {
+                // recurse into child looking for deeper process nesting
+                $this->terminateProcess($pid);
+            }
+        }
+
+        // terminate
+        posix_kill($ppid, SIGKILL);
     }
 
 

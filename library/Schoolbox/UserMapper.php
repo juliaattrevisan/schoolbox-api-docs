@@ -21,8 +21,8 @@ use UnexpectedValueException;
  * @package Schoolbox
  * @method User findById($id)
  * @method User findByIdWithFallback($id)
- * @method User findOneByColumn($columnName, $columnValue, $order = [])
- * @method User findOneByColumnList($columnList, $order = [])
+ * @method User findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ * @method User findOneByColumnList($columnList, $order = array(), $options = array())
  * @method User hydrate(array $row, $alias = '', $callback = null)
  * @method User createModel($idValue = null)
  */

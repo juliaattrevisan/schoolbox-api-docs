@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use UnexpectedValueException;
 
 class UserSubscriptionList extends SubscriptionList {
 
@@ -37,6 +38,7 @@ class UserSubscriptionList extends SubscriptionList {
 
     /**
      * @param int $userId
+     * @throws UnexpectedValueException
      * @return string
      */
     public function createQueueName($userId)
@@ -48,6 +50,7 @@ class UserSubscriptionList extends SubscriptionList {
     /**
      * @param UserMapper $source
      * @param bool       $clear
+     * @throws UnexpectedValueException
      * @return void
      */
     public function importFromSource($source, $clear = true)
@@ -55,6 +58,8 @@ class UserSubscriptionList extends SubscriptionList {
         if ($clear) {
             $this->log->debug("Dropping cache");
             $this->queues = array();
+        } else {
+            $this->log->debug("Retaining cache, only new users will be added");
         }
 
         $userIds = $source->findAllIds();

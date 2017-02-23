@@ -2392,7 +2392,7 @@ abstract class Mapper implements IMapper, Serializable
                     foreach ($this->getMap() as $map) {
                         if (empty($map['join'])
                             || empty($this->joins[$map['join']]['multi'])
-                            || $this->joins[$map['join']]['multi']['read_only']
+                            || (isset($this->joins[$map['join']]['multi']['read_only']) && $this->joins[$map['join']]['multi']['read_only'])
                         ) {
                             // not interested
                             continue;
