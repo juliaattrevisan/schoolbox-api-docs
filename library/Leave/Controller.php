@@ -665,8 +665,8 @@ class Leave_Controller extends Controller
 
             $request->setUser($boarder);
             $request->setAuthor($author);
-            $request->setStart($start->getDatabase());
-            $request->setFinish($finish->getDatabase());
+            $request->setStart($start);
+            $request->setFinish($finish);
             $request->setHostType($data['request']['hostType']);
             $request->setHostName($data['request']['hostName']);
             $request->setHostAddress($data['request']['hostAddress']);
@@ -910,8 +910,8 @@ class Leave_Controller extends Controller
         $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/Y H:i:s');
         $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/Y H:i:s');
 
-        $request->setStart($start->getDatabase());
-        $request->setFinish($finish->getDatabase());
+        $request->setStart($start);
+        $request->setFinish($finish);
         $request->setHostType($data['request']['hostType']);
         $request->setHostName($data['request']['hostName']);
         $request->setHostPhone($data['request']['hostPhone']);
