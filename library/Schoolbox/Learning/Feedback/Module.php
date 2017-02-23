@@ -18,6 +18,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use \Twig_Loader_Chain;
+use Schoolbox\Error\Mapper AS ErrorMapper;
 
 class Module extends BaseModule
 {
@@ -100,7 +101,8 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
         $injector->params[Controller::class] = [
-            'feedbackDataSource' => $injector->lazyGet('feedbackDataSource')
+            'feedbackDataSource' => $injector->lazyGet('feedbackDataSource'),
+            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
         ];
     }
 
