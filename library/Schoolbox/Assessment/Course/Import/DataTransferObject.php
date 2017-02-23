@@ -325,7 +325,7 @@ class DataTransferObject
                             $start = clone $unitOpen;
                             $end = clone $limit;
                         } else {
-                            $nextAvailable->addDays($spec->getDefaultOpenSpan());
+                            $nextAvailable->addDays($spec->getDefaultOpenSpan() - 1);
                             if($nextAvailable->gt($limit)){
                                 $nextAvailable = $limit;
                             }
