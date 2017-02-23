@@ -71,9 +71,12 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             // assessment types, not just tasks (as it did previously).
             $options = [
                 'type'  => $this->getAssessmentType(),
-                'from'  => \Alaress_Date_Format::now(),
                 'order' => ['due_date' => 'asc'],
             ];
+
+            if(!$this->getConfig('showClosed')){
+                $options['from'] = \Alaress_Date_Format::now();
+            }
 
             $this->assessments = $this->getAssessmentMapper()
                 ->findAllByFolderIdForReview(
