@@ -36,21 +36,32 @@ class Visibility
     /**
      * Determines if the specified user can see an IAssessable.
      *
-     * * Staff    - can see anytime
-     * * Students - can only see after publish date
+     * * Instructor  - can see anytime (so long as not past close and we are hiding closed)
+     * * Learner     - can only see after publish date
      *
-     * Staff is considered any user with WRITE+ perm to folder
-     * Student is considered any user with READ perm to folder
+     * Instructor - is considered any user with WRITE+ perm to folder
+     * Learner    - is considered any user with READ perm to folder
      *
      * @param IAssessable $assessment
-     * @param User $user
+     * @param User        $user
+     * @param bool        $showClosed Should we hide assessments after their close date?
      * @return bool
      */
-    public function isVisibleToUser(IAssessable $assessment, User $user)
+    public function isVisibleToUser(IAssessable $assessment, User $user, $showClosed = true)
     {
         $folderAccessLevel = $this->getAccess()->getFolderAccess($user, [$assessment->getBaseContext()->getFolder()->getId()]);
 
-        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE || ($folderAccessLevel == UserAccess::ACCESS_READ && $assessment->isPublished())) {
+        // Are we hiding assessments past their close date and we are past the close date ?
+        if(!$showClosed && $assessment->isPastClose()){
+            return false;
+        }
+
+        // Is user an instructor?
+        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
+            return true;
+        }
+        // Else is user a learner and assessment is published ?
+        elseif($folderAccessLevel == UserAccess::ACCESS_READ && $assessment->isPublished()){
             return true;
         }
 

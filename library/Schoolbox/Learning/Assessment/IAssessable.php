@@ -101,12 +101,12 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
-     * Are we before the open date or after the close date?
+     * Are we after the close date? (does not consider if we are before open date)
      *
      * @param null|Alaress_Date_Format $now  Optional value of now for testing
      * @return bool
      */
-    public function isClosed(Alaress_Date_Format $now = null);
+    public function isPastClose(Alaress_Date_Format $now = null);
 
 
     /**
