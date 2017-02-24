@@ -10,32 +10,32 @@
 namespace Schoolbox\Realtime\Routing;
 
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Alaress\WorkerCrew\TXRX;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use Alaress\WorkerCrew\Worker\PipeWriter;
+use BadMethodCallException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
-use Schoolbox\Realtime\Rerouter\QueueSorter;
-use Schoolbox\UserMapper;
 
 class Worker extends AbstractProcess
 {
 
-    /** @var QueueSorter */
-    private $sorter;
+    /** @var TXRX */
+    private $txrx;
 
     /**
-     * @param QueueSorter               $queueSorter
+     * @param TXRX                      $txrx
      * @param LoopInterface             $loop
      * @param LoggerInterface           $log
      * @param PipeWriter                $writer
      * @param DispatchStrategyInterface $strat
      */
-    public function __construct($queueSorter, $loop, $log, $writer, $strat)
+    public function __construct(TXRX $txrx, LoopInterface $loop, LoggerInterface $log, PipeWriter $writer, DispatchStrategyInterface $strat)
     {
         parent::__construct($loop, $log, $writer, $strat);
-        $this->sorter = $queueSorter;
+        $this->txrx = $txrx;
     }
 
 
@@ -44,6 +44,7 @@ class Worker extends AbstractProcess
      * @param array  $args
      * @throws RuntimeException
      * @throws InvalidArgumentException
+     * @throws BadMethodCallException
      * @return mixed
      */
     protected function process($command, $args)
@@ -51,16 +52,9 @@ class Worker extends AbstractProcess
         if ($command != DispatchStrategy::TASK_ROUTE) {
             throw new InvalidArgumentException("Worker can only route");
         }
-        $count = 0;
-        $this->log->debug("Iterating frames provided");
-        foreach ($args as $v) {
-            list($frame, $userIds) = $v;
-            foreach ($userIds as $userId) {
-                $user = UserMapper::getInstance()->findById($userId);
-                $count += $this->sorter->process($user, $frame) ? 1 : 0;
-            }
-        }
 
+        $this->log->debug("Iterating frames provided");
+        $count = $this->txrx->receive($args);
         $this->log->info("Rerouted $count message" . ($count == 1 ? '' : 's'));
 
         return $count;

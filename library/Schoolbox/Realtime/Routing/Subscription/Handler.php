@@ -10,18 +10,15 @@ namespace Schoolbox\Realtime\Routing\Subscription;
 
 
 use Alaress\Routing\IRouter;
-use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
-use Alaress\WorkerCrew\Transaction\Transaction;
+use Alaress\WorkerCrew\Transaction\ITransaction;
+use Alaress\WorkerCrew\TXRX;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Realtime\Routing\DispatchStrategy;
 
 class Handler implements TaskResponseHandlerInterface
 {
@@ -37,37 +34,34 @@ class Handler implements TaskResponseHandlerInterface
     /** @var LoggerInterface */
     protected $log;
 
+    /** @var TXRX */
+    private $txrx;
+
 
     /**
      * @param IRouter         $router
      * @param Client          $stomp
      * @param LoggerInterface $log
+     * @param TXRX            $txrx
      */
-    public function __construct(IRouter $router, Client $stomp, LoggerInterface $log)
+    public function __construct(IRouter $router, Client $stomp, LoggerInterface $log, TXRX $txrx)
     {
         $this->router = $router;
         $this->stomp  = $stomp;
         $this->log    = $log;
+        $this->txrx   = $txrx;
     }
 
 
     /**
      * Start listening to a particular instance
      *
-     * @param string              $instanceId
-     * @param LoopInterface       $loop
-     * @param DispatcherInterface $dispatcher
+     * @param string        $instanceId
+     * @param ITransaction  $tx
      * @throws LogicException
      */
-    public function listen($instanceId, LoopInterface $loop, DispatcherInterface $dispatcher)
+    public function listen($instanceId, ITransaction $tx)
     {
-        // this closure is executed every $tx->put() is called in self::handle()
-        // Adds the frame to a loop cache, and dispatches appropriately
-        $tx = new Transaction($loop, function(TimerInterface $timer) use ($dispatcher) {
-            $dispatcher->enqueue($timer, DispatchStrategy::TASK_ROUTE, $timer->getData());
-        }, self::TRANSACTION_CACHE_TIMEOUT, self::TRANSACTION_COUNT_LIMIT);
-
-
         $this->stomp->subscribeWithAck("$instanceId.route", 'client-individual', function (Frame $frame, AckResolver $resolver) use ($tx) {
             try {
                 $this->assertPayload($frame->body);
@@ -119,9 +113,9 @@ class Handler implements TaskResponseHandlerInterface
 
     /**
      * @param Frame       $frame
-     * @param Transaction $tx
+     * @param ITransaction $tx
      */
-    protected function handle(Frame $frame, Transaction $tx)
+    protected function handle(Frame $frame, ITransaction $tx)
     {
         $data = json_decode($frame->body, true);
 
@@ -140,7 +134,7 @@ class Handler implements TaskResponseHandlerInterface
 
             $this->log->info("Routing message via '$topic' to $suffix");
 
-            $tx->put(sha1($frame->dump()), [ $frame, $userIds ]);
+            $this->txrx->send($frame, $tx, $userIds);
 
         } catch (InvalidArgumentException $e) {
             $this->log->info("Nobody subscribed to '$topic'");

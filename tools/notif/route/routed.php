@@ -10,6 +10,7 @@
 
 use Alaress\Routing\Router;
 use Alaress\WorkerCrew\Dispatcher;
+use Alaress\WorkerCrew\Transaction\DispatchTransaction;
 use Aura\Di;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
@@ -17,6 +18,7 @@ use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
+use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription;
 
 $flags = implode(' ', array_slice($argv, 1));
@@ -57,13 +59,18 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
         (new Subscription\Loader\Factory($redis, $log))->get('m:vagrantx:routes')->loadSubscriptions($router);
 
-        // subscribe to the
-        $handler    = new Subscription\Handler($router, $client, $log);
+        // daemon-version: no dependencies required
+        $txrx = new RouteTXRX();
 
-        $dispatcher = new Dispatcher($loop, $handler, $log, new DispatchStrategy($opts['flags']));
+        $handler     = new Subscription\Handler($router, $client, $log, $txrx);
+        $dispatcher  = new Dispatcher($loop, $handler, $log, new DispatchStrategy($opts['flags']));
+        $transaction = new DispatchTransaction($loop, $dispatcher, 'route',
+            Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
+            Subscription\Handler::TRANSACTION_COUNT_LIMIT
+        );
 
         foreach ($instances as $instance) {
-            $handler->listen($instance, $loop, $dispatcher);
+            $handler->listen($instance, $transaction);
         }
     });
 });

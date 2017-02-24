@@ -13,6 +13,8 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Rerouter\QueueSorter;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Rerouter\Filter;
+use Schoolbox\Realtime\Routing\RouteTXRX;
+use Schoolbox\UserMapper;
 
 /**
  *
@@ -72,7 +74,10 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     // we open stream(3) as our data output stream
     $writer = new PipeWriter($strat, $log, fopen("php://fd/3", 'w'));
 
-    new Routing\Worker($sorter, $loop, $log, $writer, $strat);
+    // worker-side: dependencies used
+    $txrx = new RouteTXRX(UserMapper::getInstance(), $sorter);
+
+    new Routing\Worker($txrx, $loop, $log, $writer, $strat);
 });
 
 // yup. that's all you need to do.
