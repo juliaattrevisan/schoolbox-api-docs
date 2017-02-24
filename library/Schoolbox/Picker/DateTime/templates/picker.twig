@@ -191,12 +191,16 @@
         allDay: getValue($('#{{ element }}'), 'data-datepicker-allday'), {# Show All Day switch #}
         allDayExt: getValue($('#{{ element }}'), 'data-datepicker-alldayext'),
         type: getValue($('#{{ element }}'), 'data-datepicker-call'), {# Ajax call type: events, duework or nothing #}
+        endDay: getValue($('#{{ element }}'), 'data-datepicker-endofday'), // Should allday change time to 23:59:59
 
     };
     console.log(pickerOptions);
 
     function hasTime (value) {
         var v = moment(value, convertFormat('{{ displayFormat }}'));
+        if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
+            return false;
+        }
         if (v.hours() == 0 && v.minutes() == 0 && v.seconds() == 0 ) {
             return false;
         }
