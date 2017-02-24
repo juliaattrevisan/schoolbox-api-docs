@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use MSSQL;
 use Schoolbox\External\Connector\ExternalEventsInterface;
-use UnexpectedValueException;
 use \Alaress_Date_Format;
 
 /**
@@ -42,13 +41,22 @@ class ExternalEvents implements ExternalEventsInterface
      *
      * @param  object $user
      * @param  string $startDate
-     * @return string $endDate
+     * @param  string $endDate
+     * @return array|bool
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
 
         $start = new Alaress_Date_Format($startDate, 'U');
         $finish = new Alaress_Date_Format($endDate, 'U');
+
+        if ($user->getRole()->isStaff()) {
+            $join  = "";
+            $where = " AND StaffSchedule.StaffID = {$user->getExternalId()}";
+        } else {
+            $join  = " LEFT JOIN dbo.StaffScheduleStudentClasses ON StaffSchedule.StaffScheduleSeq = StaffScheduleStudentClasses.StaffScheduleSeq";
+            $where = " AND StaffScheduleStudentClasses.ID = {$user->getExternalId()}";
+        }
 
         $query = "
             SELECT
@@ -61,23 +69,14 @@ class ExternalEvents implements ExternalEventsInterface
               luLocation.Description            AS location,
               luTeam.Description                AS team,
               SubjectClasses.Description        AS title
-            FROM SynergyOne.dbo.StaffSchedule StaffSchedule
-              LEFT JOIN SynergyOne.dbo.luLocation ON StaffSchedule.LocationCode = luLocation.Code AND StaffSchedule.LocationCode IS NOT NULL AND StaffSchedule.LocationCode <> ''
-              LEFT JOIN SynergyOne.dbo.luTeam ON StaffSchedule.TeamCode = luTeam.Code AND StaffSchedule.TeamCode IS NOT NULL AND StaffSchedule.TeamCode <> ''";
-        if (!$user->getRole()->isStaff()) {
-            $query .= " LEFT JOIN SynergyOne.dbo.StaffScheduleStudentClasses ON StaffSchedule.StaffScheduleSeq = StaffScheduleStudentClasses.StaffScheduleSeq";
-        }
-        $query .= " LEFT JOIN SynergyOne.dbo.SubjectClasses ON StaffSchedule.SubjectClassesSeq = SubjectClasses.SubjectClassesSeq AND StaffSchedule.SubjectClassesSeq IS NOT NULL AND StaffSchedule.SubjectClassesSeq <> ''
-             WHERE StaffSchedule.ScheduleDateTimeFrom > '{$start->getDatabase()}' AND StaffSchedule.ScheduleDateTimeTo < '{$finish->getDatabase()}'";
-
-        if ($user->getRole()->isStaff()) {
-            $query .= " AND StaffSchedule.StaffID = {$user->getExternalId()}";
-        }
-        //Is this always a student...?
-        else {
-            $query .= " AND StaffScheduleStudentClasses.ID = {$user->getExternalId()}";
-        }
-            $query .= " ORDER BY StaffSchedule.StaffScheduleSeq ASC";
+            FROM dbo.StaffSchedule StaffSchedule
+            LEFT JOIN dbo.luLocation ON StaffSchedule.LocationCode = luLocation.Code AND StaffSchedule.LocationCode IS NOT NULL AND StaffSchedule.LocationCode <> ''
+            LEFT JOIN dbo.luTeam ON StaffSchedule.TeamCode = luTeam.Code AND StaffSchedule.TeamCode IS NOT NULL AND StaffSchedule.TeamCode <> ''
+            {$join}
+            LEFT JOIN dbo.SubjectClasses ON StaffSchedule.SubjectClassesSeq = SubjectClasses.SubjectClassesSeq AND StaffSchedule.SubjectClassesSeq IS NOT NULL AND StaffSchedule.SubjectClassesSeq <> ''
+            WHERE StaffSchedule.ScheduleDateTimeFrom > '{$start->getDatabase()}' AND StaffSchedule.ScheduleDateTimeTo < '{$finish->getDatabase()}'
+            {$where}
+            ORDER BY StaffSchedule.StaffScheduleSeq ASC";
 
         return $this->database->getAll($query);
     }

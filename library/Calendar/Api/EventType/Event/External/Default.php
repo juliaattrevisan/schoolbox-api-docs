@@ -10,8 +10,8 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Calendar\EventType;
 
-//class Calendar_Api_External_Event_Default extends Calendar_Api_EventType_Abstract {
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
 
     /**
