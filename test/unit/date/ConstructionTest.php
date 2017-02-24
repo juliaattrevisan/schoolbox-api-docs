@@ -22,7 +22,7 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
     {
         $date = Alaress_Date_Format::now();
         $date->setLocale(new Alaress_Date_Locale_Static());
-        $this->assertEquals($_SERVER['REQUEST_TIME'], $date->getUnixTimeStamp());
+        $this->assertInstanceOf(Alaress_Date_Format::class, $date);
     }
 
     public function testCreateFromAlaressDateFormat()

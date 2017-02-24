@@ -148,11 +148,17 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$text = ":user posted the news :title in :catname";
 		$href = "/homepage/news/$catId/$articleId";
 
+        // use the more recent of the two available dates
+        $activeDate = $news->getPublishDate() < $news->getPostDate()
+            ? $news->getPostDate()
+            : $news->getPublishDate();
+
+
 		$bob->setTitle($text)
 			->setHref($href)
 			->setIcon($icon)
 			->setNamespace($this->getSlug())
-			->setTimestamp($news->getPublishDate()->getUnixTimeStamp())
+			->setTimestamp($activeDate->getUnixTimeStamp())
 			->setSeverity(Logger::INFO)
 			->addTopic("news.$articleId.published")
 			->addFilter('roletype', $roleType)
