@@ -269,7 +269,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isPublished(Alaress_Date_Format $now = null)
     {
-        $now = ($now && !$now->isNull()) ?: Alaress_Date_Format::now();
+        if (is_null($now) || $now->isNull()) {
+            $now = Alaress_Date_Format::now();
+        }
+
         // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
         return $now->gte($this->getPublishAt());
     }
@@ -280,7 +283,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isOpen(Alaress_Date_Format $now = null)
     {
-        $now = ($now && !$now->isNull()) ?: Alaress_Date_Format::now();
+        if (is_null($now) || $now->isNull()) {
+            $now = Alaress_Date_Format::now();
+        }
+
         // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
         return $now->gte($this->getOpenAt()) && $now->lt($this->getCloseAt());
     }
@@ -291,7 +297,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isOverdue(Alaress_Date_Format $now = null)
     {
-        $now = ($now && !$now->isNull()) ?: Alaress_Date_Format::now();
+        if (is_null($now) || $now->isNull()) {
+            $now = Alaress_Date_Format::now();
+        }
+
         // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
         return $now->gte($this->getDueAt()) && $now->lt($this->getCloseAt());
     }
@@ -302,7 +311,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isPastClose(Alaress_Date_Format $now = null)
     {
-        $now = ($now && !$now->isNull()) ?: Alaress_Date_Format::now();
+        if (is_null($now) || $now->isNull()) {
+            $now = Alaress_Date_Format::now();
+        }
+
         // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
         return $now->gte($this->getCloseAt());
     }
