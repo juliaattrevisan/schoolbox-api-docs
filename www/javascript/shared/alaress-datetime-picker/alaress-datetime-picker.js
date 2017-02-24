@@ -84,9 +84,9 @@ function getOptions (element) {
 }
 
 function getPickerFormats (allDayState, options) {
-    // No matter what, we are overriding the format
-    console.log(options);
+    // Getting element date/datetime format settings
     var from, to;
+    // Format is always date or datetime
     if (options.altFormat !== false ){
         var l = 1;
         if (options.altFormat == 'date') {
@@ -102,7 +102,7 @@ function getPickerFormats (allDayState, options) {
     }
     else {
         l = 2;
-        // If not overriding then looking at the enableTime option
+        // If no time, format is date
         if (options.enableTime === false) {
             l = 22;
             from = options.displayFormatDate;
@@ -110,8 +110,7 @@ function getPickerFormats (allDayState, options) {
         }
         else {
             l = 3;
-            // It depends again...
-            // Looking at the allDay option
+            // Or... looking at the allDay option
             if (options.allDay === true) {
                 l = 4;
                 // Ok, the allDay changed, changing the format accordingly
@@ -204,64 +203,6 @@ function setValue ( element, options, state, date ) {
     }
 
 }
-//
-// function manageAllDay ( state, element, options, date ) {
-//     if(options.allDayExt !==false) {
-//         // Get all linked inputs, e.g. startDate, endDate
-//         var selector = $('[data-datepicker-alldayext = '+ options.allDayExt +']');
-//     }
-//     else {
-//         var selector = element;
-//     }
-//     // Change either the elememt itself of the element and it's AllDay buddy
-//     selector.each( function() {
-//         // Get their pickerIds
-//         var pId = $(this).attr('data-datepicker-id');
-//
-//         // Get the format
-//         setPickerFormats(state, $(this));
-//
-//         if(date !== undefined) {
-//             // :P
-//             var value = date;
-//         }
-//         else if(window.pickerInstance[pId] !== undefined) {
-//             var value = window.pickerInstance[pId].input.value;
-//         }
-//         else {
-//             var value = $(this).val();
-//         }
-//         // All Day is on
-//         if(state === true) {
-//
-//             if(options.endDay) {
-//                 var v = moment(value, convertFormat(pickerFormats.from)).endOf('day').format(convertFormat(pickerFormats.to));
-//             }
-//             else {
-//                 var v = moment(value, convertFormat(pickerFormats.from)).startOf('day').format(convertFormat(pickerFormats.to));
-//             }
-//             if(window.pickerInstance[pId] !== undefined) {
-//                 // window.pickerInstance[pId].input.value = v;
-//                 window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.to)).format(convertFormat(options.databaseFormat)), true);
-//             }
-//             $(this).val(v);
-//
-//         }
-//         else {
-//             var v = moment(value, convertFormat(pickerFormats.from)).format(convertFormat(pickerFormats.to));
-//             if(window.pickerInstance[pId] !== undefined) {
-//                 // window.pickerInstance[pId].input.value = v;
-//                 window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.to)).format(convertFormat(options.databaseFormat)), true);
-//             }
-//             $(this).val(v);
-//         }
-//         if(pickerOptions.allDayExt !== false) {
-//             $('#'+pickerOptions.allDayExt).val(state?1:0);
-//         }
-//         console.log(value+' '+v+' '+state+' '+pickerFormats.from+' '+pickerFormats.to);
-//     });
-//
-// }
 
 function checkAllday( state, pickerId ) {
 
@@ -320,7 +261,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
             originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat));
         }
 
-        // var elementClicked = $(this);
         var picker = $('#picker' + pickerId);
 
         // Only AJAX in the picker if we haven't already
@@ -353,25 +293,30 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                     // nope
 
                 });
-                // window.pickerInstance[pickerId].setDate(element.val());
                 // Update picker status
-
                 picker.data('status', 'loaded');
 
                 // Display the datetime picker modal
-
                 picker.foundation('reveal', 'open');
                 // Initialise tabs
                 picker.foundation('reflow', 'tab');
 
                 $('#byDate-'+pickerId).find('.picker-submit').click(function() {
                     if ($('#hideTime'+pickerId).is(':checked')) {
-                        manageAllDay (true, element, options )
+                        setValue( element, options, true);
                     }
                     else {
-                        manageAllDay(false, element, options )
+                        setValue( element, options, false);
                     }
-                    // element.val(window.pickerInstance[pickerId].input.value);
+
+                    if (options.allDayExt !== false) {
+                        var linkedElements = getLinkedElements( element, options );
+                        linkedElements.forEach(function(item) {
+                            console.log(getOptions(item));
+                            setValue(item, getOptions(item), $('#hideTime'+pickerId).is(':checked'));
+                        });
+                    }
+
                     picker.foundation('reveal', 'close');
 
                 });
@@ -396,17 +341,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
         } else if (picker.data('status') == 'loaded') {
 
-            // Use Y-m-d to avoid mis interpreting d/m/Y
-            // var formatDate = moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat));
-            // window.pickerInstance[pickerId].setDate(formatDate);
-
-            // $('#pickerCalendar' + pickerId).data('dateDisplay', element.val());
-
-            // Since the contents have already been AJAX'd in, we can just show the modal again
-
             picker.foundation('reveal', 'open');
-
-
 
         }
     });
