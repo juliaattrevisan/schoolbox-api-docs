@@ -16,9 +16,8 @@ class DispatchTransaction extends AbstractTransaction
 {
     /** @var DispatcherInterface */
     private $dispatcher;
-    /**
-     * @var int
-     */
+
+    /** @var string */
     private $command;
 
     /**
