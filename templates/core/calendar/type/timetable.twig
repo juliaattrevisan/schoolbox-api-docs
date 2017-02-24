@@ -4,7 +4,7 @@
 {% block eventBubbleSummary %}
     <h3>{{ event.title }}</h3>
     <ul class="meta">
-        <li class="icon-calendar" title="Date">{% if event.allDay %} {{ event.getDate | raw }} {% else %} {% if  event.periodName | length %} {{ event.getPeriodName }}: {% endif %}<time>{{ event.getEventSpan|raw }}</time> {% endif %}</li>
+        <li class="icon-calendar" title="Date">{% if event.allDay %} {{ event.date | raw }} {% else %} {% if  event.periodName | length %} {{ event.periodName }}: {% endif %}<time>{{ event.eventSpan|raw }}</time> {% endif %}</li>
 
         {% if event.location %}
             <li class="icon-location" title="Location">{{ event.location }}</li>
