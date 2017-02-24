@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif;
 
 
+use InvalidArgumentException;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -86,6 +87,7 @@ class Notif implements NotifInterface
      * Return an array of handlers based on the current configuration of self, created in ascending order of priority.
      * Spawns handlers on demand.
      *
+     * @throws InvalidArgumentException
      * @return HandlerInterface[]
      */
     protected function getHandlers()
@@ -178,8 +180,13 @@ class Notif implements NotifInterface
         try {
             $log = new Logger($this->topic, $this->getHandlers());
             return $log->addRecord($level, $message, $context);
+
         } catch (Swift_TransportException $e) {
             // rabbit failed... email failed... at least it's logged to file
+            return false;
+
+        } catch (InvalidArgumentException $e) {
+            // failed to load the handler stack
             return false;
         }
     }

@@ -3175,7 +3175,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param object $object
      * @param string $verb
      * @param object $previous
-     *
+     * @throws Exception
      * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)
