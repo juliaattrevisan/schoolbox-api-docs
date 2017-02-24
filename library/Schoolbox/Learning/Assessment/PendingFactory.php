@@ -244,7 +244,7 @@ class PendingFactory
         $this->viewee           = $viewee;
         $this->database         = $database;
         $this->externalClass    = $externalClass;
-        $this->assessmentsCache = new GenericCollection(IAssessable::class);
+        $this->assessmentsCache = new GenericCollection(IAssessable::class);  // TODO SA-2631
         $this->term             = $term;
         $this->toChaseLimit     = $toChaseLimit;
         $this->nullDate         = new \Alaress_Date_NullDate();
@@ -325,7 +325,7 @@ class PendingFactory
             return $this->studentIntCache[$id];
         }
         if(!$this->teacherCache[$id] instanceof User){
-            $this->teacherCache[$id] = (new User())->setId($id);
+            $this->teacherCache[$id] = (new User())->setId($id);  // TODO SA-2631
         }
         return $this->teacherCache[$id];
     }
@@ -341,7 +341,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->projectCache[$id] instanceof Project) {
-            $this->projectCache[$id] = (new Project())->setId($id)->setTitle($title);
+            $this->projectCache[$id] = (new Project())->setId($id)->setTitle($title); // TODO SA-2631
         }
     }
 
@@ -355,7 +355,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->courseSpecsCache[$id] instanceof CourseSpecification) {
-            $this->courseSpecsCache[$id] = (new CourseSpecification())->setId($id);
+            $this->courseSpecsCache[$id] = (new CourseSpecification())->setId($id); // TODO SA-2631
         }
     }
 
@@ -369,7 +369,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->courseImplsCache[$id] instanceof CourseImplementation) {
-            $this->courseImplsCache[$id] = (new CourseImplementation())->setId($id);
+            $this->courseImplsCache[$id] = (new CourseImplementation())->setId($id); // TODO SA-2631
         }
     }
 
@@ -383,7 +383,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->unitSpecsCache[$id] instanceof UnitSpecification) {
-            $this->unitSpecsCache[$id] = (new UnitSpecification())->setId($id);
+            $this->unitSpecsCache[$id] = (new UnitSpecification())->setId($id); // TODO SA-2631
         }
     }
 
@@ -397,7 +397,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->unitImplsCache[$id] instanceof UnitImplementation) {
-            $this->unitImplsCache[$id] = (new UnitImplementation())->setId($id);
+            $this->unitImplsCache[$id] = (new UnitImplementation())->setId($id); // TODO SA-2631
         }
     }
 
@@ -1107,7 +1107,7 @@ class PendingFactory
         foreach ($quizResults as $rowIdx => $row) {
             $quiz     = $this->assessmentsCache[$row['q.assessment_id']];
             $userId   = $row['qa.user_id'];
-            $response = new QuizAttempt();
+            $response = new QuizAttempt(); // TODO SA-2631
             $response->setId($row['qa.attempt_id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
@@ -1129,7 +1129,7 @@ class PendingFactory
 
             // In this context, if not 'reviewed', then we interpret this as NO feedback
             if (!is_null($row['qa.reviewed_at'])) {
-                $feedback = new QuizReview();
+                $feedback = new QuizReview(); // TODO SA-2631
                 $feedback->setId($row['qa.attempt_id']);
                 $reviewedAt = $this->getDateFromString($row['qa.reviewed_at']);
                 $feedback->setPublishedAt($reviewedAt);
@@ -1213,7 +1213,7 @@ class PendingFactory
             $userId        = $row['tc.student_id'];
             $markingUserId = $row['tc.marking_user_id'];
 
-            $response = new TaskResponse();
+            $response = new TaskResponse(); // TODO SA-2631
             $response->setId($row['tc.id']);
             $response->setSubmittedBy($this->getStubUser($markingUserId));
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
@@ -1234,7 +1234,7 @@ class PendingFactory
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
             if ($userId != $markingUserId) {
-                $feedback = (new TaskFeedback())
+                $feedback = (new TaskFeedback()) // TODO SA-2631
                     ->setResponse($response);
 
                 $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
@@ -1268,7 +1268,7 @@ class PendingFactory
 
             $dueWork  = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId   = $row['ss.owner'];
-            $response = new DueWorkSubmission();
+            $response = new DueWorkSubmission(); // TODO SA-2631
             $response->setId($row['ss.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
@@ -1315,7 +1315,7 @@ class PendingFactory
         foreach ($dueWorkFeedbackResults as $rowIdx => $row) {
             $dueWork  = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId   = $row['sr.owner'];
-            $feedback = new DueWorkFeedback();
+            $feedback = new DueWorkFeedback(); // TODO SA-2631
             $feedback->setId($row['sr.id']);
             $feedback->setUpdatedAt($this->getDateFromString($row['sr.updated_at']));
             $feedback->setPublishedAt($this->getDateFromString($row['sr.published_at']));
@@ -1391,7 +1391,7 @@ class PendingFactory
         $this->studentExternalIds[$externalId] = $externalId;
 
         if (!$this->studentExtCache[$externalId] instanceof User) {
-            $this->studentExtCache[$externalId] = (new User())
+            $this->studentExtCache[$externalId] = (new User()) // TODO SA-2631
                 ->setId($id)
                 ->setUsername($username)
                 ->setExternalId($externalId)
