@@ -158,7 +158,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 			->setHref($href)
 			->setIcon($icon)
 			->setNamespace($this->getSlug())
-			->setTimestamp($activeDate)
+			->setTimestamp($activeDate->getUnixTimeStamp())
 			->setSeverity(Logger::INFO)
 			->addTopic("news.$articleId.published")
 			->addFilter('roletype', $roleType)
