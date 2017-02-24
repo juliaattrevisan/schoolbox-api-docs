@@ -101,17 +101,17 @@ class TaskTest extends \PHPUnit_Framework_TestCase
      *
      * @param TaskModel $taskModel
      * @param string    $link
-     * @param bool      $selfMarkable
+     * @param bool      $selfAssessable
      * @param int       $creatorId
      */
-    public function testTranslateToDomainModel(TaskModel $taskModel, $link, $selfMarkable, $creatorId)
+    public function testTranslateToDomainModel(TaskModel $taskModel, $link, $selfAssessable, $creatorId)
     {
         /** @var Task $task */
         $task = $this->translator->translateToDomainModel($taskModel);
 
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals($link, $task->getUrl());
-        $this->assertEquals($selfMarkable, $task->getIsSelfAssessable());
+        $this->assertEquals($selfAssessable, $task->isSelfAssessable());
         $this->assertEquals($creatorId, $task->getCreator()->getId());
     }
 }

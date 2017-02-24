@@ -171,7 +171,7 @@ class Model extends AbstractAssessment
         }
 
         // Must be self-assessable
-        if(!$this->getIsSelfAssessable()){
+        if(!$this->isSelfAssessable()){
             return false;
         }
 

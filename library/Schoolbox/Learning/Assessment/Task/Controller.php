@@ -297,7 +297,7 @@ class Controller extends Assessment\Controller
         if ($submittedBy->getId() == $submittedFor->getId()) {
 
             // Is the task not self-assessable ?
-            if (!$response->getAssessable()->getIsSelfAssessable()) {
+            if (!$response->getAssessable()->isSelfAssessable()) {
                 throw new \UnexpectedValueException("Students may not self-assess a task if the task is not self-assessable");
             }
 

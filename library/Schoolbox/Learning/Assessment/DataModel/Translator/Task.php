@@ -30,7 +30,7 @@ class Task implements IAssessmentTypeTranslator
             $model
                 ->setOwner($assessment->getCreator())
                 ->setLink($assessment->getUrl())
-                ->setRequiresConfirmation(!$assessment->getIsSelfAssessable())
+                ->setRequiresConfirmation(!$assessment->isSelfAssessable())
             ;
             return $model;
         }
