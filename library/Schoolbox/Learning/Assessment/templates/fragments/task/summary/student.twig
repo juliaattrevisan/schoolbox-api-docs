@@ -46,7 +46,7 @@
                                     {# No marks yet ? #}
                                     {% if not participant.allResponses | length %}
                                         {# Is this task self-assessable ? #}
-                                        {% if assessment.isSelfAssessed %}
+                                        {% if assessment.isSelfAssessable %}
                                             {% if isViewingOwnSummary %}
                                                 You {% if assessment.isPastClose %}did not complete{% else %}have not completed{% endif %} this task.
                                             {% else %}

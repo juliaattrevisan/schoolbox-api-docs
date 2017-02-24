@@ -248,6 +248,17 @@ class Model extends AbstractAssessment
     }
 
 
+    /**
+     * Convenience intuitive method (but not a mapper standard get/set)
+     *
+     * @return bool
+     */
+    public function isSelfAssessable()
+    {
+        return $this->isSelfAssessable;
+    }
+
+
     /* Getters/Setters
      */
 

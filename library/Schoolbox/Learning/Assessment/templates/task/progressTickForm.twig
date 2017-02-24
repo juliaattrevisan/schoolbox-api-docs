@@ -15,7 +15,7 @@
 <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
       method="POST"
       class="progress-tick-form"
-      data-progress-tick-form="{{ participant.assessable.isSelfAssessed ? 'selfAssessed' : 'teacherAssessed' }}">
+      data-progress-tick-form="{{ participant.assessable.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
     {% if not mostRecentResponse.markedComplete %}
         <a href="#"
            disabled

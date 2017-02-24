@@ -68,11 +68,12 @@
                 {% if readOnly == false %}
                     <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
                 {% elseif isParticipant and assessment is task %}
-                    {% set participant = assessment.getParticipant(USER) %}
-                    {% set latestResponse = participant.findMostRecentSubmittedResposne %}
+                    {% set participant                 = assessment.getParticipant(USER) %}
+                    {% set latestResponse              = participant.findMostRecentSubmittedResposne %}
+                    {% set isMarkedByTeacherAsComplete = latestResponse and latestResponse.teacherAssessed and latestResponse.markedComplete %}
                     {% include '@learningAssessment/task/progressTickForm.twig' with {
                         participant: participant,
-                        disabled: assessable.closed or not assessable.isSelfAssessable or (latestResponse.teacherAssessed and latestResponse.markedComplete )
+                        disabled: not assessment.isOpen or not assessment.isSelfAssessable or isMarkedByTeacherAsComplete
                     } only %}
                 {% endif %}
             </nav>
