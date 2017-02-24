@@ -87,28 +87,31 @@
                     selfAssessed:    'teacherAssessed',
                     teacherAssessed: 'incomplete'
                 },
-                onChange: function(newStatus) {
+                onChange: function(newTaskStatus) {
                     // Update the light and the row's status
                     var $a         = $(this).find('a[data-progress-tick-status]'),
                         $row       = $(this).closest('[data-status]'),
                         $responses = $row.find('[data-responses]'),
                         $light     = $row.find('[data-status]'),
                         newLabel   = '',
-                        newClass   = '';
+                        newClass   = '',
+                        newStatus   = '';
 
-                    switch (newStatus) {
+                    switch (newTaskStatus) {
                         case 'incomplete':
                             newLabel = '{{ labelIncomplete }}';
                             newClass = '';
+                            newStatus = '{{ statusIncomplete }}';
                             break;
                         case 'selfAssessed':
                             newLabel = '{{ labelPending }}';
                             newClass = 'pending';
+                            newStatus = '{{ statusPending }}';
                             break;
-
                         case 'teacherAssessed':
                             newLabel = '{{ labelReviewed }}';
                             newClass = 'reviewed';
+                            newStatus = '{{ statusReviewed }}';
                             break;
                     }
 
