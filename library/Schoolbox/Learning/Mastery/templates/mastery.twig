@@ -129,7 +129,7 @@
                                     {% set isMastered = mostRecentResponse.isTeacherAssessed and mostRecentResponse.markedComplete %}
                                 {% else %}
                                     {% set mostRecentResponse = null %}
-                                    {% set isAwaiting = participant.isMarkingRequired %}
+                                    {% set isAwaiting = participant.isFeedbackRequired %}
                                     {% set isMastered = normalisedMark >= 70 %}
                                 {% endif %}
 

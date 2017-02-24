@@ -47,14 +47,18 @@
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}
-        {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.markingRequired ? statusPending : statusReviewed ) %}
-        {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.markingRequired ? labelPending  : labelReviewed ) %}
+        {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}
+        {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
         {% set pSobo = true %}
 
         {% set pStatusText %}
             {%- spaceless %}
                 {% if not latestResponse %}
-                    Not submitted
+                    {% if participant.reviewComplete %}
+                        {{ labelReviewed }}
+                    {% else %}
+                        Not submitted
+                    {% endif %}
                 {% else %}
                     {% if multipleResponses %}
                         Resubmitted
