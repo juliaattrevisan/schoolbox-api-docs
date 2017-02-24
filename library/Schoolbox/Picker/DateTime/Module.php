@@ -43,11 +43,10 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-//                '/type/{type}/time/{time}/id/{id}/value/{value}' => 'getPicker',
                 '/type/{type}/element/{element}/id/{id}/value/{value}' => 'getPicker',
                 '/date/{date}' => 'getByDate',
                 '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}' => 'getEventsByTimetableDay',
-                '/day/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}' => 'getDateForTimetableDay',
+                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}/date' => 'getTimetableDate',
                 '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}/class/{classCode}' => 'getByTimetableDay',
                 '/date/{date}/class/{classCode}' => 'getDueByDate',
             ],

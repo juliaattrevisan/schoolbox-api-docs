@@ -166,7 +166,7 @@ class Controller extends Base
     /**
      * Return a list of events or assessments due for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
      */
-    public function getByTimetableDay($campusId, $termId, $cycle, $day, $classCode = '') {
+    public function getByTimetableDay($campusId, $termId, $cycle, $day, $classCode = '', $dateOnly = false) {
         $user = $this->getUser();
         //Get Campus object
         $campus = $user->getCampusCollection()->getBy('id', $campusId);
@@ -190,9 +190,24 @@ class Controller extends Base
         if(strlen($classCode) > 0){
             return $this->getDueByDate($date, $classCode);
         }
+        if($dateOnly == true) {
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data' => [
+                        'date' => $date
+                    ]
+                )
+            );
+        }
         //return events
         return $this->getByDate($date);
 
+    }
+
+    public function getTimetableDate($campusId, $termId, $cycle, $day) {
+
+        return $this->getByTimetableDay($campusId, $termId, $cycle, $day, '', true);
     }
 
     /**

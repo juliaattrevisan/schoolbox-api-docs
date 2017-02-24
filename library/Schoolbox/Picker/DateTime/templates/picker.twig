@@ -454,11 +454,11 @@
                         console.log('Failed to retrieve appointments for specified period');
                     });
         {% else %}
-        {# Fetch a timetable day date#}
+            {# Fetch a timetable day date#}
             loadingResponse('timetable');
-            $.get(('{{ routeLookup('pickerDatetime.getDateForTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+            $.get(('{{ routeLookup('pickerDatetime.getTimetableDate') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
                 .done(function (data) {
-                    {# nothing, just enjoy the date returned #}
+                    appendResponse(data, '', 'timetable');
                 })
                 .fail(function () {
                     console.log('Timetable day to date conversion failed');
