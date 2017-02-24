@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment\Task;
 
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
-use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -24,6 +23,8 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+
 
 class Controller extends Assessment\Controller
 {
@@ -199,7 +200,7 @@ class Controller extends Assessment\Controller
         // Did user mark (regardless of who they are) the task as incomplete ?
         $isMarkedComplete = $this->getRequest()->post->getInt('status') != TaskCompletion::STATUS_INCOMPLETE;
 
-        $response = (new Response\Model())
+        $response = (new TaskResponse())
             ->setAssessable($participant->getAssessable())
             ->setSubmittedOnBehalfOf($participant->getUser())
             ->setSubmittedBy($this->getUser())
@@ -210,8 +211,12 @@ class Controller extends Assessment\Controller
         try{
             $this->assertSaveability($participant, $response);
         } catch (\UnexpectedValueException $e){
+
+            // Cast reason to standardised/localised representation
+            $errorException = $this->getErrorMapper()->generateException(Error\Mapper::ERROR_INVALID_TASK_COMPLETION, null, $e->getMessage());
+
             $result['success']   = false;
-            $result['message']   = $e->getMessage();
+            $result['message']   = $errorException->getMessage();
             $result['id']        = null;
             $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set($this->buildJsonOutput($result));
@@ -245,22 +250,62 @@ class Controller extends Assessment\Controller
     }
 
     /**
-     * Ensure the current user has permission to create this response and the response state is valid
+     * Can current user save the proposed TaskResponse for the specified Participant ?
      *
-     * @param Participant    $participant
-     * @param Response\Model $response
-     * @throws \UnexpectedValueException
+     * * Instructors cannot mark a student if they lack WRITE+ perm to class
+     * * Responses cannot be created for users not participating in the task.
+     * * Cannot create a new response with the same status as the most recent response for the student.
+     * * Participants may not create a response if the task is not self-assessable
+     * * Participants may not create a new response if the teacher has marked them as complete
+     *
+     * @param Participant  $participant
+     * @param TaskResponse $response
+     * @throws \UnexpectedValueException if task response is not saveable
      */
-    protected function assertSaveability(Participant $participant, Response\Model $response)
+    protected function assertSaveability(Participant $participant, TaskResponse $response)
     {
-        // If not marking themselves, user must have write+ permission to class folder
+        $submittedBy  = $response->getSubmittedBy();
+        $submittedFor = $response->getSubmittedOnBehalfOf();
+
+        // Is teacher marking a student ?
         if($participant->getUser()->getId() != $this->getUser()->getId()){
-            $classFolderId = $participant->getAssessable()->getBaseContext()->getId();
-            if($this->getAccess()->getFolderAccess($this->getUser(), [$classFolderId]) < UserAccess::ACCESS_WRITE){
+
+            // Does teacher lack WRITE+ permission to class folder?
+            $classFolder = $participant->getAssessable()->getBaseContext()->getFolder();
+            if(!$this->getAccess()->isInstructor($this->getUser(), $classFolder)){
                 throw new \UnexpectedValueException("Teachers may only mark tasks on classes where they have write permissions.");
             }
         }
-        $response->assertSaveability();
+
+        // Is student not a participant of Task ?
+        if (!$response->getAssessable()->isParticipant($submittedFor)) {
+            throw new \UnexpectedValueException("{$submittedFor->getFullName()} is not a participant in this task");
+        }
+
+        // Does the most recent response for the student already have the proposed status?
+        if (empty($response->getId())) {
+            $mostRecentResponse = $participant->findMostRecentResponse();
+            if ($mostRecentResponse instanceof TaskResponse
+                && $mostRecentResponse->getMarkedComplete() == $response->getMarkedComplete()
+                && $mostRecentResponse->isSelfAssessed() == $response->isSelfAssessed()
+            ) {
+                throw new \UnexpectedValueException("{$submittedFor->getFullName()} already has status ({$mostRecentResponse->getCompletionStatus()}) for this task");
+            }
+        }
+
+        // Is the student self-assessing ?
+        if ($submittedBy->getId() == $submittedFor->getId()) {
+
+            // Is the task not self-assessable ?
+            if (!$response->getAssessable()->getIsSelfAssessable()) {
+                throw new \UnexpectedValueException("Students may not self-assess a task if the task is not self-assessable");
+            }
+
+            // Is the task already marked by the teacher as complete ?
+            if (!$response->isSelfAssessed() && $response->getMarkedComplete()) {
+                throw new \UnexpectedValueException("Students may not change a task completion status if the teacher has marked it complete.");
+            }
+        }
     }
 
 

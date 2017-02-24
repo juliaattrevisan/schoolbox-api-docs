@@ -67,63 +67,6 @@ class Model extends AbstractResponse
     }
 
 
-
-
-    /**
-     * Is this completion saveable in its current state?
-     *
-     * * Completions cannot be created for users not participating in the task.
-     * * Nobody may create a new completion that is the same status as the most
-     *   recent completion for this user.
-     * * Participants may not set their own work to completed.
-     * * Participants may not set their own work to self-assessed,
-     *   if the task is teacher-assessed only.
-     *
-     * This method assumes that the current user has permission to create
-     * completions for this task.
-     *
-     * @return bool
-     * @throws \UnexpectedValueException if the completion isn't saveable
-     */
-    public function assertSaveability()
-    {
-        $currentUser = $this->getSubmittedBy();
-        $student     = $this->getSubmittedOnBehalfOf();
-
-        // Only participants in task
-        if (!$this->getAssessable()->isParticipant($student)) {
-            throw new \UnexpectedValueException("Student is not a participant in this task");
-        }
-
-        // Can't create a new completion with the same status as most recent
-        if (empty($this->getId())) {
-            $mostRecentResponse = $this->getAssessable()->getParticipant($student)->findMostRecentResponse();
-            if ($mostRecentResponse instanceof static
-                && $mostRecentResponse->getMarkedComplete() == $this->getMarkedComplete()
-                && $mostRecentResponse->isSelfAssessed() == $this->isSelfAssessed()
-            ) {
-                 throw new \UnexpectedValueException("This student already has this status ({$mostRecentResponse->getCompletionStatus()}) for this task");
-            }
-        }
-
-        // Is the student self-assessing ?
-        if ($currentUser->getId() == $student->getId()) {
-
-            // Is the task self-assessable ?
-            if (!$this->getAssessable()->getIsSelfAssessable()) {
-                throw new \UnexpectedValueException("Users may not self-assess a task themselves, if the task is not self-assessable");
-            }
-
-            // Is the task already marked by the teacher as complete ?
-            if (!$this->isSelfAssessed() && $this->getMarkedComplete()) {
-                throw new \UnexpectedValueException("Students may not change a task completion status if the teacher has marked it complete.");
-            }
-        }
-
-        // Anything else is fine
-        return true;
-    }
-
     /* Getters/Setters
      */
 
