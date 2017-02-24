@@ -9,6 +9,7 @@
 namespace Schoolbox\Realtime\Routing\Subscription;
 
 
+use Alaress\Routing\IRouter;
 use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
@@ -27,8 +28,8 @@ class Handler implements TaskResponseHandlerInterface
     const TRANSACTION_CACHE_TIMEOUT = 0.5;
     const TRANSACTION_COUNT_LIMIT   = 80;
 
-    /** @var Manager */
-    protected $manager;
+    /** @var IRouter */
+    protected $router;
 
     /** @var Client */
     protected $stomp;
@@ -38,15 +39,15 @@ class Handler implements TaskResponseHandlerInterface
 
 
     /**
-     * @param Manager         $manager
+     * @param IRouter         $router
      * @param Client          $stomp
      * @param LoggerInterface $log
      */
-    public function __construct(Manager $manager, Client $stomp, LoggerInterface $log)
+    public function __construct(IRouter $router, Client $stomp, LoggerInterface $log)
     {
-        $this->manager = $manager;
-        $this->stomp   = $stomp;
-        $this->log     = $log;
+        $this->router = $router;
+        $this->stomp  = $stomp;
+        $this->log    = $log;
     }
 
 
@@ -127,7 +128,7 @@ class Handler implements TaskResponseHandlerInterface
         $topic = "{$data['level_name']}.{$data['channel']}";
 
         try {
-            $userIds = $this->manager->getSubscribers($topic);
+            $userIds = array_keys(array_filter($this->router->get($topic)));
 
             $userCount = count($userIds);
 

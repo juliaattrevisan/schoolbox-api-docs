@@ -58,7 +58,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         (new Subscription\Loader\Factory($redis, $log))->get('m:vagrantx:routes')->loadSubscriptions($router);
 
         // subscribe to the
-        $handler    = new Subscription\Handler(new Subscription\Manager($router), $client, $log);
+        $handler    = new Subscription\Handler($router, $client, $log);
 
         $dispatcher = new Dispatcher($loop, $handler, $log, new DispatchStrategy($opts['flags']));
 
