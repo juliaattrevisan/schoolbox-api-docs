@@ -67,6 +67,17 @@ class Model extends AbstractResponse
     }
 
 
+    /**
+     * Human-intuitive version of mapper-compatible getMarkedComplete()
+     *
+     * @return bool
+     */
+    public function isMarkedComplete()
+    {
+        return $this->getMarkedComplete();
+    }
+
+
     /* Getters/Setters
      */
 
