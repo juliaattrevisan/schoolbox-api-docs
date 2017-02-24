@@ -363,14 +363,14 @@ class External_Tass_User implements External_UserInterface
                     // data is stored in a single field, comma separated
                     $list = explode(',', $row['RelatedID']);
                     foreach ($list as $childID) {
-                        $return[$childID] = array('RelatedID' => $childID);
+                        $return[trim($childID)] = array('RelatedID' => trim($childID));
                     }
                 }
             }
         } else {
             $query = "
                 SELECT DISTINCT
-                    s.stud_code AS RelatedID
+                    RTRIM(s.stud_code) AS RelatedID
                 FROM student s
                 LEFT JOIN parent p
                     ON  p.par_code = s.par_code
