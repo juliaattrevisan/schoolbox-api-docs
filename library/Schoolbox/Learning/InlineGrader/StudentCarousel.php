@@ -45,7 +45,7 @@ class StudentCarousel
      * @param IAssessable $assessment
      * @param Submission $response
      */
-    public function __construct(Router $router, User $student, IAssessable $assessment, Submission $response)
+    public function __construct(Router $router, User $student, IAssessable $assessment, Submission $response = null)
     {
         $this->setRouter($router);
         $this->setStudent($student);
