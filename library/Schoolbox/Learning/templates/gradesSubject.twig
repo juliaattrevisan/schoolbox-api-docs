@@ -97,52 +97,53 @@
         {% endif %}
     </div>
 
-    <script type="text/javascript">
-        $(function() {
+    {% if graphShow %}
+        <script type="text/javascript">
+            $(function() {
 
-            var infoIndex = {{ graphInfo | purify }};
-            /**
-             *  Boxplots for each Task in the Unit
-             */
-            $.fn.reportCardBoxplotRender({
-                element: '#subject-graph',
-                /* Title of the graph
+                var infoIndex = {{ graphInfo | purify }};
+                /**
+                 *  Boxplots for each Task in the Unit
                  */
-                title: '',
-                /* Orientation of the box plots
-                 */
-                orientation: 'vertical',
-                /* A list of all the assessment names that are being graphed
-                 * These correspond to a series of data and their respective
-                 * five-point summaries
-                 */
+                $.fn.reportCardBoxplotRender({
+                    element: '#subject-graph',
+                    /* Title of the graph
+                     */
+                    title: '',
+                    /* Orientation of the box plots
+                     */
+                    orientation: 'vertical',
+                    /* A list of all the assessment names that are being graphed
+                     * These correspond to a series of data and their respective
+                     * five-point summaries
+                     */
 
-                allAssessments: {{ graphAssessments | purify }},
-                /* All the raw data
-                 */
-                allData: $.fn.reportCardBoxplotCalculateAllSeriesData({{ graphData | purify }}),
-                /* You
-                 */
-                additionalSeries: [
-                    {
-                        type: 'scatter',
-                        name: 'You',
-                        color: 'rgb(255, 87, 87)',
-                        marker: {
-                            radius: 6
-                        },
-                        data: {{ graphScatter | purify }},
-                        tooltip: {
-                            headerFormat: '',
-                            borderColor: '#000000',
-                            pointFormatter: function () {
-                                /* Basic template for each outlier
-                                 */
-                                var template =
-                                        '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
-                                        '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
-                                        '<p class="comment">{INFO}</p>' +
-                                        '</div>';
+                    allAssessments: {{ graphAssessments | purify }},
+                    /* All the raw data
+                     */
+                    allData: $.fn.reportCardBoxplotCalculateAllSeriesData({{ graphData | purify }}),
+                    /* You
+                     */
+                    additionalSeries: [
+                        {
+                            type: 'scatter',
+                            name: 'You',
+                            color: 'rgb(255, 87, 87)',
+                            marker: {
+                                radius: 6
+                            },
+                            data: {{ graphScatter | purify }},
+                            tooltip: {
+                                headerFormat: '',
+                                borderColor: '#000000',
+                                pointFormatter: function () {
+                                    /* Basic template for each outlier
+                                     */
+                                    var template =
+                                            '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+                                            '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
+                                            '<p class="comment">{INFO}</p>' +
+                                            '</div>';
                                 /* Concatenate everything
                                  */
                                 if (typeof infoIndex[this.x].displayMark != 'undefined') {
@@ -195,6 +196,8 @@
             </section>
         </div>
     </div>
+    {% endif %}
+
     {% if longitudinalRubric %}
         <div class="row">
             <div class="small-12 column">
