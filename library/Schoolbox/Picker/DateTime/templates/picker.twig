@@ -213,6 +213,8 @@
         var pickerResponse = $('#'+target+'Response{{ id }}');
         pickerResponse.html('');
         pickerResponse.append('<img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;">');
+        {# Todo: not sure about this #}
+        $('#byTimetable-{{ id }}').find('.timetable-submit').addClass('disabled');
     }
 
     {# Prepare and append response HTML #}
@@ -220,6 +222,8 @@
     function appendResponse(data, template, target) {
 
         var pickerResponse = $('#'+target+'Response{{ id }}');
+
+        $('#byTimetable-{{ id }}').find('.timetable-submit').removeClass('disabled');
 
         {# Clear out any old response display #}
         pickerResponse.html('');
