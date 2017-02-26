@@ -489,6 +489,8 @@ class Module {
     /**
      * Helper method for adding a template path for this component's basename.
      *
+     * Now adds school-specific templates to "$dir/custom/$config[site_location]".
+     *
      * @param  Twig_Loader_Chain $templateLoader
      * @param  string            $dir The directory to use as the template path
      * @param  string            $basename
@@ -497,9 +499,26 @@ class Module {
      */
     protected function addTemplatePath(Twig_Loader_Chain $templateLoader, $dir, $basename = '')
     {
+        $basePath     = $dir;
+        $overridePath = $basePath . '/custom/' . $this->getConfig()->get('site_location');
+        $namespace    = $basename ?: $this->basename;
+
+        // Set up the loader for this namespace.
         $loader = new Twig_Loader_Filesystem([]);
-        $loader->addPath($dir, $basename ?: $this->basename);
+        if (is_dir($overridePath)) {
+            // Add the school-specific dir if it's there
+            $loader->addPath($overridePath, $namespace);
+        }
+        $loader->addPath($basePath, $namespace);
         $templateLoader->addLoader($loader);
+
+        // Set up the core loader for this namespace as "$basename:core".
+        // This contains only the base path, even if the custom path exists:
+        // this allows custom templates to extend a core version of the template.
+        $coreLoader = new Twig_Loader_Filesystem([]);
+        $coreLoader->addPath($basePath, $namespace . ':core');
+        $templateLoader->addLoader($coreLoader);
+
         return $this;
     }
 
