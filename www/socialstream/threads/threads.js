@@ -256,19 +256,6 @@
 			}
 
 			/**
-			 * Update stream url
-			 * This is subject to the issue SB-3160
-			 */
-			function updateStreamUrlSlow() {
-				var newEnd = parseInt(config.end) + parseInt(config.offset);
-
-				/* Remember updated values
-				 */
-				config.end = newEnd;
-				config.streamUrl = generateStreamUrlSlow(config.instanceId, config.homepageId, config.end, config.offset);
-			}
-
-			/**
 			 * Clear out any loading gifs
 			 */
 			function removeLoaderGifs() {
@@ -312,18 +299,6 @@
 		 */
 		function generateStreamUrl(instanceId, homepageId, start, offset) {
 			return '/socialstream/threads/threads.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=' + start + '&offset=' + offset;
-		}
-
-		/**
-		 * Generate a stream url
-		 *
-		 * @param instanceId
-		 * @param homepageId
-		 * @param end
-		 * @param offset
-		 */
-		function generateStreamUrlSlow(instanceId, homepageId, end, offset) {
-			return '/socialstream/threads/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
 		}
 
 		/**
