@@ -141,13 +141,15 @@
                     data:  formData,
                     type: 'post'
                 }).done(function () {
-                    $form.find('[data-interaction-draft]').slideUp(function () {
+                    // Get handle to participant row
+                    var $li = $form.closest('[data-participant]');
+
+                    var $actionBar = $li.find('[data-interaction-draft]');
+
+                    $actionBar.slideUp(function () {
                         $btnPublish.text(config.publishText);
                         $btnDrafted.text('');
                     });
-
-                    // Get handle to participant row
-                    var $li = $form.closest('[data-participant]');
 
                     // Update this participant's status
                     $li.attr('data-status', config.statusReviewed);
@@ -163,11 +165,11 @@
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
 
-                    toast.call($form, 'Feedback published', true);
+                    toast.call($form, 'Feedback published', true, false);
                     config.onPublishCallback();
 
                 }).fail(function (xhr) {
-                    toast.call($form, xhr.responseText, false);
+                    toast.call($form, xhr.responseText, false, false);
                     $btnPublish.removeAttr('disabled').text(config.publishText);
 
                 }).always(function () {
@@ -226,11 +228,11 @@
 
             $.ajax($form.attr('action'), data)
                 .done(function () {
-                    toast.apply($form);
+                    toast.call($form, 'Draft saved', true, true);
                     $form.find('[data-draft="drafted"]').text('Saved as draft');
                 })
                 .fail(function (xhr) {
-                    toast.call($form, xhr.responseText, false);
+                    toast.call($form, xhr.responseText, false, false);
                 })
                 .always(function () {
                     $form.find('[data-draft=publish]').removeAttr("disabled");
@@ -240,17 +242,20 @@
         /**
          * Pop toast upon action occurring
          *
-         * @param text
-         * @param success
+         * @param {string} text
+         * @param {bool} isSuccess
+         * @param {bool} openActionBar  Should we open the action bar ?
          */
-        function toast(text, success) {
+        function toast(text, isSuccess, openActionBar) {
 
             $(config.formSaveLabel).toastTimeout({
                 text: text || 'Draft saved',
-                css: (success == false) ? 'alert' : 'success'
+                css: (isSuccess) ? 'success' : 'alert'
             });
 
-            this.find('[data-interaction-draft]').slideDown();
+            if(openActionBar){
+                this.find('[data-interaction-draft]').slideDown();
+            }
         }
     }
 }(jQuery));
