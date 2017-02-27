@@ -10,6 +10,8 @@
 
 namespace SocialStream;
 
+use Scrub;
+
 class Threads
 {
 
@@ -305,18 +307,16 @@ class Threads
         $i = 0;
 
         foreach ($this->getTree() as $currentPost) {
-            $rel = new \Alaress_Date_Format($currentPost->getCreatedAt());
             $page->setVar(
                 array(
-                    'COMPONENT_INSTANCE_ID'              => $this->getInstance()->getId(),
-                    'SOCIALSTREAM_POST_POST_ID'          => $currentPost->getPostId(),
-                    'SOCIALSTREAM_POST_BODY'             => nl2br(\Scrub::text($currentPost->getBody())),
-                    'SOCIALSTREAM_POST_CREATED_AT'       => $currentPost->getCreatedAt()->getRelativeTime(),
-                    'SOCIALSTREAM_POST_USER_ID'          => $currentPost->getOwner()->getId(),
-                    'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => $currentPost->getOwner()->getExternalId(),
-                    'SOCIALSTREAM_POST_USER_FULLNAME'    => \Scrub::text($currentPost->getOwner()->getFullname()),
-                    'SOCIALSTREAM_POST_TIMESTAMP'        => $currentPost->getCreatedAt()->getUnixTimestamp(),
-                    'ON_OFF'                             => $i % 2 ? 'dark' : '',
+                    'COMPONENT_INSTANCE_ID'              => Scrub::text($this->getInstance()->getId()),
+                    'SOCIALSTREAM_POST_POST_ID'          => Scrub::text($currentPost->getPostId()),
+                    'SOCIALSTREAM_POST_BODY'             => nl2br(Scrub::text($currentPost->getBody())),
+                    'SOCIALSTREAM_POST_CREATED_AT'       => Scrub::text($currentPost->getCreatedAt()->getRelativeTime()),
+                    'SOCIALSTREAM_POST_USER_ID'          => Scrub::text($currentPost->getOwner()->getId()),
+                    'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => Scrub::text($currentPost->getOwner()->getExternalId()),
+                    'SOCIALSTREAM_POST_USER_FULLNAME'    => Scrub::text($currentPost->getOwner()->getFullname()),
+                    'SOCIALSTREAM_POST_TIMESTAMP'        => Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
                 )
             );
 
@@ -373,13 +373,13 @@ class Threads
             foreach ($currentPost->getChildren() as $currentComment) {
                 $page->setVar(
                     array(
-                        'COMPONENT_INSTANCE_ID'                 => $this->getInstance()->getId(),
-                        'SOCIALSTREAM_COMMENT_POST_ID'          => $currentComment->getPostId(),
-                        'SOCIALSTREAM_COMMENT_BODY'             => nl2br(\Scrub::text($currentComment->getBody())),
-                        'SOCIALSTREAM_COMMENT_CREATED_AT'       => $currentComment->getCreatedAt()->getRelativeTime(),
-                        'SOCIALSTREAM_COMMENT_USER_ID'          => $currentComment->getOwner()->getId(),
-                        'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => $currentComment->getOwner()->getExternalId(),
-                        'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => \Scrub::text($currentComment->getOwner()->getFullname()),
+                        'COMPONENT_INSTANCE_ID'                 => Scrub::text($this->getInstance()->getId()),
+                        'SOCIALSTREAM_COMMENT_POST_ID'          => Scrub::text($currentComment->getPostId()),
+                        'SOCIALSTREAM_COMMENT_BODY'             => nl2br(Scrub::text($currentComment->getBody())),
+                        'SOCIALSTREAM_COMMENT_CREATED_AT'       => Scrub::text($currentComment->getCreatedAt()->getRelativeTime()),
+                        'SOCIALSTREAM_COMMENT_USER_ID'          => Scrub::text($currentComment->getOwner()->getId()),
+                        'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => Scrub::text($currentComment->getOwner()->getExternalId()),
+                        'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => Scrub::text($currentComment->getOwner()->getFullname())),
                     )
                 );
 
@@ -436,13 +436,13 @@ class Threads
                 foreach ($currentComment->getChildren() as $currentReply) {
                     $page->setVar(
                         array(
-                            'COMPONENT_INSTANCE_ID'               => $this->getInstance()->getId(),
-                            'SOCIALSTREAM_REPLY_POST_ID'          => $currentReply->getPostId(),
-                            'SOCIALSTREAM_REPLY_BODY'             => nl2br(\Scrub::text($currentReply->getBody())),
-                            'SOCIALSTREAM_REPLY_CREATED_AT'       => $currentReply->getCreatedAt()->getRelativeTime(),
-                            'SOCIALSTREAM_REPLY_USER_ID'          => $currentReply->getOwner()->getId(),
-                            'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => $currentReply->getOwner()->getExternalId(),
-                            'SOCIALSTREAM_REPLY_USER_FULLNAME'    => \Scrub::text($currentReply->getOwner()->getFullname()),
+                            'COMPONENT_INSTANCE_ID'               => Scrub::text($this->getInstance()->getId()),
+                            'SOCIALSTREAM_REPLY_POST_ID'          => Scrub::text($currentReply->getPostId()),
+                            'SOCIALSTREAM_REPLY_BODY'             => nl2br(Scrub::text($currentReply->getBody())),
+                            'SOCIALSTREAM_REPLY_CREATED_AT'       => Scrub::text($currentReply->getCreatedAt()->getRelativeTime()),
+                            'SOCIALSTREAM_REPLY_USER_ID'          => Scrub::text($currentReply->getOwner()->getId()),
+                            'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => Scrub::text($currentReply->getOwner()->getExternalId()),
+                            'SOCIALSTREAM_REPLY_USER_FULLNAME'    => Scrub::text($currentReply->getOwner()->getFullname()),
                         )
                     );
 
