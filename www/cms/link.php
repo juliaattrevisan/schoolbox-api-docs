@@ -29,12 +29,12 @@ if (is_numeric($this->arg[0])) {
 
     $output = array(
         'ACTION'           => 'Modify',
-        'LINK_ID'          => $link->getId(),
-        'URL'              => $link->getUrl(),
+        'LINK_ID'          => Scrub::text($link->getId()),
+        'URL'              => Scrub::text($link->getUrl()),
         'DESCRIPTION'      => Scrub::text($link->getDescription()),
         'COMMENT'          => Scrub::text($link->getComment()),
         'CATEGORY_NAME'    => Scrub::text($folder->getName()),
-        'CATEGORY_ID'      => $link->getFolder()->getId(),
+        'CATEGORY_ID'      => Scrub::text($link->getFolder()->getId()),
         'VISIBLE_SELECTED' => $link->getHidden() > 0 ? '' : 'checked',
         'BLANK_SELECTED'   => $link->getTarget() == '_blank' ? 'selected="selected"' : '',
     );
@@ -86,7 +86,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'VISIBLE_SELECTED' => 'checked',
         'BLANK_SELECTED'   => '',
         'CATEGORY_NAME'    => Scrub::text($folder->getName()),
-        'CATEGORY_ID'      => $folder->getId(),
+        'CATEGORY_ID'      => Scrub::text($folder->getId()),
     );
     $this->setVar($output);
 
@@ -131,7 +131,7 @@ elseif ($this->arg[0] == 'multicat') {
             $this->setVar(
                 array(
                     'CATEGORY_NAME' => Scrub::text($name),
-                    'CATEGORY_ID'   => $category['id'],
+                    'CATEGORY_ID'   => Scrub::text($category['id']),
                 )
             );
 

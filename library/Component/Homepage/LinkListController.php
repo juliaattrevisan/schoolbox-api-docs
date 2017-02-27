@@ -59,11 +59,11 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         // Set up component name
         $this->setVar([
             // These are for the Select Alternate Source resourcebrowser
-            'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
+            'COMPONENT_CONFIG_SRC_ID'   => Scrub::text($this->getSource()->getId()),
             'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
                     ? 'Local'
-                    : $this->getSource()->getName(),
-            'LINK_CATEGORY_ID'          => $this->getSource()->getId(),
+                    : Scrub::text($this->getSource()->getName()),
+            'LINK_CATEGORY_ID'          => Scrub::text($this->getSource()->getId()),
         ]);
 
         /** @var Schoolbox\Resource\Link[] $allLinks */
@@ -95,7 +95,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 'has_link_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
-                'SOURCE_ID' => $this->getSource()->getId(),
+                'SOURCE_ID' => Scrub::text($this->getSource()->getId()),
             ]);
 
             if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
@@ -133,15 +133,14 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                     }
 
                     $this->setVar([
-                        'LINK_ID' => $currentLink->getId(),
-                        'LINK_NAME' => Scrub::text($currentLink->getDescription()),
-                        'LINK_URL' => $currentLink->getHref(),
-                        'LINK_TARGET' => $currentLink->getLinkTarget(),
-                        'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
-                        'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
-                        'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
-                        'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
-                        'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
+                        'LINK_ID'           => Scrub::text($currentLink->getId()),
+                        'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
+                        'LINK_TARGET'       => Scrub::text($currentLink->getLinkTarget()),
+                        'LINK_POSTED_BY'    => Scrub::text($currentLink->getOwner()->formatName()),
+                        'LINK_POSTED_BY_ID' => Scrub::text($currentLink->getOwner()->getId()),
+                        'LINK_POSTED_DATE'  => Scrub::text($currentLink->getSubmitted()->getShort()),
+                        'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
+                        'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
                     ]);
 
                     // Controls
