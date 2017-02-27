@@ -49,4 +49,12 @@ class Event extends EventBase implements EventInterface {
         return $this->location;
     }
 
+    /**
+     * Returning false for external event attendance, we are not supporting this atm
+     *
+     * @return bool
+     */
+    public function canAttend() {
+        return false;
+    }
 }

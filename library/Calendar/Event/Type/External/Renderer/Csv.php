@@ -15,36 +15,10 @@ use Calendar\Event\Render\CSVTrait;
 class Csv extends Base {
 
     /**
-     * Render this event out as CSV data
+     * Inherit default CSV formatting
+     * render()
      */
-    public function render()
-    {
-        if(!$this->isVisible()){
-            return '';
-        }
+    use CSVTrait;
 
-        $fd = fopen('php://temp/maxmemory:10000', 'rw');
-
-
-        $data = array($this->getEvent()->getStartTime()->getLocalShort(),
-            $this->getEvent()->getStartTime()->getTimeOnly(),
-            $this->getEvent()->getEndTime()->getLocalShort(),
-            $this->getEvent()->getEndTime()->getTimeOnly(),
-            '',
-            $this->getEvent()->getTitle(),
-            $this->getEvent()->getDetail(),
-            $this->getEvent()->getLocation(),
-            '',
-            $this->getEvent()->getEventType(),
-            '',
-            '',
-            );
-
-        fputcsv($fd, $data);
-        rewind($fd);
-        $row = fread($fd, 10000);
-
-        return $row;
-    }
 }
 
