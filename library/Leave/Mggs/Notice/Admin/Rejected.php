@@ -10,5 +10,9 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Leave_Mggs_Notice_Admin_Rejected extends Leave_Mggs_Notice_Admin_Abstract {
+class Leave_Mggs_Notice_Admin_Rejected extends Leave_Mggs_Notice_Parent_Abstract {
+
+    public function send() {
+        return;
+    }
 }

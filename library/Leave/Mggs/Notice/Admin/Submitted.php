@@ -10,6 +10,26 @@
 class Leave_Mggs_Notice_Admin_Submitted extends Leave_Mggs_Notice_Admin_Abstract {
 
     /**
+     * Setup
+     */
+    public function setup() {
+
+        /* Common replacements
+         */
+        parent::setup();
+
+        /* Custom replacements
+         */
+        $this->getEmail()->setVar(array(
+            'LEAVE_SUBMITTED_BY' => $this->getRequest()->getAuthor()->formatName(),
+        ));
+
+        $this->getEmail()->parse('submitted_by_block', 'submitted_by');
+        $this->getEmail()->setVar('authorised_by_block', '');
+        $this->getEmail()->setVar('rejected_by_block', '');
+    }
+
+    /**
      * Send it to someone@mggs.vic.edu.au
      */
     public function send() {

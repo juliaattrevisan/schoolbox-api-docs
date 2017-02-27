@@ -11,4 +11,8 @@
  * @link      http://www.alaress.com.au/
  */
 class Leave_Mggs_Notice_Admin_Authorised extends Leave_Mggs_Notice_Admin_Abstract {
+
+    public function send() {
+        return;
+    }
 }
