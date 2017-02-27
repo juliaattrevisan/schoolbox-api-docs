@@ -43,18 +43,12 @@ class StudentCarousel
      * @param Router $router
      * @param User $student
      * @param IAssessable $assessment
-     * @param Submission $response
      */
-    public function __construct(Router $router, User $student, IAssessable $assessment, Submission $response = null)
+    public function __construct(Router $router, User $student, IAssessable $assessment)
     {
         $this->setRouter($router);
         $this->setStudent($student);
         $this->setAssessment($assessment);
-
-        /* Used when you're viewing a particular Response
-         * Otherwise null, when viewing the Response List
-         */
-        $this->setResponse($response);
     }
 
     /**
@@ -206,24 +200,6 @@ class StudentCarousel
     private function setAssessment($assessment)
     {
         $this->assessment = $assessment;
-        return $this;
-    }
-
-    /**
-     * @return Submission
-     */
-    private function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param Submission $response
-     * @return $this
-     */
-    private function setResponse($response)
-    {
-        $this->response = $response;
         return $this;
     }
 }
