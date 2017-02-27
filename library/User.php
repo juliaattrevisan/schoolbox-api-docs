@@ -173,18 +173,25 @@ class User extends DeprecatedModel
      * Gets the part of a WHERE query that filters out parents from:
      * * Guests
      * * Staff, if config.parent_search_enable is off
+     * * Students if config.student_search_enable is off
      *
      * @param  \Schoolbox\User $user
      * @return string
      */
     protected function getSearchFilter($user)
     {
+        $searchFilter = '';
         if ($user->getRole()->isGuest() ||
             (!$user->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
         ) {
-            return " `groups`.`group_type` != 'parent' ";
+            $searchFilter =  " `groups`.`group_type` != 'parent' AND ";
         }
-        return '';
+        if ($user->getRole()->isGuest() ||
+            (!$user->getRole()->isStaff() && Cfg::get('student_search_enable') != 1)
+        ) {
+            $searchFilter .= " `groups`.`group_type` != 'student' AND ";
+        }
+        return $searchFilter."1=1 ";
     }
 
     /**

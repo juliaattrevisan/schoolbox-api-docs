@@ -1,0 +1,1 @@
+INSERT INTO config (name, value, title, description, field_id, type_id, editable, hidden, required ) VALUES('student_search_enable','1','Allow Student Search','If checked students will appear in the search results conducted by students and other parents.',3,5,'true','false','false')
