@@ -116,9 +116,10 @@ class UsageMapper extends Schoolbox\Mapper {
     public function countUsage($criterionId)
     {
         $query = "
-            SELECT COUNT(DISTINCT sb.id)
+            SELECT COUNT(DISTINCT a.id)
             FROM {$this->getTable()} ru
-            INNER JOIN submission_box sb ON ru.submission_box_id = sb.id AND sb.deleted IS NOT TRUE
+            INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
+            INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
             WHERE ru.criterion_id = ?
         ";
         $statement = $this->getDatabase()->prepare($query);
