@@ -196,7 +196,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
     /**
      * Returns a list of contacts for a student
-     * @param $externalUserId
+     * @param string $externalUserId
+     * @return
      */
     public function getStudentContactList($externalUserId) {
 

@@ -683,7 +683,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * Get a list of student contacts (parents) and their contact information
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return mixed
      */
     public function getStudentContactList($externalUserId)
