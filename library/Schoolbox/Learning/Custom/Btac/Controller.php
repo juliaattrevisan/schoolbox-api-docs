@@ -49,11 +49,12 @@ class Controller extends \Schoolbox\Learning\Controller
      * @api GET /learning/grades/{userId}{/termCode}
      * @level 165
      * @param User $viewee
+     * @param Collection|null $assessments
      * @param Term $term
      * @param int|null $year
      * @param Collection $assessments
      */
-    public function getGrades(User $viewee, Collection $assessments, $year = null, Term $term = null)
+    public function getGrades(User $viewee, Collection $assessments = null, $year = null, Term $term = null)
     {
         // Storage for each folders markbook
         $markbooks = [];

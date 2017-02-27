@@ -26,6 +26,12 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
 
+
+use Eportfolio\ShowcaseMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+
 class Module extends \Schoolbox\Learning\Module
 {
     /**
@@ -117,6 +123,25 @@ class Module extends \Schoolbox\Learning\Module
         );
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        // TODO: This looks a bit weird- might be a better way (@doctor), but it works.
+
+        // First the parent controller gets init'd so that its params are set
+
+        parent::initControllers($injector);
+
+        // Then we can optionally override or add any new dependencies to this child controller
+
+        // $injector->params[Controller::class]['overriddenDependency'] = $injector->lazy('dependency');
+
+        // Then we need to overwrite the controller the parent set up with one that uses the custom controller
+
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+    }
 
     /**
      * @inheritdoc
