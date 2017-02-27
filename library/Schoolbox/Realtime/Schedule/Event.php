@@ -11,14 +11,13 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
-use Alaress\Scheduler\Event\EventInterface;
 use RuntimeException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Serializable;
 
-class Event implements EventInterface, Serializable {
+class Event implements CrudEventInterface, Serializable {
 
     /** @var User */
     protected $effector;
