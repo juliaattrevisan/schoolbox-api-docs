@@ -139,7 +139,7 @@ class DataSource
             $assessmentsWithProjectActivities->add($assessment);
 
             if ($assessment instanceof Project) {
-                $assessmentsWithProjectActivities->merge($assessment->getAssessables());
+                $assessmentsWithProjectActivities = $assessmentsWithProjectActivities->merge($assessment->getAssessables());
             }
         }
 
