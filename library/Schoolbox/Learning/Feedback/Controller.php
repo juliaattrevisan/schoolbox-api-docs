@@ -12,7 +12,7 @@ use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Feedback\Factory as FeedbackFactory;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Factory as FeedbackFactory;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -41,7 +41,7 @@ class Controller extends Base
     /**
      * Post into the feedback collection for a participant. This will create "floating feedback"
      *
-     * TODO evaluate the applicability of this to Quiz and Task. It is not applicable to Project.
+     * This is a dueWork-only route. It is not applicable to Project, Quiz, or Task.
      *
      * @api   POST /learning/assessments/{assessmentId}/{studentId}/feedback
      * @level 165

@@ -8,8 +8,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\Feedback;
+namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
+use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\IResponse;
