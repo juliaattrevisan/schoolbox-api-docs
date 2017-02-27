@@ -100,6 +100,32 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find first term for a year.
+     *
+     * @param int $year
+     * @return Collection
+     */
+    public function findForYear($year)
+    {
+        $query = "
+            SELECT   {$this->getColumnString()}
+            FROM     {$this->getTable()}
+            WHERE    year(`start`) <= :year AND (year(`actual_finish`) >= :year OR `actual_finish` IS NULL)
+            ORDER BY `start` ASC
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(['year' => $year]);
+        $results = $statement->fetchAll();
+
+        $collection = new Collection();
+
+        foreach ($results as $row) {
+            $collection->add($this->hydrate($row));
+        }
+
+        return $collection;
+    }
+    /**
      * Retrieves whichever term is the next term opening after this one.
      *
      * @param Model $term

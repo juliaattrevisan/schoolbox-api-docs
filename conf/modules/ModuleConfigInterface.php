@@ -9,7 +9,6 @@
 
 namespace Config\Modules;
 
-
 use Alaress\Application\Kernel;
 
 interface ModuleConfigInterface {
@@ -21,5 +20,4 @@ interface ModuleConfigInterface {
 	 * @return void
 	 */
 	public function configure($kernel);
-
-} 
+}

@@ -7,6 +7,7 @@
 
 namespace Config\Modules;
 
+use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
@@ -17,7 +18,7 @@ use Schoolbox\Learning\Response\Module as ResponseModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 
-class Learning implements ModuleConfigInterface
+class Learning extends ModuleLoader implements ModuleConfigInterface
 {
     /**
      * Run configuration for the given module
@@ -28,30 +29,14 @@ class Learning implements ModuleConfigInterface
     public function configure($kernel)
     {
         $namespace  = 'learning';
-        $di = $kernel->getDependencyInjector();
 
-        $learningModule = new LearningModule($di);
-        $learningModule->init("/$namespace");
-
-        $assessmentModule = new AssessmentModule($di);
-        $assessmentModule->init("/$namespace");
-
-        $feedbackModule = new FeedbackModule($di);
-        $feedbackModule->init("/$namespace");
-
-        $responseModule = new ResponseModule($di);
-        $responseModule->init("/$namespace");
-
-        $quizModule = new QuizModule($di);
-        $quizModule->init("/$namespace");
-
-        $markbookModule = new MarkbookModule($di);
-        $markbookModule ->init("/$namespace/markbook");
-
-        $upcomingModule = new UpcomingModule($di);
-        $upcomingModule->init("/$namespace/due");
-
-        $assessmentExporterModule = new AssessmentExporterModule($di);
-        $assessmentExporterModule->init("/$namespace/export");
+        $this->loadModule($kernel, LearningModule::class,           "/{$namespace}");
+        $this->loadModule($kernel, AssessmentModule::class,         "/{$namespace}");
+        $this->loadModule($kernel, FeedbackModule::class,           "/{$namespace}");
+        $this->loadModule($kernel, ResponseModule::class,           "/{$namespace}");
+        $this->loadModule($kernel, QuizModule::class,               "/{$namespace}");
+        $this->loadModule($kernel, MarkbookModule::class,           "/{$namespace}/markbook");
+        $this->loadModule($kernel, UpcomingModule::class,           "/{$namespace}/due");
+        $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
     }
 }

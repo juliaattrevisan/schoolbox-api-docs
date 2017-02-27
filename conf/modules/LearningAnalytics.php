@@ -10,10 +10,11 @@
 
 namespace Config\Modules;
 
-
+use Config\ModuleLoader;
 use Alaress\Application\Kernel;
+use Schoolbox\LearningAnalytics\Module as LearningAnalyticsModule;
 
-class LearningAnalytics implements ModuleConfigInterface {
+class LearningAnalytics extends ModuleLoader implements ModuleConfigInterface {
     /**
      * Run configuration for the given module
      *
@@ -21,8 +22,6 @@ class LearningAnalytics implements ModuleConfigInterface {
      * @return void
      */
     public function configure($kernel) {
-        $di = $kernel->getDependencyInjector();
-        $module = new \Schoolbox\LearningAnalytics\Module($di);
-        $module->init('/learning/analytics');
+        $this->loadModule($kernel, LearningAnalyticsModule::class, "/learning/analytics");
     }
 }

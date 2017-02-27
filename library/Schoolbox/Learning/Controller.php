@@ -15,6 +15,7 @@ use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -395,9 +396,11 @@ class Controller extends Base
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
      * @param User $viewee
-     * @param Term $term
+     * @param Collection|null $assessments
+     * @param null $year
+     * @param Term|null $term
      */
-    public function getGrades(User $viewee, Term $term)
+    public function getGrades(User $viewee, Collection $assessments = null, $year = null, Term $term = null)
     {
         // Storage for each folders markbook
         $markbooks = [];

@@ -8,13 +8,13 @@
 
 namespace Config\Modules;
 
+use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\News\Component\Dashboard\Module as DashboardModule;
 use Schoolbox\News\Component\Homepage\Module as HomepageModule;
 
-class News implements ModuleConfigInterface
+class News extends ModuleLoader implements ModuleConfigInterface
 {
-
     /**
      * Run configuration for the given module
      *
@@ -25,10 +25,7 @@ class News implements ModuleConfigInterface
     {
         $namespace = 'news';
 
-        $homepageModule = new HomepageModule($kernel->getDependencyInjector());
-        $homepageModule->init("/$namespace");
-
-        $dashboardModule = new DashboardModule($kernel->getDependencyInjector());
-        $dashboardModule->init("/$namespace");
+        $this->loadModule($kernel, HomepageModule::class,     "/$namespace");
+        $this->loadModule($kernel, DashboardModule::class,    "/$namespace");
     }
 }
