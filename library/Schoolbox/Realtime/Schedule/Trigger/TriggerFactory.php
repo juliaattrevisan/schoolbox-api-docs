@@ -10,10 +10,9 @@
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
+use Alaress\Scheduler\Event\EventInterface;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
-use Cron\CronExpression;
-use InvalidArgumentException;
 use OutOfRangeException;
 use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
@@ -36,10 +35,10 @@ class TriggerFactory {
 
 	/**
 	 * @param ModuleNotifierInterface $instance
-	 * @param Event $event
+	 * @param EventInterface $event
 	 * @param int $compression
 	 */
-	public function __construct($instance, $event, $compression = -1) {
+	public function __construct(ModuleNotifierInterface $instance, EventInterface $event, $compression = -1) {
 		$this->notifier = $instance;
 		$this->event = $event;
 		$this->level = $compression;
