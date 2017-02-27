@@ -22,23 +22,24 @@ class Registry {
     /**
      * A Collection of decoders
      *
-     * @var Collection
+     * @var Collection|DecoderBase[]
      */
-    private $decoders = null;
+    private $decoders;
 
     /**
-     * The original url to dstill e.g. /task/start/143
+     * The original url to distill e.g. /task/start/143
      *
      * @var string
      */
-    private $url = '';
+    private $url;
 
     /**
      * Constructor
+     * @param string $url
      */
     public function __construct($url) {
-        $this->setUrl($url);
-        $this->setDecoders(new Collection());
+        $this->url = $url;
+        $this->decoders = new Collection();
     }
 
     /**
@@ -47,7 +48,7 @@ class Registry {
      * @param DecoderBase $decoder
      */
     public function add(DecoderBase $decoder) {
-        $this->getDecoders()->add($decoder);
+        $this->decoders->add($decoder);
     }
 
     /**
@@ -55,8 +56,8 @@ class Registry {
      * can understand the format of the url
      */
     public function findUrl() {
-        foreach ($this->getDecoders() as $currentDecoder) {
-            $outcome = $currentDecoder->decode($this->getUrl());
+        foreach ($this->decoders as $currentDecoder) {
+            $outcome = $currentDecoder->decode($this->url);
 
             if (strlen($outcome)) {
                 return $outcome;
@@ -66,46 +67,4 @@ class Registry {
         return '';
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * Set decoders
-     *
-     * @param Collection $decoders
-     */
-    private function setDecoders($decoders)
-    {
-        $this->decoders = $decoders;
-    }
-
-    /**
-     * Get decoders
-     *
-     * @return Collection
-     */
-    private function getDecoders()
-    {
-        return $this->decoders;
-    }
-
-    /**
-     * Set url
-     *
-     * @param string $url
-     */
-    private function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-    /**
-     * Get url
-     *
-     * @return string
-     */
-    private function getUrl()
-    {
-        return $this->url;
-    }
 }

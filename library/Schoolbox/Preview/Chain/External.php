@@ -21,7 +21,7 @@ class External extends Base {
     /**
      * Constructor
      *
-     * @param $url
+     * @param string $url
      */
     public function __construct($url) {
         $decodedUrl = urldecode($url);
