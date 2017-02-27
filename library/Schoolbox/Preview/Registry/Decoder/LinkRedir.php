@@ -32,13 +32,13 @@ class LinkRedir extends Base {
      *
      * @var string
      */
-    protected $regex = '/redir\.php\?id=(\d+)/';
+    private $regex = '/redir\.php\?id=(\d+)/';
 
     /**
      * Distill a url from a Link instance
      *
-     * @param $url
-     * @return mixed|void
+     * @param string $url
+     * @return string
      */
     public function decode($url) {
         if ($id = $this->isThisDecoder($url)) {
@@ -55,5 +55,16 @@ class LinkRedir extends Base {
         }
 
         return '';
+    }
+
+
+    /**
+     * Get the regex to use when deciding which decoder to use
+     *
+     * @return string
+     */
+    protected function getRegex()
+    {
+        return $this->regex;
     }
 }

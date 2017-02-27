@@ -14,25 +14,18 @@ namespace Schoolbox\Preview\Registry\Decoder;
 abstract class Base {
 
     /**
-     * The regex to use when deciding which decoder to use
-     *
-     * @var string
-     */
-    protected $regex = '';
-
-    /**
      * Decode the url, distilling the actual url from some
      * encapsulated structure
      *
-     * @param $url
-     * @return mixed
+     * @param string $url
+     * @return string
      */
     abstract public function decode($url);
 
     /**
      * Get the id out of the url
      *
-     * @param $url
+     * @param string $url
      * @return bool
      */
     protected function isThisDecoder($url) {
@@ -50,23 +43,11 @@ abstract class Base {
     /* Getters/Setters
      */
 
-    /**
-     * Set regex
-     *
-     * @param string $regex
-     */
-    protected function setRegex($regex)
-    {
-        $this->regex = $regex;
-    }
 
     /**
-     * Get regex
+     * Get the regex to use when deciding which decoder to use
      *
      * @return string
      */
-    protected function getRegex()
-    {
-        return $this->regex;
-    }
+    abstract protected function getRegex();
 }
