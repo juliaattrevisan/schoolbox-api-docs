@@ -477,12 +477,19 @@ class Controller extends Base
         }
 
         /* Show the box/whisker plot on the graph for instructors
+         * and for students if the config var is on
          */
         $canSeeBoxplot = $isInstructor || $this->getConfigLoader()->get('display_grade_average');
 
         /* Show the graph for instructors
+         * and for students if the config var is on
          */
         $canSeeGraph = $isInstructor || $this->getConfigLoader()->get('display_grade_graph');
+
+        /* Show the Current Grade Average for instructors
+         * and for students if the config var is on
+         */
+        $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Let markbook calculate the statistics
 
@@ -617,7 +624,8 @@ class Controller extends Base
             'quizzes'            => $quizzes,
             'returnUrlSuffix'    => $returnUrlSuffix,
             'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term),
-            'participant'        => $assessment->getParticipant($viewee)
+            'participant'        => $assessment->getParticipant($viewee),
+            'canSeeGradeAverage' => $canSeeGradeAverage,
         ]));
     }
 
