@@ -84,8 +84,8 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
                 //Where is the best place to format this? TODO
                 $eventDetail = '';
-                if(strlen($externalEvent['comment']) > 0) {
-                    $eventDetail .= $externalEvent['comment'];
+                if(strlen(strip_tags($externalEvent['comment'])) > 0) {
+                    $eventDetail .= strip_tags($externalEvent['comment']);
                 }
                 if(strlen($externalEvent['team']) > 0) {
                     $eventDetail .= '<br />Team: '.$externalEvent['team'];
