@@ -14,17 +14,17 @@ class Component_Config_ShowClosed extends Component_Config_Abstract
     {
 
         if ($configValue == '1') {
-            $page->setVar(array(
+            $page->setVar([
                 'COMPONENT_SHOWCLOSED_HIDE'            => 'hide',
                 'COMPONENT_SHOWCLOSED_SHOW'            => '',
                 'COMPONENT_CONFIG_SHOWCLOSED_SELECTED' => 'checked="checked"'
-            ));
+            ]);
         } else {
-            $page->setVar(array(
+            $page->setVar([
                 'COMPONENT_SHOWCLOSED_HIDE'            => '',
                 'COMPONENT_SHOWCLOSED_SHOW'            => 'hide',
                 'COMPONENT_CONFIG_SHOWCLOSED_SELECTED' => ''
-            ));
+            ]);
         }
     }
 }
