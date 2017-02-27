@@ -34,6 +34,8 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Base
 {
@@ -94,6 +96,11 @@ class Controller extends Base
     private $externalClass;
 
     /**
+     * @var Access
+     */
+    private $access;
+
+    /**
      * @var \Database
      */
     private $database;
@@ -101,19 +108,20 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper                $errorMapper
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param FolderMapper               $folderMapper
-     * @param TermMapper                 $termMapper
-     * @param GradeGroup                 $defaultGradeGroup
-     * @param ShowcaseMapper             $showcaseMapper
-     * @param RubricMapper               $rubricMapper
-     * @param QuizMapper                 $quizMapper
-     * @param QuizAttemptMapper          $quizAttemptMapper
-     * @param Timetable_ColourMapper     $timetableColourMapper
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param FolderMapper $folderMapper
+     * @param TermMapper $termMapper
+     * @param GradeGroup $defaultGradeGroup
+     * @param ShowcaseMapper $showcaseMapper
+     * @param RubricMapper $rubricMapper
+     * @param QuizMapper $quizMapper
+     * @param QuizAttemptMapper $quizAttemptMapper
+     * @param Timetable_ColourMapper $timetableColourMapper
      * @param CourseImplementationMapper $courseImplementationMapper
-     * @param \External_ClassInterface   $externalClass
-     * @param \Database                  $database
+     * @param \External_ClassInterface $externalClass
+     * @param \Database $database
+     * @param Access $access
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -128,7 +136,8 @@ class Controller extends Base
         Timetable_ColourMapper $timetableColourMapper,
         CourseImplementationMapper $courseImplementationMapper,
         \External_ClassInterface $externalClass,
-        \Database $database
+        \Database $database,
+        Access $access
     ) {
         $this->errorMapper                = $errorMapper;
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
@@ -143,6 +152,7 @@ class Controller extends Base
         $this->courseImplementationMapper = $courseImplementationMapper;
         $this->externalClass              = $externalClass;
         $this->database                   = $database;
+        $this->access                     = $access;
     }
 
     /**
@@ -451,6 +461,26 @@ class Controller extends Base
             ]
         );
 
+        /* If you're an Instructor/superuser, you can see the graph regardless of
+         * the config settings. getFolderAccess() seems to do a lot of stuff,
+         * maybe there is a faster or at least, less costly, way of doing this
+         */
+        $isInstructor = false;
+
+        $perms = $this->getAccess()->getFolderAccess($this->getUser(), [$subject->getId()]);
+
+        if ($perms >= UserAccess::ACCESS_WRITE) {
+            $isInstructor = true;
+        }
+
+        /* Show the box/whisker plot on the graph for instructors
+         */
+        $canSeeBoxplot = $isInstructor || $this->getConfigLoader()->get('display_grade_average');
+
+        /* Show the graph for instructors
+         */
+        $canSeeGraph = $isInstructor || $this->getConfigLoader()->get('display_grade_graph');
+
         // Let markbook calculate the statistics
 
         $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
@@ -511,7 +541,9 @@ class Controller extends Base
                 $graphInfo[] = [];
             }
 
-            if ($statistics[$assessment->getId()]['count'] > 0) {
+            $hasStats = $statistics[$assessment->getId()]['count'] > 0;
+
+            if ($hasStats && $canSeeBoxplot) {
                 $graphData[] = [
                     // Minimum
                     [
@@ -556,7 +588,6 @@ class Controller extends Base
         $folders = $this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term);
         $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
 
-
         // Grab the students conversation history
 
         $conversation = new Conversation($viewee, $subject);
@@ -565,12 +596,6 @@ class Controller extends Base
 
         $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER["REQUEST_URI"]);
 
-        // Don't display class average data if disabled by LMS policy- this just leaves the scatter plot
-
-        if (!$this->getConfigLoader()->get('display_grade_average')) {
-            $graphData = [];
-        }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
             'student'            => $viewee,
             'term'               => $term,
@@ -578,7 +603,7 @@ class Controller extends Base
             'folders'            => $folders,
             'subject'            => $subject,
             'markbook'           => $markbook,
-            'graphShow'          => $this->getConfigLoader()->get('display_grade_graph'),
+            'graphShow'          => $canSeeGraph,
             'graphInfo'          => json_encode($graphInfo),
             'graphAssessments'   => json_encode($graphAssessments),
             'graphData'          => json_encode($graphData),
@@ -758,6 +783,25 @@ class Controller extends Base
     public function setTimetableColourMapper(Timetable_ColourMapper $timetableColourMapper)
     {
         $this->timetableColourMapper = $timetableColourMapper;
+        return $this;
+    }
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        return $this->access;
+    }
+
+
+    /**
+     * @param Access $access
+     * @return static
+     */
+    protected function setAccess($access)
+    {
+        $this->access = $access;
         return $this;
     }
 }
