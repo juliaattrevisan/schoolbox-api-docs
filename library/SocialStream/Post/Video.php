@@ -33,9 +33,9 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 		if (strlen($chain->getResult())) {
 			if ($context == 'post') {
 				$page->setVar(array(
-					'SOCIALSTREAM_POST_URL' => $chain->getResult(),
+					'SOCIALSTREAM_POST_URL'            => Scrub::text($chain->getResult()),
 					'SOCIALSTREAM_POST_EXTERNAL_TITLE' => $this->getExternalTitle(),
-					'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
+					'SOCIALSTREAM_POST_EXTERNAL_BODY'  => $this->getExternalBody(),
 				));
 
 				/* Never parse metadata for videos
@@ -57,9 +57,9 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 			}
 			else if ($context == 'comment') {
 				$page->setVar(array(
-					'SOCIALSTREAM_COMMENT_URL' => $chain->getResult(),
+					'SOCIALSTREAM_COMMENT_URL'            => Scrub::text($chain->getResult()),
 					'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => $this->getExternalTitle(),
-					'SOCIALSTREAM_COMMENT_EXTERNAL_BODY' => $this->getExternalBody(),
+					'SOCIALSTREAM_COMMENT_EXTERNAL_BODY'  => $this->getExternalBody(),
 				));
 
 				/* Never parse metadata for videos
@@ -81,9 +81,9 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 			}
 			else if ($context == 'reply') {
 				$page->setVar(array(
-					'SOCIALSTREAM_REPLY_URL' => $chain->getResult(),
+					'SOCIALSTREAM_REPLY_URL'            => Scrub::text($chain->getResult()),
 					'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => $this->getExternalTitle(),
-					'SOCIALSTREAM_REPLY_EXTERNAL_BODY' => $this->getExternalBody(),
+					'SOCIALSTREAM_REPLY_EXTERNAL_BODY'  => $this->getExternalBody(),
 				));
 
 				/* Never parse metadata for videos
@@ -124,7 +124,7 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 					array(
 						$prefix.'_POSTER'     => Scrub::text($result['poster']),
 						$prefix.'_SRC'        => Scrub::text($result['src']),
-						$prefix.'_STATUS_IMG' => "/images/core/component/video-thumbnail-".strtolower($result['status']).".gif",
+						$prefix.'_STATUS_IMG' => Scrub::text("/images/core/component/video-thumbnail-".strtolower($result['status']).".gif"),
 					)
 				);
 				if ($result['status'] === 'completed') {
