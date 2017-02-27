@@ -21,11 +21,11 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 	/**
 	 * Contextually render thumbnail images
 	 *
-	 * @param $context
+	 * @param string   $context
 	 * @param SitePage $page
 	 * @return bool|mixed
 	 */
-	public function renderThumbnail($context, $page) {
+	public function renderThumbnail($context, SitePage $page) {
 		$chain = new \SocialStream\Post\Player\Chain($this->getUrl());
 
 		/* If it was interpreted, embed that player

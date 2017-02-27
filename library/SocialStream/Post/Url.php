@@ -52,11 +52,11 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 	/**
 	 * Contextually render thumbnail images
 	 *
-	 * @param $context
-	 * @param $page
+	 * @param string   $context
+	 * @param SitePage $page
 	 * @return bool|mixed
 	 */
-	public function renderThumbnail($context, $page) {
+	public function renderThumbnail($context, SitePage $page) {
 
 		/* Determine which context to render blocks
 		 * Display a mime icon
