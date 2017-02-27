@@ -42,7 +42,7 @@ class Factory
     /**
      * All the feedbacks for this participation
      *
-     * @var array
+     * @var Collection|IFeedback[]
      */
     private $feedbacks;
 
@@ -75,7 +75,7 @@ class Factory
 
     /**
      * HTTP code representing the outcome of this $feedback production
-     * 
+     *
      * @var int
      */
     private $responseCode;
@@ -230,7 +230,7 @@ class Factory
      */
 
     /**
-     * @return mixed
+     * @return IFeedbackDataSource
      */
     private function getFeedbackDataSource()
     {
@@ -238,7 +238,7 @@ class Factory
     }
 
     /**
-     * @param mixed $feedbackDataSource
+     * @param IFeedbackDataSource $feedbackDataSource
      * @return $this
      */
     private function setFeedbackDataSource($feedbackDataSource)
@@ -248,7 +248,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return Participant
      */
     private function getParticipant()
     {
@@ -256,7 +256,7 @@ class Factory
     }
 
     /**
-     * @param mixed $participant
+     * @param Participant $participant
      * @return $this
      */
     private function setParticipant($participant)
@@ -266,7 +266,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return User
      */
     private function getCurrentUser()
     {
@@ -274,7 +274,7 @@ class Factory
     }
 
     /**
-     * @param mixed $currentUser
+     * @param User $currentUser
      * @return $this
      */
     private function setCurrentUser($currentUser)
@@ -284,7 +284,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return Collection|IFeedback[]
      */
     private function getFeedbacks()
     {
@@ -292,17 +292,17 @@ class Factory
     }
 
     /**
-     * @param mixed $feedbacks
+     * @param Collection|IFeedback[] $feedbacks
      * @return $this
      */
-    private function setFeedbacks($feedbacks)
+    private function setFeedbacks(Collection $feedbacks)
     {
         $this->feedbacks = $feedbacks;
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     private function getMark()
     {
@@ -310,7 +310,7 @@ class Factory
     }
 
     /**
-     * @param mixed $mark
+     * @param string $mark
      * @return $this
      */
     private function setMark($mark)
@@ -320,7 +320,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     private function getComment()
     {
@@ -328,7 +328,7 @@ class Factory
     }
 
     /**
-     * @param mixed $comment
+     * @param string $comment
      * @return $this
      */
     private function setComment($comment)
@@ -338,7 +338,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     private function getPublish()
     {
@@ -346,7 +346,7 @@ class Factory
     }
 
     /**
-     * @param mixed $publish
+     * @param string $publish
      * @return $this
      */
     private function setPublish($publish)
@@ -356,7 +356,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     private function getFiles()
     {
@@ -364,7 +364,7 @@ class Factory
     }
 
     /**
-     * @param mixed $files
+     * @param array $files
      * @return $this
      */
     private function setFiles($files)
@@ -374,7 +374,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return IResponse
      */
     private function getResponse()
     {
@@ -382,7 +382,7 @@ class Factory
     }
 
     /**
-     * @param mixed $response
+     * @param IResponse $response
      * @return $this
      */
     private function setResponse($response)
@@ -392,7 +392,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getResponseCode()
     {
@@ -400,7 +400,7 @@ class Factory
     }
 
     /**
-     * @param mixed $responseCode
+     * @param int $responseCode
      * @return $this
      */
     private function setResponseCode($responseCode)
