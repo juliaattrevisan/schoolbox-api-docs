@@ -114,7 +114,7 @@ class External_User implements External_UserInterface {
 	/**
 	 * Compiles a list of contacts relevant to a student
 	 *
-	 * @param Integer $externalUserId
+	 * @param string $externalUserId
 	 * @return Array
 	 */
 	function getStudentContactList ($externalUserId) {

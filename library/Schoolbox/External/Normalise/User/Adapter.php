@@ -506,7 +506,7 @@ class Adapter  implements \External_UserInterface {
      *
      * TODO: This is a variation of getStudentContactListExtended()
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      *
      * @return Collection
      */

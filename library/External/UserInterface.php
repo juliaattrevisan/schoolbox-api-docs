@@ -91,7 +91,7 @@ interface External_UserInterface {
      *
      * @importance high - used on student profile page, and the report card.
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return array
      */
     public function getStudentContactList($externalUserId);

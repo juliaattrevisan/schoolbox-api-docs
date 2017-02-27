@@ -1326,7 +1326,7 @@ class PendingFactory
      *
      * @param int    $id
      * @param string $username
-     * @param int    $externalId
+     * @param string $externalId
      * @param string $firstname
      * @param string $lastname
      * @param bool   $localEmail
@@ -1335,7 +1335,6 @@ class PendingFactory
     private function cacheUser($id, $username, $externalId, $firstname, $lastname, $localEmail, $altEmail)
     {
         $id         = intval($id);
-        $externalId = intval($externalId);
         $localEmail = boolval($localEmail);
 
         $this->studentInternalIds[$id]         = $id;

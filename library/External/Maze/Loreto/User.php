@@ -121,7 +121,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 	/**
 	 * Get a list of student contacts (parents) and their contact information
 	 *
-	 * @param $externalUserId
+	 * @param string $externalUserId
 	 * @return mixed
 	 */
 	public function getStudentContactList($externalUserId) {

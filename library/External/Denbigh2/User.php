@@ -148,7 +148,7 @@ class External_Denbigh2_User implements External_UserInterface
      * StudentContactType,
      * StudentContactSpouseRelation
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return array
      */
     public function getStudentContactList($externalUserId)

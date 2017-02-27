@@ -36,7 +36,7 @@ class User implements JsonSerializable, ISoftDeletable
     /** @var string */
     private $lastname;
 
-    /** @var int */
+    /** @var string */
     private $externalId;
 
     /** @var string */
@@ -484,7 +484,7 @@ class User implements JsonSerializable, ISoftDeletable
 
 
     /**
-     * @param int $externalId
+     * @param string $externalId
      * @return self
      */
     public function setExternalId($externalId)
@@ -495,7 +495,7 @@ class User implements JsonSerializable, ISoftDeletable
 
 
     /**
-     * @return int
+     * @return string
      */
     public function getExternalId()
     {

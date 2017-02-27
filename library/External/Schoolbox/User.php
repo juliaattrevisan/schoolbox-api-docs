@@ -128,7 +128,7 @@ class External_Schoolbox_User implements External_UserInterface
     /**
      * Get details for a student's contacts
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      *
      * @return array
      */
