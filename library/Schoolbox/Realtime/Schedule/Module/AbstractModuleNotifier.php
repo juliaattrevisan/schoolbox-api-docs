@@ -23,7 +23,7 @@ use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\User;
 

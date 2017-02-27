@@ -12,7 +12,7 @@ namespace Schoolbox\Realtime\Schedule\Trigger;
 
 use Alaress\Scheduler\Trigger\RecurringTrigger;
 use Schoolbox\Realtime\Digest\MailNotifier;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 

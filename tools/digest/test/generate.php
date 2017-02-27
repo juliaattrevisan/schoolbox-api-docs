@@ -14,7 +14,7 @@ use Schoolbox\News\Article;
 use Schoolbox\News\ArticleMapper;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Resource\Category\News;
 use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;

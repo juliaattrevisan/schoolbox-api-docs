@@ -13,7 +13,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ReflectionFailure;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use Schoolbox\Realtime\Schedule\CrudEventInterface;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;

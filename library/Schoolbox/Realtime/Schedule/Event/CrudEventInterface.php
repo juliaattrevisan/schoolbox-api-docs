@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Realtime\Schedule;
+namespace Schoolbox\Realtime\Schedule\Event;
 
 use Alaress\Scheduler\Event\EventInterface;
 use Schoolbox\Mapper;
