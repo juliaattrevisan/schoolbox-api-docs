@@ -67,9 +67,9 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 		$icon = $this->determineIcon();
 		if ($context == 'post') {
 			$page->setVar(array(
-				'SOCIALSTREAM_POST_URL' => $this->getUrl(),
+				'SOCIALSTREAM_POST_URL'            => Scrub::text($this->getUrl()),
 				'SOCIALSTREAM_POST_EXTERNAL_TITLE' => $this->getExternalTitle(),
-				'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
+				'SOCIALSTREAM_POST_EXTERNAL_BODY'  => $this->getExternalBody(),
 			));
 
 			/* Parse metadata
@@ -99,9 +99,9 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 		}
 		else if ($context == 'comment') {
 			$page->setVar(array(
-				'SOCIALSTREAM_COMMENT_URL' => $this->getUrl(),
+				'SOCIALSTREAM_COMMENT_URL'            => Scrub::text($this->getUrl()),
 				'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => $this->getExternalTitle(),
-				'SOCIALSTREAM_COMMENT_EXTERNAL_BODY' => $this->getExternalBody(),
+				'SOCIALSTREAM_COMMENT_EXTERNAL_BODY'  => $this->getExternalBody(),
 			));
 
 			/* Parse metadata
@@ -131,9 +131,9 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 		}
 		else if ($context == 'reply') {
 			$page->setVar(array(
-				'SOCIALSTREAM_REPLY_URL' => $this->getUrl(),
+				'SOCIALSTREAM_REPLY_URL'            => Scrub::text($this->getUrl()),
 				'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => $this->getExternalTitle(),
-				'SOCIALSTREAM_REPLY_EXTERNAL_BODY' => $this->getExternalBody(),
+				'SOCIALSTREAM_REPLY_EXTERNAL_BODY'  => $this->getExternalBody(),
 			));
 
 			/* Parse metadata
