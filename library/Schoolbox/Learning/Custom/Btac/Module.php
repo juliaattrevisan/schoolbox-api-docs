@@ -8,29 +8,13 @@ namespace Schoolbox\Learning\Custom\Btac;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Module\Module as BaseModule;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use \Timetable_ColourMapper;
-
-
-use Eportfolio\ShowcaseMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 
 class Module extends \Schoolbox\Learning\Module
 {

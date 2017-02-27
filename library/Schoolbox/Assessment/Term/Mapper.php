@@ -103,7 +103,7 @@ class Mapper extends BaseMapper
      * Find first term for a year.
      *
      * @param int $year
-     * @return array
+     * @return Collection
      */
     public function findForYear($year)
     {
