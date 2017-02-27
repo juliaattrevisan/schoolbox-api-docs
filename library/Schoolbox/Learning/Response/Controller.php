@@ -143,7 +143,7 @@ class Controller extends Base
                 'attachzone' => $attachZone->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
                 'markScheme' => $this->deriveSchemeName($assessment->getMarkScheme()),
-                'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment, $response))->produce(),
+                'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
 
                 /* A list of all the Responses that the participant has spawned
