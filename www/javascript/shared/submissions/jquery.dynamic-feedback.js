@@ -60,11 +60,11 @@
                  */
                 errors: [],
 
-                /* Strings representing incomplete/pending/reviewed statuse
+                /* CSS classes representing incomplete/pending/reviewed states
                  */
-                statusIncomplete: '',
-                statusPending: '',
-                statusReviewed: '',
+                statusIncomplete: 'incomplete',
+                statusPending: 'pending',
+                statusReviewed: 'reviewed',
 
                 /* The text to display on the publish button
                  */
@@ -146,6 +146,23 @@
                         $btnDrafted.text('');
                     });
 
+                    // Get handle to participant row
+                    var $li = $form.closest('[data-participant]');
+
+                    // Update this participant's status
+                    $li.attr('data-status', config.statusReviewed);
+
+                    // Update the icon
+                    $li.find('[data-status]')
+                        .removeClass(config.statusIncomplete + ' ' + config.statusPending)
+                        .addClass(config.statusReviewed);
+
+                    // Update the text
+                    $li.find('[data-status-label]').html('Reviewed');
+
+                    // Ensure the 'display reviewed' filter is ON
+                    $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
+
                     toast.call($form, 'Feedback published', true);
                     config.onPublishCallback();
 
@@ -210,16 +227,6 @@
             $.ajax($form.attr('action'), data)
                 .done(function () {
                     toast.apply($form);
-
-                    var $li = $form.closest('[data-status]');
-
-                    $li.attr('data-status', config.statusReviewed);
-
-                    $li.find('[data-status]')
-                        .removeClass(config.statusIncomplete + ' ' + config.statusPending)
-                        .addClass(config.statusReviewed);
-
-                    $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
                     $form.find('[data-draft="drafted"]').text('Saved as draft');
                 })
                 .fail(function (xhr) {
@@ -245,6 +252,5 @@
 
             this.find('[data-interaction-draft]').slideDown();
         }
-
     }
 }(jQuery));
