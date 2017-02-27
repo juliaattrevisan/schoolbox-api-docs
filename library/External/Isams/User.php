@@ -171,7 +171,7 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentStudiesCode,
                         ''                      AS StudentBoarder
             FROM        V_Student
-            WHERE       StudentID = {$externalUserId}
+            WHERE       StudentID = '{$externalUserId}'
         ";
 
         return $this->getDatabase()->getRow($query);
@@ -440,7 +440,7 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentBoardingHouse,
                         ''                      AS StudentCampus
             FROM        V_Student
-            WHERE       StudentID = {$externalUserId}
+            WHERE       StudentID = '{$externalUserId}'
         ";
 
         return $this->getDatabase()->getRow($query);
