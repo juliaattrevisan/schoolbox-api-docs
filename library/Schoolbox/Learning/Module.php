@@ -14,8 +14,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -148,12 +146,10 @@ class Module extends BaseModule
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector)
+    protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-
         $injector->params[Controller::class] = [
             'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
@@ -169,6 +165,14 @@ class Module extends BaseModule
             'externalClass'              => $this->getInjector()->get('externalClass'),
             'database'                   => $this->getInjector()->get('database'),
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /* Getters / Setters
