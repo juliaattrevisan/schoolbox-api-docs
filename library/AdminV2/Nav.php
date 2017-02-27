@@ -33,7 +33,7 @@ class AdminV2_Nav
         'usage'            => 'Usage',
         'engagement'       => 'Engagement',
         'ups'              => 'User Provisioning System',
-        'video'            => 'Video Queue',
+        'video'            => 'Media Queue',
         'import'           => 'Import',
     );
 
