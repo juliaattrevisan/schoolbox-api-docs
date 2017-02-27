@@ -15,18 +15,19 @@ use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\IResponse;
-use \Schoolbox\Learning\Assessment\IFeedback;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\MarkScheme\IMarkScheme;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as DueWorkFeedbackDataSource;
 
 class Factory
 {
 
     /**
-     * @var IFeedbackDataSource
+     * @var DueWorkFeedbackDataSource
      */
-    private $feedbackDataSource;
+    private $dueWorkFeedbackDataSource;
 
     /**
      * @var Participant
@@ -44,9 +45,9 @@ class Factory
     /**
      * All the feedbacks for this participation
      *
-     * @var Collection|IFeedback[]
+     * @var Collection|DueWorkFeedback[]
      */
-    private $feedbacks;
+    private $dueWorkFeedbacks;
 
     /**
      * @var string
@@ -71,7 +72,7 @@ class Factory
     private $files;
 
     /**
-     * @var IResponse
+     * @var DueWorkResponse
      */
     private $response;
 
@@ -85,23 +86,23 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param IFeedbackDataSource $feedbackDataSource
-     * @param Participant $participant
-     * @param User $currentUser
-     * @param Collection $feedbacks
+     * @param DueWorkFeedbackDataSource $dueWorkFeedbackDataSource
+     * @param Participant               $participant
+     * @param User                      $currentUser
+     * @param Collection                $feedbacks
      * @param $mark
      * @param $comment
      * @param $publish
      * @param $files
-     * @param IResponse|null $response
+     * @param DueWorkResponse|null      $response
      */
     public function __construct(
-        IFeedbackDataSource $feedbackDataSource,
+        DueWorkFeedbackDataSource $dueWorkFeedbackDataSource,
         Participant $participant, User $currentUser, Collection $feedbacks,
         $mark, $comment, $publish, $files,
-        IResponse $response = null
+        DueWorkResponse $response = null
     ) {
-        $this->setFeedbackDataSource($feedbackDataSource);
+        $this->setFeedbackDataSource($dueWorkFeedbackDataSource);
         $this->setParticipant($participant);
         $this->setCurrentUser($currentUser);
         $this->setFeedbacks($feedbacks);
@@ -113,11 +114,10 @@ class Factory
     }
 
     /**
-     * Produce a Feedback with the assorted details in it
+     * Produce a DueWork Feedback with the assorted details in it
      * such as mark, comment, publish, authors and attachments
      *
-     *
-     * @return IFeedback
+     * @return DueWorkFeedback
      */
     public function produce()
     {
@@ -125,12 +125,11 @@ class Factory
 
             // if none, or published: create new draft
             /** @var DueWorkFeedback $feedback */
-            $feedback = $this->getFeedbackDataSource()->createModel($this->getParticipant()->getAssessable());
+            $feedback = $this->getDueWorkFeedbackDataSource()->createModel($this->getParticipant()->getAssessable());
 
             $feedback
                 ->setReviewee($this->getParticipant()->getUser())
-                ->setCreatedAt(\Alaress_Date_Format::now())
-            ;
+                ->setCreatedAt(\Alaress_Date_Format::now());
 
             // on CREATE, return 201 Created
             $this->setResponseCode(201);
@@ -169,7 +168,7 @@ class Factory
             return $feedback;
         }
 
-        /** @var IFeedback $feedback */
+        /** @var DueWorkFeedback $feedback */
         $feedback
             ->setReviewer($this->getCurrentUser())
             ->setUpdatedAt(\Alaress_Date_Format::now())
@@ -234,9 +233,9 @@ class Factory
     /**
      * @return IFeedbackDataSource
      */
-    private function getFeedbackDataSource()
+    private function getDueWorkFeedbackDataSource()
     {
-        return $this->feedbackDataSource;
+        return $this->dueWorkFeedbackDataSource;
     }
 
     /**
@@ -245,7 +244,7 @@ class Factory
      */
     private function setFeedbackDataSource($feedbackDataSource)
     {
-        $this->feedbackDataSource = $feedbackDataSource;
+        $this->dueWorkFeedbackDataSource = $feedbackDataSource;
         return $this;
     }
 
@@ -286,20 +285,20 @@ class Factory
     }
 
     /**
-     * @return Collection|IFeedback[]
+     * @return Collection|DueWorkFeedback[]
      */
     private function getFeedbacks()
     {
-        return $this->feedbacks;
+        return $this->dueWorkFeedbacks;
     }
 
     /**
-     * @param Collection|IFeedback[] $feedbacks
+     * @param Collection|DueWorkFeedback[] $feedbacks
      * @return $this
      */
     private function setFeedbacks(Collection $feedbacks)
     {
-        $this->feedbacks = $feedbacks;
+        $this->dueWorkFeedbacks = $feedbacks;
         return $this;
     }
 
