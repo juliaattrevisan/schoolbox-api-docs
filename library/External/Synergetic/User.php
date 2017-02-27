@@ -846,6 +846,25 @@ class External_Synergetic_User implements External_UserInterface
         // GRASN/GRADR: Grandson/Granddaughter
         // FOCD:        Foster child
         // HS/HSS:      Homestay/Homestay Student
+
+        // Get student contact types from config, and wrangle into a query
+
+        $studentRelationships =
+            implode(
+                ',',
+                array_map(
+                    [$this->getDatabase(), 'smartQuote'],
+                    array_map(
+                        'trim',
+                        explode(',', Config::get('external_synergetic_student_relationships'))
+                    )
+                )
+            );
+
+        if (strlen($studentRelationships) === 0) {
+            $studentRelationships = "'SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'";
+        }
+
         $query = "
             SELECT Relationships.RelatedID
             FROM dbo.Constituencies Constituencies
@@ -853,7 +872,7 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN dbo.Community Community ON Relationships.RelatedID = Community.ID
             WHERE Relationships.ID = '{$this->database->quote($synergyID)}'
             AND Constituencies.ConstitCode='@SC'
-            AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS')
+            AND Relationships.Relationship IN ({$studentRelationships})
             ORDER BY Community.BirthDate
         ";
         return $this->getDatabase()->getAll($query);
