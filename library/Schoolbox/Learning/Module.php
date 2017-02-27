@@ -159,15 +159,15 @@ class Module extends BaseModule
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
                 'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
-                'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
+                'defaultGradeGroup'          => $injector->lazyGet('defaultGradeGroup'),
                 'showcaseMapper'             => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
                 'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
                 'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
                 'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
                 'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                'externalClass'              => $this->getInjector()->get('externalClass'),
-                'database'                   => $this->getInjector()->get('database'),
+                'externalClass'              => $injector->lazyGet('externalClass'),
+                'database'                   => $injector->lazyGet('database'),
                 'accessMapper'               => $this->getMapperFactory()->getLazy(Access::class),
             ])
         );
