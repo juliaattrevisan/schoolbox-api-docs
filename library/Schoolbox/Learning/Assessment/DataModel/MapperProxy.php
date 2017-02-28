@@ -32,6 +32,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use \Alaress_Date_Format;
+use UnderflowException;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -235,10 +236,14 @@ class MapperProxy
      */
     public function findAllImplementationsBySpecificationId($assessmentId, $options = [])
     {
-        // Get all assessables which have this assessment as a spec
-        $builder = $this->convertOptionsToPredicateBuilder($options)
-                        ->equals('spec.id', $assessmentId);
-        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        try {
+            // Get all assessables which have this assessment as a spec
+            $builder = $this->convertOptionsToPredicateBuilder($options)
+                            ->equals('spec.id', $assessmentId);
+            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        } catch (UnderflowException $e) {
+            return $this->createCollection();
+        }
     }
 
     /**
@@ -284,9 +289,13 @@ class MapperProxy
      */
     public function findAllByUnitSpecificationId($unitSpecId, $options = [])
     {
-        $builder = $this->convertOptionsToPredicateBuilder($options)
-                        ->equals('us.id', $unitSpecId);
-        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        try {
+            $builder = $this->convertOptionsToPredicateBuilder($options)
+                            ->equals('us.id', $unitSpecId);
+            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        } catch (UnderflowException $e) {
+            return $this->createCollection();
+        }
     }
 
     /**
@@ -300,9 +309,13 @@ class MapperProxy
      */
     public function findAllByUnitImplementationId($unitImplId, $options = [])
     {
-        $builder = $this->convertOptionsToPredicateBuilder($options)
-                        ->equals('ui.id', $unitImplId);
-        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        try {
+            $builder = $this->convertOptionsToPredicateBuilder($options)
+                            ->equals('ui.id', $unitImplId);
+            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        } catch (UnderflowException $e) {
+            return $this->createCollection();
+        }
     }
 
     /**
@@ -385,9 +398,13 @@ class MapperProxy
      */
     public function findAllByFolderIdExclusively($folderId, $options = [])
     {
-        $builder = $this->convertOptionsToPredicateBuilder($options)
-                        ->equals('f.id', $folderId);
-        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        try {
+            $builder = $this->convertOptionsToPredicateBuilder($options)
+                            ->equals('f.id', $folderId);
+            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        } catch (UnderflowException $e) {
+            return $this->createCollection();
+        }
     }
 
     /**
@@ -405,10 +422,14 @@ class MapperProxy
      */
     public function findAllByCourseImplementationFolderId($folderId, $options = [])
     {
-        // uicf.id = Unit Implementation Course Folder ID
-        $builder = $this->convertOptionsToPredicateBuilder($options)
-                        ->equals('uicf.id', $folderId);
-        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        try {
+            // uicf.id = Unit Implementation Course Folder ID
+            $builder = $this->convertOptionsToPredicateBuilder($options)
+                            ->equals('uicf.id', $folderId);
+            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        } catch (UnderflowException $e) {
+            return $this->createCollection();
+        }
     }
 
     /**
@@ -423,9 +444,13 @@ class MapperProxy
      */
     public function findAllByProjectId($projectId, $options = [])
     {
-        $builder = $this->convertOptionsToPredicateBuilder($options)
-                        ->equals('pa.assessment_id', $projectId);
-        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        try {
+            $builder = $this->convertOptionsToPredicateBuilder($options)
+                            ->equals('pa.assessment_id', $projectId);
+            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        } catch (UnderflowException $e) {
+            return $this->createCollection();
+        }
     }
 
     /**
