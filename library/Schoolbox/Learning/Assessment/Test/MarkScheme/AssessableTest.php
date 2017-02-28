@@ -2158,7 +2158,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $response4b->setId(4);
         $response4b->setAssessable($task);
         $response4b->setSubmittedBy($student4);
-        $response4b->setSubmittedOnBehalfOf($student4);
+        $response4b->setSubmittedOnBehalfOf($teacher);
         $response4b->setMarkedComplete(true);
         $response4b->setUpdatedAt($this->getDummyDate('2016-10-10 21:03:19'));
         $participant4->getAllResponses()->add($response4b);
