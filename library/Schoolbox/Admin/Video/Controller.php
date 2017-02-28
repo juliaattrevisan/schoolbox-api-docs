@@ -39,24 +39,21 @@ class Controller extends Base
 
         $queue = [];
 
-        foreach ($statuses as $status) {
+        $queueStatus = $this->getVideoQueueMapper()->findByColumn('status', $statuses);
 
-            $queueStatus = $this->getVideoQueueMapper()->findByColumn('status', $status, ['order' => ['createdOn' => 'desc']]);
-
-            /** @var VideoQueue $video */
-            foreach ($queueStatus as $video) {
-                try {
-                    $storageObject = $this->getStorageMapper()->findByHash($video->getHash());
-                    $video->setStorage($storageObject);
-                } catch (MapperException $e) {
-                }
-
-                if (!isset($queue[$video->getStatus()])) {
-                    $queue[$video->getStatus()] = [];
-                }
-
-                $queue[$status][] = $video;
+        /** @var VideoQueue $video */
+        foreach ($queueStatus as $video) {
+            try {
+                $storageObject = $this->getStorageMapper()->findByHash($video->getHash());
+                $video->setStorage($storageObject);
+            } catch (MapperException $e) {
             }
+
+            if (!isset($queue[$video->getStatus()])) {
+                $queue[$video->getStatus()] = [];
+            }
+
+            $queue[$video->getStatus()][] = $video;
         }
 
         $this->getResponse()->content->set([
