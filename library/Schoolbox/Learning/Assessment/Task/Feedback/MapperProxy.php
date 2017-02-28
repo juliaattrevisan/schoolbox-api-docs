@@ -128,7 +128,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($domainObjects as $domainObject) {
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
-                ->setTask((new TaskDataObject())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
+                ->setTask(
+                    (new TaskDataObject())
+                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
+                )
                 ->setStudent($domainObject->getReviewee())
                 ->setMarkingUser($domainObject->getReviewer())
                 ->setCompletionDate($domainObject->getCreatedAt())
