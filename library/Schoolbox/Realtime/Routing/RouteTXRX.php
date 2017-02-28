@@ -60,7 +60,7 @@ class RouteTXRX implements TXRX
 
         // rather than dump everyone in together, allow the transaction to batch the users
         foreach ($userIds as $userId) {
-            $tx->put($key, [ $frame, (int)$userId ]);
+            $tx->put("$key-$userId", [ $frame, (int)$userId ]);
         }
     }
 
@@ -83,10 +83,8 @@ class RouteTXRX implements TXRX
 
         $count = 0;
 
-        foreach ($args as $v) {
+        foreach ($args as list($frame, $userId)) {
             // this is the payload from $tx->put() above
-            list($frame, $userId) = $v;
-
             $user   = $this->mapper->findById($userId);
             $count += $this->sorter->process($user, $frame) ? 1 : 0;
         }
