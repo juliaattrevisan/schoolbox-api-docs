@@ -299,7 +299,6 @@ abstract class Mapper implements IMapper, Serializable
         $this->database = \Database::getInstance();
         $this->map      = new MappingCollection();
 
-
         $this->initCaches();
         // Switch on the cache if this is a web request: otherwise switch off
         if (self::isWithinWebRequest()) {
@@ -1082,6 +1081,15 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty($map['hydrator'])) {
             $map['hydrator'] = $this->column_factory->build($map['type']);
+
+        } elseif (empty($map['type'])) {
+            // hydrator specified, but no type: assume model
+            $map['type'] = self::TYPE_MODEL;
+        }
+
+        if (empty($map['type'])) {
+            // both hydrator and type cannot be empty
+            return false;
         }
 
         // if property is empty, derive it from the column, converting snake_case to camelCase
