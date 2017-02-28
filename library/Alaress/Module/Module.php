@@ -177,10 +177,12 @@ class Module {
      * route, and then execute it.
      *
      * @param string $basePath The base URL for this module, used by initRoutes
+     * @param bool   $override If true, override a previous definition with this basename
      */
-    public function init($basePath) {
+    public function init($basePath, $override = false)
+    {
         $injector = $this->getInjector();
-        if ($this->installModule($injector)) {
+        if ($this->installModule($injector, $override)) {
             $this->initSubmodules($injector, $basePath);
 
             // perform any route registration available
@@ -247,16 +249,17 @@ class Module {
      * Installs this module into the dependency injection system.
      *
      * @param  ContainerInterface $injector
+     * @param  bool               $override If true, override a previous definition with this basename
      * @return bool Was the module installed?
      * @throws LogicException if this module has no basename, or it is already defined as a different class
      */
-    protected function installModule(ContainerInterface $injector)
+    protected function installModule(ContainerInterface $injector, $override = false)
     {
         if (!$this->basename) {
             throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
         }
         $key = 'module:'.$this->basename;
-        if ($injector->has($key)) {
+        if (!$override && $injector->has($key)) {
             $other = $injector->get($key);
             if (get_class($other) != get_class($this)) {
                 throw new LogicException(
@@ -274,9 +277,8 @@ class Module {
                 );
                 return false;
             }
-        } else {
-            $injector->set($key, $this);
         }
+        $injector->set($key, $this);
         return true;
     }
 
