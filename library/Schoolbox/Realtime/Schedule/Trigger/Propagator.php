@@ -9,7 +9,6 @@
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
 use Alaress\Async\AMQP\AMQPInterface;
-use Aura\Di\Exception\ReflectionFailure;
 use JsonSerializable;
 use Predis\ClientInterface;
 use Redis;
@@ -64,11 +63,11 @@ class Propagator
      * @param object $object
      * @param Mapper $mapper
      * @param array  $diff
-     * @throws ReflectionFailure
      * @return string
      */
     public function propagate(User $subject, $verb, $object, $mapper, array $diff = null)
     {
+        // this event generation *should* be in a factory, but... ¯\_(ツ)_/¯
         return $this->propagateEvent(new Event($subject, $verb, $object, $mapper, $diff));
     }
 
