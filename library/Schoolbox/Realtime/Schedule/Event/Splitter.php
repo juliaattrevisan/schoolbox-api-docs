@@ -61,7 +61,7 @@ class Splitter
      * @throws ScheduleException
      * @return ModuleNotifierInterface
      */
-    public function getModule(CrudEventInterface $event)
+    private function getModule(CrudEventInterface $event)
     {
         // setup for ifs
         $modelClass = get_class($event->getObject());
