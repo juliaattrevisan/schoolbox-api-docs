@@ -17,7 +17,7 @@
                     $.post('{{ routeLookup('adminVideo.postSubmit') }}', {
                         videoId: deleteId,
                         videoAction: 'delete'
-                    }).done(function() {
+                    }).done(function () {
                         $(row).remove();
                     });
                 }
@@ -31,7 +31,12 @@
 
 <div class="row">
     <div class="small-12 island">
+        {% set count = 0 %}
+
         {% for status in statusOrder if queue[status] | length > 0 %}
+
+            {% set count = count + 1 %}
+
             <h2 class="subheader">
                 {{ status }} Media
             </h2>
@@ -70,6 +75,14 @@
                 </ul>
             </section>
         {% endfor %}
+
+        {% if count == 0 %}
+            <div class="empty-state">
+                <i class="icon-video"></i>
+                <p>There are no failed, pending or processing media transcodes!</p>
+            </div>
+        {% endif %}
+
     </div>
 </div>
 
