@@ -62,7 +62,7 @@ class Translator
                 $cyberHoundUrl
                     ->setPath('/api/overrideurl')
                     ->setQuery([
-                        'key'  => hash('sha256', $_SERVER['REQUEST_TIME'].base64_encode($url).$this->apiSharedKey),
+                        'key'  => hash('sha256', $_SERVER['REQUEST_TIME'].$url.$this->apiSharedKey),
                         'time' => $_SERVER['REQUEST_TIME'],
                         'base64url'  => base64_encode($url),
                     ]);
