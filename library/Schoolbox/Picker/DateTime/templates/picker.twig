@@ -146,10 +146,9 @@
                                 </th>
                                 {% set k=0 %}
                                 {% for description in timetable[campus.campusId].desc %}
-                                    <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k]  }}">{{ description }}</td>
+                                    <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k] }}">{{ description }}</td>
                                         {% for i in 1..timetable[campus.campusId].dayCount %}
-                                            <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
-
+                                            <td><div class="has-period period-{{ i }}-{{ k }}" title="{{ timetable[campus.campusId].start[k] }} - {{ timetable[campus.campusId].end[k] }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
                                         {% endfor %}
                                         {% set k=k+1 %}
                                     </tr>
