@@ -95,7 +95,7 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
                         ]
                     ];
                 }
-                $this->log(Logger::, $message, $input, $previous, $context);
+                $this->log(Logger::INFO, $message, $input, $previous, $context);
 
                 // This will run if user either:
                 //   has children with campuses, or
