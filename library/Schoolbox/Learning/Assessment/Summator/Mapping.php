@@ -50,7 +50,7 @@ class Mapping
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function decompose(ISummator $summator)
+    public function decompose(ISummator $summator = null)
     {
         if ($summator instanceof WeightedAverage) {
             return SummatorFactory::WEIGHTED_AVERAGE;
