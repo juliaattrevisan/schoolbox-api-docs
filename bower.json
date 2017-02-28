@@ -35,7 +35,7 @@
     "modernizr": "2.8.3",
     "datatables": "1.10.8",
     "highcharts-release": "4.2.3",
-    "flatpickr": "flatpickr-calendar#^2.2.4"
+    "flatpickr": "flatpickr-calendar#^2.2.4",
     "jquery.scrollTo": "2.1.2"
   },
   "ignore": [
