@@ -32,6 +32,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 # function to retrieve latest files from S3, needs $S3file set first
+S3file_short='';
 getS3file() {
     if [ -z $S3file ];
     then
@@ -43,12 +44,13 @@ getS3file() {
         etag=`curl -I $data_source/$S3file 2>/dev/null | grep ETag | cut -d'"' -f2`;
         if [ $? -eq 0 ];
         then
+            if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
             checketag=`grep $etag $S3file.etag.cache 2>/dev/null | wc -l`;
             if [ $checketag -eq 0 ];
             then
                 # New/updated version available - download it
-                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file";
-                curl $data_source/$S3file > $S3file;
+                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file_short";
+                wget --no-verbose $data_source/$S3file -O $S3file_short 2>&1;
                 if [ $? -eq 0 ];
                 then
                     # This is a new file, so remove old references
@@ -56,6 +58,8 @@ getS3file() {
                     # Add new file to etag cache
                     echo "$etag $S3file" >> $S3file.etag.cache;
                 fi
+            else
+                echo "[SB][`date +%Y-%m-%d\ %X`] File up to date: $S3file_short";
             fi
         fi
 
@@ -63,16 +67,20 @@ getS3file() {
     fi
 }
 
-# TODO - add support for specific version $data_filename, saving to $data_filename_short
-for S3file in vagrant.sql $data_filename;
-do
-    getS3file;
-    if [ ! -f $cachedir/$S3file ];
-    then
-        echo "Error: file missing $S3file";
-    fi
-done
-exit;
+S3file='vagrant.sql'
+getS3file;
+if [ ! -f $cachedir/$S3file ];
+then
+    echo "Error: file missing $S3file";
+fi
+
+S3file="$data_filename";
+S3file_short="$data_filename_short";
+getS3file;
+if [ ! -f $cachedir/$S3file ];
+then
+    echo "Error: file missing $S3file";
+fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
