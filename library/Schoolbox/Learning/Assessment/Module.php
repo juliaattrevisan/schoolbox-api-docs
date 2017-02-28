@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
@@ -24,6 +25,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as Submissio
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
@@ -101,6 +103,21 @@ class Module extends BaseModule
             new Rule\IsUser('studentId')
         );
 
+        // Prevent navigation to non-project assessment spec status pages
+        $canWriteAndNotSpec = new Rule\All(
+            $canWrite,
+            new Rule\Callback(function(array $params){
+                if (!isset($params['assessment'])) {
+                    throw new NotFound("No assessment preloaded");
+                }
+                /** @var IAssessable $assessment */
+                $assessment = $params['assessment'];
+                if(!$assessment instanceof Project && $assessment->getBaseContext() instanceof UnitSpecification){
+                    throw new InvalidPath("Cannot view a status page for an Assessment Specification");
+                }
+            })
+        );
+
 
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) { return $name.'s'; });
@@ -122,7 +139,7 @@ class Module extends BaseModule
         $this->register('PATCH', "$assRoute",               'patchUpdateAssessment',    $canWrite,  $preloadAssessment); // a || c
         $this->register('GET',  "$assRoute/modify",         'getUpdateAssessmentForm',  $canWrite,  $preloadAssessment); // a || c
         $this->register('POST', "$assRoute/delete",         'postDeleteAssessment',     $canWrite,  $preloadAssessment); // a || c
-        $this->register('GET',  "$assRoute/status",         'getStatus',                $canWrite,  $preloadAssessment); // a || c
+        $this->register('GET',  "$assRoute/status",         'getStatus',                $canWriteAndNotSpec,  $preloadAssessment); // a || c
         $this->register('GET',  "$assRoute/overview",       'getOverview',              $canWrite,  $preloadAssessment); // a || c
         $this->register('GET',  "$assRoute/overview/export",'downloadOverview',         $canWrite,  $preloadAssessment); // a || c
 
