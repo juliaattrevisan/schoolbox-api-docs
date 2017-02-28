@@ -10,7 +10,7 @@ namespace Schoolbox\Notif\Handler;
 
 
 use Monolog\Handler\AbstractProcessingHandler;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 
 class AMQPFallbackHandler extends AbstractProcessingHandler

@@ -14,7 +14,7 @@ use Alaress\Scheduler\Event\EventInterface;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use OutOfRangeException;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger;
 use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTriggerBundle;
