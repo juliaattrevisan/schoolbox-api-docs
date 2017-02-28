@@ -142,11 +142,11 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     /**
      * Render thumbnail (or equivalents) as determined by subclasses
      *
-     * @param $context
-     * @param $page
+     * @param string   $context
+     * @param SitePage $page
      * @return mixed
      */
-    abstract public function renderThumbnail($context, $page);
+    abstract public function renderThumbnail($context, SitePage $page);
 
     /* Getters/Setters
 	 */

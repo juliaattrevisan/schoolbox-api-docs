@@ -79,12 +79,11 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 				}
 
 				$this->setVar(array(
-					'LIST_ITEM_ID' => $currentItem->getId(),
-					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
-					'LIST_ITEM_URL' => $currentItem->getContent(),
-					'LIST_ITEM_ENCODED_URL' => $linkUrl,
-					'LIST_ITEM_TARGET' => $linkTarget,
-					'ON_OFF' => ++$j % 2 ? '' : 'dark'
+					'LIST_ITEM_ID'          => Scrub::text($currentItem->getId()),
+					'LIST_ITEM_TITLE'       => Scrub::text($currentItem->getTitle()),
+					'LIST_ITEM_URL'         => Scrub::text($currentItem->getContent()),
+					'LIST_ITEM_ENCODED_URL' => Scrub::text($linkUrl),
+					'LIST_ITEM_TARGET'      => Scrub::text($linkTarget),
 				));
 
 				/* Controls

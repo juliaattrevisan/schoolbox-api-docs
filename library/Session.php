@@ -87,7 +87,16 @@ class Session
             if ($remember == true) {
                 $key = sha1(microtime(true).mt_rand(10000, 90000));
                 $expire = strtotime('+2 month');
-                setcookie('remember', $key, $expire, '/', $_SERVER['HTTP_HOST'], false, true);
+                $cookieParams = session_get_cookie_params();
+                setcookie(
+                    'remember',
+                    $key,
+                    $expire,
+                    $cookieParams['path'],
+                    $cookieParams['domain'],
+                    $cookieParams['secure'],
+                    $cookieParams['httponly']
+                );
                 $redis = \Alaress\Redis::getClientInstance();
                 $redis->executeCommand($redis->createCommand('set', array($key, $username) ));
                 $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));

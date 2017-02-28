@@ -595,11 +595,22 @@ class SitePage extends Page
 
         //reset session timer
         $_SESSION['lasttime'] = time();
-        if(\Config::get('session_length') > 0) {
-            setcookie(session_name(), session_id(), $_SERVER['REQUEST_TIME'] + \Config::get('session_length'), '/');
-        } else {
-            setcookie(session_name(), session_id(), 0, '/');
-        }
+
+        // Resend session cookie
+        $cookieParams  = session_get_cookie_params();
+        $sessionLength = \Config::get('session_length');
+        $sessionExpiry = ($sessionLength > 0)
+            ? $_SERVER['REQUEST_TIME'] + $sessionLength
+            : 0;
+        setcookie(
+            session_name(),
+            session_id(),
+            $sessionExpiry,
+            $cookieParams['path'],
+            $cookieParams['domain'],
+            $cookieParams['secure'],
+            $cookieParams['httponly']
+        );
     }
 
     /**
