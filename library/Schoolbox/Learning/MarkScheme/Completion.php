@@ -15,7 +15,7 @@ class Completion extends AbstractMarkScheme
 {
     const TITLE = 'Completion';
 
-    const HUMAN_READABLE_INCOMPLETE = 'Incomplete';
+    const HUMAN_READABLE_INCOMPLETE                  = 'Incomplete';
     const HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT  = 'Complete';
     const HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER  = 'Complete';
 
