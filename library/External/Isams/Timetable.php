@@ -68,7 +68,13 @@ class External_Isams_Timetable implements External_TimetableInterface
     public function getTimetableDefinition($externalUserId, CampusModel $campus, $day = null, $date = null)
     {
         if (empty($day)) {
-            $day = intval(Config::get('external_isams_default_day_id'));
+            // If no day number is specified, use the current one for this campus
+            $day = $this->getDayNumber($campus);
+
+            // If that falls in a heap, use the default one specified in the config
+            if (empty($day)) {
+                $day = intval(Config::get('external_isams_default_day_id'));
+            }
         }
 
         // Get period information from database
@@ -135,18 +141,21 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getDayNumber(CampusModel $campus, $date = 0)
     {
-        if ($date == 0) {
-            $date = \Alaress_Date_Format::now();
-        } else {
-            $date = new \Alaress_Date_Format($date, "U");
-        }
+        // The days in Isams appear to have no correlation to an actual calendar date- it is purely based on the day of the week (eg. Monday - Friday) and a
+        // week number. To work out the day number we are doing the following...
+        //
+        // 1. Start with the campus external timetable code (SS/PS/TK) stored in $campus->getExtTimetableCode()
+        // 2. Look up a week ID number in V_Weeks where the 'txtShortName' field is equal to the this campus code
+        // 3. Look up the day number 'TblTimetableManagerDaysId' in the V_Days table using the week ID we found in step 2, along with the day of the week
+        //    number (where 1 = Monday, 7 = Sunday) which is stored in the 'intDay' field.
 
-        // TODO: Need something added to database to work out real day number
+
+        $dayOfWeek = date("N");
 
         $queryDay = "
-           SELECT     MIN(DayID) AS DayID
-           FROM       V_TimetableStructure
-           WHERE      CampusCode = '{$campus->getExtTimetableCode()}'
+           SELECT TblTimetableManagerDaysID as DayID FROM V_Days 
+           WHERE intWeek = (SELECT TOP 1 MAX(TblTimetableManagerWeeksID) FROM V_Weeks WHERE txtShortName = '{$this->getDatabase()->quote($campus->getExtTimetableCode())}' AND intActive = 1) AND 
+           intDay = {$dayOfWeek}
         ";
 
         $day = $this->getDatabase()->getRow($queryDay);
