@@ -16,6 +16,7 @@ use Traversable;
 
 class Staff extends IteratorIterator
 {
+    use StackableHelper;
     use StackableTrait;
 
     /**
@@ -84,41 +85,10 @@ class Staff extends IteratorIterator
 
         /* Email - one for every item in stack
          */
-        $email = [];
-        foreach ($preStack as $result) {
-            $email = array_merge(
-                $email,
-                preg_split('/[,;]/', $result['email'])
-            );
-        }
-        foreach (array_unique($email) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
 
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $staff->addEmail($currentEmail);
-            }
-        }
-
-        /* Work Email - one for every item in stack
-         */
-        $workEmail = [];
-        foreach ($preStack as $result) {
-            $workEmail = array_merge(
-                $workEmail,
-                preg_split('/[,;]/', $result['work_email'])
-            );
-        }
-        foreach (array_unique($workEmail) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
-
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $staff->addWorkEmail($currentEmail);
-            }
-        }
+        array_map([$staff, "addEmail"], $this->columnValuesAsEmail($preStack, 'default_email'));
+        array_map([$staff, "addWorkEmail"], $this->columnValuesAsEmail($preStack, 'work_email'));
+        array_map([$staff, "addHomeEmail"], $this->columnValuesAsEmail($preStack, 'home_email'));
 
         /* Position - one for every item in stack
          */
@@ -129,25 +99,6 @@ class Staff extends IteratorIterator
             }
         }
         $staff->getMeta()->setPosition($position);
-        /* Home Email - one for every item in stack
-         */
-        $homeEmail = [];
-        foreach ($preStack as $result) {
-            $homeEmail = array_merge(
-                $homeEmail,
-                preg_split('/[,;]/', $result['home_email'])
-            );
-        }
-        foreach (array_unique($homeEmail) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
-
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $staff->addHomeEmail($currentEmail);
-            }
-        }
-
         /* Campus
          */
         $campus = new User\Common\Campus();

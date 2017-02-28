@@ -15,6 +15,8 @@ use Schoolbox\External\Normalise\User;
 
 class Student extends IteratorIterator
 {
+    use StackableHelper;
+
     /**
      * Return the current element
      *
@@ -50,56 +52,12 @@ class Student extends IteratorIterator
             ->setLogin($currentResult['network_login'])
         ;
 
-        /* Email - one for every item in stack
+        /* Emails - one for every item in stack
          */
-        $email = [];
-        $email = array_merge(
-            $email,
-            preg_split('/[,;]/', $currentResult['student_default_email'])
-        );
-        foreach (array_unique($email) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
 
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $student->addEmail($currentEmail);
-            }
-        }
-
-        /* Work Email - one for every item in stack
-         */
-        $workEmail = [];
-        $workEmail = array_merge(
-            $workEmail,
-            preg_split('/[,;]/', $currentResult['student_work_email'])
-        );
-        foreach (array_unique($workEmail) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
-
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $student->addWorkEmail($currentEmail);
-            }
-        }
-
-        /* Home Email - one for every item in stack
-         */
-        $homeEmail = [];
-        $homeEmail = array_merge(
-            $homeEmail,
-            preg_split('/[,;]/', $currentResult['student_home_email'])
-        );
-        foreach (array_unique($homeEmail) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
-
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $student->addHomeEmail($currentEmail);
-            }
-        }        
+        array_map([$student, "addEmail"], $this->columnValuesAsEmail([$currentResult], 'student_default_email'));
+        array_map([$student, "addWorkEmail"], $this->columnValuesAsEmail([$currentResult], 'student_work_email'));
+        array_map([$student, "addHomeEmail"], $this->columnValuesAsEmail([$currentResult], 'student_home_email'));
 
         /* Boarding House should be set if it has a value
          * You can't actually rely on StudentBoarder field, because that
