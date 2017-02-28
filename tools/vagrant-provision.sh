@@ -75,11 +75,15 @@ rm -rf /vagrant/data/cache;
 /vagrant/tools/create-data-dirs.sh /vagrant/data;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up browscap cache";
-# TODO - pull from concourse CI prebuild
 mkdir -p /vagrant/tools/browscap;
-rm -f /vagrant/tools/browscap/browscap.ini;
-touch /vagrant/tools/browscap/browscap.ini;
-cp -f $cachedir/cache-2016-01-14.txt /vagrant/tools/browscap/cache.php;
+find /vagrant/tools/browscap/cache.php -mtime +7 -type f -exec rm -vf {} \;
+if [ ! -f /vagrant/tools/browscap/cache.php ];
+then
+    php tools/ci/build-browscap-cache.php >/dev/null 2>&1;
+    mv -f cache.php /vagrant/tools/browscap/cache.php;
+    rm -f /vagrant/tools/browscap/browscap.ini;
+    touch /vagrant/tools/browscap/browscap.ini;
+fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
 mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
