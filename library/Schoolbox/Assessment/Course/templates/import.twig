@@ -155,15 +155,6 @@ Usages:
             stageFour.mage({
                 validateOptions: {},
                 beforeSubmit: function() {
-                    // check at least one assessment has been selected per unit
-                    $('#import_assessments').find('[data-unit]').each(function(idx, elem) {
-                        var unitSpecId = $(elem).data('unit');
-                        var checkBoxGroup = 'unit-spec-' + unitSpecId;
-                        $('input[data-checkbox-group="' + checkBoxGroup + '"]').rules('add', {
-                            oneCheckbox: checkBoxGroup
-                        });
-                    });
-
                     // check every visible publish date field
                     $('input[data-role="publish_date"]:visible:enabled').each(function() {
                         $(this).rules('add', {
