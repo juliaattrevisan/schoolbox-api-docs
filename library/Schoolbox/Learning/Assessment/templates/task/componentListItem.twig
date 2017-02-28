@@ -11,7 +11,7 @@
 
         {% include '@learningAssessment/task/progressTickForm.twig' with {
             participant: participant,
-            disabled: assessable.closed or not assessable.isSelfAssessable or (latestResponse.teacherAssessed and latestResponse.markedComplete )
+            disabled: not assessable.isOpen or not assessable.isSelfAssessable or (latestResponse.teacherAssessed and latestResponse.markedComplete )
         } only %}
     {% endif %}
 
