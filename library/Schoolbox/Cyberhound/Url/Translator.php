@@ -64,7 +64,7 @@ class Translator
                     ->setQuery([
                         'key'  => hash('sha256', $_SERVER['REQUEST_TIME'].base64_encode($url).$this->apiSharedKey),
                         'time' => $_SERVER['REQUEST_TIME'],
-                        'url'  => base64_encode($url),
+                        'base64url'  => base64_encode($url),
                     ]);
                 $url = $cyberHoundUrl->toString();
             }
