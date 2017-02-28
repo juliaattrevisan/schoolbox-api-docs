@@ -107,7 +107,7 @@ class Controller extends \Schoolbox\Learning\Controller
 
         // Squish this mess out
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/Btac/grades.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
             'student'       => $viewee,
             'term'          => $term,
             'year'          => $year,
