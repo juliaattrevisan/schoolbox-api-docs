@@ -4,17 +4,17 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-namespace Schoolbox\Learning\Custom\Btac;
+namespace Custom\Btac\Grades;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Role;
-use \Twig_Loader_Chain;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
+use Twig_Loader_Chain;
 
 class Module extends \Schoolbox\Learning\Module
 {
