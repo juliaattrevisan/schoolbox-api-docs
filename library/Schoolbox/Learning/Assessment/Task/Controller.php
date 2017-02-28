@@ -285,10 +285,7 @@ class Controller extends Assessment\Controller
         // Does the most recent response for the student already have the proposed status?
         if (empty($response->getId())) {
             $mostRecentResponse = $participant->findMostRecentResponse();
-            if ($mostRecentResponse instanceof TaskResponse
-                && $mostRecentResponse->getMarkedComplete() == $response->getMarkedComplete()
-                && $mostRecentResponse->isSelfAssessed() == $response->isSelfAssessed()
-            ) {
+            if ($mostRecentResponse instanceof TaskResponse && $mostRecentResponse->getCompletionStatus() == $response->getCompletionStatus()) {
                 throw new \UnexpectedValueException("{$submittedFor->getFullName()} already has status ({$mostRecentResponse->getCompletionStatus()}) for this task");
             }
         }
