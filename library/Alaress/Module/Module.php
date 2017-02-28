@@ -172,6 +172,29 @@ class Module {
     /**
      * Installs module with its most basic configuration.
      *
+     * This will not override a previous install of a module with the same basename.
+     *
+     * @param string $basePath The base URL for this module, used by initRoutes
+     */
+    public function init($basePath)
+    {
+        $this->internalInit($basePath, false);
+    }
+
+    /**
+     * Installs module with its most basic configuration, overriding a previous
+     * install of a module with the same basename.
+     *
+     * @param string $basePath The base URL for this module, used by initRoutes
+     */
+    public function initOverride($basePath)
+    {
+        $this->internalInit($basePath, true);
+    }
+
+    /**
+     * Installs module with its most basic configuration.
+     *
      * Only the module's submodules and routes should be initialised here -
      * these are the bare minimum the kernel requires to bind a module to a
      * route, and then execute it.
@@ -179,7 +202,7 @@ class Module {
      * @param string $basePath The base URL for this module, used by initRoutes
      * @param bool   $override If true, override a previous definition with this basename
      */
-    public function init($basePath, $override = false)
+    protected function internalInit($basePath, $override)
     {
         $injector = $this->getInjector();
         if ($this->installModule($injector, $override)) {
@@ -191,8 +214,8 @@ class Module {
             // preload registered routes
             foreach ($this->routeIndex as $controllerMethod => list ($method, $path, $tokens)) {
                 $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
-                    ->setMethod($method)
-                    ->setTokens($tokens);
+                     ->setMethod($method)
+                     ->setTokens($tokens);
             }
             // no need that no more
             unset($this->routeIndex);

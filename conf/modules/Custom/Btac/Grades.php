@@ -20,7 +20,7 @@ class Grades implements ModuleConfigInterface
         if ($di->get('config')->get('site_location') == 'btac') {
             $module = new Module($di);
             // Override previous definition
-            $module->init('/learning', true);
+            $module->initOverride('/learning');
         }
     }
 }
