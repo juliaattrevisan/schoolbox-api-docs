@@ -128,82 +128,82 @@ vendorfile='';
 composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
 if [ -f /vagrant/vendor/composer.lock.checksum ];
 then
-        currentvendorsha=`awk '{print $1}' /vagrant/vendor/composer.lock.checksum`;
-        if [ "$currentvendorsha" == "$composerlocksha" ];
-        then
-                echo "[SB][`date +%Y-%m-%d\ %X`] Vendor build up to date, nothing to change";
-                vendorfile='ignore';
-        fi
+    currentvendorsha=`awk '{print $1}' /vagrant/vendor/composer.lock.checksum`;
+    if [ "$currentvendorsha" == "$composerlocksha" ];
+    then
+        echo "[SB][`date +%Y-%m-%d\ %X`] Vendor build up to date, nothing to change";
+        vendorfile='ignore';
+    fi
 fi
 
 if [ "$vendorfile" != 'ignore' ];
 then
-        check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
-        if [ $check -gt 0 ];
-        then
-                # Woo - we've located a matching cache file
-                vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-        else
-                # No cache files match - boo hoo - check to see if there are new versions
-                for branch in develop master;
-                do
-                        # Check if we've already found a matching file
-                        if [ "$vendorfile" == '' ];
-                        then
-                                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
-                                if [ $? -eq 0 ];
-                                then
-                                        checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
-                                        if [ $checketag -eq 0 ];
-                                        then
-                                                # New/updated version available - download it
-                                                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
-                                                wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
-                                                if [ $? -eq 0 ];
-                                                then
-                                                        # This is a new file, so remove old references
-                                                        sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.etag.cache 2>/dev/null;
-                                                        sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.cache 2>/dev/null;
-                                                        # Add new file to etag cache
-                                                        echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
-                                                        # Cleanup for purity
-                                                        rm -fR /vagrant/vagrantcache/vendor 2>/dev/null;
-                                                        # Extract checksum
-                                                        tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
-                                                        vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
-                                                        rm -fR /vagrant/vagrantcache/vendor 2>/dev/null;
-                                                        # Add new file to vendor cache
-                                                        echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
-                                                        # Check if this is file we need
-                                                        if [ "$vendorchecksum" == "$composerlocksha" ];
-                                                        then
-                                                                vendorfile="$branch-vendor-php-dev.tar.gz";
-                                                        fi
-                                                fi
-                                        fi
-                                fi
-                        fi
-                done
-        fi
-        cd /vagrant;
-        if [ "$vendorfile" != '' ];
-        then
-                if [ -f /vagrant/vagrantcache/$vendorfile ];
+    check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
+    if [ $check -gt 0 ];
+    then
+        # Woo - we've located a matching cache file
+        vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+    else
+        # No cache files match - boo hoo - check to see if there are new versions
+        for branch in develop master;
+        do
+            # Check if we've already found a matching file
+            if [ "$vendorfile" == '' ];
+            then
+                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                if [ $? -eq 0 ];
                 then
-                        # Extract content
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Found matching vendor cache file '$vendorfile', now extracting";
-                        rm -fR /vagrant/vendor 2>/dev/null;
-                        tar xzf /vagrant/vagrantcache/$vendorfile;
-                else
-                        # Still no luck, build from scratch with composer
-                        echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-                        /vagrant/tools/composer.sh 2>&1;
+                    checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
+                    if [ $checketag -eq 0 ];
+                    then
+                        # New/updated version available - download it
+                        echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
+                        wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
+                        if [ $? -eq 0 ];
+                        then
+                            # This is a new file, so remove old references
+                            sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.etag.cache 2>/dev/null;
+                            sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.cache 2>/dev/null;
+                            # Add new file to etag cache
+                            echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
+                            # Cleanup for purity
+                            rm -fR /vagrant/vagrantcache/vendor 2>/dev/null;
+                            # Extract checksum
+                            tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
+                            vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
+                            rm -fR /vagrant/vagrantcache/vendor 2>/dev/null;
+                            # Add new file to vendor cache
+                            echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
+                            # Check if this is file we need
+                            if [ "$vendorchecksum" == "$composerlocksha" ];
+                            then
+                                vendorfile="$branch-vendor-php-dev.tar.gz";
+                            fi
+                        fi
+                    fi
                 fi
+            fi
+        done
+    fi
+    cd /vagrant;
+    if [ "$vendorfile" != '' ];
+    then
+        if [ -f /vagrant/vagrantcache/$vendorfile ];
+        then
+            # Extract content
+            echo "[SB][`date +%Y-%m-%d\ %X`] Found matching vendor cache file '$vendorfile', now extracting";
+            rm -fR /vagrant/vendor 2>/dev/null;
+            tar xzf /vagrant/vagrantcache/$vendorfile;
         else
-                # Still no luck, build from scratch with composer
-                echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-                /vagrant/tools/composer.sh 2>&1;
+            # Still no luck, build from scratch with composer
+            echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
+            /vagrant/tools/composer.sh 2>&1;
         fi
+    else
+        # Still no luck, build from scratch with composer
+        echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
+        /vagrant/tools/composer.sh 2>&1;
+    fi
 fi
 cd /vagrant;
 
@@ -278,87 +278,87 @@ npmfile='';
 npmlocksha=`sha1sum /vagrant/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
 if [ -f /vagrant/node_modules/npm.shrinkwrap.checksum ];
 then
-        currentnpmsha=`awk '{print $1}' /vagrant/node_modules/npm.shrinkwrap.checksum`;
-        if [ "$currentnpmsha" == "$npmlocksha" ];
-        then
-                echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change ($npmlocksha)";
-                npmfile='ignore';
-        fi
+    currentnpmsha=`awk '{print $1}' /vagrant/node_modules/npm.shrinkwrap.checksum`;
+    if [ "$currentnpmsha" == "$npmlocksha" ];
+    then
+        echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change ($npmlocksha)";
+        npmfile='ignore';
+    fi
 fi
 
 if [ "$npmfile" != 'ignore' ];
 then
-        echo "[SB][`date +%Y-%m-%d\ %X`] NPM build not correct or missing ($npmlocksha)";
-        check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
-        if [ $check -gt 0 ];
-        then
-                # Woo - we've located a matching cache file
-                npmfile=`grep $npmlocksha npm.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-        else
-                # No cache files match - boo hoo - check to see if there are new versions
-                for branch in develop master;
-                do
-                        # Check if we've already found a matching file
-                        if [ "$npmfile" == '' ];
-                        then
-                                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
-                                if [ $? -eq 0 ];
-                                then
-                                        checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
-                                        if [ $checketag -eq 0 ];
-                                        then
-                                                # New/updated version available - download it
-                                                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
-                                                wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
-                                                if [ $? -eq 0 ];
-                                                then
-                                                        # This is a new file, so remove old references
-                                                        sed -i "/$branch-npm.tar.gz/d" npm.etag.cache 2>/dev/null;
-                                                        sed -i "/$branch-npm.tar.gz/d" npm.cache 2>/dev/null;
-                                                        # Add new file to etag cache
-                                                        echo "$etag $branch-npm.tar.gz" >> npm.etag.cache;
-                                                        # Cleanup for purity
-                                                        rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
-                                                        # Extract checksum
-                                                        tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
-                                                        npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
-                                                        rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
-                                                        # Add new file to NPM cache
-                                                        echo "$npmchecksum $branch-npm.tar.gz" >> npm.cache;
-                                                        # Check if this is file we need
-                                                        if [ "$npmchecksum" == "$npmlocksha" ];
-                                                        then
-                                                                npmfile="$branch-npm.tar.gz";
-                                                        fi
-                                                fi
-                                        fi
-                                fi
-                        fi
-                done
-        fi
-        cd /vagrant;
-        if [ "$npmfile" != '' ];
-        then
-                if [ -f /vagrant/vagrantcache/$npmfile ];
+    echo "[SB][`date +%Y-%m-%d\ %X`] NPM build not correct or missing ($npmlocksha)";
+    check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
+    if [ $check -gt 0 ];
+    then
+        # Woo - we've located a matching cache file
+        npmfile=`grep $npmlocksha npm.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+    else
+        # No cache files match - boo hoo - check to see if there are new versions
+        for branch in develop master;
+        do
+            # Check if we've already found a matching file
+            if [ "$npmfile" == '' ];
+            then
+                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                if [ $? -eq 0 ];
                 then
-                        # Extract content
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
-                        rm -fR /vagrant/node_modules 2>/dev/null;
-                        tar xzf /vagrant/vagrantcache/$npmfile;
-                else
-                        # Still no luck, build from scratch with npm
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-                        cat /vagrant/vagrantcache/npm.cache;
-                        echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
-                        /vagrant/tools/pkg-build-npm.sh 2>&1;
+                    checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
+                    if [ $checketag -eq 0 ];
+                    then
+                        # New/updated version available - download it
+                        echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
+                        wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
+                        if [ $? -eq 0 ];
+                        then
+                            # This is a new file, so remove old references
+                            sed -i "/$branch-npm.tar.gz/d" npm.etag.cache 2>/dev/null;
+                            sed -i "/$branch-npm.tar.gz/d" npm.cache 2>/dev/null;
+                            # Add new file to etag cache
+                            echo "$etag $branch-npm.tar.gz" >> npm.etag.cache;
+                            # Cleanup for purity
+                            rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                            # Extract checksum
+                            tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
+                            npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
+                            rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                            # Add new file to NPM cache
+                            echo "$npmchecksum $branch-npm.tar.gz" >> npm.cache;
+                            # Check if this is file we need
+                            if [ "$npmchecksum" == "$npmlocksha" ];
+                            then
+                                npmfile="$branch-npm.tar.gz";
+                            fi
+                        fi
+                    fi
                 fi
+            fi
+        done
+    fi
+    cd /vagrant;
+    if [ "$npmfile" != '' ];
+    then
+        if [ -f /vagrant/vagrantcache/$npmfile ];
+        then
+            # Extract content
+            echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
+            rm -fR /vagrant/node_modules 2>/dev/null;
+            tar xzf /vagrant/vagrantcache/$npmfile;
         else
-                # Still no luck, build from scratch with npm
-                echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-                cat /vagrant/vagrantcache/npm.cache;
-                echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
-                /vagrant/tools/pkg-build-npm.sh 2>&1;
+            # Still no luck, build from scratch with npm
+            echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+            cat /vagrant/vagrantcache/npm.cache;
+            echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
+            /vagrant/tools/pkg-build-npm.sh 2>&1;
         fi
+    else
+        # Still no luck, build from scratch with npm
+        echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+        cat /vagrant/vagrantcache/npm.cache;
+        echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
+        /vagrant/tools/pkg-build-npm.sh 2>&1;
+    fi
 fi
 cd /vagrant;
 
@@ -368,87 +368,87 @@ bowerfile='';
 bowerlocksha=`sha1sum /vagrant/bower.json 2>/dev/null | awk '{print $1}'`;
 if [ -f /vagrant/www/javascript/components/bower.checksum ];
 then
-        currentbowersha=`awk '{print $1}' /vagrant/www/javascript/components/bower.checksum`;
-        if [ "$currentbowersha" == "$bowerlocksha" ];
-        then
-                echo "[SB][`date +%Y-%m-%d\ %X`] Javascript build up to date, nothing to change ($bowerlocksha)";
-                bowerfile='ignore';
-        fi
+    currentbowersha=`awk '{print $1}' /vagrant/www/javascript/components/bower.checksum`;
+    if [ "$currentbowersha" == "$bowerlocksha" ];
+    then
+        echo "[SB][`date +%Y-%m-%d\ %X`] Javascript build up to date, nothing to change ($bowerlocksha)";
+        bowerfile='ignore';
+    fi
 fi
 
 if [ "$bowerfile" != 'ignore' ];
 then
-        echo "[SB][`date +%Y-%m-%d\ %X`] Javascript build not correct or missing ($bowerlocksha)";
-        check=`grep $bowerlocksha bower.cache 2>/dev/null | wc -l`;
-        if [ $check -gt 0 ];
-        then
-                # Woo - we've located a matching cache file
-                bowerfile=`grep $bowerlocksha bower.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-        else
-                # No cache files match - boo hoo - check to see if there are new versions
-                for branch in develop master;
-                do
-                        # Check if we've already found a matching file
-                        if [ "$bowerfile" == '' ];
-                        then
-                                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
-                                if [ $? -eq 0 ];
-                                then
-                                        checketag=`grep $etag bower.etag.cache 2>/dev/null | wc -l`;
-                                        if [ $checketag -eq 0 ];
-                                        then
-                                                # New/updated version available - download it
-                                                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest Javascript build: $branch-bower.tar.gz";
-                                                wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz -O $branch-bower.tar.gz 2>&1;
-                                                if [ $? -eq 0 ];
-                                                then
-                                                        # This is a new file, so remove old references
-                                                        sed -i "/$branch-bower.tar.gz/d" bower.etag.cache 2>/dev/null;
-                                                        sed -i "/$branch-bower.tar.gz/d" bower.cache 2>/dev/null;
-                                                        # Add new file to etag cache
-                                                        echo "$etag $branch-bower.tar.gz" >> bower.etag.cache;
-                                                        # Cleanup for purity
-                                                        rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
-                                                        # Extract checksum
-                                                        tar xzf $branch-bower.tar.gz www/javascript/components/bower.checksum;
-                                                        bowerchecksum=`awk '{print $1}' www/javascript/components/bower.checksum`;
-                                                        rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
-                                                        # Add new file to Javascript cache
-                                                        echo "$bowerchecksum $branch-bower.tar.gz" >> bower.cache;
-                                                        # Check if this is file we need
-                                                        if [ "$bowerchecksum" == "$bowerlocksha" ];
-                                                        then
-                                                                bowerfile="$branch-bower.tar.gz";
-                                                        fi
-                                                fi
-                                        fi
-                                fi
-                        fi
-                done
-        fi
-        cd /vagrant;
-        if [ "$bowerfile" != '' ];
-        then
-                if [ -f /vagrant/vagrantcache/$bowerfile ];
+    echo "[SB][`date +%Y-%m-%d\ %X`] Javascript build not correct or missing ($bowerlocksha)";
+    check=`grep $bowerlocksha bower.cache 2>/dev/null | wc -l`;
+    if [ $check -gt 0 ];
+    then
+        # Woo - we've located a matching cache file
+        bowerfile=`grep $bowerlocksha bower.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+    else
+        # No cache files match - boo hoo - check to see if there are new versions
+        for branch in develop master;
+        do
+            # Check if we've already found a matching file
+            if [ "$bowerfile" == '' ];
+            then
+                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                if [ $? -eq 0 ];
                 then
-                        # Extract content
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Found matching Javascript cache file ($bowerlocksha) '$bowerfile', now extracting";
-                        rm -fR /vagrant/node_modules 2>/dev/null;
-                        tar xzf /vagrant/vagrantcache/$bowerfile;
-                else
-                        # Still no luck, build from scratch with bower
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-                        cat /vagrant/vagrantcache/bower.cache;
-                        echo "[SB][`date +%Y-%m-%d\ %X`] No matching Javascript cache found. Building with bower";
-                        /vagrant/tools/pkg-build-bower.sh 2>&1;
+                    checketag=`grep $etag bower.etag.cache 2>/dev/null | wc -l`;
+                    if [ $checketag -eq 0 ];
+                    then
+                        # New/updated version available - download it
+                        echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest Javascript build: $branch-bower.tar.gz";
+                        wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz -O $branch-bower.tar.gz 2>&1;
+                        if [ $? -eq 0 ];
+                        then
+                            # This is a new file, so remove old references
+                            sed -i "/$branch-bower.tar.gz/d" bower.etag.cache 2>/dev/null;
+                            sed -i "/$branch-bower.tar.gz/d" bower.cache 2>/dev/null;
+                            # Add new file to etag cache
+                            echo "$etag $branch-bower.tar.gz" >> bower.etag.cache;
+                            # Cleanup for purity
+                            rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                            # Extract checksum
+                            tar xzf $branch-bower.tar.gz www/javascript/components/bower.checksum;
+                            bowerchecksum=`awk '{print $1}' www/javascript/components/bower.checksum`;
+                            rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                            # Add new file to Javascript cache
+                            echo "$bowerchecksum $branch-bower.tar.gz" >> bower.cache;
+                            # Check if this is file we need
+                            if [ "$bowerchecksum" == "$bowerlocksha" ];
+                            then
+                                bowerfile="$branch-bower.tar.gz";
+                            fi
+                        fi
+                    fi
                 fi
+            fi
+        done
+    fi
+    cd /vagrant;
+    if [ "$bowerfile" != '' ];
+    then
+        if [ -f /vagrant/vagrantcache/$bowerfile ];
+        then
+            # Extract content
+            echo "[SB][`date +%Y-%m-%d\ %X`] Found matching Javascript cache file ($bowerlocksha) '$bowerfile', now extracting";
+            rm -fR /vagrant/node_modules 2>/dev/null;
+            tar xzf /vagrant/vagrantcache/$bowerfile;
         else
-                # Still no luck, build from scratch with bower
-                echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-                cat /vagrant/vagrantcache/bower.cache;
-                echo "[SB][`date +%Y-%m-%d\ %X`] No matching Javascript cache found. Building with bower";
-                /vagrant/tools/pkg-build-bower.sh 2>&1;
+            # Still no luck, build from scratch with bower
+            echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+            cat /vagrant/vagrantcache/bower.cache;
+            echo "[SB][`date +%Y-%m-%d\ %X`] No matching Javascript cache found. Building with bower";
+            /vagrant/tools/pkg-build-bower.sh 2>&1;
         fi
+    else
+        # Still no luck, build from scratch with bower
+        echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+        cat /vagrant/vagrantcache/bower.cache;
+        echo "[SB][`date +%Y-%m-%d\ %X`] No matching Javascript cache found. Building with bower";
+        /vagrant/tools/pkg-build-bower.sh 2>&1;
+    fi
 fi
 cd /vagrant;
 
