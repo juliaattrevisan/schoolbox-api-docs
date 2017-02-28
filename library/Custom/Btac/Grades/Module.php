@@ -121,5 +121,6 @@ class Module extends \Schoolbox\Learning\Module
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/../../templates');
+        parent::initTemplatePaths($templateLoader);
     }
 }
