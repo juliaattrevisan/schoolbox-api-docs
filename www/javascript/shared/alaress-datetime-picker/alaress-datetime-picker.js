@@ -89,59 +89,45 @@ function getPickerFormats (allDayState, options) {
     var from, to;
     // Format is always date or datetime
     if (options.altFormat !== false ){
-        var l = 1;
         if (options.altFormat == 'date') {
-            l = 11;
             from = options.displayFormatDate;
             to = options.displayFormatDate;
         }
         else if (options.altFormat == 'datetime') {
-            l = 12;
             from  = options.displayFormat;
             to = options.displayFormat;
         }
     }
     else {
-        l = 2;
         // If no time, format is date
         if (options.enableTime === false) {
-            l = 22;
             from = options.displayFormatDate;
             to = options.displayFormatDate;
         }
         else {
-            l = 3;
             // Or... looking at the allDay option
             if (options.allDay === true) {
-                l = 4;
                 // Ok, the allDay changed, changing the format accordingly
                 if (allDayState) {
-                    l = 41;
                     from = options.displayFormat;
                     to = options.displayFormatDate;
                 }
                 else {
-                    l = 42;
                     from = options.displayFormat;
                     to = options.displayFormat;
-                    console.log(options);
                 }
             }
             else {
-                l = 5;
                 from = options.displayFormat;
                 to = options.displayFormat;
             }
         }
-
     }
-    console.log(l);
     var formats = {
         convertFrom: from,
         convertTo: to
     };
     return formats;
-
 }
 
 function getLinkedElements (element, options) {
@@ -336,7 +322,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                     if (options.allDayExt !== false) {
                         var linkedElements = getLinkedElements( element, options );
                         linkedElements.forEach(function(item) {
-                            console.log(getOptions(item));
                             setValue(item, getOptions(item), false);
                         });
                     }

@@ -193,7 +193,6 @@
         endDay: getValue($('#{{ element }}'), 'data-datepicker-endofday'), // Should allday change time to 23:59:59
 
     };
-    console.log(pickerOptions);
 
     function hasTime (value) {
         var v = moment(value, convertFormat('{{ displayFormat }}'));
