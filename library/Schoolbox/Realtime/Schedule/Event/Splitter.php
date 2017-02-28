@@ -59,10 +59,9 @@ class Splitter
      *   (so "\\Schoolbox\\User\\Model" becomes "\\Schoolbox\\User\\Notifier")
      *
      * @throws ScheduleException
-     * @throws ReflectionFailure
      * @return ModuleNotifierInterface
      */
-    private function getModule(CrudEventInterface $event)
+    public function getModule(CrudEventInterface $event)
     {
         // setup for ifs
         $modelClass = get_class($event->getObject());
@@ -84,11 +83,29 @@ class Splitter
             throw new ScheduleException("No notifier for model '$modelClass'.");
         }
 
-        // use the DI to create this object
+        try {
+            return $this->newInstance($classname);
+
+        } catch (ReflectionFailure $e) {
+            // cast reflection failure to schedule exception
+            throw new ScheduleException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+
+    /**
+     * Instantiate ModuleNotifier via DI
+     *
+     * @param string $classname
+     * @throws ReflectionFailure
+     * @return ModuleNotifierInterface
+     */
+    private function newInstance($classname)
+    {
         $instance = $this->di->newInstance($classname, [ 'configLoader' => $this->conf ]);
 
         if (!$instance instanceof ModuleNotifierInterface) {
-            throw new ScheduleException("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
+            throw new ReflectionFailure("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
         }
 
         return $instance;
@@ -97,16 +114,20 @@ class Splitter
 
     /**
      * @param CrudEventInterface $event
-     * @throws ReflectionFailure
-     * @throws ScheduleException
      * @return TriggerInterface[]
      */
     public function generateTriggers(CrudEventInterface $event)
     {
-        return $this->factory
-            ->spawn($this->getModule($event), $event)
-            ->buildTriggers($event->getAction())
-            ->getTriggers();
+        try {
+            return $this->factory
+                ->spawn($this->getModule($event), $event)
+                ->buildTriggers($event->getAction())
+                ->getTriggers();
+
+        } catch (ScheduleException $e) {
+            // schedule exception simply means there is no notifier, which is fine
+            return [];
+        }
     }
 
 }
