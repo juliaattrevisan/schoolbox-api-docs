@@ -19,27 +19,25 @@ use Alaress\Scheduler\StompScheduler;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use ErrorException;
 use Exception;
+use InvalidArgumentException;
 use OutOfBoundsException;
 use PDOException;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
+use Redis;
 use RuntimeException;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Notifactory;
-use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 
 /**
  * This class is meant to hold a list of notifications that are pending for broadcast, and at the appropriate time,
@@ -51,11 +49,7 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
  */
 class Scheduler extends StompScheduler
 {
-
-    const MODULE_NS      = 'Schoolbox\\Realtime\\Schedule\\Module\\';
-
     const COMPRESSION_LEVEL = 9;
-
 
     /** @var Notif */
     protected $notif;
@@ -70,6 +64,8 @@ class Scheduler extends StompScheduler
      */
     protected $jit;
 
+    /** @var Redis|ClientInterface */
+    protected $redis;
 
     /**
      * @param LoopInterface             $loop
@@ -78,11 +74,13 @@ class Scheduler extends StompScheduler
      * @param string                    $scheduleQueue - don't forget to declare this in rabbit!
      * @param IConfigLoader             $conf
      * @param Notif                     $notif
+     * @param ClientInterface           $redis
      * @param IClock                    $clock
      */
-    public function __construct($loop, $dispatchStrategy, $log, $scheduleQueue, $conf, $notif, $clock = null)
+    public function __construct($loop, $dispatchStrategy, $log, $scheduleQueue, $conf, $notif, $redis, $clock = null)
     {
         $this->notif = $notif;
+        $this->redis = $redis;
 
         // run construction
         parent::__construct($loop, $dispatchStrategy, $scheduleQueue, $log, $conf, $clock);
@@ -113,11 +111,11 @@ class Scheduler extends StompScheduler
     {
         $stompFactory = new Factory($this->loop);
         return $stompFactory->createClient(array(
-            'host'     => $this->conf->get('amqp_host'),
-            'port'     => $this->conf->get('amqp_stomp_port'),
-            'vhost'    => $this->conf->get('amqp_vhost'),
-            'login'    => $this->conf->get('amqp_user'),
-            'passcode' => $this->conf->get('amqp_pass'),
+            'host'     => $this->getConfig()->get('amqp_host'),
+            'port'     => $this->getConfig()->get('amqp_stomp_port'),
+            'vhost'    => $this->getConfig()->get('amqp_vhost'),
+            'login'    => $this->getConfig()->get('amqp_user'),
+            'passcode' => $this->getConfig()->get('amqp_pass'),
         ));
     }
 
@@ -152,43 +150,64 @@ class Scheduler extends StompScheduler
     {
         $this->log->info("Received event from $this->scheduleQueue", array('char' => '>'));
         try {
-            $formatted = CompressedFormatter::uncompress($frame->body);
-            $event     = unserialize($formatted['message']);
+            // either it will be a compressed payload (event, deprecated), or a redis key (trigger, new format)
+            if (preg_match('`:[0-9a-f]{40}$`', $frame->body)) {
+                $trigger = $this->frame2trigger($this->redis, $frame);
+                $this->scheduleNotification($trigger, $resolver);
 
-            // only a few Models actually have schedule strategies, failure is ok
-            // each module strategy knows how to deal with its own events
-            $this->log->debug("Building trigger factory for " . get_class($event->getObject()));
-            $triggerFactory = new TriggerFactory($this->getModule($event), $event, self::COMPRESSION_LEVEL);
+                // notice that we don't ACK the resolver here before returning
+                return;
+            }
 
-            // retrieve, populate, and schedule this bundle of triggers
-            $this->log->debug("Retrieving triggers");
-            $triggers = $triggerFactory->buildTriggers($event->getAction())->getTriggers();
-            $this->scheduleNotifications($triggers, $resolver);
-            $triggerFactory->cleanup($triggers);
+        } catch (InvalidArgumentException $e) {
+            $this->log->error($e->getMessage(), [ $e ]);
 
-            // notice that we don't ACK the resolver here before returning
-            return;
-        } catch(MapperException $e) {
-            // TODO Mappers shouldn't even be being used from within this block @see SB-5250
-            $this->log->critical("Mapper exception: " . $e->getMessage());
-        } catch(PDOException $e) {
+        } catch (PDOException $e) {
             // this must be thrown out!
             throw $e;
-        } catch(RuntimeException $e) {
+
+        } catch (RuntimeException $e) {
             $truncated = substr($frame->body, 0, 64);
             $this->log->critical("Could not decode '$truncated...' to schedule event", array($e));
             // this message is can't be parsed, so we ACK it to make it go away
-        } catch(ScheduleException $e) {
-            // we're happy to ignore this, it just means no scheduling strategy exists for this Model
-            $this->log->debug('Schedule Exception: ' . $e->getMessage());
-        } catch(CompressionException $e) {
-            // this message is unparseable, so we'll eventually ACK it to make it go away
-            $this->log->critical('Compression Exception: ' . $e->getMessage(), array($e));
-        } catch(\ErrorException $e) {
+
+        } catch (CompressionException $e) {
+            $this->log->debug('Failed to inflate message: ' . $e->getMessage(), array($e));
+
+        } catch (ErrorException $e) {
             $this->log->critical('Error Exception: '. $e->getMessage(), array($e));
         }
 
         $resolver->ack();
+    }
+
+
+    /**
+     * This is static so that safe-restart has access
+     *
+     * @param Redis|ClientInterface $redis
+     * @param Frame                 $frame
+     * @throws InvalidArgumentException
+     * @throws ErrorException
+     * @return TriggerInterface
+     */
+    public static function frame2trigger(ClientInterface $redis, Frame $frame)
+    {
+        $content = $redis->get($frame->body);
+
+        if (strlen($content) == 0) {
+            throw new InvalidArgumentException("Key `{$frame->body}` is not set");
+        }
+
+        // try to unserialize: depending on kernel, will either throw EE or just emit warning
+        $trigger = unserialize($content);
+
+        // verify it worked
+        if ($trigger instanceof TriggerInterface) {
+            return $trigger;
+        }
+
+        throw new InvalidArgumentException("Could not unserialize trigger");
     }
 
 
@@ -199,7 +218,7 @@ class Scheduler extends StompScheduler
     {
         $this->log->notice("HUP received", array('char' => '>'));
         $this->log->debug("Invalidating config cache");
-        $this->conf->dropCache();
+        $this->getConfig()->dropCache();
         $this->log->debug("Releasing workers");
         $this->dispatcher->releaseWorkerPool(false);
     }
@@ -376,51 +395,6 @@ class Scheduler extends StompScheduler
 
 
     /**
-     * Return the module to be working with, based on the model class (with additional safety checks)
-     *
-     * @param Event $event
-     *   Currently there are two strategies for finding the notifier class:
-     *   * Add "Notifier" to the name of the model class
-     *   (so "\\Schoolbox\\User" becomes "\\Schoolbox\\UserNotifier")
-     *   * Replace last word in namespace with "Notifier"
-     *   (so "\\Schoolbox\\User\\Model" becomes "\\Schoolbox\\User\\Notifier")
-     *
-     * @param Event $event
-     * @throws ScheduleException
-     * @return ModuleNotifierInterface
-     */
-    public function getModule($event)
-    {
-        // setup for ifs
-        $modelClass = get_class($event->getObject());
-        $pregClass  = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
-
-        // first try: does the event have a mapper, and if so, does it have a modulenotifier declared?
-        if ($event->getMapper() instanceof Mapper && $event->getMapper()->getModuleNotifier()) {
-            $classname = $event->getMapper()->getModuleNotifier();
-        } // next, try for '\Schoolbox\User' => '\Schoolbox\UserNotifier'
-        elseif (class_exists($modelClass . 'Notifier')) {
-            $classname = $modelClass . 'Notifier';
-        } // then, try for '\Schoolbox\User' => '\Schoolbox\Notifier'
-        elseif (class_exists($pregClass)) {
-            $classname = $pregClass;
-        } else {
-            throw new ScheduleException("No notifier for model '$modelClass'.");
-        }
-
-        $instance = new $classname($this->conf);
-        if (!$instance instanceof ModuleNotifierInterface) {
-            throw new ScheduleException("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
-        }
-
-        // Enable logging on all modules
-        $instance->enableLogging(Notifactory::create(), $this->log);
-
-        return $instance;
-    }
-
-
-    /**
      * Attach a trigger to a resolver
      *
      * @param AckResolver      $ackResolver
@@ -491,4 +465,14 @@ class Scheduler extends StompScheduler
         return $this->detachTrigger($trigger);
     }
 
+
+    /**
+     * @return IConfigLoader
+     */
+    protected function getConfig()
+    {
+        /** @var IConfigLoader $c */
+        $c = $this->conf;
+        return $c;
+    }
 }

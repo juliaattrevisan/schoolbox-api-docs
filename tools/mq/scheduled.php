@@ -4,6 +4,7 @@
 use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
 use Aura\Di;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
@@ -79,9 +80,12 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$sched) {
 	/** @var IConfigLoader $conf */
 	$conf = $di->get('config');
 
+	/** @var ClientInterface $redis */
+	$redis = $di->get('redis');
+
 	try {
 		$strat = new SchedulerDispatchStrategy($notif, new QueueItemMapper(), $opts['flags']);
-		$sched = new Scheduler($loop, $strat, $log, $q, $conf, $notif);
+		$sched = new Scheduler($loop, $strat, $log, $q, $conf, $notif, $redis);
 
         $sched->setJitCache(new RedisCache(Redis::getClientInstance(), $log, INSTANCE_ID));
 
