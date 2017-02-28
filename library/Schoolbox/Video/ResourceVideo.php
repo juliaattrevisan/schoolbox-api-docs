@@ -10,7 +10,6 @@
 namespace Schoolbox\Video;
 
 use Schoolbox\Config\Loader as ConfigLoader;
-
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
@@ -43,9 +42,8 @@ class ResourceVideo
     */
     public function __construct()
     {
-        $this->setConfig( new ConfigLoader() );
+        $this->setConfig(new ConfigLoader());
     }
-
 
     /**
      * @deprecated this needs to switch to the Flysystem paradigm
@@ -61,7 +59,6 @@ class ResourceVideo
         return '';
     }
 
-
     /**
      * @deprecated this needs to switch to the Flysystem paradigm
      * @return string
@@ -70,7 +67,6 @@ class ResourceVideo
     {
         return $this->getConfig()->get('video_dir').'/'.$this->getHash() . '.mp4';
     }
-
 
     /**
      * @deprecated this needs to switch to the Flysystem paradigm
@@ -81,7 +77,6 @@ class ResourceVideo
         return $this->getConfig()->get('video_dir').'/'.$this->getHash() . '.mp3';
     }
 
-
     /**
      * @deprecated this needs to switch to the Flysystem paradigm
      * @return string
@@ -90,7 +85,6 @@ class ResourceVideo
     {
         return $this->getConfig()->get('video_dir').'/'.$this->getHash() . '-64.jpg';
     }
-
 
     /**
      * @deprecated this needs to switch to the Flysystem paradigm
@@ -101,14 +95,56 @@ class ResourceVideo
         return $this->getConfig()->get('video_dir').'/'.$this->getHash() . '-poster.jpg';
     }
 
+    /**
+     * Get the full path to the image used in statuses
+     *
+     * @param string $type Defaults to "video", but you could pass "audio" for an audio thumbnail.
+     * @return string
+     */
+    public function getStatusImage($type = 'video')
+    {
+        return "/images/core/component/$type-thumbnail-".strtolower($this->getStatus()).".gif";
+    }
 
     /**
-     * @param IConfigLoader $config
+     * Is this video currently completed?
+     * @return bool
      */
-    private function setConfig($config)
+    public function isComplete()
     {
-        $this->config = $config;
+        return $this->getStatus() == QueueMapper::STATUS_COMPLETED;
     }
+
+    /**
+     * Is this video currently pending?
+     * @return bool
+     */
+    public function isPending()
+    {
+        return $this->getStatus() == QueueMapper::STATUS_PENDING;
+    }
+
+    /**
+     * Is this video currently processing?
+     * @return bool
+     */
+    public function isProcessing()
+    {
+        return $this->getStatus() == QueueMapper::STATUS_PROCESSING;
+    }
+
+    /**
+     * Is this video currently failed?
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->getStatus() == QueueMapper::STATUS_FAILED;
+    }
+
+    /**
+     * Getters and setters below
+     */
 
     /**
      * @return IConfigLoader $config
@@ -117,15 +153,15 @@ class ResourceVideo
     {
         return $this->config;
     }
-
     /**
-     * @param int $duration
+     * @param IConfigLoader $config
+     * @return self
      */
-    public function setDuration($duration)
+    private function setConfig($config)
     {
-        $this->duration = $duration;
+        $this->config = $config;
+        return $this;
     }
-
 
     /**
      * @return int
@@ -135,15 +171,15 @@ class ResourceVideo
         return $this->duration;
     }
 
-
     /**
-     * @param string $status
+     * @param int $duration
+     * @return self
      */
-    public function setStatus($status)
+    public function setDuration($duration)
     {
-        $this->status = $status;
+        $this->duration = $duration;
+        return $this;
     }
-
 
     /**
      * @return string
@@ -154,65 +190,14 @@ class ResourceVideo
     }
 
     /**
-     * Get the full path to the image used in statuses
-     *
-     * @param string $type Defaults to "video", but you could pass "audio" for an audio thumbnail.
-     *
-     * @return string
+     * @param string $status
+     * @return self
      */
-    public function getStatusImage($type = 'video')
+    public function setStatus($status)
     {
-        return "/images/core/component/$type-thumbnail-".strtolower($this->getStatus()).".gif";
+        $this->status = $status;
+        return $this;
     }
-
-    /**
-     * Is this video currently completed?
-     *
-     * @return bool
-     */
-    public function isComplete()
-    {
-        return $this->getStatus() == QueueMapper::STATUS_COMPLETED;
-    }
-
-    /**
-     * Is this video currently pending?
-     *
-     * @return bool
-     */
-    public function isPending()
-    {
-        return $this->getStatus() == QueueMapper::STATUS_PENDING;
-    }
-
-    /**
-     * Is this video currently processing?
-     *
-     * @return bool
-     */
-    public function isProcessing()
-    {
-        return $this->getStatus() == QueueMapper::STATUS_PROCESSING;
-    }
-
-    /**
-     * Is this video currently failed?
-     *
-     * @return bool
-     */
-    public function isFailed()
-    {
-        return $this->getStatus() == QueueMapper::STATUS_FAILED;
-    }
-
-    /**
-     * @param File\IFile $file
-     */
-    public function setFile($file)
-    {
-        $this->file = $file;
-    }
-
 
     /**
      * @return File\IFile
@@ -220,6 +205,16 @@ class ResourceVideo
     public function getFile()
     {
         return $this->file;
+    }
+
+    /**
+     * @param File\IFile $file
+     * @return self
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+        return $this;
     }
 
     /**
@@ -232,13 +227,21 @@ class ResourceVideo
 
     /**
      * @param Storage\Model $storage
+     * @return self
      */
     public function setStorage($storage)
     {
         $this->storage = $storage;
+        return $this;
     }
 
-
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
     * @param  int $id
@@ -251,15 +254,6 @@ class ResourceVideo
     }
 
     /**
-    * @return int
-    */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-
-    /**
      * @return string
      */
     public function getHash()
@@ -269,11 +263,11 @@ class ResourceVideo
 
     /**
      * @param string $hash
+     * @return self
      */
     public function setHash($hash)
     {
         $this->hash = $hash;
+        return $this;
     }
-
-
 }

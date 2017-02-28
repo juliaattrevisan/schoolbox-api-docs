@@ -10,32 +10,37 @@
 namespace Schoolbox\Video;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Alaress_Date_Format;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as Storage;
+use \Schoolbox\Mapper\Traits\Model\Id;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 class Queue extends ResourceVideo
 {
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+
     /** @var string */
     protected $message;
 
-    /** @var Alaress_Date_Format */
-    protected $created;
+    /** @var Storage */
+    protected $file;
 
-    /** @var Alaress_Date_Format */
-    protected $modified;
+    /** @var string */
+    private $type;
+
+    /** @var int */
+    protected $fileId;
 
     /** @var StorageMapper */
     protected $storageMapper;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $audioBitrate;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $videoBitrate;
 
     /**
@@ -62,6 +67,9 @@ class Queue extends ResourceVideo
      */
     private $fallbackInfo   = 'ffprobe';
 
+    /**
+     * Queue constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -80,13 +88,11 @@ class Queue extends ResourceVideo
      */
     public function process()
     {
-        $sourceFile = $this->getSourceFile();
-        
-        if($sourceFile->getMimetype()->isAudio()){
-            return $this->processAudio($this->getSourceLocation($sourceFile));
+        if ($this->getFile()->getMimetype()->isAudio()){
+            return $this->processAudio($this->getSourceLocation($this->getFile()));
         }
-        else if($sourceFile->getMimeType()->isVideo()){
-            return $this->processVideo($this->getSourceLocation($sourceFile));
+        else if($this->getFile()->getMimeType()->isVideo()){
+            return $this->processVideo($this->getSourceLocation($this->getFile()));
         }
 
         return false;
@@ -127,7 +133,6 @@ class Queue extends ResourceVideo
         }
 
     }
-
 
     /**
      * Takes existing file and transcodes into web format and creates thumbnail
@@ -278,22 +283,10 @@ class Queue extends ResourceVideo
     }
 
     /**
-     * Returns the source object related to this video queue item
-     * This has been deprecated to be replaced by a proper join on hash
-     *
-     * @return \Schoolbox\Resource\Storage\Model
-     * @deprecated
-     */
-    private function getSourceFile()
-    {
-        return $this->getStorageMapper()->findByHash($this->getHash());
-    }
-
-    /**
      * This returns the location of the original file on disk
      * This has been deprecated as it needs to be replaced by a Flysystem equivalent
      *
-     * @param $sourceObject
+     * @param Storage $sourceObject
      * @return string
      * @deprecated
      */
@@ -345,43 +338,6 @@ class Queue extends ResourceVideo
         }
     }
 
-
-    /**
-     * @param Alaress_Date_Format $created
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
-    }
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreated()
-    {
-        return $this->created;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $modified
-     */
-    public function setModified($modified)
-    {
-        $this->modified = $modified;
-    }
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getModified()
-    {
-        return $this->modified;
-    }
-
-
     /**
      * @param string $message
      */
@@ -390,7 +346,6 @@ class Queue extends ResourceVideo
         $this->message = $message;
     }
 
-
     /**
      * @return string
      */
@@ -398,7 +353,6 @@ class Queue extends ResourceVideo
     {
         return $this->message;
     }
-
 
     /**
      * Ensures $dimensions are contained within $maxDimensions
@@ -442,7 +396,7 @@ class Queue extends ResourceVideo
     }
 
     /** Here be the getters/setters, nothing else to see here */
-    
+
     /**
      * @return StorageMapper
      */
@@ -458,4 +412,52 @@ class Queue extends ResourceVideo
         $this->storageMapper = $storageMapper;
         return $this;
     }
+
+    /**
+     * @return Storage
+     */
+    public function getStorage() {
+        return $this->storage;
+    }
+
+    /**
+     * @param $storage
+     * @return $this
+     */
+    public function setStorage($storage) {
+        $this->storage = $storage;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType() {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * @return $this
+     */
+    public function setType($type) {
+        $this->type = $type;
+        return $this;
+    }    
+
+    /**
+     * @return int
+     */
+    public function getFileId() {
+        return $this->fileId;
+    }
+
+    /**
+     * @param int
+     * @return $this
+     */
+    public function setFileId($fileId) {
+        $this->fileId = $fileId;
+        return $this;
+    }    
 }
