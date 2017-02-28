@@ -78,6 +78,7 @@ function getOptions (element) {
         // allDateTime: 'start', //Set time to start or end of the day: start, finish
         type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
         endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
+        endPeriod: getValue(element, 'data-datepicker-endofperiod'),// It will use end of the period to set time through timetable picker
 
     };
     return elementOptions;
@@ -323,7 +324,12 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 $('#byTimetable-'+pickerId).find('.timetable-submit').click(function() {
                     var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
-                    var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'h:mma');
+                    if(options.endPeriod) {
+                        var newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-end'), 'h:mma');
+                    }
+                    else {
+                        var newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-start'), 'h:mma');
+                    }
                     var newDate = moment($(this).attr('data-timetable-value'), convertFormat(options.displayFormatDate)).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
                     setValue( element, options, false, newDate);
 
