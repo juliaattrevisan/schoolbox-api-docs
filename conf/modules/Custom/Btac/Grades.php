@@ -19,7 +19,8 @@ class Grades implements ModuleConfigInterface
         $di = $kernel->getDependencyInjector();
         if ($di->get('config')->get('site_location') == 'btac') {
             $module = new Module($di);
-            $module->init('/modules/custom/btac/grades');
+            // Override previous definition
+            $module->init('/learning', true);
         }
     }
 }
