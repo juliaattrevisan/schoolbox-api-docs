@@ -37,26 +37,26 @@ echo "";
 #curl http://$download_url/schoolboxdemo-$demo_data_version-sha1.txt > schoolboxdemo-$demo_data_version-sha1.txt 2>/dev/null
 #if [ $? -eq 0 ];
 #then
-#	mv -f schoolboxdemo-$demo_data_version-sha1.txt schoolboxdemo-$demo_data_version-sha1-cached.txt;
-#	rm -f schoolboxdemo-$demo_data_version-sha1.txt;
+#    mv -f schoolboxdemo-$demo_data_version-sha1.txt schoolboxdemo-$demo_data_version-sha1-cached.txt;
+#    rm -f schoolboxdemo-$demo_data_version-sha1.txt;
 #else
-#	echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrive $demo_data_version sha1 list, continuing with current";
+#    echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrive $demo_data_version sha1 list, continuing with current";
 #fi
 #if [ ! -f schoolboxdemo-$demo_data_version-sha1-cached.txt ];
 #then
-#	echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrieve $demo_data_version demo data. Halting provisioning.";
-#	exit 1;
+#    echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrieve $demo_data_version demo data. Halting provisioning.";
+#    exit 1;
 #fi
 #while read line;
 #do
-#	demofile=`echo "$line" | awk {'print $2'}`;
-#	demosha1=`echo "$line" | awk {'print $1'}`;
-#	currentsha1=`sha1sum $demofile 2>/dev/null || echo 'false'`;
-#	if [ "$line" != "$currentsha1" ];
-#	then
-#		echo "[SB][`date +%Y-%m-%d\ %X`] Downloading $demofile";
-#		curl -L http://$download_url/$demofile > $demofile;
-#	fi
+#    demofile=`echo "$line" | awk {'print $2'}`;
+#    demosha1=`echo "$line" | awk {'print $1'}`;
+#    currentsha1=`sha1sum $demofile 2>/dev/null || echo 'false'`;
+#    if [ "$line" != "$currentsha1" ];
+#    then
+#        echo "[SB][`date +%Y-%m-%d\ %X`] Downloading $demofile";
+#        curl -L http://$download_url/$demofile > $demofile;
+#    fi
 #done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
@@ -156,7 +156,7 @@ then
                         fi
                 done
         fi
-	cd /vagrant;
+        cd /vagrant;
         if [ "$vendorfile" != '' ];
         then
                 if [ -f /vagrant/vagrantcache/$vendorfile ];
@@ -307,7 +307,7 @@ then
                         fi
                 done
         fi
-	cd /vagrant;
+        cd /vagrant;
         if [ "$npmfile" != '' ];
         then
                 if [ -f /vagrant/vagrantcache/$npmfile ];
@@ -397,7 +397,7 @@ then
                         fi
                 done
         fi
-	cd /vagrant;
+        cd /vagrant;
         if [ "$bowerfile" != '' ];
         then
                 if [ -f /vagrant/vagrantcache/$bowerfile ];
@@ -463,9 +463,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";
 
 if [ "`apache2 -v | grep Apache | cut -d'/' -f2 | cut -d'.' -f1-2`" == "2.4" ];
 then
-	echo "[SB][`date +%Y-%m-%d\ %X`] Apache is v2.4.x, changing access config to match";
-	sed -i 's/Order\ allow,deny//g' /etc/apache2/sites-available/*.conf;
-	sed -i 's/Allow\ from\ all/Require\ all\ granted/g' /etc/apache2/sites-available/*.conf;
+    echo "[SB][`date +%Y-%m-%d\ %X`] Apache is v2.4.x, changing access config to match";
+    sed -i 's/Order\ allow,deny//g' /etc/apache2/sites-available/*.conf;
+    sed -i 's/Allow\ from\ all/Require\ all\ granted/g' /etc/apache2/sites-available/*.conf;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
@@ -481,12 +481,12 @@ service schoolbox-rerouted restart > /dev/null 2>/dev/null &
 # call custom provisioning
 if [ -f /vagrant/post-provision.sh ];
 then
-	echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
-	/vagrant/post-provision.sh 2>&1;
+    echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
+    /vagrant/post-provision.sh 2>&1;
 fi
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
-	echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => http://$eth/";
-	echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => http://$eth:8000/";
+    echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => http://$eth/";
+    echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => http://$eth:8000/";
 done
