@@ -34,33 +34,33 @@
 
         {% else %}
 
-            /**
+             /**
              * Update new form action url
              *
              * Inject common details
              * Inject assessmentType-specific details
              */
-            {#$('input[data-mage-next="part-2"]').mage({#}
-                {#onXhrDone: function(data) {#}
-                    {#$('#assessmentForm')#}
-                        {#.attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) }}')#}
-                        {#.find('[data-assessment-details]')#}
-                        {#.html(data);#}
+            $('input[data-mage-next="part-2"]').mage({
+                onXhrDone: function(data) {
+                    $('#assessmentForm')
+                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) }}')
+                        .find('[data-assessment-details]')
+                        .html(data);
 
-                    {#/* Save everything when creating with Part 1#}
-                     {#*/#}
-                    {#var assessmentType = $('input[name="type"]:checked').val();#}
-                    {#setupAssessmentEnd(assessmentType);#}
-                {#}#}
-            {#});#}
+                    /* Save everything when creating with Part 1
+                     */
+                    var assessmentType = $('input[name="type"]:checked').val();
+                    setupAssessmentEnd(assessmentType);
+                }
+            });
 
-            {#/**#}
-             {#* Once they have clicked an activity type - trigger a click on the part-2 hidden input#}
-             {#* to send the user straight to the next section#}
-             {#*/#}
-            {#$('input[name=type]').click(function() {#}
-                {#$('[data-mage-next=part-2]').trigger('click');#}
-            {#});#}
+            /**
+             * Once they have clicked an activity type - trigger a click on the part-2 hidden input
+             * to send the user straight to the next section
+             */
+            $('input[name=type]').click(function() {
+                $('[data-mage-next=part-2]').trigger('click');
+            });
 
         {% endif %}
     });
@@ -122,8 +122,8 @@
                     {% endif %}
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
                     <input type="hidden" name="contextId" value="{{ context.id }}" />
-                    {% if assessment.baseContext.folder.codeString|length %}
-                        <input type="hidden" name="classCode" value="{{ assessment.baseContext.folder.codeString }}" />
+                    {% if context.folder.codeString|length %}
+                        <input type="hidden" name="classCode" value="{{ context.folder.codeString }}" />
                     {% endif %}
 
                     {% if assessmentType|length %}
