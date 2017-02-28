@@ -92,13 +92,9 @@ class Staff extends IteratorIterator
 
         /* Position - one for every item in stack
          */
-        $position = [];
-        foreach ($preStack as $result) {
-            if (!empty($result['staff_position'])) {
-                $position [] = $result['staff_position'];
-            }
-        }
-        $staff->getMeta()->setPosition($position);
+
+        $staff->getMeta()->setPosition($this->columnValuesAsArray($preStack, 'staff_position'));
+
         /* Campus
          */
         $campus = new User\Common\Campus();
