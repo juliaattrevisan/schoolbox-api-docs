@@ -88,6 +88,7 @@
 <div class="row">
     <dl class="tabs-material center" data-tab role="tablist">
         <dd class="active" role="presentation"><a href="#byDate-{{ id }}">View By Date</a></dd>
+        {# TODO: Cover the case where timetable picker won't be displayed at all #}
         <dd role="presentation"><a href="#byTimetable-{{ id }}">View By Timetable</a></dd>
     </dl>
 </div>
@@ -116,7 +117,6 @@
                 <a class="button submit picker-submit">Update</a>
             </div>
         </div>
-
         <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
             <div class="row">
                 <div class="small-12 medium-{{ width }} columns">
