@@ -120,6 +120,7 @@ class Module extends \Schoolbox\Learning\Module
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
+        // Use this custom module's templates in preference to external module's
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
         parent::initTemplatePaths($templateLoader);
     }
