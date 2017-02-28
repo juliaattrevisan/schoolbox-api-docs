@@ -499,6 +499,20 @@ class Mapper extends BaseMapper
             INNER JOIN `assessment` AS `af`
                 ON `af`.`id` = `v_ui`.`assessment_id`
             WHERE uicf.id IN {$placeholders}
+            
+            UNION
+            
+            SELECT `p_a`.`assessment_id`
+            FROM project_assessment `p_a` 
+            INNER JOIN `project` AS `p` 
+                ON `p`.`id` = `p_a`.`project_id`
+            INNER JOIN assessment_course_unit_implementation AS `v_ui` 
+                ON `v_ui`.`assessment_id` = `p`.assessment_id
+            INNER JOIN `course_unit_implementation` AS `ui` 
+                ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
+            INNER JOIN course_implementation AS `uic`
+                ON `uic`.`id` = `ui`.course_implementation_id
+            WHERE `uic`.`folder_id` IN {$placeholders}
         ";
         $idStatement = $this->getDatabase()->prepare($idQuery);
         $idStatement->execute($params);
