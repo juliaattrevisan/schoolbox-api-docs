@@ -79,7 +79,15 @@ class Sync implements SyncInterface
                 ''                       AS student_house,
                 0                        AS student_boarder,
                 ''                       AS student_boarding_house,
-                ''                       AS student_campus
+                (
+                    SELECT TOP 1 CampusCode FROM V_TimetableStructure WHERE PeriodID = 
+                    (
+                        SELECT TOP 1 PeriodID FROM V_TimetableSchedule WHERE ClassCode = 
+                        (
+                            SELECT TOP 1 classcode FROM V_Class WHERE StudentID = V_Student.StudentID
+                        )
+                    )
+                ) AS student_campus
             FROM V_Student
         ";
 
@@ -102,7 +110,15 @@ class Sync implements SyncInterface
                         ParentSurname                   AS student_contact_surname,
                         CISEmail                        AS student_contact_default_email,
                         ''                              AS student_contact_work_email,
-                        V_Student.StudentID             AS student_id,
+                        (
+                            SELECT TOP 1 CampusCode FROM V_TimetableStructure WHERE PeriodID = 
+                            (
+                                SELECT TOP 1 PeriodID FROM V_TimetableSchedule WHERE ClassCode = 
+                                (
+                                    SELECT TOP 1 classcode FROM V_Class WHERE StudentID = V_Student.StudentID
+                                )
+                            )
+                        ) AS student_campus,                        
                         ''                              AS student_campus,
                         ''                              AS student_house,
                         ''                              AS student_gender,
