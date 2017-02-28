@@ -10,12 +10,10 @@ VAGRANTFILE_API_VERSION = "2"
 # Load Defaults
 default = YAML.load_file('vagrant.default.yaml')
 vagrant_box = default["vagrant_box"]
-download_url = default["download_url"]
 memory = default["memory"]
 external_db = default["external_db"]
 external_db_host = default["external_db_host"]
 external_db_db = default["external_db_db"]
-demo_data_version = default["demo_data_version"]
 public_network = default["public_network"]
 private_network_ip = default["private_network_ip"]
 provision_script = default["provision_script"]
@@ -28,9 +26,6 @@ if File.file?('vagrant.yaml')
 
   if !conf["vagrant_box"].nil?
     vagrant_box = conf["vagrant_box"]
-  end
-  if !conf["download_url"].nil?
-    download_url = conf["download_url"]
   end
   if !conf["memory"].nil?
     memory = conf["memory"]
@@ -68,7 +63,7 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = vagrant_box
-  config.vm.box_url = "http://#{download_url}/#{vagrant_box}.box"
+  config.vm.box_url = "#{data_source}/#{vagrant_box}.box"
 
   config.vm.network :private_network, ip: private_network_ip
 
