@@ -43,6 +43,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 
 use Schoolbox\Error;
+use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
@@ -165,6 +166,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 }
             )
         );
+
+        // install mapper DI
+        // (yes I know this is icky, but it will have to do until mapper construction is set up with DI properly)
+        Mapper::di($di);
 
         // Enable mappers to be injectable, but instantiated only when required
         $mapperFactory = new MapperFactory($di);

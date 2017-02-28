@@ -36,9 +36,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /** @var IConfigLoader */
     protected $conf;
 
-    /** @var NotifInterface */
-    protected $notif;
-
     /** @var LoggerInterface */
     protected $log;
 
@@ -56,6 +53,12 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
     /** @var int */
     protected $iconSize = 'square64';
+
+    /**
+     * Default behaviour is to allow propagation of sub-events
+     * @var bool
+     */
+    private $propagation = true;
 
 
     /**
@@ -290,14 +293,14 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
 
     /**
-     * @param NotifInterface  $notif
      * @param LoggerInterface $log
+     * @param bool            $allowPropagation
      * @return void
      */
-    public function enableLogging(NotifInterface $notif, LoggerInterface $log)
+    public function enableLogging(LoggerInterface $log, $allowPropagation)
     {
-        $this->notif = $notif;
-        $this->log   = $log;
+        $this->log         = $log;
+        $this->propagation = $allowPropagation;
     }
 
 
@@ -311,8 +314,8 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
      */
     protected function raiseNotification(User $effector, $action, $model, Mapper $mapper, array $diff = null)
     {
-        $this->notif
-             ->setTopic(NotifInterface::TOPIC_APPLICATION)
-             ->notice(serialize(new Event($effector, $action, $model, $mapper, $diff)));
+        if ($this->propagation) {
+            $mapper->getEventPropagator()->propagate($effector, $action, $model, $mapper, $diff);
+        }
     }
 }

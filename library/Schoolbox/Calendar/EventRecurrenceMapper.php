@@ -287,6 +287,7 @@ class EventRecurrenceMapper
      * @param Event  $object
      * @param string $verb
      * @param Event  $previous
+     * @throws Schoolbox\Mapper\Exception
      * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)
@@ -301,9 +302,7 @@ class EventRecurrenceMapper
 
         $diff = $previous && ($verb != Schoolbox\Mapper::METHOD_DELETE) ? $em->diff($object, $previous) : null;
 
-        $event = new Schoolbox\Realtime\Schedule\Event\Event($sess['user'], $verb, $object, $em, $diff);
-
-        $this->notif->setTopic(Schoolbox\Notif\Notif::TOPIC_APPLICATION)->notice(serialize($event));
+        $em->getEventPropagator()->propagate($sess['user'], $verb, $object, $em, $diff);
 
         return true;
     }

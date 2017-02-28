@@ -250,7 +250,7 @@ function verifyFrameTrigger(Frame $input, LoggerInterface $log)
                     continue;
                 }
 
-                $object->enableLogging(new SilentNotif(), $log);
+                $object->enableLogging($log, false);
 
                 $log->debug("Testing $methodName");
 
