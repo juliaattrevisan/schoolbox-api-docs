@@ -261,8 +261,7 @@
                         if (data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
                             html += data.students[i].assessmentList[k]['duetime'];
                         }
-                        html += '</td><td>' + data.students[i].assessmentList[k]['context'] + '</td>' +
-                                '<td>' + data.students[i].assessmentList[k]['title'] + '</td>' +
+                        html += '</td><td>'+ data.students[i].assessmentList[k]['context'] + ': ' + data.students[i].assessmentList[k]['title'] + '</td>' +
                                 '</tr>';
                     }
                     html += '</table>';
