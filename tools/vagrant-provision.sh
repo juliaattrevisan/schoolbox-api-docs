@@ -4,51 +4,60 @@ mkdir -p $cachedir;
 cd $cachedir;
 
 # Defaults
-download_url="vagrant.alaress-dev.com.au";
 external_db="synergetic";
 external_db_host="172.31.15.10";
 external_db_db="Synergetic_AUVIC_ALARESS_PRD";
 
 # Get options
-if [ ! -z $1 ]; then download_url=$1; fi;
-if [ ! -z $2 ]; then demo_data_version=$2; else echo "Please provide demo_data_version"; exit 1; fi;
+if [ ! -z $1 ]; then data_source=$1; else echo "Please provide data_source"; exit 1; fi;
+if [ ! -z $2 ];
+then
+    data_filename=$2;
+    data_filename_short=`echo "$data_filename" | cut -d'?' -f1`;
+else
+    echo "Please provide data_filename";
+    exit 1;
+fi;
 if [ ! -z $3 ]; then external_db=$3; fi;
 if [ ! -z $4 ]; then external_db_host=$4; fi;
 if [ ! -z $5 ]; then external_db_db=$5; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Provision Script: vagrant-provision-1404-php55.sh";
-echo "[SB][`date +%Y-%m-%d\ %X`] Download URL: $download_url";
-echo "[SB][`date +%Y-%m-%d\ %X`] Demo Data Version: $demo_data_version";
+echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
+echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Demo Data files";
-curl http://$download_url/schoolboxdemo-$demo_data_version-sha1.txt > schoolboxdemo-$demo_data_version-sha1.txt 2>/dev/null
-if [ $? -eq 0 ];
-then
-	mv -f schoolboxdemo-$demo_data_version-sha1.txt schoolboxdemo-$demo_data_version-sha1-cached.txt;
-	rm -f schoolboxdemo-$demo_data_version-sha1.txt;
-else
-	echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrive $demo_data_version sha1 list, continuing with current";
-fi
-if [ ! -f schoolboxdemo-$demo_data_version-sha1-cached.txt ];
-then
-	echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrieve $demo_data_version demo data. Halting provisioning.";
-	exit 1;
-fi
-while read line;
-do
-	demofile=`echo "$line" | awk {'print $2'}`;
-	demosha1=`echo "$line" | awk {'print $1'}`;
-	currentsha1=`sha1sum $demofile 2>/dev/null || echo 'false'`;
-	if [ "$line" != "$currentsha1" ];
-	then
-		echo "[SB][`date +%Y-%m-%d\ %X`] Downloading $demofile";
-		curl -L http://$download_url/$demofile > $demofile;
-	fi
-done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
+echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
+echo "";
+echo "TODO";
+echo "";
+#curl http://$download_url/schoolboxdemo-$demo_data_version-sha1.txt > schoolboxdemo-$demo_data_version-sha1.txt 2>/dev/null
+#if [ $? -eq 0 ];
+#then
+#	mv -f schoolboxdemo-$demo_data_version-sha1.txt schoolboxdemo-$demo_data_version-sha1-cached.txt;
+#	rm -f schoolboxdemo-$demo_data_version-sha1.txt;
+#else
+#	echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrive $demo_data_version sha1 list, continuing with current";
+#fi
+#if [ ! -f schoolboxdemo-$demo_data_version-sha1-cached.txt ];
+#then
+#	echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrieve $demo_data_version demo data. Halting provisioning.";
+#	exit 1;
+#fi
+#while read line;
+#do
+#	demofile=`echo "$line" | awk {'print $2'}`;
+#	demosha1=`echo "$line" | awk {'print $1'}`;
+#	currentsha1=`sha1sum $demofile 2>/dev/null || echo 'false'`;
+#	if [ "$line" != "$currentsha1" ];
+#	then
+#		echo "[SB][`date +%Y-%m-%d\ %X`] Downloading $demofile";
+#		curl -L http://$download_url/$demofile > $demofile;
+#	fi
+#done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
@@ -59,7 +68,14 @@ mysql --defaults-extra-file=/root/.my.cnf -e "DROP DATABASE IF EXISTS schoolbox"
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox Data directory";
 rm /vagrant/data/* -fR;
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox data directories";
+cd /vagrant;
+tar -xzf $cachedir/$data_filename_short;
+rm -rf /vagrant/data/cache;
+/vagrant/tools/create-data-dirs.sh /vagrant/data;
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up browscap cache";
+# TODO - pull from concourse CI prebuild
 mkdir -p /vagrant/tools/browscap;
 rm -f /vagrant/tools/browscap/browscap.ini;
 touch /vagrant/tools/browscap/browscap.ini;
@@ -67,17 +83,10 @@ cp -f $cachedir/cache-2016-01-14.txt /vagrant/tools/browscap/cache.php;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
 mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/schoolboxdemo-$demo_data_version.sql;
-
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/data/schoolbox.sql;
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_db' WHERE name='external_db_db'";
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox data directories";
-cd /vagrant;
-tar -xzf $cachedir/schoolboxdemo-$demo_data_version.tar.gz;
-rm -rf /vagrant/data/cache;
-/vagrant/tools/create-data-dirs.sh /vagrant/data;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox conf file";
 cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
@@ -175,11 +184,12 @@ cd tools;
 cd /vagrant;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes";
-cp -f $cachedir/schoolboxdemo-vagrant-$demo_data_version.sql /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
+# TODO - pull vagrant.sql from S3 or Git?
+cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/vagrant.sql;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/schoolboxdemo-vagrant-$demo_data_version.sql
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/vagrant.sql
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Upgrading demo data with latest SQL updates";
 mkdir /var/lib/vagrant -p > /dev/null;
@@ -189,11 +199,11 @@ rm -R /var/lib/vagrant > /dev/null;
 rm -f /vagrant/www/conf/pre*conf.php;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes (post version upgrade)";
-cp -f $cachedir/schoolboxdemo-vagrant-$demo_data_version.sql /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-$demo_data_verison.sql;
+cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/vagrant.sql;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/schoolboxdemo-vagrant-$demo_data_version.sql
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/vagrant.sql
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying UTF8 schema patch";
 /vagrant/tools/schema/collation.sh;

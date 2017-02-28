@@ -19,6 +19,8 @@ demo_data_version = default["demo_data_version"]
 public_network = default["public_network"]
 private_network_ip = default["private_network_ip"]
 provision_script = default["provision_script"]
+data_source = default["data_source"]
+data_filename = default["data_filename"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -54,6 +56,12 @@ if File.file?('vagrant.yaml')
   if !conf["provision_script"].nil?
     provision_script = conf["provision_script"]
   end
+  if !conf["data_source"].nil?
+    data_source = conf["data_source"]
+  end
+  if !conf["data_filename"].nil?
+    data_filename = conf["data_filename"]
+  end
 
 end
 
@@ -80,7 +88,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "#{provision_script}"
-    s.args = "#{download_url} #{demo_data_version} #{external_db} #{external_db_host} #{external_db_db}"
+    s.args = "#{data_source} \"#{data_filename}\" #{external_db} #{external_db_host} #{external_db_db}"
   end
 
 end
