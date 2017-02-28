@@ -10,12 +10,13 @@ namespace Schoolbox\Realtime\Schedule\Trigger;
 
 use Alaress\Async\AMQP\AMQPInterface;
 use Aura\Di\Exception\ReflectionFailure;
+use JsonSerializable;
 use Predis\ClientInterface;
 use Redis;
 use Schoolbox\Mapper;
+use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
-use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\User;
 
 /**
@@ -64,13 +65,22 @@ class Propagator
      * @param Mapper $mapper
      * @param array  $diff
      * @throws ReflectionFailure
-     * @throws ScheduleException
      * @return string
      */
-    function propagate(User $subject, $verb, $object, $mapper, array $diff = null)
+    public function propagate(User $subject, $verb, $object, $mapper, array $diff = null)
     {
-        $event = new Event($subject, $verb, $object, $mapper, $diff);
+        return $this->propagateEvent(new Event($subject, $verb, $object, $mapper, $diff));
+    }
 
+
+    /**
+     * Take a CRUD event and propagate triggers. Returns the key used to store the event in Redis.
+     *
+     * @param CrudEventInterface $event
+     * @return string
+     */
+    public function propagateEvent(CrudEventInterface $event)
+    {
         // drop event serial into redis
         $redisKey = $this->toRedis($event, "e:{$this->instanceId}");
         $triggers = $this->splitter->generateTriggers($event);
@@ -94,7 +104,13 @@ class Propagator
      */
     private function toRedis($object, $prefix)
     {
-        $serial = serialize($object);
+        if ($object instanceof JsonSerializable) {
+            // we *prefer* JSON if possible
+            $serial = json_encode($object);
+        } else {
+            $serial = serialize($object);
+        }
+
         $hash   = sha1($serial);
         $key    = trim("$prefix:$hash", ':');
 
