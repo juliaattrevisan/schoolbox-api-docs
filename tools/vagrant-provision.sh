@@ -72,6 +72,7 @@ getS3file;
 if [ ! -f $cachedir/$S3file ];
 then
     echo "Error: file missing $S3file";
+    exit 1;
 fi
 
 S3file="$data_filename";
@@ -80,6 +81,7 @@ getS3file;
 if [ ! -f $cachedir/$S3file ];
 then
     echo "Error: file missing $S3file";
+    exit 1;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
