@@ -11,13 +11,14 @@
 namespace Schoolbox\Realtime\Schedule\Event;
 
 
+use JsonSerializable;
 use RuntimeException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Serializable;
 
-class Event implements CrudEventInterface, Serializable {
+class Event implements CrudEventInterface, Serializable, JsonSerializable {
 
     /** @var User */
     protected $effector;
@@ -111,30 +112,25 @@ class Event implements CrudEventInterface, Serializable {
     }
 
 
-	/**
-	 * String representation of object
-	 *
-	 * @return string the string representation of the object or null
-	 */
+    /**
+     * String representation of object
+     *
+     * @throws Mapper\Exception
+     * @return string the string representation of the object or null
+     */
 	public function serialize() {
-		return serialize(array(
-			'u' => UserMapper::getInstance()->dehydrate($this->effector),
-			'a' => $this->getAction(),
-			'o' => array(
-				'c' => get_class($this->getMapper()),
-				'i' => $this->getMapper()->dehydrate($this->getObject())
-			),
-			'd' => $this->getDiff(),
-		));
+		return serialize($this->jsonSerialize());
 	}
 
 
-	/**
-	 * Constructs the object
-	 *
-	 * @param string $serialized The string representation of the object.
-	 * @return void
-	 */
+    /**
+     * Constructs the object
+     *
+     * @param string $serialized The string representation of the object.
+     * @throws Mapper\Exception
+     * @throws RuntimeException
+     * @return void
+     */
 	public function unserialize($serialized) {
 		$array = unserialize($serialized);
 
@@ -154,4 +150,23 @@ class Event implements CrudEventInterface, Serializable {
 		$this->object   = $this->getMapper()->hydrate($array['o']['i']);
 		$this->diff     = $array['d'];
 	}
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @throws Mapper\Exception
+     * @return array
+     */
+    function jsonSerialize()
+    {
+        return [
+            'u' => UserMapper::getInstance()->dehydrate($this->effector),
+            'a' => $this->getAction(),
+            'o' => [
+                'c' => get_class($this->getMapper()),
+                'i' => $this->getMapper()->dehydrate($this->getObject())
+            ],
+            'd' => $this->getDiff(),
+        ];
+    }
 }
