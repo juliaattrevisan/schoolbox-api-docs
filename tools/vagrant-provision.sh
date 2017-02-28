@@ -156,7 +156,7 @@ then
                                         then
                                                 # New/updated version available - download it
                                                 echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
-                                                curl https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz > $branch-vendor-php-dev.tar.gz;
+                                                wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
                                                 if [ $? -eq 0 ];
                                                 then
                                                         # This is a new file, so remove old references
@@ -307,7 +307,7 @@ then
                                         then
                                                 # New/updated version available - download it
                                                 echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
-                                                curl https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz > $branch-npm.tar.gz;
+                                                wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
                                                 if [ $? -eq 0 ];
                                                 then
                                                         # This is a new file, so remove old references
@@ -397,7 +397,7 @@ then
                                         then
                                                 # New/updated version available - download it
                                                 echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest Javascript build: $branch-bower.tar.gz";
-                                                curl https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz > $branch-bower.tar.gz;
+                                                wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz -O $branch-bower.tar.gz 2>&1;
                                                 if [ $? -eq 0 ];
                                                 then
                                                         # This is a new file, so remove old references
