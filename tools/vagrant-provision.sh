@@ -31,33 +31,48 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
-echo "";
-echo "TODO";
-echo "";
-#curl http://$download_url/schoolboxdemo-$demo_data_version-sha1.txt > schoolboxdemo-$demo_data_version-sha1.txt 2>/dev/null
-#if [ $? -eq 0 ];
-#then
-#    mv -f schoolboxdemo-$demo_data_version-sha1.txt schoolboxdemo-$demo_data_version-sha1-cached.txt;
-#    rm -f schoolboxdemo-$demo_data_version-sha1.txt;
-#else
-#    echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrive $demo_data_version sha1 list, continuing with current";
-#fi
-#if [ ! -f schoolboxdemo-$demo_data_version-sha1-cached.txt ];
-#then
-#    echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrieve $demo_data_version demo data. Halting provisioning.";
-#    exit 1;
-#fi
-#while read line;
-#do
-#    demofile=`echo "$line" | awk {'print $2'}`;
-#    demosha1=`echo "$line" | awk {'print $1'}`;
-#    currentsha1=`sha1sum $demofile 2>/dev/null || echo 'false'`;
-#    if [ "$line" != "$currentsha1" ];
-#    then
-#        echo "[SB][`date +%Y-%m-%d\ %X`] Downloading $demofile";
-#        curl -L http://$download_url/$demofile > $demofile;
-#    fi
-#done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
+# function to retrieve latest files from S3, needs $S3file set first
+getS3file() {
+    if [ -z $S3file ];
+    then
+        echo "Error - missing S3file target";
+    else
+        predir=`pwd`;
+        cd $cachedir;
+
+        etag=`curl -I $data_source/$S3file 2>/dev/null | grep ETag | cut -d'"' -f2`;
+        if [ $? -eq 0 ];
+        then
+            checketag=`grep $etag $S3file.etag.cache 2>/dev/null | wc -l`;
+            if [ $checketag -eq 0 ];
+            then
+                # New/updated version available - download it
+                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file";
+                curl $data_source/$S3file > $S3file;
+                if [ $? -eq 0 ];
+                then
+                    # This is a new file, so remove old references
+                    sed -i "/$S3file/d" $S3file.etag.cache 2>/dev/null;
+                    # Add new file to etag cache
+                    echo "$etag $S3file" >> $S3file.etag.cache;
+                fi
+            fi
+        fi
+
+        cd $predir;
+    fi
+}
+
+# TODO - add support for specific version $data_filename, saving to $data_filename_short
+for S3file in vagrant.sql $data_filename;
+do
+    getS3file;
+    if [ ! -f $cachedir/$S3file ];
+    then
+        echo "Error: file missing $S3file";
+    fi
+done
+exit;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
