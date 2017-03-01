@@ -170,7 +170,7 @@ abstract class Mapper implements IMapper, Serializable
     static protected $instance;
 
     /** @var IFactory */
-    static private $columnFactory;
+    protected static $columnFactory;
 
     /** @var IMonitor */
     protected static $perfmon;
@@ -237,17 +237,6 @@ abstract class Mapper implements IMapper, Serializable
      */
     public static function di(Di\ContainerInterface $di)
     {
-        self::$prop = $di->newInstance(Propagator::class, [
-            'splitter'   => $di->lazyNew(Splitter::class, [
-                'conf'        => $di->lazyGet('config'),
-                'di'          => $di,
-                'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
-            ]),
-            'redis'      => $di->lazyGet('redis'),
-            'amqp'       => $di,
-            'instanceId' => INSTANCE_ID,
-        ]);
-
         self::$columnFactory = new ColumnFactory();
 
         // only functional in development
@@ -255,6 +244,17 @@ abstract class Mapper implements IMapper, Serializable
             ? new DevMonitor(DebugBar::getInstance())
             : new LiveMonitor()
         ;
+
+        self::$prop = $di->newInstance(Propagator::class, [
+            'splitter'   => $di->lazyNew(Splitter::class, [
+                'conf'        => $di->lazyGet('config'),
+                'di'          => $di,
+                'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
+            ]),
+            'redis'      => $di->lazyGet('redis'),
+            'amqp'       => $di->lazyGet('amqp'),
+            'instanceId' => INSTANCE_ID,
+        ]);
     }
 
     /**
