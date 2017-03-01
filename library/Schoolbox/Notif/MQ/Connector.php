@@ -15,7 +15,7 @@ use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use InvalidArgumentException;
-use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
@@ -60,8 +60,8 @@ class Connector extends AMQPConnector {
 	 * @return void
 	 */
 	protected function connect() {
-		if(!$this->conn instanceof AMQPConnection) {
-			$this->conn = new AMQPConnection(
+		if(!$this->conn instanceof AMQPStreamConnection) {
+			$this->conn = new AMQPStreamConnection(
 				$this->conf->get('amqp_host'),
 				$this->conf->get('amqp_port'),
 				$this->conf->get('amqp_user'),

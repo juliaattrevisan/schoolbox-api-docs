@@ -11,7 +11,7 @@ namespace Alaress\Async\AMQP;
 
 
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 use RuntimeException;
@@ -44,7 +44,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	protected $expiry     = 1209600000; // 1000 * 60 * 60 * 24 * 14 = 2 weeks in millis
 
 	/**
-	 * @var AMQPConnection
+	 * @var AMQPStreamConnection
 	 */
 	protected $conn;
 
@@ -69,10 +69,10 @@ abstract class AMQPConnector implements AMQPInterface {
 
 
 	/**
-	 * @return AMQPConnection
+	 * @return AMQPStreamConnection
 	 */
 	public function getConnection() {
-		if(!$this->conn instanceof AMQPConnection) {
+		if(!$this->conn instanceof AMQPStreamConnection) {
 			$this->connect();
 		}
 		return $this->conn;
