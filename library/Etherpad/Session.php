@@ -51,7 +51,7 @@ class Session {
             $cookieParams['path'],
             $cookieParams['domain'],
             $cookieParams['secure'],
-            $cookieParams['httponly']
+            false
         );
 	}
 
