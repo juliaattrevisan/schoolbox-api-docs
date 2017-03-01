@@ -73,7 +73,7 @@
                     </div>
 
                     {# Was the task non self assessed ? #}
-                    {% if not mostRecentResponse.selfAssessed %}
+                    {% if mostRecentResponse and not mostRecentResponse.selfAssessed %}
                         <ul class="information-list reply">
                             <li class="list-item">
                                 <div class="card small-12">
