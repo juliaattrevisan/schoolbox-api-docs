@@ -176,17 +176,17 @@ class Rubric extends Core\Rubric
 
 
     /**
-     * @param Criterion $criterion
+     * @param Core\Criteria\Criterion $criterion
      * @param int $sequence
      * @return Usage
      */
-    protected function createORMUsage(Criterion $criterion, $sequence)
+    protected function createORMUsage(Core\Criteria\Criterion $criterion, $sequence)
     {
         if (!$this->uCache->contains($criterion)) {
             $this->uCache->attach($criterion,
                 UsageMapper::getInstance()
                   ->createModel()
-                  ->setCriterion($criterion)
+                  ->setCriterion($this->cCache->offsetGet($criterion))
                   ->setSubmissionBox($this->box)
             );
         }
