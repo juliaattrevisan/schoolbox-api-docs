@@ -75,6 +75,10 @@ a[disabled], a.disabled {
 	}
 }
 
+.flex-wrap{
+	flex-wrap: wrap;
+}
+
 /* Splash effect when clicking buttons
 */
 .splash {
@@ -154,21 +158,19 @@ a.submit {
  * I don't think this should be such a strange number; maybe
  * the actual flex-list button dimensions aren't right.
  */
-ul.flex-list {
-    &.buttons > li > a, button {
-        /* Allow long content
-         * This expands UPWARDS! Don't know why
-         */
-        white-space: normal;
-        height: auto;
+.flex-list {
+    &.buttons a {
+		@include flex;
 		@extend .button;
-        /* Also allow fake submit styles in flex list
-         */
+		justify-content: center;
+		margin: 0 1px 1px 0;
         &.submit {
             @extend input[type="submit"];
         }
     }
-
+	li:last-child a{
+		margin-right: 0;
+	}
     button {
         width: 100%;
     }

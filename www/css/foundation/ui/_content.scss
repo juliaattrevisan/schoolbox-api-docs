@@ -1045,28 +1045,24 @@ $selector-width: 2.25rem;
 }
 
 // this is like inline list, but it flexes to full width. Basically a more flexible version of the button bar
-ul.flex-list {
-	width: 100%;
-	display: table;
-	table-layout: fixed;
-	margin: 0;
-	line-height: 1;
-	> li {
-		display: table-cell;
-		margin: 0;
-		padding-right: 1px;
-		&:last-child {
-			padding-right: 0;
+.flex-list {
+	@include flex;
+	@at-root {
+		ul#{&} {
+			list-style: none;
+			margin: 0;
+			li{
+				flex: 1 auto;
+			}
+		}
+	}
+	a {
+		flex: 1 auto;
+		&:empty:before {
+			float: none !important; // grrrr :(
 		}
 		&.overflow {
 			width: 3rem;
-		}
-		> a {
-			width: 100%;
-			white-space: nowrap;
-			&:empty:before {
-				float: none !important; // grrrr :(
-			}
 		}
 	}
 
