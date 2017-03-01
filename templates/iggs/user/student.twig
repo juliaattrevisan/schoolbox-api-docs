@@ -1,5 +1,12 @@
 {% extends '@core/user/student.twig' %}
 
+{% block details_dob %}
+    {#{% if externalUser.StudentBirthDate %}#}
+        {#<dt class="no-margin small-6 medium-3">Date of Birth</dt>#}
+        {#<dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(dateFormats.dateOnlyFormat) }}</dd>#}
+    {#{% endif %}#}
+{% endblock details_dob %}
+
 {% block details_tutorGroup %}
 {#{% if showClasses %}#}
     {#{% if externalUser.StudentTutorDescription %}#}
