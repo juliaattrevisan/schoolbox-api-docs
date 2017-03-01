@@ -41,12 +41,12 @@ class Completion implements ISoftDeletable
      *
      * @var User
      */
-    private $marking_user;
+    private $markingUser;
 
     /**
      * @var int
      */
-    private $completion_status = self::STATUS_INCOMPLETE;
+    private $completionStatus = self::STATUS_INCOMPLETE;
 
 
     private $completionDate;
@@ -96,7 +96,7 @@ class Completion implements ISoftDeletable
      */
     public function getMarkingUser()
     {
-        return $this->marking_user;
+        return $this->markingUser;
     }
 
     /**
@@ -105,7 +105,7 @@ class Completion implements ISoftDeletable
      */
     public function setMarkingUser(User $marker)
     {
-        $this->marking_user = $marker;
+        $this->markingUser = $marker;
         return $this;
     }
 
@@ -132,16 +132,16 @@ class Completion implements ISoftDeletable
      */
     public function getCompletionStatus()
     {
-        return $this->completion_status;
+        return $this->completionStatus;
     }
 
     /**
-     * @param  int $completion_status
+     * @param  int $completionStatus
      * @return static
      */
-    public function setCompletionStatus($completion_status)
+    public function setCompletionStatus($completionStatus)
     {
-        $this->completion_status = $completion_status;
+        $this->completionStatus = $completionStatus;
         return $this;
     }
 }
