@@ -43,15 +43,11 @@ class Session {
 	 */
 	public function generateCookie($sessionId)
     {
-        $cookieParams = session_get_cookie_params();
         setcookie(
             'sessionID',
             $sessionId,
             $_SERVER['REQUEST_TIME'] + (60*60*$this->getDuration()),
-            $cookieParams['path'],
-            $cookieParams['domain'],
-            $cookieParams['secure'],
-            false
+            '/'
         );
 	}
 
