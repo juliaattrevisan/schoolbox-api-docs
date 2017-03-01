@@ -154,7 +154,8 @@ class Sync implements SyncInterface
                 JobPositions.StaffJobPositionCode AS staff_position,
                 vStaff.StaffDepartment            AS staff_department,
                 vStaff.StaffYearLevel             AS staff_year_level,
-                luYearLevel.Description           AS staff_year_level_description
+                luYearLevel.Description           AS staff_year_level_description,
+                vStaff.StaffHouse                 AS staff_house
             FROM dbo.vStaff vStaff
             LEFT JOIN dbo.luYearLevel ON luYearLevel.Code = vStaff.StaffYearLevel AND luYearLevel.Campus = vStaff.StaffCampus
             LEFT JOIN dbo.Community ON Community.ID = vStaff.StaffID

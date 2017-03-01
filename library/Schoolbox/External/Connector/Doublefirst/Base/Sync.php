@@ -151,6 +151,7 @@ class Sync implements SyncInterface
                           ELSE 'Non Teaching' 
                         END AS staff_category,
 			            
+			            ''                    AS staff_house,
 			            cat.Description	      AS staff_position,
                         ''                    AS staff_department,
                         ''                    AS staff_year_level,

@@ -78,6 +78,10 @@ class Staff extends IteratorIterator
             ->setActive($currentResult['active_flag'])
         ;
 
+        $staff
+            ->getHouse()
+            ->setCode($currentResult['staff_house']);
+
         /* Email - one for every item in stack
          */
         $email = [];

@@ -125,6 +125,7 @@ class Sync implements SyncInterface
                 CAMPUS     AS staff_campus,
                 NULL       AS staff_category_type,
                 NULL       AS staff_category,
+                ''         AS staff_house,
                 NULL       AS staff_department,
                 ''         AS staff_year_level,
                 ''         AS staff_year_level_description                

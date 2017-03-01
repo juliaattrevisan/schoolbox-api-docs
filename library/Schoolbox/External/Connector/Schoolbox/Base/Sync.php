@@ -123,6 +123,7 @@ class Sync implements SyncInterface
                 c.ext_timetable_code AS staff_campus,
                 ''                   AS staff_category_type,
                 ''                   AS staff_category,
+                ''                   AS staff_house,
                 ''                   AS staff_department,
                 u.year               AS staff_year_level,
                 ''                   AS staff_year_level_description                
