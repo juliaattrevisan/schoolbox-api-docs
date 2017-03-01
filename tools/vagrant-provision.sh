@@ -68,6 +68,7 @@ getS3file() {
 }
 
 S3file='vagrant.sql'
+S3file_short='vagrant.sql'
 getS3file;
 if [ ! -f $cachedir/$S3file ];
 then
@@ -76,6 +77,7 @@ then
 fi
 
 S3file='vagrant-cleanup.sql'
+S3file_short='vagrant-cleanup.sql'
 getS3file;
 if [ ! -f $cachedir/$S3file ];
 then
@@ -221,7 +223,6 @@ cd tools;
 cd /vagrant;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes";
-# TODO - pull vagrant.sql from S3 or Git?
 cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
 /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/vagrant.sql;
 
