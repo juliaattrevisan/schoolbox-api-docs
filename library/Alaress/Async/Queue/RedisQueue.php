@@ -12,13 +12,14 @@ namespace Alaress\Async\Queue;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Predis\ClientInterface;
+use Redis;
 
 class RedisQueue implements QueueInterface
 {
 
     const TTL = 1209600; // 2 weeks
 
-    /** @var ClientInterface */
+    /** @var Redis|ClientInterface */
     protected $redis;
 
     /** @var string */
@@ -64,7 +65,7 @@ class RedisQueue implements QueueInterface
             return $instances;
         }
 
-        $result = $this->exec("MGET", $idList);
+        $result = $this->redis->mget($idList);
 
         $count = count($idList);
 
@@ -75,7 +76,7 @@ class RedisQueue implements QueueInterface
             // attempt to unserialize the message
             if (is_null($data)) {
                 // the thing we're pointing at doesn't exist? remove the reference
-                 $this->exec('SREM', $this->getRedisSetKey(), $key);
+                 $this->redis->sRem($this->getRedisSetKey(), $key);
                 continue;
             }
 
@@ -96,12 +97,12 @@ class RedisQueue implements QueueInterface
     {
         $id = $this->getRedisMsgKey($instance);
 
-        $exists = !!$this->exec('EXISTS', $id);
-        $listed = !!$this->exec('SISMEMBER', $this->getRedisSetKey(), $id);
+        $exists = !!$this->redis->exists($id);
+        $listed = !!$this->redis->sIsMember($this->getRedisSetKey(), $id);
 
         // a little housekeeping: if the 'queue' contains the reference, but the msg has expired, drop the reference
         if ($listed && !$exists) {
-            $this->exec('SREM', $this->getRedisSetKey(), $id);
+            $this->redis->sRem($this->getRedisSetKey(), $id);
         }
 
         return $exists && $listed;
@@ -116,7 +117,7 @@ class RedisQueue implements QueueInterface
     public function drain()
     {
         // delete the list, which is a user's reference to the messages. they will be expired automatically (and other users may still be attached)
-        $this->exec("DEL", $this->getRedisSetKey());
+        $this->redis->del($this->getRedisSetKey());
     }
 
 
@@ -132,33 +133,14 @@ class RedisQueue implements QueueInterface
         $id    = $this->getRedisMsgKey($instance);
         $data  = $this->deflate($instance);
 
-        // insert the msg body into storage, with expiry automatically set
-        $this->exec("SET", $id, $data);
-        $this->exec("EXPIRE", $id, $this->ttl);
+        // insert the msg payload ONLY if it doesn't already exist
+        $this->redis->setnx($id, $data);
+
+        // set the expiry; if the key already existed, this has the effect of resetting the TTL
+        $this->redis->expire($id, $this->ttl);
 
         // insert the msg reference into this 'queue'
-        $this->exec("SADD", $this->getRedisSetKey(), $id);
-    }
-
-
-    /**
-     * Simple wrapper to encapsulate Predis interfaces
-     *
-     * @param string $cmd
-     * @param mixed $_args
-     * @return mixed
-     */
-    protected function exec($cmd, $_args = null)
-    {
-        // if the args just got put in this var, use that; otherwise, read func_args
-        if (!is_array($_args)) {
-            $_args = func_get_args();
-            array_shift($_args);
-        }
-
-        $cmd = $this->redis->createCommand($cmd, $_args);
-
-        return $this->redis->executeCommand($cmd);
+        $this->redis->sAdd($this->getRedisSetKey(), $id);
     }
 
 
@@ -178,7 +160,7 @@ class RedisQueue implements QueueInterface
      */
     protected function fetchIdList()
     {
-        return $this->exec("SMEMBERS", $this->getRedisSetKey()) ? : array();
+        return $this->redis->sMembers($this->getRedisSetKey()) ? : array();
     }
 
 
