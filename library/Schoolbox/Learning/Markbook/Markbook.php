@@ -18,7 +18,7 @@ use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\PercentageWithoutBounds;
 use Schoolbox\User;
 
 /**
@@ -216,7 +216,7 @@ class Markbook
 
         // Summate assessment statistics for all users for each assessment
         // Render all stats as percentages for now?
-        $markScheme = new Percentage();
+        $markScheme = new PercentageWithoutBounds();
 
         // Just get marks for all students, and let the summators do the rest.
         $normMarks = [];
