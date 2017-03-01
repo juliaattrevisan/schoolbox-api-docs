@@ -155,7 +155,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		&:hover, &.focus {
 			width: 100%;
 			@include placeholder-color($black, $font-weight-normal);
-			padding-left: $tabbar-height;
+			padding-left: $tabbar-icon-width;
 		}
 
 		/* Search icon in its idle state
