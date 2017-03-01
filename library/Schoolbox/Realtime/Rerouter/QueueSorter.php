@@ -99,24 +99,17 @@ class QueueSorter implements FilterInterface {
                 throw new FilterException("Reroute level is unacceptable: " . json_encode($outputLevels));
             }
 
-            // put the instance in redis: it will always end up being stored in one queue or the other
-            $q = $this->qFactory->setKind($method)->buildForUser($user->getId());
-
-            if ($q instanceof RedisQueue) {
-                $q->push($instance);
-            }
-
             // cast 'listed' to 'instant'
-			$newTopic = ($method == UserQueue::Q_LISTED ? 'instant' : $method) . ".user.{$user->getId()}";
+            $newTopic = ($method == UserQueue::Q_LISTED ? 'instant' : $method) . ".user.{$user->getId()}";
 
             $this->log->info(sprintf('SEND %s:%s -> %s @ %s', $instance->getBaseHash(), $instance->getParamHash(), $newTopic, json_encode($outputLevels)));
 
             // log for each expected output level
             foreach ($outputLevels as $level) {
-               try {
+                try {
                     $this->notif->logTo($newTopic, $this->permMapper->getSeverity($level), $formatted['message'], $formatted['context']);
 
-               } catch (OutOfBoundsException $e) {
+                } catch (OutOfBoundsException $e) {
                     $this->log->warning("Unable to SEND: could not map priority '$level'");
                 }
             }
