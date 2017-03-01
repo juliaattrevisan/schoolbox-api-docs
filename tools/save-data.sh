@@ -77,6 +77,16 @@ mkdir -p $cachedir;
 
 echo "Cleaning data";
 echo "--- TODO: Clean all the things ---";
+echo "Cleaning: deleted files";
+/vagrant/tools/gc-storage.php$longverbose -n 10000000 -p;
+echo "Cleaning: log and cache files";
+rm -f$longverbose /vagrant/data/*.log{,.gz};
+rm -f$longverbose -R /vagrant/data/cache/logs;
+rm -f$longverbose -R /vagrant/data/storage/css;
+/vagrant/tools/clean-cache-dir.sh >/dev/null 2>&1;
+/vagrant/tools/create-data-dirs.sh /vagrant/data >/dev/null;
+echo "Cleaning: old sql backups";
+rm -f$longverbose /vagrant/data/*.sql{,.gz};
 
 if [ ! -z $initial ];
 then
@@ -85,7 +95,7 @@ then
 fi
 
 echo "Exporting database";
-mysqldump --defaults-extra-file=~/.my.cnf -f$longverbose --allow-keywords -i -e -q -a -c schoolbox > /vagrant/data/schoolbox.sql;
+mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords -i -e -q -a -c schoolbox > /vagrant/data/schoolbox.sql;
 if [ $? -ne 0 ];
 then
     echo "Error: exporting database failed";
