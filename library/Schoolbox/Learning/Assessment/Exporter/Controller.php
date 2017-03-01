@@ -248,4 +248,50 @@ class Controller extends BaseController
 
         return $result;
     }
+
+    /**
+     * Download a csv of asessment results for Accellerus
+     *
+     * @api GET /learning/export/assessment/getCSV
+     * @level 160
+     *
+     */
+    public function getCSV()
+    {
+        // Generate an updated csv
+        $filename = sb_tempnam();
+        $file = fopen($filename, 'w');
+        $exporter = new Exporter($this->getDi()->get('database'));
+        $exporter->generate($file);
+        fclose($file);
+
+        $now = date('Y-m-d-H-i-s');
+        $newFilename = "results-{$now}.csv";
+
+        // Force download/
+        if (file_exists($filename)) {
+
+            $headers  = $this->getResponse()->headers;
+
+            // per header
+            $headers->set('Content-Description', 'File Transfer');
+            $headers->set('Content-Type', 'text/csv');
+            $headers->set('Content-Description', 'File Transfer');
+            $headers->set('Content-Disposition', 'attachment; filename="' . $newFilename . '"');
+            $headers->set('Expires', 0);
+            $headers->set('Cache-Control', 'must-revalidate');
+            $headers->set('Pragma', 'public');
+            $headers->set('Content-Length', filesize($filename));
+
+            $this->getResponse()->content->set([
+                'format'     => 'file',
+                'file'       => $filename,
+                'postOutput' => [function () use ($filename) {
+                    /* Delete the temp file
+                     */
+                    unlink($filename);
+                }]
+            ]);
+        }
+    }
 }
