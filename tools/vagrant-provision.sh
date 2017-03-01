@@ -75,6 +75,14 @@ then
     exit 1;
 fi
 
+S3file='vagrant-cleanup.sql'
+getS3file;
+if [ ! -f $cachedir/$S3file ];
+then
+    echo "Error: file missing $S3file";
+    exit 1;
+fi
+
 S3file="$data_filename";
 S3file_short="$data_filename_short";
 getS3file;

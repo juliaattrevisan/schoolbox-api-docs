@@ -76,7 +76,6 @@ cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 
 echo "Cleaning data";
-echo "--- TODO: Clean all the things ---";
 echo "Cleaning: deleted files";
 /vagrant/tools/gc-storage.php$longverbose -n 10000000 -p;
 echo "Cleaning: log and cache files";
@@ -87,6 +86,8 @@ rm -f$longverbose -R /vagrant/data/storage/css;
 /vagrant/tools/create-data-dirs.sh /vagrant/data >/dev/null;
 echo "Cleaning: old sql backups";
 rm -f$longverbose /vagrant/data/*.sql{,.gz};
+echo "Reverting vagrant specific changes";
+mysql --defaults-extra-file=~/.my.cnf schoolbox < $cachedir/vagrant-cleanup.sql;
 
 if [ ! -z $initial ];
 then
