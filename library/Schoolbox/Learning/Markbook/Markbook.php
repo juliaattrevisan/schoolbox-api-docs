@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\LetterGradeWithoutBounds;
 use Schoolbox\Learning\MarkScheme\PercentageWithoutBounds;
 use Schoolbox\User;
 
@@ -170,7 +170,7 @@ class Markbook
 
         // Summate student's statistics as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
-        $overallMarkScheme = new LetterGrade($this->gradeGroup);
+        $overallMarkScheme = new LetterGradeWithoutBounds($this->gradeGroup);
         $weightedSummator  = new WeightedAverage();
 
         // Not all assessables are used in stats:

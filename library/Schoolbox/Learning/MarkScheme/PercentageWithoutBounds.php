@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 /**
- * Percentage mark scheme, with no upper or lower bound.
+ * Percentage mark scheme, with no upper or lower bound on its normalised mark.
  *
  * This is not used by any assessment types, but is used in the markbook -
  * quizzes may have a mark outside the conventional upper or lower bound, and
