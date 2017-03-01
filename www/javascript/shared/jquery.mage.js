@@ -363,7 +363,7 @@
 
             // Does there exist a CK Editor instance for this text area?
             if ($ckEditor != undefined) {
-                // do both for good measure
+                // do both because different browsers (*cough*firefail*cough*) can't handle textarea.val() as part of form serialization
                 $textArea.html($ckEditor.getData());
                 $textArea.val($ckEditor.getData());
             }
