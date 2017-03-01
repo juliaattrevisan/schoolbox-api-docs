@@ -468,26 +468,6 @@ class Controller extends Base
     }
 
     /**
-     * Impersonate user
-     * @param \Schoolbox\User $user
-     */
-    public function postImpersonate($user)
-    {
-        $oldSession = $this->getSession();
-
-        $sessionHandler = new Session();
-
-        if ($sessionHandler->create($user->getUsername())) {
-            $this->getSession()->set('previous', $oldSession);
-            $logger = new User_Logger_AssumeUser($oldSession['user'], $this->getUser());
-            $logger->notify();
-            $this->getResponse()->redirect->afterPost("/");
-        } else {
-            $this->getResponse()->redirect->afterPost("/adminv2/user");
-        }
-    }
-
-    /**
      * Update a groups access level
      * @param \Schoolbox\User $user
      * @param \Schoolbox\Resource\Folder\Model $folder

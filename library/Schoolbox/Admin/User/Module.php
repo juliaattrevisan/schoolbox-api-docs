@@ -59,7 +59,6 @@ class Module extends BaseModule
         // Other stuff
 
         $this->addPostRoute($router, 'postAlert', $basePath, "/{userId}/alert");
-        $this->addPostRoute($router, 'postImpersonate', $basePath, "/{userId}/impersonate");
     }
 
     /**
