@@ -26,6 +26,21 @@ class Rubric extends Core\Rubric
     /** @var SubmissionBox|null */
     private $box;
 
+    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
+    private $cCache;
+
+    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
+    private $uCache;
+
+    /** @var SplObjectStorage|Core\Competency\Level[] */
+    private $lCache;
+
+    /** @var SplObjectStorage|Core\Descriptor[] */
+    private $dCache;
+
+    /** @var SplObjectStorage|Core\Descriptor[] */
+    private $mCache;
+
 
     /**
      * @param SubmissionBox $submissionBox
@@ -90,9 +105,6 @@ class Rubric extends Core\Rubric
     }
 
 
-    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
-    protected $cCache;
-
     /**
      * @param Core\Criteria\Criterion $criterion
      * @param string                  $groupName
@@ -143,9 +155,6 @@ class Rubric extends Core\Rubric
     }
 
 
-    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
-    protected $uCache;
-
     /**
      * @param Criterion $criterion
      * @param int $sequence
@@ -183,9 +192,6 @@ class Rubric extends Core\Rubric
         return $c;
     }
 
-
-    /** @var SplObjectStorage|Core\Competency\Level[] */
-    protected $lCache;
 
     /**
      * @param Core\Competency\Level $level
@@ -237,9 +243,6 @@ class Rubric extends Core\Rubric
         return $c;
     }
 
-
-    /** @var SplObjectStorage|Core\Descriptor[] */
-    protected $dCache;
 
     /**
      * @param Core\Descriptor       $descriptor
@@ -317,9 +320,6 @@ class Rubric extends Core\Rubric
         return $c;
     }
 
-
-    /** @var SplObjectStorage|Core\Descriptor[] */
-    protected $mCache;
 
     /**
      * @param Core\Descriptor         $descriptor
