@@ -73,7 +73,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMCriteria()
     {
-        $c = new Collection();
+        $c = CriterionMapper::getInstance()->createCollection();
 
         // cast our object hierarchy into the flattened ORM-style models
         foreach ($this->criteriaGroups as $group) {
@@ -124,7 +124,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMUsages()
     {
-        $c = new Collection();
+        $c = UsageMapper::getInstance()->createCollection();
 
         $sequence = 0;
         foreach ($this->criteriaGroups as $group) {
@@ -169,7 +169,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMLevels()
     {
-        $c = new Collection();
+        $c = LevelMapper::getInstance()->createCollection();
 
         $sequence = 0;
         foreach ($this->levels as $level) {
@@ -222,7 +222,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMDescriptors()
     {
-        $c = new Collection();
+        $c = DescriptorMapper::getInstance()->createCollection();
 
         foreach ($this->levels as $sequence => $level) {
             foreach ($level->getAllDescriptors() as $descriptor) {
@@ -285,7 +285,7 @@ class Rubric extends Core\Rubric
      */
     public function getAllDescriptors()
     {
-        $c = new Collection();
+        $c = DescriptorMapper::getInstance()->createCollection();
 
         foreach ($this->levels as $level) {
             $c = $c->merge($level->getAllDescriptors());
@@ -302,7 +302,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMMarks($student, $timestamp)
     {
-        $c = new Collection();
+        $c = MarkMapper::getInstance()->createCollection();
 
         foreach ($this->getAllDescriptors() as $descr) {
             if ($descr->isSelected()) {
