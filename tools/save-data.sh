@@ -75,6 +75,19 @@ echo "Saving data as: $filename";
 cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 
+if [ ! -z $initial ];
+then
+    echo "Cleaning data for Initial dataset";
+    echo "Cleaning: log tables";
+    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE cmsLog";
+    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE user_activity_log";
+    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE login_log";
+    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE msg_reroute_override";
+    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE user_assume_log";
+    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE user_password_reset_request";
+    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE ups_log";
+fi
+
 echo "Cleaning data";
 echo "Cleaning: deleted files";
 /vagrant/tools/gc-storage.php$longverbose -n 10000000 -p;
@@ -88,12 +101,6 @@ echo "Cleaning: old sql backups";
 rm -f$longverbose /vagrant/data/*.sql{,.gz};
 echo "Reverting vagrant specific changes";
 mysql --defaults-extra-file=~/.my.cnf schoolbox < $cachedir/vagrant-cleanup.sql;
-
-if [ ! -z $initial ];
-then
-    echo "Cleaning data for Initial dataset";
-    echo "--- TODO: Clean all the special initial only things ---";
-fi
 
 echo "Exporting database";
 mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords -i -e -q -a -c schoolbox > /vagrant/data/schoolbox.sql;
