@@ -147,7 +147,7 @@ class Report_Bialik_Parent extends \Report_Parent
                 ON StudentContactCountryCode = StudentCountry.Code
             LEFT JOIN dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
-            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
+            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
             AND FileSemester = '" . $db->quote($fileSemester) . "'
             AND FileYear = '" . $db->quote($fileYear) ."'";
         /* Search for a particular year level
@@ -261,4 +261,4 @@ class Report_Bialik_Parent extends \Report_Parent
 
         return $contactList;
     }
-} 
+}

@@ -478,7 +478,7 @@ class External_Synergetic_User implements External_UserInterface
                 ON StudentContactCountryCode = StudentCountry.Code
             LEFT JOIN dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
-            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
+            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
         ;
@@ -617,7 +617,7 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
             LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
             LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
-            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
+            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             AND StudentBoarder = 'B'
@@ -673,7 +673,7 @@ class External_Synergetic_User implements External_UserInterface
             
             WHERE
                 StudentID = '$externalUserId'
-                AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
+                AND StudentContactType IN ('SC1', 'SC2', 'SC3')
                 AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
                 AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
         ;
@@ -846,6 +846,25 @@ class External_Synergetic_User implements External_UserInterface
         // GRASN/GRADR: Grandson/Granddaughter
         // FOCD:        Foster child
         // HS/HSS:      Homestay/Homestay Student
+
+        // Get student contact types from config, and wrangle into a query
+
+        $studentRelationships =
+            implode(
+                ',',
+                array_map(
+                    [$this->getDatabase(), 'smartQuote'],
+                    array_map(
+                        'trim',
+                        explode(',', Config::get('external_synergetic_student_relationships'))
+                    )
+                )
+            );
+
+        if (strlen($studentRelationships) === 0) {
+            $studentRelationships = "'SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'";
+        }
+
         $query = "
             SELECT Relationships.RelatedID
             FROM dbo.Constituencies Constituencies
@@ -853,7 +872,7 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN dbo.Community Community ON Relationships.RelatedID = Community.ID
             WHERE Relationships.ID = '{$this->database->quote($synergyID)}'
             AND Constituencies.ConstitCode='@SC'
-            AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS')
+            AND Relationships.Relationship IN ({$studentRelationships})
             ORDER BY Community.BirthDate
         ";
         return $this->getDatabase()->getAll($query);
@@ -907,6 +926,22 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
+        // Get student contact types from config, and wrangle into a query
+        $studentContactTypes =
+            implode(
+                ',',
+                array_map(
+                    [$this->getDatabase(), 'smartQuote'],
+                    array_map(
+                        'trim',
+                        explode(',', Config::get('external_synergetic_student_contact_types'))
+                    )
+                )
+            );
+        if (strlen($studentContactTypes) === 0) {
+            $studentContactTypes = "'SC1','SC2'";
+        }
+
         $query = "
             SELECT DISTINCT
 				cp.NetworkLogin AS StudentContactNetworkLogin,
@@ -927,7 +962,7 @@ class External_Synergetic_User implements External_UserInterface
 			FROM dbo.vStudentContactAllAddress s
 			LEFT JOIN dbo.Community cp ON s.StudentContactID = cp.ID
 			LEFT JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
-            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+            WHERE StudentContactType IN ({$studentContactTypes})
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             ORDER BY StudentContactID

@@ -11,7 +11,9 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use External_User;
 use MSSQL;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
@@ -20,6 +22,11 @@ class Sync implements SyncInterface
      * @var MSSQL
      */
     protected $database;
+
+    /**
+     * @var IConfigLoader
+     */
+    protected $config;
 
     /**
      * @var string
@@ -41,6 +48,8 @@ class Sync implements SyncInterface
         $externalUser = new \External_User();
         $this->year     = $externalUser->getCurrentYear();
         $this->semester = $externalUser->getCurrentSemester();
+        // Add config -_-
+        $this->config   = ConfigMapper::getInstance();
     }
 
     /**
@@ -79,6 +88,22 @@ class Sync implements SyncInterface
      */
     public function findAllParents()
     {
+        // Get student contact types from config, and wrangle into a query
+        $studentContactTypes =
+            implode(
+                ',',
+                array_map(
+                    [$this->database, 'smartQuote'],
+                    array_map(
+                        'trim',
+                        explode(',', $this->config->get('external_synergetic_student_contact_types'))
+                    )
+                )
+            );
+        if (strlen($studentContactTypes) === 0) {
+            $studentContactTypes = "'SC1','SC2'";
+        }
+
         $query = "
             SELECT DISTINCT
                 cp.NetworkLogin              AS student_contact_network_login,
@@ -98,7 +123,7 @@ class Sync implements SyncInterface
                 s.StudentSurname             AS student_surname
             FROM dbo.vStudentContactAllAddress s
             INNER JOIN dbo.Community cp ON s.StudentContactID = cp.ID
-            WHERE (s.StudentContactType IN ('SC1', 'SC2'))
+            WHERE (s.StudentContactType IN ($studentContactTypes))
             AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
             AND   s.FileYear = '" . $this->database->quote($this->year) . "'
 
@@ -122,7 +147,7 @@ class Sync implements SyncInterface
                 s.StudentSurname                   AS student_surname
             FROM dbo.vStudentContactAllAddress s
             INNER JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
-            WHERE (s.StudentContactType IN ('SC1', 'SC2'))
+            WHERE (s.StudentContactType IN ($studentContactTypes))
             AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
             AND   s.FileYear = '" . $this->database->quote($this->year) . "'
 
