@@ -27,6 +27,9 @@
 {% set isViewingOwnSummary = participant.user.id == USER.id %}
 {% set reviewer            = mostRecentResponse.submittedBy %}
 {% set reviewerName        = reviewer.id == USER.id ? 'You' : reviewer.fullName %}
+{% set COMPLETION_STATUS_INCOMPLETE              = 1 %}
+{% set COMPLETION_STATUS_SELF_MARKED_COMPLETE    = 2 %}
+{% set COMPLETION_STATUS_TEACHER_MARKED_COMPLETE = 3 %}
 
 <div class="row">
     <div class="small-12 island">
@@ -103,10 +106,11 @@
         {% if createResponseRoute and (hasWritePerm or not isMarkedByTeacherAsComplete) and (hasWritePerm or participant.assessable.isOpen) %}
             <form action="{{ createResponseRoute }}" method="POST">
                 {% if mostRecentResponse.markedComplete %}
-                    <input type="hidden" name="status" value="1" />
+                    <input type="hidden" name="status" value="{{ COMPLETION_STATUS_INCOMPLETE }}" />
                     <input type="submit" class="full-width" value="Mark as Incomplete" />
                 {% else %}
-                    <input type="hidden" name="status" value="{% if USER.id == student.id %}2{% else %}3{% endif %}" />
+                    {% set completedValue = USER.id == student.id ? COMPLETION_STATUS_SELF_MARKED_COMPLETE : COMPLETION_STATUS_TEACHER_MARKED_COMPLETE %}
+                    <input type="hidden" name="status" value="{{ completedValue }}" />
                     <input type="submit" class="full-width" value="Mark as Complete" />
                 {% endif %}
             </form>
