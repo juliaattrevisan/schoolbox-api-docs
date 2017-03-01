@@ -26,19 +26,39 @@ class Rubric extends Core\Rubric
     /** @var SubmissionBox|null */
     private $box;
 
-    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
+    /**
+     * Maps domain object Criterion to ORM Criterion
+     *
+     * @var SplObjectStorage|Core\Criteria\Criterion[]
+     */
     private $cCache;
 
-    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
+    /**
+     * Maps domain object Criterion to ORM Usage
+     *
+     * @var SplObjectStorage|Core\Criteria\Criterion[]
+     */
     private $uCache;
 
-    /** @var SplObjectStorage|Core\Competency\Level[] */
+    /**
+     * Maps domain object Level to ORM Level
+     *
+     * @var SplObjectStorage|Core\Competency\Level[]
+     */
     private $lCache;
 
-    /** @var SplObjectStorage|Core\Descriptor[] */
+    /**
+     * Maps domain object Descriptor to ORM Descriptor
+     *
+     * @var SplObjectStorage|Core\Descriptor[]
+     */
     private $dCache;
 
-    /** @var SplObjectStorage|Core\Descriptor[] */
+    /**
+     * Maps domain object Descriptor to ORM Mark
+     *
+     * @var SplObjectStorage|Core\Descriptor[]
+     */
     private $mCache;
 
 
