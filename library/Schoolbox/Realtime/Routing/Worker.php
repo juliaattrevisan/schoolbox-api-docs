@@ -53,7 +53,7 @@ class Worker extends AbstractProcess
             throw new InvalidArgumentException("Worker can only route");
         }
 
-        $this->log->debug("Iterating frames provided");
+        $this->log->debug(sprintf("Iterating %d frame%s provided", count($args), count($args) == 1 ? '' : 's'));
         $count = $this->txrx->receive($args);
         $this->log->info("Rerouted $count message" . ($count == 1 ? '' : 's'));
 
