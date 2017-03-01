@@ -17,7 +17,7 @@ use Schoolbox;
  * @method Criterion createModel($idValue = null)
  * @method Criterion findById($id)
  * @method Criterion[] findByColumnList($columnList, $options = array())
- * @method Criterion findOneByColumnList($columnList, $order = array())
+ * @method Criterion findOneByColumnList($columnList, $order = [], $options = [])
  */
 class CriterionMapper extends Schoolbox\Mapper {
 
