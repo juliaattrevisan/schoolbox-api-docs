@@ -88,6 +88,7 @@ class Marksheet_Rubric extends Marksheet_Abstract
      * @param int $maxMark
      * @param bool $asText
      * @param bool $blankZero
+     * @return string|float|int
      */
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {

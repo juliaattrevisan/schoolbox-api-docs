@@ -138,7 +138,7 @@ class Rubric implements Twiggable
      * @param Criteria\Group $group
      * @return self
      */
-    public function putGroup($group)
+    public function putGroup(Criteria\Group $group)
     {
         if (!$group instanceof Criteria\Group) {
             throw new InvalidArgumentException("Invalid Group given");
@@ -153,7 +153,7 @@ class Rubric implements Twiggable
      * @param Criteria\Group $group
      * @param Criteria\Criterion $criterion
      */
-    public function putCriterion($group, $criterion)
+    public function putCriterion(Criteria\Group $group, Criteria\Criterion $criterion)
     {
         $group->putCriterion($criterion);
         $this->putGroup($group);
@@ -164,7 +164,7 @@ class Rubric implements Twiggable
      * @param Competency\Level $level
      * @return self
      */
-    public function putLevel($level)
+    public function putLevel(Competency\Level $level)
     {
         if (!$level instanceof Competency\Level) {
             throw new InvalidArgumentException("Invalid Level given");

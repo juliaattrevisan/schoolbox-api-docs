@@ -41,7 +41,7 @@ class Level implements ISoftDeletable
 
     public function __construct()
     {
-        $this->descriptors = new GenericCollection(Descriptor::class);
+        $this->descriptors = DescriptorMapper::getInstance()->createCollection();
     }
 
     /**
@@ -57,7 +57,7 @@ class Level implements ISoftDeletable
      * @param SubmissionBox $submissionBox
      * @return static
      */
-    public function setSubmissionBox($submissionBox)
+    public function setSubmissionBox(SubmissionBox $submissionBox)
     {
         $this->submissionBox = $submissionBox;
         return $this;
