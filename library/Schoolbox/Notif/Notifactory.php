@@ -11,11 +11,13 @@ namespace Schoolbox\Notif;
 
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Lumberjack;
+use Alaress\Redis;
 use ConfigFallback;
 use Database;
 use Mailer;
 use PDOException;
 use PhpAmqpLib\Exception\AMQPExceptionInterface;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -27,6 +29,8 @@ class Notifactory
 
     /** @var IConfigLoader */
     protected $conf;
+    /** @var ClientInterface */
+    protected $redis;
     /** @var AMQPInterface */
     protected $mqc;
     /** @var Swift_Transport */
@@ -40,7 +44,7 @@ class Notifactory
      *
      * @param string        $topic
      * @param IConfigLoader $configLoader
-     * @return Notif
+     * @return NotifInterface
      */
     public static function create($topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
     {
@@ -55,12 +59,14 @@ class Notifactory
      *
      * @param IConfigLoader   $configLoader
      * @param AMQPInterface   $mqc
+     * @param ClientInterface $redis
      * @param Swift_Transport $swift
      * @param LoggerInterface $log
      */
-    public function __construct(IConfigLoader $configLoader = null, AMQPInterface $mqc = null, Swift_Transport $swift = null, LoggerInterface $log = null)
+    public function __construct(IConfigLoader $configLoader = null, AMQPInterface $mqc = null, ClientInterface $redis = null, Swift_Transport $swift = null, LoggerInterface $log = null)
     {
         $this->setConfigLoader($configLoader);
+        $this->setRedis($redis);
         $this->setAMQP($mqc);
         $this->setSwiftTransport($swift);
         $this->setLogger($log);
@@ -82,7 +88,7 @@ class Notifactory
      */
     public function generateHandlerFactory()
     {
-        return new HandlerFactory($this->conf, $this->swift, $this->log, $this->mqc);
+        return new HandlerFactory($this->conf, $this->swift, $this->log, $this->redis, $this->mqc);
     }
 
 
@@ -114,6 +120,17 @@ class Notifactory
             $this->conf = new ConfigFallback();
         }
 
+        return $this;
+    }
+
+
+    /**
+     * @param ClientInterface $redis
+     * @return $this
+     */
+    public function setRedis(ClientInterface $redis = null)
+    {
+        $this->redis = $redis ?: Redis::getClientInstance();
         return $this;
     }
 

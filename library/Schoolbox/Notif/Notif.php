@@ -117,6 +117,7 @@ class Notif implements NotifInterface
             array_push($handlers, $this->factory->getFileLogHandler($this->topic));
 
         } else {
+            $stack[] = HandlerFactory::USER_UNREAD;
             $stack[] = HandlerFactory::USER_INSTANT;
             $stack[] = HandlerFactory::USER_PUSH;
             $stack[] = HandlerFactory::USER_MAIL;

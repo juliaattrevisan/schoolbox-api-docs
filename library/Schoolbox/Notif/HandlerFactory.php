@@ -17,6 +17,7 @@ use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
 use Schoolbox\IConfigLoader;
@@ -26,6 +27,7 @@ use Schoolbox\Notif\Handler\AMQPHandler;
 use Schoolbox\Notif\Handler\InstamailHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\Handler\PushHandler;
+use Schoolbox\Notif\Handler\RedisMessageHandler;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_RfcComplianceException;
@@ -47,6 +49,7 @@ class HandlerFactory
     const LOG_AUTH           = Notif::TOPIC_AUTH;
     const LOG_CMS            = Notif::TOPIC_CMS;
 
+    const USER_UNREAD        = 'unread';
     const USER_INSTANT       = 'instant';
     const USER_PUSH          = 'push';
     const USER_MAIL          = 'mail';
@@ -67,6 +70,9 @@ class HandlerFactory
     /** @var callable[] */
     protected $handlerGenerators;
 
+    /** @var ClientInterface */
+    private $redis;
+
 
     /**
      * HandlerFactory constructor. Loads up a whole bunch of lazy-loaded handlers.
@@ -75,11 +81,13 @@ class HandlerFactory
      * @param IConfigLoader   $conf
      * @param Swift_Transport $swift
      * @param LoggerInterface $log
+     * @param ClientInterface $redis
      * @param AMQPInterface   $mqc
      */
-    public function __construct(IConfigLoader $conf, Swift_Transport $swift, LoggerInterface $log, AMQPInterface $mqc = null)
+    public function __construct(IConfigLoader $conf, Swift_Transport $swift, LoggerInterface $log, ClientInterface $redis, AMQPInterface $mqc = null)
     {
         $this->conf  = $conf;
+        $this->redis = $redis;
         $this->mqc   = $mqc;
         $this->swift = $swift;
         $this->log   = $log;
@@ -119,6 +127,10 @@ class HandlerFactory
         $this->handlerGenerators[self::SYS_DEBUG_MAIL] = function ()
         {
             return $this->createMailHandler('Schoolbox Debug', Logger::DEBUG, false);
+        };
+        $this->handlerGenerators[self::USER_UNREAD]  = function ()
+        {
+            return new RedisMessageHandler($this->redis, Logger::NOTICE, true);
         };
         $this->handlerGenerators[self::USER_INSTANT] = function ()
         {
