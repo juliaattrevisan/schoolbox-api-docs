@@ -44,10 +44,10 @@ class Visibility
      *
      * @param IAssessable $assessment
      * @param User        $user
-     * @param bool        $showClosed Should we hide assessments after their close date?
+     * @param bool        $showClosed Should we exclude assessments if their close date has passed?
      * @return bool
      */
-    public function isVisibleToUser(IAssessable $assessment, User $user, $showClosed = true)
+    public function isVisibleToUser(IAssessable $assessment, User $user, $showClosed)
     {
         $folderAccessLevel = $this->getAccess()->getFolderAccess($user, [$assessment->getBaseContext()->getFolder()->getId()]);
 

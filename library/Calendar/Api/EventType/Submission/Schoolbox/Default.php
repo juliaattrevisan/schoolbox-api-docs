@@ -93,7 +93,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         foreach ($assessables as $assessment) {
 
             // Permission check to see the assessment
-            if(!$visibility->isVisibleToUser($assessment, $this->getUser())){
+            if(!$visibility->isVisibleToUser($assessment, $this->getUser(), true)){
                 continue;
             }
 
