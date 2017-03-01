@@ -101,9 +101,6 @@ class Bootstrap extends AbstractBootstrap {
 
 		// MySQL connection configuration
 		Database::getInstance()->connect(SQL_dsn, SQL_user, SQL_passwd, array('throw' => true));
-
-		// Redis connection configuration
-		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'), null, INSTANCE_ID);
 	}
 
     /**

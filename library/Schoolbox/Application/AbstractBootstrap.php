@@ -45,6 +45,7 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
+use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -82,17 +83,9 @@ abstract class AbstractBootstrap implements BootstrapInterface
      */
     public function installDependencies()
     {
-        // Set correct timezone
-        date_default_timezone_set($timezone = Config::get('date_timezone'));
-
-        // Set up DB timezones here too
-        Database::getInstance()->setTimezone($timezone);
-        DeprecatedDatabase::getInstance()->setTimezone($timezone);
-
-        // Set up the dependency injector
-
         // Do dependency injection stuff
         // How do I get this container elsewhere without using a global?
+        // Set up the dependency injector
         $di = new Di\Container(new Di\Factory());
 
         // Database
@@ -102,6 +95,31 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
         // Configuration
         $di->set('config', $di->lazyNew(\Schoolbox\Config\Loader::class));
+
+        $di->set('redis', $di->lazy(function () use ($di) {
+            // Redis connection configuration
+            Redis::getInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+
+            return Redis::getClientInstance();
+        }));
+
+        $di->set('amqp', $di->lazy(function () {
+            return Connector::getInstance();
+        }));
+
+        // install mapper DI
+        // (yes I know this is icky, but it will have to do until mapper construction is set up with DI properly)
+        Mapper::di($di);
+
+        $conf = $di->get('config');
+
+        // Set correct timezone
+        date_default_timezone_set($timezone = $conf->get('date_timezone'));
+
+        // Set up DB timezones here too
+        Database::getInstance()->setTimezone($timezone);
+        DeprecatedDatabase::getInstance()->setTimezone($timezone);
+
         $di->set('notif', $di->lazy(function () {
             // replace this with $di->lazyGetCall() once we upgrade Aura.Di
             return Notifactory::create();
@@ -166,10 +184,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 }
             )
         );
-
-        // install mapper DI
-        // (yes I know this is icky, but it will have to do until mapper construction is set up with DI properly)
-        Mapper::di($di);
 
         // Enable mappers to be injectable, but instantiated only when required
         $mapperFactory = new MapperFactory($di);
@@ -442,10 +456,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 ]
             )
         );
-
-        $di->set('redis', $di->lazy(function () {
-            return Redis::getClientInstance();
-        }));
 
         // Register External_User service
         $di->set('externalUser', $di->lazyNew(\External_User::class));

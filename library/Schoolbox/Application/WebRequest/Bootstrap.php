@@ -138,9 +138,6 @@ class Bootstrap extends AbstractBootstrap {
         // The only solution is to allow the config query to run and then throw
         // away my connection, and create a fresh one with debug enabled.
         $database->connect(SQL_dsn, SQL_user, SQL_passwd);
-
-        // Redis connection configuration
-        Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'), null, INSTANCE_ID);
     }
 
 
