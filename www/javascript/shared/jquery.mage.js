@@ -363,6 +363,8 @@
 
             // Does there exist a CK Editor instance for this text area?
             if ($ckEditor != undefined) {
+                // do both for good measure
+                $textArea.html($ckEditor.getData());
                 $textArea.val($ckEditor.getData());
             }
         });
