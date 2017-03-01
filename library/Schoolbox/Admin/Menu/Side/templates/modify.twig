@@ -19,30 +19,13 @@
             return false;
         });
 
-        $.validator.addMethod("roles", function(value, elem, param) {
-            if($("[data-role]:checked").length > 0){
-                return true;
-            }else {
-                return false;
-            }
-        }, "You must select at least one role before you can proceed.");
-
-        $.validator.addMethod("campuses", function(value, elem, param) {
-            if($("[data-campus]:checked").length > 0){
-                return true;
-            }else {
-                return false;
-            }
-        }, "You must select at least one campus before you can proceed.");
 
         $('[data-submit]').click(function () {
             form.alaressValidate({
                 ignore: ':disabled',
                 rules: {
                     'title': {required: true},
-                    'url': {required: true, isURL: true},
-                    'campuses[]': {campuses: true},
-                    'roles[]': {roles: true}
+                    'url': {required: true, isURL: true}
                 },
                 messages: {
                     'title': {required: 'You must enter a title before you can proceed.'},
