@@ -14,15 +14,14 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use \Calendar_Layout_Full_Ajax_JSON;
-use \Group;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \External_Timetable;
-use \Schoolbox\CampusMapper;
-use \External_Synergetic_Timetable;
-use Schoolbox\Learning\Upcoming;
 use \Config;
 use Alaress_Date_Format;
+use Schoolbox\Role;
 
 class Controller extends Base
 {
@@ -166,7 +165,7 @@ class Controller extends Base
     /**
      * Return a list of events or assessments due for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
      */
-    public function getByTimetableDay($campusId, $termId, $cycle, $day, $classCode = '', $dateOnly = false) {
+    public function getByTimetableDay($campusId, $termId, $cycle, $day, $folder, $dateOnly = false) {
         $user = $this->getUser();
         //Get Campus object
         $campus = $user->getCampusCollection()->getBy('id', $campusId);
@@ -187,8 +186,8 @@ class Controller extends Base
         $date = $this->getDateForTimetableDay($termStartDate, $termFirstDay, $daysInCycle, $cycle, $day);
 
         //Return duework
-        if(strlen($classCode) > 0){
-            return $this->getDueByDate($date, $classCode);
+        if($folder > 0){
+            return $this->getDueByDate($date, $folder);
         }
         if($dateOnly == true) {
             $this->getResponse()->content->set(
@@ -287,7 +286,7 @@ class Controller extends Base
      * @param string $date (Date we are interested in)
      * @param string $classCode (CSV list of class codes)
      */
-    public function getDueByDate($date, $classCode)
+    public function getDueByDate($date, $folder)
     {
         // Test URL with assignments due:
         // http://192.168.36.10/picker/datetime/date/01-07-2018/class/CH123
@@ -296,10 +295,15 @@ class Controller extends Base
 
         $students = [];
 
-        // Get all students in the class code
+        // Get all students for the class or the group
 
-        $externalClassHandler = new \External_Class();
-        $externalStudents = $externalClassHandler->getStudents($classCode);
+        $folderModel = FolderMapper::getInstance()->findById($folder);
+        $externalStudents = UserAccessMapper::getInstance()->findUsersInCategory(
+            $folderModel,
+            Role::STUDENT,
+            UserAccess::ACCESS_READ,
+            true
+        );
 
         // Find out the term this date falls in (needed to locate assessments)
         $term = $this->getTermMapper()->findForDate( \Alaress_Date_Format::newLocalShort($date) );
@@ -309,7 +313,7 @@ class Controller extends Base
         $externalIds = [];
 
         foreach ($externalStudents as $studentCurrent) {
-            $externalIds[] = $studentCurrent['synergy_id'];
+            $externalIds[] = $studentCurrent->getExternalId();
         }
 
         $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
@@ -409,7 +413,7 @@ class Controller extends Base
      */
     public function getTermMapper() {
         return $this->termMapper;
-    }    
+    }
 
     /** @var AssessmentMapperProxy */
     private $assessmentMapperProxy;

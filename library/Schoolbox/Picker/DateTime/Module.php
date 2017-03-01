@@ -47,8 +47,8 @@ class Module extends BaseModule
                 '/date/{date}' => 'getByDate',
                 '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}' => 'getEventsByTimetableDay',
                 '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}/date' => 'getTimetableDate',
-                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}/class/{classCode}' => 'getByTimetableDay',
-                '/date/{date}/class/{classCode}' => 'getDueByDate',
+                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}/folder/{folder}' => 'getByTimetableDay',
+                '/date/{date}/folder/{folder}' => 'getDueByDate',
             ],
             'POST' => [
             ]

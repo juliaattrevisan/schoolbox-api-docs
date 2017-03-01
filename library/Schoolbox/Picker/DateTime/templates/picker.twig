@@ -428,11 +428,11 @@
         {% if type == 'duework'  %}
 
             // Can the assessment form have dates and be called outside the class page?
-            var classCode = $('*[name = "classCode"]').val();
+            var folder = $('*[name = "folderId"]').val();
 
             loadingResponse('timetable');
 
-            $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{classCode}/g, classCode))
+            $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{folder}/g, folder))
                     .done(function (data) {
 
                         appendResponse(data, 'duework', 'timetable');
@@ -543,9 +543,9 @@
 
                 loadingResponse('calendar');
 
-                var classCode = $('*[name = "classCode"]').val();
+                var folder = $('*[name = "folderId"]').val();
 
-                $.get(('{{ routeLookup('pickerDatetime.getDueByDate') }}').replace(/{classCode}/g, classCode).replace(/{date}/g, encodeURIComponent(dateSplit[0])))
+                $.get(('{{ routeLookup('pickerDatetime.getDueByDate') }}').replace(/{folder}/g, folder).replace(/{date}/g, encodeURIComponent(dateSplit[0])))
 
                         .done(function (data) {
 
