@@ -265,6 +265,16 @@ class Participant
         return $this->assessable->getMarkScheme()->getPublishedHumanReadableMark($this);
     }
 
+    /**
+     * Returns this Participant's most recent Human-Readable mark (includes draft marks)
+     *
+     * @return null|string
+     */
+    public function getMostRecentHumanReadableMark()
+    {
+        return $this->assessable->getMarkScheme()->getMostRecentHumanReadableMark($this);
+    }
+
 
     /* Getters/Setters
      */

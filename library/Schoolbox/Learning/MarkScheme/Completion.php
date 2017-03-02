@@ -64,4 +64,12 @@ class Completion extends AbstractMarkScheme
     {
         return $this->getHumanReadableMark(null, $participant->findMostRecentSubmittedResponse());
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMostRecentHumanReadableMark(Participant $participant)
+    {
+        return $this->getHumanReadableMark(null, $participant->findMostRecentSubmittedResponse());
+    }
 }

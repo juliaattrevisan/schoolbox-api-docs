@@ -97,4 +97,13 @@ abstract class AbstractMarkScheme implements IMarkScheme
         $feedback = $participant->findMostRecentPublishedFeedback();
         return $feedback ? $feedback->getHumanReadableMark() : null;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMostRecentHumanReadableMark(Participant $participant)
+    {
+        $feedback = $participant->findMostRecentFeedback();
+        return $feedback ? $feedback->getHumanReadableMark() : null;
+    }
 }

@@ -81,4 +81,12 @@ interface IMarkScheme
      * @return string|null
      */
     public function getPublishedHumanReadableMark(Participant $participant);
+
+    /**
+     * Return the most recent human-readable mark (including drafts) for the specified participant
+     *
+     * @param Participant $participant
+     * @return string|null
+     */
+    public function getMostRecentHumanReadableMark(Participant $participant);
 }
