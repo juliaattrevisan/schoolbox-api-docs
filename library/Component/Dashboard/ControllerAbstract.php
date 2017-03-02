@@ -88,7 +88,7 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
      * @param Folder|null $source
      * @return static
      */
-    public function setSource(Folder $source = null)
+    public function setSource( $source = null)
     {
         parent::setSource($source);
         return $this;

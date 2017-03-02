@@ -25,7 +25,7 @@ class MyFile extends DeprecatedModel
 		$this->_table = "myFile";
 		$this->_index = "id";
 
-		parent::DeprecatedModel();
+		parent::__construct();
 	}
 
 	/**

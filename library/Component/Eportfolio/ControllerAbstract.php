@@ -29,7 +29,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      *
      * @param Eportfolio_Page_Instance|null $context Null when used in admin ePortfolio screen
       */
-    public function setup(Eportfolio_Page_Instance $context = null)
+    public function setup($context = null)
     {
         parent::setup($context);
 
@@ -158,7 +158,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * @param Eportfolio_Page_Instance|null $context
      * @return static
      */
-    protected function setContext(Eportfolio_Page_Instance $context = null)
+    protected function setContext($context = null)
     {
         parent::setContext($context);
         return $this;
@@ -170,7 +170,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * @param Eportfolio_Page_Instance|null $source
      * @return static
      */
-    public function setSource(Eportfolio_Page_Instance $source = null) {
+    public function setSource( $source = null) {
         parent::setSource($source);
         return $this;
     }

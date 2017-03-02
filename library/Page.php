@@ -4,12 +4,12 @@ require_once(WEB_root.'/include/stdfuncs.php');
 
 class Page {
 
-	function Page($error = false) {
+	public function __construct($error = false) {
 		$this->templateRoot = Cfg::get('template_dir');
 		$this->template = new Template($this->templateRoot);
 	}
 
-	function loadContent($pageFile, $execute=TRUE) {
+	public function loadContent($pageFile, $execute=TRUE) {
 		$this->pageName = $pageFile;
 
 		//max dir depth is 2 so anything after that must be arguments being passed to the script
@@ -35,34 +35,34 @@ class Page {
 	}
 
 
-	function pageNotFound() {
+    public function pageNotFound() {
 		header("HTTP/1.0 404 Not Found");
 		$this->setFile(TEMPLATE_content, '404.html');
 		$this->outputPage();
 		exit;
 	}
 
-	function setVar($var, $value='') {
+    public function setVar($var, $value='') {
 		$this->template->setVar($var, $value);
 	}
 
-	function setUnknowns($unknowns) {
+    public function setUnknowns($unknowns) {
 		$this->template->setUnknowns($unknowns);
 	}
 
-	function setBlock($parent, $handle, $name = '') {
+    public function setBlock($parent, $handle, $name = '') {
 		$this->template->setBlock($parent, $handle, $name);
 	}
 
-	function parse($target, $handle, $append = false) {
+    public function parse($target, $handle, $append = false) {
 		$this->template->parse($target, $handle, $append);
 	}
 
-	function setFile($handle, $file) {
+    public function setFile($handle, $file) {
 		return $this->template->setFile($handle, $file);
 	}
 
-        function dropDown($handle, $data, $selected='', $mapping='', $template=TEMPLATE_content) {
+    public function dropDown($handle, $data, $selected='', $mapping='', $template=TEMPLATE_content) {
                 $this->setBlock($template, $handle, $handle.'_block');
 		$this->setVar($handle.'_block', '');
 		if(is_array($data)) {
@@ -83,7 +83,7 @@ class Page {
 
 	}
 
-	function outputPage() {
+    public function outputPage() {
 		$this->template->pparse('finaloutput', TEMPLATE_body);
 	}
 }

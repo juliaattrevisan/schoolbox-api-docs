@@ -2,12 +2,12 @@
 
 class AllowedFile extends DeprecatedModel {
 
-	function AllowedFile () {
+	function __construct() {
 
 		$this->_table = "allowedFileTypes";
 		$this->_index = "fileTypeID";
 
-		parent::DeprecatedModel();
+		parent::__construct();
 	}
 
 	function checkError($error) {

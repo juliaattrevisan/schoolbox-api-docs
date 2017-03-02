@@ -35,7 +35,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      *
      * @param Folder|null $context null when called from admin homepage config screen
      */
-    public function setup(Folder $context = null)
+    public function setup($context = null)
     {
         parent::setup($context);
 
@@ -186,7 +186,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      * @param Folder|null $context null when used on admin homepage config screen
      * @return static
      */
-    protected function setContext(Folder $context = null)
+    protected function setContext($context = null)
     {
         parent::setContext($context);
         return $this;
@@ -196,7 +196,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      * @param Folder|null $source
      * @return static
      */
-    public function setSource(Folder $source = null)
+    public function setSource( $source = null)
     {
         parent::setSource($source);
         return $this;

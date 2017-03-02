@@ -14,14 +14,9 @@ class External_Schoolbox_User implements External_UserInterface
 
     private $database;
 
-    private $group;
-
-    private $user;
-
     public function __construct()
     {
         $this->setdatabase(Database::getInstance());
-        $this->setUser(new User);
     }
 
     public function getParent($externalUserId)
@@ -182,7 +177,7 @@ class External_Schoolbox_User implements External_UserInterface
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    function getStaff($externalUserId)
+    public function getStaff($externalUserId)
     {
     }
 
@@ -242,7 +237,7 @@ class External_Schoolbox_User implements External_UserInterface
         return $contactAdaptionList;
     }
 
-    function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester($externalUserId = null)
     {
         return date('m') < 6 ? 1 : 2;
     }
@@ -258,7 +253,7 @@ class External_Schoolbox_User implements External_UserInterface
      * @param User $user
      * @return array
      */
-    function getSubjectList(\Schoolbox\User $user)
+    public function getSubjectList(\Schoolbox\User $user)
     {
         $externalId = $user->getExternalId();
 
@@ -296,7 +291,7 @@ class External_Schoolbox_User implements External_UserInterface
         return array_values(array_unique($classList, SORT_REGULAR));
     }
 
-    function getEnrolledStudents($externalUserId)
+    public function getEnrolledStudents($externalUserId)
     {
         $statement = $this->getDatabase()->prepare(
             "
@@ -318,7 +313,7 @@ class External_Schoolbox_User implements External_UserInterface
         return $childList;
     }
 
-    function getEmail($externalUserId)
+    public function getEmail($externalUserId)
     {
 
     }
@@ -414,22 +409,6 @@ class External_Schoolbox_User implements External_UserInterface
     private function getDatabase()
     {
         return $this->database;
-    }
-
-    /**
-     * @param User $user
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    /**
-     * @return User
-     */
-    public function getUser()
-    {
-        return $this->user;
     }
 
     public function getHousemasterByHouseId($houseID)

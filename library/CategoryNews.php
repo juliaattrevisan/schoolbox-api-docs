@@ -6,12 +6,12 @@
  */
 class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
-	function CategoryNews () {
+	function __construct() {
 
 		$this->_table = "subject_news";
 		$this->_index = "id";
 
-		parent::DeprecatedModel();
+		parent::__construct();
 	}
 
 	/**

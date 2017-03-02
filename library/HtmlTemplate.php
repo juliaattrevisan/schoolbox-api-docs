@@ -104,7 +104,7 @@ class HtmlTemplate
      *
      * @access public
      */
-    function HtmlTemplate($root = '.', $unknowns = '', $fallback='')
+    function __construct($root = '.', $unknowns = '', $fallback='')
     {
         $this->setRoot($root);
 		if ($unknowns !== '') $this->setUnknowns($unknowns);

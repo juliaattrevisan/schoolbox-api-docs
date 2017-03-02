@@ -78,13 +78,16 @@ class SitePage extends Page
      * @param bool $login
      *
      */
-    public function SitePage($login = true)
+    public function __construct($login = true)
     {
-        parent::Page();
+        parent::__construct();
 
         $this->config = \Config::getInstance();
         $this->db = \DeprecatedDatabase::getInstance();
-        $this->user = $_SESSION["user"];
+
+        if(isset($_SESSION['user'])) {
+            $this->user = $_SESSION['user'];
+        }
 
         if ($login) {
             $this->initSession();
@@ -166,7 +169,7 @@ class SitePage extends Page
      * @param bool $execute
      * @return bool
      */
-    function loadContent($pageFile, $execute = true)
+    public function loadContent($pageFile, $execute = true)
     {
         $this->pageName = $pageFile;
 
@@ -232,7 +235,7 @@ class SitePage extends Page
     /**
      * @return bool
      */
-    function setSite()
+    public function setSite()
     {
         if ($this->config->get('skin_builder')) {
             // If config.skin_builder is on - set $site to core
@@ -273,7 +276,7 @@ class SitePage extends Page
     /**
      * @param bool $state
      */
-    function setAjax($state = true)
+    public function setAjax($state = true)
     {
         $this->ajax = $state;
     }
@@ -281,7 +284,7 @@ class SitePage extends Page
     /**
      * @param $state
      */
-    function setLite($state)
+    public function setLite($state)
     {
         $this->lite = $state;
     }
@@ -297,7 +300,11 @@ class SitePage extends Page
      */
     public static function detectAjax()
     {
-        return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+            return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -326,7 +333,7 @@ class SitePage extends Page
      * @param bool $lite
      * @return bool
      */
-    function outputPage($lite = false)
+    public function outputPage($lite = false)
     {
         if ($this->ajax) {
             return true;
@@ -396,7 +403,7 @@ class SitePage extends Page
     /**
      * @param bool $customHead
      */
-    function buildPage($customHead = true)
+    public function buildPage($customHead = true)
     {
         $this->setFile(TEMPLATE_body, 'include/body.html');
         $this->setFile('headerTpl', 'include/header.html');
@@ -532,7 +539,7 @@ class SitePage extends Page
     /**
      * @param $tab
      */
-    function setTab($tab)
+    public function setTab($tab)
     {
         $this->currentTab = $tab;
     }
@@ -540,7 +547,7 @@ class SitePage extends Page
     /**
      *
      */
-    function initSession()
+    public function initSession()
     {
         session_start();
 
@@ -616,7 +623,7 @@ class SitePage extends Page
     /**
      * @param string $override
      */
-    function saveHistory($override = '')
+    public function saveHistory($override = '')
     {
         /* Function saves user page history in session so we can go back to where they came from */
         if (!is_array($_SESSION['history'])) {
@@ -638,7 +645,7 @@ class SitePage extends Page
     /**
      * @param $page
      */
-    static function backToTheFuture($page)
+    public static function backToTheFuture($page)
     {
         /* In Dans honour, time is ours */
         if (is_array($_SESSION['history'])) {
@@ -662,7 +669,7 @@ class SitePage extends Page
      * @param array $args Replaces '%MESSAGE%' in $ec
      * @param int $code HTTP response code, defaults to 400 (Bad Request)
      */
-    function error($ec, $args = [], $code = 400)
+    public function error($ec, $args = [], $code = 400)
     {
         // Backward-compatibility with $args being a message
         if (is_string($args)) {
@@ -757,7 +764,7 @@ class SitePage extends Page
     /**
      *
      */
-    function renderInstantMessages()
+    public function renderInstantMessages()
     {
         /* Docking the tray
          */
@@ -794,7 +801,7 @@ class SitePage extends Page
     /**
      *
      */
-    function renderScriptIncludes()
+    public function renderScriptIncludes()
     {
         $this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
         $this->setBlock('headerTpl', 'header_css', 'header_css_block');
@@ -822,7 +829,7 @@ class SitePage extends Page
     /**
      * @param $file
      */
-    function setJavascript($file)
+    public function setJavascript($file)
     {
         $this->jscript[] = array('HEADER_SCRIPT_LOCATION' => $file);
     }
@@ -831,7 +838,7 @@ class SitePage extends Page
      * @param $file
      * @param string $type
      */
-    function setCSS($file, $type = 'screen')
+    public function setCSS($file, $type = 'screen')
     {
         $this->css[] = array('HEADER_CSS_TYPE' => $type, 'HEADER_CSS_LOCATION' => $file);
     }
@@ -841,7 +848,7 @@ class SitePage extends Page
      * @param $file
      * @return bool
      */
-    function setFile($handle, $file)
+    public function setFile($handle, $file)
     {
         if (!$this->template->setFile($handle, $this->getTemplate($file))) {
             return false;
@@ -858,7 +865,7 @@ class SitePage extends Page
     /**
      * @param string $title
      */
-    function setTitle($title = '')
+    public function setTitle($title = '')
     {
         $this->setVar('TITLE', $this->config->get('title') . (!empty($title) ? ' - ' . Scrub::text($title) : ''));
     }
@@ -867,7 +874,7 @@ class SitePage extends Page
      * @param $template
      * @return bool|string
      */
-    function getTemplate($template)
+    public function getTemplate($template)
     {
         // Chrome/skin templates are always core if skin builder is on,
         // except if the version in the skin is newer than 15.5 release date (this is determined if instant.html is included)
@@ -898,7 +905,7 @@ class SitePage extends Page
      * @param $varname
      * @return mixed
      */
-    function getVar($varname)
+    public function getVar($varname)
     {
         return $this->template->getVar($varname);
     }
@@ -1007,7 +1014,7 @@ class SitePage extends Page
      * @param string $error An error message to display on the login page.
      * @param string $page If set, this page is set as the path to redirect to.
      */
-    function goLoginPage($error = '', $page = '')
+    public function goLoginPage($error = '', $page = '')
     {
         // AJAX request? Don't ever output a page.
         // Output something with a 401 status code.
@@ -1147,7 +1154,7 @@ class SitePage extends Page
      * @param string $template
      * @param array $mapping
      */
-    function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
+    public function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
     {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array();
@@ -1196,7 +1203,7 @@ class SitePage extends Page
      * @param string $template
      * @param array $mapping
      */
-    function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
+    public function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
     {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array($selected);
@@ -1245,7 +1252,7 @@ class SitePage extends Page
      * @param $perm
      * @return bool
      */
-    function canRead($perm)
+    public function canRead($perm)
     {
         return $perm >= UserAccess::ACCESS_READ ? true : false;
     }
@@ -1254,7 +1261,7 @@ class SitePage extends Page
      * @param $perm
      * @return bool
      */
-    function canWrite($perm)
+    public function canWrite($perm)
     {
         return $perm >= UserAccess::ACCESS_WRITE ? true : false;
     }
@@ -1294,12 +1301,14 @@ class SitePage extends Page
 
         // Check referrer for if the last page was a create or modify page.
         unset($_SESSION['disableXssProtectionForNextPage']);
-        $referer = parse_url($_SERVER['HTTP_REFERER']);
-        if ($referer['host'] === $_SERVER['SERVER_NAME']) {
-            foreach (array('create', 'modify') as $path) {
-                if (stripos($referer['path'], $path) !== false) {
-                    header("X-XSS-Protection: 0\r\n");
-                    return true;
+        if(isset($_SERVER['HTTP_REFERER'])) {
+            $referer = parse_url($_SERVER['HTTP_REFERER']);
+            if ($referer['host'] === $_SERVER['SERVER_NAME']) {
+                foreach (array('create', 'modify') as $path) {
+                    if (stripos($referer['path'], $path) !== false) {
+                        header("X-XSS-Protection: 0\r\n");
+                        return true;
+                    }
                 }
             }
         }

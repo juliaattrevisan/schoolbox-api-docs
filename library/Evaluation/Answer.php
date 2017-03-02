@@ -51,7 +51,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
      */
     public function __construct($responseHandler, $questionHandler)
     {
-        parent::DeprecatedModel();
+        parent::__construct();
         $this->responseHandler = $responseHandler;
         $this->questionHandler = $questionHandler;
     }

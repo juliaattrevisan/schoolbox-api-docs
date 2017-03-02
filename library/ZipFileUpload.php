@@ -62,7 +62,7 @@ class ZipFileUpload extends DeprecatedModel
      */
     public function __construct($extractTo = '')
     {
-        parent::DeprecatedModel();
+        parent::__construct();
 
         $this->extractTo = (string)(trim($extractTo) ?: sys_get_temp_dir());
 

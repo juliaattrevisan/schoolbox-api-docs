@@ -105,16 +105,6 @@ class Controller extends Base\Base
      */
     private $importFactory;
 
-    /**
-     * Just a raw template render
-     *
-     * @param string $template
-     * @param array $data
-     */
-    protected function tpl($template, $data = [])
-    {
-        parent::tpl('course', $template, $data);
-    }
 
     /**
      * This GET is the start of the import process.
@@ -190,7 +180,7 @@ class Controller extends Base\Base
             ? self::IMPORT_STAGE_OWNERSHIPS
             : self::IMPORT_STAGE_COURSE_AND_CLASSES;
 
-        $this->tpl('import', [
+        $this->tpl('course', 'import', [
             'action'              => 'import',
             'initialStage'        => $initialStage,
             'courseSpec'          => $courseSpec,
@@ -260,7 +250,7 @@ class Controller extends Base\Base
 
         // Everything kosher, proceed with the mage
         // respond with stage 2: ownership
-        $this->tpl('import/ownership', [
+        $this->tpl('course', 'import/ownership', [
             'courseSpec'          => $courseSpec,
             'targetFolders'       => $folders,
             'componentId'         => $componentId,
@@ -319,7 +309,7 @@ class Controller extends Base\Base
 
         // process ownership assignments
         // respond with stage 3: unit selection
-        $this->tpl('unitImportForm', [
+        $this->tpl('course', 'unitImportForm', [
             'action'       => 'import',
             'courseSpecId' => $courseSpecId,
             'componentId'  => $componentId,
@@ -519,7 +509,7 @@ class Controller extends Base\Base
         };
 
         // respond with stage 4: coursework list
-        $this->tpl('unitImportResults', [
+        $this->tpl('course', 'unitImportResults', [
             'action'           => $action,
             'returnUrlName'    => Redirect::RETURN_URL,
             'encodedReturnUrl' => $encodedReturnUrl,
@@ -981,7 +971,7 @@ class Controller extends Base\Base
             $owner = $this->getUser();
         }
 
-        $this->tpl('import', [
+        $this->tpl('course', 'import', [
             'action'              => 'modify',
             'initialStage'        => self::IMPORT_STAGE_UNITS,
             'courseSpec'          => $courseSpec,
@@ -1134,7 +1124,7 @@ class Controller extends Base\Base
             $folderAncestry[$courseImpl->getId()] = array_reverse($folderAncestry[$courseImpl->getId()]);
         }
 
-        $this->tpl('management', [
+        $this->tpl('course', 'management', [
             'folder'           => $folder,
             'courseImpls'      => $courseImpls,
             'componentNames'   => $componentNames,

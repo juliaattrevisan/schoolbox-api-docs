@@ -2,11 +2,11 @@
 
 class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
-    function TextBox() {
+    function __construct() {
         $this->_table = 'textBox';
         $this->_index = 'textBoxID';
 
-        parent::DeprecatedModel();
+        parent::__construct();
     }
 
     function getAllByCategory($categoryID) {

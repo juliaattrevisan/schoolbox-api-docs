@@ -17,7 +17,7 @@ class SubmissionReturn extends DeprecatedModel
         $this->_table = "submission_return";
         $this->_index = "id";
 
-        parent::DeprecatedModel();
+        parent::__construct();
     }
 
 

@@ -15,11 +15,6 @@ abstract class Evaluation_Factory extends DeprecatedModel
     protected $questionPrefix = 'Question';
     protected $answerPrefix = 'Answer';
 
-    public function __construct()
-    {
-        parent::DeprecatedModel();
-    }
-
     /**
      * @return Evaluation_Response
      */

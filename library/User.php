@@ -2,7 +2,6 @@
 
 class User extends DeprecatedModel
 {
-
     /**
      * A copy of the user notifier - it is called when a user changes.
      *
@@ -10,11 +9,11 @@ class User extends DeprecatedModel
      */
     protected $userNotifier;
 
-    public function User()
+    public function __construct()
     {
         $this->_table = "user";
         $this->_index = "id";
-        parent::DeprecatedModel();
+        parent::__construct();
     }
 
 

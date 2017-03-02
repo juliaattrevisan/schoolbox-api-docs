@@ -5,13 +5,13 @@ define('FORUM_POSTS_PER_PAGE', 15);
 
 class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
-    function Forum() {
+    function __construct() {
 
         $this->_table = "forumThread";
         $this->_index = "threadID";
         $this->_postTable = "forumPost";
 
-        parent::DeprecatedModel();
+        parent::__construct();
     }
 
     function getRecentThreadList($categoryID, $config) {

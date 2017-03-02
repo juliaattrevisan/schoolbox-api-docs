@@ -5,14 +5,14 @@ class Blog extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 	/**
 	 * @deprecated
 	 */
-	function Blog () {
+	function __construct() {
 		$this->_table = "blog";
 		$this->_index = "id";
 		$this->_config = array();
 
 		$this->group = new Group();
 
-		parent::DeprecatedModel();
+		parent::__construct();
 	}
 
 	/**
