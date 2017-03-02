@@ -12,10 +12,18 @@ namespace Alaress\Async\AMQP;
 
 use PhpAmqpLib\Message\AMQPMessage;
 
+/**
+ * Interface AMQPResponseHandlerInterface
+ *
+ * @deprecated
+ * @package Alaress\Async\AMQP
+ */
 interface AMQPResponseHandlerInterface
 {
 
     /**
+     * @deprecated
+     *
      * Called from within a Subscription object for notifying attached sockets of a new message
      *
      * @param AMQPMessage $message
