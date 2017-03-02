@@ -10,7 +10,14 @@
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
-ver='2.6.3';
+
+ver=`curl https://www.johnvansickle.com/ffmpeg/ 2>/dev/null | grep 'release:' | awk '{print $2}'`;
+if [ "$ver" == "" ];
+then
+    echo "Error: unable to retrieve version";
+fi
+
+echo "Packaging ffmpeg version: $ver";
 
 # Create directories for completing the build
 builddir="/tmp/build-dir-`date -I`";
@@ -38,6 +45,7 @@ tar czf schoolbox-ffmpeg_$ver.orig.tar.gz schoolbox-ffmpeg-$ver;
 # Copy deb build details to be ready for build
 cd schoolbox-ffmpeg-$ver;
 cp -fR $fullpath/debian .;
+sed -i "s/x.y.z/$ver/g" debian/changelog;
 
 # Build!
 debuild -i -I -us -uc;
