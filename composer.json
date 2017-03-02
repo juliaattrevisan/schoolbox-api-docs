@@ -36,23 +36,6 @@
             }
         },
         {
-            "type": "package",
-            "package": {
-                "name": "devristo/phpws",
-                "version": "0.1.0",
-                "source": {
-                    "url": "https://github.com/Devristo/phpws",
-                    "type": "git",
-                    "reference": "911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30"
-                },
-                "autoload": {
-                    "psr-0": {
-                        "Devristo\\Phpws\\": "src/"
-                    }
-                }
-            }
-        },
-        {
             "type": "vcs",
             "url":  "https://github.com/alaress/etherpad-lite-client"
         },
@@ -63,16 +46,14 @@
     ],
     "require": {
         "gggeek/phpxmlrpc": "0.1.0",
-        "zendframework/zend-http": "2.2.*",
-        "zendframework/zend-log": "2.2.*",
-        "zendframework/zend-uri": "2.2.*",
         "zendframework/zendservice-apple-apns": "~1.0",
+        "zendframework/zend-uri": "2.2.*",
         "league/oauth2-client": "0.9.0",
-        "sabre/dav": "~3.0.5",
-        "sabre/vobject" : "~3.4.7",
-        "ezyang/htmlpurifier": "4.7.*",
-        "twig/twig": "~1.23.3",
-        "twig/extensions": "~1.3.0",
+        "sabre/dav": "~3.2.2",
+        "sabre/vobject" : "~4.1.2",
+        "ezyang/htmlpurifier": "4.8.*",
+        "twig/twig": "~1.31.0",
+        "twig/extensions": "~1.4.1",
         "swiftmailer/swiftmailer": "5.4.*",
         "maximebf/debugbar": "~1.11.1",
         "shareworks/xml-security": "dev-master",
@@ -82,7 +63,6 @@
         "league/flysystem-aws-s3-v3": "1.0.*",
         "php-amqplib/php-amqplib": "2.6.3",
         "cboden/ratchet": "0.3.4",
-        "devristo/phpws": "0.1.0",
         "react/stomp": "0.2.*@dev",
         "react/dns": "0.4.*",
         "react/socket-client": "0.4.*",
@@ -97,7 +77,7 @@
         "aura/sqlquery": "~2.0.0",
         "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master",
         "easyrdf/easyrdf": "~0.8.0",
-        "caxy/php-htmldiff": "dev-master",
+        "caxy/php-htmldiff": "~0.1.3",
         "imagine/imagine": "dev-0.6.2-patches",
         "jenssegers/date": "~3.2.8",
         "mpratt/embera": "~1.8.6",

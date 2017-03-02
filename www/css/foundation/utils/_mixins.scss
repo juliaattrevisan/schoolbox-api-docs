@@ -12,7 +12,6 @@
 	// see https://css-tricks.com/using-flexbox/
 	display: -webkit-box;      // iOS 6-, Safari 3.1-6
 	display: -moz-box;         // Firefox 19- (buggy but mostly works)
-	display: -ms-flexbox;      // IE 10
 	display: -webkit-flex;     // Chrome
 	display: flex;             // Opera 12.1, Firefox 20+
 }
@@ -21,7 +20,6 @@
 @mixin link-bg-transition{
 	-webkit-transition: background-color 0.3s;
 	-moz-transition: background-color 0.3s;
-	-ms-transition: background-color 0.3s;
 	-o-transition: background-color 0.3s;
 	transition: background-color 0.3s;
 }
@@ -29,7 +27,6 @@
 @mixin link-transition{
 	-webkit-transition: color 0.3s;
 	-moz-transition: color 0.3s;
-	-ms-transition: color 0.3s;
 	-o-transition: color 0.3s;
 	transition: color 0.3s;
 }
@@ -37,7 +34,6 @@
 @mixin all-transition{
 	-webkit-transition: all 0.5s;
 	-moz-transition: all 0.5s;
-	-ms-transition: all 0.5s;
 	-o-transition: all 0.5s;
 	transition: all 0.5s;
 }
@@ -54,7 +50,6 @@
 	position: relative;
 	top: 50%;
 	-webkit-transform: translateY(-50%);
-	-ms-transform: translateY(-50%);
 	transform: translateY(-50%);
 }
 
@@ -109,7 +104,6 @@
 
 @mixin transform ($transform) {
 	-webkit-transform: $transform;
-	-ms-transform: $transform;
 	transform: $transform;
 }
 
@@ -173,10 +167,8 @@
 	background-image: -webkit-gradient(linear, left top, left bottom, from($start-colour), to($end-colour));
 	background-image: -webkit-linear-gradient(top, $start-colour, $end-colour);
 	background-image:    -moz-linear-gradient(top, $start-colour, $end-colour);
-	background-image:     -ms-linear-gradient(top, $start-colour, $end-colour);
 	background-image:      -o-linear-gradient(top, $start-colour, $end-colour);
 	background-image:         linear-gradient(top, $start-colour, $end-colour);
-	filter:            progid:DXImageTransform.Microsoft.gradient(start-colourStr='#{$start-colour}', end-colourStr='#{$end-colour}');
 }
 
 @mixin placeholder-color($color, $font-weight) {
