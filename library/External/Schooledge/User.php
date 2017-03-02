@@ -28,6 +28,8 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
 
         $quotedId = $this->getDatabase()->smartQuote($externalId);
         if ($user->getRole()->isStudent()) {
+            // 1st part: blocked classes
+            // 2nd part: non-blocked classes
             $query = "
                 SELECT DISTINCT
                     ts.Code     AS code,
@@ -39,6 +41,25 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 INNER JOIN fc.TimetableSubjectChoice tsc ON ts.ID          = tsc.TimetableSubjectID
                 INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
                 INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.ID
+
+                WHERE s.Code = $quotedId
+                AND   t.Enabled = 1
+
+                UNION
+
+                SELECT DISTINCT
+                    ts.Code     AS code,
+                    ts.Name     AS name,
+                    t.ShortName AS campusCode,
+                    ''          AS classType
+
+                FROM fc.TimetableSubject ts
+
+                INNER JOIN fc.TimetableClass      tc   ON ts.ID             = tc.TimetableSubjectID
+                INNER JOIN fc.YearLevelSub        yls  ON tc.YearLevelSubID = yls.ID
+                INNER JOIN fc.YearLevelSubStudent ylss ON yls.ID            = ylss.YearLevelSubID
+                INNER JOIN dbo.Student            s    ON ylss.PersonID     = s.ID
+                INNER JOIN fc.Timetable           t    ON ts.TimetableID    = t.ID
 
                 WHERE s.Code = $quotedId
                 AND   t.Enabled = 1
