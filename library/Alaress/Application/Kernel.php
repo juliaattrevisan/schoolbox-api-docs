@@ -12,7 +12,7 @@ use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\Web\Controller;
 use Alaress\Module\Module;
 use Aura\Di;
-use Exception;
+use Throwable;
 use OutOfBoundsException;
 use RuntimeException;
 
@@ -167,9 +167,9 @@ abstract class Kernel {
 	/**
 	 * Calls all exception callbacks with the given exception.
 	 *
-	 * @param Exception $e
+	 * @param Throwable $e
 	 */
-	public function callExceptionCallbacks($e)
+	public function callExceptionCallbacks(Throwable $e)
 	{
 		foreach ($this->exceptionCallbacks as $callback) {
 			call_user_func($callback, $e);
