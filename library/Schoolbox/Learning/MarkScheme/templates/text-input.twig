@@ -15,7 +15,7 @@
             id="mark-{{ participant.user.id }}" name="mark"
             type="text"
             maxlength="{{ maxLength }}"
-            value="{{ participant.mark.unpublished.humanReadable }}"
+            value="{{ participant.mostRecentHumanReadableMark }}"
             title="{{ inputTitle }}"
             data-mark-input
             data-combobox
