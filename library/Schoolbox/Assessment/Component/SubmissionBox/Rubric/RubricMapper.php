@@ -930,6 +930,7 @@ class RubricMapper
             ->isNull('rc.deleted_at')
             ->isNull('rl.deleted_at')
             ->isNull('rd.deleted_at')
+            ->isNull('a.deleted_at')
             ->notNull('rm.published_at')
             ->isTrue('rm.valid');
 
