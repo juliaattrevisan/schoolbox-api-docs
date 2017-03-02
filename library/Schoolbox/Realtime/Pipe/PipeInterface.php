@@ -10,14 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
-use Ratchet\ConnectionInterface;
-
 interface PipeInterface {
-
-	/**
-	 * @param ConnectionInterface $conn
-	 */
-	public function __construct($conn);
 
 	/**
 	 * @return void
@@ -56,4 +49,25 @@ interface PipeInterface {
 	 */
 	public function send($data);
 
+    /**
+     * Prevent additional commands being executed by this pipe until it releases
+     *
+     * @param $command
+     * @return void
+     */
+	public function lock($command);
+
+    /**
+     * Is this pipe currently locked?
+     *
+     * @return bool
+     */
+	public function isLocked();
+
+    /**
+     * Release the command lock on this pipe
+     *
+     * @return void
+     */
+	public function unlock();
 } 
