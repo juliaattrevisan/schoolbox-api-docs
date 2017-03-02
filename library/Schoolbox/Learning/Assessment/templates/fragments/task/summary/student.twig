@@ -103,7 +103,9 @@
         }) %}
         {# If already marked as teacher-assessed, require WRITE+ perm to change. If student, ensure not closed #}
         {% set isMarkedByTeacherAsComplete = mostRecentResponse.teacherAssessed and mostRecentResponse.markedComplete %}
-        {% if createResponseRoute and (hasWritePerm or not isMarkedByTeacherAsComplete) and (hasWritePerm or participant.assessable.isOpen) %}
+
+        {# TODO - this test should be inside the route auth rule #}
+        {% if createResponseRoute and (hasWritePerm or (not isMarkedByTeacherAsComplete and participant.assessable.isOpen and assessment.isSelfAssessable)) %}
             <form action="{{ createResponseRoute }}" method="POST">
                 {% if mostRecentResponse.markedComplete %}
                     <input type="hidden" name="status" value="{{ COMPLETION_STATUS_INCOMPLETE }}" />
