@@ -482,6 +482,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     $settings['baseUri'].'staff/' . $_SESSION['username'] .'/',
                     $settings['baseUri'].'staffgroup/',
+                    $settings['baseUri'].'student/',
                 );
             } elseif ($groupHandler->isStudent()) {
                 $paths = array(
