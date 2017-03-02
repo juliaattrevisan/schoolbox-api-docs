@@ -488,6 +488,9 @@
 
     };
 
+    Flatpickr.localize(Flatpickr.l10ns.default);
+    Flatpickr.l10ns.default.firstDayOfWeek = {{ weekStartDay }};
+
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
 
         defaultDate: new Date({{ value }}),

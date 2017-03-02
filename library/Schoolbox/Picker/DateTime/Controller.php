@@ -82,6 +82,7 @@ class Controller extends Base
 //                    'enableTime' => $time,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
                     'displayFormatDate' => $this->convertFormat($displayFormatDate),
+                    'weekStartDay' => Config::get('calendar_start_day'),
 //                    'databaseFormat' => urldecode($database),
                     'timetable' => $timetable,
                     'terms' => $terms,
