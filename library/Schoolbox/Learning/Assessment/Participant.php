@@ -19,15 +19,6 @@ use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
 use \Schoolbox\User;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
-use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use \DomainException;
 
 class Participant
