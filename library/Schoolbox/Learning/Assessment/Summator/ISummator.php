@@ -75,4 +75,13 @@ interface ISummator
      * @return string
      */
     public static function getTitle();
+
+
+    /**
+     * Under normal circumstances, would this summator imply a student
+     * could complete just one of the sub-assessables and consider the project complete ?
+     *
+     * @return bool
+     */
+    public function impliesOptionality();
 }

@@ -303,8 +303,8 @@ class MapperProxy
      *
      * This method does not currently load participants or the rubric grid.
      *
-     * @param int   $unitImplId
-     * @param array $options
+     * @param int|int[] $unitImplId
+     * @param array     $options
      * @return Collection|IAssessable[]
      */
     public function findAllByUnitImplementationId($unitImplId, $options = [])
@@ -323,9 +323,9 @@ class MapperProxy
      *
      * This method loads participants, responses and feedback.
      *
-     * @param int   $unitImplId
-     * @param User  $student If provided, load only this student's participation
-     * @param array $options
+     * @param int|int[] $unitImplId
+     * @param User      $student If provided, load only this student's participation
+     * @param array     $options
      * @return Collection|IAssessable[]
      */
     public function findAllByUnitImplementationIdForCourseOutline($unitImplId, User $student = null, $options = [])

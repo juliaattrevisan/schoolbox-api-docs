@@ -12,9 +12,6 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as Completion;
-use Schoolbox\Learning\Assessment\Task\ICompletion;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -250,39 +247,9 @@ class Controller extends Base
                         $comment = '';
                     }
 
-                    if ($assessment instanceof Task) {
-
-                        $result = '';
-
-                        $mostRecentResponse = $participant->findMostRecentResponse();
-
-                        if ($mostRecentResponse instanceof Completion) {
-                            switch ($mostRecentResponse->getCompletionStatus()) {
-                                case ICompletion::STATUS_COMPLETED:
-                                    $result = "Completed";
-                                    break;
-                                case ICompletion::STATUS_SELF_ASSESSED:
-                                    if ($participant->getAssessable()->isSelfAssessed()) {
-                                        $result = "Self Assessed";
-                                    } else {
-                                        $result = "Teacher Assessed";
-                                    }
-                                    break;
-                                case ICompletion::STATUS_NOT_ATTEMPTED:
-                                    $result = "Not Attempted";
-                                    break;
-                            }
-
-                        }
-
-                        $data[$title] = $result;
-                        $data[$title . " (Normalized)"] = '';
-                        $data[$title . " (Comment)"] = $comment;
-                    } else {
-                        $data[$title] = $assessment->getHumanReadableMark($student, true);
-                        $data[$title . " (Normalized)"] = $assessment->getNormalisedMark($student, true);
-                        $data[$title . " (Comment)"] = $comment;
-                    }
+                    $data[$title] = $assessment->getHumanReadableMark($student, true);
+                    $data[$title . " (Normalized)"] = $assessment->getNormalisedMark($student, true);
+                    $data[$title . " (Comment)"] = $comment;
                 }
                 else
                 {

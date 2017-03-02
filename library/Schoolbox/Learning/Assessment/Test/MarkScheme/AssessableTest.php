@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -1108,9 +1108,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $task = $this->getDummyTask();
         return [
             [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_STUDENT_COMPLETED],
-            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_TEACHER_COMPLETED],
-            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_TEACHER_COMPLETED],
+            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT],
+            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
+            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
         ];
     }
 
@@ -1119,9 +1119,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $task = $this->getDummyTask();
         return [
             [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_STUDENT_COMPLETED],
-            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_STUDENT_COMPLETED],
+            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT],
+            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
+            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
         ];
     }
 
@@ -2115,57 +2115,60 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // user1: no Response or Feedback
 
         // user2: self-assessed
-        $response2 = new TaskCompletion();
+        $response2 = new TaskResponse();
         $response2->setId(2);
         $response2->setAssessable($task);
         $response2->setSubmittedBy($student2);
         $response2->setSubmittedOnBehalfOf($student2);
+        $response2->setMarkedComplete(true);
         $response2->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant2->getAllResponses()->add($response2);
         $task->getResponses()->add($response2);
 
 
         // user3: teacher-assessed
-        $response3 = new TaskCompletion();
+        $response3 = new TaskResponse();
         $response3->setId(3);
         $response3->setAssessable($task);
         $response3->setSubmittedBy($teacher);
         $response3->setSubmittedOnBehalfOf($student3);
+        $response3->setMarkedComplete(true);
         $response3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant3->getAllResponses()->add($response3);
         $task->getResponses()->add($response3);
 
-        $feedback3 = new TaskFeedback();
-        $feedback3->setId(3);
-        $feedback3->setAssessable($task);
-        $feedback3->setResponse($response3);
-        $feedback3->setReviewer($teacher);
-        $feedback3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
-        $feedback3->setPublishedAt($this->getDummyDate(null));
+        $feedback3 = (new TaskFeedback())
+            ->setResponse($response3);
         $participant3->getAllFeedbacks()->add($feedback3);
         $task->getFeedbacks()->add($feedback3);
         $response3->getAllFeedback()->add($feedback3);
 
         // user4: student-assessed then teacher-assessed
-        $response4 = new TaskCompletion();
-        $response4->setId(4);
-        $response4->setAssessable($task);
-        $response4->setSubmittedBy($student4);
-        $response4->setSubmittedOnBehalfOf($student4);
-        $response4->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
-        $participant4->getAllResponses()->add($response4);
-        $task->getResponses()->add($response4);
+        $response4a = new TaskResponse();
+        $response4a->setId(4);
+        $response4a->setAssessable($task);
+        $response4a->setSubmittedBy($student4);
+        $response4a->setSubmittedOnBehalfOf($student4);
+        $response4a->setMarkedComplete(true);
+        $response4a->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $participant4->getAllResponses()->add($response4a);
+        $task->getResponses()->add($response4a);
 
-        $feedback4 = new TaskFeedback();
-        $feedback4->setId(4);
-        $feedback4->setAssessable($task);
-        $feedback4->setResponse($response4);
-        $feedback4->setReviewer($teacher);
-        $feedback4->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
-        $feedback4->setPublishedAt($this->getDummyDate(null));
-        $participant4->getAllFeedbacks()->add($feedback4);
-        $task->getFeedbacks()->add($feedback4);
-        $response4->getAllFeedback()->add($feedback4);
+        $response4b = new TaskResponse();
+        $response4b->setId(4);
+        $response4b->setAssessable($task);
+        $response4b->setSubmittedBy($student4);
+        $response4b->setSubmittedOnBehalfOf($teacher);
+        $response4b->setMarkedComplete(true);
+        $response4b->setUpdatedAt($this->getDummyDate('2016-10-10 21:03:19'));
+        $participant4->getAllResponses()->add($response4b);
+        $task->getResponses()->add($response4b);
+
+        $feedback4b = (new TaskFeedback())
+            ->setResponse($response4b);
+        $participant4->getAllFeedbacks()->add($feedback4b);
+        $task->getFeedbacks()->add($feedback4b);
+        $response4b->getAllFeedback()->add($feedback4b);
 
         return $task;
     }
@@ -2752,6 +2755,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $userId
+     * @param IAssessable $assessable
      * @return Participant
      */
     private function getDummyParticipant($userId, IAssessable $assessable)

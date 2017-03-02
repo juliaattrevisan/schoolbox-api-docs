@@ -14,11 +14,11 @@
     <script type="text/javascript">
         $(function() {
             // Save form for task completion
-            $('form[data-progress-tick-form="selfAssessed"]').progressTickForm({
+            $('#component{{ component_id }}').find('form[data-progress-tick-form="selfAssessed"]').progressTickForm({
                 transitions: {
-                    notAttempted: 'selfAssessed',
-                    selfAssessed: 'notAttempted',
-                    complete:     'notAttempted'
+                    incomplete:      'selfAssessed',
+                    selfAssessed:    'incomplete',
+                    teacherAssessed: 'incomplete'
                 }
             });
         });

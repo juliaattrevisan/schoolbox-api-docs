@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Response\SubSource;
 
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy;
+use Schoolbox\Learning\Assessment\Task\Response\MapperProxy;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
 
 /**

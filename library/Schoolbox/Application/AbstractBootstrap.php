@@ -502,8 +502,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
 
         /* TASK SOURCES */
-        $di->set('completionDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\Task\Completion\MapperProxy::class));
-        $di->params[\Schoolbox\Learning\Assessment\Task\Completion\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(\Schoolbox\Assessment\Course\Task\CompletionMapper::class);
+        $di->set('completionDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\Task\Response\MapperProxy::class));
+        $di->params[\Schoolbox\Learning\Assessment\Task\Response\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(\Schoolbox\Assessment\Course\Task\CompletionMapper::class);
 
         $di->set('ratificationDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy::class));
         $di->params[\Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(\Schoolbox\Assessment\Course\Task\CompletionMapper::class);

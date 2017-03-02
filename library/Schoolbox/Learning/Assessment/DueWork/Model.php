@@ -18,6 +18,8 @@ use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 
 class Model extends AbstractAssessment
 {
@@ -261,21 +263,54 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * Decide whether $user can create a response to this IAssessable
-     *
-     * @param User $user
-     * @return bool
+     * @inheritdoc
      */
-    public function canCreateResponse(User $user)
+    public function canLearnerCreateResponse(User $learner)
     {
-        if ($this->isParticipant($user)) {
-            if ($this->isAcceptSingle() && $this->getParticipant($user)->isResponded()) {
-                return false;
-            }
+        // Not open ?
+        if(!$this->isOpen()){
+            return false;
         }
 
-        /* What about isAcceptNone() - should students still be able to see it?
-         */
+        // Does this DueWork not accept online responses ?
+        if($this->isAcceptNone()){
+            return false;
+        }
+
+        // Not a participant ?
+        if(!$this->isParticipant($learner)){
+            return false;
+        }
+
+        // Has the student already submitted their single permitted response ?
+        if($this->isAcceptSingle() && $this->getParticipant($learner)->hasSubmittedResponse()) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner)
+    {
+        // Does this DueWork not accept online responses ?
+        if($this->isAcceptNone()){
+            return false;
+        }
+
+        // Not a participant ?
+        if(!$this->isParticipant($learner)){
+            return false;
+        }
+
+        // Has the student already submitted their single permitted response ?
+        if($this->isAcceptSingle() && $this->getParticipant($learner)->hasSubmittedResponse()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -507,5 +542,21 @@ class Model extends AbstractAssessment
     {
         $this->attachedFiles = $attachedFiles;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseClass()
+    {
+        return DueWorkSubmission::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFeedbackClass()
+    {
+        return DueWorkFeedback::class;
     }
 }

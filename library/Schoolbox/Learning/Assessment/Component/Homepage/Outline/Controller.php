@@ -15,7 +15,6 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 
 use Alaress_Date_Format;
 use Component_Instance;
-use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;

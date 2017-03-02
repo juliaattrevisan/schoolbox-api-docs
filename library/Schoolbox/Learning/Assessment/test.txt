@@ -20,7 +20,7 @@ use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 
@@ -467,7 +467,7 @@ $feedback
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
-$response = new TaskCompletion();
+$response = new TaskResponse();
 $response
     ->setAssessable($task1)
     ->setSubmittedBy($hodes)
@@ -518,7 +518,7 @@ $feedback
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
-$response = new TaskCompletion();
+$response = new TaskResponse();
 $response
     ->setAssessable($task2)
     ->setSubmittedBy($hodes)
@@ -646,7 +646,7 @@ $feedback
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
-$response = new TaskCompletion();
+$response = new TaskResponse();
 $response
     ->setAssessable($task3)
     ->setSubmittedBy($hodes)
@@ -745,8 +745,8 @@ $project
 new \Alaress_Probe('ID, Title', '% of Project Marked', '% of Project Marked And Published');
 new \Alaress_Probe(
     "{$project->getId()} {$project->getTitle()}",
-    "{$project->numMarked()}/{$project->numParticipants()} = {$project->calculatePercentageMarked()}",
-    "{$project->numPublished()}/{$project->numParticipants()} = {$project->calculatePercentagePublished()}"
+    "{$project->getCountMarkedByTeacher()}/{$project->getCountParticipants()} = {$project->calculatePercentageMarked()}",
+    "{$project->getCountPublished()}/{$project->getCountParticipants()} = {$project->calculatePercentagePublished()}"
 );
 
 echo "<h1>Types and Visibility</h1>";
@@ -868,7 +868,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
         /** @var Participant $currentParticipant */
         foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
-            /** @var TaskCompletion $latestSubmission */
+            /** @var TaskResponse $latestSubmission */
             $latestSubmission = null;
 
             /** @var \Schoolbox\User $submittedBy */
@@ -997,7 +997,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
             $allFiles = [];
             $allPlagscan = [];
 
-            /** @var TaskCompletion $latestSubmission */
+            /** @var TaskResponse $latestSubmission */
             $latestSubmission = null;
 
             /** @var TaskFeedback $latestFeedback */

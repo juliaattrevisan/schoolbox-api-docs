@@ -19,15 +19,7 @@ use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
 use \Schoolbox\User;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
-use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+use \DomainException;
 
 class Participant
 {
@@ -91,103 +83,105 @@ class Participant
         $this->setUser($user);
         $this->setAssessable($assessable);
 
-        $this->allResponses = new GenericCollection($this->getAllowedResponseType() ?: IResponse::class);
-
-        $this->allFeedbacks = new GenericCollection($this->getAllowedFeedbackType() ?: IFeedback::class);
+        $this->allResponses = new GenericCollection($assessable->getResponseClass());
+        $this->allFeedbacks = new GenericCollection($assessable->getFeedbackClass());
 
         $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
 
     /**
-     * Whether this Participant has unmarked Response
+     * Does the student still need to submit a response ?
      *
+     * No need if already responded and the response is not 'incomplete', or
+     * if marked by Teacher already as not 'incomplete'
+     *
+     * Represented as GREY SQUARE
+     *
+     * @throws DomainException if $user is not a participant of the participation assessable.
      * @return bool
      */
-    public function isMarkingRequired()
+    public function isResponseRequired()
     {
-        // No responses, or latest response has feedback already
-        $latestResponse = $this->findMostRecentSubmittedResponse();
-        if (!$latestResponse || $latestResponse->hasFeedback()) {
-            return false;
-        }
-
-        // No feedback
-        $latestFeedback = $this->findMostRecentFeedback();
-        if (!$latestFeedback) {
-            return true;
-        }
-
-        /* Otherwise determine based on the timeline of events
-         */
-        return $latestResponse->getUpdatedAt() > $latestFeedback->getUpdatedAt();
+        return $this->assessable->isResponseRequired($this->user);
     }
+
 
     /**
-     * @deprecated use isMarked()
-     * This Participant received a Feedback for the $assessable
+     * Does the teacher need to mark this participant ?
      *
+     * Represented in UI as ORANGE DIAMOND
+     *
+     * This is a teacher-perspective function. ie, does the teacher need to do anything?
+     * eg, Give a mark? Publish a draft? Mark off as 'complete' ?
+     *
+     * @throws DomainException if $user is not a participant of the participation assessable.
      * @return bool
      */
-    public function isAssessableMarked()
+    public function isFeedbackRequired()
     {
-        return count($this->allFeedbacks) > 0;
+        return $this->assessable->isFeedbackRequired($this->user);
     }
 
+
     /**
-     * Has this participant received ANY (published) feedback for this assessment?
+     * Has the teacher marked this participant as not-explicitly-incomplete, and
+     * the student has not subsequently submitted/re-submitted.
      *
-     * @return bool
+     * @throws DomainException if $user is not a participant of the participation assessable.
+     * Represented in UI as GREEN CIRCLE
      */
-    public function isMarked()
+    public function isReviewComplete()
     {
-        return $this->allFeedbacks->filter(function (IFeedback $feedback) { return $feedback->isPublished(); })->count() > 0;
+        return $this->assessable->isReviewComplete($this->user);
     }
+
 
     /**
      * Has this participant made ANY kind of (submitted) response to this assessment?
      *
+     * Includes teacher Submitting-On-Behalf-Of (S-O-B-O)
+     *
+     * Important: This will still return TRUE if task has been marked as 'incomplete'.
+     *
+     * @throws DomainException if $user is not a participant of the participation assessable.
      * @return bool
      */
-    public function isResponded()
+    public function hasSubmittedResponse()
     {
-        return $this->allResponses->filter(function (IResponse $response) { return $response->isSubmitted(); })->count() > 0;
+        return $this->assessable->hasSubmittedResponse($this->user);
     }
 
-    /**
-     * Has this participant completed this assessment?
-     *
-     * The logic for whether an assessment is completed is determined by the
-     * feedback within this participant - if the latest feedback is marked
-     * completed, the assessment is.
-     *
-     * @return bool
-     */
-    public function isComplete()
-    {
-        $mostRecent = $this->findMostRecentPublishedFeedback();
-        return ($mostRecent instanceof IFeedback)
-            ? $mostRecent->isComplete()
-            : false;
-    }
 
     /**
-     * @deprecated misnomer, use hasPublishedFeedback()
-     * This Participant received a Published Feedback for the $assessable
+     * Has a teacher given a published mark to this participant.
      *
-     * @return bool
-     */
-    public function isAssessablePublished()
-    {
-        return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
-    }
-
-    /**
+     * For clarity - a self-assessed task, while complete, is not marked by teacher
+     * @see $this->hasMark to include self-assessed marks.
+     *
+     * @throws DomainException if $user is not a participant of the participation assessable.
      * @return bool
      */
     public function hasPublishedFeedback()
     {
-        return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
+        return $this->assessable->hasPublishedFeedback($this->user);
     }
+
+
+    /**
+     * Does this student have a mark for the assessment.
+     *
+     * This includes marks given by the teacher, and
+     * self-assessed marks for a task (even if self-assessed as 'Incomplete')
+     *
+     * @see $this->isMarkedByTeacher for teacher-assigned-only marks
+     * @throws DomainException if $user is not a participant of the participation assessable.
+     * @return bool
+     */
+    public function hasMark()
+    {
+        return $this->assessable->hasMark($this->user);
+    }
+
 
     /**
      * @return IResponse|null
@@ -268,50 +262,19 @@ class Participant
      */
     public function getPublishedHumanReadableMark()
     {
-        $feedback = $this->findMostRecentPublishedFeedback();
-        return $feedback ? $feedback->getHumanReadableMark() : null;
-    }
-
-
-    /**
-     * Determine what sort of objects are permitted in the Response collection
-     *
-     * @return string|null
-     */
-    protected function getAllowedResponseType()
-    {
-        if ($this->assessable instanceof Quiz) {
-            return QuizAttempt::class;
-        } elseif ($this->assessable instanceof DueWork) {
-            return DueWorkSubmission::class;
-        } elseif ($this->assessable instanceof Task) {
-            return TaskCompletion::class;
-        } elseif ($this->assessable instanceof Project) {
-            return null;
-        } else {
-            throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($this->assessable));
-        }
+        return $this->assessable->getMarkScheme()->getPublishedHumanReadableMark($this);
     }
 
     /**
-     * Determine what sort of objects are permitted in the Feedback collection
+     * Returns this Participant's most recent Human-Readable mark (includes draft marks)
      *
-     * @return string|null
+     * @return null|string
      */
-    protected function getAllowedFeedbackType()
+    public function getMostRecentHumanReadableMark()
     {
-        if ($this->assessable instanceof Quiz) {
-            return QuizReview::class;
-        } elseif ($this->assessable instanceof DueWork) {
-            return DueWorkFeedback::class;
-        } elseif ($this->assessable instanceof Task) {
-            return TaskFeedback::class;
-        } elseif ($this->assessable instanceof Project) {
-            return null;
-        } else {
-            throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($this->assessable));
-        }
+        return $this->assessable->getMarkScheme()->getMostRecentHumanReadableMark($this);
     }
+
 
     /* Getters/Setters
      */
@@ -386,28 +349,5 @@ class Participant
     {
         $this->allFeedbacks->replaceWith($allFeedbacks);
         return $this;
-    }
-
-    /**
-     * Get a little data structure of Unpublished marks in both Human Readable
-     * and Normalised formats
-     *
-     * Maybe this can be broken down into getMark(), getPublishedMark(), getUnpublishedMark()
-     * methods but for now, just throw them all together
-     *
-     * @return array
-     */
-    public function getMark()
-    {
-        return [
-            'published' => [
-                'humanReadable' => $this->getAssessable()->getHumanReadableMark($this->getUser(), true),
-                'normalised' => $this->getAssessable()->getNormalisedMark($this->getUser(), true)
-            ],
-            'unpublished' => [
-                'humanReadable' => $this->getAssessable()->getHumanReadableMark($this->getUser(), false),
-                'normalised' => $this->getAssessable()->getNormalisedMark($this->getUser(), false)
-            ]
-        ];
     }
 }

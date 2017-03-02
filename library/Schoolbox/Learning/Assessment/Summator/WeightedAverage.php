@@ -90,4 +90,13 @@ class WeightedAverage extends AbstractSummator
     {
         return 'Weighted Average';
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function impliesOptionality()
+    {
+        return false;
+    }
 }

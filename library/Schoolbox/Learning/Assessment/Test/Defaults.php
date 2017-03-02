@@ -28,7 +28,7 @@ use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use \Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
 
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;

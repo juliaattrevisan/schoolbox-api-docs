@@ -55,13 +55,27 @@ abstract class AbstractSubSource implements IFeedbackDataSource
                 $columns[$this->studentField] = $student->getId();
             }
 
-            return $this->mapperProxy->findByColumnList($columns)
-                                     ->map(function ($item) use ($assessment) {
-                                         /** @var IFeedback $item */
-                                         return $item->setAssessable($assessment);
-                                     });
+            $feedbacks = $this->mapperProxy->findByColumnList($columns);
+
+            return $this->linkFeedbacksToAssessment($feedbacks, $assessment);
         }
         return new Collection();
+    }
+
+
+    /**
+     * Link IFeedback back to IAssessable
+     *
+     * @param Collection|IFeedback[] $feedbacks
+     * @param IAssessable $assessment
+     * @return Collection
+     */
+    protected function linkFeedbacksToAssessment(Collection $feedbacks, IAssessable $assessment)
+    {
+        return $feedbacks->map(function ($item) use ($assessment) {
+            /** @var IFeedback $item */
+            return $item->setAssessable($assessment);
+        });
     }
 
     /**
@@ -81,24 +95,37 @@ abstract class AbstractSubSource implements IFeedbackDataSource
         }
 
         // Group feedback by assessment
-        /** @var Collection|IFeedback[][] $feedback */
-        $feedback = $this->mapperProxy
+        /** @var Collection|IFeedback[][] $feedbacks */
+        $feedbacks = $this->mapperProxy
             ->findByColumnList($columns)
             ->groupByCallback(function(IFeedback $v) {
                 return $v->getAssessable()->getId();
             })
         ;
 
-        // Add assessment into each response
+        $this->linkFeedbacksToAssessments($feedbacks, $assessments);
+
+        return $feedbacks;
+    }
+
+
+    /**
+     * Add assessment into each feedback
+     *
+     * @param Collection|IFeedback[][] $feedbacks
+     * @param Collection|IAssessable[] $assessments
+     * @return Collection
+     */
+    protected function linkFeedbacksToAssessments(Collection $feedbacks, Collection $assessments)
+    {
         foreach ($assessments as $assessment) {
-            if (isset($feedback[$assessment->getId()])) {
-                foreach ($feedback[$assessment->getId()] as $response) {
-                    $response->setAssessable($assessment);
+            if (isset($feedbacks[$assessment->getId()])) {
+                foreach ($feedbacks[$assessment->getId()] as $feedback) {
+                    $feedback->setAssessable($assessment);
                 }
             }
         }
-
-        return $feedback;
+        return $assessments;
     }
 
     /**

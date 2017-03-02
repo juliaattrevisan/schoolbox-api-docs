@@ -8,7 +8,7 @@
     errors: {{ errors | json_encode | raw }},
     statusIncomplete: {{ statusIncomplete }},
     statusPending: {{ statusPending }},
-    statusComplete: {{ statusComplete }}
+    statusReviewed: {{ statusReviewed }}
     ...
     ...
 
@@ -60,11 +60,11 @@
                  */
                 errors: [],
 
-                /* Strings representing incomplete/pending/complete statuse
+                /* Strings representing incomplete/pending/reviewed statuse
                  */
                 statusIncomplete: '',
                 statusPending: '',
-                statusComplete: '',
+                statusReviewed: '',
 
                 /* The text to display on the publish button
                  */
@@ -213,13 +213,13 @@
 
                     var $li = $form.closest('[data-status]');
 
-                    $li.attr('data-status', config.statusComplete);
+                    $li.attr('data-status', config.statusReviewed);
 
                     $li.find('[data-status]')
                         .removeClass(config.statusIncomplete + ' ' + config.statusPending)
-                        .addClass(config.statusComplete);
+                        .addClass(config.statusReviewed);
 
-                    $(config.filters).find('[data-status="complete"]').prop('checked', true);
+                    $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
                     $form.find('[data-draft="drafted"]').text('Saved as draft');
                 })
                 .fail(function (xhr) {

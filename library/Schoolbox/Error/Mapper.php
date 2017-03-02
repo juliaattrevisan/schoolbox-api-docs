@@ -164,6 +164,8 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     const ERROR_ZIP_EXTRACT = 188;
     const ERROR_NO_ANALYTICS_DATA = 198;
 
+    const ERROR_INVALID_TASK_COMPLETION = 199;
+
     /**
      * Setup mapping
      */

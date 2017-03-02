@@ -8,12 +8,13 @@
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
 use Schoolbox\Assessment\Course\Task as TaskDataObject;
+use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion as DataObject;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskResponseDomainObject;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponseDomainObject;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as DomainObject;
 use Schoolbox\Mapper;
 
@@ -89,34 +90,26 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $taskFeedbacks = new GenericCollection(DomainObject::class);
 
         foreach($mapperModels as $completion){
-            $taskFeedback = (new DomainObject())
+
+            // Exclude completions that are self-assessed, these are not considered IFeedbacks
+            if($completion->getStudent()->getId() == $completion->getMarkingUser()->getId()){
+                continue;
+            }
+
+            // The completion serves as both a response and a feedback.
+            // Add stub objects to be replaced by caller.
+
+            $taskResponse = (new TaskResponseDomainObject())
                 ->setId($completion->getId())
                 ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
-                // The completion serves as both a response and a feedback.
-                // Add a corresponding stub response.
-                ->setResponse(
-                    (new TaskResponseDomainObject())
-                        ->setId($completion->getId())
-                )
-                ->setReviewee($completion->getStudent())
-                ->setReviewer($completion->getMarkingUser())
+                ->setSubmittedBy($completion->getMarkingUser())
+                ->setSubmittedOnBehalfOf($completion->getStudent())
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setUpdatedAt($completion->getCompletionDate())
-                ->setPublishedAt($completion->getCompletionDate())
+                ->setMarkedComplete($completion->getCompletionStatus() != Completion::STATUS_INCOMPLETE)
                 ->setDeletedAt($completion->getDeletedAt());
 
-            // Set completion of this feedback
-            $status = $completion->getCompletionStatus();
-            if ($status == DataObject::COMPLETION_STATUS_INCOMPLETE) {
-                $taskFeedback->markAsNotAttempted();
-
-            } elseif ($status == DataObject::COMPLETION_STATUS_REQUIRES_CONFIRMATION) {
-                $taskFeedback->markAsSelfAssessed();
-
-            } elseif ($status == DataObject::COMPLETION_STATUS_COMPLETE) {
-                $taskFeedback->markAsCompleted();
-
-            }
+            $taskFeedback = (new DomainObject())->setResponse($taskResponse);
 
             $taskFeedbacks->add($taskFeedback);
         }

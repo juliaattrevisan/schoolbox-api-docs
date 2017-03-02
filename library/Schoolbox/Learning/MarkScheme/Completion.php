@@ -7,17 +7,17 @@
 
 namespace Schoolbox\Learning\MarkScheme;
 
-use InvalidArgumentException;
-use RangeException;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 
 class Completion extends AbstractMarkScheme
 {
     const TITLE = 'Completion';
 
-    const HUMAN_READABLE_INCOMPLETE        = 'Not Completed';
-    const HUMAN_READABLE_STUDENT_COMPLETED = 'Student-Assessed';
-    const HUMAN_READABLE_TEACHER_COMPLETED = 'Teacher-Assessed';
+    const HUMAN_READABLE_INCOMPLETE                  = 'Incomplete';
+    const HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT  = 'Student-Assessed';
+    const HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER  = 'Teacher-Assessed';
 
     /**
      * This type is not comparable numerically.
@@ -29,22 +29,18 @@ class Completion extends AbstractMarkScheme
     /**
      * Returns a string representation of a normalised Mark
      *
-     * @param mixed          $normalisedMark Ignored.
-     * @param IResponse|null $response
-     * @throws RangeException if normalised mark is outside valid range
-     * @throws InvalidArgumentException if enum not matched
+     * @param mixed                       $normalisedMark  - ignored, even if invalid
+     * @param IResponse|TaskResponse|null $response
      * @return string
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if(null === $response){
+        if (null === $response || !$response->getMarkedComplete()) {
             return self::HUMAN_READABLE_INCOMPLETE;
-        } else if (count($response->getAllFeedback())){
-            return self::HUMAN_READABLE_TEACHER_COMPLETED;
-        } else if($response->getSubmittedBy()->getId() === $response->getSubmittedOnBehalfOf()->getId() ) {
-            return self::HUMAN_READABLE_STUDENT_COMPLETED;
+        } elseif($response->isSelfAssessed()) {
+            return self::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT;
         } else {
-            return self::HUMAN_READABLE_INCOMPLETE;
+            return self::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
         }
     }
 
@@ -58,5 +54,22 @@ class Completion extends AbstractMarkScheme
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         return null;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getPublishedHumanReadableMark(Participant $participant)
+    {
+        return $this->getHumanReadableMark(null, $participant->findMostRecentSubmittedResponse());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMostRecentHumanReadableMark(Participant $participant)
+    {
+        return $this->getHumanReadableMark(null, $participant->findMostRecentSubmittedResponse());
     }
 }

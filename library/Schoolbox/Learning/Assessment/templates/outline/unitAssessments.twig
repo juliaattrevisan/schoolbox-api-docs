@@ -15,9 +15,10 @@
         {# Is this user particpating? #}
         {% set isParticipant = assessment.isParticipant(USER) %}
 
+        {# TODO skip this if not displaying counts, eg to teacher #}
         {# count students which have completed this #}
         {% for participant in assessment.allParticipants %}
-            {% if participant.isResponded %}
+            {% if not participant.responseRequired %}
                 {% set completionCount = completionCount + 1 %}
             {% endif %}
             {% set studentCount = studentCount + 1 %}
@@ -26,16 +27,6 @@
         {% if studentCount %}
             {% set completionGradient = (completionCount / studentCount) * 100 %}
         {% endif %}
-
-        {# TODO: if unit.isopen and not task.requireConfirmation #}
-        {# TODO: if task.undoable #}
-        {% set taskAction = '/undo' %}
-        {# TODO elseif task.completable #}
-        {% set taskAction = '/complete' %}
-        {# TODO: endif #}
-        {# TODO: else #}
-        {% set taskAction = '' %}
-        {# TODO: endif #}
 
         <li class="actions-small-1 interact" data-unit-assessment="{{ assessment.id }}">
             {% if readOnly == false %}
@@ -77,9 +68,12 @@
                 {% if readOnly == false %}
                     <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
                 {% elseif isParticipant and assessment is task %}
+                    {% set participant                 = assessment.getParticipant(USER) %}
+                    {% set latestResponse              = participant.findMostRecentSubmittedResposne %}
+                    {% set isMarkedByTeacherAsComplete = latestResponse and latestResponse.teacherAssessed and latestResponse.markedComplete %}
                     {% include '@learningAssessment/task/progressTickForm.twig' with {
-                    participant: assessment.getParticipant(USER),
-                    disabled: false
+                        participant: participant,
+                        disabled: not assessment.isOpen or not assessment.isSelfAssessable or isMarkedByTeacherAsComplete
                     } only %}
                 {% endif %}
             </nav>

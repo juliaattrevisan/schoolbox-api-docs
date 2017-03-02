@@ -30,7 +30,7 @@ class Task implements IAssessmentTypeTranslator
             $model
                 ->setOwner($assessment->getCreator())
                 ->setLink($assessment->getUrl())
-                ->setRequiresConfirmation($assessment->isTeacherAssessed())
+                ->setRequiresConfirmation(!$assessment->isSelfAssessable())
             ;
             return $model;
         }
@@ -49,11 +49,7 @@ class Task implements IAssessmentTypeTranslator
                 ->setUrl($model->getLink())
                 ->setCreator($model->getOwner())
             ;
-            if ($model->getRequiresConfirmation()) {
-                $task->teacherAssessed();
-            } else {
-                $task->selfAssessed();
-            }
+            $task->setIsSelfAssessable(!$model->getRequiresConfirmation());
             return $task;
         }
         return null;

@@ -18,13 +18,22 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
+use Schoolbox\GenericCollection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use \Schoolbox\Resource\Storage\Model as StorageFile;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 
-
+/**
+ * When a student self-assesses a task, it will generate an IResponse only, with a mark of 'incomplete' or 'self-assessed'.
+ * When a teacher assesses a student, it will generate both an IResponse and an IFeedback, with a mark of 'incomplete' or 'teacher-assessed'.
+ *
+ * @method TaskFeedback[]|GenericCollection getFeedbacks()
+ * @method TaskResponse[]|GenericCollection getResponses()
+ */
 class Model extends AbstractAssessment
 {
     /**
@@ -32,7 +41,7 @@ class Model extends AbstractAssessment
      *
      * @var bool
      */
-    protected $isSelfAssessed = false;
+    protected $isSelfAssessable = false;
 
     /**
      * The content this task links to (if any).
@@ -132,47 +141,6 @@ class Model extends AbstractAssessment
         return 0;
     }
 
-    /**
-     * This task is student self-assessed
-     *
-     * @return boolean
-     */
-    public function isSelfAssessed()
-    {
-        return $this->isSelfAssessed == true;
-    }
-
-    /**
-     * This task is teacher-assessed
-     *
-     * @return bool
-     */
-    public function isTeacherAssessed()
-    {
-        return $this->isSelfAssessed == false;
-    }
-
-    /**
-     * Set this task to be teacher-assessed
-     *
-     * @return $this
-     */
-    public function teacherAssessed()
-    {
-        $this->setIsSelfAssessed(false);
-        return $this;
-    }
-
-    /**
-     * Set this task to be self-assessed
-     *
-     * @return $this
-     */
-    public function selfAssessed()
-    {
-        $this->setIsSelfAssessed(true);
-        return $this;
-    }
 
     /**
      * Check the dates set on this model are valid
@@ -193,43 +161,122 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * Decide whether $user can create a response to this IAssessable
-     *
-     * @param User $user
-     * @return bool
+     * @inheritdoc
      */
-    public function canCreateResponse(User $user)
+    public function canLearnerCreateResponse(User $learner)
     {
-        /* No Interactions - user can see this task
-         */
-        if ($this->isParticipant($user)) {
-            $participant = $this->getParticipant($user);
-
-            if (!$participant->isResponded() && !$participant->getAllFeedbacks()->count()) {
-                return true;
-            }
-
-            /* Some set of interactions exists, but the latest feedback isn't official yet
-             * This might require more finesse due to toggleability of Completions
-             */
-            if (!$participant->hasPublishedFeedback()) {
-                return true;
-            }
+        // Not open ?
+        if(!$this->isOpen()){
+            return false;
         }
 
-        return false;
+        // Must be self-assessable
+        if(!$this->isSelfAssessable()){
+            return false;
+        }
+
+        // Not a participant ?
+        if(!$this->isParticipant($learner)){
+            return false;
+        }
+
+        // If teacher has marked as complete, then student cannot alter back to 'incomplete'
+        /** @var TaskResponse $latestResponse */
+        $latestResponse = $this->getParticipant($learner)->findMostRecentSubmittedResponse();
+        if ($latestResponse && !$latestResponse->isSelfAssessed() && $latestResponse->getMarkedComplete()) {
+            return false;
+        }
+
+        // Task is open, self-assessable, and not yet marked by the teacher as 'complete'
+        return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner)
+    {
+        // Instructor can mark the task as long as the learner is a participant
+        return $this->isParticipant($learner);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isResponseRequired(User $user)
+    {
+        /** @var TaskResponse $mostRecentResponse */
+        $mostRecentResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        return !$mostRecentResponse || !$mostRecentResponse->getMarkedComplete();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isFeedbackRequired(User $user)
+    {
+        /** @var TaskResponse $latestSubmittedResponse */
+        $latestSubmittedResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        return $latestSubmittedResponse
+            && $latestSubmittedResponse->isSelfAssessed()
+            && $latestSubmittedResponse->getMarkedComplete();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isReviewComplete(User $user)
+    {
+        /** @var TaskResponse $latestSubmittedResponse */
+        $latestSubmittedResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        return $latestSubmittedResponse
+            && $latestSubmittedResponse->getMarkedComplete()
+            && !$latestSubmittedResponse->isSelfAssessed();
+    }
+
+    /**
+     * Special case for task - can be 'marked' by student or teacher.
+     *
+     * @inheritdoc
+     */
+    public function hasMark(User $user)
+    {
+        // Has the task been marked ?
+        // Note this distinguishes between implicit 'Incomplete' and explicit 'Incomplete'.
+        // The former returns FALSE, while the latter returns TRUE
+        return $this->getParticipant($user)->getAllResponses()->count() > 0;
+    }
+
+
+    /**
+     * Convenience intuitive method (but not a mapper standard get/set)
+     *
+     * @return bool
+     */
+    public function isSelfAssessable()
+    {
+        return $this->isSelfAssessable;
+    }
+
 
     /* Getters/Setters
      */
 
     /**
-     * @param boolean $isSelfAssessed
+     * @return boolean
+     */
+    public function getIsSelfAssessable()
+    {
+        return $this->isSelfAssessable;
+    }
+
+    /**
+     * @param boolean $isSelfAssessable
      * @return $this;
      */
-    public function setIsSelfAssessed($isSelfAssessed)
+    public function setIsSelfAssessable($isSelfAssessable)
     {
-        $this->isSelfAssessed = $isSelfAssessed;
+        $this->isSelfAssessable = $isSelfAssessable;
         return $this;
     }
 
@@ -303,5 +350,21 @@ class Model extends AbstractAssessment
     {
         // noop
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseClass()
+    {
+        return TaskResponse::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFeedbackClass()
+    {
+        return TaskFeedback::class;
     }
 }

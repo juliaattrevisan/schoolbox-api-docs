@@ -105,26 +105,6 @@ abstract class AbstractFeedback implements IFeedback
         return $this->getPublishedAt() !== null;
     }
 
-    /**
-     * Does this feedback mark this participant as having completed the assessment?
-     *
-     * @return bool
-     */
-    public function isComplete()
-    {
-        return $this->isPublished();
-    }
-
-    /**
-     * $user is the reviewee of this Feedback
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isReviewedFor(User $user)
-    {
-        return $this->getReviewee()->getId() == $user->getId();
-    }
 
     /* Getters/Setters
      */
@@ -267,7 +247,7 @@ abstract class AbstractFeedback implements IFeedback
      * @param IResponse $response
      * @return static
      */
-    public function setResponse($response)
+    public function setResponse(IResponse $response = null)
     {
         $this->response = $response;
         return $this;

@@ -13,7 +13,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskResponse;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Personalised\Participant;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -199,11 +199,12 @@ class Factory
                 if ($assessable instanceof Task) {
                     $response = $participantObject->findMostRecentResponse();
                     if ($response instanceof TaskResponse) {
-                        if ($response->isMarkedAsCompleted()) {
-                            $className[] = 'mastered';
-
-                        } elseif ($response->isMarkedAsSelfAssessed()) {
-                            $className[] = 'notmarked';
+                        if($response->getMarkedComplete()){
+                            if ($response->isSelfAssessed()) {
+                                $className[] = 'notmarked';
+                            } else {
+                                $className[] = 'mastered';
+                            }
                         }
                     }
 
@@ -218,7 +219,7 @@ class Factory
 
             } else {
                 // No feedback yet. Is there a response?
-                if (!$participantObject->isMarked() && $participantObject->isResponded()) {
+                if (!$participantObject->isFeedbackRequired()) {
                     $className[] = 'notmarked';
                 }
 

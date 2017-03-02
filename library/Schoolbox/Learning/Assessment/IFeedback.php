@@ -22,31 +22,12 @@ interface IFeedback
      */
     public function isPublished();
 
-    /**
-     * Should the existence of this feedback specify that the participant has
-     * completed the assessment?
-     *
-     * Usually, this will be true if this feedback is published - in the future,
-     * I see us implementing a min mark that a participant must achieve for them
-     * to be marked completed?
-     *
-     * @return bool
-     */
-    public function isComplete();
-
-    /**
-     * $user is the reviewee of this Feedback
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isReviewedFor(User $user);
 
     /* Getters/Setters
      */
 
     /**
-     * @var string
+     * @return int
      */
     public function getId();
 
@@ -163,10 +144,10 @@ interface IFeedback
     public function getResponse();
 
     /**
-     * @param IResponse $response
+     * @param IResponse|null $response
      * @return static
      */
-    public function setResponse($response);
+    public function setResponse(IResponse $response = null);
 
     /**
      * Get the date when this IFeedback was made accessible to respondents

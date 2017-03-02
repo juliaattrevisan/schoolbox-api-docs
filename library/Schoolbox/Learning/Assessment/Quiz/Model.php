@@ -20,6 +20,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class Model extends AbstractAssessment
 {
@@ -146,46 +148,56 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * Decide whether $user can create a response to this IAssessable
-     *
-     * @param User $user
-     * @return bool
+     * @inheritdoc
      */
-    public function canCreateResponse(User $user)
+    public function canLearnerCreateResponse(User $learner)
     {
-        /* Unlimited Attempts
-         */
-        if ($this->getMaxAttempts() == 0) {
-            return true;
-        }
-
-        if ($this->isParticipant($user)) {
-
-            $participant = $this->getParticipant($user);
-
-            /* Responses less than maximum allowed
-             */
-            if ($participant->getAllResponses()->count() < $this->getMaxAttempts()) {
-                return true;
-            }
-
-            /* Response count is the same as the maximum allowed
-             */
-            if ($participant->getAllResponses()->count() == $this->getMaxAttempts()) {
-                $mostRecentResponse = $participant->findMostRecentResponse();
-
-                /* Check whether the most recent response is officially submitted
-                 * You should be allowed to resume the draft/in-progress attempt
-                 */
-                if (!$mostRecentResponse->isSubmitted()) {
-                    return true;
-                }
-            }
+        // Not open ?
+        if(!$this->isOpen()){
             return false;
         }
 
-        return true;
+        // Not a participant ?
+        if(!$this->isParticipant($learner)){
+            return false;
+        }
 
+        if ($this->getMaxAttempts() == self::ATTEMPTS_UNLIMITED) {
+            return true;
+        }
+
+        $participant = $this->getParticipant($learner);
+
+        /* Responses less than maximum allowed
+         */
+        if ($participant->getAllResponses()->count() < $this->getMaxAttempts()) {
+            return true;
+        }
+
+        /* Response count is the same as the maximum allowed
+         */
+        if ($participant->getAllResponses()->count() == $this->getMaxAttempts()) {
+            $mostRecentResponse = $participant->findMostRecentResponse();
+
+            /* Check whether the most recent response is officially submitted
+             * You should be allowed to resume the draft/in-progress attempt
+             */
+            if (!$mostRecentResponse->isSubmitted()) {
+                return true;
+            }
+        }
+
+        // Participant has exceeded attempt count
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner)
+    {
+        // Quiz does not currently support submission-on-behalf-of
+        return false;
     }
 
     /* Getters/Setters
@@ -261,5 +273,21 @@ class Model extends AbstractAssessment
     {
         $this->completionMessage = $completionMessage;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseClass()
+    {
+        return QuizAttempt::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFeedbackClass()
+    {
+        return QuizReview::class;
     }
 }

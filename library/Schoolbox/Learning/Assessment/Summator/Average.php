@@ -72,4 +72,12 @@ class Average extends AbstractSummator
     {
         return 'Average';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function impliesOptionality()
+    {
+        return false;
+    }
 }

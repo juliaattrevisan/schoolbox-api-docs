@@ -7,8 +7,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\IDatabase;
+use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -27,7 +27,7 @@ use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 /**
@@ -154,6 +154,15 @@ class PendingFactory
     private $studentIntCache = [];
 
     /**
+     * Contains stub teachers, typically used as the 'submittedBy' for SOBO responses, or for feedbacks.
+     *
+     * Indexed by user.id so we can find O(1) when generating Participants
+     *
+     * @var User[]
+     */
+    private $teacherCache;
+
+    /**
      * @var Term $term
      */
     private $term;
@@ -205,6 +214,13 @@ class PendingFactory
      */
     private $folderMapper;
 
+    /**
+     * Indexed by studentSubmission.id so we can link non-floating feedback to their response
+     *
+     * @var DueWorkSubmission[]
+     */
+    private $dueWorkSubmissionCache = [];
+
 
     /**
      * @param User                         $viewee
@@ -223,11 +239,12 @@ class PendingFactory
         \Alaress_Date_Format $toChaseLimit,
         $includeTasks,
         FolderMapper $folderMapper
+
     ) {
         $this->viewee           = $viewee;
         $this->database         = $database;
         $this->externalClass    = $externalClass;
-        $this->assessmentsCache = new GenericCollection(IAssessable::class);
+        $this->assessmentsCache = new GenericCollection(IAssessable::class);  // TODO SA-2631
         $this->term             = $term;
         $this->toChaseLimit     = $toChaseLimit;
         $this->nullDate         = new \Alaress_Date_NullDate();
@@ -291,8 +308,26 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->foldersCache[$id] instanceof Folder) {
-            $this->foldersCache[$id] = (new Folder())->setId($id)->setName($name);
+            $this->foldersCache[$id] = $this->folderMapper->createModel($id)->setName($name);
         }
+    }
+
+
+    /**
+     * Returns a User object that may be partially hydrated, but at the least contains the user.id.
+     *
+     * @param $id
+     * @return User
+     */
+    private function getStubUser($id)
+    {
+        if($this->studentIntCache[$id] instanceof User){
+            return $this->studentIntCache[$id];
+        }
+        if(!$this->teacherCache[$id] instanceof User){
+            $this->teacherCache[$id] = (new User())->setId($id);  // TODO SA-2631
+        }
+        return $this->teacherCache[$id];
     }
 
 
@@ -306,7 +341,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->projectCache[$id] instanceof Project) {
-            $this->projectCache[$id] = (new Project())->setId($id)->setTitle($title);
+            $this->projectCache[$id] = (new Project())->setId($id)->setTitle($title); // TODO SA-2631
         }
     }
 
@@ -320,7 +355,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->courseSpecsCache[$id] instanceof CourseSpecification) {
-            $this->courseSpecsCache[$id] = (new CourseSpecification())->setId($id);
+            $this->courseSpecsCache[$id] = (new CourseSpecification())->setId($id); // TODO SA-2631
         }
     }
 
@@ -334,7 +369,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->courseImplsCache[$id] instanceof CourseImplementation) {
-            $this->courseImplsCache[$id] = (new CourseImplementation())->setId($id);
+            $this->courseImplsCache[$id] = (new CourseImplementation())->setId($id); // TODO SA-2631
         }
     }
 
@@ -348,7 +383,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->unitSpecsCache[$id] instanceof UnitSpecification) {
-            $this->unitSpecsCache[$id] = (new UnitSpecification())->setId($id);
+            $this->unitSpecsCache[$id] = (new UnitSpecification())->setId($id); // TODO SA-2631
         }
     }
 
@@ -362,7 +397,7 @@ class PendingFactory
     {
         $id = intval($id);
         if (!$this->unitImplsCache[$id] instanceof UnitImplementation) {
-            $this->unitImplsCache[$id] = (new UnitImplementation())->setId($id);
+            $this->unitImplsCache[$id] = (new UnitImplementation())->setId($id); // TODO SA-2631
         }
     }
 
@@ -601,7 +636,7 @@ class PendingFactory
                     $this->assessmentsCache[$assessmentId]     = new DueWork();
                 } elseif (!is_null($row['tk.id'])) {
                     $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
-                    $this->assessmentsCache[$assessmentId]  = (new Task())->setIsSelfAssessed(!$row['tk.requires_confirmation']);
+                    $this->assessmentsCache[$assessmentId]  = (new Task())->setIsSelfAssessable(!$row['tk.requires_confirmation']);
                 } else {
                     throw new \LogicException('Assessment must be Quiz, DueWork or Task. row: ' . print_r($row, true));
                 }
@@ -891,7 +926,7 @@ class PendingFactory
 
 
     /**
-     * Get any TaskCompletions or TaskFeedbacks related to selected Tasks
+     * Get any TaskResponses or TaskFeedbacks related to selected Tasks
      *
      * @return array
      */
@@ -909,15 +944,20 @@ class PendingFactory
         $query = "
             SELECT 
                 t.assessment_id         AS 't.assessment_id',
-                t.requires_confirmation AS 't.requires_confirmation',
                 tc.id                   AS 'tc.id',
                 tc.student_id           AS 'tc.student_id',
-                tc.marking_user_id      AS 'tc.marking_user_id',
-                max(tc.completion_date) AS 'tc.completion_date'
+                tc.completion_date      AS 'tc.completion_date',
+                tc.completion_status    AS 'tc.completion_status'
             FROM task t
             JOIN task_completion tc ON tc.task_id = t.id
+            JOIN (
+              SELECT task_id, tc.student_id, max(tc.completion_date) as max_completion_date
+              FROM task t
+              JOIN task_completion tc ON tc.task_id = t.id              
+              WHERE " . implode(' AND ', $pb->getWhere()) . "
+              GROUP BY task_id, student_id
+            ) tc2 ON tc.task_id = tc2.task_id AND tc.student_id = tc2.student_id AND tc.completion_date = tc2.max_completion_date
             WHERE " . implode(' AND ', $pb->getWhere()) . "
-            GROUP BY t.assessment_id, tc.student_id" . "
             ORDER BY t.assessment_id";
 
         $statement = $this->database->prepare($query);
@@ -989,13 +1029,11 @@ class PendingFactory
         $query = "
             SELECT
                 sb.assessment_id                 AS 'sb.assessment_id',
-                sb.mark_visibility               AS 'sb.mark_visibility',
                 sr.id                            AS 'sr.id',
-                sr.marker                        AS 'sr.marker',
                 sr.owner                         AS 'sr.owner',
+                sr.student_submission_id         AS 'sr.student_submission_id',
                 sr.updated_at                    AS 'sr.updated_at',
-                sr.published_at                  AS 'sr.published_at',
-                sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
+                sr.published_at                  AS 'sr.published_at'
             FROM submission_box sb
             JOIN submission_return sr ON sr.box_id = sb.id
             WHERE " . implode(' AND ', $pb->getWhere()) . "
@@ -1069,7 +1107,7 @@ class PendingFactory
         foreach ($quizResults as $rowIdx => $row) {
             $quiz     = $this->assessmentsCache[$row['q.assessment_id']];
             $userId   = $row['qa.user_id'];
-            $response = new QuizAttempt();
+            $response = new QuizAttempt(); // TODO SA-2631
             $response->setId($row['qa.attempt_id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
@@ -1091,7 +1129,7 @@ class PendingFactory
 
             // In this context, if not 'reviewed', then we interpret this as NO feedback
             if (!is_null($row['qa.reviewed_at'])) {
-                $feedback = new QuizReview();
+                $feedback = new QuizReview(); // TODO SA-2631
                 $feedback->setId($row['qa.attempt_id']);
                 $reviewedAt = $this->getDateFromString($row['qa.reviewed_at']);
                 $feedback->setPublishedAt($reviewedAt);
@@ -1121,7 +1159,7 @@ class PendingFactory
     private function checkAssessmentRelevance(IAssessable $assessment)
     {
         // Does this assessment require marking or chasing ?
-        if (!$this->isMarkingRequired($assessment) && !$this->isChasingRequired($assessment)) {
+        if (!$this->isFeedbackRequired($assessment) && !$this->isChasingRequired($assessment)) {
             unset($this->assessmentsCache[$assessment->getId()]);
         }
     }
@@ -1133,9 +1171,9 @@ class PendingFactory
      * @param IAssessable $assessment
      * @return bool
      */
-    private function isMarkingRequired(IAssessable $assessment)
+    private function isFeedbackRequired(IAssessable $assessment)
     {
-        return $assessment->numMarkingRequired() > 0;
+        return (new Statistics($assessment))->getCountFeedbackRequired() > 0;
     }
 
 
@@ -1147,7 +1185,7 @@ class PendingFactory
      */
     private function isChasingRequired(IAssessable $assessment)
     {
-        return $assessment->getDueAt()->lt($this->toChaseLimit) && $assessment->numNoResponseOrFeedback() > 0;
+        return $assessment->getDueAt()->lt($this->toChaseLimit) && (new Statistics($assessment))->getCountResponseRequired() > 0;
     }
 
 
@@ -1156,11 +1194,11 @@ class PendingFactory
      *
      * @param string[][] $taskResults
      * @var string       $taskResults []['t.assessment_id']
-     * @var string       $taskResults []['t.requires_confirmation']
      * @var string       $taskResults []['tc.id']
      * @var string       $taskResults []['tc.student_id']
      * @var string       $taskResults []['tc.marking_user_id']
      * @var string       $taskResults []['tc.completion_date']
+     * @var string       $taskResults []['tc.completion_status']
      */
     private function hydrateTaskResults(array $taskResults)
     {
@@ -1171,21 +1209,19 @@ class PendingFactory
         $lastIdx = $countRows - 1;
 
         foreach ($taskResults as $rowIdx => $row) {
-            $task     = $this->assessmentsCache[$row['t.assessment_id']];
-            $userId   = $row['tc.student_id'];
-            $response = new TaskCompletion();
+            $task          = $this->assessmentsCache[$row['t.assessment_id']];
+            $userId        = $row['tc.student_id'];
+            $markingUserId = $row['tc.marking_user_id'];
+
+            $response = new TaskResponse(); // TODO SA-2631
             $response->setId($row['tc.id']);
-            $response->setSubmittedBy($this->studentIntCache[$userId]);
+            $response->setSubmittedBy($this->getStubUser($markingUserId));
+            $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
             $response->setAssessable($task);
             $completedAt = $this->getDateFromString($row['tc.completion_date']);
             $response->setCreatedAt($completedAt);
             $response->setUpdatedAt($completedAt);
-
-            // TODO - sigh replace this with composition ASAP
-            $response->markAs($row['tc.student_id'] == $row['tc.marking_user_id']
-                ? ICompletion::STATUS_SELF_ASSESSED
-                : ICompletion::STATUS_COMPLETED
-            );
+            $response->setMarkedComplete($row['tc.completion_status'] != Completion::STATUS_INCOMPLETE);
 
             $task->getResponses()->setOffset($response->getId(), $response);
             $participants = $task->getAllParticipants();
@@ -1197,13 +1233,9 @@ class PendingFactory
             $participants[$userId]->getAllResponses()->setOffset($response->getId(), $response);
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
-            if ($userId != $row['tc.marking_user_id']) {
-                $feedback = new TaskFeedback();
-                $feedback->setId($row['tc.id']);
-                $feedback->setPublishedAt($completedAt);
-                $feedback->setUpdatedAt($completedAt);
-                $feedback->setResponse($response);
-                $feedback->setAssessable($task);
+            if ($userId != $markingUserId) {
+                $feedback = (new TaskFeedback()) // TODO SA-2631
+                    ->setResponse($response);
 
                 $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
                 $task->getFeedbacks()->setOffset($feedback->getId(), $feedback);
@@ -1236,7 +1268,7 @@ class PendingFactory
 
             $dueWork  = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId   = $row['ss.owner'];
-            $response = new DueWorkSubmission();
+            $response = new DueWorkSubmission(); // TODO SA-2631
             $response->setId($row['ss.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
@@ -1245,6 +1277,10 @@ class PendingFactory
             $response->setUpdatedAt($this->getDateFromString($row['ss.updated_at']));
 
             $dueWork->getResponses()->setOffset($response->getId(), $response);
+
+            // Add to cache so we can later link non-floating feedbacks to responses
+            $this->dueWorkSubmissionCache[$response->getId()] = $response;
+
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
@@ -1260,6 +1296,13 @@ class PendingFactory
      * Create DueWorkFeedbacks from DB results
      *
      * @param array $dueWorkFeedbackResults
+     * @var int    $dueWorkFeedbackResults['sb.assessment_id']
+     * @var string $dueWorkFeedbackResults['sr.owner']
+     * @var int    $dueWorkFeedbackResults['sr.id']
+     * @var int    $dueWorkFeedbackResults['sr.student_submission_id']
+     * @var int    $dueWorkFeedbackResults['sr.updated_at']
+     * @var int    $dueWorkFeedbackResults['sr.published_at']
+     * @var int    $dueWorkFeedbackResults['sb.assessment_id']
      */
     private function hydrateDueWorkFeedbacks(array $dueWorkFeedbackResults)
     {
@@ -1272,7 +1315,7 @@ class PendingFactory
         foreach ($dueWorkFeedbackResults as $rowIdx => $row) {
             $dueWork  = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId   = $row['sr.owner'];
-            $feedback = new DueWorkFeedback();
+            $feedback = new DueWorkFeedback(); // TODO SA-2631
             $feedback->setId($row['sr.id']);
             $feedback->setUpdatedAt($this->getDateFromString($row['sr.updated_at']));
             $feedback->setPublishedAt($this->getDateFromString($row['sr.published_at']));
@@ -1286,6 +1329,13 @@ class PendingFactory
                 $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
             $participants[$userId]->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
+
+            // Does this feedback relate to a specific response ?
+            $studentSubmissionId = $row['sr.student_submission_id'];
+            if($studentSubmissionId && $this->dueWorkSubmissionCache[$studentSubmissionId] instanceof DueWorkSubmission){
+                $feedback->setResponse($this->dueWorkSubmissionCache[$studentSubmissionId]);
+                $this->dueWorkSubmissionCache[$studentSubmissionId]->getAllFeedback()->add($feedback);
+            }
 
             // Have we reached the last row for an Assessment ?
             if ($rowIdx == $lastIdx || $dueWork->getId() != $dueWorkFeedbackResults[$rowIdx + 1]['sb.assessment_id']) {
@@ -1341,7 +1391,7 @@ class PendingFactory
         $this->studentExternalIds[$externalId] = $externalId;
 
         if (!$this->studentExtCache[$externalId] instanceof User) {
-            $this->studentExtCache[$externalId] = (new User())
+            $this->studentExtCache[$externalId] = (new User()) // TODO SA-2631
                 ->setId($id)
                 ->setUsername($username)
                 ->setExternalId($externalId)

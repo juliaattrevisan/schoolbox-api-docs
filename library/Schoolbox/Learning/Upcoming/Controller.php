@@ -186,9 +186,9 @@ class Controller extends Base
 
         $visibility = new Visibility(Access::getInstance());
 
-        // Only show work that isn't yet due
+        // Only show work that student has permission to view, and can accept their submission
         $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student, $visibility) {
-            return $visibility->isUpcomingVisibleToUser($assessable, $student);
+            return $visibility->isVisibleToUser($assessable, $student, false) && $assessable->canLearnerCreateResponse($student);
         });
 
         // TODO Populate $_SESSION[children] properly

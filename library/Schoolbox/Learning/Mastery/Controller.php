@@ -76,8 +76,8 @@ class Controller extends Base
     }
 
     /**
+     * @api /learning/mastery/{classId}
      * @param Folder $class
-     * @param Term $term
      */
     public function getMastery($class)
     {
@@ -85,6 +85,7 @@ class Controller extends Base
     }
 
     /**
+     * @api /learning/mastery/{classId}/term/{termCode}
      * @param Folder $class
      * @param Term $term
      */

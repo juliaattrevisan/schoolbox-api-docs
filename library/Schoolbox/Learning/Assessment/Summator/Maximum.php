@@ -66,4 +66,13 @@ class Maximum extends AbstractSummator
     {
         return 'Maximum';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function impliesOptionality()
+    {
+        // Eg, project has two sub-assessments, and student completes first and gets 100%. They would not be expected to attempt second.
+        return true;
+    }
 }

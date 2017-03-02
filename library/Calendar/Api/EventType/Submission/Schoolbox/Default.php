@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Learning\Assessment\Visibility;
 
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
@@ -86,11 +87,19 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
         }
 
-        $visibility = new \Schoolbox\Learning\Assessment\Visibility(Access::getInstance());
+        $access = Access::getInstance();
+        $visibility = new Visibility($access);
 
         foreach ($assessables as $assessment) {
 
-            if (!$visibility->isVisibleToUser($assessment, $this->getUser())) {
+            // Permission check to see the assessment
+            if(!$visibility->isVisibleToUser($assessment, $this->getUser(), true)){
+                continue;
+            }
+
+            // Hide if user is a learner and unable to submit
+            if($access->isLearner($this->getUser(), $assessment->getBaseContext()->getFolder())
+                && !$assessment->canLearnerCreateResponse($this->getUser())){
                 continue;
             }
 

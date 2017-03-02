@@ -111,7 +111,7 @@
                                     {% set value = assessment.getHumanReadableMark(student, true) | default('–') %}
                                     {% set participant = assessment.getParticipant(student) %}
 
-                                    {% if participant.isResponded %}
+                                    {% if participant.hasSubmittedResponse %}
                                         {% set url = routeLookup('learningAssessment.getSummary', {studentId: student.id, assessmentId: assessment.id}) %}
                                     {% endif %}
 
@@ -125,11 +125,11 @@
                                 {% set isAttempted = normalisedMark is not null %}
                                 {% if assessment is task %}
                                     {% set mostRecentResponse = participant.findMostRecentResponse %}
-                                    {% set isAwaiting = mostRecentResponse.isMarkedAsSelfAssessed %}
-                                    {% set isMastered = mostRecentResponse.isMarkedAsCompleted %}
+                                    {% set isAwaiting = mostRecentResponse.markedComplete and mostRecentResponse.isSelfAssessed  %}
+                                    {% set isMastered = mostRecentResponse.markedComplete and not mostRecentResponse.isSelfAssessed %}
                                 {% else %}
                                     {% set mostRecentResponse = null %}
-                                    {% set isAwaiting = not participant.isMarked and participant.isResponded %}
+                                    {% set isAwaiting = participant.isFeedbackRequired %}
                                     {% set isMastered = normalisedMark >= 70 %}
                                 {% endif %}
 

@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
@@ -262,6 +263,63 @@ abstract class AbstractAssessment implements IAssessable
         return null;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function isPublished(Alaress_Date_Format $now = null)
+    {
+        if (is_null($now) || $now->isNull()) {
+            $now = Alaress_Date_Format::now();
+        }
+
+        // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
+        return $now->gte($this->getPublishAt());
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function isOpen(Alaress_Date_Format $now = null)
+    {
+        if (is_null($now) || $now->isNull()) {
+            $now = Alaress_Date_Format::now();
+        }
+
+        // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
+        return $now->gte($this->getOpenAt()) && $now->lt($this->getCloseAt());
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function isOverdue(Alaress_Date_Format $now = null)
+    {
+        if (is_null($now) || $now->isNull()) {
+            $now = Alaress_Date_Format::now();
+        }
+
+        // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
+        return $now->gte($this->getDueAt()) && $now->lt($this->getCloseAt());
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function isPastClose(Alaress_Date_Format $now = null)
+    {
+        if (is_null($now) || $now->isNull()) {
+            $now = Alaress_Date_Format::now();
+        }
+
+        // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
+        return $now->gte($this->getCloseAt());
+    }
+
+
     /**
      * Get the Human Readable Mark value for a particular User
      *
@@ -274,11 +332,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
-        $markScheme = $this->getMarkScheme();
         $response = null;
 
         // Special Case: Completion depends only presence of $response and/or $feedback
-        if ($markScheme instanceof Completion) {
+        if ($this->markScheme instanceof Completion) {
             $participant = $this->getParticipant($user);
 
             $feedback = $publishedOnly
@@ -295,7 +352,7 @@ abstract class AbstractAssessment implements IAssessable
                     if($publishedOnly){
                         // Ignore any unpublished teacher feedback
                         $response = clone $response;
-                        $response->setAllFeedback(new Collection());
+                        $response->setAllFeedback(new GenericCollection(IFeedback::class));
                     }
                 } else {
                     $response = null;
@@ -303,7 +360,7 @@ abstract class AbstractAssessment implements IAssessable
             }
         }
 
-        return $markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
+        return $this->markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
     }
 
     /**
@@ -352,149 +409,95 @@ abstract class AbstractAssessment implements IAssessable
     /* Traversals
      */
 
-    /**
-     * @inheritdoc
-     *
-     * @return int
-     */
-    public function numParticipants()
-    {
-        return $this->getAllParticipants()->count();
-    }
-
-    /**
-     * Returns the number of Participants who have Responses to this Assessment
-     *
-     * @return int
-     */
-    public function numSubmitted()
-    {
-        $num = 0;
-        foreach ($this->getAllParticipants() as $currentParticipant) {
-            if (count($currentParticipant->getAllResponses())) {
-                $num++;
-            }
-        }
-        return $num;
-    }
-
-    /**
-     * Returns what percentage of Participants have Responses to this Assessment
-     *
-     * @return float
-     */
-    public function getPercentageSubmitted()
-    {
-        $numParticipants = $this->numParticipants();
-        if(!$numParticipants){
-            return 0;
-        }
-        return 100 * ($this->numSubmitted() / $numParticipants);
-    }
-
-    /**
-     * Returns the number of Participants who have neither Feedback nor Responses to this Assessment
-     *
-     * @return int
-     */
-    public function numNoResponseOrFeedback()
-    {
-        $num = 0;
-        foreach ($this->getAllParticipants() as $currentParticipant) {
-            if (!count($currentParticipant->getAllResponses()) && !count($currentParticipant->getAllFeedbacks())) {
-                $num++;
-            }
-        }
-        return $num;
-    }
 
     /**
      * @inheritdoc
-     *
-     * @return int
      */
-    public function numMarked()
+    public function isResponseRequired(User $user)
     {
-        $num = 0;
-        foreach ($this->getAllParticipants() as $currentParticipant) {
-            if ($currentParticipant->isAssessableMarked()) {
-                $num++;
-            }
+        $participant = $this->getParticipant($user);
+
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
+        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
+
+        // No Responses and No Feedback?
+        if(!$latestSubmittedResponse && !$latestPublishedFeedback){
+            // No interaction yet - waiting for student to submit or teacher to give mark
+            return true;
         }
-        return $num;
+
+        // We either have a submitted response, or a published feedback, or both.
+        // All these scenarios imply student does not need to respond.
+        return false;
     }
 
     /**
      * @inheritdoc
      */
-    public function getPercentageMarked()
+    public function isFeedbackRequired(User $user)
     {
-        $numParticipants = $this->numParticipants();
-        if(!$numParticipants){
-            return 0;
-        }
-        return 100 * ($this->numMarked() / $numParticipants);
-    }
+        $participant = $this->getParticipant($user);
 
-    /**
-     * How many Participants have Responses that require marking.
-     *
-     * @return int
-     */
-    public function numMarkingRequired()
-    {
-        $num = 0;
-        foreach ($this->getAllParticipants() as $participant) {
-            if ($participant->isMarkingRequired()) {
-                $num++;
-            }
+        // No responses, or latest response has published feedback already ?
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
+        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
+            return false;
         }
-        return $num;
-    }
 
-    /**
-     * What percentage of Participants have Responses that require marking.
-     *
-     * This does not always equate to 100 - getPercentageMarked()
-     *
-     * @return float
-     */
-    public function getPercentageMarkingRequired()
-    {
-        $numParticipants = $this->numParticipants();
-        if(!$numParticipants){
-            return 0;
+        // One or more responses and no feedback ?
+        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
+        if (!$latestPublishedFeedback) {
+            return true;
         }
-        return 100 * ($this->numMarkingRequired() / $numParticipants);
+
+        // Was the latest student response submitted after the latest mark was published?
+        return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
     }
 
     /**
      * @inheritdoc
      */
-    public function numPublished()
+    public function isReviewComplete(User $user)
     {
-        $num = 0;
-
-        foreach ($this->getAllParticipants() as $currentParticipant) {
-            if ($currentParticipant->isAssessablePublished()) {
-                $num++;
-            }
-        }
-
-        return $num;
+        $participant = $this->getParticipant($user);
+        return  $participant->hasPublishedFeedback() && !$participant->isFeedbackRequired();
     }
 
     /**
      * @inheritdoc
      */
-    public function getPercentagePublished()
+    public function hasSubmittedResponse(User $user)
     {
-        $numParticipants = $this->numParticipants();
-        if(!$numParticipants){
-            return 0;
+        foreach($this->getParticipant($user)->getAllResponses() as $response){
+            if($response->isSubmitted()){
+                return true;
+            }
         }
-        return 100 * ($this->numPublished() / $numParticipants);
+        return false;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasPublishedFeedback(User $user)
+    {
+        foreach($this->getParticipant($user)->getAllFeedbacks() as $feedback){
+            if($feedback->isPublished()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasMark(User $user)
+    {
+        // Default case
+        return $this->hasPublishedFeedback($user);
+    }
+
 
     /**
      * Is feedback on this assessment visible to $viewingUser?
@@ -950,5 +953,21 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->curriculumNodes = $curriculumNodes;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseClass()
+    {
+        return IResponse::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFeedbackClass()
+    {
+        return IFeedback::class;
     }
 }

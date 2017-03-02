@@ -123,7 +123,7 @@ class StudentCarousel
                         </div>
                     </div>
                 ",
-                'submitted' => $currentParticipant->isMarkingRequired(),
+                'submitted' => $currentParticipant->isFeedbackRequired(),
             ];
 
             $allPeople[] = $person;

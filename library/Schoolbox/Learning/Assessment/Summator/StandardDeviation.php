@@ -78,4 +78,12 @@ class StandardDeviation extends AbstractSummator
     {
         return 'Standard Deviation';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function impliesOptionality()
+    {
+        return false;
+    }
 }

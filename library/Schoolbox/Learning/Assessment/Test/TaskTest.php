@@ -17,7 +17,7 @@ use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Participant;
 
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 class TaskTest extends \PHPUnit_Framework_TestCase
@@ -113,8 +113,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     {
         $task = $this->spawnTask();
 
-        $completion = (new TaskCompletion);
-        $completion
+        $response = (new TaskResponse());
+        $response
             ->setId(883)
             ->setAssessable($task)
             ->setSubmittedBy($this->hodes)
@@ -122,22 +122,22 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $task->getParticipant($this->hodes)->getAllResponses()->add($completion);
+        $task->getParticipant($this->hodes)->getAllResponses()->add($response);
 
         /* Check that it linked to the Task correctly
          */
-        $this->assertEquals(1234, $completion->getAssessable()->getId());
+        $this->assertEquals(1234, $response->getAssessable()->getId());
 
         /* Authors
          */
-        $this->assertEquals($this->hodes->getId(), $completion->getSubmittedBy()->getId());
-        $this->assertEquals($this->hodes->getId(), $completion->getSubmittedOnBehalfOf()->getId());
+        $this->assertEquals($this->hodes->getId(), $response->getSubmittedBy()->getId());
+        $this->assertEquals($this->hodes->getId(), $response->getSubmittedOnBehalfOf()->getId());
 
         /* Dates
          */
-        $this->assertEquals('2016-08-06 10:01:22', $completion->getCreatedAt()->getDatabase());
-        $this->assertEquals('2016-08-06 10:01:22', $completion->getUpdatedAt()->getDatabase());
-        $this->assertEquals(null, $completion->getDeletedAt());
+        $this->assertEquals('2016-08-06 10:01:22', $response->getCreatedAt()->getDatabase());
+        $this->assertEquals('2016-08-06 10:01:22', $response->getUpdatedAt()->getDatabase());
+        $this->assertEquals(null, $response->getDeletedAt());
     }
 
 
@@ -148,14 +148,15 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     {
         $task = $this->spawnTask();
 
-        $feedback = new TaskFeedback();
-        $feedback
+        $response = (new TaskResponse())
             ->setId(87)
             ->setAssessable($task)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setSubmittedBy($this->celia)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
         $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
 
@@ -171,7 +172,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
         /* Dates
          */
         $this->assertEquals('2016-09-15 01:27:33', $feedback->getPublishedAt()->getDatabase());
-        $this->assertEquals('2016-08-07 19:03:19', $feedback->getCreatedAt()->getDatabase());
+        $this->assertEquals('2016-09-15 01:27:33', $feedback->getCreatedAt()->getDatabase());
         $this->assertEquals('2016-08-07 19:03:19', $feedback->getUpdatedAt()->getDatabase());
         $this->assertEquals(null, $feedback->getDeletedAt());
     }
@@ -184,8 +185,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     {
         $task = $this->spawnTask();
 
-        $completion = (new TaskCompletion);
-        $completion
+        $response = (new TaskResponse());
+        $response
             ->setId(883)
             ->setAssessable($task)
             ->setSubmittedBy($this->hodes)
@@ -193,25 +194,19 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback = new TaskFeedback();
-        $feedback
-            ->setId(87)
-            ->setAssessable($task)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
-        $completion->getAllFeedback()->add($feedback);
+        $response->getAllFeedback()->add($feedback);
 
-        $task->getParticipant($this->hodes)->getAllResponses()->add($completion);
+        $task->getParticipant($this->hodes)->getAllResponses()->add($response);
         $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
 
         /* Check everything connects up
          */
-        $this->assertEquals(1234, $completion->getAssessable()->getId());
+        $this->assertEquals(1234, $response->getAssessable()->getId());
         $this->assertEquals(1234, $feedback->getAssessable()->getId());
-        $this->assertCount(1, $completion->getAllFeedback());
+        $this->assertCount(1, $response->getAllFeedback());
 
         /* Total number of Responses
          */
@@ -220,7 +215,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
         /* Feedback setup
          */
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->getAllFeedbacks()->getOffset(0)->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->getAllFeedbacks()->getOffset(0)->getId());
         $this->assertEquals(true, $task->getParticipant($this->hodes)->getAllFeedbacks()->getOffset(0)->isPublished());
 
         /* Total number of Feedbacks
@@ -236,8 +231,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     {
         $task = $this->spawnTask();
 
-        $completion = (new TaskCompletion);
-        $completion
+        $response = (new TaskResponse());
+        $response
             ->setId(883)
             ->setAssessable($task)
             ->setSubmittedBy($this->hodes)
@@ -245,24 +240,18 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback = new TaskFeedback();
-        $feedback
-            ->setId(87)
-            ->setAssessable($task)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
-        $completion->getAllFeedback()->add($feedback);
+        $response->getAllFeedback()->add($feedback);
 
-        $task->getParticipant($this->hodes)->getAllResponses()->add($completion);
+        $task->getParticipant($this->hodes)->getAllResponses()->add($response);
         $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
 
         /* The most recent feedback is published
          */
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
     }
 
     /**
@@ -273,52 +262,41 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     {
         $task = $this->spawnTask();
 
-        $completion = (new TaskCompletion);
-        $completion
-            ->setId(883)
+        $response1 = (new TaskResponse());
+        $response1
+            ->setId(87)
             ->setAssessable($task)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
+        $task->getParticipant($this->hodes)->getAllResponses()->add($response1);
 
-        $feedback = new TaskFeedback();
-        $feedback
-            ->setId(87)
+        $response2 = (new TaskResponse());
+        $response2
+            ->setId(883)
             ->setAssessable($task)
-            ->setComment('This is the most recently published feedback')
-            ->setNormalisedMark(999999)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->celia)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $floatingFeedback = new TaskFeedback();
-        $floatingFeedback
-            ->setId(89)
-            ->setAssessable($task)
-            ->setComment('This is the most recent feedback (ignoring published-status)')
-            ->setNormalisedMark(8888888)
-            ->setReviewer($this->celia)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $completion->getAllFeedback()->add($feedback);
-
-        $task->getParticipant($this->hodes)->getAllResponses()->add($completion);
-        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $feedback2 = (new TaskFeedback())
+            ->setResponse($response2);
+        $response2->getAllFeedback()->add($feedback2);
+        $task->getParticipant($this->hodes)->getAllResponses()->add($response2);
+        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback2);
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
-        $this->assertEquals(89, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
 
         /* Most recent feedback has a normalised mark of null
          * Tasks always return null for normalised marks
          */
         $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getNormalisedMark());
-        $this->assertEquals(false, $task->getParticipant($this->hodes)->findMostRecentFeedback()->isPublished());
+        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentFeedback()->isPublished());
     }
 
     /**
@@ -328,8 +306,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     {
         $task = $this->spawnTask();
 
-        $completion = (new TaskCompletion);
-        $completion
+        $response = (new TaskResponse());
+        $response
             ->setId(883)
             ->setAssessable($task)
             ->setSubmittedBy($this->hodes)
@@ -337,37 +315,18 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback = new TaskFeedback();
-        $feedback
-            ->setId(87)
-            ->setAssessable($task)
-            ->setComment('This is the most recently published feedback, updated after publishing')
-            ->setNormalisedMark(999999)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2017-08-27 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+        $feedback = (new TaskFeedback())
+            ->setResponse($response);
 
-        $floatingFeedback = new TaskFeedback();
-        $floatingFeedback
-            ->setId(89)
-            ->setAssessable($task)
-            ->setComment('Helly was here')
-            ->setNormalisedMark(8888888)
-            ->setReviewer($this->celia)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT));
+        $response->getAllFeedback()->add($feedback);
 
-        $completion->getAllFeedback()->add($feedback);
-
-        $task->getParticipant($this->hodes)->getAllResponses()->add($completion);
+        $task->getParticipant($this->hodes)->getAllResponses()->add($response);
         $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
 
         /* Most recent feedback has a normalised mark of null
          * Tasks always return null for normalised marks

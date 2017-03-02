@@ -33,13 +33,13 @@ interface IResponse
      */
     public function findMostRecentPublishedFeedback();
 
+
     /**
-     * $user is the author of this Response
+     * Does this IResponse have published feedback?
      *
-     * @param User $user
      * @return bool
      */
-    public function isAuthoredBy(User $user);
+    public function hasPublishedFeedback();
 
     /* Getters/Setters
      */
@@ -86,7 +86,7 @@ interface IResponse
      * @param User $submittedBy
      * @return $this
      */
-    public function setSubmittedBy($submittedBy);
+    public function setSubmittedBy(User $submittedBy);
 
     /**
      * Get the person for whom the IResponse was created. This is used when
@@ -104,7 +104,7 @@ interface IResponse
      * @param User $submittedOnBehalfOf
      * @return $this
      */
-    public function setSubmittedOnBehalfOf($submittedOnBehalfOf);
+    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf);
 
     /**
      * Get the datetime at which this response was submitted.
@@ -112,7 +112,7 @@ interface IResponse
      * This is the when:
      * * DueWorkSubmission: transitioned from "draft" to "submitted"
      * * QuizAttempt:       student finished
-     * * TaskCompletion:    creation
+     * * TaskResponse:      creation
      *
      * @return Alaress_Date_Format
      */

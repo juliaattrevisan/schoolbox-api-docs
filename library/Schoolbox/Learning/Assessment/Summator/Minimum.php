@@ -76,4 +76,15 @@ class Minimum extends AbstractSummator
     {
         return 'Minimum';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function impliesOptionality()
+    {
+        /* eg, project has 2 sub-assessments. Students completes first and gets 80%.
+         * Student would still need to complete second to avoid getting 0%.
+         */
+        return false;
+    }
 }

@@ -1,19 +1,23 @@
 {#  usage: per-participation, configure the following vars for the parent template to use
      - pActionResponses: a route to see the list of responses for this participation
      - pStatusText:      the description to output under the user's name
-     - pStatusClass:     one of [ '', 'pending', 'complete' ] to denote the action status of this participation
+     - pStatusClass:     one of [ '', 'pending', 'reviewed' ] to denote the action status of this participation
      - pTooltip:         a tooltip explaining the status marker
 
     available variables:
-     - routeArgs:   an array that represents a participant, to be pushed into a routeLookup
-     - assessment:  the assessment we're looking at
-     - participant: the current participant of the iteration
+     - routeArgs:        an array that represents a participant, to be pushed into a routeLookup
+     - assessment:       the assessment we're looking at
+     - participant:      the current participant of the iteration
      - statusIncomplete: a string representing the 'incomplete' state
-     - statusPending: a string representing the 'pending' state
-     - statusComplete: a string representing the 'complete' state
+     - statusPending:    a string representing the 'pending'    state
+     - statusReviewed:   a string representing the 'reviewed'   state
 
 #}
 {% extends '@learningAssessment/status.twig' %}
+
+{% set labelIncomplete = 'Submission required' %}
+{% set labelPending    = 'Marking required' %}
+{% set labelReviewed   = 'Reviewed' %}
 
 {% block headerOptions %}
     {% if assessment.useRubric %}
@@ -43,14 +47,18 @@
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}
-        {% set pStatusClass = participant.markingRequired ? statusPending : (latestResponse or latestFeedback ? statusComplete : statusIncomplete) %}
-        {% set pTooltip     = participant.markingRequired ? 'Mark required' : (latestResponse or latestFeedback ? 'Marked' : 'No submission') %}
+        {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}
+        {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
         {% set pSobo = true %}
 
         {% set pStatusText %}
             {%- spaceless %}
                 {% if not latestResponse %}
-                    Not submitted
+                    {% if participant.reviewComplete %}
+                        {{ labelReviewed }}
+                    {% else %}
+                        Not submitted
+                    {% endif %}
                 {% else %}
                     {% if multipleResponses %}
                         Resubmitted
@@ -117,7 +125,7 @@
          - participant: the current participant of the iteration
          - statusIncomplete: a string representing the 'incomplete' state
          - statusPending: a string representing the 'pending' state
-         - statusComplete: a string representing the 'complete' state
+         - statusReviewed: a string representing the 'reviewed' state
          - errors: An array of "Submission States" such as absent, et al.
      #}
     <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
@@ -127,7 +135,7 @@
                 errors: {{ errors | json_encode | raw }},
                 statusIncomplete: '{{ statusIncomplete }}',
                 statusPending: '{{ statusPending }}',
-                statusComplete: '{{ statusComplete }}'
+                statusReviewed: '{{ statusReviewed }}'
             });
 
             $('#mass-publish').bulky({

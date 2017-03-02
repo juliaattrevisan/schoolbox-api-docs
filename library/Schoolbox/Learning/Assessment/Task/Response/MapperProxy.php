@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Assessment\Task\Completion;
+namespace Schoolbox\Learning\Assessment\Task\Response;
 
 use Schoolbox\Assessment\Course\Task as TaskDataObject;
 use Schoolbox\Collection;
@@ -13,7 +13,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion as DataObject;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as DomainObject;
+use Schoolbox\Learning\Assessment\Task\Response\Model as DomainObject;
 use Schoolbox\Mapper;
 
 
@@ -85,35 +85,23 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     protected function transformModels(Collection $mapperModels)
     {
-        $taskCompletions = new GenericCollection(DomainObject::class);
+        $taskResponses = new GenericCollection(DomainObject::class);
 
         foreach($mapperModels as $completion){
-            $taskCompletion = (new DomainObject())
+            $response = (new DomainObject())
                 ->setId($completion->getId())
                 ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
                 ->setSubmittedBy($completion->getMarkingUser())
                 ->setSubmittedOnBehalfOf($completion->getStudent())
+                ->setMarkedComplete($completion->getCompletionStatus() != DataObject::STATUS_INCOMPLETE)
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setUpdatedAt($completion->getCompletionDate())
                 ->setDeletedAt($completion->getDeletedAt());
 
-            // Set completion of this feedback
-            $status = $completion->getCompletionStatus();
-            if ($status == DataObject::COMPLETION_STATUS_INCOMPLETE) {
-                $taskCompletion->markAsNotAttempted();
-
-            } elseif ($status == DataObject::COMPLETION_STATUS_REQUIRES_CONFIRMATION) {
-                $taskCompletion->markAsSelfAssessed();
-
-            } elseif ($status == DataObject::COMPLETION_STATUS_COMPLETE) {
-                $taskCompletion->markAsCompleted();
-
-            }
-
-            $taskCompletions->add($taskCompletion);
+            $taskResponses->add($response);
         }
 
-        return $taskCompletions;
+        return $taskResponses;
     }
 
     /**

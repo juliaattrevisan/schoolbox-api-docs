@@ -23,8 +23,13 @@
 
 {# student submit form #}
 {% set participant         = assessment.getParticipant(student) %}
-{% set mostRecentFeedback  = participant.findMostRecentPublishedFeedback %}
+{% set mostRecentResponse  = participant.findMostRecentSubmittedResponse %}
 {% set isViewingOwnSummary = participant.user.id == USER.id %}
+{% set reviewer            = mostRecentResponse.submittedBy %}
+{% set reviewerName        = reviewer.id == USER.id ? 'You' : reviewer.fullName %}
+{% set COMPLETION_STATUS_INCOMPLETE              = 1 %}
+{% set COMPLETION_STATUS_SELF_MARKED_COMPLETE    = 2 %}
+{% set COMPLETION_STATUS_TEACHER_MARKED_COMPLETE = 3 %}
 
 <div class="row">
     <div class="small-12 island">
@@ -40,77 +45,73 @@
                                      class="hide-for-small-only">
                                 <p>{{ participant.user.formatName }}</p>
 
-                                {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
-                                    <p class="meta">
-                                        {% if isViewingOwnSummary %}
-                                            You completed this task on {{ mostRecentFeedback.publishedAt.short }}.
-                                        {% else %}
-                                            completed this task on {{ mostRecentFeedback.publishedAt.short }}.
-                                        {% endif %}
-                                    </p>
-                                {% else %}
-                                    <p class="meta">
-                                        {% if assessment.isSelfAssessed %}
+                                <p class="meta">
+                                    {# Are there no responses for this participant ? #}
+                                    {% if not mostRecentResponse %}
+
+                                        {# Is this task self-assessable ? #}
+                                        {% if assessment.isSelfAssessable %}
                                             {% if isViewingOwnSummary %}
-                                                You have not yet attempted this task.
+                                                You {% if assessment.isPastClose %}did not complete{% else %}have not completed{% endif %} this task.
                                             {% else %}
-                                                has not yet attempted this task.
+                                                {% if assessment.isPastClose %}did not complete{% else %}has not completed{% endif %} this task.
                                             {% endif %}
                                         {% else %}
                                             {% if isViewingOwnSummary %}
-                                                Your teacher has not verified that you have completed this task.
+                                                Your teacher {% if assessment.isPastClose %}did not verify{% else %}has not verified{% endif %} that you have completed this task.
                                             {% else %}
-                                                has not been verified as having completed this task.
+                                                {% if assessment.isPastClose %}was not{% else %}has not been{% endif %} verified as having completed this task.
                                             {% endif %}
                                         {% endif %}
-                                    </p>
-                                {% endif %}
+                                    {% else %}
+                                    {% if isViewingOwnSummary %}You were{% else %}was{% endif %} marked as
+                                    {% if mostRecentResponse.isMarkedComplete %}complete{% else %}incomplete{% endif %} on {{ mostRecentResponse.submittedAt.short }}.
+                                    {% endif %}
+                                </p>
                             </a>
                         </div>
                     </div>
 
-                    {# Has teacher confirmed this is complete? #}
-                    {% if mostRecentFeedback.isMarkedAsCompleted %}
+                    {# Was the task non self assessed ? #}
+                    {% if mostRecentResponse and not mostRecentResponse.selfAssessed %}
                         <ul class="information-list reply">
                             <li class="list-item">
                                 <div class="card small-12">
-                                    <a href="/search/user/{{ mostRecentFeedback.reviewer.id }}" title="View Profile">
-                                        <img src="/portrait.php?userId={{ mostRecentFeedback.reviewer.externalId }}&amp;size=square64"
-                                             alt="{{ mostRecentFeedback.reviewer.formatName }}"
+                                    <a href="/search/user/{{ mostRecentResponse.submittedBy.id }}" title="View Profile">
+                                        <img src="/portrait.php?userId={{ mostRecentResponse.submittedBy.externalId }}&amp;size=square64"
+                                             alt="{{ mostRecentResponse.submittedBy.formatName }}"
                                              class="hide-for-small-only">
-                                        <p>{{ mostRecentFeedback.reviewer.formatName }}</p>
-
+                                        <p>{{ mostRecentResponse.submittedBy.formatName }}</p>
                                         <p class="meta">
-                                            {% if isViewingOwnSummary %}
-                                                verified that you have completed this task.
-                                            {% else %}
-                                                verified this task is complete.
-                                            {% endif %}
+                                            marked {% if isViewingOwnSummary %}you{% else %}this task{% endif %} as
+                                            {% if mostRecentResponse.isMarkedComplete %}complete{% else %}incomplete{% endif %}.
                                         </p>
                                     </a>
                                 </div>
                             </li>
                         </ul>
                     {% endif %}
+
                 </li>
             </ul>
         </section>
-
 
         {% set createResponseRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
             assessmentId: participant.assessable.id,
             studentId:    participant.user.id,
             participant:  participant
         }) %}
-        {% if createResponseRoute and  assessment.isSelfAssessed %}
-            <form action="{{ createResponseRoute }}"
-                  method="POST">
-                {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
-                    <input type="hidden" name="status" value="1" />
-                    <input type="submit" class="full-width" value="Mark Task as Not Attempted" />
+        {# If already marked as teacher-assessed, require WRITE+ perm to change. If student, ensure not closed #}
+        {% set isMarkedByTeacherAsComplete = mostRecentResponse.teacherAssessed and mostRecentResponse.markedComplete %}
+        {% if createResponseRoute and (hasWritePerm or not isMarkedByTeacherAsComplete) and (hasWritePerm or participant.assessable.isOpen) %}
+            <form action="{{ createResponseRoute }}" method="POST">
+                {% if mostRecentResponse.markedComplete %}
+                    <input type="hidden" name="status" value="{{ COMPLETION_STATUS_INCOMPLETE }}" />
+                    <input type="submit" class="full-width" value="Mark as Incomplete" />
                 {% else %}
-                    <input type="hidden" name="status" value="2" />
-                    <input type="submit" class="full-width" value="Complete Task" />
+                    {% set completedValue = USER.id == student.id ? COMPLETION_STATUS_SELF_MARKED_COMPLETE : COMPLETION_STATUS_TEACHER_MARKED_COMPLETE %}
+                    <input type="hidden" name="status" value="{{ completedValue }}" />
+                    <input type="submit" class="full-width" value="Mark as Complete" />
                 {% endif %}
             </form>
         {% endif %}

@@ -1412,7 +1412,7 @@ $progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
         }
     }
 
-    &.complete {
+    &.reviewed {
         @extend .icon-approve;
         background-color: $success-color;
         border-radius: $progress-tick-size-regular;

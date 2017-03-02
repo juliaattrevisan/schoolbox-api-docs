@@ -18,6 +18,8 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
+use Alaress_Date_Format;
+use \DomainException;
 
 interface IAssessable extends ISoftDeletable
 {
@@ -60,6 +62,7 @@ interface IAssessable extends ISoftDeletable
      */
     public function getBaseContext();
 
+
     /**
      * Set the context within which this assessment belongs.
      *
@@ -68,13 +71,65 @@ interface IAssessable extends ISoftDeletable
      */
     public function setContext(AssessmentContext $assessmentContext);
 
+
     /**
-     * Decide whether $user can create a response to this IAssessable
+     * Is now after the published date?
      *
-     * @param User $user
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function canCreateResponse(User $user);
+    public function isPublished(Alaress_Date_Format $now = null);
+
+
+    /**
+     * Is the assessment between its open and close dates ?
+     *
+     * Note this includes the overdue period.
+     *
+     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @return bool
+     */
+    public function isOpen(Alaress_Date_Format $now = null);
+
+
+    /**
+     * Are we past the due date and before the close date?
+     *
+     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @return bool
+     */
+    public function isOverdue(Alaress_Date_Format $now = null);
+
+
+    /**
+     * Are we after the close date? (does not consider if we are before open date)
+     *
+     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @return bool
+     */
+    public function isPastClose(Alaress_Date_Format $now = null);
+
+
+    /**
+     * Can the specified learner (a user with READ perm only) create a response for themself ?
+     *
+     * In all cases, a learner may only create a response if they are a participant.
+     *
+     * @param User $learner A user with WRITE+ perm to this assessment's folder context
+     * @return bool
+     */
+    public function canLearnerCreateResponse(User $learner);
+
+
+    /**
+     * Can the specified instructor (a user with WRITE+ perms) create a submission-on-behalf-of response ?
+     *
+     * @param User $instructor A user with WRITE+ perm to this assessment's folder context
+     * @param User $learner    The user who the response will be created for
+     * @return bool
+     */
+    public function canInstructorCreateResponse(User $instructor, User $learner);
+
 
     /**
      * Retrieve the specification this assessment was created from, if any.
@@ -172,98 +227,71 @@ interface IAssessable extends ISoftDeletable
      */
 
     /**
-     * Calculate how many Participant instances are in this IAssessable
+     * Does the specified Participant need to submit a response?
      *
-     * @return int
+     * @param User $user
+     * @throws DomainException if $user is not a participant
+     * @return bool
      */
-    public function numParticipants();
+    public function isResponseRequired(User $user);
 
     /**
-     * Returns what percentage of Participants have Responses to this Assessment
+     * Does the teacher need to give feedback to a student response?
      *
-     * @return float
+     * @param User $user
+     * @throws DomainException if $user is not a participant
+     * @return bool
      */
-    public function getPercentageSubmitted();
+    public function isFeedbackRequired(User $user);
 
     /**
-     * Returns the number of Participants who have neither Feedback nor Responses to this Assessment
+     * Has the participant been marked as not-incomplete, and has not subsequently re-submitted ?
      *
-     * @return int
+     * @param User $user
+     * @throws DomainException if $user is not a participant
+     * @return bool
      */
-    public function numNoResponseOrFeedback();
+    public function isReviewComplete(User $user);
+
 
     /**
-     * Returns the number of Participants who have Responses to this Assessment
+     * Has the participant made ANY kind of (submitted) response to the assessment?
      *
-     * @return int
+     * Includes teacher Submitting-On-Behalf-Of (S-O-B-O)
+     *
+     * Important: This will still return TRUE if task has been marked as 'incomplete'.
+     *
+     * @param User $user
+     * @throws DomainException if $user is not a participant
+     * @return bool
      */
-    public function numSubmitted();
+    public function hasSubmittedResponse(User $user);
 
     /**
-     * Calculate how many IAssessable instances have a non-null mark value
+     * Has a teacher given a published mark to the participant.
      *
-     * The most recent action determines the marked/not-marked state of
-     * an Assessable. This accounts for a series of edge cases which really
-     * make you hate life
+     * For clarity - a self-assessed task, while complete, is not marked by teacher
+     * @see $this->hasMark to include self-assessed marks.
      *
-     * For a particular Participant:
-     *
-     * If the Assessable contains zero Responses and zero Feedbacks:
-     *     >>> not marked
-     *
-     * If the Assessable contains at least one Response and zero Feedbacks:
-     *     >>> not marked
-     *
-     * If the Assessable contains zero Responses and at least one Feedback:
-     *     >>> marked
-     *
-     * If the Assessable contains at least one Response and at least one Feedback:
-     * Start traversing to find out what's going on.
-     *          If the most recent Response contains a Feedback -OR-
-     *          If a Feedback occurred more recently than the Response
-     *          (ie. Feedback is the most recent action) >>> marked
-     *
-     *          Otherwise >>> not marked
+     * @param User $user
+     * @throws DomainException if $user is not a participant
+     * @return bool
      */
-    public function numMarked();
+    public function hasPublishedFeedback(User $user);
 
     /**
-     * Calculate percentage of an IAssessable that has been marked
+     * Does this student have a mark for the assessment.
      *
-     * @return float
+     * This includes marks given by the teacher, and
+     * self-assessed marks for a task (even if self-assessed as 'Incomplete')
+     *
+     * @see $this->isMarkedByTeacher for teacher-assigned-only marks
+     * @param User $user
+     * @throws DomainException if $user is not a participant
+     * @return bool
      */
-    public function getPercentageMarked();
+    public function hasMark(User $user);
 
-    /**
-     * How many Participants have Responses that require marking.
-     *
-     * @return int
-     */
-    public function numMarkingRequired();
-
-    /**
-     * What percentage of Participants have Responses that require marking.
-     *
-     * This does not always equate to 100 - getPercentageMarked()
-     *
-     * @return float
-     */
-    public function getPercentageMarkingRequired();
-
-    /**
-     * Calculate the number of Feedbacks that have been Published
-     * to Students
-     *
-     * @return int
-     */
-    public function numPublished();
-
-    /**
-     * Calculate percentage of an IAssessable that has been Published
-     *
-     * @return float
-     */
-    public function getPercentagePublished();
 
     /**
      * The friendly, uninformative version of assertValidDates
@@ -544,6 +572,13 @@ interface IAssessable extends ISoftDeletable
     public function setResponses(Collection $responses);
 
     /**
+     * Return the IResponse implementation class for this IAssessable
+     *
+     * @return string
+     */
+    public function getResponseClass();
+
+    /**
      * @return Collection|IFeedback[]
      */
     public function getFeedbacks();
@@ -553,6 +588,13 @@ interface IAssessable extends ISoftDeletable
      * @return $this
      */
     public function setFeedbacks(Collection $feedbacks);
+
+    /**
+     * Return the IFeedback implementation class for this IAssessable
+     *
+     * @return string
+     */
+    public function getFeedbackClass();
 
     /**
      * A collection of Curriculum Nodes

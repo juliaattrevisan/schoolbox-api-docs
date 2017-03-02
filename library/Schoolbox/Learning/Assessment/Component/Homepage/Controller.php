@@ -25,7 +25,7 @@ use SitePage;
 abstract class Controller extends Component_Homepage_ControllerAbstract
 {
     /** @var IAssessable[]|Collection */
-    protected $assessments;
+    private $assessments;
 
     /** @var AssessmentMapperProxy $assessmentMapper */
     private $assessmentMapper;
@@ -71,9 +71,12 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             // assessment types, not just tasks (as it did previously).
             $options = [
                 'type'  => $this->getAssessmentType(),
-                'from'  => \Alaress_Date_Format::now(),
                 'order' => ['due_date' => 'asc'],
             ];
+
+            if(!$this->getConfig('showClosed')){
+                $options['from'] = \Alaress_Date_Format::now();
+            }
 
             $this->assessments = $this->getAssessmentMapper()
                 ->findAllByFolderIdForReview(
@@ -84,15 +87,10 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                 ->filter(
                     function (IAssessable $assessment) use ($visibility)
                     {
-                        return $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
+                        return $visibility->isVisibleToUser($assessment, $this->getUser(), $this->getConfig('showClosed'));
                     }
                 )
-            ;
-
-            if ($this->getConfig('size') > 0) {
-                $this->assessments->limit($this->getConfig('size'));
-            }
-
+                ->limit($this->getConfig('size') ?: null);
 
         } catch (\DomainException $e) {
             // if something goes wrong, this component will not be displayed
