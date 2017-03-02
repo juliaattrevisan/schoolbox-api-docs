@@ -12,7 +12,6 @@ namespace Schoolbox\Resource\Storage;
 use Alaress_Date_Format;
 use League\Flysystem\File;
 use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
 use RuntimeException;
 use Schoolbox\File\Mimetype;
 
@@ -49,16 +48,6 @@ class Model extends File implements IStorage
 
     /** @var string */
     protected $extension;
-
-
-    /**
-     * @param FilesystemInterface $filesystem
-     * @param string              $path
-     */
-    public function __construct(FilesystemInterface $filesystem = null, $path = null)
-    {
-        parent::__construct($filesystem, $path);
-    }
 
 
     /**

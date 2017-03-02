@@ -9,14 +9,10 @@ namespace Schoolbox\News\Component\Homepage;
 
 use CategoryNews;
 use Component_Homepage_ControllerAbstract;
-use Component_Instance;
 use Schoolbox\Permission\Access\UserAccess;
-use Group;
 use News;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
-use SitePage;
 use Schoolbox\Resource\Category\NewsMapper;
 
 class Controller extends Component_Homepage_ControllerAbstract
@@ -25,11 +21,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @param News $news
      */
     protected $news;
-
-    /**
-     * @var Group
-     */
-    protected $groupHandler;
 
     /**
      * @var CategoryNews
@@ -46,16 +37,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     protected $folderMapper = null;    
 
-    /**
-     * Injectable constructor
-     *
-     * @param Component_Instance $instance
-     * @param User               $user
-     * @param SitePage           $sitepage
-     */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
-        parent::__construct($instance, $user, $sitepage);
-    }
 
     /**
      * Loads the grid component into its set configuration.
@@ -64,7 +45,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
         $this->newsHandler  = new CategoryNews();
         $this->setFolderMapper(new FolderMapper());
 
@@ -126,22 +106,4 @@ class Controller extends Component_Homepage_ControllerAbstract
             ]
         );
     }
-
-    /**
-     * @param FolderMapper $folderMapper
-     * @return $this
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
-
-    /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }    
 }

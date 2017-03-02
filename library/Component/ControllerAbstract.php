@@ -1107,7 +1107,7 @@ abstract class Component_ControllerAbstract
      * @param Folder|Eportfolio_Page_Instance|null $source
      * @return static
      */
-    public function setSource($source)
+    public function setSource($source = null)
     {
         $this->source = $source;
         return $this;
