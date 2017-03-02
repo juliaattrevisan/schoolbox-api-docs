@@ -33,7 +33,14 @@
             {% endif %}
             <div class="list-item">
                 <div class="small-12 compact card wrap-down">
-                    {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
+                    {##
+                    #  Special case for projects, to take teachers to status page rather than summary
+                    #}
+                    {% if readOnly == false and assessment is project %}
+                        {% set href = routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) %}
+                    {% else %}
+                        {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
+                    {% endif %}
 
                     <a title="{{ assessment.typeName }}" href="{{ href }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
                         <span class="{{ icon.renderClass(assessment) }}"></span>
