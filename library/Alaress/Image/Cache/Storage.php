@@ -12,6 +12,7 @@
 namespace Alaress\Image\Cache;
 
 use Alaress_Byte_Format;
+use League\Flysystem\File;
 use Schoolbox\Config\Loader;
 use Schoolbox\Resource;
 
@@ -39,9 +40,9 @@ class Storage extends Flysystem
     }
 
     /**
-     * @param Resource\Storage\Model $file
+     * @param File $file
      */
-    protected function makeCache(Resource\Storage\Model $file)
+    protected function makeCache(File $file)
     {
         $mgr = new Resource\Storage\Manager($this->mgr, new Alaress_Byte_Format());
 
