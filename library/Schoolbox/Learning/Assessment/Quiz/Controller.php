@@ -195,8 +195,7 @@ class Controller extends Assessment\Controller
 
         $userPermission = $this->getAccess()->getFolderAccess($this->getUser(), [$assessment->getBaseContext()->getFolder()->getId()]);
 
-        // A user with write permission will be redirected to attempts, even he has completed the quiz
-        if ($sessionUser->getId() == $participantUser->getId() && $userPermission < UserAccess::ACCESS_WRITE) {
+        if ($sessionUser->getId() == $participantUser->getId()) {
             // this is the special case: redirect to intro
             $this->getResponse()->redirect->afterPost(
                 $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
