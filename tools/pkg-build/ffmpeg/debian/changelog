@@ -1,4 +1,4 @@
-schoolbox-ffmpeg (2.6.3-1) stable; urgency=low
+schoolbox-ffmpeg (x.y.z-1) stable; urgency=low
 
   * FFmpeg for schoolbox, built from static build
 
