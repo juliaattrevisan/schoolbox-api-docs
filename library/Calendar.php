@@ -30,7 +30,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $this->groupHandler = new Group(CALENDAR_SERVICE);
 
-        parent::__contruct();
+        parent::__construct();
     }
 
     /**

@@ -11,7 +11,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
 		$this->_table = "subject_news";
 		$this->_index = "id";
 
-		parent::__contruct();
+		parent::__construct();
 	}
 
 	/**

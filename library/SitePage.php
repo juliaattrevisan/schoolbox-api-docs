@@ -80,11 +80,14 @@ class SitePage extends Page
      */
     public function __construct($login = true)
     {
-        parent::Page();
+        parent::__construct();
 
         $this->config = \Config::getInstance();
         $this->db = \DeprecatedDatabase::getInstance();
-        $this->user = $_SESSION["user"];
+
+        if(isset($_SESSION['user'])) {
+            $this->user = $_SESSION['user'];
+        }
 
         if ($login) {
             $this->initSession();
@@ -297,7 +300,11 @@ class SitePage extends Page
      */
     public static function detectAjax()
     {
-        return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+            return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -1294,12 +1301,14 @@ class SitePage extends Page
 
         // Check referrer for if the last page was a create or modify page.
         unset($_SESSION['disableXssProtectionForNextPage']);
-        $referer = parse_url($_SERVER['HTTP_REFERER']);
-        if ($referer['host'] === $_SERVER['SERVER_NAME']) {
-            foreach (array('create', 'modify') as $path) {
-                if (stripos($referer['path'], $path) !== false) {
-                    header("X-XSS-Protection: 0\r\n");
-                    return true;
+        if(isset($_SERVER['HTTP_REFERER'])) {
+            $referer = parse_url($_SERVER['HTTP_REFERER']);
+            if ($referer['host'] === $_SERVER['SERVER_NAME']) {
+                foreach (array('create', 'modify') as $path) {
+                    if (stripos($referer['path'], $path) !== false) {
+                        header("X-XSS-Protection: 0\r\n");
+                        return true;
+                    }
                 }
             }
         }

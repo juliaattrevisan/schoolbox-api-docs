@@ -6,7 +6,7 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         $this->_table = 'textBox';
         $this->_index = 'textBoxID';
 
-        parent::__contruct();
+        parent::__construct();
     }
 
     function getAllByCategory($categoryID) {

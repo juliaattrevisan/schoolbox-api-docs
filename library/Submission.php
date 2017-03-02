@@ -28,7 +28,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
         $this->_table = "submission_box";
         $this->_index = "id";
 
-        parent::__contruct();
+        parent::__construct();
     }
 
     /**

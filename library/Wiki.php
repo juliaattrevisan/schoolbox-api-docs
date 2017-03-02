@@ -9,7 +9,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 		$this->_revisionTable = 'wikiRevision';
 		$this->_openTable = 'wikiOpens';
 
-		parent::__contruct();
+		parent::__construct();
 	}
 
 	/**

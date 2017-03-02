@@ -14,7 +14,6 @@ use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Web\Output\OutputInterface;
-use Aura\Di;
 use Aura\Router\Route;
 use ReflectionMethod;
 use RuntimeException;
@@ -80,6 +79,7 @@ class Kernel extends \Alaress\Application\Kernel
         if (!empty($server['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
             $server['REQUEST_METHOD'] = strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']);
         }
+
 
         $route = $this->di->get('router')->match($path, $server);
 

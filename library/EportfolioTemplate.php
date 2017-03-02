@@ -8,7 +8,7 @@ class EportfolioTemplate extends  DeprecatedModel {
 		$this->_table = 'eportfolioTemplate';
 		$this->_index = 'id';
 
-		parent::__contruct();
+		parent::__construct();
 	}
 
 	public function getTemplateListDropDown() {

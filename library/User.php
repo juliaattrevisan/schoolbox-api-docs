@@ -13,7 +13,7 @@ class User extends DeprecatedModel
     {
         $this->_table = "user";
         $this->_index = "id";
-        parent::__contruct();
+        parent::__construct();
     }
 
 

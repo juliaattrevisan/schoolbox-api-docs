@@ -7,7 +7,7 @@ class News extends DeprecatedModel
         $this->_table = "news_items";
         $this->_index = "item_id";
 
-        parent::__contruct();
+        parent::__construct();
     }
 
     /**

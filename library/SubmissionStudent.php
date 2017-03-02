@@ -13,7 +13,7 @@ class SubmissionStudent extends DeprecatedModel
         $this->_table = "student_submission";
         $this->_index = "id";
 
-        parent::__contruct();
+        parent::__construct();
     }
 
     /**

@@ -38,7 +38,7 @@ class Group extends DeprecatedModel
         $this->_index = 'cid';
         $this->_service = $service;
 
-        parent::__contruct();
+        parent::__construct();
     }
 
 

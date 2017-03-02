@@ -14,7 +14,7 @@ class MyFolder extends DeprecatedModel {
 		$this->_table = "myFolder";
 		$this->_index = "id";
 
-		parent::__contruct();
+		parent::__construct();
 	}
 
 	function getFolderList($parent = 0) {

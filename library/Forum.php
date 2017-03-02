@@ -11,7 +11,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         $this->_index = "threadID";
         $this->_postTable = "forumPost";
 
-        parent::__contruct();
+        parent::__construct();
     }
 
     function getRecentThreadList($categoryID, $config) {
