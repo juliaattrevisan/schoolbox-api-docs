@@ -15,7 +15,7 @@ use Alaress_Byte_Format;
 use League\Flysystem\File;
 use Schoolbox\Config\Loader;
 use Schoolbox\Resource;
-use TypeError;
+use InvalidArgumentException;
 
 class Storage extends Flysystem
 {
@@ -42,14 +42,14 @@ class Storage extends Flysystem
 
     /**
      * @param File $file
-     * @throws TypeError if $file isn't a Resource\Storage\Model
+     * @throws InvalidArgumentException if $file isn't a Resource\Storage\Model
      */
     protected function makeCache(File $file)
     {
         // I don't like being this messy, but the alternative is making this
         // method declaration inconsistent with its parent.
         if (!($file instanceof Resource\Storage\Model)) {
-            throw new TypeError('$file must be an instance of "\Schoolbox\Resource\Storage\Model"');
+            throw new InvalidArgumentException('$file must be an instance of "\Schoolbox\Resource\Storage\Model"');
         }
         $mgr = new Resource\Storage\Manager($this->mgr, new Alaress_Byte_Format());
 
