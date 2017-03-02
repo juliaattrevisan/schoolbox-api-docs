@@ -25,7 +25,7 @@ class DeprecatedModel
 	/**
 	 * @deprecated
 	 */
-	function __construct()
+	public function  __construct()
     {
         $this->db = DeprecatedDatabase::getInstance();
     }
@@ -35,7 +35,7 @@ class DeprecatedModel
 	 * @param $id
 	 * @return array|bool|null
 	 */
-	function getByID($id)
+    public function getByID($id)
     {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $this->_index . "` =  " . $this->db->smartQuote($id);
@@ -48,7 +48,7 @@ class DeprecatedModel
 	 * @param $id
 	 * @return array|bool|null
 	 */
-	function getByField($field, $id)
+    public function getByField($field, $id)
     {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
@@ -61,7 +61,7 @@ class DeprecatedModel
 	 * @param string $termOp
 	 * @return array|bool
 	 */
-	function getByArray($fieldList, $termOp = 'AND')
+    public function getByArray($fieldList, $termOp = 'AND')
     {
         $query = "SELECT * FROM `" . $this->_table . "` WHERE ";
 
@@ -94,7 +94,7 @@ class DeprecatedModel
 	 * @param string $orderDir
 	 * @return array|bool
 	 */
-	function getAllByField($field, $id, $orderBy = "", $orderDir = "")
+    public function getAllByField($field, $id, $orderBy = "", $orderDir = "")
     {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
@@ -109,7 +109,7 @@ class DeprecatedModel
 	 * @param string $order
 	 * @return array|bool
 	 */
-	function getAll($order = '')
+    public function getAll($order = '')
     {
         $query = "SELECT * FROM `" . $this->_table . "`";
         if ($order) {
@@ -124,7 +124,7 @@ class DeprecatedModel
 	 * @param $name
 	 * @return mixed
 	 */
-	function getIDByName($name)
+    public function getIDByName($name)
     {
         $query = "SELECT `" . $this->_index . "` FROM `" . $this->_table . "` WHERE name = '$name'";
         $row = $this->db->getRow($query);
@@ -138,7 +138,7 @@ class DeprecatedModel
      * @param <type> $fields
      * @return <type>
      */
-    function getAllByFields($fields, $type = 'AND')
+    public function getAllByFields($fields, $type = 'AND')
     {
         if (is_array($fields)) {
             $query = "SELECT *
@@ -162,7 +162,7 @@ class DeprecatedModel
 	 * @param $object
 	 * @return bool
 	 */
-	function update($object)
+    public function update($object)
     {
         return $this->db->update($this->_table, $this->_index, $object);
     }
@@ -172,7 +172,7 @@ class DeprecatedModel
 	 * @param $id
 	 * @return bool
 	 */
-	function delete($id)
+    public function delete($id)
     {
         return $this->db->delete($this->_table, $this->_index, $id);
     }
@@ -182,7 +182,7 @@ class DeprecatedModel
 	 * @param $object
 	 * @return int|string
 	 */
-	function create($object)
+    public function create($object)
     {
         $this->db->insert($this->_table, $object);
         return $this->db->insertID();
