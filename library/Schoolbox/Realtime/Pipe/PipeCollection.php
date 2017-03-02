@@ -16,13 +16,13 @@ use Schoolbox\Realtime\SessionException;
 class PipeCollection {
 
 	/** @var Pipe[] */
-	protected $pipesBySocketKey;
+	protected $pipesBySocketKey = [];
 
-	/** @var array */
-	protected $pipesBySessionId;
+	/** @var Pipe[][] */
+	protected $pipesBySessionId = [];
 
-	/** @var array */
-	protected $pipesByUserId;
+	/** @var Pipe[][] */
+	protected $pipesByUserId = [];
 
 	/** @var LoggerInterface */
 	protected $log;
@@ -32,27 +32,27 @@ class PipeCollection {
      * @param SessionValidator $validator
      * @param LoggerInterface $log
      */
-    public function __construct($validator, $log) {
-		$this->pipesBySocketKey = array();
-		$this->pipesBySessionId = array();
-		$this->pipesByUserId    = array();
+    public function __construct($validator, $log)
+    {
 		$this->validator = $validator;
-		$this->log = $log;
+		$this->log       = $log;
 	}
 
-	/**
-	 * Register this pipe connection
-	 *
-	 * @param Pipe $pipe
-	 * @throws SessionException
-	 */
-	public function registerPipe(Pipe $pipe) {
+    /**
+     * Register this pipe connection
+     *
+     * @param Pipe $pipe
+     * @throws SessionException
+     * @throws \Predis\CommunicationException
+     */
+	public function registerPipe(Pipe $pipe)
+    {
 		$socketKey = $pipe->getSocketKey();
 		$sessionId = $pipe->getSession();
         $remember  = $pipe->getCookie('remember');
 
 		try {
-			if(!($sessionId || $remember)) {
+			if (!($sessionId || $remember)) {
 				throw new SessionException("No session or remember-me token, no user.");
 			}
 
@@ -68,15 +68,17 @@ class PipeCollection {
             $pipe->setUserId($userId);
             $this->pipesByUserId[$userId][$socketKey] = $pipe;
             $this->log->debug("LINK       '$socketKey' -> USER    '$userId'");
-		}
-		catch(SessionException $e) {
+
+		} catch (SessionException $e) {
 			$this->unregisterPipe($socketKey);
+			// rethrow
 			throw $e;
 		}
 	}
 
 	/**
 	 * @param string $socketKey
+     * @return void
 	 */
 	public function unregisterPipe($socketKey) {
 		if($this->containsPipe($socketKey)) {
@@ -108,7 +110,8 @@ class PipeCollection {
 	 * @param string $socketKey
 	 * @return bool
 	 */
-	public function containsPipe($socketKey) {
+	public function containsPipe($socketKey)
+    {
 		return array_key_exists($socketKey, $this->pipesBySocketKey);
 	}
 
@@ -116,48 +119,53 @@ class PipeCollection {
 	 * @param int $userId
 	 * @return int
 	 */
-	public function userPipeCount($userId) {
+	public function userPipeCount($userId)
+    {
 		return array_key_exists($userId, $this->pipesByUserId) ? count($this->pipesByUserId[$userId]) : 0;
 	}
 
 	/**
-	 * @param $sessionId
+	 * @param string $sessionId
 	 * @return int
 	 */
-	public function sessionPipeCount($sessionId) {
+	public function sessionPipeCount($sessionId)
+    {
 		return array_key_exists($sessionId, $this->pipesBySessionId) ? count($this->pipesBySessionId[$sessionId]) : 0;
 	}
 
 	/**
-	 * @param $socketKey
+	 * @param string $socketKey
 	 * @return Pipe
 	 */
-	public function getPipeBySocketKey($socketKey) {
-		if($this->containsPipe($socketKey)) {
+	public function getPipeBySocketKey($socketKey)
+    {
+		if ($this->containsPipe($socketKey)) {
 			return $this->pipesBySocketKey[$socketKey];
 		}
 		return null;
 	}
 
 	/**
-	 * @param $userId
+	 * @param int $userId
 	 * @return Pipe[]
 	 */
-	public function getPipesByUserId($userId) {
+	public function getPipesByUserId($userId)
+    {
 		if($this->userPipeCount($userId)) {
 			return $this->pipesByUserId[$userId];
 		}
-		return array();
+		return [];
 	}
 
 	/**
-	 * @param $sessionId
+	 * @param string $sessionId
 	 * @return Pipe[]
 	 */
-	public function getPipesBySessionId($sessionId) {
-		if($this->sessionPipeCount($sessionId)) {
+	public function getPipesBySessionId($sessionId)
+    {
+		if ($this->sessionPipeCount($sessionId)) {
 			return $this->pipesBySessionId[$sessionId];
 		}
-		return array();
+		return [];
 	}
 } 
