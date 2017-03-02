@@ -67,6 +67,11 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 ORDER BY code ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
+            // If there is no override staff join:
+            // If there is an override join:
+            // tcis.TimetableClassStaffID is null: add tcis.PersonID
+            // tcis.PersonID is null: remove
+            // neither is null: use tcis.PersonID in preference to tcs.PersonID
             $query = "
                 SELECT DISTINCT
                     ts.Code     AS code,
@@ -79,17 +84,26 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 INNER JOIN fc.TimetableClass tc ON ts.ID          = tc.TimetableSubjectID
                 INNER JOIN fc.Timetable      t  ON ts.TimetableID = t.ID
 
-                -- Base relation to staff - is this required?
+                -- Base staff
                 LEFT  JOIN fc.TimetableClassStaff tcs       ON tc.ID        = tcs.TimetableClassId
                 LEFT  JOIN dbo.Staff              tcs_staff ON tcs.PersonID = tcs_staff.ID
 
-                -- Individual relation to staff
+                -- Override staff
                 INNER JOIN fc.TimetableClassInstance      tci        ON tc.ID         = tci.TimetableClassID
                 LEFT  JOIN fc.TimetableClassInstanceStaff tcis       ON tci.ID        = tcis.TimetableClassInstanceId
                 LEFT  JOIN dbo.Staff                      tcis_staff ON tcis.PersonID = tcis_staff.ID
 
-                WHERE (tcs_staff.Code = $quotedId OR tcis_staff.Code = $quotedId)
-                AND   t.Enabled = 1
+                WHERE (
+                    -- No override
+                    (tcs_staff.Code = $quotedId AND tcis.ID IS NULL) OR
+                    -- Override - add
+                    (tcis_staff.Code = $quotedId AND tcis.TimetableClassStaffID IS NULL)
+                )
+                AND NOT (
+                    -- Override - remove or replace
+                    (tcs_staff.Code = $quotedId AND tcis.TimetableClassStaffID IS NOT NULL)
+                )
+                AND t.Enabled = 1
 
                 ORDER BY code ASC
             ";
