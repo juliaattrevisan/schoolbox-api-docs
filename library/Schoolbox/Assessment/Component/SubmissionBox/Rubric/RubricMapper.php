@@ -977,7 +977,7 @@ class RubricMapper
                 GROUP BY sb.id, rc.id
             ) t
             WHERE {$where}
-            AND `sb`.`id` = `t`.`sb.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
+            AND `sb`.`id` = `t`.`sb.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at` AND `a`.`deleted_at` IS NULL
             ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC;
         ");
 
