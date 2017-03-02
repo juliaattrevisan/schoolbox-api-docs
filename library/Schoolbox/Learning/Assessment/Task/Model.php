@@ -188,7 +188,7 @@ class Model extends AbstractAssessment
         }
 
         // Task is open, self-assessable, and not yet marked by the teacher as 'complete'
-        return false;
+        return true;
     }
 
     /**
