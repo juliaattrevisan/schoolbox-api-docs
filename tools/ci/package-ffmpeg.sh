@@ -12,8 +12,37 @@ echo "operating in dir: `pwd`";
 echo "Creating artifact directory";
 mkdir -vp $initialdir/package-artifacts;
 
-echo "Building Package";
-tools/pkg-build/ffmpeg/build.sh;
+ver=`curl https://www.johnvansickle.com/ffmpeg/ 2>/dev/null | grep 'release:' | awk '{print $2}'`;
+if [ "$ver" == "" ];
+then
+    echo "Error: unable to retrieve version";
+fi
+
+echo "Packaging ffmpeg version: $ver";
+
+tardir="schoolbox-ffmpeg-$ver";
+mkdir -p $tardir;
+
+wget -c http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz;
+if [ $? -ne 0 ];
+then
+  echo "An error occurred";
+  exit 1;
+fi
+
+tar -xJvf ffmpeg-release-64bit-static.tar.xz;
+mv -v ffmpeg-$ver-64bit-static $tardir/ffmpeg;
+
+# Retar everything for the build process
+tar czf schoolbox-ffmpeg_$ver.orig.tar.gz $tardir;
+
+# Copy deb build details to be ready for build
+cd $tardir;
+cp -fR $instdir/tools/ci/ffmpeg/debian .;
+sed -i "s/x.y.z/$ver/g" debian/changelog;
+
+# Build!
+debuild -i -I -us -uc;
 if [ $? -ne 0 ];
 then
 	echo "Build failed";
