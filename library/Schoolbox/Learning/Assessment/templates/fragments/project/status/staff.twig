@@ -132,7 +132,7 @@
                                 </nav>
                                 <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
                                     {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
-                                    {% if viewRoute %}
+                                    {% if viewRoute and assessment.baseContext is not unitSpecification %}
                                     <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
                                     {% endif %}
                                     {% if assessable is quiz %}
