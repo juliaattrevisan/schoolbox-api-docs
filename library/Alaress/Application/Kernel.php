@@ -169,7 +169,7 @@ abstract class Kernel {
 	 *
 	 * @param Exception $e
 	 */
-	public function callExceptionCallbacks(Exception $e)
+	public function callExceptionCallbacks($e)
 	{
 		foreach ($this->exceptionCallbacks as $callback) {
 			call_user_func($callback, $e);
