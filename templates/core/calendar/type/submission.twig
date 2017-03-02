@@ -2,15 +2,17 @@
 
 {% block eventBubbleButtons %}
 <div>
-    {% if event.getIsAssessment() %}
-        <a class="button icon-quiz" href="/assess/intro/{{ event.submissionBoxId }}">Start Quiz</a>
+    {% if renderer.user.role.type == 'staff' %}
+        {% set viewRoute = routeLookup('learningAssessment.getAssessment', {assessmentId: event.assessment.id }) %}
     {% else %}
-        {% if renderer.isEditable() %}
-            <a class="button icon-due-work" href="/submission/viewSubmission/{{ event.eventID }}">View Submissions</a>
-            <a class="button icon-modify" href="/submission/createSubmission/modify/{{ event.eventID }}">Modify</a>
-        {% else %}
-            <a class="button icon-due-work" href="/submission/submissionHistory/{{ event.eventID }}/{{ renderer.viewer.id }}">View Details</a>
-        {% endif %}
+        {% set viewRoute = routeLookup('learningAssessment.getSummary', {assessmentId: event.assessment.id, studentId: renderer.user.id }) %}
+    {% endif %}
+    {% if viewRoute %}
+        <a class="button icon-due-work" href="{{ viewRoute }}">View More Details</a>
+    {% endif %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: event.assessment.id, assessment: event.assessment}) %}
+    {% if modifyRoute %}
+        <a class="button icon-modify" href="{{ modifyRoute }}">Modify</a>
     {% endif %}
 </div>
 {% endblock eventBubbleButtons %}
