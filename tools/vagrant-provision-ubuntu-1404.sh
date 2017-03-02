@@ -24,6 +24,19 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
+
+phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
+echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
+if [ "$phpversion" != "7.1" ];
+then
+    add-apt-repository ppa:ondrej/php
+	apt-get update 2>&1 >/dev/null;
+	apt-get install -y php7.1 php7.1-cli php7.1-dev php7.1-opcache php7.1-bcmath php7.1-bz2 php7.1-common php7.1-curl php7.1-dba php7.1-enchant php7.1-gd php7.1-imap php7.1-json php7.1-ldap php7.1-mbstring php7.1-mcrypt php7.1-pspell php7.1-readline php7.1-soap php7.1-xml php7.1-zip php7.1-mysql libapache2-mod-php7.1 php-apcu php-imagick php-redis php7.1-sybase;
+	apt-get install -y php-xdebug;
+	a2dismod php5;
+	a2enmod php7.1;
+fi
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Demo Data files";
 curl http://$download_url/schoolboxdemo-$demo_data_version-sha1.txt > schoolboxdemo-$demo_data_version-sha1.txt 2>/dev/null
 if [ $? -eq 0 ];
