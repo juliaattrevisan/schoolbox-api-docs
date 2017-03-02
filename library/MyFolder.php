@@ -5,7 +5,7 @@ use Schoolbox\Notif\Notifactory;
 
 class MyFolder extends DeprecatedModel {
 
-	function MyFolder ($owner = 0) {
+	function __construct($owner = 0) {
 		if($owner == 0)
 			$this->owner = $_SESSION['id'];
 		else
@@ -14,7 +14,7 @@ class MyFolder extends DeprecatedModel {
 		$this->_table = "myFolder";
 		$this->_index = "id";
 
-		parent::DeprecatedModel();
+		parent::__contruct();
 	}
 
 	function getFolderList($parent = 0) {

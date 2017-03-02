@@ -74,7 +74,7 @@ class MSSQL {
 	 * @param bool $db
 	 * @param bool $optionalConfig
 	 */
-	function MSSQL($db = false, $optionalConfig = false) {
+	function __construct($db = false, $optionalConfig = false) {
 
 		/* Blasphemy (heresy unavoidable)
 		 * Hijack these settings for alternative config

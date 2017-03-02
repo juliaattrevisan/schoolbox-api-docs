@@ -32,7 +32,7 @@ class User_Logger_AssumeUser extends DeprecatedModel {
 		$this->setCurrentUser($currentUser);
 		$this->setUser($user);
 
-		parent::DeprecatedModel();
+		parent::__contruct();
 	}
 
 	/**

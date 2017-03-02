@@ -7,13 +7,13 @@ class SubmissionStudent extends DeprecatedModel
      * SubmissionStudent constructor.
      * @deprecated
      */
-    function SubmissionStudent()
+    function __construct()
     {
 
         $this->_table = "student_submission";
         $this->_index = "id";
 
-        parent::DeprecatedModel();
+        parent::__contruct();
     }
 
     /**

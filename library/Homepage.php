@@ -12,7 +12,7 @@ class Homepage
     const REMOVE_HOMEPAGE_TEMPLATE_ID = -1;
     const KEEP_EXISTING_HOMEPAGE = 0;
 
-    function Homepage($cid)
+    function __construct($cid)
     {
         $this->db = DeprecatedDatabase::getInstance();
         $this->cid = $cid;

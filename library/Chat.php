@@ -7,7 +7,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
             $this->group = new Group();
 
-            parent::DeprecatedModel();
+            parent::__contruct();
     }
 
     /* Get logs */

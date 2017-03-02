@@ -2,12 +2,12 @@
 
 class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
-	function Poll () {
+	function __construct() {
 	
 		$this->_table = "poll";
 		$this->_index = "pollID";
 		
-		parent::DeprecatedModel();
+		parent::__contruct();
 	}
 
 	function getByID($pollID) {

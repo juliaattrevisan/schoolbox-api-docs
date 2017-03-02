@@ -24,13 +24,6 @@ abstract class Evaluation_Question extends DeprecatedModel
 	 */
 	protected $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'config', 'deleted_at');
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        parent::DeprecatedModel();
-    }
 
     /**
      * Creates a Question.

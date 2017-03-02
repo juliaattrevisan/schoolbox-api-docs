@@ -10,7 +10,7 @@ class Feed {
 	/**
 	 * @deprecated use \Schoolbox\Feed
 	 */
-	function Feed() {
+	function __construct() {
 	    $this->db = DeprecatedDatabase::getInstance();
     }
 

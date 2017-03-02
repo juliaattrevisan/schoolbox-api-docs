@@ -8,7 +8,7 @@
 //display what has change since the last login for the user
 
 class Activity {
-    function Activity() {
+    function __construct() {
         //setup db
 	    $this->db = DeprecatedDatabase::getInstance();
     }

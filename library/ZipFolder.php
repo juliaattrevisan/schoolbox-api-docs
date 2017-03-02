@@ -7,7 +7,7 @@
 
 class ZipFolder
 {
-    function ZipFolder($folder)
+    function __construct($folder)
     {
         $this->db = DeprecatedDatabase::getInstance();
         $this->folder = $folder;

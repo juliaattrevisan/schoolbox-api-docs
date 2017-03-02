@@ -2,11 +2,11 @@
 
 class MyLinks extends DeprecatedModel {
 
-	public function MyLinks() {
+	public function __construct() {
 		$this->_table = 'bookmarks';
 		$this->_index = 'id';
 
-		parent::DeprecatedModel();
+		parent::__contruct();
 	}
 
     function linkExists($uid, $link) {

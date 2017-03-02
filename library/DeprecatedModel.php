@@ -25,7 +25,7 @@ class DeprecatedModel
 	/**
 	 * @deprecated
 	 */
-	function DeprecatedModel()
+	function __construct()
     {
         $this->db = DeprecatedDatabase::getInstance();
     }

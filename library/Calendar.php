@@ -22,7 +22,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     const ACCESS_GROUP = 2;
     const ACCESS_CAMPUS = 3;
 
-    function Calendar()
+    function __construct()
     {
 
         $this->_table = "event";
@@ -30,7 +30,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $this->groupHandler = new Group(CALENDAR_SERVICE);
 
-        parent::DeprecatedModel();
+        parent::__contruct();
     }
 
     /**

@@ -4,7 +4,7 @@ require_once(WEB_root.'/include/stdfuncs.php');
 
 class Page {
 
-	function Page($error = false) {
+	function __construct($error = false) {
 		$this->templateRoot = Cfg::get('template_dir');
 		$this->template = new Template($this->templateRoot);
 	}

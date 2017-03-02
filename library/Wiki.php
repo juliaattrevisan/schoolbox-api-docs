@@ -2,14 +2,14 @@
 
 class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
-	function Wiki()
+	function __construct()
 	{
 		$this->_table = 'wiki';
 		$this->_index = 'wikiID';
 		$this->_revisionTable = 'wikiRevision';
 		$this->_openTable = 'wikiOpens';
 
-		parent::DeprecatedModel();
+		parent::__contruct();
 	}
 
 	/**

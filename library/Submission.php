@@ -22,13 +22,13 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
      * Submission constructor.
      * @deprecated
      */
-    function Submission()
+    function __construct()
     {
 
         $this->_table = "submission_box";
         $this->_index = "id";
 
-        parent::DeprecatedModel();
+        parent::__contruct();
     }
 
     /**

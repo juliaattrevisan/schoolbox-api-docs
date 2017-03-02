@@ -78,7 +78,7 @@ class SitePage extends Page
      * @param bool $login
      *
      */
-    public function SitePage($login = true)
+    public function __construct($login = true)
     {
         parent::Page();
 

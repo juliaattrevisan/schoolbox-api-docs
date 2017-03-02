@@ -32,13 +32,13 @@ class Group extends DeprecatedModel
      */
     private $_service = HOMEPAGE_SERVICE;
 
-    function Group($service = HOMEPAGE_SERVICE)
+    function __construct($service = HOMEPAGE_SERVICE)
     {
         $this->_table = 'userGroups';
         $this->_index = 'cid';
         $this->_service = $service;
 
-        parent::DeprecatedModel();
+        parent::__contruct();
     }
 
 
