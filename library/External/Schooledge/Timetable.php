@@ -114,6 +114,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         ";
 
         // Student query - non-blocked
+        // Still requires a room and staff
         $query = "
             SELECT
                 t.ID as TimetableID,
