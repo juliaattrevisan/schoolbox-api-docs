@@ -52,10 +52,10 @@ class ExternalEvents implements ExternalEventsInterface
 
         if ($user->getRole()->isStaff()) {
             $join  = "";
-            $where = " AND StaffSchedule.StaffID = {$user->getExternalId()}";
+            $where = " AND StaffSchedule.StaffID = '{$user->getExternalId()}'";
         } else {
             $join  = " LEFT JOIN dbo.StaffScheduleStudentClasses ON StaffSchedule.StaffScheduleSeq = StaffScheduleStudentClasses.StaffScheduleSeq";
-            $where = " AND StaffScheduleStudentClasses.ID = {$user->getExternalId()}";
+            $where = " AND StaffScheduleStudentClasses.ID = '{$user->getExternalId()}'";
         }
 
         $query = "
@@ -77,6 +77,7 @@ class ExternalEvents implements ExternalEventsInterface
             WHERE NOT (StaffSchedule.ScheduleDateTimeFrom < '{$start->getDatabase()}' OR StaffSchedule.ScheduleDateTimeTo >= '{$finish->getDatabase()}')
             {$where}
             ORDER BY StaffSchedule.StaffScheduleSeq ASC";
+        
         return $this->database->getAll($query);
     }
  }
