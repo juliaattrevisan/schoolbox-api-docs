@@ -67,11 +67,9 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 ORDER BY code ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
-            // If there is no override staff join:
-            // If there is an override join:
-            // tcis.TimetableClassStaffID is null: add tcis.PersonID
-            // tcis.PersonID is null: remove
-            // neither is null: use tcis.PersonID in preference to tcs.PersonID
+            // As far as I can interpret:
+            // Use base staff if there is no TimetableClassStaff in TimetableClassInstanceStaff
+            // Use use replacement staff if it's found
             $query = "
                 SELECT DISTINCT
                     ts.Code     AS code,
@@ -80,28 +78,25 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                     ''          AS classType
                 FROM fc.TimetableSubject ts
 
-                -- Base join to class and timetable
-                INNER JOIN fc.TimetableClass tc ON ts.ID          = tc.TimetableSubjectID
-                INNER JOIN fc.Timetable      t  ON ts.TimetableID = t.ID
+                -- Base join to class
+                INNER JOIN fc.TimetableClass         tc  ON ts.ID = tc.TimetableSubjectID
+                INNER JOIN fc.TimetableClassInstance tci ON tc.ID = tci.TimetableClassID
+
+                -- Base join to timetable
+                INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID
 
                 -- Base staff
-                LEFT  JOIN fc.TimetableClassStaff tcs       ON tc.ID        = tcs.TimetableClassId
-                LEFT  JOIN dbo.Staff              tcs_staff ON tcs.PersonID = tcs_staff.ID
+                LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
+                LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
 
                 -- Override staff
-                INNER JOIN fc.TimetableClassInstance      tci        ON tc.ID         = tci.TimetableClassID
-                LEFT  JOIN fc.TimetableClassInstanceStaff tcis       ON tci.ID        = tcis.TimetableClassInstanceId
-                LEFT  JOIN dbo.Staff                      tcis_staff ON tcis.PersonID = tcis_staff.ID
+                LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID        = tcis.TimetableClassInstanceId
+                LEFT  JOIN dbo.Staff staff_replacement         ON tcis.PersonID = staff_replacement.ID
 
                 WHERE (
-                    -- No override
-                    (tcs_staff.Code = $quotedId AND tcis.ID IS NULL) OR
-                    -- Override - add
-                    (tcis_staff.Code = $quotedId AND tcis.TimetableClassStaffID IS NULL)
-                )
-                AND NOT (
-                    -- Override - remove or replace
-                    (tcs_staff.Code = $quotedId AND tcis.TimetableClassStaffID IS NOT NULL)
+                    (staff_base.Code = $quotedId AND tcis.TimetableClassStaffID IS NULL)
+                    OR
+                    staff_replacement.Code = $quotedId
                 )
                 AND t.Enabled = 1
 
