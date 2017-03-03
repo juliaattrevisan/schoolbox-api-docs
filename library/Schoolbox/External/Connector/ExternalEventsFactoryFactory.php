@@ -9,7 +9,7 @@
 
 namespace Schoolbox\External\Connector;
 
-class ExternalEvents
+class ExternalEventsFactory
 {
     /**
      * Choose which variant of the sync to spawn
