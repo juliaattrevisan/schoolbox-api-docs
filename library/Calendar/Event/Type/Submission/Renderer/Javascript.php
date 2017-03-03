@@ -40,6 +40,34 @@ class Javascript extends Base
             $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
         }
 
+        $modifyLink = $this->getRouteIfAuthorized(
+            'learningAssessment.getUpdateAssessmentForm',
+            [
+                'assessment'   => $this->getEvent()->getAssessment(),
+                'assessmentId' => $this->getEvent()->getEventId(),
+            ]
+        );
+
+        if($this->getUser()->getRole()->isStaff()){
+            $moreDetailsLink = $this->getRouteIfAuthorized(
+                'learningAssessment.getAssessment',
+                [
+                    'assessment'   => $this->getEvent()->getAssessment(),
+                    'assessmentId' => $this->getEvent()->getEventId(),
+                ]
+            );
+        }
+        else {
+            $moreDetailsLink = $this->getRouteIfAuthorized(
+                'learningAssessment.getSummary',
+                [
+                    'assessment'   => $this->getEvent()->getAssessment(),
+                    'assessmentId' => $this->getEvent()->getEventId(),
+                    'studentId' => $this->getUser()->getId(),
+                    'student' => $this->getUser(),
+                ]
+            );
+        }
         $event = array(
             'title'     => $this->getEvent()->getTitle(),
             'start'     => $start,
@@ -84,20 +112,8 @@ class Javascript extends Base
                     'listButton'    => false,
                 ),
                 'custom' => array(
-                    'modifyLink' => $this->getRouteIfAuthorized(
-                        'learningAssessment.getUpdateAssessmentForm',
-                        [
-                            'assessment'   => $this->getEvent()->getAssessment(),
-                            'assessmentId' => $this->getEvent()->getEventId(),
-                        ]
-                    ),
-                    'moreDetailsLink' => $this->getRouteIfAuthorized(
-                        'learningAssessment.getAssessment',
-                        [
-                            'assessment'   => $this->getEvent()->getAssessment(),
-                            'assessmentId' => $this->getEvent()->getEventId(),
-                        ]
-                    ),
+                    'modifyLink' => $modifyLink,
+                    'moreDetailsLink' => $moreDetailsLink,
                 )
             )
         );
