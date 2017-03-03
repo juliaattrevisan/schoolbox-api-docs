@@ -118,12 +118,11 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID
 
             -- Base staff
-            LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-            LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
+            INNER JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
+            INNER JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
 
-            -- Override staff
-            LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID        = tcis.TimetableClassInstanceId
-            LEFT  JOIN dbo.Staff staff_replacement         ON tcis.PersonID = staff_replacement.ID
+            -- Override staff - not used in this part, but need to ensure there is no override
+            LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID = tcis.TimetableClassInstanceId
 
             WHERE $classQuery
             AND   tcis.TimetableClassStaffID IS NULL
@@ -142,10 +141,6 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
 
             -- Base join to timetable
             INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID
-
-            -- Base staff
-            LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-            LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
 
             -- Override staff
             LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID        = tcis.TimetableClassInstanceId
