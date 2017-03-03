@@ -12,7 +12,6 @@ use Alaress\Redis\Async\Event\Event;
 use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\Event\PMessage;
 use Alaress\Redis\Async\Event\Pong;
-use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
 use Predis;
 use stdClass;
@@ -35,6 +34,7 @@ class Client
     /**
      * @param string|string[] $channel  one or more channels to which to subscribe
      * @param EventListener   $listener
+     * @throws Predis\ClientException if the subscribe fails
      */
     public function subscribe($channel, EventListener $listener)
     {
@@ -45,6 +45,7 @@ class Client
     /**
      * @param string|string[] $pattern  one or more patterns to which to subscribe
      * @param EventListener   $listener
+     * @throws Predis\ClientException if the subscribe fails
      */
     public function psubscribe($pattern, EventListener $listener)
     {
@@ -54,6 +55,7 @@ class Client
 
     /**
      * @param string|string[] $channel  one or more channels from which to unsubscribe
+     * @throws Predis\ClientException if the subscribe fails
      */
     public function unsubscribe($channel)
     {
@@ -63,6 +65,7 @@ class Client
 
     /**
      * @param string|string[] $pattern  one or more patterns from which to unsubscribe
+     * @throws Predis\ClientException if the subscribe fails
      */
     public function punsubscribe($pattern)
     {
@@ -74,6 +77,7 @@ class Client
      * @param string          $type
      * @param string|string[] $arguments
      * @param EventListener   $listener
+     * @throws Predis\ClientException if the subscribe fails
      */
     private function addSubscription($type, $arguments, EventListener $listener)
     {
@@ -86,7 +90,9 @@ class Client
 
         $this->client->pubSubLoop($channels, function (stdClass $event) use ($listener) {
             // cast this stdClass event object to a named class and push to the listener
-            $listener->handle($this->castEvent($event));
+            if ($e = $this->castEvent($event)) {
+                $listener->handle($e);
+            }
         });
     }
 
@@ -94,6 +100,7 @@ class Client
     /**
      * @param string          $type
      * @param string|string[] $arguments
+     * @throws Predis\ClientException if the unsubscribe fails
      */
     private function removeSubscription($type, $arguments)
     {
@@ -111,7 +118,6 @@ class Client
      * Cast a primitive object into an actual class
      *
      * @param stdClass $event
-     * @throws InvalidArgumentException
      * @return Event
      */
     private function castEvent(stdClass $event)
@@ -124,7 +130,8 @@ class Client
             case Predis\Async\PubSub\Consumer::PMESSAGE:
                 return new PMessage($event->payload, $event->channel, $event->pattern);
             default:
-                throw new InvalidArgumentException("Unknown event type '{$event->kind}'.");
+                // given its async nature, throwing an exception in here would be pointless
+                return null;
         }
     }
 }
