@@ -101,30 +101,58 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     public function getTeacherName($classCode)
     {
         $classQuery = $this->getClassCodeQuery($classCode);
+
+        // As far as I can interpret:
+        // Use base staff if there is no TimetableClassStaff in TimetableClassInstanceStaff
+        // Use use replacement staff if it's found
         $query      = "
-            SELECT DISTINCT tcs_staff.Code AS code
+            SELECT DISTINCT
+                staff_base.Code AS code
             FROM fc.TimetableSubject ts
-            -- Base join to class and timetable
-            INNER JOIN fc.TimetableClass tc ON ts.ID          = tc.TimetableSubjectID
-            INNER JOIN fc.Timetable      t  ON ts.TimetableID = t.ID
-            -- Base relation to staff - is this required?
-            INNER JOIN fc.TimetableClassStaff tcs       ON tc.ID        = tcs.TimetableClassId
-            INNER JOIN dbo.Staff              tcs_staff ON tcs.PersonID = tcs_staff.ID
+
+            -- Base join to class
+            INNER JOIN fc.TimetableClass         tc  ON ts.ID = tc.TimetableSubjectID
+            INNER JOIN fc.TimetableClassInstance tci ON tc.ID = tci.TimetableClassID
+
+            -- Base join to timetable
+            INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID
+
+            -- Base staff
+            LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
+            LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
+
+            -- Override staff
+            LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID        = tcis.TimetableClassInstanceId
+            LEFT  JOIN dbo.Staff staff_replacement         ON tcis.PersonID = staff_replacement.ID
+
             WHERE $classQuery
+            AND   tcis.TimetableClassStaffID IS NULL
+            AND   staff_base.Code IS NOT NULL
             AND   t.Enabled = 1
 
             UNION
 
-            SELECT DISTINCT tcis_staff.Code AS code
+            SELECT DISTINCT
+                staff_replacement.Code AS code
             FROM fc.TimetableSubject ts
-            -- Base join to class and timetable
-            INNER JOIN fc.TimetableClass tc ON ts.ID          = tc.TimetableSubjectID
-            INNER JOIN fc.Timetable      t  ON ts.TimetableID = t.ID
-            -- Individual relation to staff
-            INNER JOIN fc.TimetableClassInstance      tci        ON tc.ID         = tci.TimetableClassID
-            INNER JOIN fc.TimetableClassInstanceStaff tcis       ON tci.ID        = tcis.TimetableClassInstanceId
-            INNER JOIN dbo.Staff                      tcis_staff ON tcis.PersonID = tcis_staff.ID
+
+            -- Base join to class
+            INNER JOIN fc.TimetableClass         tc  ON ts.ID = tc.TimetableSubjectID
+            INNER JOIN fc.TimetableClassInstance tci ON tc.ID = tci.TimetableClassID
+
+            -- Base join to timetable
+            INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID
+
+            -- Base staff
+            LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
+            LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
+
+            -- Override staff
+            LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID        = tcis.TimetableClassInstanceId
+            LEFT  JOIN dbo.Staff staff_replacement         ON tcis.PersonID = staff_replacement.ID
+
             WHERE $classQuery
+            AND   staff_replacement.Code IS NOT NULL
             AND   t.Enabled = 1
 
             ORDER BY code ASC
