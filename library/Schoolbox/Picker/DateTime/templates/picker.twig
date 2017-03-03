@@ -242,7 +242,7 @@
                 html += '<div class="row">';
                 html += '<div class="small-12 medium-12 columns">';
                 html += '<h2>Work due on ' + timetableDate + '</h2>';
-                html += '<ul class="information-list expandable-card">';
+                html += '<ul class="small-12 information-list expandable-card">';
                 for (var i = 0; i < data.students.length; i++) {
                     html += '<li>';
                     html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
@@ -281,7 +281,7 @@
                 html += '<div class="row">';
                 html += '<div class="small-12 medium-12 columns">';
                 html += '<h2>Events on ' + timetableDate + '</h2>';
-                html += '<ul class="information-list card">';
+                html += '<ul class="small-12 information-list card">';
                 {# Populate with appointments for the selected date #}
                 for (var i = 0; i < data.appointments.length; i++) {
                     html += '<li>';
