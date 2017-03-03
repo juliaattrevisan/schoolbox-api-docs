@@ -9,6 +9,7 @@
 namespace Schoolbox\Realtime\Subscription\Redis;
 
 use Alaress\Async\Notification\Instance\Instance;
+use InvalidArgumentException;
 use Redis;
 use Schoolbox\Realtime\Subscription\ISubscription;
 use Alaress\Redis\Async;
@@ -65,8 +66,7 @@ class Subscription implements ISubscription
         }
 
         // unload object refs
-        unset($this->asyncClient);
-        unset($this->syncClient);
+        unset($this->asyncClient, $this->syncClient);
     }
 
 
@@ -122,6 +122,7 @@ class Subscription implements ISubscription
     /**
      * Returns the messages contained within this subscription
      *
+     * @throws InvalidArgumentException
      * @return Instance[]
      */
     public function getUnread()
