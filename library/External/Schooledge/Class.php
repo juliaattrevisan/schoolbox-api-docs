@@ -45,6 +45,9 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     public function getStudents($classCode)
     {
         $classQuery = $this->getClassCodeQuery($classCode);
+
+        // 1st part: blocked classes
+        // 2nd part: non-blocked classes
         $query      = "
             SELECT DISTINCT
                 s.FirstName    AS firstname,
@@ -60,6 +63,29 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             INNER JOIN fc.TimetableSubjectChoice tsc ON ts.ID          = tsc.TimetableSubjectID
             INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
             INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.ID
+
+            WHERE $classQuery
+            AND   t.Enabled = 1
+
+            UNION
+
+            SELECT DISTINCT
+                s.FirstName    AS firstname,
+                s.LastName     AS lastname,
+                s.Year         AS StudentYearLevel,
+                s.House        AS StudentHouseDescription,
+                ''             AS StudentMedicalAlert,
+                s.SpecialNeeds AS StudentSpecialNeedsFlag,
+                s.Code         AS synergy_id,
+                ''             AS ClassCampus
+
+            FROM fc.TimetableSubject ts
+
+            INNER JOIN fc.TimetableClass      tc   ON ts.ID             = tc.TimetableSubjectID
+            INNER JOIN fc.YearLevelSub        yls  ON tc.YearLevelSubID = yls.ID
+            INNER JOIN fc.YearLevelSubStudent ylss ON yls.ID            = ylss.YearLevelSubID
+            INNER JOIN dbo.Student            s    ON ylss.PersonID     = s.ID
+            INNER JOIN fc.Timetable           t    ON ts.TimetableID    = t.ID
 
             WHERE $classQuery
             AND   t.Enabled = 1
