@@ -14,7 +14,7 @@ class ExternalEventsFactory
     /**
      * Choose which variant of the sync to spawn
      *
-     * @return SyncInterface
+     * @return ExternalEventsInterface
      * @throws \UnexpectedValueException if nothing can be built
      */
     public function build()
