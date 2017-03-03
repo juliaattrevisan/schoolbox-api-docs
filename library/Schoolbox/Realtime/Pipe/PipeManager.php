@@ -283,10 +283,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /**
      * This method is invoked whenever something is published in Redis on one of our subscriptions
      *
-     * @param Async\Event\Event $event
+     * @param Async\Event\IEvent $event
      * @return void
      */
-    public function handle(Async\Event\Event $event)
+    public function handle(Async\Event\IEvent $event)
     {
         if (!$event instanceof Async\Event\Message) {
             // we're only interested in messages, no pongs
