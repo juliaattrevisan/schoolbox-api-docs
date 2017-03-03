@@ -166,7 +166,7 @@ class Controller extends Base
     /**
      * Return a list of events or assessments due for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
      */
-    public function getByTimetableDay($campusId, $termId, $cycle, $day, $folder, $dateOnly = false) {
+    public function getByTimetableDay($campusId, $termId, $cycle, $day, $folder = 0, $dateOnly = false) {
         $user = $this->getUser();
         //Get Campus object
         $campus = $user->getCampusCollection()->getBy('id', $campusId);
