@@ -250,12 +250,11 @@ class Controller extends Base
         try {
 
             // Get start/end of the date
-
             $start = \Alaress_Date_Format::newLocalShort($date);
             $end = \Alaress_Date_Format::newLocalShort($date)->addDays(1);
 
-            $user = $this->getUser();
-            $api = new  \Calendar_Api_EventType_Event_Schoolbox_Default($user, array());
+            $factory = $this->getDi()->get('calendarApiFactory');
+            $api = $factory->produceForUser($this->getUser());
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
             foreach ($events as $event) {
                 $appointments[] = [
@@ -264,8 +263,6 @@ class Controller extends Base
                     'title' => $event->getTitle()
                 ];
             }
-
-            // $appointments = $this->loadDummyAppointments();
 
         } catch (\Exception $e) {
             var_dump($e->getMessage());
