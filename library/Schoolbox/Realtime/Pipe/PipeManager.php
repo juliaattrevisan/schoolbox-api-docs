@@ -27,7 +27,6 @@ use Schoolbox\Realtime\Pipe\Action\IAction;
 use Schoolbox\Realtime\Pipe\Action;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
-use Schoolbox\Realtime\Stomp\SubscriptionException;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
@@ -70,7 +69,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /** @var Dispatcher */
     private $taskDispatcher;
 
-    /** @var Transaction[] */
+    /** @var Transaction[][] */
     private $pushTransactions;
 
     /** @var TimerInterface[] */
@@ -401,6 +400,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
                     } catch (QueueingException $e) {
                         $this->log->critical('Failed to enqueue, task lost: '.$e->getMessage());
+                    } catch (InvalidArgumentException $e) {
+                        $this->log->critical('Failed to enqueue, task lost: '.$e->getMessage());
                     }
                 }
             );
@@ -431,22 +432,20 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         switch (strtolower($command)) {
             // deal with this yourself
             case self::PIPE_METHOD_SUBSCRIBE:
-                try {
-                    if ($this->subscriptionManager->subscribeUser($userId)) {
-                        $this->sendToPipe($pipe, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
+                if ($this->subscriptionManager->subscribeUser($userId)) {
+                    $this->sendToPipe($pipe, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
 
-                        // push all unread messages to this new pipe
-                        $this->enqueue(
-                            $pipe,
-                            static::PIPE_METHOD_PUSH,
-                            (new Decorator())->appendInstances(
-                                $this->subscriptionManager
-                                    ->getUserSubscription($userId)
-                                    ->getUnread()
-                            )->renderAsSocketArray(true)
-                        );
-                    }
-                } catch (SubscriptionException $e) {
+                    // push all unread messages to this new pipe
+                    $this->enqueue(
+                        $pipe,
+                        static::PIPE_METHOD_PUSH,
+                        (new Decorator())->appendInstances(
+                            $this->subscriptionManager
+                                ->getUserSubscription($userId)
+                                ->getUnread()
+                        )->renderAsSocketArray(true)
+                    );
+                } else {
                     // could not subscribe the user, rabbit-offline has already been reported, just inform the user
                     $this->sendToPipe($pipe, [ $command => false ]);
                 }
