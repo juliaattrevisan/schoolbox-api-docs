@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Pipe;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Redis\Async;
@@ -37,6 +36,7 @@ use Schoolbox\Realtime\Subscription\ISubscriptionManager;
  * This is the main "app" of our React loop.
  *
  * Class PipeManager
+ *
  * @package Schoolbox\Realtime
  */
 class PipeManager implements MessageComponentInterface, TaskResponseHandlerInterface, Async\EventListener
@@ -53,6 +53,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
     const PIPE_METHOD_WAIT        = 'wait';
 
+    /** @var string[] */
+    private static $headerMap = [
+        401 => 'Unauthorized',
+        503 => 'Service Unavailable',
+    ];
 
     /** @var PipeCollection */
     private $pipes;
@@ -74,6 +79,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
     /** @var TimerInterface[] */
     private $userTimeouts = [];
+
 
     /**
      * @param LoopInterface             $reactLoop
@@ -113,11 +119,15 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->log->warning('Socket does not conform to RFC6455, cannot handle');
 
             // handle the connection raw
-            $conn->send(json_encode([
-                'error' => 'Bad Request',
-                'code'  => 400,
-                'retry' => false
-            ]));
+            $conn->send(
+                json_encode(
+                    [
+                        'error' => 'Bad Request',
+                        'code'  => 400,
+                        'retry' => false,
+                    ]
+                )
+            );
             $conn->close();
 
             return;
@@ -131,7 +141,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         } catch (CommunicationException $e) {
             // couldn't talk to redis, send a retry back to the client
-            $this->log->error("Communication Exception" . $e->getMessage(), [ $e ]);
+            $this->log->error('Communication Exception: ' . $e->getMessage(), [ $e ]);
 
             $this->sendHeader($pipe, 503, true);
             $pipe->close();
@@ -173,7 +183,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
     /**
      * If there is an error with one of the sockets, or somewhere in the application where an Exception is thrown, the
-     * Exception is sent back down the stack, handled by the Server and bubbled back up the application through this method.
+     * Exception is sent back down the stack, handled by the Server and bubbled back up the application through this
+     * method.
      *
      * @param  ConnectionInterface $conn
      * @param  \Exception          $e
@@ -210,11 +221,17 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             throw new ConnectionException("Unrecognised pipe: '$socketKey'");
         }
 
-        $userId = $pipe->getUserId();
+        $userId    = $pipe->getUserId();
         $sessionId = $pipe->getSession();
 
         $this->log->info(
-            sprintf('Received message: %s (%s:%s) > %s', $userId ?: 'unknown', $socketKey, $sessionId ?: 'sessionless', $msg),
+            sprintf(
+                'Received message: %s (%s:%s) > %s',
+                $userId ?: 'unknown',
+                $socketKey,
+                $sessionId ?: 'sessionless',
+                $msg
+            ),
             [ 'char' => '>' ]
         );
 
@@ -226,17 +243,18 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $data = json_decode($msg, true);
 
         // and we'll also ignore it if it doesn't parse as json in a way we expect (which is key => data)
-        if (is_null($data) || count($data) != 1) {
+        if (is_null($data) || count($data) !== 1) {
             return;
         }
 
         $request   = each($data);
-        $command   = $request[ 'key' ];
-        $arguments = [ $userId, $request[ 'value' ] ];
+        $command   = $request['key'];
+        $arguments = [ $userId, $request['value'] ];
 
         if ($pipe->isLocked()) {
             // pipe has a command active: don't permit another until this one is finished
             $this->sendToPipe($pipe, json_encode([ $command => self::PIPE_METHOD_WAIT ]));
+
             return;
         }
 
@@ -251,7 +269,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->enqueue($pipe, $command, $arguments);
 
         } catch (QueueingException $e) {
-            $this->log->critical("Failed to enqueue, task '$command' lost: ".$e->getMessage());
+            $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage());
             // since a full queue constitutes service unavailable, probably best to kick this pipe
             $this->sendHeader($pipe, 503, true);
 
@@ -283,10 +301,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 // subscription before it could be unsubscribed - just drop the message.
                 return;
             }
+
             $action->execute($this);
 
         } catch (InvalidArgumentException $e) {
             $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
+
             return;
         }
     }
@@ -362,9 +382,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
 
     /**
-     * @param int $userId
+     * @param int    $userId
      * @param string $key
-     * @param mixed $payload
+     * @param mixed  $payload
      * @return void
      */
     public function transactUser($userId, $key, $payload)
@@ -383,7 +403,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $pipeId = $pipe->getSocketKey();
 
         if (empty($this->pushTransactions[$userId][$pipeId])) {
-            $this->pushTransactions[$userId][$pipeId] = new Transaction($this->reactLoop,
+            $this->pushTransactions[$userId][$pipeId] = new Transaction(
+                $this->reactLoop,
                 function (TimerInterface $timer) use ($pipe, $userId) {
 
                     // the timer contains the data to be processed
@@ -399,9 +420,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                         );
 
                     } catch (QueueingException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: '.$e->getMessage());
+                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage());
                     } catch (InvalidArgumentException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: '.$e->getMessage());
+                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage());
                     }
                 }
             );
@@ -453,7 +474,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             // this was dealt with by a worker, just push the result
             case self::PIPE_METHOD_FETCH:
-                $data = $data[ 0 ];
+                $data = $data[0];
                 $this->sendToPipe($pipe, [ $command => $data ]);
                 break;
 
@@ -466,7 +487,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             case self::PIPE_METHOD_ACKNOWLEDGE:
                 if ($subscription = $this->subscriptionManager->getUserSubscription($userId)) {
                     $markAsRead = [];
-
+                    /** @var string[][] $data */
                     foreach ($data[1] as $msgId) {
                         if ($subscription->acknowledgeMessage($msgId)) {
                             $markAsRead[] = $msgId;
@@ -481,8 +502,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             case self::PIPE_METHOD_ALERT:
                 $this->sendToUser($userId, [ $command => $data ]);
                 $release = false;
+
                 if ($subscription = $this->subscriptionManager->getUserSubscription($userId)) {
-                    foreach (array_keys($data) as $msgId) {
+                    foreach ($data as $msgId => $msgData) {
                         $subscription->acknowledgeMessage($msgId);
                     }
                 }
@@ -512,21 +534,16 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
     /**
      * @param Pipe $pipe
-     * @param int $code
+     * @param int  $code
      * @param bool $allowRetry
      * @return bool
      */
     private function sendHeader($pipe, $code, $allowRetry = false)
     {
-        $map = [
-            401 => 'Unauthorized',
-            503 => 'Service Unavailable'
-        ];
-
-        if (isset($map[$code])) {
+        if (isset(static::$headerMap[$code])) {
             $data = [
-                'error' => $map[$code],
-                'code'  => $code
+                'error' => static::$headerMap[$code],
+                'code'  => $code,
             ];
 
             if ($allowRetry) {
@@ -534,6 +551,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             }
 
             $this->sendToPipe($pipe, json_encode($data));
+
             return true;
         }
 
@@ -596,17 +614,16 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onTimeout(TimerInterface $timer)
     {
-        $userId = $timer->getData();
+        $userId  = $timer->getData();
         $success = $this->subscriptionManager->removeSubscription($userId);
-        $this->log->info("User $userId has timed out, " . ($success ? "unsubscribed" : "failed to unsubscribe"));
+        $this->log->info("User $userId has timed out, " . ($success ? 'unsubscribed' : 'failed to unsubscribe'));
 
         foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
             $this->sendHeader($pipe, 401);
             $pipe->close();
         }
 
-        unset($this->userTimeouts[$userId]);
-        unset($this->pushTransactions[$userId]);
+        unset($this->userTimeouts[$userId], $this->pushTransactions[$userId]);
     }
 
 
