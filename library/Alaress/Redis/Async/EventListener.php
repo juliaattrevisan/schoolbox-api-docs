@@ -8,7 +8,7 @@
 
 namespace Alaress\Redis\Async;
 
-use Alaress\Redis\Async\Event\Event;
+use Alaress\Redis\Async\Event\IEvent;
 
 interface EventListener
 {
@@ -16,9 +16,9 @@ interface EventListener
     /**
      * Handle the given event
      *
-     * @param Event $event
+     * @param IEvent $event
      * @return void
      */
-    public function handle(Event $event);
+    public function handle(IEvent $event);
 
 }

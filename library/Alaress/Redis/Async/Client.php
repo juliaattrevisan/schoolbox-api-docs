@@ -8,7 +8,7 @@
 
 namespace Alaress\Redis\Async;
 
-use Alaress\Redis\Async\Event\Event;
+use Alaress\Redis\Async\Event\IEvent;
 use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\Event\PMessage;
 use Alaress\Redis\Async\Event\Pong;
@@ -118,7 +118,7 @@ class Client
      * Cast a primitive object into an actual class
      *
      * @param stdClass $event
-     * @return Event
+     * @return IEvent
      */
     private function castEvent(stdClass $event)
     {

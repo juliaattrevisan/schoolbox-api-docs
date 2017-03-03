@@ -15,7 +15,7 @@ namespace Alaress\Redis\Async\Event;
  *
  * @package Alaress\Redis\Async\Event
  */
-interface Event
+interface IEvent
 {
 
     /**

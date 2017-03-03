@@ -8,7 +8,7 @@
 
 namespace Alaress\Redis\Async\Event;
 
-abstract class AbstractEvent implements Event
+abstract class AbstractEvent implements IEvent
 {
 
     /** @var string  */

@@ -25,10 +25,10 @@ class TestListener implements Redis\Async\EventListener
     }
 
     /**
-     * @param Redis\Async\Event\Event $event
+     * @param Redis\Async\Event\IEvent $event
      * @return void
      */
-    public function handle(Redis\Async\Event\Event $event)
+    public function handle(Redis\Async\Event\IEvent $event)
     {
         $signal = strtoupper($event->getPayload());
 
