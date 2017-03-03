@@ -265,7 +265,7 @@ class Controller extends Base
             }
 
         } catch (\Exception $e) {
-            var_dump($e->getMessage());
+            $this->getResponse()->status->setCode(404);
         }
 
         $this->getResponse()->content->set(
