@@ -45,7 +45,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    function getDayName($dayNumber)
+    public function getDayName($dayNumber)
     {
         return [];
     }
@@ -113,50 +113,39 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             ORDER BY DayNumber ASC, PeriodStart ASC;
         ";
 
-        // Student query - electives
+        // Student query - non-blocked
         $query = "
-            SELECT DISTINCT
+            SELECT
+                t.ID as TimetableID,
                 ts.Code as ClassCode,
                 ts.Name as ClassName,
                 td.SortOrder as DayNumber,
                 td.Name as DayName,
-                tp.StartTime as PeriodStart,
-                tp.EndTime as PeriodEnd,
-                tp.Name as PeriodName,
-                dbor.Code as Room,
-                tbi.Consecutive as PeriodSpan,
-                dbos.Code as StaffID,
-                dbos.FirstName AS StaffPreferredName,
-                dbos.LastName AS StaffSurname,
-                dbos.Title As StaffTitle
+                tpe.StartTime as PeriodStart,
+                tpe.EndTime as PeriodEnd,
+                tpe.Name as PeriodName,
+                tci.TimetablePeriodID as PeriodID,
+                tci.Consecutive as Consecutive
 
             FROM fc.TimetableSubject ts
 
-            -- Class instance
-            INNER JOIN fc.TimetableClass         tc  ON ts.ID = tc.TimetableSubjectID
-            INNER JOIN fc.TimetableClassInstance tci ON tc.ID = tci.TimetableClassID
-            INNER JOIN fc.TimetableBlockInstance tbi ON tci.TimetableBlockInstanceID = tbi.ID
-            INNER JOIN fc.TimetablePeriod        tp  ON tbi.TimetablePeriodID = tp.ID
-            INNER JOIN fc.TimetableDay           td  ON tp.TimetableDayID = td.ID
+            INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+            INNER JOIN fc.YearLevelSub           yls  ON tc.YearLevelSubID = yls.ID
+            INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
+            INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
+            INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
+            INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
+            -- CROSS APPLY: an INNER JOIN onto a table-level function
+            CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
+            INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
 
-            -- Optional room, from either instance or class
-            LEFT JOIN fc.TimetableClassRoom         tcr  ON tc.ID  = tcr.TimetableClassId
-            LEFT JOIN fc.TimetableClassInstanceRoom tcir ON tci.ID = tcir.TimetableClassInstanceId
-            LEFT JOIN fc.Room                       r    ON COALESCE(tcir.RoomID, tcr.RoomID) = r.ID
-            LEFT JOIN dbo.Room                      dbor ON r.ID = dbor.ID
+            WHERE s.Code = {$this->database->smartQuote($externalUserId)}
+            AND   tci.TimetableBlockInstanceID IS NULL
+            AND   tci.TimetablePeriodID IS NOT NULL
+            AND   t.Enabled = 1
 
-            -- Staff - either instance or class
-            LEFT  JOIN fc.TimetableClassStaff         tcs  ON tc.ID = tcs.TimetableClassId
-            LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID = tcis.TimetableClassInstanceId
-            INNER JOIN dbo.Staff                      dbos ON COALESCE(tcis.PersonID, tcs.PersonID) = dbos.ID
-
-            -- Student
-            INNER JOIN fc.TimetableSubjectChoice tsc  ON ts.ID = tsc.TimetableSubjectID
-            INNER JOIN dbo.Student               dboc ON tsc.PersonID = dboc.ID
-
-            WHERE dboc.Code = {$this->database->smartQuote($externalUserId)}
-
-            ORDER BY DayNumber ASC, PeriodStart ASC;
+            ORDER BY DayNumber asc, PeriodStart asc
         ";
 
         // Student query - core
