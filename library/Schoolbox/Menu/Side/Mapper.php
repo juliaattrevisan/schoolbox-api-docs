@@ -12,6 +12,7 @@ namespace Schoolbox\Menu\Side;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 class Mapper extends BaseMapper
 {
@@ -32,22 +33,35 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param \Schoolbox\User $user
+     * @param User $user
      * @return \Schoolbox\Collection
      * @throws MapperException
      */
-    public function findNodesForUser($user)
+    public function findNodesForUser(User $user)
     {
-        $campusList = array();
-        foreach ($user->getCampusCollection() as $campus) {
-            $campusList[] = $campus->getId();
-        }
+        $params = [];
 
-        if(count($campusList) < 1) {
-            throw new MapperException('User has no campus, and therefore has no menu');
+        if($user->isSuperuser()) {
+            $query = "
+                SELECT DISTINCT {$this->getColumnString()}
+                FROM menu_side
+                WHERE deleted_at IS NULL
+                AND (menu_side.parent_id IN (SELECT id FROM menu_side) OR menu_side.parent_id = 0)
+                ORDER BY sort_order ASC
+            ";
         }
+        else {
 
-        $query = "
+            $campusList = array();
+            foreach ($user->getCampusCollection() as $campus) {
+                $campusList[] = $campus->getId();
+            }
+
+            if(count($campusList) < 1) {
+                throw new MapperException('User has no campus, and therefore has no menu');
+            }
+
+            $query = "
                 SELECT DISTINCT {$this->getColumnString()}
                 FROM menu_side
                 INNER JOIN menu_side_campus ON menu_side.id = menu_side_campus.menu_side_id
@@ -57,15 +71,18 @@ class Mapper extends BaseMapper
                 AND menu_side_role.role_id = :roleId
                 AND (menu_side.parent_id IN (SELECT id FROM menu_side) OR menu_side.parent_id = 0)
                 ORDER BY sort_order ASC
-        ";
+            ";
 
-        $params = $this->getPredicateBuilder()->getArrayParameters($campusList, 'campus');
-        $params['roleId'] = $user->getRole()->getId();
+            $params = $this->getPredicateBuilder()->getArrayParameters($campusList, 'campus');
+            $params['roleId'] = $user->getRole()->getId();
+        }
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateList($statement);
     }
+
+
 
     /**
      * @param \Schoolbox\User $user
