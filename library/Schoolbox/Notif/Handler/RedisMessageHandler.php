@@ -16,6 +16,7 @@ use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Predis\ClientInterface;
 use Redis;
+use Schoolbox\Realtime\Pipe\PipeManager;
 
 class RedisMessageHandler extends AbstractProcessingHandler
 {
@@ -58,10 +59,13 @@ class RedisMessageHandler extends AbstractProcessingHandler
 
         list (, $queue, $userId) = $matches;
 
+        $publish = false;
+
         switch ($queue) {
             case 'listed':
             case 'instant':
                 $lists = [ 'unread', 'listed' ];
+                $publish = true;
                 break;
             case 'digest':
                 $lists = [ 'digest' ];
@@ -74,6 +78,13 @@ class RedisMessageHandler extends AbstractProcessingHandler
         foreach ($lists as $list) {
             // push onto each list
             (new RedisQueue($this->redis, "$userId:$list"))->push($instance);
+        }
+
+        if ($publish) {
+            $this->redis->publish(
+                sprintf('msg:%s:%d:%s', INSTANCE_ID, $userId, PipeManager::PIPE_METHOD_PUSH),
+                json_encode($record)
+            );
         }
     }
 
