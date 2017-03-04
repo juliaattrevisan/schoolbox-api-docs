@@ -117,7 +117,7 @@ class Controller extends Base
 
         // Build a markbook
         $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
-        $markbook->getAssessments()->sortBy('dueAt', 'asc');
+        $markbook->getAssessments()->sortBy(['dueAt','sequence'], ['asc','asc']);
 
         // And what is required for a context selector
         $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
