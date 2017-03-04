@@ -40,7 +40,7 @@
                 <li class="icon-staff-students" title="Author">Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
                 {% endif %}
 
-                {% if event.category %}
+                {% if event.categoryId and event.categoryName %}
                 <li class="icon-home" title="Homepage"><a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a></li>
                 {% endif %}
 
