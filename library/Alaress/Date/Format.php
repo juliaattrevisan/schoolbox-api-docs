@@ -72,24 +72,31 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public static function now(IClock $clock = null)
     {
         if ($clock) {
-            $time = $clock->time();
+            // always give precendence to a clock if passed in
+            return new static($clock->time(), 'U');
 
-        } elseif (php_sapi_name() == 'cli') {
+        } elseif (php_sapi_name() === 'cli') {
+            // if we're CLI, do not freeze time
             return new static(time(), 'U');
-
-        } elseif (isset(static::$now)) {
-            return clone static::$now;
-
-        } elseif (isset($_SERVER['REQUEST_TIME'])) {
-            $time = $_SERVER['REQUEST_TIME'];
-
-        } else {
-            // @codeCoverageIgnoreStart
-            $time = time();
-            // @codeCoverageIgnoreEnd
         }
 
-        return static::$now = new static($time, 'U');
+        // down here, cache the clock at time of request
+        if (!static::$now instanceof static) {
+
+            if (isset($_SERVER['REQUEST_TIME'])) {
+                $time = $_SERVER['REQUEST_TIME'];
+
+            } else {
+                // @codeCoverageIgnoreStart
+                $time = time();
+                // @codeCoverageIgnoreEnd
+            }
+
+            static::$now = new static($time, 'U');
+        }
+
+        // never return the actual object, always a clone
+        return clone static::$now;
     }
 
     /**
