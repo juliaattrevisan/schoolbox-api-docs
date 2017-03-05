@@ -72,6 +72,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     public function getFullTimetable($externalUserId, $userId, Campus $campus)
     {
         // Teacher query
+        // Still requires a room
+        // I'm guessing we smoosh the staff and student queries together somehow?
         $query = "
             SELECT
                 t.ID as TimetableID,
