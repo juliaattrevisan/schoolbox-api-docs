@@ -168,24 +168,23 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     tbi.TimetablePeriodID as PeriodID,
                     tbi.Consecutive as Consecutive
 
-                FROM fc.TimetableSubject ts
-
+                FROM       fc.TimetableSubject       ts
+                -- Join onto timetable
+                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
+                -- Join onto staff
                 INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
                 INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
                 INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
-
-                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
-                INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID = tp.ID
-                CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
-                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
-
                 -- Base staff
                 LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
                 LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
-
                 -- Override staff
-                LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID        = tcis.TimetableClassInstanceId
-                LEFT  JOIN dbo.Staff staff_replacement         ON tcis.PersonID = staff_replacement.ID
+                LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
+                LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
+                -- Expand period
+                INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID = tp.ID
+                CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
+                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
 
                 WHERE (
                     (staff_base.Code = {$quotedId} AND tcis.TimetableClassStaffID IS NULL)
@@ -194,7 +193,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 )
                 AND t.Enabled = 1
 
-                ORDER BY DayNumber ASC, PeriodStart ASC;
+                ORDER BY DayNumber ASC, PeriodStart ASC
             ";
 
         } else {
