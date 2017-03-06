@@ -179,7 +179,7 @@
                             <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
                                 {% set studentEmails = [] %}
                                 {% for participant in assessment.allParticipants %}
-                                    {% if not participant.getAllResponses|length and not participant.getAllFeedbacks|length %}
+                                    {% if participant.responseRequired %}
                                         {% set studentEmails = studentEmails|merge([participant.user.getEmail()]) %}
                                         <li>
                                             <a class="link-row" href="/search/user/{{ participant.user.id }}">
