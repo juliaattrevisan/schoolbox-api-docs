@@ -98,18 +98,17 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     tbi.TimetablePeriodID as PeriodID,
                     tbi.Consecutive as Consecutive
 
-                FROM fc.TimetableSubject ts
-
+                FROM       fc.TimetableSubject       ts
+                -- Join onto timetable
+                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
+                -- Join onto student via subject choice
                 INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
                 INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+                INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID             = tsc.TimetableClassID
+                INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.ID
+                -- Expand period
                 INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
-
-                INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID = tsc.TimetableClassID
-                INNER JOIN dbo.Student               s    ON tsc.PersonID     = s.ID
-
-                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
                 INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID = tp.ID
-
                 CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
 
@@ -130,16 +129,17 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     tci.TimetablePeriodID as PeriodID,
                     tci.Consecutive as Consecutive
 
-                FROM fc.TimetableSubject ts
-
+                FROM       fc.TimetableSubject       ts
+                -- Join onto timetable
+                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
+                -- Join onto student via year level
                 INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
-                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
                 INNER JOIN fc.YearLevelSub           yls  ON tc.YearLevelSubID = yls.ID
                 INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
                 INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
-                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
+                -- Expand period
+                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
                 INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
-                -- CROSS APPLY: an INNER JOIN onto a table-level function
                 CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
 
