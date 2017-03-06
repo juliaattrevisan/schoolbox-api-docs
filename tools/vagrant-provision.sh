@@ -44,8 +44,11 @@ getS3file() {
         etag=`curl -I $data_source/$S3file 2>/dev/null | grep ETag | cut -d'"' -f2`;
         if [ $? -eq 0 ];
         then
+            # If S3file_short is not set, assume same as S3file for simplicity
             if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
-            checketag=`grep $etag $S3file.etag.cache 2>/dev/null | wc -l`;
+            # Auto cleanup etag cache file if actual file is missing
+            if [ ! -f $S3file_short ]; then rm -f $S3file_short.etag.cache; fi;
+            checketag=`grep $etag $S3file_short.etag.cache 2>/dev/null | wc -l`;
             if [ $checketag -eq 0 ];
             then
                 # New/updated version available - download it
@@ -54,9 +57,9 @@ getS3file() {
                 if [ $? -eq 0 ];
                 then
                     # This is a new file, so remove old references
-                    sed -i "/$S3file/d" $S3file.etag.cache 2>/dev/null;
+                    sed -i "/$S3file_short/d" $S3file_short.etag.cache 2>/dev/null;
                     # Add new file to etag cache
-                    echo "$etag $S3file" >> $S3file.etag.cache;
+                    echo "$etag $S3file_short" >> $S3file_short.etag.cache;
                 fi
             else
                 echo "[SB][`date +%Y-%m-%d\ %X`] File up to date: $S3file_short";
