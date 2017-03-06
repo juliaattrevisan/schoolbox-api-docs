@@ -95,12 +95,14 @@ if($enabled) {
             } catch(RuntimeException $e) {
                 $checked = false;
             }
-            $char = substr($date->format('D'), 0, 1);
+            $dayName = $date->format('l');
+            $char = substr($dayName, 0, 1);
 
             $this->setVar(array(
                 'DAY_VALUE' => $i,
                 'DAY_CHECKED' => $checked ? 'checked="checked"' : '',
-                'DAY_CHAR' => $char
+                'DAY_CHAR' => $char,
+                'DAY_NAME' => $dayName
             ));
 
             $this->parse('day_check_block', 'day_check', true);
