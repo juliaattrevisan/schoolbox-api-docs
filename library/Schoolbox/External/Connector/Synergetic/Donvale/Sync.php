@@ -17,38 +17,6 @@ class Sync extends BaseSync
     /**
      * {@inheritdoc}
      */
-    public function findAllStudents()
-    {
-        $query = "
-            SELECT
-                vStudents.StudentID            AS student_id,
-                CASE WHEN ISNULL(NetworkLogin,'') = '' THEN CONCAT('_', vStudents.StudentID) ELSE NetworkLogin END AS network_login,
-                vStudents.StudentTitle         AS student_title,
-                vStudents.StudentGiven1        AS student_given_name,
-                vStudents.StudentPreferred     AS student_preferred,
-                vStudents.StudentSurname       AS student_surname,
-                StudentGender                  AS student_gender,
-                StudentEmail                   AS student_email,
-                StudentOccupEmail              AS student_work_email,
-                CASE WHEN ISNULL(vStudents.StudentYearLevel,'') = '' THEN 0 ELSE vStudents.StudentYearLevel END AS student_year_level,
-                vStudents.StudentHouse         AS student_house,
-                vStudents.StudentBoarder       AS student_boarder,
-                vStudents.StudentBoardingHouse AS student_boarding_house,
-                StudentCampus                  AS student_campus
-            FROM dbo.vStudents vStudents
-            LEFT JOIN Community ON Community.ID = StudentID
-            WHERE
-            FileSemester = '" . $this->database->quote($this->semester) . "'
-            AND FileYear = '" . $this->database->quote($this->year) . "'
-            ORDER BY network_login, vStudents.StudentID ASC
-        ";
-
-        return new Iterator\Student($this->database->getIterator($query));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function findAllParents()
     {
         $query = "
