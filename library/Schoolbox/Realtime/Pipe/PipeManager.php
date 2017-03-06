@@ -227,7 +227,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         $this->log->info(
             sprintf(
-                'Received message: %s (%s:%s) > %s',
+                'Received message: %s @ %s (%s) > %s',
                 $userId ?: 'unknown',
                 $socketKey,
                 $sessionId ?: 'sessionless',
@@ -245,6 +245,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         // and we'll also ignore it if it doesn't parse as json in a way we expect (which is key => data)
         if (is_null($data) || count($data) !== 1) {
+            $this->log->error("Bad data: $msg");
             return;
         }
 
@@ -328,6 +329,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     {
         if (preg_match('`^msg:.*:(\d+):(.*)$`', $msg->getChannel(), $matches)) {
             $userId = $matches[1];
+
+            $this->log->info("Received {$matches[2]} for {$userId}", [ 'char' => '>' ]);
 
             // in all cases, we expect the payload to be a standard message
             $formatted = json_decode($msg->getPayload(), true);
