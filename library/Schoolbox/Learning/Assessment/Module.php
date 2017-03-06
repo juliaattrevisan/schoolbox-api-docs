@@ -178,13 +178,34 @@ class Module extends BaseModule
     protected function preloadParticipant(array $params)
     {
         try {
+
             // obtain the assessment from our other preload
             $student     = $this->getUserMapper()->findById($params['studentId']);
             $assessment  = $this->preloadAssessment($params, $student)['assessment'];
 
-            /** @var IAssessable $assessment */
-            $participant = $assessment->getParticipant($student);
+            $access = $this->getAccess()->getFolderAccess($student, [$assessment->getContext()->getFolder()->getId()]);
 
+            /* Allow the currently logged in user to accesss the student's Assessment Summary
+             *
+             * This allows write-accessors to view a typically read-access page ie. when a teacher
+             * wants to preview a task's summary screen (see SA-2193)
+             *
+             * This pretends the teacher is a participant
+             */
+            if ($access >= UserAccess::ACCESS_WRITE) {
+                $participant = new Participant($student, $assessment);
+            }
+            /* Allow read-accessors to see Summary
+             */
+            elseif ($access == UserAccess::ACCESS_READ) {
+                /** @var IAssessable $assessment */
+                $participant = $assessment->getParticipant($student);
+            }
+            /* Nobody else allowed
+             */
+            else {
+                throw new Forbidden();
+            }
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
             throw new Forbidden();

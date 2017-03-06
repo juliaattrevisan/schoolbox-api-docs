@@ -3,7 +3,6 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="action-list sortable-card ui-sortable task-list {% if expanded==false %}hide{% endif %}" data-task-list>
     {% for assessment in unit.assessables %}
-        {% set preview    = assessment is task ? 'data-plugin="preview"' : '' %}
 
         {# TODO hook these vars up to data once available #}
         {% set taskClass   = 'incomplete' %}
@@ -34,7 +33,16 @@
             {% endif %}
             <div class="list-item">
                 <div class="small-12 compact card wrap-down">
-                    <a class="" title="{{ assessment.typeName }}"  href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
+                    {##
+                    #  Special case for projects, to take teachers to status page rather than summary
+                    #}
+                    {% if readOnly == false and assessment is project %}
+                        {% set href = routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) %}
+                    {% else %}
+                        {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
+                    {% endif %}
+
+                    <a title="{{ assessment.typeName }}" href="{{ href }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
                         <span class="{{ icon.renderClass(assessment) }}"></span>
                         <p>{{ assessment.title }}</p>
                     </a>
@@ -79,12 +87,8 @@
             </nav>
             {% if readOnly == false  %}
                 <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
-                    {% if assessment is quiz %}
-                        <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Results</a></li>
-                    {% endif %}
-                    {% if assessment is dueWork %}
-                        <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Results</a></li>
-                    {% endif %}
+                    <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
+
                     {% if assessment is quiz %}
                         <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify this assessment">Modify</a></li>
                     {% else %}

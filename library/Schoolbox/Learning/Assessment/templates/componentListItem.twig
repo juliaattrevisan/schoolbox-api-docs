@@ -8,28 +8,34 @@
 {% endif %}
 {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
 
-{% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) + extraNavItemCount %}
-
-<li id="component-assessment-{{ assessable.id }}" class="actions-small-{{ actionCount }}" data-assessment="{{ assessable.id }}" data-assessment-title="{{  assessable.title }}">
+<li id="component-assessment-{{ assessable.id }}" class="actions-small-1" data-assessment="{{ assessable.id }}" data-assessment-title="{{  assessable.title }}">
     <div class="list-item">
         <div class="card small-12">
-            {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
+            {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id, studentId: USER.id}) %}
+
+            {% if viewRoute %}<a href="{{ href }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
             {% if viewRoute %}</a>{% endif %}
             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
         </div>
     </div>
-    {% if actionCount %}
-        <nav>{% spaceless %}
-                {% block extraNavItems %}{% endblock %}
+    {% if viewRoute or modifyRoute or deleteRoute %}
+        <nav><a href="#" class="icon-more" data-dropdown="duework-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
+        <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
+            {% spaceless %}
+                <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
                 {% if modifyRoute %}
-                    <a class="icon-modify" href="{{ modifyRoute }}" title="Modify"></a>
+                <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
                 {% endif %}
                 {% if deleteRoute %}
-                    <a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}" title="Delete"></a>
+                    <li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>
                 {% endif %}
-            {% endspaceless %}</nav>
+            {% endspaceless %}
+        </ul>
+    {% else %}
+        <nav>{% block extraNavItems %}{% endblock %}</nav>
     {% endif %}
+
     {% if not compact %}
         <article>{{ assessable.description | purify }}</article>
     {% endif %}

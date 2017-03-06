@@ -22,7 +22,6 @@
 
 
 {# student submit form #}
-{% set participant         = assessment.getParticipant(student) %}
 {% set mostRecentResponse  = participant.findMostRecentSubmittedResponse %}
 {% set isViewingOwnSummary = participant.user.id == USER.id %}
 {% set reviewer            = mostRecentResponse.submittedBy %}
@@ -111,7 +110,7 @@
                     <input type="hidden" name="status" value="{{ COMPLETION_STATUS_INCOMPLETE }}" />
                     <input type="submit" class="full-width" value="Mark as Incomplete" />
                 {% else %}
-                    {% set completedValue = USER.id == student.id ? COMPLETION_STATUS_SELF_MARKED_COMPLETE : COMPLETION_STATUS_TEACHER_MARKED_COMPLETE %}
+                    {% set completedValue = USER.id == participant.user.id ? COMPLETION_STATUS_SELF_MARKED_COMPLETE : COMPLETION_STATUS_TEACHER_MARKED_COMPLETE %}
                     <input type="hidden" name="status" value="{{ completedValue }}" />
                     <input type="submit" class="full-width" value="Mark as Complete" />
                 {% endif %}

@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Error;
@@ -91,13 +92,13 @@ class Controller extends Assessment\Controller
         );
     }
 
-
     /**
      * Display appropriate landing page based on role
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      * @param Participant $participant
+     * @throws ServiceNotFound
      */
     public function getSummary(Participant $participant)
     {
@@ -153,7 +154,7 @@ class Controller extends Assessment\Controller
             'assessment'   => $task,
             'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $task->getBaseContext()->getFolder()),
             'preview'      => $previewFragment,
-            'student'      => $participant->getUser(),
+            'participant'  => $participant,
         ];
 
         $this->getResponse()->content->set(

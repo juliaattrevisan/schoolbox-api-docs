@@ -40,11 +40,9 @@
     <section id="assessment-section-{{ component_id }}">
         <ul id="assessment-list-{{ component_id }}" class="action-list">
             {% for assessable in assessables %}
-
                 {% block listItem %}
-                    {% include '@learningAssessment/componentListItem.twig' with {extraNavItemCount: 0} %}
+                    {% include '@learningAssessment/componentListItem.twig' %}
                 {% endblock %}
-
             {% endfor %}
         </ul>
         {% if createRoute %}
@@ -55,9 +53,7 @@
             </div>
         {% endif %}
     </section>
-
     <div class="toast" data-assessment-toast="{{ component_id }}"></div>
-
     <script type="text/javascript">
         $(function () {
             $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
