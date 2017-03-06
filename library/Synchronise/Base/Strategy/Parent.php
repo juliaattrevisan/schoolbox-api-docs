@@ -174,7 +174,8 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
                     }
                 }
                 catch (UnexpectedValueException $e) {
-                    $this->verbose_filter->skip('user because: ' .$e->getMessage() ?: 'exception thrown');
+                    $person = "{$externalUser['StudentContactID']} {$externalUser['StudentContactPreferred']} {$externalUser['StudentContactSurname']}";
+                    $this->verbose_filter->skip($person.' because: ' .$e->getMessage() ?: 'exception thrown');
                     $this->verbose_filter->incrementSkipped();
                 }
             }
