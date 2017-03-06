@@ -9,6 +9,7 @@
 namespace Alaress\Routing;
 
 
+use Alaress\Routing\Dictionary\IDictionary;
 use InvalidArgumentException;
 use OutOfBoundsException;
 
@@ -22,14 +23,8 @@ class Router implements IRouter
     /** @var Trie */
     protected $root;
 
-    /** @var string */
-    protected $delimiter;
-
-    /** @var array */
-    protected $shardDictionary;
-
-    /** @var array */
-    protected $wholeDictionary;
+    /** @var IDictionary */
+    protected $dictionary;
 
     /** @var Trie[] */
     protected $cache;
@@ -38,25 +33,13 @@ class Router implements IRouter
     /**
      * Router constructor.
      *
-     * @param string $delimiter
-     * @param array  $dictionary
-     * @throws \InvalidArgumentException
+     * @param IDictionary $dictionary
+     * @throws InvalidArgumentException
      */
-    public function __construct($delimiter = '/', array $dictionary = null)
+    public function __construct(IDictionary $dictionary)
     {
-        if (empty($delimiter)) {
-            throw new \InvalidArgumentException("Delimiter cannot be empty");
-        }
-
         $this->root = new Trie('');
-
-        $this->delimiter = $delimiter;
-
-        $this->setDictionary($dictionary ?: [
-            '\*'  => "[^\\{$this->delimiter}]+",  // asterisk matches single word
-            '#'   => '.*',                        // hash matches multiple words
-            '\d+' => '(\d+)'                      // compress digits into a \d+ check rather than storing individually
-        ]);
+        $this->dictionary = $dictionary;
     }
 
 
@@ -73,7 +56,7 @@ class Router implements IRouter
      */
     public function add($path, $key, $value = null)
     {
-        $fullRegex = $this->transform(str_replace('.', '\.', $path), $this->wholeDictionary);
+        $fullRegex = $this->dictionary->translateWhole(str_replace('.', '\.', $path));
 
         // let's not do work we don't have to, eh?
         if (empty($this->cache[$fullRegex])) {
@@ -81,10 +64,10 @@ class Router implements IRouter
             $trie = $this->root;
 
             // perform Trie construction
-            foreach (explode($this->delimiter, $path) as $shard) {
+            foreach (explode($this->dictionary->getDelimiter(), $path) as $shard) {
 
                 // translate the shard to regex according to our dictionary
-                $pattern = $this->transform($shard, $this->shardDictionary);
+                $pattern = $this->dictionary->translateShard($shard);
 
                 if ($trie->has($pattern)) {
                     $trie = $trie->get($pattern);
@@ -130,39 +113,9 @@ class Router implements IRouter
      */
     public function get($path)
     {
-        $route = new Route($path, $this->root, $this->delimiter);
+        $route = new Route($path, $this->root, $this->dictionary->getDelimiter());
 
         return $route->data();
     }
 
-
-    /**
-     * @param array $dictionary
-     */
-    private function setDictionary(array $dictionary)
-    {
-        foreach ($dictionary as $pattern => $transform) {
-            $this->shardDictionary["`^$pattern$`"] = $transform;
-            $this->wholeDictionary["`$pattern`"]   = $transform;
-        }
-
-        // pre-cache this transformation into the format we will need
-        $this->shardDictionary = [
-            array_keys($this->shardDictionary), array_values($this->shardDictionary)
-        ];
-        $this->wholeDictionary = [
-            array_keys($this->wholeDictionary), array_values($this->wholeDictionary)
-        ];
-    }
-
-
-    /**
-     * @param string $string
-     * @param array  &$dictionary
-     * @return string
-     */
-    private function transform($string, array &$dictionary)
-    {
-        return preg_replace($dictionary[0], $dictionary[1], $string);
-    }
 }
