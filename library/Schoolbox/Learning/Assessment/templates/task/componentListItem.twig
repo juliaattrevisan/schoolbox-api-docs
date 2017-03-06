@@ -1,11 +1,7 @@
 {% extends '@learningAssessment/componentListItem.twig' %}
-
-{% set extraNavItemCount = assessable.isParticipant(USER) ? 1 : 0 %}
-
 {% block extraNavItems %}
 
     {% if assessable.isParticipant(USER) %}
-        {% set extraNavItemCount = 1 %}
         {% set participant = assessable.getParticipant(USER) %}
         {% set latestResponse = participant.findMostRecentSubmittedResponse %}
 

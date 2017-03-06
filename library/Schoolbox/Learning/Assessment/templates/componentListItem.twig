@@ -19,13 +19,13 @@
             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
         </div>
     </div>
-    {% if modifyRoute %}
+    {% if viewRoute or modifyRoute or deleteRoute %}
         <nav><a href="#" class="icon-more" data-dropdown="duework-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
             {% spaceless %}
                 <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
                 {% if modifyRoute %}
-                    <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
+                <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
                 {% endif %}
                 {% if deleteRoute %}
                     <li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>

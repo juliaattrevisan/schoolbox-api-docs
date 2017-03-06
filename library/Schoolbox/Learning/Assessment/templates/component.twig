@@ -41,7 +41,7 @@
         <ul id="assessment-list-{{ component_id }}" class="action-list">
             {% for assessable in assessables %}
                 {% block listItem %}
-                    {% include '@learningAssessment/componentListItem.twig' with {extraNavItemCount: 0} %}
+                    {% include '@learningAssessment/componentListItem.twig' %}
                 {% endblock %}
             {% endfor %}
         </ul>
