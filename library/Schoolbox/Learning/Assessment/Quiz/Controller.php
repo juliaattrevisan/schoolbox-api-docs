@@ -125,16 +125,10 @@ class Controller extends Assessment\Controller
      *
      * Sends you to a page depending on the user's role and progress in a Quiz
      *
-     * if(user is a participant of this quiz)
      *     if(user has no attempts || latest attempt is finished)
      *         Display Quiz Intro
      *     else(user's latest attempt is unfinished)
      *         Display latest attempt, first section
-     * else(user is not participant)
-     *    if(user is teacher)
-     *        Display Summary page
-     *    else(user not teacher)
-     *        Display permission denied
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
@@ -161,7 +155,7 @@ class Controller extends Assessment\Controller
          * If the current user is a student, then redirect to a place
          * where they can continue the attempt
          */
-        if ($this->getUser()->getRole()->isStudent() && (is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate)) {
+        if (is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate) {
             $quiz     = $this->getQuizForAssessmentId($assessment->getId());
             $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
 
@@ -192,8 +186,6 @@ class Controller extends Assessment\Controller
     protected function redirectToSummaryOrIntro(User $sessionUser, User $participantUser, IAssessable $assessment)
     {
         $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
-
-        $userPermission = $this->getAccess()->getFolderAccess($this->getUser(), [$assessment->getBaseContext()->getFolder()->getId()]);
 
         if ($sessionUser->getId() == $participantUser->getId()) {
             // this is the special case: redirect to intro
