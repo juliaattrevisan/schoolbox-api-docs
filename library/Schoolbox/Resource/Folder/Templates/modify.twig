@@ -249,7 +249,7 @@
 
                 {# Permissions block is only visible if not inheriting permissions #}
 
-                <div id="permissions" {% if folder.getInherit %}class="hide"{% endif %}>
+                <fieldset id="permissions" class="content {% if folder.getInherit %}hide{% endif %}">
                     <table class="scrollable">
                         <thead>
                         <tr>
@@ -296,7 +296,7 @@
                             </div>
                         </div>
                     {% endif %}
-                </div>
+                </fieldset>
 
                 <fieldset id="synergetic-codes" class="content {{ folder.getInherit() ? 'hide' : '' }}">
                     <div class="small-12 columns">
