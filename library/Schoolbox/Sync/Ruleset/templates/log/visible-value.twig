@@ -9,5 +9,6 @@
 {%- elseif value is iterable -%}
     [{{ value|join(', ') }}]
 {%- else -%}
+    {# raw HTML requires further investigation. Can this be used for XSS? (It may be possible with carefully crafted CSV imports) #}
     {{ value | raw }}
 {%- endif -%}

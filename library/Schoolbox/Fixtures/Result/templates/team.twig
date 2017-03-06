@@ -46,7 +46,7 @@
                     <div class="list-item">
                         <div class="small-12 columns">
                             <h4>{{ team.name }}</h4>
-                            {{ match.result[team.id].description|raw }}
+                            {{ match.result[team.id].description|purify }}
                         </div>
                     </div>
                     <nav>

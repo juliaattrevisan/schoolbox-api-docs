@@ -16,7 +16,7 @@
     {%- if crit.used -%}
 
     <label for="{{ critInput }}[on]" class="checkbox-label rb-criterion rb-readonly">
-        {{- crit.name | raw -}}
+        {{- crit.name | nl2br -}}
         <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricCriterion') }} cannot be modified because it is in use elsewhere">?</span>
         <input type="hidden" value="{{ crit.name }}" name="{{ critInput }}[name]" />
     </label>

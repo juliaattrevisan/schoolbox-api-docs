@@ -3,6 +3,7 @@
     <i class="icon-info"></i>
     <h2>Sorry, we are unable to complete this request </h2>
 
+    {# raw HTML reluctantly sanctioned - this should not be HTML, but maybe some error codes are? #}
     <p>{{ summary.message|raw }}</p>
 
     {% if info|length %}

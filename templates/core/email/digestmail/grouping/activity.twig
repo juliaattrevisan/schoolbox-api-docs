@@ -17,6 +17,7 @@
             <tr>
                 <td>
                     {% set msg = row.messages | first %}
+                    {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. #}
                     <p>{{ msg.title | raw }}</p>
                 </td>
             </tr>

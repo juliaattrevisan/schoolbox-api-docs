@@ -16,6 +16,7 @@
             <span class="news-title">{{ msg.meta.title }}</span>
         {% endif %}
     {% else %}
+        {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. #}
         {{ msg.title | raw }}
     {% endif %}
 {% endblock %}

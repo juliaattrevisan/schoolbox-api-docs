@@ -4,6 +4,7 @@
 {% block eventBubbleSummary %}
     <h3>{{ event.title }}</h3>
     <ul class="meta">
+        {# raw HTML reluctantly sanctioned - getEventSpan() should be updated to not output htmlentities #}
         <li class="icon-calendar" title="Date">{{ event.getPeriodName() }}: <time>{{ event.getEventSpan()|raw }}</time></li>
 
         {% if event.location %}

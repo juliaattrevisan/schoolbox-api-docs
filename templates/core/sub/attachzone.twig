@@ -68,7 +68,8 @@ $data = {
                 trigger: 'div.dzone',
                 detachSelector: '[data-dz-remove]',
                 dropzoneSelector: 'div.dzone',
-                dictDefaultMessage: {{ (attachzone.mode == 'button' ? 'null' : "'" ~ attachzone.prompt|e('js') ~ "'")|raw }},
+                dictDefaultMessage: {{ (attachzone.mode == 'button' ? 'null' : (attachzone.prompt|json_encode|raw)) }},
+                {# raw HTML reluctantly sanctioned - this should be passed to template as raw, then json_encode|raw #}
                 allowedFiles: {{ attachzone.mime|raw ?: 'null' }},
                 multi: {{ attachzone.multi ? 'true' : 'false' }},
                 title: '{{ attachzone.title }}',

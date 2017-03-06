@@ -14,7 +14,7 @@
         {% if group.name %}
             <label>
                 {%- if group.used -%}
-                    {{ groupName | raw }}
+                    {{ groupName }}
                     <span data-tooltip
                           class="hint has-tip tip-right"
                           data-width="200"
@@ -26,7 +26,7 @@
                 {% endif %}
             </label>
         {% else %}
-            <label class="meta">{{ groupName | raw }}</label>
+            <label class="meta">{{ groupName }}</label>
             <input type="hidden" value="" name="{{ groupInput }}[name]" />
         {% endif %}
     </th>

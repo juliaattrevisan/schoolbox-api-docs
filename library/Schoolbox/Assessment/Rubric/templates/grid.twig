@@ -24,11 +24,11 @@
     <tr>
         {# yay html tables... -_-; #}
         {% if rowspan %}
-            <th rowspan="{{ rowspan }}">{{ group.name|raw }}</th>
+            <th rowspan="{{ rowspan }}">{{ group.name }}</th>
             {% set rowspan = 0 %}
         {% endif %}
 
-        <th>{{ crit.name|raw }}</th>
+        <th>{{ crit.name }}</th>
 
             {% for levelIndex, level in rubric.levels %}
 
@@ -38,7 +38,7 @@
 
                     <td {% if descriptor.selected  and markVisibility %}class="rb-selected"{% endif %}>
                         <p>
-                            {{- descriptor.text|raw -}}
+                            {{- descriptor.text|nl2br -}}
                         </p>
                         {% if descriptor.value is not null and config.rubric_show_points %}
                         <aside>

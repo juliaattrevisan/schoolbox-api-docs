@@ -30,6 +30,7 @@
         <td valign="middle">
             <table>
                 <tr>
+                    {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
                     <td>{{ msg.title | raw }}</td>
                 </tr>
                 {% if msg.meta %}
@@ -38,6 +39,7 @@
                 <tr>
                     <td>
                         <p>
+                            {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
                             <em>{{ msg.meta.byline | raw }}</em>
                         </p>
                     </td>

@@ -1,7 +1,7 @@
 {# ensure these are set #}
 {%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
 {%- set groupId   = rubricId ~ '-' ~ group.id -%}
-{%- set groupName = group.name ? group.name|raw : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
+{%- set groupName = group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
 {%- set levelLimit = levelLimit ?: config.rubric_max_levels -%}
 {%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
 
@@ -22,7 +22,7 @@
         {% if group.name %}
             <label>
                 {%- if group.used -%}
-                    {{ groupName | raw }}
+                    {{ groupName }}
                     <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
                     <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                 {% else %}
@@ -30,7 +30,7 @@
                 {% endif %}
             </label>
         {% else %}
-            <label class="meta">{{ groupName | raw }}</label>
+            <label class="meta">{{ groupName }}</label>
         {% endif %}
     </th>
 </tr>
