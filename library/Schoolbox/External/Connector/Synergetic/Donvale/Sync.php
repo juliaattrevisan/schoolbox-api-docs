@@ -32,7 +32,7 @@ class Sync extends BaseSync
             student_contact_work_email,
             student_id, 
             student_campus, 
-            student_year_level,
+            CASE WHEN ISNULL(student_year_level,'') = '' THEN 0 ELSE student_year_level END AS student_year_level,
             student_gender,
             student_preferred,
             student_surname
