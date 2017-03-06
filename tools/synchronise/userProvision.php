@@ -42,8 +42,6 @@ $kernel->registerExceptionCallback($cleanup);
 
 $kernel->run(
     function ($di, $loop, $log, $opts) {
-
-        global $opts;
         $instance_id = isset($opts["instance"]) ? $opts["instance"] : INSTANCE_ID;
 
         /**
