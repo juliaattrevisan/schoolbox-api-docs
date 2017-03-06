@@ -80,6 +80,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         }
 
         // Ignore campus for now. Eventually, match campi against timetable ID
+
+        $quotedId = $this->database->smartQuote($externalUserId);
         if ($user->getRole()->isStudent()) {
             // Student query - non-blocked
             // Still requires a room and staff
@@ -109,7 +111,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
 
-                WHERE s.Code = {$this->database->smartQuote($externalUserId)}
+                WHERE s.Code = {$quotedId}
                 AND   tci.TimetableBlockInstanceID IS NULL
                 AND   tci.TimetablePeriodID IS NOT NULL
                 AND   t.Enabled = 1
@@ -147,7 +149,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
 
-                WHERE s.Code = {$this->database->smartQuote($externalUserId)}
+                WHERE s.Code = {$quotedId}
                 AND   t.Enabled = 1
 
                 ORDER BY DayNumber ASC, PeriodStart ASC;
@@ -190,9 +192,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 LEFT  JOIN dbo.Staff staff_replacement         ON tcis.PersonID = staff_replacement.ID
 
                 WHERE (
-                    (staff_base.Code = {$this->database->smartQuote($externalUserId)} AND tcis.TimetableClassStaffID IS NULL)
+                    (staff_base.Code = {$quotedId} AND tcis.TimetableClassStaffID IS NULL)
                     OR
-                    staff_replacement.Code = {$this->database->smartQuote($externalUserId)}
+                    staff_replacement.Code = {$quotedId}
                 )
                 AND t.Enabled = 1
 
