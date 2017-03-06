@@ -135,11 +135,9 @@ class External_Schoolbox_User implements External_UserInterface
             "
                         SELECT
                             parent.synergy_id AS StudentContactID,
-                            '' AS StudentContactTitle,
-                            '' AS StudentContactPreferred,
-                            '' AS StudentContactSurname,
-                            pp.guardian1Name AS StudentContactPreferred,
-                            '' AS StudentContactSurname,
+                            parent.title AS StudentContactTitle,
+                            parent.firstname AS StudentContactPreferred,
+                            parent.lastname AS StudentContactSurname,
                             pp.guardian1Email AS StudentContactDefaultEmail,
                             pp.guardian1Address AS StudentContactAddress1,
                             pp.guardian1Suburb AS StudentContactSuburb,
