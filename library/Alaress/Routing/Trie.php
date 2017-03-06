@@ -80,12 +80,7 @@ class Trie
             return true;
         }
 
-        foreach ($this->tries as $pattern => $trie) {
-            if (preg_match("`^$pattern$`", $key)) {
-                return true;
-            }
-        }
-
+        // do not attempt a pattern match, simply return false
         return false;
     }
 
