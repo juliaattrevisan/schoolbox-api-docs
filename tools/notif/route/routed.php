@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\Transaction\DispatchTransaction;
@@ -22,7 +23,7 @@ use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription;
 
 $flags = implode(' ', array_slice($argv, 1));
-$opts = require_once __DIR__ . '/../../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Routing', array(
@@ -52,7 +53,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         }
 
         // this holds and traverses all our subscription data
-        $router = new Router('.');
+        $router = new Router(new SubscriptionDictionary('.'));
 
         /** @var Redis|ClientInterface $redis */
         $redis = $di->get('redis');
