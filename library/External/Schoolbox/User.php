@@ -162,9 +162,9 @@ class External_Schoolbox_User implements External_UserInterface
                             pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
                         FROM `user` child
                         INNER JOIN user_relation ur ON child.id = ur.relation_id
-                        INNER JOIN `user` parent ON ur.user_id = parent.id
+                        INNER JOIN `user` parent ON ur.user_id = parent.id AND parent.deleted_at IS NULL
                         LEFT JOIN user_profile pp ON `parent`.id = pp.user_id
-                        WHERE child.synergy_id = :externalUserId
+                        WHERE child.synergy_id = :externalUserId AND child.deleted_at IS NULL
                     "
         );
         $statement->execute(
