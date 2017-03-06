@@ -297,8 +297,8 @@ class External_Schoolbox_User implements External_UserInterface
             "
                               SELECT c.synergy_id AS RelatedID
                               FROM user_relation ur
-                              LEFT JOIN user p ON p.id = ur.user_id
-                              LEFT JOIN user c ON c.id = ur.relation_id
+                              LEFT JOIN user p ON p.id = ur.user_id AND p.deleted_at IS NOT null
+                              LEFT JOIN user c ON c.id = ur.relation_id AND c.deleted_at IS NOT null
                               WHERE p.synergy_id = :externalUserId
                                 AND ur.relation_type = :relationType
                           "
