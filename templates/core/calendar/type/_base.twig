@@ -26,8 +26,7 @@
             <h3>{{ event.title }}</h3>
 
             <ul class="meta">
-                {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
-                <li class="icon-calendar" title="Date"><time>{{ event.getFullDate()|raw }}</time></li>
+                <li class="icon-calendar" title="Date"><time>{{ event.getFullDate() }}</time></li>
 
                 {% if event.eventType %}
                 <li class="icon-list" title="Type">{{ event.eventType }}</li>
