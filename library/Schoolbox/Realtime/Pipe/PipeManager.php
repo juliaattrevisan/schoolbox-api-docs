@@ -456,15 +456,19 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 if ($this->subscriptionManager->subscribeUser($userId)) {
                     $this->sendToPipe($pipe, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
 
+                    $unread = $this->subscriptionManager
+                        ->getUserSubscription($userId)
+                        ->getUnread();
+
+                    if (empty($unread)) {
+                        break;
+                    }
+
                     // push all unread messages to this new pipe
                     $this->enqueue(
                         $pipe,
                         static::PIPE_METHOD_PUSH,
-                        (new Decorator())->appendInstances(
-                            $this->subscriptionManager
-                                ->getUserSubscription($userId)
-                                ->getUnread()
-                        )->renderAsSocketArray(true)
+                        (new Decorator())->appendInstances($unread)->renderAsSocketArray(true)
                     );
                 } else {
                     // could not subscribe the user, rabbit-offline has already been reported, just inform the user
