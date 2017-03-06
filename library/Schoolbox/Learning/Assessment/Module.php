@@ -94,8 +94,7 @@ class Module extends BaseModule
 
         $participantView = new Rule\Any(
             new Rule\IsSuperuser(),
-            new CanSeeAssessment($this->getAccess(), $this->getConfig()),
-            $canWrite
+            new CanSeeAssessment($this->getAccess(), $this->getConfig())
         );
 
         $canSubmit = new Rule\Any(
