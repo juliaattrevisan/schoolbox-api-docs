@@ -50,7 +50,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Socket', [
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     /** @var Redis|ClientInterface $redis */
-    $redis = $di->get('redis');
+    $redis = \Alaress\Redis::getClientInstance();
 
     // TODO put this in DI
     $asyncRedis = new Async\Client($di->get('config')->get('redis_url'), $loop);
