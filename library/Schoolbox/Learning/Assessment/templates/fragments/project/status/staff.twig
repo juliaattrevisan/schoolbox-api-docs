@@ -103,11 +103,12 @@
                                 <div class="list-item">
                                     <div class="card small-12">
                                         <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
-                                        <a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessable.id}) }}">
-                                            <h3>
-                                                {{ assessable.title }}
-                                            </h3>
-                                        </a>
+
+                                        {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
+
+                                        {% if url %}<a href="{{ url }}">{% endif %}
+                                            <h3>{{ assessable.title }}</h3>
+                                        {% if url %}</a>{% endif %}
 
                                         {% if assessable.getDueAt.isNull == false %}
                                             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
