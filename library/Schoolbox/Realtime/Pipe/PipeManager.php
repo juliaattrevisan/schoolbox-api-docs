@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\QueueingException;
 use Alaress\WorkerCrew\Transaction\Transaction;
+use ErrorException;
 use InvalidArgumentException;
 use Predis\CommunicationException;
 use Psr\Log\LoggerInterface;
@@ -296,19 +297,22 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         try {
             $action = $this->convertMessageToAction($event);
 
-            if (!$this->pipes->userPipeCount($action->getUserId())) {
-                // this scenario will arise if the last socket for the user disconnects but a message arrived on their
-                // subscription before it could be unsubscribed - just drop the message.
-                return;
-            }
-
-            $action->execute($this);
-
         } catch (InvalidArgumentException $e) {
             $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
+            return;
 
+        } catch (ErrorException $e) {
+            $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
             return;
         }
+
+        if (!$this->pipes->userPipeCount($action->getUserId())) {
+            // this scenario will arise if the last socket for the user disconnects but a message arrived on their
+            // subscription before it could be unsubscribed - just drop the message.
+            return;
+        }
+
+        $action->execute($this);
     }
 
 
@@ -317,6 +321,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      *
      * @param Async\Event\Message $msg
      * @throws InvalidArgumentException
+     * @throws ErrorException
      * @return IAction
      */
     private function convertMessageToAction(Async\Event\Message $msg)
