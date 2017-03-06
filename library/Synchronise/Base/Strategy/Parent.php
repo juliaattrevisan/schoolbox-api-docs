@@ -166,10 +166,17 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
             $externalUser = $parent['external_user'];
             unset($parent['external_user']);
             if (!empty($parent)) {
-                $user_id = $this->executeCreateUpdate($parent);
-                if ($user_id > 0) {
-                    $parent['id'] = $user_id;
-                    $this->executePostCreateUpdate($parent, $externalUser);
+                try {
+                    $user_id = $this->executeCreateUpdate($parent);
+                    if ($user_id > 0) {
+                        $parent['id'] = $user_id;
+                        $this->executePostCreateUpdate($parent, $externalUser);
+                    }
+                }
+                catch (UnexpectedValueException $e) {
+                    $person = "{$externalUser['StudentContactID']} {$externalUser['StudentContactPreferred']} {$externalUser['StudentContactSurname']}";
+                    $this->verbose_filter->skip($person.' because: ' .$e->getMessage() ?: 'exception thrown');
+                    $this->verbose_filter->incrementSkipped();
                 }
             }
         }
