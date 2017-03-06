@@ -83,44 +83,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
         $quotedId = $this->database->smartQuote($externalUserId);
         if ($user->getRole()->isStudent()) {
-            // Student query - non-blocked
-            // Still requires a room and staff
-            $query = "
-                SELECT
-                    t.ID as TimetableID,
-                    ts.Code as ClassCode,
-                    ts.Name as ClassName,
-                    td.SortOrder as DayNumber,
-                    td.Name as DayName,
-                    tpe.StartTime as PeriodStart,
-                    tpe.EndTime as PeriodEnd,
-                    tpe.Name as PeriodName,
-                    tci.TimetablePeriodID as PeriodID,
-                    tci.Consecutive as Consecutive
-
-                FROM fc.TimetableSubject ts
-
-                INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
-                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
-                INNER JOIN fc.YearLevelSub           yls  ON tc.YearLevelSubID = yls.ID
-                INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
-                INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
-                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
-                INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
-                -- CROSS APPLY: an INNER JOIN onto a table-level function
-                CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
-                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
-
-                WHERE s.Code = {$quotedId}
-                AND   tci.TimetableBlockInstanceID IS NULL
-                AND   tci.TimetablePeriodID IS NOT NULL
-                AND   t.Enabled = 1
-
-                ORDER BY DayNumber asc, PeriodStart asc
-            ";
-
-            // Student query - blocked
-            // Still requires a room and staff
+            // 1st part: blocked classes
+            // 2nd part: non-blocked classes
             $query = "
                 SELECT
                     t.ID as TimetableID,
@@ -152,7 +116,39 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 WHERE s.Code = {$quotedId}
                 AND   t.Enabled = 1
 
-                ORDER BY DayNumber ASC, PeriodStart ASC;
+                UNION
+
+                SELECT
+                    t.ID as TimetableID,
+                    ts.Code as ClassCode,
+                    ts.Name as ClassName,
+                    td.SortOrder as DayNumber,
+                    td.Name as DayName,
+                    tpe.StartTime as PeriodStart,
+                    tpe.EndTime as PeriodEnd,
+                    tpe.Name as PeriodName,
+                    tci.TimetablePeriodID as PeriodID,
+                    tci.Consecutive as Consecutive
+
+                FROM fc.TimetableSubject ts
+
+                INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
+                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+                INNER JOIN fc.YearLevelSub           yls  ON tc.YearLevelSubID = yls.ID
+                INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
+                INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
+                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
+                INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
+                -- CROSS APPLY: an INNER JOIN onto a table-level function
+                CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
+                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
+
+                WHERE s.Code = {$quotedId}
+                AND   tci.TimetableBlockInstanceID IS NULL
+                AND   tci.TimetablePeriodID IS NOT NULL
+                AND   t.Enabled = 1
+
+                ORDER BY DayNumber asc, PeriodStart asc
             ";
 
         } elseif ($user->getRole()->isStaff()) {
