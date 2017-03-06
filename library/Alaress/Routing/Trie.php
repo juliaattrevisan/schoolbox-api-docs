@@ -13,24 +13,30 @@ use InvalidArgumentException;
 
 class Trie
 {
-    /** @var array */
-    protected $tries;
+    /** @var static[] */
+    protected $tries = [];
 
     /** @var array */
-    protected $data;
+    private $data = [];
 
     /** @var string */
-    protected $key;
+    private $key;
+
+    /** @var bool */
+    private $sorted = false;
+
+    /** @var callable */
+    private $usort;
 
 
     /**
      * @param string $key
+     * @param callable $usort
      */
-    public function __construct($key)
+    public function __construct($key, callable $usort)
     {
-        $this->key = $key;
-        $this->tries = [];
-        $this->data  = [];
+        $this->key   = $key;
+        $this->usort = $usort;
     }
 
 
@@ -46,10 +52,15 @@ class Trie
     /**
      * @param string $key
      * @throws InvalidArgumentException
-     * @return self
+     * @return static
      */
     public function get($key)
     {
+        // if not sorted, do it now
+        if (!$this->sorted) {
+            $this->sort();
+        }
+
         if (empty($this->tries)) {
             throw new InvalidArgumentException("Set is empty");
         }
@@ -87,11 +98,14 @@ class Trie
 
     /**
      * @param string $key
-     * @return self
+     * @return static
      */
     public function put($key)
     {
-        $t = new self($key);
+        // new insertion: no longer can guarantee sorted
+        $this->sorted = false;
+
+        $t = new static($key, $this->usort);
         $this->tries[$key] = $t;
 
         return $t;
@@ -137,4 +151,24 @@ class Trie
         return $node;
     }
 
+
+    /**
+     * Sort the internally-held trie structure.
+     * This method is protected so, if required, you can extend to override this behaviour.
+     *
+     * @return void
+     */
+    protected function sort()
+    {
+        // recursively sort the entire tree
+        foreach ($this->tries as $t) {
+            $t->sort();
+        }
+
+        if ($this->sorted) {
+            return;
+        }
+
+        uksort($this->tries, $this->usort);
+    }
 }

@@ -38,7 +38,7 @@ class Router implements IRouter
      */
     public function __construct(IDictionary $dictionary)
     {
-        $this->root = new Trie('');
+        $this->root = new Trie('', [ $dictionary, 'sort' ]);
         $this->dictionary = $dictionary;
     }
 
