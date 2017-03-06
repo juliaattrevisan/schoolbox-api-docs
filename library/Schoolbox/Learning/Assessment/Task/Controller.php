@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Error;
@@ -97,6 +98,7 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      * @param Participant $participant
+     * @throws ServiceNotFound
      */
     public function getSummary(Participant $participant)
     {
