@@ -14,6 +14,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -181,6 +182,9 @@ class Model implements ISoftDeletable
         $storageMapper = StorageMapper::getInstance();
         $storageObject = $storageMapper->findByHash($this->getHash());
 
+        $pastoralMapper = PastoralMapper::getInstance();
+        $pastoral = $pastoralMapper->findById($this->getPastoralId());
+
         // This whole thing is a bit of an ass, unfortunately Synergetic stores its DocMan files in
         // the actual database- which means we need to shove the file into a SQL query as a hex string
         // which is totally inefficient and very slow :(
@@ -192,12 +196,17 @@ class Model implements ISoftDeletable
 
         // Save the file into to the database
 
+        $database = \MSSQL::getInstance();
+
         $hex = "0x" . bin2hex($storageObject->read());
         $externalId = $this->getExternalId();
         $studentExternalId = $this->getStudentExternalId();
         $date = date("Y-m-d H:i:s");
         $sourceDate = $storageObject->getCreatedAt()->getDatabase();
         $extension = strtoupper($storageObject->getExtension());
+        $pastoralExternalId = $pastoral->getExternalId();
+
+        $filename = $database->quote($storageObject->getFilename());
 
         $query = "
             INSERT INTO SynergyOneMedia.dbo.tDocuments
@@ -213,7 +222,7 @@ class Model implements ISoftDeletable
             )
             VALUES
             (
-                'Imported from Schoolbox',
+                '{$filename}',
                 {$externalId},
                 {$externalId},
                 {$hex},
@@ -224,14 +233,13 @@ class Model implements ISoftDeletable
             );            
         ";
 
-        $database = \MSSQL::getInstance();
         $database->query($query);
         $documentReferencesSeq = $database->getOne("SELECT @@IDENTITY");
 
-        // Add a document reference to the student so it shows up on their record
+        // Add a document reference to the student so it shows up on their normal community record
 
         $query =
-        "
+            "
             INSERT INTO SynergyOneMedia.dbo.DocumentReferences
             (
                 ID,
@@ -242,6 +250,33 @@ class Model implements ISoftDeletable
                 {$studentExternalId},
                 {$documentReferencesSeq}
             );            
+        ";
+
+        $database->query($query);
+
+        // Specifically link it to their pastoral record as well
+
+        $query =
+        "
+            INSERT INTO SynergyOneMedia.dbo.tDocumentReferences
+            (
+                CommunityID,
+                tDocumentsSeq,
+                SynDatabaseCode,
+                RelatedSeqModuleCode,
+                SortOrder,
+                RelatedSeq
+            )
+            SELECT  
+                0,
+                {$documentReferencesSeq},
+                '',
+                'SPC',
+                COALESCE(MAX(SortOrder) + 1, 0),
+                {$pastoralExternalId}
+                
+            FROM    SynergyOneMedia.dbo.tDocumentReferences 
+            WHERE   tDocumentsSeq = {$documentReferencesSeq}
         ";
 
         $database->query($query);
