@@ -154,7 +154,7 @@ class Controller extends Assessment\Controller
             'assessment'   => $task,
             'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $task->getBaseContext()->getFolder()),
             'preview'      => $previewFragment,
-            'student'      => $participant->getUser(),
+            'participant'  => $participant,
         ];
 
         $this->getResponse()->content->set(
