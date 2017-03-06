@@ -237,7 +237,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         );
 
         // we'll just ignore messages that are of unknown origin
-        if (!($userId && $sessionId)) {
+        if (!$userId) {
             return;
         }
 
