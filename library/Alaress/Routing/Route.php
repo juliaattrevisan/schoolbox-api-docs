@@ -30,7 +30,7 @@ class Route
      * @param string $delimiter
      * @throws \InvalidArgumentException
      */
-    public function __construct($path, Trie $trie, $delimiter = '/')
+    public function __construct($path, Trie $trie, $delimiter)
     {
         $this->path      = $path;
         $this->delimiter = $delimiter;
@@ -89,7 +89,9 @@ class Route
             return $this->trie->fetch($matches);
         }
 
-        throw new \InvalidArgumentException("No data match");
+        // this is here for safety, but as far as can be determined
+        // it is not possible for the above preg_match to return false
+        throw new \InvalidArgumentException('No data match'); // @codeCoverageIgnore
     }
 
 }
