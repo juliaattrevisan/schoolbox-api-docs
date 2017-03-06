@@ -9,13 +9,11 @@ namespace Schoolbox\Fixtures\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Component\ComponentDelegate as ComponentDelegate;
 use Schoolbox\User;
 use \Schoolbox\Permission\Access\UserAccess;
 use SitePage;
-use Alaress\Authorizer\Rule;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {

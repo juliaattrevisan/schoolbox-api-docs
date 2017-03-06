@@ -178,9 +178,7 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
-     * @param Resource\AbstractFile $file
-     * @throws Resource\Exception
-     * @return array
+     * @inheritdoc
      */
     protected function buildFileNode(Resource\AbstractFile $file)
     {

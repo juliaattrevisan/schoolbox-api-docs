@@ -25,7 +25,7 @@ class Controller extends Base
      */
     public function __construct()
     {
-        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstanceByName('sportsfixtures_school', 'id', 'name'));
     }
 
     /**

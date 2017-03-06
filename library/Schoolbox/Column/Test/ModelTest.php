@@ -30,6 +30,9 @@ class ModelTest extends TestCase {
 	 */
 	protected $test_mapper;
 
+    /**
+     * @inheritdoc
+     */
 	public function setupObject() {
 		$this->object = new Model();
 		$this->test_model = new TestModel();
@@ -59,28 +62,46 @@ class ModelTest extends TestCase {
 			->will($this->returnValue($this->test_model));
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function getTestHydrate() {
 		return array();
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function getTestDehydrate() {
 		return array();
 	}
 
-	public function testHydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function testHydrate($input, $expected_output) {
 		$hydrate = $this->object->hydrate(1, $this->test_mapper);
 		$this->assertSame(1, $hydrate->getId());
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function testHydrateNull() {
 		$hydrate = $this->object->hydrate(null, $this->test_mapper);
 		$this->assertSame(null, $hydrate->getId());
 	}
 
-	public function testDehydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function testDehydrate($input, $expected_output) {
 		$this->assertSame(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function testDehydrateNull() {
 		$this->assertSame(null, $this->object->dehydrate(null, $this->test_mapper));
 	}

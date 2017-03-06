@@ -114,8 +114,10 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @param string $url
 	 * @return self
-	 */
-	public function init($url) {
+     * @param string $params
+     * @return $this
+     */
+	public function init($url, $params="") {
 		$this->setUrl($url);
 
 		/* Logging class handles verbosity and any logging

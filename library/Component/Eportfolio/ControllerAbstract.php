@@ -170,7 +170,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * @param Eportfolio_Page_Instance|null $source
      * @return static
      */
-    public function setSource( $source = null) {
+    public function setSource($source = null) {
         parent::setSource($source);
         return $this;
     }
