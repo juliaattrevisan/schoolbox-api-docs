@@ -299,7 +299,7 @@ class Controller extends Assessment\Controller
             }
 
             // Is the task already marked by the teacher as complete ?
-            if (!$response->isSelfAssessed() && $response->getMarkedComplete()) {
+            if (!$mostRecentResponse->isSelfAssessed() && $mostRecentResponse->getMarkedComplete()) {
                 throw new \UnexpectedValueException("Students may not change a task completion status if the teacher has marked it complete.");
             }
         }
