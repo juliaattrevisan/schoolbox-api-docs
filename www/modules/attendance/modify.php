@@ -31,6 +31,20 @@ if (count($this->arg) < 3) {
  */
 $externalClass = new External_Synergetic_Class();
 if ($this->arg[0]) {
+    if (count($this->arg) >= 6) {
+
+        // This is a crazy ugly hack to handle attendance for class codes with 2 or more slashes, keeps appending subsequent arguments onto the 2nd one with
+        // slash delimiters until we've got less than 6 items in the array
+
+        while (count($this->arg) >= 6) {
+            // Merged arguments 1 & 2
+            $this->arg[1] .= "/{$this->arg[2]}";
+
+            // Remove argument 2 and shuffle everything back up
+            unset($this->arg[2]);
+            $this->arg = array_values($this->arg);
+        }
+    }
     $class = $externalClass->getClass($this->arg[0] . '/' . urldecode(urldecode($this->arg[1])), $_SESSION['user']);
 } else {
     $class = $externalClass->getClass(urldecode(urldecode($this->arg[1])), $_SESSION['user']);
