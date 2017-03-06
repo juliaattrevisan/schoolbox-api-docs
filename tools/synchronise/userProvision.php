@@ -42,7 +42,7 @@ $kernel->registerExceptionCallback($cleanup);
 
 $kernel->run(
     function ($di, $loop, $log, $opts) {
-        $instance_id = isset($opts["instance"]) ? $opts["instance"] : INSTANCE_ID;
+        $instanceId = isset($opts["instance"]) ? $opts["instance"] : INSTANCE_ID;
 
         /**
          * @var Di\Container    $di
@@ -52,7 +52,7 @@ $kernel->run(
          */
 
         // define the redis key we'll use for this run
-        $di->values['ups.redisKey'] = $instance_id . '.provision.user.' . getmypid();
+        $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
 
         /** @var CompositeLoggerInterface $logger */
         $logger = $di->get('ups.logger');
