@@ -21,7 +21,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getHumanReadable_IncompleteImplicit($normalised)
     {
-        $expected = null;
+        $expected = Completion::HUMAN_READABLE_INCOMPLETE;
 
         $markScheme = new Completion();
         $actual = $markScheme->getHumanReadableMark($normalised);
@@ -35,7 +35,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getHumanReadable_IncompleteAsNull($normalised)
     {
-        $expected = null;
+        $expected = Completion::HUMAN_READABLE_INCOMPLETE;
 
         $markScheme = new Completion();
         $actual = $markScheme->getHumanReadableMark($normalised, null);
@@ -67,7 +67,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
         $response = $this->getSelfAssessedResponseMarkedAsComplete();
         $markScheme = new Completion();
 
-        $expected = Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT;
+        $expected = Completion::HUMAN_READABLE_COMPLETE;
         $actual = $markScheme->getHumanReadableMark($normalised, $response);
 
         $this->assertEquals($expected, $actual);
@@ -98,7 +98,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
         $response = $this->getTeacherAssessedResponseMarkedAsComplete();
         $markScheme = new Completion();
 
-        $expected = Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
+        $expected = Completion::HUMAN_READABLE_COMPLETE;
         $actual = $markScheme->getHumanReadableMark($normalised, $response);
 
         $this->assertEquals($expected, $actual);
@@ -180,8 +180,8 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [Completion::HUMAN_READABLE_INCOMPLETE],
-            [Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT],
-            [Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
+            [Completion::HUMAN_READABLE_COMPLETE],
+            [Completion::HUMAN_READABLE_COMPLETE],
         ];
     }
 

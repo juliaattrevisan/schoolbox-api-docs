@@ -15,9 +15,8 @@ class Completion extends AbstractMarkScheme
 {
     const TITLE = 'Completion';
 
-    const HUMAN_READABLE_INCOMPLETE                  = 'Incomplete';
-    const HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT  = 'Student-Assessed';
-    const HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER  = 'Teacher-Assessed';
+    const HUMAN_READABLE_INCOMPLETE  = 'Incomplete';
+    const HUMAN_READABLE_COMPLETE    = 'Complete';
 
     /**
      * This type is not comparable numerically.
@@ -30,19 +29,15 @@ class Completion extends AbstractMarkScheme
      * Returns a string representation of a normalised Mark
      *
      * @param mixed                       $normalisedMark  - ignored, even if invalid
-     * @param IResponse|TaskResponse|null $response
+     * @param IResponse|null $response
      * @return string|null
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if (null === $response){
-            return null;
-        } elseif (!$response->getMarkedComplete()) {
+        if (null === $response || !$response->isSubmitted() || ($response instanceof TaskResponse && !$response->getMarkedComplete())){
             return self::HUMAN_READABLE_INCOMPLETE;
-        } elseif($response->isSelfAssessed()) {
-            return self::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT;
         } else {
-            return self::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
+            return self::HUMAN_READABLE_COMPLETE;
         }
     }
 
