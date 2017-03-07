@@ -1,5 +1,9 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
+{% set classFeedbackRequired = 'notmarked' %}
+{% set classFailed           = 'fail' %}
+{% set classMastered         = 'mastered' %}
+
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
@@ -31,13 +35,13 @@
 </div>
 
 <style>
-    .fail {
+    .{{ classFailed }} {
         background-color: rgb(247, 206, 204);
     }
-    .mastered {
+    .{{ classMastered }} {
         background-color: rgb(213, 231, 212);
     }
-    .notmarked {
+    .{{ classFeedbackRequired }} {
         background-color: rgb(255, 242, 205);
     }
 </style>
@@ -164,9 +168,9 @@
                                     {% endif %}
 
                                 {% elseif isMastered %}
-                                    {% set className = 'mastered' %}
+                                    {% set className = classMastered %}
                                 {% else %}
-                                    {% set className = 'fail' %}
+                                    {% set className = classFailed %}
                                 {% endif %}
 
                                 {# If student has submitted work but has not received a mark, style the cell appropriately #}
@@ -174,7 +178,7 @@
                                 {% if participant is not empty %}
                                     {% if isAwaiting %}
                                         {% set value='<i class="icon-pause" title="Awaiting Teacher Assessment">' %}
-                                        {% set className = 'notmarked' %}
+                                        {% set className = classFeedbackRequired %}
                                     {% endif %}
                                 {% endif %}
 
