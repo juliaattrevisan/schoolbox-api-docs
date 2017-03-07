@@ -104,11 +104,10 @@
                                     <div class="card small-12">
                                         <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
 
-                                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id, studentId: USER.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
-                                            <h3>
-                                                {{ assessable.title }}
-                                            </h3>
-                                        </a>
+                                        {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: student}) %}
+                                        {% if route %}<a href="{{ route }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">{% endif %}
+                                        <h3>{{ assessable.title }}</h3>
+                                        {% if route %}</a>{% endif %}
 
                                         {% if assessable.getDueAt.isNull == false %}
                                             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
