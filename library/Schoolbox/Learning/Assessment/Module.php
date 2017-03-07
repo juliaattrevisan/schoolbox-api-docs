@@ -93,9 +93,21 @@ class Module extends BaseModule
             $this->getAccess()
         );
 
-        $participantView = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new CanSeeAssessment($this->getAccess(), $this->getConfig())
+        $participantView = new Rule\All(
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new CanSeeAssessment($this->getAccess(), $this->getConfig())
+            ),
+            new Rule\Callback(function(array $params){
+                if (!isset($params['assessment'])) {
+                    throw new NotFound("No assessment preloaded");
+                }
+                /** @var IAssessable $assessment */
+                $assessment = $params['assessment'];
+                if($assessment->getBaseContext() instanceof UnitSpecification){
+                    throw new InvalidPath("Cannot view a summary page for an Assessment Specification");
+                }
+            })
         );
 
         $canSubmit = new Rule\Any(
