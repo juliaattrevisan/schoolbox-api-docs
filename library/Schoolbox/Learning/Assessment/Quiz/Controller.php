@@ -150,26 +150,27 @@ class Controller extends Assessment\Controller
         $latestAttempt  = $this->quizAttemptMapper->findById($latestResponse->getId());
         $finishDate     = $latestAttempt->getFinish();
 
-        /* Is the attempt in progress ?
-         *
-         * If the current user is a student, then redirect to a place
-         * where they can continue the attempt
-         */
+        // Is the attempt in progress ?
         if (is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate) {
-            $quiz     = $this->getQuizForAssessmentId($assessment->getId());
-            $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
 
-            /** @var QuizSection $firstSection */
-            $firstSection = null;
+            // Is the current session user the specified participant?
+            if ($this->getUser()->getId() == $participant->getUser()->getId()){
+                // redirect to a place where they can continue the attempt
+                $quiz     = $this->getQuizForAssessmentId($assessment->getId());
+                $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
 
-            foreach ($sections as $section) {
-                if (is_null($firstSection) || $section->getSequence() < $firstSection->getSequence()) {
-                    $firstSection = $section;
+                /** @var QuizSection $firstSection */
+                $firstSection = null;
+
+                foreach ($sections as $section) {
+                    if (is_null($firstSection) || $section->getSequence() < $firstSection->getSequence()) {
+                        $firstSection = $section;
+                    }
                 }
-            }
 
-            $this->getResponse()->redirect->to("/assess/attempt/{$quiz->getId()}/{$firstSection->getId()}");
-            return;
+                $this->getResponse()->redirect->to("/assess/attempt/{$quiz->getId()}/{$firstSection->getId()}");
+                return;
+            }
         }
 
         // Not in progress (or you're a teacher - this redirect eventually
