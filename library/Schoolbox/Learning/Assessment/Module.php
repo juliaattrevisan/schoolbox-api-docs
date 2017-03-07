@@ -64,6 +64,7 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws \InvalidArgumentException
      */
     protected function registerRoutes()
     {
@@ -92,9 +93,21 @@ class Module extends BaseModule
             $this->getAccess()
         );
 
-        $participantView = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new CanSeeAssessment($this->getAccess(), $this->getConfig())
+        $participantView = new Rule\All(
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new CanSeeAssessment($this->getAccess(), $this->getConfig())
+            ),
+            new Rule\Callback(function(array $params){
+                if (!isset($params['assessment']) && !isset($params['participant'])) {
+                    throw new NotFound("No assessment or participant preloaded");
+                }
+                /** @var IAssessable $assessment */
+                $assessment = $params['assessment'] ?: $params['participant']->getAssessable() ;
+                if($assessment->getBaseContext() instanceof UnitSpecification){
+                    throw new InvalidPath("Cannot view a summary page for an Assessment Specification");
+                }
+            })
         );
 
         $canSubmit = new Rule\Any(
