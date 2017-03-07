@@ -111,6 +111,7 @@ class External_Schoolbox_User implements External_UserInterface
                         FROM `user`
                         LEFT JOIN user_profile ON user.id = user_profile.user_id
                         WHERE user.synergy_id = :externalUserId
+                        AND `user`.deleted_at IS NULL
                     "
         );
         $statement->execute(
