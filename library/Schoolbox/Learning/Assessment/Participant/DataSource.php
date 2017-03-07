@@ -189,7 +189,7 @@ class DataSource
 
     /**
      * @param Collection|IAssessable[] $assessments
-     * @param User                     $user
+     * @param User                     $user             If provided, load only this user's participation
      * @param bool                     $includeResponses
      * @param bool                     $includeFeedbacks
      * @return Collection|\Schoolbox\Learning\Assessment\Participant[][]
@@ -214,6 +214,10 @@ class DataSource
 
             // It's acceptable to findAllStudents in a loop for now, because the list is cached
             foreach ($this->findAllStudentsForAssessment($assessment) as $currentUser) {
+                // Don't load other users as participants
+                if ($user instanceof User && ($currentUser->getId() != $user->getId())) {
+                    continue;
+                }
                 $assessmentParticipants->add(
                     new Participant($currentUser, $assessment)
                 );
