@@ -22,13 +22,12 @@
 <div class="row">
     <div class="small-12 island">
         <div class="context-switch">
-            {% include '@learningMastery/fragments/markbookSelector.twig'
-            with {
-            class: class,
-            terms: terms,
-            currentTerm: currentTerm,
-            previousTerm: previousTerm,
-            nextTerm: nextTerm
+            {% include '@learningMastery/fragments/markbookSelector.twig' with {
+                class:        class,
+                terms:        terms,
+                currentTerm:  currentTerm,
+                previousTerm: previousTerm,
+                nextTerm:     nextTerm
             } %}
         </div>
     </div>
@@ -58,12 +57,10 @@
                         {% for assessment in assessments %}
                             <th>
                                 <div>
-                                    <span>
-                                        <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
-                                        <span class="meta">
-                                            {{ assessment.typeName }}
-                                        </span>
-                                    </span>
+                                <span>
+                                    <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
+                                    <span class="meta">{{ assessment.typeName }}</span>
+                                </span>
                                 </div>
                             </th>
                         {% endfor %}
@@ -120,7 +117,7 @@
                                 {% set isAttempted = normalisedMark is not null %}
                                 {% if assessment is task %}
                                     {% set mostRecentResponse = participant.findMostRecentResponse %}
-                                    {% set isAwaiting = mostRecentResponse.markedComplete and mostRecentResponse.isSelfAssessed  %}
+                                    {% set isAwaiting = mostRecentResponse.markedComplete and mostRecentResponse.isSelfAssessed %}
                                     {% set isMastered = mostRecentResponse.markedComplete and not mostRecentResponse.isSelfAssessed %}
                                 {% else %}
                                     {% set mostRecentResponse = null %}
