@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Mastery;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
@@ -78,6 +79,7 @@ class Controller extends Base
     /**
      * @api /learning/mastery/{classId}
      * @param Folder $class
+     * @throws ApplicationException
      */
     public function getMastery($class)
     {
@@ -88,6 +90,7 @@ class Controller extends Base
      * @api /learning/mastery/{classId}/term/{termCode}
      * @param Folder $class
      * @param Term $term
+     * @throws ApplicationException
      */
     public function getMasteryForTerm($class, $term)
     {
