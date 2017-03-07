@@ -57,9 +57,10 @@ class External_Schoolbox_User implements External_UserInterface
                 parent.alt_email AS StudentContactEmail
             FROM `user`
             INNER JOIN user_relation ON user.id = user_relation.relation_id
-            INNER JOIN `user` parent ON parent.id = user_relation.user_id
+            INNER JOIN `user` parent ON parent.id = user_relation.user_id AND parent.deleted_at IS NULL
             WHERE user.synergy_id IN ($id_list)
             AND user_relation.relation_type = :relation_type
+            AND `user`.deleted_at IS NULL
         "
         );
         $statement->execute(array(':relation_type' => self::RELATION_TYPE_PARENT));
