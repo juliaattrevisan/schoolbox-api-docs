@@ -408,7 +408,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 FROM       fc.TimetableDate td
                 INNER JOIN fc.Timetable     t  ON td.TimetableID    = t.ID
                 WHERE t.Name = {$quotedCampus}
-                AND   CAST(td.DateValue AS DATE) = {$this->database->smartQuote($cModel['dateValue'])}
+                AND   CAST(td.DateValue AS DATE) = {$this->database->smartQuote($cModel['DateValue'])}
             ");
             if ($timetableDate) {
                 $cModel['TimetableDayType'] = $timetableDate['TimetableDateTypeID'];
