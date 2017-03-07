@@ -30,7 +30,65 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0)
     {
-        return [];
+        if (!$day) {
+            $day = $this->getDayNumber($campus);
+        }
+        if (!$day) {
+            $day = 1;
+        }
+        $dayCount = $this->database->getOne("
+            SELECT COUNT(DISTINCT td.ID)
+            FROM       fc.Timetable       t
+            INNER JOIN fc.TimetableDay    td ON t.ID  = td.TimetableId
+            WHERE t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND   t.Enabled = 1
+        ");
+        $periods  = [];
+        $result   = $this->database->getAll("
+            SELECT
+                tp.Name                    AS Name,
+                CAST(tp.StartTime AS TIME) AS StartTime,
+                CAST(tp.EndTime   AS TIME) AS EndTime,
+                td.SortOrder               AS DayNumber
+
+            FROM       fc.Timetable       t
+            INNER JOIN fc.TimetableDay    td ON t.ID  = td.TimetableId
+            INNER JOIN fc.TimetablePeriod tp ON td.ID = tp.TimetableDayId
+
+            WHERE t.Name       = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND   t.Enabled    = 1
+            AND   td.SortOrder = {$this->database->smartQuote($day)}
+
+            ORDER BY DayNumber ASC, StartTime ASC, EndTime ASC
+        ");
+
+        // Figure out period number
+        foreach ($result as $i => $period) {
+            $periodNumber = $i+1;
+            $period['PeriodNumber'] = $periodNumber;
+            $periods[$periodNumber] = $period;
+        }
+
+        // This is all the same as HumanEdge
+        $definition = [
+            'desc'        => [],
+            'start'       => [],
+            'end'         => [],
+            'number'      => [],
+            'sequence'    => [],
+            'periodCount' => count($periods),
+            'dayCount'    => $dayCount,
+        ];
+        foreach ($periods as $period) {
+            $startTime = new Alaress_Date_Format($period['StartTime'], 'H:i:s+');
+            $endTime   = new Alaress_Date_Format($period['EndTime'], 'H:i:s+');
+            $definition['desc'][]     = $period['Name'];
+            $definition['start'][]    = $startTime->getUsingFormat('H:i');
+            $definition['end'][]      = $endTime->getUsingFormat('H:i');
+            $definition['number'][]   = intval($period['PeriodNumber']);
+            $definition['sequence'][] = 1;
+        }
+        return $definition;
     }
 
     /**
