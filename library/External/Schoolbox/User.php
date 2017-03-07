@@ -200,7 +200,7 @@ class External_Schoolbox_User implements External_UserInterface
             "
                 SELECT u.*
                 FROM user_relation ur
-                LEFT JOIN user u ON u.id = ur.user_id
+                LEFT JOIN `user` u ON u.id = ur.user_id AND u.deleted_at IS NULL
                 WHERE ur.relation_id = {$externalUserId}
                   AND ur.relation_type = " . External_Schoolbox_User::RELATION_TYPE_PARENT . "
             "
