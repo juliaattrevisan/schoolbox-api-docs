@@ -111,7 +111,7 @@ class Sync implements SyncInterface
         $statement = $this->database->prepare("
             SELECT
                 p.denbighID      AS staff_id,
-                s.staffCode      AS network_login,
+                s.username       AS network_login,
                 1                AS active_flag,
                 p.title          AS staff_title,
                 p.given_names    AS staff_given_name,
