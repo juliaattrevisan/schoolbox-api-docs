@@ -399,6 +399,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param $publishedOnly
      * @param $normalised
      * @return float|null|string
+     * @throws \UnexpectedValueException
      */
     protected function getMark(User $user, $publishedOnly, $normalised)
     {

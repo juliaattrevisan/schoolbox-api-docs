@@ -249,18 +249,6 @@ class Model extends AbstractAssessment
         return $this->getMark($user, $publishedOnly, $normalised);
     }
 
-    /**
-     * DueWork does not use the MarkScheme. It merely returns the cached value.
-     *
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return float|null
-     */
-    public function getNormalisedMark(User $user, $publishedOnly)
-    {
-        $normalised = true;
-        return $this->getMark($user, $publishedOnly, $normalised);
-    }
 
     /**
      * @inheritdoc
