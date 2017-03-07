@@ -297,7 +297,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     $classCode = $timetabledClass['ClassCode'];
                     $dayNumber = $timetabledClass['DayNumber'];
                     if (!isset($timetable[$x]['day'][$dayNumber][$classCode])) {
-                        $timetable[$x]['day'][$dayNumber][$classCode] = array(
+                        // TODO add room and staff back
+                        $timetable[$x]['day'][$dayNumber][$classCode] = [
                             'description'    => $timetabledClass['ClassName'],
                             'code'           => $timetabledClass['ClassCode'],
 //                            'campus'         => $timetabledClass['ClassCampus'],
@@ -306,7 +307,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 //                            'staffFirstname' => $timetabledClass['StaffPreferredName'],
 //                            'staffSurname'   => $timetabledClass['StaffSurname'],
 //                            'staffTitle'     => $timetabledClass['StaffTitle'],
-                        );
+                        ];
                     }
                 }
             }
