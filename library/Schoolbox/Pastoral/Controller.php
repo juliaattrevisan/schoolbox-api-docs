@@ -280,7 +280,8 @@ class Controller extends Base
 
         // Filters out records that the user should not see
         $records = $records->filter( function($record) {
-            return $this->getAuthorizer()->isPathAuthorizedForUser('pastoral.getRecord', ['record'=>$record, 'access'=>$record->getAccessList()], $this->getUser());
+            /** @var PastoralModel $record */
+            return $this->getAuthorizer()->isPathAuthorizedForUser('pastoral.getRecord', ['record'=>$record, 'access'=>$record->getAccessList(), 'studentId'=>$record->getStudent()->getId()], $this->getUser());
         });
 
         $this->getResponse()->content->set(
