@@ -105,21 +105,21 @@ abstract class Base {
     protected $homeAddress = null;
 
     /**
-     * Email address
+     * Default email address
      *
      * @var \Schoolbox\Collection
      */
     protected $email = '';
 
     /**
-     * Work Email address
+     * Work email address
      *
      * @var \Schoolbox\Collection
      */
     protected $workEmail = '';
 
     /**
-     * Home Email address
+     * Home email address
      *
      * @var \Schoolbox\Collection
      */
