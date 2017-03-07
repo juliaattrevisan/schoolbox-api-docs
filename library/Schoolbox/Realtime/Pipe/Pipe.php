@@ -62,7 +62,7 @@ class Pipe implements PipeInterface
 	 */
 	public function getSocketKey()
     {
-		return $this->getSocketKeyForConnection($this->socketConnection);
+		return self::getSocketKeyForConnection($this->socketConnection);
 	}
 
 	/**
@@ -143,9 +143,11 @@ class Pipe implements PipeInterface
     {
 		$rq = self::extractWebSocketRequest($conn);
 
-        if (($value = $rq->getHeader($header)) instanceof Header) {
-			$token = reset($value->toArray());
-			return (string)$token;
+        $value = $rq->getHeader($header);
+
+        if ($value instanceof Header) {
+            $value = $value->toArray();
+			return (string)reset($value);
 		}
 		// otherwise header not found
 		return '';
