@@ -215,7 +215,7 @@ class DataSource
             // It's acceptable to findAllStudents in a loop for now, because the list is cached
             foreach ($this->findAllStudentsForAssessment($assessment) as $currentUser) {
                 // Don't load other users as participants
-                if ($user instanceof User && !($currentUser->getId() == $user->getId())) {
+                if ($user instanceof User && ($currentUser->getId() != $user->getId())) {
                     continue;
                 }
                 $assessmentParticipants->add(
