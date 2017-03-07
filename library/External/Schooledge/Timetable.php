@@ -127,6 +127,14 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
+    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getFullTimetable($externalUserId, $userId, Campus $campus)
     {
         // Wat
@@ -304,5 +312,13 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             }
         }
         return $timetable;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRoomTimetable($roomCodes)
+    {
+        return [];
     }
 }
