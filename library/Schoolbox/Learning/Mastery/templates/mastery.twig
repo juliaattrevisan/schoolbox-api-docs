@@ -97,7 +97,7 @@
                                     </a>
                                 </div>
                             </th>
-                            {% set upcomingFound = false %}
+                            {% set nextUpcomingFound = false %}
 
                             {% for assessment in assessments %}
 
@@ -137,7 +137,7 @@
 
                                     {# No mark available. Maybe they've done it but not been marked yet? #}
 
-                                    {% if not upcomingFound %}
+                                    {% if not nextUpcomingFound %}
 
                                         {# Check if there is one pending #}
 
@@ -148,8 +148,8 @@
 
                                                     {% set value = '<i class="icon-close" title="Past Due Date. No Response">' %}
                                                 {% else %}
-                                                    {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
-                                                    {% set upcomingFound = true %}
+                                                    {# Assume the first assessment with that requires a resposne is the 'upcoming' assessment and insert an eye-icon #}
+                                                    {% set nextUpcomingFound = true %}
                                                     {% set value = '<i class="icon-eye" title="Next Assessment">' %}
                                                     {% set url = routeLookupIfAuthorized('learningAssessment.getSummary', { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable }) %}
                                                 {% endif %}
