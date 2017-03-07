@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment\Project;
 
 use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -85,6 +86,7 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param Project|IAssessable $assessment
+     * @throws ServiceNotFound
      */
     public function getStatus(IAssessable $assessment)
     {
