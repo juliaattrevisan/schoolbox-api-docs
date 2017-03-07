@@ -47,9 +47,10 @@ class FactoryTest extends BaseTestCase {
 	}
 
     /**
-     * @inheritdoc
+     * @param string $expected_class
+     * @param string $type
      */
-    public function testBuild($expected_class, $type) {
+    public function testBuild($expected_class = '', $type = '') {
 		$column = $this->object->build($type);
 		if (!$expected_class) {
 			$this->assertNull($column);
