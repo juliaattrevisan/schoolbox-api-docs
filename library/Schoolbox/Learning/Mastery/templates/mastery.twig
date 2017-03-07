@@ -46,19 +46,10 @@
     }
 </style>
 
-{# Need to only show due work and quizzes only. Would be nice to be able to do markbook.assessments.filterBy('typeName', ['quiz', 'dueWork']) instead #)
-{# but 'dueWork' is not a typename #}
-
-{% set empty = true %}
-{% for assessment in assessments %}
-    {% if assessment is quiz or assessment is dueWork %}
-        {% set empty = false %}
-    {% endif %}
-{% endfor %}
 
 <div class="row">
     <div class="small-12 island">
-        {% if not empty %}
+        {% if assessments | length %}
             <div class="scrollable">
                 <table>
                     <thead>
@@ -99,6 +90,8 @@
                                     </a>
                                 </div>
                             </th>
+
+                            {# For each student, treat the first assessment found which requires a response as the 'upcoming' assessment #}
                             {% set nextUpcomingFound = false %}
 
                             {% for assessment in assessments %}
