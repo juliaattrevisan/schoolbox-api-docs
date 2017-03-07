@@ -99,11 +99,11 @@ class Module extends BaseModule
                 new CanSeeAssessment($this->getAccess(), $this->getConfig())
             ),
             new Rule\Callback(function(array $params){
-                if (!isset($params['assessment'])) {
-                    throw new NotFound("No assessment preloaded");
+                if (!isset($params['assessment']) && !isset($params['participant'])) {
+                    throw new NotFound("No assessment or participant preloaded");
                 }
                 /** @var IAssessable $assessment */
-                $assessment = $params['assessment'];
+                $assessment = $params['assessment'] ?: $params['participant']->getAssessable() ;
                 if($assessment->getBaseContext() instanceof UnitSpecification){
                     throw new InvalidPath("Cannot view a summary page for an Assessment Specification");
                 }
