@@ -100,8 +100,12 @@ class Controller extends Base
         }
 
         // Generate data: assessments and their Participants
+        $options = [
+            'term'  => $term,
+            'order' => ['due_date' => 'ASC'],
+        ];
         /** @var Collection|IAssessable[] $assessments */
-        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview($class->getId(), null, ['term' => $term])
+        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview($class->getId(), null, $options)
                                                         ->filter(function (IAssessable $assessable) {
                                                             return !$assessable instanceof Project;
                                                         });

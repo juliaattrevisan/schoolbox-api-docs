@@ -42,8 +42,6 @@
     }
 </style>
 
-{% set assessments = markbook.assessments.sortBy('dueAt', 'asc') %}
-
 {# Need to only show due work and quizzes only. Would be nice to be able to do markbook.assessments.filterBy('typeName', ['quiz', 'dueWork']) instead #)
 {# but 'dueWork' is not a typename #}
 
