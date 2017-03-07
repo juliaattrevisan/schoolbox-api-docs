@@ -634,7 +634,6 @@ class Controller extends Base
             'quizzes'            => $quizzes,
             'returnUrlSuffix'    => $returnUrlSuffix,
             'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term),
-            'participant'        => $assessment->getParticipant($viewee),
             'canSeeGradeAverage' => $canSeeGradeAverage,
         ]));
     }
