@@ -34,7 +34,7 @@ class Completion extends AbstractMarkScheme
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if (null === $response || !$response->isSubmitted() || ($response instanceof TaskResponse && !$response->getMarkedComplete())){
+        if (null === $response || ($response instanceof TaskResponse && !$response->getMarkedComplete())){
             return self::HUMAN_READABLE_INCOMPLETE;
         } else {
             return self::HUMAN_READABLE_COMPLETE;
@@ -50,7 +50,11 @@ class Completion extends AbstractMarkScheme
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
-        return null;
+        if (null === $response || ($response instanceof TaskResponse && !$response->getMarkedComplete())){
+            return self::NORMALISED_MARK_MIN;
+        } else {
+            return self::NORMALISED_MARK_MAX;
+        }
     }
 
 

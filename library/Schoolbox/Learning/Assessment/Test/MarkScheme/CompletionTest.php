@@ -123,7 +123,12 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getNormalised_withResponse($humanReadable, TaskResponse $response = null)
     {
-        $expected = null;
+        if($response && $response->isMarkedComplete()){
+            $expected = Completion::NORMALISED_MARK_MAX;
+        } else {
+            $expected = Completion::NORMALISED_MARK_MIN;
+        }
+
         $markScheme = new Completion();
         $actual = $markScheme->getNormalisedMark($humanReadable, $response);
         $this->assertEquals($expected, $actual);
