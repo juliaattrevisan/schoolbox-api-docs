@@ -21,7 +21,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getHumanReadable_IncompleteImplicit($normalised)
     {
-        $expected = Completion::HUMAN_READABLE_INCOMPLETE;
+        $expected = null;
 
         $markScheme = new Completion();
         $actual = $markScheme->getHumanReadableMark($normalised);
@@ -35,7 +35,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getHumanReadable_IncompleteAsNull($normalised)
     {
-        $expected = Completion::HUMAN_READABLE_INCOMPLETE;
+        $expected = null;
 
         $markScheme = new Completion();
         $actual = $markScheme->getHumanReadableMark($normalised, null);

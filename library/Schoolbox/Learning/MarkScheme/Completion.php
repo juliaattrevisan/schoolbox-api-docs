@@ -31,11 +31,13 @@ class Completion extends AbstractMarkScheme
      *
      * @param mixed                       $normalisedMark  - ignored, even if invalid
      * @param IResponse|TaskResponse|null $response
-     * @return string
+     * @return string|null
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if (null === $response || !$response->getMarkedComplete()) {
+        if (null === $response){
+            return null;
+        } elseif (!$response->getMarkedComplete()) {
             return self::HUMAN_READABLE_INCOMPLETE;
         } elseif($response->isSelfAssessed()) {
             return self::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT;
