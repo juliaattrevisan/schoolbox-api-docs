@@ -181,9 +181,13 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            {% if participant.mark.published.humanReadable %}
+
+                                            {# cache to prevent repeated traversals #}
+                                            {% set publishedHumanReadableMark = participant.publishedHumanReadableMark %}
+
+                                            {% if publishedHumanReadableMark is not null %}
                                             <span class="neutral label right">
-                                                {{ participant.mark.published.humanReadable }}
+                                                {{ publishedHumanReadableMark }}
                                             </span>
                                             {% endif %}
                                             <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
