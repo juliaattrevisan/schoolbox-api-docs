@@ -113,8 +113,8 @@
                                     {% if not nextUpcomingFound and responseRequired and not assessment.dueAt.isPast %}
                                         {% if not (assessment is task and participant.hasMark) %}
                                             {% set isNextUpcoming = true %}
+                                            {% set nextUpcomingFound = true %}
                                         {% endif %}
-                                        {% set nextUpcomingFound = true %}
                                     {% endif %}
 
                                     {# Determine background color #}
@@ -138,25 +138,25 @@
                                     {% endif %}
 
                                     {# Determine title #}
-                                    {% if responseRequired and not assessment is task %}
+                                    {% if feedbackRequired %}
+                                        {% set title = 'Awaiting Teacher Assessment' %}
+                                    {% elseif isNextUpcoming %}
+                                        {% set title = 'Next Assessment' %}
+                                    {% elseif responseRequired and not assessment is task %}
                                         {% set title = 'Response Required.' %}
                                         {% if assessment.dueAt.isPast %}
                                             {% set title = title ~ ' Past Due Date.' %}
                                         {% endif %}
-                                    {% elseif feedbackRequired %}
-                                        {% set title = 'Awaiting Teacher Assessment' %}
-                                    {% elseif isNextUpcoming %}
-                                        {% set title = 'Next Assessment' %}
                                     {% else %}
                                         {% if assessment is task %}
                                             {% set title = participant.publishedHumanReadableMark %}
                                         {% else %}
-                                            {% set title = normalisedMark | round ~ ' %' %}
+                                            {% set title = normalisedMark is null ? 'null' : normalisedMark | round ~ ' %' %}
                                         {% endif %}
                                     {% endif %}
 
                                     {# Determine text #}
-                                    {% if participant.hasMark and not humanMark is null %}
+                                    {% if participant.hasMark %}
                                         {% set text = humanMark %}
                                     {% elseif feedbackRequired %}
                                         {% set text = '<i class="icon-pause">' %}
