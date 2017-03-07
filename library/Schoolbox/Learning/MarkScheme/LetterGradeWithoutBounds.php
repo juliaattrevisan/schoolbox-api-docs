@@ -7,9 +7,6 @@
 
 namespace Schoolbox\Learning\MarkScheme;
 
-use RangeException;
-use Schoolbox\Learning\Assessment\IResponse;
-
 /**
  * Letter grade mark scheme, with no upper or lower bound on its normalised mark.
  *
@@ -21,20 +18,12 @@ use Schoolbox\Learning\Assessment\IResponse;
 class LetterGradeWithoutBounds extends LetterGrade
 {
     /**
-     * @param float     $normalisedMark
-     * @param IResponse $response
-     * @return string
+     * Any value is okay, as long as it's numeric type
+     * (that is checked in $this->validateNormalisedMarkType).
+     *
+     * @param float $normalisedMark
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    protected function validateNormalisedMarkValue($normalisedMark)
     {
-        try {
-            return parent::getHumanReadableMark($normalisedMark, $response);
-
-        } catch (RangeException $e) {
-            // $normalisedMark is outside valid range - coerce it to within those ranges
-            $normalisedMark = max($normalisedMark, IMarkScheme::NORMALISED_MARK_MIN);
-            $normalisedMark = min($normalisedMark, IMarkScheme::NORMALISED_MARK_MAX);
-            return parent::getHumanReadableMark($normalisedMark, $response);
-        }
     }
 }
