@@ -28,7 +28,11 @@ class Sync extends BaseSync
                 vStudents.StudentPreferred     AS student_preferred,
                 vStudents.StudentSurname       AS student_surname,
                 StudentGender                  AS student_gender,
-                StudentEmail                   AS student_email,
+                StudentEmail                   AS student_home_email,
+                CASE WHEN Community.DefaultEmailCode = 'O' 
+                  THEN Community.OccupEmail 
+                  ELSE Community.Email 
+                END AS student_default_email,
                 StudentOccupEmail              AS student_work_email,
                 vStudents.StudentYearLevel     AS student_year_level,
                 vStudents.StudentHouse         AS student_house,

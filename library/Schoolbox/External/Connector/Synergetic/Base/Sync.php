@@ -67,11 +67,11 @@ class Sync implements SyncInterface
                 vStudents.StudentSurname       AS student_surname,
                 StudentGender                  AS student_gender,
                 StudentEmail                   AS student_home_email,
-                StudentOccupEmail              AS student_work_email,
                 CASE WHEN Community.DefaultEmailCode = 'O' 
                   THEN Community.OccupEmail 
                   ELSE Community.Email 
                 END AS student_default_email,
+                StudentOccupEmail              AS student_work_email,
                 vStudents.StudentYearLevel     AS student_year_level,
                 vStudents.StudentHouse         AS student_house,
                 vStudents.StudentBoarder       AS student_boarder,
@@ -116,8 +116,8 @@ class Sync implements SyncInterface
                 s.StudentContactPreferredFormal AS student_contact_given_name,
                 s.StudentContactPreferred    AS student_contact_preferred,
                 s.StudentContactSurname      AS student_contact_surname,
-                s.StudentContactDefaultEmail AS student_contact_default_email,
                 s.StudentContactEmail        AS student_contact_home_email,
+                s.StudentContactDefaultEmail AS student_contact_default_email,
                 s.StudentContactOccupEmail   AS student_contact_work_email,
                 s.StudentId                  AS student_id,
                 s.StudentYearLevel           AS student_year_level,
@@ -178,8 +178,8 @@ class Sync implements SyncInterface
                 vStaff.StaffSurname               AS staff_surname,
                 Community.DefaultEmailCode        AS default_email_code,
                 vCommunity.Email                  AS home_email,
-                vCommunity.OccupEmail             AS work_email,
                 vCommunity.DefaultEmail           AS default_email,
+                vCommunity.OccupEmail             AS work_email,
                 vStaff.StaffCampus                AS staff_campus,
                 vStaff.StaffCategoryType          AS staff_category_type,
                 vStaff.StaffCategory              AS staff_category,

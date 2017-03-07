@@ -42,8 +42,7 @@ class Sync implements SyncInterface
                 s.FirstName   AS student_preferred,
                 s.LastName    AS student_surname,
                 s.Sex         AS student_gender,
-                s.Email       AS student_email,
-                s.Email       AS student_home_email,
+                ''            AS student_home_email,
                 s.Email       AS student_default_email,
                 ''            AS student_work_email,
                 s.Year        AS student_year_level,
@@ -71,14 +70,7 @@ class Sync implements SyncInterface
                 c.FirstName AS student_contact_given_name,
                 c.FirstName AS student_contact_preferred,
                 c.LastName  AS student_contact_surname,
-                CASE WHEN c.EmailCorrespondence = 'Y'
-                    THEN c.Email
-                    ELSE ''
-                END         AS student_contact_email,
-                CASE WHEN c.EmailCorrespondence = 'Y'
-                    THEN c.Email
-                    ELSE ''
-                END         AS student_contact_home_email,
+                ''          AS student_contact_home_email,
                 CASE WHEN c.EmailCorrespondence = 'Y'
                     THEN c.Email
                     ELSE ''
@@ -128,8 +120,7 @@ class Sync implements SyncInterface
                 t.FirstName AS staff_preferred_name,
                 t.LastName  AS staff_surname,
                 ''          AS default_email_code,
-                t.Email     AS email,
-                t.Email     AS home_email,
+                ''          AS home_email,
                 t.Email     AS default_email,
                 ''          AS work_email,
                 t.CampusID  AS staff_campus,
