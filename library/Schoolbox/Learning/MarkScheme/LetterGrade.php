@@ -8,8 +8,6 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use InvalidArgumentException;
-use DomainException;
-
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Assessment\IResponse;
 
@@ -42,7 +40,7 @@ class LetterGrade extends AbstractMarkScheme
      * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
      * @return string The caption for the first grade level $normalizedMark is not less than,
-     *                or an em-dash if it's not less than none of them.
+     *                or an en-dash if it's not less than none of them.
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
@@ -58,8 +56,8 @@ class LetterGrade extends AbstractMarkScheme
             }
         }
 
-        // Is this mark lower than all marks? Have a nully value (in this case, em-dash)
-        return '—';
+        // Is this mark lower than all marks? Have a nully value (in this case, en-dash)
+        return '–';
     }
 
     /**
