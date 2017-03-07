@@ -322,4 +322,103 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     {
         return [];
     }
+
+
+    // Helper methods
+
+
+    /**
+     * Gets dates for a timetable
+     *
+     * @param Campus $campus
+     * @return array
+     */
+    protected function getTimetableCalendarList(Campus $campus)
+    {
+        // Adapted from some C# code SchoolEdge gave us
+        $quotedCampus   = $this->database->smartQuote($campus->getExtTimetableCode());
+        $timetable      = $this->database->getRow("
+            SELECT
+                CAST(t.StartDate AS DATE) AS StartDate,
+                CAST(t.EndDate   AS DATE) AS EndDate
+            FROM fc.Timetable t
+            WHERE t.Name = {$quotedCampus}
+        ");
+        if (!$timetable) {
+            return [];
+        }
+
+        $timetableDays  = $this->database->getAll("
+            SELECT *
+            FROM       fc.TimetableDay td
+            INNER JOIN fc.Timetable    t  ON td.TimetableID    = t.ID
+            WHERE t.Name = {$quotedCampus}
+            ORDER BY td.SortOrder ASC
+        ");
+//        $timetableDates = $this->database->getAll("
+//            SELECT *
+//            FROM       fc.TimetableDate td
+//            INNER JOIN fc.Timetable     t  ON td.TimetableID    = t.ID
+//            WHERE t.Code = {$quotedCampus}
+//            ORDER BY td.SortOrder ASC
+//        ");
+
+//        $timetableCalendarList = [];
+
+        $startDate = new Alaress_Date_Format($timetable['StartDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $endDate   = new Alaress_Date_Format($timetable['EndDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+        $calendarModelList = [];
+        for ($currentDate = clone $startDate; $currentDate->lte($endDate); $currentDate = $currentDate->addDays(1)) {
+            $cModel = [
+                'DateValue' => $currentDate->getDatabaseDate(),
+            ];
+            $timetableDate = $this->database->getRow("
+                SELECT
+                    td.TimetableDateTypeID,
+                    td.TimetableDayID
+                FROM       fc.TimetableDate td
+                INNER JOIN fc.Timetable     t  ON td.TimetableID    = t.ID
+                WHERE t.Name = {$quotedCampus}
+                AND   CAST(td.DateValue AS DATE) = {$this->database->smartQuote($cModel['dateValue'])}
+            ");
+            if ($timetableDate) {
+                $cModel['TimetableDayType'] = $timetableDate['TimetableDateTypeID'];
+                $cModel['TimetableDayID']   = $timetableDate['TimetableDayID'];
+            } else {
+                $cModel['TimetableDayType'] = null;
+                $cModel['TimetableDayID']   = null;
+            }
+            $calendarModelList[] = $cModel;
+        }
+
+        // get timetable day
+//        int dayIndex = -1;
+//        int keepIndex = -1;
+//        foreach ($calendarModelList as $cm) {
+//            keepIndex = dayIndex;
+//            dayIndex++;
+//            if (dayIndex > timetableDays.Count - 1) dayIndex = 0;
+//
+//            int timetableDayID = timetableDays[dayIndex].ID;
+//
+//                switch (cm.TimetableDayType) {
+//                    case TimetableDateTypeEnum.None:
+//                        cm.TimetableDayID = timetableDayID;
+//                        break;
+//                    case TimetableDateTypeEnum.NonDay:
+//                        dayIndex = keepIndex;
+//                        break;
+//                    case TimetableDateTypeEnum.SkipDay:
+//                        break;
+//                    case TimetableDateTypeEnum.RestartDay:
+//                        dayIndex = timetableDays.IndexOf(timetableDays.First(td => td.ID == cm.TimetableDayID));
+//                        break;
+//                    case TimetableDateTypeEnum.FixedDay:
+//                        break;
+//                }
+//        }
+
+        return $calendarModelList;
+    }
 }
