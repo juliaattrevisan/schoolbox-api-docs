@@ -13,6 +13,34 @@ use Schoolbox\Campus;
 class External_Schooledge_Timetable extends External_Humanedge_Timetable implements External_TimetableInterface
 {
     /**
+     * Timetable date type constant - this date is not in the sequence.
+     *
+     * @var int
+     */
+    const TIMETABLE_DATE_TYPE_NON_DAY = 10000;
+
+    /**
+     * Timetable date type constant - this day is forced to a particular day in the sequence.
+     *
+     * @var int
+     */
+    const TIMETABLE_DATE_TYPE_FIXED_DAY = 10003;
+
+    /**
+     * Timetable date type constant - the timetable restarts on this day.
+     *
+     * @var int
+     */
+    const TIMETABLE_DATE_TYPE_RESTART_DAY = 10002;
+
+    /**
+     * Timetable date type constant - this day is in the sequence, but is skipped?
+     *
+     * @var int
+     */
+    const TIMETABLE_DATE_TYPE_SKIP_DAY = 10001;
+
+    /**
      * @var MSSQL
      */
     private $database;
@@ -349,7 +377,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         }
 
         $timetableDays  = $this->database->getAll("
-            SELECT *
+            SELECT td.*
             FROM       fc.TimetableDay td
             INNER JOIN fc.Timetable    t  ON td.TimetableID    = t.ID
             WHERE t.Name = {$quotedCampus}
@@ -392,32 +420,45 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             $calendarModelList[] = $cModel;
         }
 
-        // get timetable day
-//        int dayIndex = -1;
-//        int keepIndex = -1;
-//        foreach ($calendarModelList as $cm) {
-//            keepIndex = dayIndex;
-//            dayIndex++;
-//            if (dayIndex > timetableDays.Count - 1) dayIndex = 0;
-//
-//            int timetableDayID = timetableDays[dayIndex].ID;
-//
-//                switch (cm.TimetableDayType) {
-//                    case TimetableDateTypeEnum.None:
-//                        cm.TimetableDayID = timetableDayID;
-//                        break;
-//                    case TimetableDateTypeEnum.NonDay:
-//                        dayIndex = keepIndex;
-//                        break;
-//                    case TimetableDateTypeEnum.SkipDay:
-//                        break;
-//                    case TimetableDateTypeEnum.RestartDay:
-//                        dayIndex = timetableDays.IndexOf(timetableDays.First(td => td.ID == cm.TimetableDayID));
-//                        break;
-//                    case TimetableDateTypeEnum.FixedDay:
-//                        break;
-//                }
-//        }
+        // get timetable day?
+        $dayIndex  = -1;
+        $keepIndex = -1;
+        foreach ($calendarModelList as $cm) {
+            $keepIndex = $dayIndex;
+            $dayIndex++;
+            if ($dayIndex > (count($timetableDays) - 1)) {
+                $dayIndex = 0;
+            }
+
+            $timetableDayID = $timetableDays[$dayIndex]['ID'];
+
+            switch ($cm['TimetableDayType']) {
+                case self::TIMETABLE_DATE_TYPE_NON_DAY:
+                    // Non-day - increment the keep index?
+                    $dayIndex = $keepIndex;
+                    break;
+
+                case self::TIMETABLE_DATE_TYPE_SKIP_DAY:
+                    break;
+
+                case self::TIMETABLE_DATE_TYPE_RESTART_DAY:
+                    $cm['TimetableDayID'];
+                    foreach ($timetableDays as $i => $timetableDay) {
+                        if ($timetableDay['ID'] == $cm['TimetableDayID']) {
+                            $dayIndex = $i;
+                            break;
+                        }
+                    }
+                    break;
+
+                case self::TIMETABLE_DATE_TYPE_FIXED_DAY:
+                    break;
+
+                default:
+                    $cm['TimetableDayID'] = $timetableDayID;
+                    break;
+            }
+        }
 
         return $calendarModelList;
     }
