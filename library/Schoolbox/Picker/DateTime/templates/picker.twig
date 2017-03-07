@@ -175,27 +175,46 @@
 </div>
 
 <script>
+    var twigVars = {
+        value: '{{ value }}',
+        element: '{{ element }}',
+        id: '{{ id }}',
+        displayFormat: '{{ displayFormat }}',
+        displayFormatDate: '{{ displayFormatDate }}',
+        type: '{{ type }}',
+        timetableDay: {
+            daysUntilDate: {{ timetableDay.daysUntilDate }},
+            isWeekend: {{ timetableDay.isWeekend }}
+        },
+        routeLookup: {
+            getByTimetableDay: '{{ routeLookup('pickerDatetime.getByTimetableDay') }}',
+            getEventsByTimetableDay: '{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}',
+            getTimetableDate: '{{ routeLookup('pickerDatetime.getTimetableDate') }}',
+            getDueByDate: '{{ routeLookup('pickerDatetime.getDueByDate') }}',
+            getByDate: '{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'
+        },
+        weekStartDay: {{ weekStartDay }}
+    };
+    // Picker settings
 
-    {# Picker settings#}
-
-    {# Build datepicker options here... again... #}
+    // Build datepicker options here... again...
 
     var pickerOptions = {
 
-        {# Flatpickr related #}
-        enableTime: getValue($('#{{ element }}'), 'data-datepicker-time'),
+        // Flatpickr related
+        enableTime: getValue($('#'+twigVars.element), 'data-datepicker-time'),
 
-        {# All the rest #}
-        altFormat: getValue($('#{{ element }}'), 'data-datepicker-format'), {# false|date|datetime #}
-        allDay: getValue($('#{{ element }}'), 'data-datepicker-allday'), {# Show All Day switch #}
-        allDayExt: getValue($('#{{ element }}'), 'data-datepicker-alldayext'),
-        type: getValue($('#{{ element }}'), 'data-datepicker-call'), {# Ajax call type: events, duework or nothing #}
-        endDay: getValue($('#{{ element }}'), 'data-datepicker-endofday'), // Should allday change time to 23:59:59
+        // All the rest
+        altFormat: getValue($('#'+twigVars.element), 'data-datepicker-format'), // false|date|datetime
+        allDay: getValue($('#'+twigVars.element), 'data-datepicker-allday'), // Show All Day switch
+        allDayExt: getValue($('#'+twigVars.element), 'data-datepicker-alldayext'),
+        type: getValue($('#'+twigVars.element), 'data-datepicker-call'), // Ajax call type: events, duework or nothing
+        endDay: getValue($('#'+twigVars.element), 'data-datepicker-endofday'), // Should allday change time to 23:59:59
 
     };
 
     function hasTime (value) {
-        var v = moment(value, convertFormat('{{ displayFormat }}'));
+        var v = moment(value, convertFormat(twigVars.displayFormat));
         if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
             return false;
         }
@@ -205,30 +224,30 @@
         return true;
     }
 
-    {# Show loader #}
+    // Show loader
 
     function loadingResponse (target) {
-        var pickerResponse = $('#'+target+'Response{{ id }}');
+        var pickerResponse = $('#'+target+'Response'+twigVars.id);
         pickerResponse.html('');
         pickerResponse.append('<img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;">');
-        {# Todo: not sure about this #}
-        $('#byTimetable-{{ id }}').find('.timetable-submit').addClass('disabled');
+        // Todo: not sure about this
+        $('#byTimetable-'+twigVars.id).find('.timetable-submit').addClass('disabled');
     }
 
-    {# Prepare and append response HTML #}
+    // Prepare and append response HTML
 
     function appendResponse(data, template, target) {
 
-        var pickerResponse = $('#'+target+'Response{{ id }}');
+        var pickerResponse = $('#'+target+'Response'+twigVars.id);
 
-        $('#byTimetable-{{ id }}').find('.timetable-submit').removeClass('disabled');
+        $('#byTimetable-'+twigVars.id).find('.timetable-submit').removeClass('disabled');
 
-        {# Clear out any old response display #}
+        // Clear out any old response display
         pickerResponse.html('');
         var html = '';
 
-        {# Ajax returned date #}
-        timetableDate = moment(data.date, convertFormat('{{ displayFormat }}')).format(convertFormat('F d, Y'));
+        // Ajax returned date
+        timetableDate = moment(data.date, convertFormat(twigVars.displayFormat)).format(convertFormat('F d, Y'));
         $('.timetable-submit').attr('data-timetable-value', data.date);
         if (template == 'duework') {
 
@@ -237,7 +256,7 @@
             }
             else {
 
-                {# Populate with results for the selected date #}
+                // Populate with results for the selected date
 
                 html += '<div class="row">';
                 html += '<div class="small-12 medium-12 columns">';
@@ -282,7 +301,7 @@
                 html += '<div class="small-12 medium-12 columns">';
                 html += '<h2>Events on ' + timetableDate + '</h2>';
                 html += '<ul class="small-12 information-list card">';
-                {# Populate with appointments for the selected date #}
+                // Populate with appointments for the selected date
                 for (var i = 0; i < data.appointments.length; i++) {
                     html += '<li>';
                     html += '<h3>' + data.appointments[i].title + '</h3>';
@@ -298,7 +317,7 @@
             }
         }
         else {
-            {# nope #}
+            // nope
             html = '';
         }
 
@@ -307,11 +326,8 @@
             $('[data-collapser]').collapsable();
         }
     }
-
-
-    {# Timtable picker #}
-
-    {# Build cycles dynamically #}
+    // Timtable picker
+    // Build cycles dynamically
     //    function buildCycles(onFirstLoad) {
     function buildCycles() {
 
@@ -320,7 +336,7 @@
         var optionsHtml = '';
         //Select cycle number on first load
 //        if(onFirstLoad === true) {
-        cycleSelected = parseInt({{ timetableDay.daysUntilDate }}/daysInCycle);
+        cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate /daysInCycle);
 //        }
         for (i = 1; i <= (termDuration / daysInCycle); i++) {
             var selected = '';
@@ -333,15 +349,15 @@
         $('select[name*="cycle"]').empty().append(optionsHtml);
     }
 
-    {# Highlight day and period #}
+    // Highlight day and period
     function showPeriod() {
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
-        var isWeekend = {{ timetableDay.isWeekend }};
-        {# Highlight day if it doen't fall on a weekend #}
+        var isWeekend = twigVars.timetableDay.isWeekend;
+        // Highlight day if it doen't fall on a weekend
         if(isWeekend == 0) {
             var period = 0;
-            {# Get day of the cycle #}
-            var cycleDay = {{ timetableDay.daysUntilDate }}%daysInCycle;
+            // Get day of the cycle
+            var cycleDay = twigVars.timetableDay.daysUntilDate % daysInCycle;
             if(cycleDay == 0) {
                 cycleDay = daysInCycle;
             }
@@ -351,7 +367,7 @@
 
                 var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm');
                 var e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm');
-                var t = moment('{{ value }}').format('HHmm');
+                var t = moment(twigVars.value).format('HHmm');
                 if((t >= s) && (t < e)) {
                     $(this).addClass('period-selected');
                     period = $(this).attr('data-period-number');
@@ -364,22 +380,22 @@
         }
     }
 
-    {# Reveal Timetable#}
+    // Reveal Timetable
     function revealTimetable() {
         var campus = $('select[name*="campus"]').find(':selected').val();
-        $('.timetablePicker{{ id }}').css('display', 'none');
-        $('#timetable{{ id }}'+'-'+campus).css('display', 'table');
+        $('.timetablePicker'+twigVars.id).css('display', 'none');
+        $('#timetable'+twigVars.id+'-'+campus).css('display', 'table');
     }
 
-    {# Put cycles on load #}
+    // Put cycles on load
     buildCycles(true);
     showPeriod();
     revealTimetable();
 
-    {# Update cycles on Campus or Term change #}
+    // Update cycles on Campus or Term change
     $('select[name*="campus"]').change(function(){
         buildCycles();
-        {# Clear selected #}
+        // Clear selected
         $('.period-selected').removeClass('period-selected');
         $('table').find('[data-selected=1]').attr('data-selected', 0);
         revealTimetable();
@@ -389,9 +405,9 @@
         buildCycles();
     });
 
-    var timetableAppointments = $('#timetableAppointments{{ id }}');
+    var timetableAppointments = $('#timetableAppointments'+twigVars.id);
 
-    {# Timetable picker behaviour #}
+    // Timetable picker behaviour
     $('table.timetablePicker').mouseout(function(){
         $('.period-hover').removeClass('period-hover');
     });
@@ -406,8 +422,8 @@
 
     });
 
-    {# Loading events on timetable picker click #}
-    var timetableDate = moment().format(convertFormat('{{ displayFormat }}')); //today
+    // Loading events on timetable picker click
+    var timetableDate = moment().format(convertFormat(twigVars.displayFormat)); //today
     $('.has-period').click(function(){
 
         var day = $(this).attr('data-day');
@@ -425,14 +441,14 @@
         var term = $('select[name*="term"]').val();
         var cycle = $('select[name*="cycle"]').val();
 
-        {% if type == 'duework'  %}
+        if (twigVars.type == 'duework') {
 
             // Can the assessment form have dates and be called outside the class page?
             var folder = $('*[name = "folderId"]').val();
 
             loadingResponse('timetable');
 
-            $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{folder}/g, folder))
+            $.get((twigVars.routeLookup.getByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{folder}/g, folder))
                     .done(function (data) {
 
                         appendResponse(data, 'duework', 'timetable');
@@ -441,11 +457,12 @@
                     .fail(function () {
                         console.log('Failed to retrieve appointments for specified period');
                     });
-        {% elseif type == 'event' %}
-            {# Or fetch events #}
+        }
+        else if (twigVars.type == 'event') {
+            // Or fetch events
 
             loadingResponse('timetable');
-            $.get(('{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+            $.get((twigVars.routeLookup.getEventsByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
                     .done(function (data) {
 
                         appendResponse(data, 'events', 'timetable');
@@ -454,32 +471,32 @@
                     .fail(function () {
                         console.log('Failed to retrieve appointments for specified period');
                     });
-        {% else %}
-            {# Fetch a timetable day date#}
+        }
+        else {
+            // Fetch a timetable day date
             loadingResponse('timetable');
-            $.get(('{{ routeLookup('pickerDatetime.getTimetableDate') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
-                .done(function (data) {
-                    appendResponse(data, '', 'timetable');
-                })
-                .fail(function () {
-                    console.log('Timetable day to date conversion failed');
-                });
-
-        {% endif %}
+            $.get((twigVars.routeLookup.getTimetableDate).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                    .done(function (data) {
+                        appendResponse(data, '', 'timetable');
+                    })
+                    .fail(function () {
+                        console.log('Timetable day to date conversion failed');
+                    });
+        }
     });
 
-    {# Setup calendar #}
+    // Setup calendar
     var newDate, latestDate;
 
     function renderAllday(instance) {
-        var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
+        var timeDiv = $('#pickerCalendar'+twigVars.id).closest('#picker'+twigVars.id).find('.flatpickr-time');
 
         var html = '<div class="row"><div class="small-6 columns">';
 
-        {# Build an All Day switch if it's been set in the options #}
+        // Build an All Day switch if it's been set in the options
         if (pickerOptions.allDay === true) {
-            html += '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
-                    '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
+            html += '<div class="time-switch"><input id="hideTime'+twigVars.id+'" type="checkbox" value="1" checked>' +
+                    '<label for="hideTime'+twigVars.id+'" class="checkbox-label">All Day</label></div>' +
                     '</div>';
         }
         html += '<div class="small-6 columns"></div></div>';
@@ -489,12 +506,12 @@
     };
 
     Flatpickr.localize(Flatpickr.l10ns.default);
-    Flatpickr.l10ns.default.firstDayOfWeek = {{ weekStartDay }};
+    Flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
 
-    window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
+    window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar"+twigVars.id, {
 
-        defaultDate: new Date({{ value }}),
-        dateFormat: pickerOptions.enableTime?'{{ displayFormat }}':'{{ displayFormatDate }}',
+        defaultDate: new Date(twigVars.value),
+        dateFormat: pickerOptions.enableTime?twigVars.displayFormat:twigVars.displayFormatDate,
         inline: true,
         altInput: false,
         allowInput: true,
@@ -505,78 +522,78 @@
         onReady: function (selectedDates, dateStr, instance) {
             renderAllday(instance);
 
-            {# Hide time picker if allday hidden field is set to 1 #}
+            // Hide time picker if allday hidden field is set to 1
             if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
-                checkAllday(true, {{ id }} );
+                checkAllday(true, twigVars.id );
             }
             else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
-                checkAllday(false, {{ id }} );
+                checkAllday(false, twigVars.id);
             }
             else if (hasTime(instance.input.value) === false ) {
-                checkAllday(true, {{ id }} );
+                checkAllday(true, twigVars.id);
             }
             else {
-                checkAllday(false, {{ id }} );
+                checkAllday(false, twigVars.id);
             }
 
             if (pickerOptions.allDay === true) {
-                $('#hideTime{{ id }}').click(function () {
-                    if ($('#hideTime{{ id }}').is(':checked')) {
-                        checkAllday(true, {{ id }}  );
+                $('#hideTime'+twigVars.id).click(function () {
+                    if ($('#hideTime'+twigVars.id).is(':checked')) {
+                        checkAllday(true, twigVars.id);
                     }
                     else {
-                        checkAllday(false, {{ id }} );
+                        checkAllday(false, twigVars.id);
                     }
                 });
             }
         },
         onChange: function (selectedDates, dateStr, instance) {
 
-            {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
+            // Put the display date onto the calendar div so we can capture it when the modal is closed
             var dateSplit = dateStr.split(' ');
-            $('#pickerCalendar{{ id }}').attr('data-date', dateSplit[0]);
-            $('#pickerCalendar{{ id }}').attr('data-time', dateSplit[1]);
+            $('#pickerCalendar'+twigVars.id).attr('data-date', dateSplit[0]);
+            $('#pickerCalendar'+twigVars.id).attr('data-time', dateSplit[1]);
 
-            {# Check if selected date has changed and don't send an ajax on time change #}
+            // Check if selected date has changed and don't send an ajax on time change
             var selectedObj = new Date(selectedDates);
             newDate = selectedObj.getDate() + '/' + (selectedObj.getMonth() + 1) + '/' + selectedObj.getFullYear();
             if (newDate !== latestDate) {
 
-                {% if type == 'duework' %}
+                if (twigVars.type == 'duework') {
 
-                loadingResponse('calendar');
+                    loadingResponse('calendar');
 
-                var folder = $('*[name = "folderId"]').val();
+                    var folder = $('*[name = "folderId"]').val();
 
-                $.get(('{{ routeLookup('pickerDatetime.getDueByDate') }}').replace(/{folder}/g, folder).replace(/{date}/g, encodeURIComponent(dateSplit[0])))
+                    $.get((twigVars.routeLookup.getDueByDate).replace(/{folder}/g, folder).replace(/{date}/g, encodeURIComponent(dateSplit[0])))
 
-                        .done(function (data) {
+                            .done(function (data) {
 
-                            appendResponse(data, 'duework', 'calendar');
+                                appendResponse(data, 'duework', 'calendar');
 
-                        })
-                        .fail(function () {
-                            console.log('Failed to retrieve appointments for specified date');
-                        });
+                            })
+                            .fail(function () {
+                                console.log('Failed to retrieve appointments for specified date');
+                            });
+                }
+                else if (twigVars.type == 'event') {
 
-                {% elseif (type == 'event') %}
+                    // AJAX in appointments for the selected date
 
-                {# AJAX in appointments for the selected date #}
+                    loadingResponse('calendar');
+                    $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, encodeURIComponent(dateSplit[0])))
+                            .done(function (data) {
 
-                loadingResponse('calendar');
+                                appendResponse(data, 'events', 'calendar');
 
-                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(dateSplit[0])))
-                        .done(function (data) {
-
-                            appendResponse(data, 'events', 'calendar');
-
-                        })
-                        .fail(function () {
-                            console.log('Failed to retrieve appointments for specified date');
-                        });
-                {% else %}
-                {#Do nothing#}
-                {% endif %}
+                            })
+                            .fail(function () {
+                                console.log('Failed to retrieve appointments for specified date');
+                            });
+                }
+                else {
+                    // Do nothing
+                }
             }
             latestDate = newDate;
         },
