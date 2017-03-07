@@ -79,7 +79,7 @@ class ModelTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function testHydrate($input, $expected_output) {
+    public function testHydrate($input = null, $expected_output = null) {
 		$hydrate = $this->object->hydrate(1, $this->test_mapper);
 		$this->assertSame(1, $hydrate->getId());
 	}
@@ -95,7 +95,7 @@ class ModelTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function testDehydrate($input, $expected_output) {
+    public function testDehydrate($input = null, $expected_output = null) {
 		$this->assertSame(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
 	}
 

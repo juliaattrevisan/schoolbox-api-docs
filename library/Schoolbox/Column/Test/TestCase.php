@@ -43,8 +43,10 @@ abstract class TestCase extends BaseTestCase {
 
 	/**
 	 * @dataProvider getTestHydrate
-	 */
-	public function testHydrate($input, $expected_output) {
+     * @param null $input
+     * @param null $expected_output
+     */
+	public function testHydrate($input = null, $expected_output = null) {
 		$this->assertSame($expected_output, $this->object->hydrate($input));
 	}
 
@@ -57,8 +59,10 @@ abstract class TestCase extends BaseTestCase {
 
 	/**
 	 * @dataProvider getTestDehydrate
-	 */
-	public function testDehydrate($input, $expected_output) {
+     * @param null $input
+     * @param null $expected_output
+     */
+	public function testDehydrate($input = null, $expected_output = null) {
 		$this->assertSame($expected_output, $this->object->dehydrate($input));
 	}
 }

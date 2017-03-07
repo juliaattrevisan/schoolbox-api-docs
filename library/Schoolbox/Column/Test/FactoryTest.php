@@ -20,11 +20,17 @@ class FactoryTest extends BaseTestCase {
 	 */
 	protected $object;
 
-	public function setup() {
+    /**
+     * @inheritdoc
+     */
+    public function setup() {
 		$this->object = new Factory();
 	}
 
-	public function getTestBuild() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestBuild() {
 		return array(
 			array('\\Schoolbox\\Column\\Base',       Mapper::TYPE_STRING),
 			array('\\Schoolbox\\Column\\Binary',     Mapper::TYPE_LOB),
@@ -40,10 +46,10 @@ class FactoryTest extends BaseTestCase {
 		);
 	}
 
-	/**
-	 * @dataProvider getTestBuild
-	 */
-	public function testBuild($expected_class, $type) {
+    /**
+     * @inheritdoc
+     */
+    public function testBuild($expected_class, $type) {
 		$column = $this->object->build($type);
 		if (!$expected_class) {
 			$this->assertNull($column);
@@ -52,5 +58,4 @@ class FactoryTest extends BaseTestCase {
 			$this->assertInstanceOf($expected_class, $column);
 		}
 	}
-
 }

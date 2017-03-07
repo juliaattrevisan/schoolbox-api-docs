@@ -22,11 +22,17 @@ class DateTest extends DatetimeTest
      */
     protected $object;
 
+    /**
+     * @inheritdoc
+     */
     public function setupObject()
     {
         $this->object = new Date();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestHydrate()
     {
         // Anything that can be parsed as Y-m-d will parse, even if there's
@@ -41,6 +47,9 @@ class DateTest extends DatetimeTest
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestDehydrate()
     {
         return [

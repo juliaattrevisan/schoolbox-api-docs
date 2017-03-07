@@ -20,11 +20,17 @@ class BinaryTest extends TestCase {
 	 */
 	protected $object;
 
-	public function setupObject() {
+    /**
+     * @inheritdoc
+     */
+    public function setupObject() {
 		$this->object = new Binary();
 	}
 
-	public function getTestHydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestHydrate() {
 		return array(
 			array(true, true),
 			array(false, false),
@@ -33,7 +39,10 @@ class BinaryTest extends TestCase {
 		);
 	}
 
-	public function getTestDehydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestDehydrate() {
 		return array(
 			array(true, true),
 			array(false, false),

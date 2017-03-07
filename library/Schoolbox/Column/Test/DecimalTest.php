@@ -18,11 +18,17 @@ class DecimalTest extends TestCase {
 	 */
 	protected $object;
 
-	public function setupObject() {
+    /**
+     * @inheritdoc
+     */
+    public function setupObject() {
 		$this->object = new Decimal();
 	}
 
-	public function getTestHydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestHydrate() {
 		return array(
             array(null,        null),
 			array('0',         0.0),
@@ -34,7 +40,10 @@ class DecimalTest extends TestCase {
 		);
 	}
 
-	public function getTestDehydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestDehydrate() {
 		return array(
             array(null,   null),
             array('',     null),
@@ -46,17 +55,17 @@ class DecimalTest extends TestCase {
 		);
 	}
 
-	/**
-	 * @dataProvider getTestHydrate
-	 */
-	public function testHydrate($input, $expected_output) {
+    /**
+     * @inheritdoc
+     */
+    public function testHydrate($input = null, $expected_output = null) {
 		$this->assertSame($expected_output, $this->object->hydrate($input));
 	}
 
-	/**
-	 * @dataProvider getTestDehydrate
-	 */
-	public function testDehydrate($input, $expected_output) {
+    /**
+     * @inheritdoc
+     */
+    public function testDehydrate($input = null, $expected_output = null) {
 		$this->assertSame($expected_output, $this->object->dehydrate($input));
 	}
 }

@@ -22,11 +22,17 @@ class TimeTest extends DatetimeTest
     */
     protected $object;
 
+    /**
+     * @inheritdoc
+     */
     public function setupObject()
     {
         $this->object = new Time();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestHydrate()
     {
         return array(
@@ -46,6 +52,9 @@ class TimeTest extends DatetimeTest
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestDehydrate()
     {
         return array(

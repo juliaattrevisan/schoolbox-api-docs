@@ -18,11 +18,17 @@ class SerializedTest extends TestCase {
 	 */
 	protected $object;
 
-	public function setupObject() {
+    /**
+     * @inheritdoc
+     */
+    public function setupObject() {
 		$this->object = new Serialized();
 	}
 
-	public function getTestHydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestHydrate() {
 		return array(
 			array('b:1;', true),
 			array('b:0;', false),
@@ -31,7 +37,10 @@ class SerializedTest extends TestCase {
 		);
 	}
 
-	public function getTestDehydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestDehydrate() {
 		return array(
 			array(true, 'b:1;'),
 			array(false, 'b:0;'),

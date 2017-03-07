@@ -20,7 +20,10 @@ class DatetimeTest extends TestCase {
 	 */
 	protected $object;
 
-	public function setupObject() {
+    /**
+     * @inheritdoc
+     */
+    public function setupObject() {
 		$this->object = new Datetime();
 	}
 
@@ -43,7 +46,10 @@ class DatetimeTest extends TestCase {
 		);
 	}
 
-	public function getTestDehydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestDehydrate() {
 		return array(
 			array(null, null),
 			array(false, null),
@@ -66,10 +72,10 @@ class DatetimeTest extends TestCase {
 		);
 	}
 
-	/**
-	 * @dataProvider getTestHydrate
-	 */
-	public function testHydrate($input, $expected_output) {
+    /**
+     * @inheritdoc
+     */
+    public function testHydrate($input = null, $expected_output = null) {
         // Silence errors: date creation warns on invalid but parseable dates
         $hydrated = @$this->object->hydrate($input);
         $this->assertSame(
@@ -78,10 +84,10 @@ class DatetimeTest extends TestCase {
         );
 	}
 
-	/**
-	 * @dataProvider getTestDehydrate
-	 */
-	public function testDehydrate($input, $expected_output) {
+    /**
+     * @inheritdoc
+     */
+    public function testDehydrate($input = null, $expected_output = null) {
 		//
 		// Test these with Alaress_Date_Format objects too.
 		$this->assertSame($expected_output, $this->object->dehydrate($input));

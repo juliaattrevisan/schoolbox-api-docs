@@ -19,10 +19,16 @@ class IntervalTest extends TestCase {
      */
     protected $object;
 
+    /**
+     * @inheritdoc
+     */
     public function setupObject() {
         $this->object = new Interval();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestHydrate() {
         $invertedInterval1 = new DateInterval('PT23H59M59S');
         $invertedInterval1->invert = 1;
@@ -48,12 +54,15 @@ class IntervalTest extends TestCase {
     }
 
     /**
-     * @dataProvider getTestHydrate
+     * @inheritdoc
      */
-    public function testHydrate($input, $expected_output) {
+    public function testHydrate($input = null, $expected_output = null) {
         $this->assertEquals($expected_output, $this->object->hydrate($input));
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestDehydrate() {
         $invertedInterval = new DateInterval('PT27H15M');
         $invertedInterval->invert = 1;
@@ -94,9 +103,9 @@ class IntervalTest extends TestCase {
     }
 
     /**
-     * @dataProvider getTestDehydrate
+     * @inheritdoc
      */
-    public function testDehydrate($input, $expected_output) {
+    public function testDehydrate($input = null, $expected_output = null) {
         $this->assertEquals($expected_output, $this->object->dehydrate($input));
     }
 }
