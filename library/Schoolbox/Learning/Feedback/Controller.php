@@ -7,17 +7,17 @@
 namespace Schoolbox\Learning\Feedback;
 
 use Alaress\Web\Controller\Base;
+use Aura\Web\Request\Values as RequestValues;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Feedback\Factory as FeedbackFactory;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Factory as DueWorkFeedbackFactory;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Error\Mapper AS ErrorMapper;
 
 class Controller extends Base
 {
@@ -41,7 +41,7 @@ class Controller extends Base
     /**
      * Post into the feedback collection for a participant. This will create "floating feedback"
      *
-     * TODO evaluate the applicability of this to Quiz and Task. It is not applicable to Project.
+     * This is a dueWork-only route. It is not applicable to Project, Quiz, or Task.
      *
      * @api   POST /learning/assessments/{assessmentId}/{studentId}/feedback
      * @level 165
@@ -50,11 +50,11 @@ class Controller extends Base
      */
     public function postParticipantFeedback(Participant $participant)
     {
-        $feedbacks = $this->getFloatingFeedback($participant);
+        $mostRecentFloatingFeedback = $this->getFloatingFeedback($participant)->first();
         $post = $this->getRequest()->post;
 
         try {
-            $this->processFeedback($participant, $feedbacks, $post);
+            $this->processFeedback($participant, $mostRecentFloatingFeedback, $post);
             $this->processRubric($participant, $post);
         }
         catch (\RangeException $e) {
@@ -104,15 +104,10 @@ class Controller extends Base
      */
     public function postResponseFeedback(Participant $participant, IResponse $response)
     {
-        $feedbacks  = new Collection();
-        $mostRecent = $participant->findMostRecentFeedback();
-
-        if (isset($mostRecent)) {
-            $feedbacks->add($mostRecent);
-        }
+        $mostRecentFeedback = $participant->findMostRecentFeedback();
 
         try {
-            $this->processFeedback($participant, $feedbacks, $this->getRequest()->post, $response);
+            $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
             $this->processRubric($participant, $this->getRequest()->post);
         }
         catch (\RangeException $e) {
@@ -126,24 +121,24 @@ class Controller extends Base
     }
 
     /**
-     * Process feedbacks
+     * Process feedback
      *
      * This method is shared between the Quickmark (postParticipantFeedback) and the
      * Inline Grader (postResponseFeedback) methods so they behave similarly
      *
-     * @param Participant $participant
-     * @param Collection $feedbacks
-     * @param $postVars
-     * @param IResponse $response
+     * @param Participant         $participant
+     * @param IFeedback|null      $mostRecentFeedback
+     * @param RequestValues|array $postVars
+     * @param IResponse|null      $response
      * @throws \Alaress\Web\Controller\Exception
      */
-    private function processFeedback(Participant $participant, Collection $feedbacks, $postVars, IResponse $response = null)
+    private function processFeedback(Participant $participant, IFeedback $mostRecentFeedback = null, $postVars, IResponse $response = null)
     {
-        $feedbackFactory = new FeedbackFactory(
+        $dueWorkFeedbackFactory = new DueWorkFeedbackFactory(
             $this->getFeedbackDataSource(),
             $participant,
             $this->getUser(),
-            $feedbacks,
+            $mostRecentFeedback,
             $postVars['mark'],
             $postVars['comment'],
             $postVars['publish'],
@@ -151,7 +146,7 @@ class Controller extends Base
             $response
         );
 
-        $feedback = $feedbackFactory->produce();
+        $feedback = $dueWorkFeedbackFactory->produce();
         $this->getFeedbackDataSource()->save($feedback);
 
         $data = [
@@ -160,7 +155,7 @@ class Controller extends Base
             'id'      => $feedback->getId(),
         ];
 
-        $this->respond('', $data, $feedbackFactory->getResponseCode());
+        $this->respond('', $data);
     }
 
     /**
@@ -214,9 +209,9 @@ class Controller extends Base
     }
 
     /**
-     * @param string $template
-     * @param array  $data
-     * @param int    $responseCode
+     * @param string       $template
+     * @param array|string $data
+     * @param int          $responseCode
      */
     protected function respond($template, $data, $responseCode = 200)
     {

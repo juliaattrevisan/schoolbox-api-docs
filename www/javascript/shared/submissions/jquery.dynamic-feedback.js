@@ -60,11 +60,11 @@
                  */
                 errors: [],
 
-                /* Strings representing incomplete/pending/reviewed statuse
+                /* CSS classes representing incomplete/pending/reviewed states
                  */
-                statusIncomplete: '',
-                statusPending: '',
-                statusReviewed: '',
+                statusIncomplete: 'incomplete',
+                statusPending: 'pending',
+                statusReviewed: 'reviewed',
 
                 /* The text to display on the publish button
                  */
@@ -141,16 +141,35 @@
                     data:  formData,
                     type: 'post'
                 }).done(function () {
-                    $form.find('[data-interaction-draft]').slideUp(function () {
+                    // Get handle to participant row
+                    var $li = $form.closest('[data-participant]');
+
+                    var $actionBar = $li.find('[data-interaction-draft]');
+
+                    $actionBar.slideUp(function () {
                         $btnPublish.text(config.publishText);
                         $btnDrafted.text('');
                     });
 
-                    toast.call($form, 'Feedback published', true);
+                    // Update this participant's status
+                    $li.attr('data-status', config.statusReviewed);
+
+                    // Update the icon
+                    $li.find('[data-status]')
+                        .removeClass(config.statusIncomplete + ' ' + config.statusPending)
+                        .addClass(config.statusReviewed);
+
+                    // Update the text
+                    $li.find('[data-status-label]').html('Reviewed');
+
+                    // Ensure the 'display reviewed' filter is ON
+                    $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
+
+                    toast.call($form, 'Feedback published', true, false);
                     config.onPublishCallback();
 
                 }).fail(function (xhr) {
-                    toast.call($form, xhr.responseText, false);
+                    toast.call($form, xhr.responseText, false, false);
                     $btnPublish.removeAttr('disabled').text(config.publishText);
 
                 }).always(function () {
@@ -209,21 +228,11 @@
 
             $.ajax($form.attr('action'), data)
                 .done(function () {
-                    toast.apply($form);
-
-                    var $li = $form.closest('[data-status]');
-
-                    $li.attr('data-status', config.statusReviewed);
-
-                    $li.find('[data-status]')
-                        .removeClass(config.statusIncomplete + ' ' + config.statusPending)
-                        .addClass(config.statusReviewed);
-
-                    $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
+                    toast.call($form, 'Draft saved', true, true);
                     $form.find('[data-draft="drafted"]').text('Saved as draft');
                 })
                 .fail(function (xhr) {
-                    toast.call($form, xhr.responseText, false);
+                    toast.call($form, xhr.responseText, false, false);
                 })
                 .always(function () {
                     $form.find('[data-draft=publish]').removeAttr("disabled");
@@ -233,18 +242,20 @@
         /**
          * Pop toast upon action occurring
          *
-         * @param text
-         * @param success
+         * @param {string} text
+         * @param {bool} isSuccess
+         * @param {bool} openActionBar  Should we open the action bar ?
          */
-        function toast(text, success) {
+        function toast(text, isSuccess, openActionBar) {
 
             $(config.formSaveLabel).toastTimeout({
                 text: text || 'Draft saved',
-                css: (success == false) ? 'alert' : 'success'
+                css: (isSuccess) ? 'success' : 'alert'
             });
 
-            this.find('[data-interaction-draft]').slideDown();
+            if(openActionBar){
+                this.find('[data-interaction-draft]').slideDown();
+            }
         }
-
     }
 }(jQuery));
