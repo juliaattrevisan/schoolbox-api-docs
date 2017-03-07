@@ -78,6 +78,19 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * @inheritdoc
+     */
+    public function isFeedbackRequired(User $user)
+    {
+        $participant = $this->getParticipant($user);
+
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
+
+        // Does quiz have most recent response and it is not reviewed ?
+        return $latestSubmittedResponse && !$latestSubmittedResponse->hasPublishedFeedback();
+    }
+
+    /**
      * @param User $user
      * @param bool $publishedOnly
      * @return null|string
