@@ -137,9 +137,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             return [];
         }
 
-        // Ignore campus for now. Eventually, match campi against timetable ID
-
-        $quotedId = $this->database->smartQuote($externalUserId);
+        $quotedId     = $this->database->smartQuote($externalUserId);
+        $quotedCampus = $this->database->smartQuote($campus->getExtTimetableCode());
         if ($user->getRole()->isStudent()) {
             // 1st part: blocked classes
             // 2nd part: non-blocked classes
@@ -150,8 +149,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     ts.Name as ClassName,
                     td.SortOrder as DayNumber,
                     td.Name as DayName,
-                    tpe.StartTime as PeriodStart,
-                    tpe.EndTime as PeriodEnd,
+                    CAST(tpe.StartTime AS TIME) AS PeriodStart,
+                    CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
                     tpe.Name as PeriodName,
                     tbi.TimetablePeriodID as PeriodID,
                     tbi.Consecutive as Consecutive
@@ -171,6 +170,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
 
                 WHERE s.Code = {$quotedId}
+                AND   t.Name = {$quotedCampus}
                 AND   t.Enabled = 1
 
                 UNION
@@ -181,8 +181,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     ts.Name as ClassName,
                     td.SortOrder as DayNumber,
                     td.Name as DayName,
-                    tpe.StartTime as PeriodStart,
-                    tpe.EndTime as PeriodEnd,
+                    CAST(tpe.StartTime AS TIME) AS PeriodStart,
+                    CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
                     tpe.Name as PeriodName,
                     tci.TimetablePeriodID as PeriodID,
                     tci.Consecutive as Consecutive
@@ -204,6 +204,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 WHERE s.Code = {$quotedId}
                 AND   tci.TimetableBlockInstanceID IS NULL
                 AND   tci.TimetablePeriodID IS NOT NULL
+                AND   t.Name = {$quotedCampus}
                 AND   t.Enabled = 1
 
                 ORDER BY DayNumber asc, PeriodStart asc
@@ -220,8 +221,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     ts.Name as ClassName,
                     td.SortOrder as DayNumber,
                     td.Name as DayName,
-                    tpe.StartTime as PeriodStart,
-                    tpe.EndTime as PeriodEnd,
+                    CAST(tpe.StartTime AS TIME) AS PeriodStart,
+                    CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
                     tpe.Name as PeriodName,
                     tbi.TimetablePeriodID as PeriodID,
                     tbi.Consecutive as Consecutive
@@ -249,6 +250,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     OR
                     staff_replacement.Code = {$quotedId}
                 )
+                AND t.Name = {$quotedCampus}
                 AND t.Enabled = 1
 
                 ORDER BY DayNumber ASC, PeriodStart ASC
@@ -260,7 +262,6 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
         // Copied from HumanEdge
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus);
-        var_dump($query, $timetabledef);
 
         // Build the timetable
         $timetable = [];
@@ -279,8 +280,12 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 //                $timetabledClass['PeriodNumber'],
 //                $timetabledClass['PeriodNumber'] + $timetabledClass['PeriodSpan'] - 1
 //            );
+            $startTime = (new Alaress_Date_Format($timetabledClass['PeriodStart'], 'H:i:s.u'))->getUsingFormat('H:i');
+            $endTime   = (new Alaress_Date_Format($timetabledClass['PeriodEnd'], 'H:i:s.u'))->getUsingFormat('H:i');
+
             foreach ($timetable as $x => $timetablePeriod) {
-                if (in_array($timetablePeriod['periodNumber'], $periodSpan)) {
+                // SchoolEdge has no actual period numbers?
+                if ($timetablePeriod['periodStart'] == $startTime && $timetablePeriod['periodEnd'] == $endTime) {
                     $classCode = $timetabledClass['ClassCode'];
                     $dayNumber = $timetabledClass['DayNumber'];
                     if (!isset($timetable[$x]['day'][$dayNumber][$classCode])) {
