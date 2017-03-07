@@ -421,9 +421,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         }
 
         // get timetable day?
-        $dayIndex  = -1;
-        $keepIndex = -1;
-        foreach ($calendarModelList as $cm) {
+        $dayIndex = -1;
+        foreach ($calendarModelList as &$cm) {
             $keepIndex = $dayIndex;
             $dayIndex++;
             if ($dayIndex > (count($timetableDays) - 1)) {
@@ -459,6 +458,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     break;
             }
         }
+        unset($cm);
 
         return $calendarModelList;
     }
