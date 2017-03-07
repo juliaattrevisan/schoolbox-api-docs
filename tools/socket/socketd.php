@@ -11,7 +11,9 @@ use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\Pipe\HttpServer;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
+use Schoolbox\Realtime\Pipe\Server;
 
 /**
  * The Websocket Daemon.
@@ -75,8 +77,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);
     $wss->disableVersion(0);
 
-    $https   = new Ratchet\Http\HttpServer($wss);
-    $webSock = new React\Socket\Server($loop);
+    $https   = new HttpServer($wss);
+    $webSock = new Server($loop);
 
     try {
         $webSock->listen($opts['port'], '0.0.0.0');
