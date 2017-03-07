@@ -157,11 +157,7 @@
 
                                     {# Determine text #}
                                     {% if participant.hasMark and not humanMark is null %}
-                                        {% if assessment is task %}
-                                            {% set text = participant.findMostRecentResponse.markedComplete ? 'Complete' : 'Incomplete' %}
-                                        {% else %}
-                                            {% set text = humanMark %}
-                                        {% endif %}
+                                        {% set text = humanMark %}
                                     {% elseif feedbackRequired %}
                                         {% set text = '<i class="icon-pause">' %}
                                     {% elseif isNextUpcoming %}
