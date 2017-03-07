@@ -41,8 +41,8 @@ class LetterGrade extends AbstractMarkScheme
      * @param float          $normalisedMark
      * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
-     * @throws DomainException if unable to locate corresponding GradeLevel
-     * @return string
+     * @return string The caption for the first grade level $normalizedMark is not less than,
+     *                or an em-dash if it's not less than none of them.
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
@@ -58,7 +58,8 @@ class LetterGrade extends AbstractMarkScheme
             }
         }
 
-        throw new DomainException("Unable to determine Human-Readable mark. Normalised: $normalisedMark");
+        // Is this mark lower than all marks? Have a nully value (in this case, em-dash)
+        return '—';
     }
 
     /**
