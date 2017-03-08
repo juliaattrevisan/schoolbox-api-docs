@@ -75,7 +75,10 @@ class PipeCollection
         $this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
         $this->pipesByUserId[$userId][$socketKey]       = $pipe;
 
-        $this->log->debug("LINK '$socketKey' -> USER '$userId' SESSION '$sessionId'");
+        $sess = $sessionId ?: 'sessionless';
+
+        $pipeCount = count($this->pipesBySocketKey);
+        $this->log->debug("Registered $userId @ $socketKey ($sess) [pipes={$pipeCount}]");
     }
 
 
@@ -103,8 +106,13 @@ class PipeCollection
             }
 
             unset($this->pipesBySocketKey[$socketKey]);
+
+            $pipeCount = count($this->pipesBySocketKey);
+            $this->log->debug("Unregistered $socketKey [pipes={$pipeCount}]");
+
         } else {
-            $this->log->debug("Ignoring closure of '$socketKey'");
+            $pipeCount = count($this->pipesBySocketKey);
+            $this->log->debug("Ignoring closure of $socketKey [pipes={$pipeCount}]");
         }
     }
 
