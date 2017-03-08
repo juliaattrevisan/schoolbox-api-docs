@@ -13,6 +13,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -162,6 +163,7 @@ class Controller extends Base
                     'nextTerm'     => $nextTerm,
                     'courses'      => $courses,
                     'writable'     => $writable,
+                    'contextTypes' => AssessmentContextType::getInstance(),
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );
