@@ -188,7 +188,7 @@ class Controller extends Base
 
         // Only show work that student has permission to view, and can accept their submission
         $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student, $visibility) {
-            return $visibility->isVisibleToUser($assessable, $student, false) && $assessable->canLearnerCreateResponse($student);
+            return $visibility->isVisibleToUser($assessable, $student, false) && $assessable->canLearnerViewInUpcomingList($student);
         });
 
         // TODO Populate $_SESSION[children] properly
