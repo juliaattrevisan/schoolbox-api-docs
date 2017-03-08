@@ -8,6 +8,8 @@
 
 {% if user %}
 
+    {% set method = 'Update' %}
+
     {# Display modify user header with drop-down #}
 
     <div class="actions-small-2 row">
@@ -29,6 +31,8 @@
     </div>
 
 {% else %}
+
+    {% set method = 'Create' %}
 
     {# Display create new user header with nothing #}
 
@@ -63,10 +67,10 @@
                         </select>
 
                         <label for="firstname">First Name</label>
-                        <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}" data-relation="name"/>
+                        <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
 
                         <label for="lastname">Surname</label>
-                        <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}" data-relation="name"/>
+                        <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
 
                         <label for="database">{{ externalDatabase }} ID</label>
                         <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
@@ -87,36 +91,20 @@
                         <label for="position_title">Position Title</label>
                         <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
 
-                        <label>Campus</label>
-                        <table data-role="campusList">
-                            <tbody>
-                            {% for campus in campuses %}
-                                <tr>
-                                    <td>{{ campus.name }}</td>
-                                    <td>
-                                        <input id="defaultCampus-{{ campus.id }}" data-role="defaultCampus" type="radio" name="defaultCampus"
-                                               value="{{ campus.id }}" {% if user.defaultCampus.id == campus.id %}checked{% endif %} required/>
-                                        <label for="defaultCampus-{{ campus.id }}" class="radio-label">Default?</label>
-                                    </td>
+                        <label>Campus Involvement</label>
 
-                                    {# Work out if the user is in this campus- really need to write a collection.contains() method #}
+                        {% for campus in campuses %}
+                            {# Work out if the user is in this campus- really need to write a collection.contains() method #}
 
-                                    {% set campusChecked = false %}
-                                    {% for userCampus in user.campusCollection %}
-                                        {% if userCampus.id == campus.id %}
-                                            {% set campusChecked = true %}
-                                        {% endif %}
-                                    {% endfor %}
-
-                                    <td>
-                                        <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}"
-                                               {% if campusChecked %}checked{% endif %} />
-                                        <label for="campus-{{ campus.id }}" class="checkbox-label">Involved?</label>
-                                    </td>
-                                </tr>
+                            {% set campusChecked = false %}
+                            {% for userCampus in user.campusCollection %}
+                                {% if userCampus.id == campus.id %}
+                                    {% set campusChecked = true %}
+                                {% endif %}
                             {% endfor %}
-                            </tbody>
-                        </table>
+                            <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                            <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
+                        {% endfor %}
                     </div>
 
                     <div class="small-12 medium-6 island">
@@ -179,7 +167,7 @@
                     </div>
 
                     <div class="small-12 columns">
-                        <input type="submit" value="Update User"/>
+                        <input type="submit" value="{{ method }} User"/>
                     </div>
                 </form>
             </div>
@@ -567,7 +555,6 @@
 {% endif %}
 
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
@@ -578,24 +565,15 @@
         $('form[data-validatable-as="userDetails"]').alaressValidate({
             rules: {
                 'alt_email':        { email: true },
-                'firstname':        { require_from_group: [1, '[data-relation="name"]'] },
-                'lastname':         { require_from_group: [1, '[data-relation="name"]'] },
+                'firstname':        { required: true },
+                'lastname':         { required: true },
                 'campus[]':         { required: true }
             },
             messages: {
                 'firstname':        { require_from_group: "Please enter either a first name or surname" },
                 'lastname':         { require_from_group: "Please enter either a first name or surname" },
-                'defaultCampus':    "Please select a default campus",
                 'alt_email':        "If you are entering an alternative email, please ensure it's a valid address",
-                'campus[]':         { required: 'Users must be involved in at least one Campus' }
-            },
-            errorPlacement: function (error, element) {
-                if (element.is('[data-role="defaultCampus"]') || 'campus[]' === element.attr('name')) {
-                    error.css('margin', 0);
-                    error.insertAfter(element.closest('[data-role="campusList"]'));
-                } else {
-                    $.alaressValidate.defaultErrorPlacement(error, element);
-                }
+                'campus[]':         { required: 'Users must be involved in at least one campus' }
             }
         });
 

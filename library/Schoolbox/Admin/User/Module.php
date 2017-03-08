@@ -44,7 +44,7 @@ class Module extends BaseModule
 
         // CRUD Actions
 
-        $this->addPostRoute($router, 'postDetails', $basePath, "/{userId}");
+        $this->addPostRoute($router, 'postDetails', $basePath, "{/userId}");
         $this->addPostRoute($router, 'postInsertGroup', $basePath, "/{userId}/group");
         $this->addPostRoute($router, 'postInsertPermission', $basePath, "/{userId}/permission");
         $this->addPostRoute($router, 'postInsertLinked', $basePath, "/{userId}/linked");
@@ -81,7 +81,7 @@ class Module extends BaseModule
             ->addRoutePreload($matcher, '.*', function($params) {
 
                 if (array_key_exists('userId', $params)) {
-                    $params['user'] = $this->getUserMapper()->findById($params['userId']);
+                    $params['user'] = $this->getUserMapper()->findByIdWithFallback($params['userId']);
                 }
 
                 if (array_key_exists('folderId', $params)) {
