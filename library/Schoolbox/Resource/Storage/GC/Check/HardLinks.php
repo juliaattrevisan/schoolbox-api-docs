@@ -64,14 +64,13 @@ class HardLinks extends DbCheck
              AND deleted_at IS NULL",
 
             "SELECT hash FROM student_submission_file
-             WHERE hash IS NOT NULL",
+             WHERE deleted_at IS NULL",
 
             "SELECT storage_id
              FROM submission_box_file",
 
             "SELECT hash FROM submission_return_file
-             WHERE hash IS NOT NULL
-             AND deleted_at IS NULL",
+             WHERE deleted_at IS NULL",
 
             "SELECT background_image_hash FROM tile
              WHERE background_image_hash IS NOT NULL
