@@ -62,7 +62,7 @@
                         <div class="list-item">
                             <div class="compact card small-12">
                                 <div class="icon-{{ statusIcon.statusIcon(video) }}" title="Video processing {{ video.status }}"></div>
-                                <h3>{{ video.storage.filename | default(video.file.filename) | default(defaultFilename) }} {{ video.file.id }}</h3>
+                                <h3>{{ video.storage.filename | default(video.file.filename) | default(defaultFilename) }}</h3>
                                 <p class="meta">{{ video.createdAt.long }}</p>
                             </div>
                         </div>
