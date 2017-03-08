@@ -22,7 +22,18 @@ use React\EventLoop\LoopInterface;
 use RuntimeException;
 
 
-class Kernel extends \Alaress\Application\Kernel {
+class Kernel extends \Alaress\Application\Kernel
+{
+    const RLIMIT_CORE_FILESIZE    = 'core';
+    const RLIMIT_CPU_TIME         = 'cpu';
+    const RLIMIT_DATA_SEGMENT     = 'data';
+    const RLIMIT_FILESIZE         = 'filesize';
+    const RLIMIT_FILE_DESCRIPTORS = 'openfiles';
+    const RLIMIT_PROCESSES        = 'maxproc';
+    const RLIMIT_MEMORY_LOCK      = 'memlock';
+    const RLIMIT_RESIDENT_SET     = 'rss';
+    const RLIMIT_STACK_SIZE       = 'stack';
+    const RLIMIT_TOTAL_MEMORY     = 'totalmem';
 
 	/** @var string */
 	protected $name;
@@ -35,6 +46,13 @@ class Kernel extends \Alaress\Application\Kernel {
 
 	/** @var LoggerInterface */
 	protected $log;
+
+    /**
+     * Various process limits imposed by the operating system
+     *
+     * @var string[][]
+     */
+	protected $limits;
 
 	/**
 	 * Initialise
@@ -52,6 +70,11 @@ class Kernel extends \Alaress\Application\Kernel {
 		$this->name = $name;
 
 		$this->loop = $this->di->values['react.loop'] = Factory::create();
+
+		foreach (posix_getrlimit() as $key => $value) {
+		    list ($strength, $attr) = explode(' ', $key);
+		    $this->limits[$attr][$strength] = $value === 'unlimited' ? null : $value;
+        }
 	}
 
 
@@ -83,6 +106,26 @@ class Kernel extends \Alaress\Application\Kernel {
 	}
 
 
+    /**
+     * @param string $attribute
+     * @return string
+     */
+	public function getHardLimit($attribute)
+    {
+	    return $this->limits[$attribute]['hard'];
+    }
+
+
+    /**
+     * @param string $attribute
+     * @return string
+     */
+    public function getSoftLimit($attribute)
+    {
+        return $this->limits[$attribute]['soft'];
+    }
+
+
 	/**
 	 * Go. Do stuff.
 	 *
@@ -91,7 +134,7 @@ class Kernel extends \Alaress\Application\Kernel {
 	 * @throws \Schoolbox\External\Exception
 	 */
 	public function run($callable = null) {
-        if(!is_null($this->getOpt('verbose'))) {
+        if (posix_isatty(STDOUT) && !is_null($this->getOpt('verbose'))) {
 			echo <<<EOL
 
  ||
