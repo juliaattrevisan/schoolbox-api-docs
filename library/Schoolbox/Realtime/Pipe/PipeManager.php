@@ -56,6 +56,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
     /** @var string[] */
     private static $headerMap = [
+        400 => 'Bad Request',
         401 => 'Unauthorized',
         503 => 'Service Unavailable',
     ];
@@ -119,17 +120,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (!$conn instanceof RFC6455\Connection) {
             $this->log->warning('Socket does not conform to RFC6455, cannot handle');
 
-            // handle the connection raw
-            $conn->send(
-                json_encode(
-                    [
-                        'error' => 'Bad Request',
-                        'code'  => 400,
-                        'retry' => false,
-                    ]
-                )
-            );
-            $conn->close();
+            $this->closeConnectionWithReason($conn, 400);
+            return;
+        }
 
             return;
         }
@@ -152,8 +145,28 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->log->error('Failed to fully register pipe: ' . $e->getMessage(), [ $e ]);
 
             $this->sendHeader($pipe, 401);
+            $this->pipes->unregisterPipe($pipe->getSocketKey());
             $pipe->close();
         }
+    }
+
+
+    /**
+     * @param ConnectionInterface $conn
+     * @param int                 $code
+     */
+    private function closeConnectionWithReason(ConnectionInterface $conn, $code)
+    {
+        // handle the connection raw
+        $conn->send(
+            json_encode( [
+                'error' => self::$headerMap[$code],
+                'code'  => [$code],
+                'retry' => false,
+            ])
+        );
+
+        $conn->close();
     }
 
 
