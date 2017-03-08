@@ -247,39 +247,14 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
     {
-        // Didn't we change these method so they take a User object?
-        try {
-            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        $extraWhere          = "td.SortOrder = {$this->database->smartQuote($dayNumber)}";
+        $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus, $extraWhere);
+        if (empty($timetabledClassRows)) {
             return [];
         }
 
-        $extraWhere = "td.SortOrder = {$this->database->smartQuote($dayNumber)}";
-        if ($user->getRole()->isStudent()) {
-            $query = "
-                {$this->getStudentBlockedTimetableQuery($externalUserId, $campus)}
-                AND $extraWhere
-                UNION
-                {$this->getStudentNonBlockedTimetableQuery($externalUserId, $campus)}
-                AND $extraWhere
-                ORDER BY DayNumber asc, PeriodStart asc
-            ";
-
-        } elseif ($user->getRole()->isStaff()) {
-            $query = "
-                {$this->getStaffTimetableQuery($externalUserId, $campus)}
-                AND $extraWhere
-                ORDER BY DayNumber ASC, PeriodStart ASC
-            ";
-
-        } else {
-            return [];
-        }
-
-        // Mostly copied from getFullTimetable
         $timetable = $this->getTimetableDefinitionForTimetable($externalUserId, $campus);
-
-        foreach ($this->database->getAll($query) as $timetabledClass) {
+        foreach ($timetabledClassRows as $timetabledClass) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
                     if (!isset($timetable[$x]['class'])) {
@@ -297,10 +272,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
     {
-        // Didn't we change these method so they take a User object?
-        try {
-            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus);
+        if (empty($timetabledClassRows)) {
             return [];
         }
 
@@ -310,32 +283,14 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             return [];
         }
 
-        $extraWhere = "td.ID = {$this->database->smartQuote($timetableDate['TimetableDay']['ID'])}";
-        if ($user->getRole()->isStudent()) {
-            $query = "
-                {$this->getStudentBlockedTimetableQuery($externalUserId, $campus)}
-                AND $extraWhere
-                UNION
-                {$this->getStudentNonBlockedTimetableQuery($externalUserId, $campus)}
-                AND $extraWhere
-                ORDER BY DayNumber asc, PeriodStart asc
-            ";
-
-        } elseif ($user->getRole()->isStaff()) {
-            $query = "
-                {$this->getStaffTimetableQuery($externalUserId, $campus)}
-                AND $extraWhere
-                ORDER BY DayNumber ASC, PeriodStart ASC
-            ";
-
-        } else {
+        $extraWhere          = "td.ID = {$this->database->smartQuote($timetableDate['TimetableDay']['ID'])}";
+        $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus, $extraWhere);
+        if (empty($timetabledClassRows)) {
             return [];
         }
 
-        // Mostly copied from getFullTimetable
         $timetable = $this->getTimetableDefinitionForTimetable($externalUserId, $campus);
-
-        foreach ($this->database->getAll($query) as $timetabledClass) {
+        foreach ($timetabledClassRows as $timetabledClass) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
                     if (!isset($timetable[$x]['class'])) {
@@ -353,34 +308,14 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getFullTimetable($externalUserId, $userId, Campus $campus)
     {
-        // Didn't we change these method so they take a User object?
-        try {
-            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            return [];
-        }
-
-        if ($user->getRole()->isStudent()) {
-            $query = "
-                {$this->getStudentBlockedTimetableQuery($externalUserId, $campus)}
-                UNION
-                {$this->getStudentNonBlockedTimetableQuery($externalUserId, $campus)}
-                ORDER BY DayNumber asc, PeriodStart asc
-            ";
-
-        } elseif ($user->getRole()->isStaff()) {
-            $query = "
-                {$this->getStaffTimetableQuery($externalUserId, $campus)}
-                ORDER BY DayNumber ASC, PeriodStart ASC
-            ";
-
-        } else {
+        $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus);
+        if (empty($timetabledClassRows)) {
             return [];
         }
 
         // Build the timetable
         $timetable = $this->getTimetableDefinitionForTimetable($externalUserId, $campus);
-        foreach ($this->database->getAll($query) as $timetabledClass) {
+        foreach ($timetabledClassRows as $timetabledClass) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
                     $dayNumber = $timetabledClass['DayNumber'];
@@ -605,6 +540,50 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             ];
         }
         return $parts;
+    }
+
+    /**
+     * Helper function for getting all timetable related rows for a user.
+     *
+     * @param mixed  $externalUserId
+     * @param int    $userId
+     * @param Campus $campus
+     * @param string $extraWhere
+     * @return array
+     */
+    protected function getAllTimetableRows($externalUserId, $userId, Campus $campus, $extraWhere = '')
+    {
+        try {
+            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
+        }
+
+        if (!empty($extraWhere)) {
+            $extraWhere = 'AND ' . $extraWhere;
+        }
+        if ($user->getRole()->isStudent()) {
+            $query = "
+                {$this->getStudentBlockedTimetableQuery($externalUserId, $campus)}
+                $extraWhere
+                UNION
+                {$this->getStudentNonBlockedTimetableQuery($externalUserId, $campus)}
+                $extraWhere
+                ORDER BY DayNumber asc, PeriodStart asc
+            ";
+
+        } elseif ($user->getRole()->isStaff()) {
+            $query = "
+                {$this->getStaffTimetableQuery($externalUserId, $campus)}
+                $extraWhere
+                ORDER BY DayNumber ASC, PeriodStart ASC
+            ";
+
+        } else {
+            return [];
+        }
+        $result = $this->database->getAll($query);
+        return is_array($result) ? $result : [];
     }
 
     /**
