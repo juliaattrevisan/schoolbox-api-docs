@@ -64,33 +64,45 @@ $kernel->run(function($di, $loop, $log, $opts) {
 
     $failed = 0;
     $success = 0;
+
     foreach ($pendingQueue as $vid) {
 
         $file_id = $vid->getHash();
 
-        /* Update video to indicate processing has begun */
-        $log->info("Starting process of media #$file_id");
-        $vid->setStatus(QueueMapper::STATUS_PROCESSING);
-        $mapper->save($vid);
+        if (empty($file_id)) {
 
-        /* Process video */
-        try {
-            if ($vid->process() == true) {
-                $vid->setStatus(QueueMapper::STATUS_COMPLETED);
-            } else {
+            $log->error("Process of media queue item #{$vid->getId()} failed. No file hash specified.");
+            $vid->setMessage("Unrecoverable Error: Media file could not be located");
+            $vid->setStatus(QueueMapper::STATUS_FAILED);
+            $mapper->save($vid);
+            $failed++;
+
+        } else {
+
+            /* Update video to indicate processing has begun */
+            $log->info("Starting process of media #$file_id");
+            //$vid->setStatus(QueueMapper::STATUS_PROCESSING);
+            //$mapper->save($vid);
+
+            /* Process video */
+            try {
+                if ($vid->process() == true) {
+                    $vid->setStatus(QueueMapper::STATUS_COMPLETED);
+                } else {
+                    $vid->setStatus(QueueMapper::STATUS_FAILED);
+                }
+            } catch (Exception $e) {
+                $log->error("$e", array($e));
                 $vid->setStatus(QueueMapper::STATUS_FAILED);
             }
-        } catch (Exception $e) {
-            $log->error("$e", array($e));
-            $vid->setStatus(QueueMapper::STATUS_FAILED);
-        }
 
-        if ($vid->getStatus() === QueueMapper::STATUS_FAILED) {
-            $log->error("Process of media #$file_id failed");
-            $failed++;
-        } else {
-            $log->info("Process of media #$file_id completed\n");
-            $success++;
+            if ($vid->getStatus() === QueueMapper::STATUS_FAILED) {
+                $log->error("Process of media #$file_id failed");
+                $failed++;
+            } else {
+                $log->info("Process of media #$file_id completed\n");
+                $success++;
+            }
         }
 
         $mapper->save($vid);

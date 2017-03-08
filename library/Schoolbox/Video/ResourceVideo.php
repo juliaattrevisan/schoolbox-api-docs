@@ -13,14 +13,11 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 class ResourceVideo
 {
-    /** @var int */
-    protected $id;
-
-    /** @var string */
-    protected $hash;
+    use Id;
 
     /** @var string */
     protected $status;
@@ -236,38 +233,14 @@ class ResourceVideo
     }
 
     /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-    * @param  int $id
-    * @return self
-    */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return string
+     * @return null|string
      */
     public function getHash()
     {
-        return $this->hash;
-    }
-
-    /**
-     * @param string $hash
-     * @return self
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
-        return $this;
+        if ($this->storage instanceof Storage\Model) {
+            return $this->storage->getHash();
+        } else {
+            return null;
+        }
     }
 }

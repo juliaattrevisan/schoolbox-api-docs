@@ -10,15 +10,12 @@
 namespace Schoolbox\Video;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
-use \Schoolbox\Mapper\Traits\Model\Id;
-use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 class Queue extends ResourceVideo
 {
-    use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
 
@@ -33,9 +30,6 @@ class Queue extends ResourceVideo
 
     /** @var int */
     protected $fileId;
-
-    /** @var StorageMapper */
-    protected $storageMapper;
 
     /** @var string */
     private $audioBitrate;
@@ -73,7 +67,6 @@ class Queue extends ResourceVideo
     public function __construct()
     {
         parent::__construct();
-        $this->setStorageMapper(StorageMapper::getInstance());
 
         // Grab bitrates from config
 
@@ -396,22 +389,6 @@ class Queue extends ResourceVideo
     }
 
     /** Here be the getters/setters, nothing else to see here */
-
-    /**
-     * @return StorageMapper
-     */
-    public function getStorageMapper() {
-        return $this->storageMapper;
-    }
-
-    /**
-     * @param $storageMapper
-     * @return $this
-     */
-    public function setStorageMapper($storageMapper) {
-        $this->storageMapper = $storageMapper;
-        return $this;
-    }
 
     /**
      * @return Storage

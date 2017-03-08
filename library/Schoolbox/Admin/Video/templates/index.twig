@@ -1,3 +1,5 @@
+{% import '@adminVideo/macros/statusIcon.twig' as statusIcon %}
+
 <script>
     $(function () {
         $('[data-submit]').click(function (e) {
@@ -7,18 +9,27 @@
             $(formName + ' input[name="videoAction"]').val('resubmit');
             form.submit();
         });
+        $('[data-view]').click(function (e) {
+            e.preventDefault();
+            window.location.href = '{{ routeLookup('adminVideo.getIndex') }}/' +  $(this).data('view');
+        });
         $('[data-delete]').click(function (e) {
             e.preventDefault();
             var deleteId = $(this).data('delete');
             var row = $(this).closest('li');
+            var toaster = $('#toaster');
             $(this).confirmDialog({
                 text: 'Are you sure you want to remove this video from the queue?',
                 confirmEvent: function () {
+                    toaster.toastActivate({text: 'Removing'});
                     $.post('{{ routeLookup('adminVideo.postSubmit') }}', {
                         videoId: deleteId,
                         videoAction: 'delete'
-                    }).done(function () {
+                    }).success(function () {
                         $(row).remove();
+                        toaster.toastTimeout({text: 'Removed from queue', css: 'success'});
+                    }).error(function () {
+                        toaster.toastTimeout({text: 'Error removing item from queue', css: 'alert'});
                     });
                 }
             });
@@ -31,58 +42,76 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% set count = 0 %}
+        {% if queue | length %}
 
-        {% for status in statusOrder if queue[status] | length > 0 %}
+            {% for status in statusOrder %}
 
-            {% set count = count + 1 %}
+                {% for video in queue[status] %}
 
-            <h2 class="subheader">
-                {{ status }} Media
-            </h2>
-            <section>
-                <ul class="information-list">
-                    {% for video in queue[status] %}
-                        <li class="actions-small-2">
-                            <div class="list-item">
-                                <div class="compact card small-12">
-                                    <a href="#">
-                                        {% if video.status == 'pending' or video.status == 'processing' %}
-                                            {% set icon = 'clock' %}
-                                        {% elseif video.status == 'failed' %}
-                                            {% set icon = 'alert' %}
-                                        {% else %}
-                                            {% set icon = 'tick' %}
-                                        {% endif %}
-                                        <div class="icon-{{ icon }}" title="Video processing {{ video.status }}"></div>
-                                        <h3>{{ video.storage.filename | default('Unknown Filename') }}</h3>
-                                        <p class="meta">{{ video.createdAt }}</p>
-                                    </a>
-                                </div>
+                    {% if loop.first %}
+                        <h2 class="subheader">
+                            {{ status }} Media
+                        </h2>
+                        <section>
+                        <ul class="information-list">
+                    {% endif %}
+
+                    <li class="actions-small-2">
+                        <div class="list-item">
+                            <div class="compact card small-12">
+                                <div class="icon-{{ statusIcon.statusIcon(video) }}" title="Video processing {{ video.status }}"></div>
+                                <h3>{{ video.storage.filename | default('Unknown Filename') }}</h3>
+                                <p class="meta">{{ video.createdAt.long }}</p>
                             </div>
-                            <nav>
-                                {% if video.status == 'failed' %}
-                                    <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
-                                        <input type="hidden" value="{{ video.id }}" name="videoId">
-                                        <input type="hidden" value="" name="videoAction">
-                                        <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
-                                        <a class="icon-close no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
-                                    </form>
-                                {% endif %}
-                            </nav>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% endfor %}
+                        </div>
+                        <nav>
+                            {% if video.isFailed %}
+                                <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
+                                    <input type="hidden" value="{{ video.id }}" name="videoId">
+                                    <input type="hidden" value="" name="videoAction">
+                                    <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results"></a>
+                                    <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
+                                    <a class="icon-close no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
+                                </form>
+                            {% endif %}
+                        </nav>
+                    </li>
 
-        {% if count == 0 %}
+                    {% if loop.last %}
+                        </ul>
+                        </section>
+                    {% endif %}
+
+                {% endfor %}
+
+            {% endfor %}
+
+        {% else %}
+
             <div class="empty-state">
                 <i class="icon-video"></i>
                 <p>There are no failed, pending or processing media transcodes!</p>
             </div>
+
         {% endif %}
 
     </div>
 </div>
+
+{% if log.message is not empty %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">
+                Transcoding Results - {{ log.storage.filename | default('Unknown Filename') }}
+            </h2>
+            <section class="content">
+            <pre>{{ log.message }}</pre>
+            </section>
+        </div>
+    </div>
+
+{% endif %}
+
+<div class="toast" id="toaster"></div>
 

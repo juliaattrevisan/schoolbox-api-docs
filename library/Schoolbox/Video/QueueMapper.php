@@ -13,6 +13,8 @@ namespace Schoolbox\Video;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -40,7 +42,6 @@ class QueueMapper extends Mapper {
         $this->hasModel(Queue::class);
         $this->uses('video_queue_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses('file_id', self::TYPE_INTEGER);
-        $this->uses('hash', self::TYPE_STRING);
         $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'file', 'file');
         $this->uses('status', self::TYPE_STRING);
         $this->uses('message', self::TYPE_STRING);
@@ -55,6 +56,28 @@ class QueueMapper extends Mapper {
      */
     public function getPending() {
         return $this->findByColumn('status', self::STATUS_PENDING);
+    }
+
+    /**
+     * @param string|array $status
+     * @return \Schoolbox\GenericCollection
+     */
+    public function findByStatus($status) {
+        if (is_array($status)) {
+            $result = [];
+
+            foreach ($status as $statusCurrent) {
+                $results = $this->findByColumn('status', $statusCurrent);
+
+                if (!empty($results)) {
+                    $result[$statusCurrent] = $results;
+                }
+            }
+
+            return $result;
+        } else {
+            return $this->findByColumn('status', $status);
+        }
     }
 
     /**
@@ -80,6 +103,27 @@ class QueueMapper extends Mapper {
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function getSelectString()
+    {
+        $table = $this->database->quoteIdentifier($this->table);
+
+        $storageMapper = $this->getJoinMapper('file');
+
+        $query = "
+            SELECT      {$this->getColumnString()},
+                        {$storageMapper->getColumnString('s')},
+				        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
+            FROM        {$table}
+			LEFT JOIN   {$this->getJoinSql('file', '', 's')}
+			LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime', true)}
+        ";
+
+        return $query;
+    }
+
+    /**
      * @param PDOStatement $statement
      * @return Collection
      */
@@ -87,19 +131,46 @@ class QueueMapper extends Mapper {
     {
         $hydratedCollection = $this->createCollection();
 
+        // Shut the front door there are a goddamn lot of hoops to jump through to get a mime type!
+        //
+        //        ▄████████████▄▐█▄▄▄▄█▌
+        //        █████▌▄▌▄▐▐▌██▌▀▀██▀▀
+        //        ███▄█▌▄▌▄▐▐▌▀██▄▄█▌
+        //        ▄▄▄▄█████████████
+
+        /** @var Storage\Mapper $storageMapper */
+        $storageMapper = $this->getJoinMapper('file');
+
+        /** @var MimetypeMapper $mimeMapper */
+        $mimeMapper = $storageMapper->getJoinMapper('allowedFileExtension');
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
+            /** @var Queue $record */
             $record = $this->hydrate($row);
 
             // Can't hydrate storage if there isn't a hash
 
             if (!empty($row['hash'])) {
-                $record->setStorage($this->hydrateJoin($row, 'file'));
-            }
 
+                /** @var Storage\Model $file */
+                $file = $this->hydrateJoin($row, 'file', 's');
+
+                // Hydrate a mime type if we can find one
+
+                /** @var Mimetype $mime */
+                $mime = $mimeMapper->hydrate($row, 'mime');
+
+                if ($mime instanceof Mimetype) {
+                    $file->setMimetype($mime);
+                }
+
+                $record->setStorage($file);
+            }
             $hydratedCollection->add($record);
         }
 
         return $hydratedCollection;
     }
+
 }

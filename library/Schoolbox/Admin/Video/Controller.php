@@ -26,8 +26,9 @@ class Controller extends Base
      *
      * @api   GET /adminv2/video
      * @level 165
+     * @param VideoQueue $queue
      */
-    public function getIndex()
+    public function getIndex($queue)
     {
         // Render this thing out
 
@@ -37,30 +38,14 @@ class Controller extends Base
             VideoQueueMapper::STATUS_PENDING
         ];
 
-        $queue = [];
-
-        $queueStatus = $this->getVideoQueueMapper()->findByColumn('status', $statuses);
-
-        /** @var VideoQueue $video */
-        foreach ($queueStatus as $video) {
-            try {
-                $storageObject = $this->getStorageMapper()->findByHash($video->getHash());
-                $video->setStorage($storageObject);
-            } catch (MapperException $e) {
-            }
-
-            if (!isset($queue[$video->getStatus()])) {
-                $queue[$video->getStatus()] = [];
-            }
-
-            $queue[$video->getStatus()][] = $video;
-        }
+        $queueItems = $this->getVideoQueueMapper()->findByStatus($statuses);
 
         $this->getResponse()->content->set([
             'template' => '@adminVideo/index.twig',
             'data' => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'queue' => $queue,
+                'queue' => $queueItems,
+                'log' => $queue,
                 'statusOrder' => $statuses
             ],
             'title' => 'Admin - Video Queue'
@@ -74,20 +59,35 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-
         try {
             /** @var VideoQueue $video */
             $video = $this->getVideoQueueMapper()->findById($post['videoId']);
 
             if ($post['videoAction'] == 'resubmit') {
-                $video->setStatus('pending');
+                $video->setStatus(VideoQueueMapper::STATUS_PENDING);
                 $this->getVideoQueueMapper()->save($video);
                 $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminVideo.getIndex'));
             } else if ($post['videoAction'] == 'delete') {
                 $this->getVideoQueueMapper()->delete($video);
             }
+
+            $data = [
+                'result' => 'success'
+            ];
+
         } catch (MapperException $e) {
+            $this->getResponse()->status->setCode(500);
+            $data = [
+                'result' => 'error'
+            ];
         }
+
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $data
+            )
+        );
     }
 
     /** Here be mappers and stuff */
