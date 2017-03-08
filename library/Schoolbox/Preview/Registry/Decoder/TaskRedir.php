@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Preview\Registry\Decoder;
 
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Router;
 use Component_InstanceMapper;
 use Group;
 use Schoolbox\Assessment\Course\Task;
@@ -31,6 +33,21 @@ class TaskRedir extends Base {
      * @var string
      */
     private $regex = '/task\/start\/(\d+)/';
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+
+    /**
+     * @param Router $router
+     */
+    public function __construct(Router $router)
+    {
+        $this->router = $router;
+    }
+
 
     /**
      * Distill a url from a Task instance
@@ -57,8 +74,19 @@ class TaskRedir extends Base {
             return '';
         }
 
-        // Just redirect user to assessment summary page
-        return "/learning/assessments/{$task->getAssessmentModel()->getId()}/{$user->getId()}";
+        try{
+            $route = $this->router->generate(
+                'learningAssessment.getSummary',
+                [
+                    'assessmentId' => $task->getAssessmentModel()->getId(),
+                    'studentId'    => $user->getId(),
+                ]
+            );
+        } catch (RouteNotFound $e){
+            return '';
+        }
+
+        return $route;
     }
 
 

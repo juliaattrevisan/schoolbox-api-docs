@@ -77,7 +77,7 @@ class Controller extends Base
         /* Regurgitate it
          */
 
-        $previewFragment = (new Factory())->urlFragment($params['encodedUrl'], $this->getUser());
+        $previewFragment = (new Factory($this->getRouter()))->urlFragment($params['encodedUrl'], $this->getUser());
 
         if($previewFragment['type'] == 'inline') {
             $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();

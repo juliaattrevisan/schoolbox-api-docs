@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Preview;
 
+use Aura\Router\Router;
 use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
 use Schoolbox\Preview\Registry\Decoder\LinkRedir;
@@ -15,6 +16,22 @@ use Schoolbox\User;
 
 class Factory
 {
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+
+    /**
+     * @param Router $router
+     */
+    public function __construct(Router $router)
+    {
+        $this->router = $router;
+    }
+
+
     /**
      * Given a URL will create the appropriate preview json array for outputting
      * This exists separately now so that it can be used in the task screen for displaying URLs inline
@@ -28,7 +45,7 @@ class Factory
          */
         $decoderRegistry = new Registry\Registry($encodedUrl);
         $decoderRegistry->add(new LinkRedir());
-        $decoderRegistry->add(new TaskRedir());
+        $decoderRegistry->add(new TaskRedir($this->router));
 
         $testUrl = $decoderRegistry->findUrl();
 
