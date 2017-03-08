@@ -9,6 +9,7 @@
 
 // require SitePage context
 use Alaress\Redis;
+use Schoolbox\Realtime\Alert\RedisPublisher;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../library/Bootstrap.php';
@@ -47,9 +48,6 @@ $bob->setTitle($body)
     ->putMeta('title', 'Message from ' . $user->formatName());
 
 
-// TODO abstract this away
-Redis::getClientInstance()->publish(sprintf('msg:%s:%d:alert', INSTANCE_ID, $userId), json_encode([
-    'message' => json_encode($bob->build())
-]));
+(new RedisPublisher(Redis::getClientInstance(), INSTANCE_ID))->alertUser($userId, $bob->build());
 
 $this->backToTheFuture(1);

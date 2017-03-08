@@ -17,17 +17,18 @@ use Alaress\Redis;
 use InvalidArgumentException;
 use Monolog\Logger;
 use OutOfBoundsException;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\Alert\IPublisher;
+use Schoolbox\Realtime\Alert\RedisPublisher;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 use Schoolbox\Realtime\WorkNotifier;
 
 class TimetableNotifier extends WorkNotifier {
 
-    /** @var ClientInterface */
-    private $redis;
+    /** @var IPublisher */
+    private $publisher;
 
     /** @var IClock */
     protected $clock;
@@ -37,9 +38,9 @@ class TimetableNotifier extends WorkNotifier {
      * @param IConfigLoader   $configLoader
      * @param LoggerInterface $log
      * @param IClock          $clock
-     * @param ClientInterface $redis
+     * @param IPublisher      $publisher
      */
-    public function __construct($configLoader = null, $log = null, IClock $clock = null, ClientInterface $redis = null)
+    public function __construct($configLoader = null, $log = null, IClock $clock = null, IPublisher $publisher = null)
     {
         parent::__construct($configLoader, $log);
 
@@ -47,22 +48,22 @@ class TimetableNotifier extends WorkNotifier {
             $this->clock = $clock;
         }
 
-        if ($redis instanceof ClientInterface) {
-            $this->redis = $redis;
+        if ($publisher instanceof IPublisher) {
+            $this->publisher = $publisher;
         }
     }
 
 
     /**
-     * @return ClientInterface
+     * @return IPublisher
      */
-    public function redis()
+    public function publisher()
     {
         // lazyload
-        if (null === $this->redis) {
-            $this->redis = Redis::getClientInstance();
+        if ($this->publisher === null) {
+            $this->publisher = new RedisPublisher(Redis::getClientInstance(), INSTANCE_ID);
         }
-        return $this->redis;
+        return $this->publisher;
     }
 
 
@@ -72,7 +73,7 @@ class TimetableNotifier extends WorkNotifier {
     public function clock()
     {
         // lazyload
-        if (null === $this->clock) {
+        if ($this->clock === null) {
             $this->clock = new Clock();
         }
         return $this->clock;
@@ -282,11 +283,9 @@ class TimetableNotifier extends WorkNotifier {
         $i = 0;
 
         while ($id = $stmt->fetchColumn()) {
-            // TODO abstract this away
-            $i += $this->redis()->publish(sprintf('msg:%s:%d:alert', INSTANCE_ID, $id), json_encode([
-                'message' => json_encode($instance)
-            ]));
+            $i += $this->publisher()->alertUser($id, $instance);
         }
+
         $this->log()->debug("Alerted $i users");
 
         return $i;
