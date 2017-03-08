@@ -71,7 +71,6 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             WHERE t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
             AND   t.Enabled = 1
         ");
-        $periods  = [];
         $result   = $this->database->getAll("
             SELECT
                 tp.Name                    AS Name,
@@ -91,12 +90,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             ORDER BY DayNumber ASC, StartTime ASC, EndTime ASC
         ");
 
-        // Figure out period number
-        foreach ($result as $i => $period) {
-            $periodNumber = $i+1;
-            $period['PeriodNumber'] = $periodNumber;
-            $periods[$periodNumber] = $period;
-        }
+        // Key result by period number
+        $periods = array_combine(
+            array_column($result, 'PeriodNumber'),
+            $result
+        );
 
         // This is all the same as HumanEdge
         $definition = [
@@ -114,7 +112,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             $definition['desc'][]     = $period['Name'];
             $definition['start'][]    = $startTime->getUsingFormat('H:i');
             $definition['end'][]      = $endTime->getUsingFormat('H:i');
-            $definition['number'][]   = intval($period['PeriodNumber']);
+            $definition['number'][]   = $period['PeriodNumber'];
             $definition['sequence'][] = 1;
         }
         return $definition;
@@ -357,7 +355,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
             foreach ($timetable as $x => $timetablePeriod) {
                 // SchoolEdge has no actual period numbers?
-                if ($timetablePeriod['periodStart'] == $startTime && $timetablePeriod['periodEnd'] == $endTime) {
+                if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
                     $classCode = $timetabledClass['ClassCode'];
                     $dayNumber = $timetabledClass['DayNumber'];
                     if (!isset($timetable[$x]['day'][$dayNumber][$classCode])) {
