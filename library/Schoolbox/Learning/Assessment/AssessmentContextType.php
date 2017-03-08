@@ -26,6 +26,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
  */
 class AssessmentContextType implements IType
 {
+    use TypeTrait;
+
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
     const TYPE_FOLDER = 'folder';
@@ -33,7 +35,29 @@ class AssessmentContextType implements IType
     const TYPE_UNIT_IMPLEMENTATION = 'unit';
     const TYPE_UNIT_SPECIFICATION = 'unitspec';
 
-    use TypeTrait;
+    /**
+     * @var static
+     */
+    private static $instance;
+
+
+    /**
+     * Protected constructor to enforce singleton pattern
+     */
+    protected function __construct(){}
+
+    /**
+     * Retrieves the singleton instance of this class.
+     *
+     * @return static
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new static();
+        }
+        return self::$instance;
+    }
 
     /**
      * Get twig template directory for a given AssessmentContext
