@@ -8,6 +8,8 @@
  */
 
 // require SitePage context
+use Alaress\Redis;
+
 if (empty($this)) {
     require_once __DIR__ . '/../../library/Bootstrap.php';
     SitePage::localRedir('/adminv2/home');
@@ -44,8 +46,10 @@ $bob->setTitle($body)
     ->putMeta('ttl', 30)
     ->putMeta('title', 'Message from ' . $user->formatName());
 
-$n = \Schoolbox\Notif\Notifactory::create("instant.user.$userId.alert", \Schoolbox\Config\ConfigMapper::getInstance());
 
-$n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
+// TODO abstract this away
+Redis::getClientInstance()->publish(sprintf('msg:%s:%d:alert', INSTANCE_ID, $userId), json_encode([
+    'message' => json_encode($bob->build())
+]));
 
 $this->backToTheFuture(1);
