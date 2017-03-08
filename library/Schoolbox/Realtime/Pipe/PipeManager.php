@@ -547,12 +547,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             case self::PIPE_METHOD_ALERT:
                 $this->sendToUser($userId, [ $command => $data ]);
                 $release = false;
-
-                if ($subscription = $this->subscriptionManager->getUserSubscription($userId)) {
-                    foreach ($data as $msgId => $msgData) {
-                        $subscription->acknowledgeMessage($msgId);
-                    }
-                }
                 break;
         }
 
