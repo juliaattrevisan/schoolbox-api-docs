@@ -345,16 +345,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], []);
         }
         foreach ($this->database->getAll($query) as $timetabledClass) {
-//            // Account for classes which extend multiple periods
-//            $periodSpan = range(
-//                $timetabledClass['PeriodNumber'],
-//                $timetabledClass['PeriodNumber'] + $timetabledClass['PeriodSpan'] - 1
-//            );
-            $startTime = (new Alaress_Date_Format($timetabledClass['PeriodStart'], 'H:i:s.u'))->getUsingFormat('H:i');
-            $endTime   = (new Alaress_Date_Format($timetabledClass['PeriodEnd'], 'H:i:s.u'))->getUsingFormat('H:i');
-
             foreach ($timetable as $x => $timetablePeriod) {
-                // SchoolEdge has no actual period numbers?
                 if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
                     $classCode = $timetabledClass['ClassCode'];
                     $dayNumber = $timetabledClass['DayNumber'];
