@@ -294,67 +294,10 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         $timetableFilter = "t.Name = {$quotedCampus} AND t.Enabled = 1";
 
         if ($user->getRole()->isStudent()) {
-            // 1st part: blocked classes
-            // 2nd part: non-blocked classes
             $query = "
-                SELECT
-                    $this->classSelect,
-                    $this->baseStaffSelect,
-                    $this->replacementStaffSelect,
-                    $this->baseRoomSelect,
-                    $this->replacementRoomSelect
-
-                FROM       fc.TimetableSubject       ts
-                -- Join onto student via subject choice
-                INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
-                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
-                INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID             = tsc.TimetableClassID
-                INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.ID
-                -- Expand period
-                INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
-                INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
-                CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
-                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
-                $this->baseStaffJoin
-                $this->replacementStaffJoin
-                $this->baseRoomJoin
-                $this->replacementRoomJoin
-                $this->timetableJoin
-
-                WHERE s.Code = {$quotedId}
-                AND   $timetableFilter
-
+                {$this->getStudentBlockedTimetableQuery($externalUserId, $campus)}
                 UNION
-
-                SELECT
-                    $this->classSelect,
-                    $this->baseStaffSelect,
-                    $this->replacementStaffSelect,
-                    $this->baseRoomSelect,
-                    $this->replacementRoomSelect
-
-                FROM       fc.TimetableSubject       ts
-                -- Join onto student via year level
-                INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
-                INNER JOIN fc.YearLevelSub           yls  ON tc.YearLevelSubID = yls.ID
-                INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
-                INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
-                -- Expand period
-                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID                 = tci.TimetableClassID
-                INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
-                CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
-                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID    = td.ID
-                $this->baseStaffJoin
-                $this->replacementStaffJoin
-                $this->baseRoomJoin
-                $this->replacementRoomJoin
-                $this->timetableJoin
-
-                WHERE s.Code = {$quotedId}
-                AND   tci.TimetableBlockInstanceID IS NULL
-                AND   tci.TimetablePeriodID IS NOT NULL
-                AND   $timetableFilter
-
+                {$this->getStudentNonBlockedTimetableQuery($externalUserId, $campus)}
                 ORDER BY DayNumber asc, PeriodStart asc
             ";
 
@@ -643,7 +586,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      * @param Campus $campus
      * @return string
      */
-    protected function getStudentBlockTimetableQuery($externalUserId, Campus $campus)
+    protected function getStudentBlockedTimetableQuery($externalUserId, Campus $campus)
     {
         $quotedId = $this->database->smartQuote($externalUserId);
         return "
@@ -655,12 +598,14 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 $this->replacementRoomSelect
 
             FROM       fc.TimetableSubject       ts
-            -- Join onto staff
+            -- Join onto student via subject choice
             INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
             INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+            INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID             = tsc.TimetableClassID
+            INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.ID
             -- Expand period
             INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
-            INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
+            INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
             CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
             INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
             $this->baseStaffJoin
@@ -669,13 +614,50 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             $this->replacementRoomJoin
             $this->timetableJoin
 
-            WHERE (
-                (staff_base.Code = {$quotedId} AND tcis.TimetableClassStaffID IS NULL)
-                OR
-                staff_replacement.Code = {$quotedId}
-            )
-            AND t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
-            AND t.Enabled = 1
+            WHERE s.Code = {$quotedId}
+            AND   t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND   t.Enabled = 1
+        ";
+    }
+
+    /**
+     * @param mixed  $externalUserId
+     * @param Campus $campus
+     * @return string
+     */
+    protected function getStudentNonBlockedTimetableQuery($externalUserId, Campus $campus)
+    {
+        $quotedId = $this->database->smartQuote($externalUserId);
+        return "
+            SELECT
+                $this->classSelect,
+                $this->baseStaffSelect,
+                $this->replacementStaffSelect,
+                $this->baseRoomSelect,
+                $this->replacementRoomSelect
+
+            FROM       fc.TimetableSubject       ts
+            -- Join onto student via year level
+            INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
+            INNER JOIN fc.YearLevelSub           yls  ON tc.YearLevelSubID = yls.ID
+            INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
+            INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
+            -- Expand period
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID                 = tci.TimetableClassID
+            INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
+            CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
+            INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID    = td.ID
+            $this->baseStaffJoin
+            $this->replacementStaffJoin
+            $this->baseRoomJoin
+            $this->replacementRoomJoin
+            $this->timetableJoin
+
+            WHERE s.Code = {$quotedId}
+            AND   tci.TimetableBlockInstanceID IS NULL
+            AND   tci.TimetablePeriodID IS NOT NULL
+            AND   t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND   t.Enabled = 1
         ";
     }
 }
