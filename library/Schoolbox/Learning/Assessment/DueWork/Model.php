@@ -287,18 +287,6 @@ class Model extends AbstractAssessment
         return true;
     }
 
-    public function canLearnerView(User $learner) {
-        // Not open ?
-        if(!$this->isPublished()){
-            return false;
-        }
-
-        // Not a participant ?
-        if(!$this->isParticipant($learner)){
-            return false;
-        }
-    }
-
     /**
      * @inheritdoc
      */

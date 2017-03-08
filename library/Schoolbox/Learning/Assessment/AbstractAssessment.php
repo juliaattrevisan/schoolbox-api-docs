@@ -321,6 +321,21 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * @inheritdoc
+     */
+    public function canLearnerView(User $learner)
+    {
+        if (!$this->isPublished()) {
+            return false;
+        }
+        if (!$this->isParticipant($learner)) {
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
      * Get the Human Readable Mark value for a particular User
      *
      * Optionally get the Published Human Readable Mark or the
