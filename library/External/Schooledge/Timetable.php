@@ -279,19 +279,12 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getFullTimetable($externalUserId, $userId, Campus $campus)
     {
-        // Wat
-        // Didn't we change this?
+        // Didn't we change these method so they take a User object?
         try {
             $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
-
-        $quotedId     = $this->database->smartQuote($externalUserId);
-        $quotedCampus = $this->database->smartQuote($campus->getExtTimetableCode());
-
-        // Sub-parts common to all queries
-        $timetableFilter = "t.Name = {$quotedCampus} AND t.Enabled = 1";
 
         if ($user->getRole()->isStudent()) {
             $query = "
