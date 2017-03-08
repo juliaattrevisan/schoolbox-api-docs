@@ -54,15 +54,11 @@ class TaskRedir extends Base {
             /** @var Task $task */
             $task = TaskMapper::getInstance()->findById($id);
         } catch (MapperException $e){
-            $task = null;
-        }
-
-        if($task){
-            // Just redirect user to assessment summary page
-            return "/learning/assessments/{$task->getAssessmentModel()->getId()}/{$user->getId()}";
-        } else {
             return '';
         }
+
+        // Just redirect user to assessment summary page
+        return "/learning/assessments/{$task->getAssessmentModel()->getId()}/{$user->getId()}";
     }
 
 
