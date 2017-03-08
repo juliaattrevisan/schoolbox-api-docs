@@ -371,7 +371,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByFolderIdForReview($folderId, User $student = null, $options = [])
+    public function findAllByFolderIdForReview($folderId, User $student = null, array $options = [])
     {
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection(
