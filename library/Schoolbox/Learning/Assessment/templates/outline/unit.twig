@@ -6,41 +6,43 @@
         {% set expanded_icon = expanded ? 'icon-up-arrow' :'icon-down-arrow'  %}
         {% set expanded_state = expanded ? 'expanded' :'collapsed' %}
 
-        <li class="actions-small-1 interact {{ expanded_state }}" data-unit="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
-            <div class="list-item">
-                <div class="card small-12">
-                    <h3>
-                        {% if unit.isBeforeOpenDate==false or readOnly == false %}
-                        <a class="expand-link {{ expanded_icon }}" data-interaction="toggle-expanded" data-interaction-state="{{ expanded_state }}"></a>
-                        <a href="/homepage/{{ unit.specification.folder.id }}">{{ unit.title }}</a>
-                        {% else %}
-                            {{ unit.title }}
-                        {% endif %}
-                    </h3>
-                    <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>
+        <li class="interact {{ expanded_state }}" data-unit="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
+            <div class="actions-small-1">
+                <div class="list-item">
+                    <div class="card small-12">
+                        <h3>
+                            {% if unit.isBeforeOpenDate==false or readOnly == false %}
+                            <a class="expand-link {{ expanded_icon }}" data-interaction="toggle-expanded" data-interaction-state="{{ expanded_state }}"></a>
+                            <a href="/homepage/{{ unit.specification.folder.id }}">{{ unit.title }}</a>
+                            {% else %}
+                                {{ unit.title }}
+                            {% endif %}
+                        </h3>
+                        <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>
+                    </div>
                 </div>
-            </div>
-            {% if readOnly == false %}
-            <nav>
-                <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
-            </nav>
-            <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
+                {% if readOnly == false %}
+                <nav>
+                    <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
+                </nav>
+                <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
 
-                {% if unit.isAfterDueDate == false %}
-                <li class="separator">Create</li>
-                <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=project&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-project">Project</a></li>
-                <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=dueWork&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
-                <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
-                <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task">Task</a></li>
+                    {% if unit.isAfterDueDate == false %}
+                    <li class="separator">Create</li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=project&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-project">Project</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=dueWork&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task">Task</a></li>
+                    {% endif %}
+                    <li class="separator">Manage</li>
+                    <li><a href="{{ routeLookup('learningMarkbook.getMarkbook', {classId: courseImplementation.folder.id}) }}" class="icon-curriculum">Markbook</a></li>
+                    <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}" data-action="delete-unit" class="icon-delete" title="Delete this unit">Delete</a></li>
+                </ul>
                 {% endif %}
-                <li class="separator">Manage</li>
-                <li><a href="{{ routeLookup('learningMarkbook.getMarkbook', {classId: courseImplementation.folder.id}) }}" class="icon-curriculum">Markbook</a></li>
-                <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}" data-action="delete-unit" class="icon-delete" title="Delete this unit">Delete</a></li>
-            </ul>
-            {% endif %}
 
-            <!-- Form for reordering tasks - one per unit -->
-            <form action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'units', contextId: unit.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post" class="reorder_form"></form>
+                <!-- Form for reordering tasks - one per unit -->
+                <form action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'units', contextId: unit.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post" class="reorder_form"></form>
+            </div>
 
             {% include '@learningAssessment/outline/unitAssessments.twig' %}
         </li>

@@ -40,16 +40,18 @@
     {% endif %}
 
     <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
-        <div class="expander{% if participant.allResponses | length %} icon-down-arrow{% endif %}" data-collapser="user-completions-{{ participant.user.id }}"></div>
-        {% include '@learningAssessment/fragments/participantStatus.twig' with {
-            user:        participant.user,
-            statusClass: pStatusClass,
-            statusText:  pStatusText,
-            statusTip:   pTooltip,
-            cardSize:    "small-9 medium-10 xlarge-11"
-        } only %}
-        <div class="small-1">
-            {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+        <div>
+            <div class="expander{% if participant.allResponses | length %} icon-down-arrow{% endif %}" data-collapser="user-completions-{{ participant.user.id }}"></div>
+            {% include '@learningAssessment/fragments/participantStatus.twig' with {
+                user:        participant.user,
+                statusClass: pStatusClass,
+                statusText:  pStatusText,
+                statusTip:   pTooltip,
+                cardSize:    "small-9 medium-10 xlarge-11"
+            } only %}
+            <div class="small-1">
+                {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+            </div>
         </div>
         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="user-completions-{{ participant.user.id }}">
             <ul data-responses class="information-list">

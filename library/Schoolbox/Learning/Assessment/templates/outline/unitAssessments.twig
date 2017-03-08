@@ -27,76 +27,78 @@
             {% set completionGradient = (completionCount / studentCount) * 100 %}
         {% endif %}
 
-        <li class="actions-small-1 interact" data-unit-assessment="{{ assessment.id }}">
-            {% if readOnly == false %}
-                <div class="grip compact"></div>
-            {% endif %}
-            <div class="list-item">
-                <div class="small-12 compact card wrap-down">
-                    {##
-                    #  Special case for projects, to take teachers to status page rather than summary
-                    #}
-                    {% if readOnly == false and assessment is project %}
-                        {% set href = routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) %}
-                    {% else %}
-                        {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
-                    {% endif %}
+        <li class="interact" data-unit-assessment="{{ assessment.id }}">
+            <div class="actions-small-1">
+                {% if readOnly == false %}
+                    <div class="grip compact"></div>
+                {% endif %}
+                <div class="list-item">
+                    <div class="small-12 compact card wrap-down">
+                        {##
+                        #  Special case for projects, to take teachers to status page rather than summary
+                        #}
+                        {% if readOnly == false and assessment is project %}
+                            {% set href = routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) %}
+                        {% else %}
+                            {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
+                        {% endif %}
 
-                    <a title="{{ assessment.typeName }}" href="{{ href }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
-                        <span class="{{ icon.renderClass(assessment) }}"></span>
-                        <p>{{ assessment.title }}</p>
-                    </a>
+                        <a title="{{ assessment.typeName }}" href="{{ href }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
+                            <span class="{{ icon.renderClass(assessment) }}"></span>
+                            <p>{{ assessment.title }}</p>
+                        </a>
 
-                    {##
-                     # Metadata
-                     #
-                     # Teacher: sees completion stats
-                     # Others: see due date
-                     #}
-                    {% if readOnly == false %}
-                        {% if assessment is not project %}
-                            <p class="meta">
-                                <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
+                        {##
+                         # Metadata
+                         #
+                         # Teacher: sees completion stats
+                         # Others: see due date
+                         #}
+                        {% if readOnly == false %}
+                            {% if assessment is not project %}
+                                <p class="meta">
+                                    <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
+                                </p>
+                            {% endif %}
+                        {% else %}
+                            <p class="meta spaced">
+                                <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
                             </p>
                         {% endif %}
-                    {% else %}
-                        <p class="meta spaced">
-                            <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
-                        </p>
-                    {% endif %}
+                    </div>
                 </div>
-            </div>
-            <nav>
-                {##
-                 # Buttons
-                 #
-                 # Teacher: sees nav
-                 # Participant: sees complete task button (if of course it's a task that's self-assessable)
-                 #}
-                {% if readOnly == false %}
-                    <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
-                {% elseif isParticipant and assessment is task %}
-                    {% set participant                 = assessment.getParticipant(USER) %}
-                    {% set latestResponse              = participant.findMostRecentSubmittedResposne %}
-                    {% set isMarkedByTeacherAsComplete = latestResponse and latestResponse.teacherAssessed and latestResponse.markedComplete %}
-                    {% include '@learningAssessment/task/progressTickForm.twig' with {
+                <nav>
+                    {##
+                     # Buttons
+                     #
+                     # Teacher: sees nav
+                     # Participant: sees complete task button (if of course it's a task that's self-assessable)
+                     #}
+                    {% if readOnly == false %}
+                        <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
+                    {% elseif isParticipant and assessment is task %}
+                        {% set participant                 = assessment.getParticipant(USER) %}
+                        {% set latestResponse              = participant.findMostRecentSubmittedResposne %}
+                        {% set isMarkedByTeacherAsComplete = latestResponse and latestResponse.teacherAssessed and latestResponse.markedComplete %}
+                        {% include '@learningAssessment/task/progressTickForm.twig' with {
                         participant: participant,
                         disabled: not assessment.isOpen or not assessment.isSelfAssessable or isMarkedByTeacherAsComplete
-                    } only %}
-                {% endif %}
-            </nav>
-            {% if readOnly == false  %}
-                <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
-                    <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
-
-                    {% if assessment is quiz %}
-                        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify this assessment">Modify</a></li>
-                    {% else %}
-                        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this assessment">Modify</a></li>
+                        } only %}
                     {% endif %}
-                    <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" class="icon-delete" data-action="delete" title="Delete this assessment">Delete</a></li>
-                </ul>
-            {% endif %}
+                </nav>
+                {% if readOnly == false  %}
+                    <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
+                        <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
+
+                        {% if assessment is quiz %}
+                            <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify this assessment">Modify</a></li>
+                        {% else %}
+                            <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this assessment">Modify</a></li>
+                        {% endif %}
+                        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" class="icon-delete" data-action="delete" title="Delete this assessment">Delete</a></li>
+                    </ul>
+                {% endif %}
+            </div>
         </li>
     {% endfor %}
 </ul>

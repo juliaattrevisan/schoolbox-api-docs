@@ -98,30 +98,28 @@
 
                     <li class="show-for-medium-up no-border">
                         <div class="list-item">
-                            <section>
 
-                                {# If the data is sortable need to add a blank column for drag handle #}
+                            {# If the data is sortable need to add a blank column for drag handle #}
 
-                                {% if tables[table].sortable %}
-                                    <div class="small-1 columns">
-                                        <h3>Order</h3>
+                            {% if tables[table].sortable %}
+                                <div class="small-1 columns">
+                                    <h3>Order</h3>
+                                </div>
+                            {% endif %}
+
+                            {% for field_key, field in tables[table].fields %}
+                                {% if field.hidden is empty %}
+                                    <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
+                                        <h3>
+                                            {{ field.caption }}
+                                            {% if field.tooltip %}
+                                                <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>
+                                            {% endif %}
+                                        </h3>
                                     </div>
                                 {% endif %}
+                            {% endfor %}
 
-                                {% for field_key, field in tables[table].fields %}
-                                    {% if field.hidden is empty %}
-                                        <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
-                                            <h3>
-                                                {{ field.caption }}
-                                                {% if field.tooltip %}
-                                                    <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>
-                                                {% endif %}
-                                            </h3>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-
-                            </section>
                         </div>
                     </li>
 
@@ -133,6 +131,8 @@
                             <input type="hidden" name="id[]" value="{{ key }}">
 
                             {% set recordIndex = loop.index %}
+
+                            <div>
 
                                 {% if tables[table].sortable %}
                                     <div class="small-1 column grip">&nbsp;</div>
@@ -199,7 +199,10 @@
                                             {% endif %}
                                         </div>
                                     {% endif %}
-                            {% endfor %}
+                                {% endfor %}
+
+                            </div>
+
                         </li>
                     {% endfor %}
                 </ul>
