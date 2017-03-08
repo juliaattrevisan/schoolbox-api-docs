@@ -449,28 +449,6 @@ abstract class AbstractAssessment implements IAssessable
         return !$latestSubmittedResponse && !$latestPublishedFeedback;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isFeedbackRequired(Participant $participant)
-    {
-        $this->assertSameAssessment($participant);
-
-        // No responses, or latest response has published feedback already ?
-        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
-        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
-            return false;
-        }
-
-        // One or more responses and no feedback ?
-        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
-        if (!$latestPublishedFeedback) {
-            return true;
-        }
-
-        // Was the latest student response submitted after the latest mark was published?
-        return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
-    }
 
     /**
      * @inheritdoc

@@ -17,6 +17,7 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 use InvalidArgumentException;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
@@ -80,9 +81,9 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function isFeedbackRequired(User $user)
+    public function isFeedbackRequired(Participant $participant)
     {
-        $participant = $this->getParticipant($user);
+        $this->assertSameAssessment($participant);
 
         $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
 
