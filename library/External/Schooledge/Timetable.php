@@ -247,6 +247,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
             LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
         ";
+        $timetableFilter = "t.Name = {$quotedCampus} AND t.Enabled = 1";
 
         if ($user->getRole()->isStudent()) {
             // 1st part: blocked classes
@@ -274,8 +275,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 $replacementStaffJoin
 
                 WHERE s.Code = {$quotedId}
-                AND   t.Name = {$quotedCampus}
-                AND   t.Enabled = 1
+                AND   $timetableFilter
 
                 UNION
 
@@ -303,8 +303,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 WHERE s.Code = {$quotedId}
                 AND   tci.TimetableBlockInstanceID IS NULL
                 AND   tci.TimetablePeriodID IS NOT NULL
-                AND   t.Name = {$quotedCampus}
-                AND   t.Enabled = 1
+                AND   $timetableFilter
 
                 ORDER BY DayNumber asc, PeriodStart asc
             ";
@@ -338,8 +337,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     OR
                     staff_replacement.Code = {$quotedId}
                 )
-                AND t.Name = {$quotedCampus}
-                AND t.Enabled = 1
+                AND $timetableFilter
 
                 ORDER BY DayNumber ASC, PeriodStart ASC
             ";
