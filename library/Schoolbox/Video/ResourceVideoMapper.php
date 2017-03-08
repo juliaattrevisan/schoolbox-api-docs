@@ -34,13 +34,7 @@ class ResourceVideoMapper extends Mapper
                 'identifier' => true,
             )
         );
-        $this->hasMap(
-            array(
-                'column'   => 'hash',
-                'property' => 'hash',
-                'type'     => self::TYPE_STRING,
-            )
-        );
+
         $this->hasMap(
             array(
                 'column'   => 'status',
@@ -70,13 +64,6 @@ class ResourceVideoMapper extends Mapper
             )
         );
 
-        $this->hasJoin(
-            'storage', array(
-                'mapper'    => Schoolbox\Resource\Storage\Mapper::class,
-                'this_key'  => 'hash',
-                'other_key' => 'hash',
-            )
-        );
         $this->hasJoin(
             'student_submission', array(
                 'mapper'    => Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::class,
