@@ -116,7 +116,7 @@ class Controller extends Base
         $previousTerm = null;
         $nextTerm     = null;
         foreach ($terms as $i => $termInList) {
-            if ($termInList->getId() == $term->getId()) {
+            if ($termInList->getId() === $term->getId()) {
                 if (isset($terms[$i + 1])) {
                     $previousTerm = $terms[$i + 1];
                 }
