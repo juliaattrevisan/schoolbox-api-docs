@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Sync\Provisioner\Provisioner;
 
-$options = getopt("vr:", array('perform-update'));
+$options = getopt("vr:", array('perform-update', 'instance::'));
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -24,6 +24,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('UPS', [
     'verbose'  => isset($options['v']) ? $options['v'] : null,
     'perform'  => isset($options['perform-update']),
     'roleType' => (isset($options['r']) && in_array($options['r'], [ 'staff', 'student', 'parent' ])) ? $options['r'] : null,
+    'instance' => $options['instance']
 ]);
 
 // Signal handling unique to the provisioner
@@ -42,6 +43,7 @@ $kernel->registerExceptionCallback($cleanup);
 
 $kernel->run(
     function ($di, $loop, $log, $opts) {
+        $instanceId = isset($opts["instance"]) ? $opts["instance"] : INSTANCE_ID;
 
         /**
          * @var Di\Container    $di
@@ -51,7 +53,7 @@ $kernel->run(
          */
 
         // define the redis key we'll use for this run
-        $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid();
+        $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
 
         /** @var CompositeLoggerInterface $logger */
         $logger = $di->get('ups.logger');
