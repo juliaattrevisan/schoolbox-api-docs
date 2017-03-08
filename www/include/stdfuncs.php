@@ -165,3 +165,14 @@ function sb_tempnam($prefix = '', $dir = '')
 {
     return tempnam($dir ?: sys_get_temp_dir(), 'sb-' . INSTANCE_ID . ($prefix ? "-$prefix" : ''));
 }
+
+/**
+ * Get the number of file descriptors this process is currently holding open
+ *
+ * @return int
+ */
+function open_fd_count()
+{
+    $pid = getmypid();
+    return (int)`lsof -ap $pid | wc -l`;
+}
