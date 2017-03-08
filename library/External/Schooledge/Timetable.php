@@ -289,7 +289,23 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     td.Name                     AS DayName,
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
-                    tpe.Name                    AS PeriodName
+                    tpe.Name                    AS PeriodName,
+                    CASE WHEN tcis.TimetableClassStaffID IS NULL
+                        THEN 1
+                        ELSE 0
+                    END AS UseBaseStaff,
+                    staff_base.Code             AS BaseStaffID,
+                    staff_base.FirstName        AS BaseStaffPreferredName,
+                    staff_base.LastName         AS BaseStaffSurname,
+                    staff_base.Title            AS BaseStaffTitle,
+                    CASE WHEN staff_replacement.Code IS NOT NULL
+                        THEN 1
+                        ELSE 0
+                    END AS UseReplacementStaff,
+                    staff_replacement.Code      AS ReplacementStaffID,
+                    staff_replacement.FirstName AS ReplacementStaffPreferredName,
+                    staff_replacement.LastName  AS ReplacementStaffSurname,
+                    staff_replacement.Title     AS ReplacementStaffTitle
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto timetable
