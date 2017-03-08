@@ -9,14 +9,10 @@ namespace Schoolbox\Learning\Mastery;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
-use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Markbook\Markbook;
@@ -31,27 +27,27 @@ class Controller extends Base
     /**
      * @var ErrorMapper
      */
-    protected $errorMapper;
+    private $errorMapper;
 
     /**
      * @var AssessmentMapperProxy
      */
-    protected $assessmentMapperProxy;
+    private $assessmentMapperProxy;
 
     /**
      * @var GradeGroup
      */
-    protected $defaultGradeGroup;
+    private $defaultGradeGroup;
 
     /**
      * @var CourseImplementationMapper
      */
-    protected $courseImplementationMapper;
+    private $courseImplementationMapper;
 
     /**
      * @var TermMapper
      */
-    protected $termMapper;
+    private $termMapper;
 
     /**
      * Constructor
