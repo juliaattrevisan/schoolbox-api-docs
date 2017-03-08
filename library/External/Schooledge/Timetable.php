@@ -152,7 +152,29 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
     {
-        return [];
+        $dateObject    = $this->getDateObjectFromTimestamp($now);
+        $timetableDate = $this->getTimetableDate($campus, $dateObject);
+        if (!isset($timetableDate)) {
+            return [];
+        }
+
+        // SchoolEdge doesn't really have period numbers as such - use period name.
+        $quotedTime      = $this->database->smartQuote($dateObject->getDatabaseTime());
+        $timetablePeriod = $this->database->getRow($q="
+            SELECT tp.*
+            FROM fc.TimetablePeriod tp
+
+            WHERE tp.TimetableDayID = {$this->database->smartQuote($timetableDate['TimetableDay']['ID'])}
+            AND   CAST(tp.StartTime AS TIME) <= $quotedTime
+            AND   CAST(tp.EndTime   AS TIME) >  $quotedTime
+        ");
+        if (empty($timetablePeriod)) {
+            return [];
+        }
+        return [
+            'PeriodNumber'    => $timetablePeriod['Code'],
+            'PeriodNumberSeq' => $timetablePeriod['Code'],
+        ];
     }
 
     /**
