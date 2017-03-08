@@ -175,7 +175,6 @@ function setValue ( element, options, state, date ) {
             window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true);
         }
         element.val(v);
-
     }
     else {
         var v = moment(value, convertFormat(pickerFormats.convertFrom)).format(convertFormat(pickerFormats.convertTo));
@@ -185,8 +184,9 @@ function setValue ( element, options, state, date ) {
         }
         element.val(v);
     }
-    if(pickerOptions.allDayExt !== false) {
-        $('#'+pickerOptions.allDayExt).val(state?1:0);
+    console.log(v);
+    if(options.allDayExt !== false) {
+        $('#'+options.allDayExt).val(state?1:0);
     }
 
 }
