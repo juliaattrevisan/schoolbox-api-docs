@@ -31,8 +31,9 @@
 
 {# Render unit selector too #}
 {% if courses|length %}
-    <select title="Filter by unit" data-unit-selector>
-        <option disabled selected>All Units</option>
+    <select title="Filter by unit" data-context-selector>
+        <option selected value="all">All Units and Folder</option>
+        <option value="folder">On Folder</option>
         {% for course in courses %}
             <optgroup label="Course: {{ course.specification.folder.title }}">
                 {% for unit in course.units %}
@@ -56,5 +57,110 @@
                 previousSemester: '[data-interaction="previous-term"]'
             }
         });
+
+        var $contextSelector    = $('[data-context-selector]');
+        var $markSheet          = $('[data-mark-sheet]');
+        var $headers            = $markSheet.find('[data-headers]');
+        var $assessmentHeaders  = $headers.find('[data-assessment]');
+        var $hidableColumnRows  = $markSheet.find('[data-hidable-columns]');
+        var $allAssessmentCells = $hidableColumnRows.find('[data-assessment]');
+
+        /**
+         * Context Selector
+         */
+        function applyContextFilter()
+        {
+            var hash = getValidHash(window.location.hash);
+
+            // Determine which columns to hide
+            var assessmentsToHide = [];
+            $.each($assessmentHeaders, function(idx, elem){
+                var $elem = $(elem);
+                var assessmentId = $elem.data('assessment');
+                var contextType = $elem.data('context-type');
+                var contextId = $elem.data('context');
+
+                if (hash == 'folder'){
+                    if(contextType != 'folder'){
+                        assessmentsToHide.push(assessmentId);
+                    }
+                } else if (hash) {
+                    if(contextId != hash){
+                        assessmentsToHide.push(assessmentId);
+                    }
+                }
+            });
+            showAllAssessments();
+            hideAssessments(assessmentsToHide);
+        }
+
+        /**
+         * Show all assessments
+         */
+        function showAllAssessments()
+        {
+            $allAssessmentCells.show();
+        }
+
+        /**
+         * Hide specified assessments
+         */
+        function hideAssessments(assessmentsToHide)
+        {
+            for (var i = 0; i < assessmentsToHide.length; i++) {
+                $hidableColumnRows.find('[data-assessment='+assessmentsToHide[i]+']').hide();
+            }
+        }
+
+        /**
+         * Returns a valid location hash or null
+         *
+         * @param {string} proposedHash
+         * @return {string|null}
+         */
+        function getValidHash(proposedHash)
+        {
+            // Is hash not empty ?
+            if(proposedHash.length <= 1) {
+                return null;
+            }
+            var hash = proposedHash.substr(1);
+
+            // Is hash not string 'folder' or an integer (unit-impl) ?
+            if(hash != 'folder' && parseInt(hash) != hash){
+                return null;
+            }
+            return hash;
+        }
+
+        /**
+         * Update location hash and visible assessments when user selects item in context dropdown
+         */
+        $contextSelector.on('change', function(){
+            window.location.hash = $(this).val();
+            applyContextFilter();
+        });
+
+
+        /**
+         * If hash already in URL, then select it from dropdown
+         */
+        function init()
+        {
+            var hash = getValidHash(window.location.hash);
+            if(hash){
+                // Is the hash found in context selector ?
+                if($contextSelector.find('option[value='+hash+']').length){
+                    $contextSelector.find('option[value='+hash+']').prop('selected', true);
+                } else {
+                    window.location.hash = '';
+                }
+            }
+            applyContextFilter();
+        }
+
+        // Init
+        init();
     });
+
 </script>
