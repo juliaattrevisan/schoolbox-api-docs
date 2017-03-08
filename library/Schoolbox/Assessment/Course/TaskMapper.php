@@ -12,8 +12,6 @@ namespace Schoolbox\Assessment\Course;
 use Schoolbox;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Course\Task\CompletionMapper;
 
 /**
  * Task mapper
@@ -25,6 +23,7 @@ class TaskMapper extends Schoolbox\Mapper
     /**
      * Setup method. Implementing classes to define their SQL map here.
      * @return void
+     * @throws Schoolbox\Mapper\DefinitionException
      */
     protected function mapping()
     {
@@ -54,6 +53,7 @@ class TaskMapper extends Schoolbox\Mapper
      * Soft deletes all Completions for the specified Task
      *
      * @param Task $task
+     * @throws Schoolbox\Mapper\DefinitionException
      */
     public function softDeleteCompletions(Task $task)
     {
@@ -67,64 +67,12 @@ class TaskMapper extends Schoolbox\Mapper
      * Restores all soft-deleted Completions for the specified Task
      *
      * @param Task $task
+     * @throws Schoolbox\Mapper\DefinitionException
      */
     public function restoreCompletions(Task $task)
     {
         $taskCompletionMapper = $this->getJoinMapper('completion');
         $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
         $taskCompletionMapper->restoreSoftDeleted($completions);
-    }
-
-    /**
-     * Helper method for retrieving a sensible base task. It contains a join to
-     * the category, submission box, assessment and owner of this task.
-     *
-     * @return string
-     */
-    protected function getBaseQuery()
-    {
-        return "
-            SELECT
-                {$this->getColumnString('t')},
-                {$this->getJoinColumnString('owner',          'u')}
-            FROM {$this->getTable()} AS t
-            LEFT JOIN {$this->getJoinSql('owner',          't', 'u')}
-        ";
-    }
-
-    /**
-     * Hydrate callback for use with queries created with $this->getBaseQuery();
-     *
-     * @param TaskMapper $mapper
-     * @param Task $model
-     * @param array $row
-     *
-     * @return Task
-     */
-    public static function baseHydrateCallback($mapper, $model, $row)
-    {
-        /** @var Schoolbox\User $owner */
-        $owner = $mapper->hydrateJoin($row, 'owner', 'u');
-        $model->setOwner($owner);
-        return $model;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return Task
-     */
-    public function findById($id)
-    {
-        $query = $this->getBaseQuery() . " WHERE t.id=?";
-        $statement = $this->database->prepare($query);
-        $statement->execute(array($id));
-        if (($row = $statement->fetch()) !== false) {
-            $task = $this->hydrate($row, 't', array($this, 'baseHydrateCallback'));
-            $this->throwIfDeleted($task);
-            return $task;
-        } else {
-            throw new MapperException('Instance of object not found');
-        }
     }
 }
