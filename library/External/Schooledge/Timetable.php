@@ -77,7 +77,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 tp.Name                    AS Name,
                 CAST(tp.StartTime AS TIME) AS StartTime,
                 CAST(tp.EndTime   AS TIME) AS EndTime,
-                td.SortOrder               AS DayNumber
+                td.SortOrder               AS DayNumber,
+                tp.Name                    AS PeriodNumber
 
             FROM       fc.Timetable       t
             INNER JOIN fc.TimetableDay    td ON t.ID  = td.TimetableId
@@ -194,6 +195,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     ts.Code as ClassCode,
                     ts.Name as ClassName,
                     td.SortOrder as DayNumber,
+                    tpe.Name as PeriodNumber,
                     td.Name as DayName,
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
@@ -226,6 +228,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     ts.Code as ClassCode,
                     ts.Name as ClassName,
                     td.SortOrder as DayNumber,
+                    tpe.Name as PeriodNumber,
                     td.Name as DayName,
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
