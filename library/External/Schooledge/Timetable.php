@@ -256,36 +256,10 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         foreach ($this->database->getAll($query) as $timetabledClass) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
-                    $classCode = $timetabledClass['ClassCode'];
-
-                    // Add for both base and replacement staff
-                    $room = isset($timetabledClass['ReplacementRoom'])
-                        ? $timetabledClass['ReplacementRoom']
-                        : $timetabledClass['BaseRoom'];
-                    if ($timetabledClass['UseBaseStaff']) {
-                        $timetable[$x]['class'][$classCode.'-'.$timetabledClass['BaseStaffID']] = [
-                            'description'    => $timetabledClass['ClassName'],
-                            'code'           => $timetabledClass['ClassCode'],
-                            'campus'         => $timetabledClass['ClassCampus'],
-                            'room'           => $room,
-                            'staffID'        => $timetabledClass['BaseStaffID'],
-                            'staffFirstname' => $timetabledClass['BaseStaffPreferredName'],
-                            'staffSurname'   => $timetabledClass['BaseStaffSurname'],
-                            'staffTitle'     => $timetabledClass['BaseStaffTitle'],
-                        ];
+                    if (!isset($timetable[$x]['class'])) {
+                        $timetable[$x]['class'] = [];
                     }
-                    if ($timetabledClass['UseReplacementStaff']) {
-                        $timetable[$x]['class'][$classCode.'-'.$timetabledClass['ReplacementStaffID']] = [
-                            'description'    => $timetabledClass['ClassName'],
-                            'code'           => $timetabledClass['ClassCode'],
-                            'campus'         => $timetabledClass['ClassCampus'],
-                            'room'           => $room,
-                            'staffID'        => $timetabledClass['ReplacementStaffID'],
-                            'staffFirstname' => $timetabledClass['ReplacementStaffPreferredName'],
-                            'staffSurname'   => $timetabledClass['ReplacementStaffSurname'],
-                            'staffTitle'     => $timetabledClass['ReplacementStaffTitle'],
-                        ];
-                    }
+                    $timetable[$x]['class'] += $this->getTimetableEntries($timetabledClass);
                 }
             }
         }
@@ -430,38 +404,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         foreach ($this->database->getAll($query) as $timetabledClass) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
-                    $classCode = $timetabledClass['ClassCode'];
                     $dayNumber = $timetabledClass['DayNumber'];
-                    if (!isset($timetable[$x]['day'][$dayNumber][$classCode])) {
-                        // Add for both base and replacement staff
-                        $room = isset($timetabledClass['ReplacementRoom'])
-                            ? $timetabledClass['ReplacementRoom']
-                            : $timetabledClass['BaseRoom'];
-                        if ($timetabledClass['UseBaseStaff']) {
-                            $timetable[$x]['day'][$dayNumber][$classCode.'-'.$timetabledClass['BaseStaffID']] = [
-                                'description'    => $timetabledClass['ClassName'],
-                                'code'           => $timetabledClass['ClassCode'],
-                                'campus'         => $timetabledClass['ClassCampus'],
-                                'room'           => $room,
-                                'staffID'        => $timetabledClass['BaseStaffID'],
-                                'staffFirstname' => $timetabledClass['BaseStaffPreferredName'],
-                                'staffSurname'   => $timetabledClass['BaseStaffSurname'],
-                                'staffTitle'     => $timetabledClass['BaseStaffTitle'],
-                            ];
-                        }
-                        if ($timetabledClass['UseReplacementStaff']) {
-                            $timetable[$x]['day'][$dayNumber][$classCode.'-'.$timetabledClass['ReplacementStaffID']] = [
-                                'description'    => $timetabledClass['ClassName'],
-                                'code'           => $timetabledClass['ClassCode'],
-                                'campus'         => $timetabledClass['ClassCampus'],
-                                'room'           => $room,
-                                'staffID'        => $timetabledClass['ReplacementStaffID'],
-                                'staffFirstname' => $timetabledClass['ReplacementStaffPreferredName'],
-                                'staffSurname'   => $timetabledClass['ReplacementStaffSurname'],
-                                'staffTitle'     => $timetabledClass['ReplacementStaffTitle'],
-                            ];
-                        }
+                    if (!isset($timetable[$x]['day'][$dayNumber])) {
+                        $timetable[$x]['day'][$dayNumber] = [];
                     }
+                    $timetable[$x]['day'][$dayNumber] += $this->getTimetableEntries($timetabledClass);
                 }
             }
         }
@@ -644,5 +591,40 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             $timetable[$x]['class']          = [];
         }
         return $timetable;
+    }
+
+    /**
+     * @param $timetabledClass
+     * @return array
+     */
+    protected function getTimetableEntries($timetabledClass)
+    {
+        $parts     = [];
+        $classCode = $timetabledClass['ClassCode'];
+        $basePart  = [
+            'description'    => $timetabledClass['ClassName'],
+            'code'           => $timetabledClass['ClassCode'],
+            'campus'         => $timetabledClass['ClassCampus'],
+            'room'           => isset($timetabledClass['ReplacementRoom'])
+                ? $timetabledClass['ReplacementRoom']
+                : $timetabledClass['BaseRoom'],
+        ];
+        if ($timetabledClass['UseBaseStaff']) {
+            $parts[$classCode.'-'.$timetabledClass['BaseStaffID']] = $basePart + [
+                'staffID'        => $timetabledClass['BaseStaffID'],
+                'staffFirstname' => $timetabledClass['BaseStaffPreferredName'],
+                'staffSurname'   => $timetabledClass['BaseStaffSurname'],
+                'staffTitle'     => $timetabledClass['BaseStaffTitle'],
+            ];
+        }
+        if ($timetabledClass['UseReplacementStaff']) {
+            $parts[$classCode.'-'.$timetabledClass['ReplacementStaffID']] = $basePart + [
+                'staffID'        => $timetabledClass['ReplacementStaffID'],
+                'staffFirstname' => $timetabledClass['ReplacementStaffPreferredName'],
+                'staffSurname'   => $timetabledClass['ReplacementStaffSurname'],
+                'staffTitle'     => $timetabledClass['ReplacementStaffTitle'],
+            ];
+        }
+        return $parts;
     }
 }
