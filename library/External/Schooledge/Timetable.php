@@ -239,6 +239,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             staff_replacement.LastName  AS ReplacementStaffSurname,
             staff_replacement.Title     AS ReplacementStaffTitle
         ";
+        $timetableJoin = "INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID";
         $baseStaffJoin = "
             LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
             LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
@@ -259,8 +260,6 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     $replacementStaffSelect
 
                 FROM       fc.TimetableSubject       ts
-                -- Join onto timetable
-                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
                 -- Join onto student via subject choice
                 INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
                 INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
@@ -273,6 +272,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
                 $baseStaffJoin
                 $replacementStaffJoin
+                $timetableJoin
 
                 WHERE s.Code = {$quotedId}
                 AND   $timetableFilter
@@ -285,8 +285,6 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     $replacementStaffSelect
 
                 FROM       fc.TimetableSubject       ts
-                -- Join onto timetable
-                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
                 -- Join onto student via year level
                 INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
                 INNER JOIN fc.YearLevelSub           yls  ON tc.YearLevelSubID = yls.ID
@@ -299,6 +297,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID    = td.ID
                 $baseStaffJoin
                 $replacementStaffJoin
+                $timetableJoin
 
                 WHERE s.Code = {$quotedId}
                 AND   tci.TimetableBlockInstanceID IS NULL
@@ -319,8 +318,6 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     $replacementStaffSelect
 
                 FROM       fc.TimetableSubject       ts
-                -- Join onto timetable
-                INNER JOIN fc.Timetable              t    ON ts.TimetableID    = t.ID
                 -- Join onto staff
                 INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
                 INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
@@ -331,6 +328,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
                 $baseStaffJoin
                 $replacementStaffJoin
+                $timetableJoin
 
                 WHERE (
                     (staff_base.Code = {$quotedId} AND tcis.TimetableClassStaffID IS NULL)
