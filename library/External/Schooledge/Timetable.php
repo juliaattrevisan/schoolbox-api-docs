@@ -211,6 +211,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             // 2nd part: non-blocked classes
             $query = "
                 SELECT
+                    t.Name AS ClassCampus,
                     ts.Code as ClassCode,
                     ts.Name as ClassName,
                     td.SortOrder as DayNumber,
@@ -241,6 +242,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 UNION
 
                 SELECT
+                    t.Name AS ClassCampus,
                     ts.Code as ClassCode,
                     ts.Name as ClassName,
                     td.SortOrder as DayNumber,
@@ -279,6 +281,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             // I'm guessing we smoosh the staff and student queries together somehow?
             $query = "
                 SELECT
+                    t.Name AS ClassCampus,
                     ts.Code as ClassCode,
                     ts.Name as ClassName,
                     td.SortOrder as DayNumber,
@@ -345,7 +348,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                         $timetable[$x]['day'][$dayNumber][$classCode] = [
                             'description'    => $timetabledClass['ClassName'],
                             'code'           => $timetabledClass['ClassCode'],
-//                            'campus'         => $timetabledClass['ClassCampus'],
+                            'campus'         => $timetabledClass['ClassCampus'],
 //                            'room'           => $timetabledClass['Room'],
 //                            'staffID'        => $timetabledClass['StaffID'],
 //                            'staffFirstname' => $timetabledClass['StaffPreferredName'],
