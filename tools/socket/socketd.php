@@ -1,4 +1,4 @@
-#!/usr/bin/hhvm
+#!/usr/bin/php
 <?php
 
 use Alaress\Redis\Async;
