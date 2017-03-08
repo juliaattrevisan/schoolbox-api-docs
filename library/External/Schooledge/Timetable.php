@@ -428,8 +428,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             if ($dayIndex > (count($timetableDays) - 1)) {
                 $dayIndex = 0;
             }
-
-            $timetableDayID = $timetableDays[$dayIndex]['ID'];
+            $timetableDay   = $timetableDays[$dayIndex];
+            $timetableDayId = $timetableDay['ID'];
 
             switch ($cm['TimetableDayType']) {
                 case self::TIMETABLE_DATE_TYPE_NON_DAY:
@@ -453,9 +453,15 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     break;
 
                 default:
-                    $cm['TimetableDayID'] = $timetableDayID;
+                    $cm['TimetableDayID'] = $timetableDayId;
                     break;
             }
+
+            // Set timetable day fully
+            $cm['TimetableDay'] = isset($cm['TimetableDayID'])
+                ? $timetableDay
+                : null;
+            unset($cm['TimetableDayID']);
         }
         unset($cm);
 
