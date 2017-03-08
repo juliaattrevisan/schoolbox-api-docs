@@ -76,7 +76,7 @@ class Controller extends Base
                 'data' => [
                     'id' => $id,
                     //Pass unix timestamp to flatpicker, it misinterprets day and month in d/m/Y format
-                    'value' => $dateObject->geJSDate(),
+                    'value' => $dateObject->getJSDate(),
                     'element' => $element,
                     'type' => $type,
 //                    'enableTime' => $time,

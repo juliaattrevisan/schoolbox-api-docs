@@ -1084,7 +1084,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Format to be used in JS new Date()
      * @return string
      */
-    public function geJSDate(){
+    public function getJSDate(){
         return $this->getYear().','.$this->getMonth().'-1,'.$this->getDay().','.$this->getHour().','.$this->getMinute().','.$this->getSecond();
     }
 
