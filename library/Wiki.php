@@ -159,43 +159,6 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     }
 
 	/**
-	 * Creates a wiki page and assigns latest revision
-	 *
-	 * @deprecated use \Schoolbox\Wiki\WikiMapper::save()
-	 * @param  $data
-	 * @return int
-	 */
-	public function create(&$data) {
-		$data['created'] = 'NOW()';
-
-        $data['slug'] = $this->makeUnique($data['slug']);
-
-		$revision = array(
-			'heading' => $data['heading'],
-			'body' => $data['body']
-		);
-
-		unset($data['heading'], $data['body']);
-
-		$wikiID = parent::create($data);
-
-		if ($wikiID) {
-			$revision['wikiID'] = $wikiID;
-			$revisionID = $this->createRevision($revision);
-
-			parent::update(array(
-				'wikiID' => $wikiID,
-				'latestRevision' => $revisionID
-			));
-		}
-		else {
-			error(2);
-		}
-
-		return $wikiID;
-	}
-
-	/**
 	 * Updates a wiki's data with the latest revision if applicable
 	 * Note that wikis now know whether they are stubs or not
 	 *
