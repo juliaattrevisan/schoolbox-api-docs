@@ -1,3 +1,5 @@
+{% set defaultFilename = 'Unknown Filename' %}
+
 {% import '@adminVideo/macros/statusIcon.twig' as statusIcon %}
 
 <script>
@@ -60,7 +62,7 @@
                         <div class="list-item">
                             <div class="compact card small-12">
                                 <div class="icon-{{ statusIcon.statusIcon(video) }}" title="Video processing {{ video.status }}"></div>
-                                <h3>{{ video.storage.filename | default('Unknown Filename') }}</h3>
+                                <h3>{{ video.storage.filename | default(video.file.filename) | default(defaultFilename) }} {{ video.file.id }}</h3>
                                 <p class="meta">{{ video.createdAt.long }}</p>
                             </div>
                         </div>
@@ -103,7 +105,7 @@
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">
-                Transcoding Results - {{ log.storage.filename | default('Unknown Filename') }}
+                Transcoding Results - {{ log.storage.filename | default(log.file.filename) | default(defaultFilename) }}
             </h2>
             <section class="content">
             <pre>{{ log.message }}</pre>
