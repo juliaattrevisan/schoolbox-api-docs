@@ -124,15 +124,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getDayNumber(Campus $campus, $date = 0)
     {
-        $timetableDates = $this->getTimetableDates($campus);
-        $dateObject     = $date
-            ? new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP)
-            : Alaress_Date_Format::now();
-        $key            = $dateObject->getDatabaseDate();
-
-        return array_key_exists($key, $timetableDates)
-            ? $timetableDates[$key]['SortOrder']
-            : 0;
+        $timetableDate = $this->getTimetableDate($campus, $date);
+        if (isset($timetableDate)) {
+            return $timetableDate['SortOrder'];
+        }
+        return 0;
     }
 
     /**
@@ -479,5 +475,25 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         unset($timetableDate);
 
         return $timetableDates;
+    }
+
+    /**
+     * Fetches the timetable date for a given day
+     *
+     * @param Campus $campus
+     * @param int    $timestamp The timestamp to fetch a date for
+     * @return array the timetable date, or null if it doesn't exist
+     */
+    protected function getTimetableDate(Campus $campus, $timestamp = 0)
+    {
+        $timetableDates = $this->getTimetableDates($campus);
+        $dateObject     = $timestamp
+            ? new Alaress_Date_Format($timestamp, Alaress_Date_Format::TIMESTAMP)
+            : Alaress_Date_Format::now();
+        $key            = $dateObject->getDatabaseDate();
+
+        return array_key_exists($key, $timetableDates)
+            ? $timetableDates[$key]
+            : null;
     }
 }
