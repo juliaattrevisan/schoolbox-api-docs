@@ -53,7 +53,7 @@ class TaskRedir extends Base {
         // Try to decode URL using this decoder's regex
         $id = $this->isThisDecoder($url);
 
-        if(false === $id){
+        if(!is_numeric($id)){
             return '';
         }
 

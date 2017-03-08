@@ -26,15 +26,16 @@ abstract class Base {
      * Get the id out of the url
      *
      * @param string $url
-     * @return bool
+     * @return int|null
      */
-    protected function isThisDecoder($url) {
-        $id = false;
+    protected function isThisDecoder($url)
+    {
+        $id = null;
 
         preg_match($this->getRegex(), $url, $matches);
 
         if (count($matches)) {
-            $id = $matches[1];
+            $id = (int)$matches[1];
         }
 
         return $id;
