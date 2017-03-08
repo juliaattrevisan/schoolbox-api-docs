@@ -61,14 +61,15 @@ class QueueMapper extends Mapper {
 
     /**
      * @param string|array $status
+     * @param array|null $options
      * @return array|\Schoolbox\GenericCollection
      */
-    public function findByStatus($status) {
+    public function findByStatus($status, $options = null) {
         if (is_array($status)) {
             $result = [];
 
             foreach ($status as $statusCurrent) {
-                $results = $this->findByColumn('status', $statusCurrent);
+                $results = $this->findByColumn('status', $statusCurrent, $options);
 
                 if (!empty($results)) {
                     $result[$statusCurrent] = $results;
@@ -77,7 +78,7 @@ class QueueMapper extends Mapper {
 
             return $result;
         } else {
-            return $this->findByColumn('status', $status);
+            return $this->findByColumn('status', $status, $options);
         }
     }
 

@@ -33,12 +33,12 @@ class Controller extends Base
         // Render this thing out
 
         $statuses = [
-            VideoQueueMapper::STATUS_FAILED,
             VideoQueueMapper::STATUS_PROCESSING,
-            VideoQueueMapper::STATUS_PENDING
+            VideoQueueMapper::STATUS_PENDING,
+            VideoQueueMapper::STATUS_FAILED
         ];
 
-        $queueItems = $this->getVideoQueueMapper()->findByStatus($statuses);
+        $queueItems = $this->getVideoQueueMapper()->findByStatus($statuses, ['order' => ['createdOn' => 'desc']]);
 
         $this->getResponse()->content->set([
             'template' => '@adminVideo/index.twig',
