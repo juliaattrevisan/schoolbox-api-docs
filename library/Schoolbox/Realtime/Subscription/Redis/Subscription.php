@@ -19,7 +19,7 @@ class Subscription implements ISubscription
 {
     const PATTERN_SUBSCRIPTION = 'msg:%s:%d:*';
     const PATTERN_SET          = 'msg:%s:q:%d:unread';
-    const PATTERN_MESSAGE      = 'msg:%s:m:%s';
+    const PATTERN_MESSAGE      = 'msg:%s:m:%s:*';
 
 
     /** @var string */
@@ -101,12 +101,12 @@ class Subscription implements ISubscription
     }
 
     /**
-     * @param string $doubleHash
+     * @param string $baseHash
      * @return string
      */
-    private function getMessageKey($doubleHash)
+    private function getMessageScan($baseHash)
     {
-        return sprintf(static::PATTERN_MESSAGE, $this->instanceId, $doubleHash);
+        return sprintf(static::PATTERN_MESSAGE, $this->instanceId, $baseHash);
     }
 
     /**
@@ -115,7 +115,19 @@ class Subscription implements ISubscription
      */
     public function acknowledgeMessage($messageId)
     {
-        return $this->syncClient->sRem($this->getSetIdentifier(), $this->getMessageKey($messageId)) > 0;
+        $cursor  = 0;
+        $removed = 0;
+
+        do {
+            list($cursor, $messageIds) = $this->syncClient->sscan($this->getSetIdentifier(), $cursor, [ 'match' => $this->getMessageScan($messageId) ]);
+
+            /** @var array $messageIds */
+            foreach ($messageIds as $id) {
+                $removed += $this->syncClient->sRem($this->getSetIdentifier(), $id);
+            }
+        } while ($cursor);
+
+        return $removed > 0;
     }
 
 
