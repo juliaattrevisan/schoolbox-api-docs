@@ -261,6 +261,8 @@ interface IAssessable extends ISoftDeletable
      * @param Participant $participant
      * @throws DomainException if participant's assessment is not this assessment
      * @return bool
+     * @throws \UnexpectedValueException if $user is not a participant
+     * @throw DomainException
      */
     public function isReviewComplete(Participant $participant);
 

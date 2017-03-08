@@ -16,7 +16,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
 use \Schoolbox\User;
-use \DomainException;
 
 class Participant
 {
@@ -72,7 +71,7 @@ class Participant
      * Represented as GREY SQUARE
      *
      * @return bool
-     * @throws DomainException
+     * @throws \DomainException
      */
     public function isResponseRequired()
     {
@@ -88,7 +87,7 @@ class Participant
      * This is a teacher-perspective function. ie, does the teacher need to do anything?
      * eg, Give a mark? Publish a draft? Mark off as 'complete' ?
      *
-     * @throws DomainException if $user is not a participant of the participation assessable.
+     * @throws \UnexpectedValueException if $user is not a participant of the participation assessable.
      * @return bool
      */
     public function isFeedbackRequired()
@@ -101,7 +100,7 @@ class Participant
      * Has the teacher marked this participant as not-explicitly-incomplete, and
      * the student has not subsequently submitted/re-submitted.
      *
-     * @throws DomainException if $user is not a participant of the participation assessable.
+     * @throws \UnexpectedValueException if $user is not a participant of the participation assessable.
      * Represented in UI as GREEN CIRCLE
      */
     public function isReviewComplete()
@@ -117,7 +116,7 @@ class Participant
      *
      * Important: This will still return TRUE if task has been marked as 'incomplete'.
      *
-     * @throws DomainException if $user is not a participant of the participation assessable.
+     * @throws \UnexpectedValueException if $user is not a participant of the participation assessable.
      * @return bool
      */
     public function hasSubmittedResponse()
@@ -132,7 +131,7 @@ class Participant
      * For clarity - a self-assessed task, while complete, is not marked by teacher
      * @see $this->hasMark to include self-assessed marks.
      *
-     * @throws DomainException if $user is not a participant of the participation assessable.
+     * @throws \UnexpectedValueException if $user is not a participant of the participation assessable.
      * @return bool
      */
     public function hasPublishedFeedback()
@@ -148,7 +147,7 @@ class Participant
      * self-assessed marks for a task (even if self-assessed as 'Incomplete')
      *
      * @see $this->isMarkedByTeacher for teacher-assigned-only marks
-     * @throws DomainException if $user is not a participant of the participation assessable.
+     * @throws \UnexpectedValueException if $user is not a participant of the participation assessable.
      * @return bool
      */
     public function hasMark()
