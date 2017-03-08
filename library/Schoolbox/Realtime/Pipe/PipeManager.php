@@ -446,7 +446,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 function (TimerInterface $timer) use ($pipe, $userId) {
 
                     // the timer contains the data to be processed
-                    $this->log->info("Pushing cached messages to user $userId", [ 'char' => '>' ]);
+                    $this->log->info("Pushing cached messages to user $userId", [ 'char' => '<' ]);
 
                     try {
                         // enqueue to be dispatched
@@ -473,7 +473,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function enqueueInstances(PipeInterface $pipe, array $instances)
     {
-        if (empty($unread)) {
+        if (empty($instances)) {
             return;
         }
 
