@@ -376,6 +376,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             return [];
         }
 
+        // All timetable days
         $timetableDays  = $this->database->getAll("
             SELECT td.*
             FROM       fc.TimetableDay td
@@ -383,15 +384,22 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             WHERE t.Name = {$quotedCampus}
             ORDER BY td.SortOrder ASC
         ");
-//        $timetableDates = $this->database->getAll("
-//            SELECT *
-//            FROM       fc.TimetableDate td
-//            INNER JOIN fc.Timetable     t  ON td.TimetableID    = t.ID
-//            WHERE t.Code = {$quotedCampus}
-//            ORDER BY td.SortOrder ASC
-//        ");
 
-//        $timetableCalendarList = [];
+        // All dates within the timetable
+        $timetableDates = $this->database->getAll("
+            SELECT
+                CAST(td.DateValue AS DATE) AS TimetableDate,
+                td.TimetableDateTypeID,
+                td.TimetableDayID
+            FROM       fc.TimetableDate td
+            INNER JOIN fc.Timetable     t  ON td.TimetableID    = t.ID
+            WHERE t.Name = {$quotedCampus}
+            ORDER BY TimetableDate ASC
+        ");
+        $timetableDates = array_combine(
+            array_column($timetableDates, 'TimetableDate'),
+            $timetableDates
+        );
 
         $startDate = new Alaress_Date_Format($timetable['StartDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
         $endDate   = new Alaress_Date_Format($timetable['EndDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
@@ -401,15 +409,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             $cModel = [
                 'DateValue' => $currentDate->getDatabaseDate(),
             ];
-            $timetableDate = $this->database->getRow("
-                SELECT
-                    td.TimetableDateTypeID,
-                    td.TimetableDayID
-                FROM       fc.TimetableDate td
-                INNER JOIN fc.Timetable     t  ON td.TimetableID    = t.ID
-                WHERE t.Name = {$quotedCampus}
-                AND   CAST(td.DateValue AS DATE) = {$this->database->smartQuote($cModel['DateValue'])}
-            ");
+            $timetableDate = $timetableDates[$cModel['DateValue']];
             if ($timetableDate) {
                 $cModel['TimetableDayType'] = $timetableDate['TimetableDateTypeID'];
                 $cModel['TimetableDayID']   = $timetableDate['TimetableDayID'];
@@ -441,7 +441,6 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     break;
 
                 case self::TIMETABLE_DATE_TYPE_RESTART_DAY:
-                    $cm['TimetableDayID'];
                     foreach ($timetableDays as $i => $timetableDay) {
                         if ($timetableDay['ID'] == $cm['TimetableDayID']) {
                             $dayIndex = $i;
