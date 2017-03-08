@@ -52,7 +52,7 @@ class TaskRedir extends Base {
 
         try {
             /** @var Task $task */
-            $task = TaskMapper::getInstance()->findByColumn('id', $id)->first();
+            $task = TaskMapper::getInstance()->findById($id);
         } catch (MapperException $e){
             $task = null;
         }
