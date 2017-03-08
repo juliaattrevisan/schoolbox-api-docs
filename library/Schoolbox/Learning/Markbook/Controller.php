@@ -147,8 +147,7 @@ class Controller extends Base
         }
 
         // Can the viewee mark Assessments in for this class ?
-        $writable = !$term->getArchived() &&
-            Access::getInstance()->getFolderAccess($this->getUser(), [$class->getId()]) >= UserAccess::ACCESS_WRITE;
+        $writable = !$term->getArchived() && Access::getInstance()->isInstructor($this->getUser(), $class);
 
         // And output
         $this->getResponse()->content->set(
