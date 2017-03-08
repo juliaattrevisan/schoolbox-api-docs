@@ -12,18 +12,11 @@ namespace Schoolbox\Preview\Registry\Decoder;
 
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
-use Component_InstanceMapper;
-use Group;
 use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Course\UnitInstance;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
+
 
 class TaskRedir extends Base {
 
