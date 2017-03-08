@@ -186,7 +186,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
     {
         return [];
     }
