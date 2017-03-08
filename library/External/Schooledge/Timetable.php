@@ -184,18 +184,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         $query = 'SELECT * FROM fc.Timetable WHERE 1 = 0';
 
         // Mostly copied from getFullTimetable
-        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus);
+        $timetable = $this->getTimetableDefinitionForTimetable($externalUserId, $campus);
 
-        // Build the timetable
-        $timetable = [];
-        foreach ($timetabledef['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
-            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
-            $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
-            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
-            $timetable[$x]['class']          = [];
-        }
         foreach ($this->database->getAll($query) as $timetabledClass) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
@@ -432,20 +422,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             return [];
         }
 
-        // Copied from HumanEdge
-        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus);
-
         // Build the timetable
-        $timetable = [];
-        foreach ($timetabledef['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
-            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
-            $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
-            // Fill in each day with blanks
-            $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], []);
-        }
+        $timetable = $this->getTimetableDefinitionForTimetable($externalUserId, $campus);
         foreach ($this->database->getAll($query) as $timetabledClass) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
@@ -638,5 +616,30 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         return array_key_exists($key, $timetableDates)
             ? $timetableDates[$key]
             : null;
+    }
+
+    /**
+     * Gets timetable definition into a form which timetable methods can use.
+     *
+     * @param mixed  $externalUserId
+     * @param Campus $campus
+     * @param int    $day
+     * @return array
+     */
+    protected function getTimetableDefinitionForTimetable($externalUserId, Campus $campus, $day = 0)
+    {
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $day);
+        $timetable    = [];
+        foreach ($timetabledef['desc'] as $x => $name) {
+            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
+            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
+            $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
+            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
+            // Fill in each day with blanks
+            $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], [])
+            $timetable[$x]['class']          = [];
+        }
+        return $timetable;
     }
 }
