@@ -19,17 +19,19 @@ const redis     = require('redis').createClient();
 const WebSocket = require('ws');
 const JSON      = require('jsonify');
 const http      = require('http');
+const sleep     = require('sleep');
 
 // config constants
-const remember  = process.env.REMEMBER || '2a7d8585f8d491ad53bafdfc20a4ca27486a0590';
+const remember  = process.env.REMEMBER || '';
 const subscript = `msg:vagrantx:${process.env.USER_ID || '230'}:push`;
 
-const cc = 10000;
+const repeat = process.env.REPEAT || 500;
+const delay  = process.env.DELAY || 16; // 75/sec
 
-let c = cc;
+let c = repeat;
 
-for (let i = 0; i < cc; ++i) {
-    ws();
+for (let i = 0; i < repeat; ++i) {
+    setTimeout(() => { ws(); }, i * delay);
 }
 
 // main execution
@@ -42,7 +44,6 @@ function ws() {
             cookie: `remember=${remember}`
         }
     });
-
 
     let seen = {};
     let ackd = {};
@@ -63,9 +64,8 @@ function ws() {
             ws.send(JSON.stringify({ fetch: 5 }));
 
         } else if (payload.fetch) {
-            ws.close();
             // STEP 2: anything we receive in fetch, broadcast it via redis for push
-            // seen = broadcastPush(payload.fetch, seen);
+            seen = broadcastPush(payload.fetch, seen);
 
         } else if (payload.push) {
             // STEP 3: acknowledge the pushed messages
