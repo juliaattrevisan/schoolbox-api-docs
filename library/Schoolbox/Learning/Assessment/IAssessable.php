@@ -113,11 +113,18 @@ interface IAssessable extends ISoftDeletable
     /**
      * Can the specified learner (a user with READ perm only) view this assessment in their upcoming work list?
      *
-     * @param User $learner A user with WRITE+ perm to this assessment's folder context
+     * @param User $learner A user with READ perm to this assessment's folder context
      * @return bool
      */
     public function canLearnerViewInUpcomingList(User $learner);
 
+    /**
+     * Can the specified learner (a user with READ perm only) view this assessment
+     *
+     * @param User $learner A user with READ perm to this assessment's folder context
+     * @return bool
+     */
+    public function canLearnerView(User $learner);
 
     /**
      * Can the specified learner (a user with READ perm only) create a response for themself ?

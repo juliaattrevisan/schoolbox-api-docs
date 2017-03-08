@@ -156,6 +156,7 @@ class Model extends AbstractAssessment
         return $this->canLearnerCreateResponse($learner);
     }
 
+
     /**
      * @inheritdoc
      */

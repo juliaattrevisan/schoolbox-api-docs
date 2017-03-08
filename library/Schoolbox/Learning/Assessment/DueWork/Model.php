@@ -267,13 +267,13 @@ class Model extends AbstractAssessment
      */
     public function canLearnerViewInUpcomingList(User $learner)
     {
-        // Not open ?
-        if(!$this->isOpen()){
+
+        if(!$this->canLearnerView($learner)) {
             return false;
         }
 
-        // Not a participant ?
-        if(!$this->isParticipant($learner)){
+        // Not open ?
+        if(!$this->isOpen()){
             return false;
         }
 
@@ -285,6 +285,18 @@ class Model extends AbstractAssessment
         // Note that the student CAN view the due work if it doesn't accept
         // online submission - these are handled outside of Schoolbox.
         return true;
+    }
+
+    public function canLearnerView(User $learner) {
+        // Not open ?
+        if(!$this->isPublished()){
+            return false;
+        }
+
+        // Not a participant ?
+        if(!$this->isParticipant($learner)){
+            return false;
+        }
     }
 
     /**
