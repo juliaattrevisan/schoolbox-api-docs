@@ -206,6 +206,37 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
         $quotedId     = $this->database->smartQuote($externalUserId);
         $quotedCampus = $this->database->smartQuote($campus->getExtTimetableCode());
+
+        // Sub-parts common to all queries
+        $baseStaffSelect = "
+            CASE WHEN tcis.TimetableClassStaffID IS NULL
+                THEN 1
+                ELSE 0
+            END AS UseBaseStaff,
+            staff_base.Code             AS BaseStaffID,
+            staff_base.FirstName        AS BaseStaffPreferredName,
+            staff_base.LastName         AS BaseStaffSurname,
+            staff_base.Title            AS BaseStaffTitle
+        ";
+        $replacementStaffSelect = "
+            CASE WHEN staff_replacement.Code IS NOT NULL
+                THEN 1
+                ELSE 0
+            END AS UseReplacementStaff,
+            staff_replacement.Code      AS ReplacementStaffID,
+            staff_replacement.FirstName AS ReplacementStaffPreferredName,
+            staff_replacement.LastName  AS ReplacementStaffSurname,
+            staff_replacement.Title     AS ReplacementStaffTitle
+        ";
+        $baseStaffJoin = "
+            LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
+            LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
+        ";
+        $replacementStaffJoin = "
+            LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
+            LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
+        ";
+
         if ($user->getRole()->isStudent()) {
             // 1st part: blocked classes
             // 2nd part: non-blocked classes
@@ -220,22 +251,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
                     tpe.Name                    AS PeriodName,
-                    CASE WHEN tcis.TimetableClassStaffID IS NULL
-                        THEN 1
-                        ELSE 0
-                    END AS UseBaseStaff,
-                    staff_base.Code             AS BaseStaffID,
-                    staff_base.FirstName        AS BaseStaffPreferredName,
-                    staff_base.LastName         AS BaseStaffSurname,
-                    staff_base.Title            AS BaseStaffTitle,
-                    CASE WHEN staff_replacement.Code IS NOT NULL
-                        THEN 1
-                        ELSE 0
-                    END AS UseReplacementStaff,
-                    staff_replacement.Code      AS ReplacementStaffID,
-                    staff_replacement.FirstName AS ReplacementStaffPreferredName,
-                    staff_replacement.LastName  AS ReplacementStaffSurname,
-                    staff_replacement.Title     AS ReplacementStaffTitle
+                    $baseStaffSelect,
+                    $replacementStaffSelect
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto timetable
@@ -250,12 +267,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
                 CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
-                -- Base staff
-                LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-                LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
-                -- Override staff
-                LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
-                LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
+                $baseStaffJoin
+                $replacementStaffJoin
 
                 WHERE s.Code = {$quotedId}
                 AND   t.Name = {$quotedCampus}
@@ -273,22 +286,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
                     tpe.Name                    AS PeriodName,
-                    CASE WHEN tcis.TimetableClassStaffID IS NULL
-                        THEN 1
-                        ELSE 0
-                    END AS UseBaseStaff,
-                    staff_base.Code             AS BaseStaffID,
-                    staff_base.FirstName        AS BaseStaffPreferredName,
-                    staff_base.LastName         AS BaseStaffSurname,
-                    staff_base.Title            AS BaseStaffTitle,
-                    CASE WHEN staff_replacement.Code IS NOT NULL
-                        THEN 1
-                        ELSE 0
-                    END AS UseReplacementStaff,
-                    staff_replacement.Code      AS ReplacementStaffID,
-                    staff_replacement.FirstName AS ReplacementStaffPreferredName,
-                    staff_replacement.LastName  AS ReplacementStaffSurname,
-                    staff_replacement.Title     AS ReplacementStaffTitle
+                    $baseStaffSelect,
+                    $replacementStaffSelect
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto timetable
@@ -303,12 +302,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
                 CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID    = td.ID
-                -- Base staff
-                LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-                LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
-                -- Override staff
-                LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
-                LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
+                $baseStaffJoin
+                $replacementStaffJoin
 
                 WHERE s.Code = {$quotedId}
                 AND   tci.TimetableBlockInstanceID IS NULL
@@ -334,22 +329,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
                     tpe.Name                    AS PeriodName,
-                    CASE WHEN tcis.TimetableClassStaffID IS NULL
-                        THEN 1
-                        ELSE 0
-                    END AS UseBaseStaff,
-                    staff_base.Code             AS BaseStaffID,
-                    staff_base.FirstName        AS BaseStaffPreferredName,
-                    staff_base.LastName         AS BaseStaffSurname,
-                    staff_base.Title            AS BaseStaffTitle,
-                    CASE WHEN staff_replacement.Code IS NOT NULL
-                        THEN 1
-                        ELSE 0
-                    END AS UseReplacementStaff,
-                    staff_replacement.Code      AS ReplacementStaffID,
-                    staff_replacement.FirstName AS ReplacementStaffPreferredName,
-                    staff_replacement.LastName  AS ReplacementStaffSurname,
-                    staff_replacement.Title     AS ReplacementStaffTitle
+                    $baseStaffSelect,
+                    $replacementStaffSelect
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto timetable
@@ -357,17 +338,13 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 -- Join onto staff
                 INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
                 INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
-                -- Base staff
-                LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-                LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
-                -- Override staff
-                LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
-                LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
                 -- Expand period
                 INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
                 INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
                 CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
+                $baseStaffJoin
+                $replacementStaffJoin
 
                 WHERE (
                     (staff_base.Code = {$quotedId} AND tcis.TimetableClassStaffID IS NULL)
