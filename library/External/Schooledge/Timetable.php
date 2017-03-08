@@ -417,7 +417,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 $cModel['TimetableDayType'] = null;
                 $cModel['TimetableDayID']   = null;
             }
-            $calendarModelList[] = $cModel;
+            $calendarModelList[$cModel['DateValue']] = $cModel;
         }
 
         // get timetable day?
