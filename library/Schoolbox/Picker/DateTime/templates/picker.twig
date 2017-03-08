@@ -176,7 +176,7 @@
 
 <script>
     var twigVars = {
-        value: '{{ value }}',
+        date: new Date({{ value }}),
         element: '{{ element }}',
         id: '{{ id }}',
         displayFormat: '{{ displayFormat }}',
@@ -195,7 +195,6 @@
         },
         weekStartDay: {{ weekStartDay }}
     };
-
     $.fn.alaressDateTimeModal(twigVars);
 
 </script>

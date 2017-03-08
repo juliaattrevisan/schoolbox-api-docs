@@ -178,7 +178,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
                 var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm');
                 var e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm');
-                var t = moment(twigVars.value).format('HHmm');
+                var t = moment(twigVars.date).format('HHmm');
                 if ((t >= s) && (t < e)) {
                     $(this).addClass('period-selected');
                     period = $(this).attr('data-period-number');
@@ -321,7 +321,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, {
 
-        defaultDate: new Date(twigVars.value),
+        defaultDate: twigVars.date,
         dateFormat: pickerOptions.enableTime ? twigVars.displayFormat : twigVars.displayFormatDate,
         inline: true,
         altInput: false,

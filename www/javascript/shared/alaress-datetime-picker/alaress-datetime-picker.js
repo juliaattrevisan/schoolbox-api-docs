@@ -152,14 +152,16 @@ function setValue ( element, options, state, date ) {
     console.log(pickerFormats);
 
     if(date !== undefined) {
-        // :P
         var value = date;
     }
-    else if(window.pickerInstance[pId] !== undefined) {
+    else if(window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
         var value = window.pickerInstance[pId].input.value;
     }
-    else {
+    else if (element.val() !== undefined && element.val()) {
         var value = element.val();
+    }
+    else {
+        var value = moment();
     }
     // All Day is on
     if(state === true) {
