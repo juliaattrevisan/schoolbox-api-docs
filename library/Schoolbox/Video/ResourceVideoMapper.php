@@ -63,7 +63,13 @@ class ResourceVideoMapper extends Mapper
                 'other_key' => 'hash',
             )
         );
-
+        $this->hasJoin(
+            'storage', array(
+                'mapper'    => Schoolbox\Resource\Storage\Mapper::class,
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
+            )
+        );
         $this->hasJoin(
             'student_submission', array(
                 'mapper'    => Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::class,
@@ -319,7 +325,6 @@ class ResourceVideoMapper extends Mapper
      */
     public function findByStorageHash($hash)
     {
-
         $storageMapper = $this->getJoinMapper('storage');
 
         $statement     = $this->database->prepare(
