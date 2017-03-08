@@ -211,15 +211,15 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             // 2nd part: non-blocked classes
             $query = "
                 SELECT
-                    t.Name AS ClassCampus,
-                    ts.Code as ClassCode,
-                    ts.Name as ClassName,
-                    td.SortOrder as DayNumber,
-                    tpe.Code as PeriodNumber,
-                    td.Name as DayName,
+                    t.Name                      AS ClassCampus,
+                    ts.Code                     AS ClassCode,
+                    ts.Name                     AS ClassName,
+                    td.SortOrder                AS DayNumber,
+                    tpe.Code                    AS PeriodNumber,
+                    td.Name                     AS DayName,
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
-                    tpe.Name as PeriodName
+                    tpe.Name                    AS PeriodName
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto timetable
@@ -242,15 +242,15 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 UNION
 
                 SELECT
-                    t.Name AS ClassCampus,
-                    ts.Code as ClassCode,
-                    ts.Name as ClassName,
-                    td.SortOrder as DayNumber,
-                    tpe.Code as PeriodNumber,
-                    td.Name as DayName,
+                    t.Name                      AS ClassCampus,
+                    ts.Code                     AS ClassCode,
+                    ts.Name                     AS ClassName,
+                    td.SortOrder                AS DayNumber,
+                    tpe.Code                    AS PeriodNumber,
+                    td.Name                     AS DayName,
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
-                    tpe.Name as PeriodName
+                    tpe.Name                    AS PeriodName
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto timetable
@@ -281,15 +281,15 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             // I'm guessing we smoosh the staff and student queries together somehow?
             $query = "
                 SELECT
-                    t.Name AS ClassCampus,
-                    ts.Code as ClassCode,
-                    ts.Name as ClassName,
-                    td.SortOrder as DayNumber,
-                    tpe.Code as PeriodNumber,
-                    td.Name as DayName,
+                    t.Name                      AS ClassCampus,
+                    ts.Code                     AS ClassCode,
+                    ts.Name                     AS ClassName,
+                    td.SortOrder                AS DayNumber,
+                    tpe.Code                    AS PeriodNumber,
+                    td.Name                     AS DayName,
                     CAST(tpe.StartTime AS TIME) AS PeriodStart,
                     CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
-                    tpe.Name as PeriodName
+                    tpe.Name                    AS PeriodName
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto timetable
