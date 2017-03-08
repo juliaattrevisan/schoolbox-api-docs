@@ -394,13 +394,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
 
     /**
-     * @param Pipe   $pipe
-     * @param string $command
-     * @param mixed  $payload
+     * @param PipeInterface $pipe
+     * @param string        $command
+     * @param mixed         $payload
      * @throws QueueingException
      * @return void
      */
-    private function enqueue(Pipe $pipe, $command, $payload)
+    private function enqueue(PipeInterface $pipe, $command, $payload)
     {
         $this->taskDispatcher->enqueue($pipe, $command, $payload);
     }
@@ -432,10 +432,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
 
     /**
-     * @param  Pipe $pipe
+     * @param  PipeInterface $pipe
      * @return Transaction
      */
-    private function getTransaction($pipe)
+    private function getTransaction(PipeInterface $pipe)
     {
         $userId = $pipe->getUserId();
         $pipeId = $pipe->getSocketKey();
