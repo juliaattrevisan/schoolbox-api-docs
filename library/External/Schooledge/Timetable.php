@@ -231,9 +231,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.ID
                 -- Expand period
                 INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
-                INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID = tp.ID
+                INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
                 CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
-                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
+                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
 
                 WHERE s.Code = {$quotedId}
                 AND   t.Name = {$quotedCampus}
@@ -261,10 +261,10 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
                 INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
                 -- Expand period
-                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID                 = tci.TimetableClassID
                 INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
                 CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
-                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
+                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID    = td.ID
 
                 WHERE s.Code = {$quotedId}
                 AND   tci.TimetableBlockInstanceID IS NULL
@@ -297,7 +297,6 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 -- Join onto staff
                 INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
                 INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
-                INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
                 -- Base staff
                 LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
                 LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
@@ -305,9 +304,10 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
                 LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
                 -- Expand period
-                INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID = tp.ID
+                INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
+                INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
                 CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
-                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID = td.ID
+                INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
 
                 WHERE (
                     (staff_base.Code = {$quotedId} AND tcis.TimetableClassStaffID IS NULL)
