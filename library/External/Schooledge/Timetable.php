@@ -297,7 +297,55 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
     {
-        return [];
+        // Didn't we change these method so they take a User object?
+        try {
+            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
+        }
+
+        // Figure out the day number for this day, then join onto that day
+        $timetableDate = $this->getTimetableDate($campus, $date);
+        if (!isset($timetableDate['TimetableDay']['ID'])) {
+            return [];
+        }
+
+        $extraWhere = "td.ID = {$this->database->smartQuote($timetableDate['TimetableDay']['ID'])}";
+        if ($user->getRole()->isStudent()) {
+            $query = "
+                {$this->getStudentBlockedTimetableQuery($externalUserId, $campus)}
+                AND $extraWhere
+                UNION
+                {$this->getStudentNonBlockedTimetableQuery($externalUserId, $campus)}
+                AND $extraWhere
+                ORDER BY DayNumber asc, PeriodStart asc
+            ";
+
+        } elseif ($user->getRole()->isStaff()) {
+            $query = "
+                {$this->getStaffTimetableQuery($externalUserId, $campus)}
+                AND $extraWhere
+                ORDER BY DayNumber ASC, PeriodStart ASC
+            ";
+
+        } else {
+            return [];
+        }
+
+        // Mostly copied from getFullTimetable
+        $timetable = $this->getTimetableDefinitionForTimetable($externalUserId, $campus);
+
+        foreach ($this->database->getAll($query) as $timetabledClass) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($timetablePeriod['periodNumber'] == $timetabledClass['PeriodNumber']) {
+                    if (!isset($timetable[$x]['class'])) {
+                        $timetable[$x]['class'] = [];
+                    }
+                    $timetable[$x]['class'] += $this->getTimetableEntries($timetabledClass);
+                }
+            }
+        }
+        return $timetable;
     }
 
     /**
