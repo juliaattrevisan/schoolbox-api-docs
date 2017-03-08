@@ -40,6 +40,7 @@ class AssessmentContextType implements IType
      *
      * @param AssessmentContext $context
      * @return string
+     * @throws \UnexpectedValueException
      */
     public static function objectToString(AssessmentContext $context)
     {
@@ -61,16 +62,17 @@ class AssessmentContextType implements IType
      *
      * @param string $stringVal
      * @return AssessmentContext
+     * @throws \UnexpectedValueException
      */
     public static function stringToObject($stringVal)
     {
-        if(self::TYPE_FOLDER == $stringVal){
+        if(self::TYPE_FOLDER === $stringVal){
             return new Folder();
-        } elseif(self::TYPE_PROJECT == $stringVal){
+        } elseif(self::TYPE_PROJECT === $stringVal){
             return new Project();
-        } elseif(self::TYPE_UNIT_IMPLEMENTATION == $stringVal){
+        } elseif(self::TYPE_UNIT_IMPLEMENTATION === $stringVal){
             return new UnitImplementation();
-        } elseif(self::TYPE_UNIT_SPECIFICATION == $stringVal){
+        } elseif(self::TYPE_UNIT_SPECIFICATION === $stringVal){
             return new UnitSpecification();
         }
         throw new \UnexpectedValueException("Unknown AssessmentContext: $stringVal");
