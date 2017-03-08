@@ -131,23 +131,27 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 // --------------------------------------------------------------------------------------------------------
                 // Replaceable tokens
                 // --------------------------------------------------------------------------------------------------------
-                // [yearlevel]        - Student year level
-                // [calendaryear]     - Current calendar year
-                // [graduationyear7]  - Expected graduation year (7 school years)
-                // [graduationyear12] - Expected graduation year (12 school years)
-                // [startyear7]       - Student start year (7 school years)
-                // [startyear12]      - Student start year (7 school years)
-                // [username]         - Username
+                // {:yearlevel}        - Student year level
+                // {:calendaryear}     - Current calendar year
+                // {:graduationyear7}  - Expected graduation year (7 school years) - 4 digit year
+                // {:graduationyear12} - Expected graduation year (12 school years) - 4 digit year
+                // {:graduationyeartwodigit7}  - Expected graduation year (7 school years) - 2 digit year
+                // {:graduationyeartwodigit12} - Expected graduation year (12 school years) - 2 digit year
+                // {:startyear7}       - Student start year (7 school years)
+                // {:startyear12}      - Student start year (7 school years)
+                // {:username}         - Username
                 // --------------------------------------------------------------------------------------------------------
 
                 $path = $dav->getPath();
-                $path = str_replace("[username]", $user->getUsername(), $path);
-                $path = str_replace("[yearlevel]", $user->getYear(), $path);
-                $path = str_replace("[calendaryear]", date("Y"), $path);
-                $path = str_replace("[graduationyear7]", 7 - $user->getYear() + date("Y"), $path);
-                $path = str_replace("[graduationyear12]", 12 - $user->getYear() + date("Y"), $path);
-                $path = str_replace("[startyear7]", date("Y") - ($user->getYear() - 7) + , $path);
-                $path = str_replace("[startyear12]", date("Y") - ($user->getYear() - 12) + , $path);
+                $path = str_replace("{:username}", $user->getUsername(), $path);
+                $path = str_replace("{:yearlevel}", $user->getYear(), $path);
+                $path = str_replace("{:calendaryear}", date("Y"), $path);
+                $path = str_replace("{:graduationyear7}", 7 - $user->getYear() + date("Y"), $path);
+                $path = str_replace("{:graduationyear12}", 12 - $user->getYear() + date("Y"), $path);
+                $path = str_replace("{:graduationyeartwodigit7}", 7 - $user->getYear() + date("y"), $path);
+                $path = str_replace("{:graduationyeartwodigit12}", 12 - $user->getYear() + date("y"), $path);
+                $path = str_replace("{:startyear7}", date("Y") - ($user->getYear() - 7), $path);
+                $path = str_replace("{:startyear12}", date("Y") - ($user->getYear() - 12), $path);
 
                 $paths[] = $path;
             }
