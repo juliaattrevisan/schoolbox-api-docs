@@ -133,7 +133,7 @@
                 <tbody>
                 {# Need all students that ever participated in any assessments #}
                 {% for student in markbook.students %}
-                <tr data-id="{{ student.id }}">
+                <tr data-student="{{ student.id }}">
                     <th class="no-pad">
                         <div class="compact card no-pad small-12">
                             <a href="/search/user/{{ student.id }}" title="View Profile">
