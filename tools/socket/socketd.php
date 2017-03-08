@@ -10,6 +10,7 @@ use Psr\Log\LoggerInterface;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
+use Schoolbox\Application\Daemon\Kernel;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Pipe\HttpServer;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
@@ -49,7 +50,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Socket', [
 ]);
 
 // CREATE WEBSOCKET APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) use ($kernel) {
 
     /** @var Redis|ClientInterface $redis */
     $redis = \Alaress\Redis::getClientInstance();
@@ -71,7 +72,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $pipeManager = (new PipeManagerFactory(
         $loop, new PhpHandler(), $log, $redis, $asyncRedis, $conf->get('session_length'),
-        $db, INSTANCE_ID, $stratBuilder->build($opts['flags'])
+        $db, INSTANCE_ID, $stratBuilder->build($opts['flags']), $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
     ))->build();
 
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);

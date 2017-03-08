@@ -82,6 +82,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /** @var TimerInterface[] */
     private $userTimeouts = [];
 
+    /** @var int */
+    private $fdLimit;
+
 
     /**
      * @param LoopInterface             $reactLoop
@@ -89,19 +92,22 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param ISubscriptionManager      $subscriptionManager
      * @param LoggerInterface           $log
      * @param DispatchStrategyInterface $strat
+     * @param int                       $fdLimit
      */
     public function __construct(
         LoopInterface $reactLoop,
         PipeCollection $pipes,
         ISubscriptionManager $subscriptionManager,
         LoggerInterface $log,
-        DispatchStrategyInterface $strat
+        DispatchStrategyInterface $strat,
+        $fdLimit
     ) {
         $this->reactLoop           = $reactLoop;
         $this->log                 = $log;
         $this->subscriptionManager = $subscriptionManager;
         $this->pipes               = $pipes;
         $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
+        $this->fdLimit             = $fdLimit - 16;
 
         $this->log->debug('Instantiated PipeManager');
     }
@@ -124,6 +130,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             return;
         }
 
+        $fdOpen = open_fd_count();
+
+        if ($fdOpen >= $this->fdLimit) {
+            // we're about to go over our FD limit (which is fatal)
+            $this->log->warning("Open file descriptors has reached $fdOpen; rejecting client connection");
+            $this->closeConnectionWithReason($conn, 503);
             return;
         }
 
@@ -138,6 +150,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->log->error('Communication Exception: ' . $e->getMessage(), [ $e ]);
 
             $this->sendHeader($pipe, 503, true);
+            $this->pipes->unregisterPipe($pipe->getSocketKey());
             $pipe->close();
 
         } catch (SessionException $e) {
