@@ -26,7 +26,15 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
             return [];
         }
 
-        $quotedId = $this->getDatabase()->smartQuote($externalId);
+        $quotedId    = $this->getDatabase()->smartQuote($externalId);
+        $campusCodes = array_map(
+            [$this->getDatabase(), 'smartQuote'],
+            $user->getCampusCollection()->getColumnValues('extTimetableCode')
+        );
+        if (empty($campusCodes)) {
+            return [];
+        }
+        $campusCodeString = implode(',', $campusCodes);
         if ($user->getRole()->isStudent()) {
             // 1st part: blocked classes
             // 2nd part: non-blocked classes
@@ -44,6 +52,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
 
                 WHERE s.Code = $quotedId
                 AND   t.Enabled = 1
+                AND   t.Name IN ($campusCodeString)
 
                 UNION
 
@@ -63,6 +72,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
 
                 WHERE s.Code = $quotedId
                 AND   t.Enabled = 1
+                AND   t.Name IN ($campusCodeString)
 
                 ORDER BY code ASC
             ";
@@ -99,6 +109,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                     staff_replacement.Code = $quotedId
                 )
                 AND t.Enabled = 1
+                AND t.Name IN ($campusCodeString)
 
                 ORDER BY code ASC
             ";
