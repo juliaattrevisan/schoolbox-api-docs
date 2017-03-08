@@ -208,6 +208,17 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         $quotedCampus = $this->database->smartQuote($campus->getExtTimetableCode());
 
         // Sub-parts common to all queries
+        $classSelect = "
+            t.Name                      AS ClassCampus,
+            ts.Code                     AS ClassCode,
+            ts.Name                     AS ClassName,
+            td.SortOrder                AS DayNumber,
+            tpe.Code                    AS PeriodNumber,
+            td.Name                     AS DayName,
+            CAST(tpe.StartTime AS TIME) AS PeriodStart,
+            CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
+            tpe.Name                    AS PeriodName
+        ";
         $baseStaffSelect = "
             CASE WHEN tcis.TimetableClassStaffID IS NULL
                 THEN 1
@@ -242,15 +253,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             // 2nd part: non-blocked classes
             $query = "
                 SELECT
-                    t.Name                      AS ClassCampus,
-                    ts.Code                     AS ClassCode,
-                    ts.Name                     AS ClassName,
-                    td.SortOrder                AS DayNumber,
-                    tpe.Code                    AS PeriodNumber,
-                    td.Name                     AS DayName,
-                    CAST(tpe.StartTime AS TIME) AS PeriodStart,
-                    CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
-                    tpe.Name                    AS PeriodName,
+                    $classSelect,
                     $baseStaffSelect,
                     $replacementStaffSelect
 
@@ -277,15 +280,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 UNION
 
                 SELECT
-                    t.Name                      AS ClassCampus,
-                    ts.Code                     AS ClassCode,
-                    ts.Name                     AS ClassName,
-                    td.SortOrder                AS DayNumber,
-                    tpe.Code                    AS PeriodNumber,
-                    td.Name                     AS DayName,
-                    CAST(tpe.StartTime AS TIME) AS PeriodStart,
-                    CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
-                    tpe.Name                    AS PeriodName,
+                    $classSelect,
                     $baseStaffSelect,
                     $replacementStaffSelect
 
@@ -320,15 +315,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             // I'm guessing we smoosh the staff and student queries together somehow?
             $query = "
                 SELECT
-                    t.Name                      AS ClassCampus,
-                    ts.Code                     AS ClassCode,
-                    ts.Name                     AS ClassName,
-                    td.SortOrder                AS DayNumber,
-                    tpe.Code                    AS PeriodNumber,
-                    td.Name                     AS DayName,
-                    CAST(tpe.StartTime AS TIME) AS PeriodStart,
-                    CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
-                    tpe.Name                    AS PeriodName,
+                    $classSelect,
                     $baseStaffSelect,
                     $replacementStaffSelect
 
