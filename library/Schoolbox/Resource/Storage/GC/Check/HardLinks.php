@@ -22,6 +22,12 @@ class HardLinks extends DbCheck
     {
         // all the places hard links occur
         $queries = [
+            "SELECT hash FROM blog_image 
+             WHERE deleted_at IS NULL",
+
+            "SELECT hash FROM eportfolio_component_blog_image 
+             WHERE deleted_at IS NULL",
+
             "SELECT item_image FROM news_items
              WHERE item_image IS NOT NULL
              AND item_deleted = 0",
@@ -38,9 +44,16 @@ class HardLinks extends DbCheck
              WHERE hash IS NOT NULL
              AND deleted_at IS NULL",
 
+            "SELECT image_hash FROM folder 
+             WHERE hash IS NOT NULL 
+             AND deleted_at IS NULL",
+
             "SELECT hash FROM myFile
              WHERE hash IS NOT NULL
              AND deleted_at IS NULL",
+
+            "SELECT hash FROM pastoral_attachment
+             WHERE deleted_at IS NULL",
 
             "SELECT image_hash FROM resource
              WHERE image_hash IS NOT NULL
@@ -50,17 +63,13 @@ class HardLinks extends DbCheck
              WHERE cache_hash IS NOT NULL
              AND deleted_at IS NULL",
 
-            "SELECT hash FROM student_submission
+            "SELECT hash FROM student_submission_file
              WHERE hash IS NOT NULL",
 
             "SELECT storage_id
-             FROM submission_box_file
-             LEFT JOIN submission_box
-             ON submission_box_file.box_id = submission_box.id
-             WHERE submission_box.id IS NULL
-             OR submission_box.deleted IS TRUE",
+             FROM submission_box_file",
 
-            "SELECT hash FROM submission_return
+            "SELECT hash FROM submission_return_file
              WHERE hash IS NOT NULL
              AND deleted_at IS NULL",
 
