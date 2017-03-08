@@ -41,13 +41,13 @@
             <div class="content">
                 <div class="row no-margin">
                     <div class="small-12 medium-2 columns no-pad">
-                        <img class="profile-img full-width" src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=constrain200"/>
+                        <img class="full-width" src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=constrain200"/>
                     </div>
 
-                    <div class="small-12 medium-10 columns no-pad">
+                    <div class="small-12 medium-10 columns">
                         {% block specialAlert %}
                             {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
-                                <div class="alert-box warning icon-bell no-margin">
+                                <div class="alert-box warning icon-bell">
                                     {{ locale.translate('specialNeeds', false, true) }}
                                 </div>
                             {% endif %}
@@ -55,7 +55,7 @@
 
                         {% block medicalAlert %}
                             {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
-                                <div class="alert-box alert icon-alert no-margin">
+                                <div class="alert-box alert icon-alert">
                                     Medical Note: {{ externalUser.StudentMedicalAlert }}
                                 </div>
                             {% endif %}
@@ -64,8 +64,8 @@
                         {% block details %}
                         <dl class="profile">
                             {% if showTitle %}
-                                <dt class="no-margin small-6 medium-3">Position Title</dt>
-                                <dd class="no-margin small-6 medium-9">
+                                <dt class="small-6 medium-3">Position Title</dt>
+                                <dd class="small-6 medium-9">
                                     {{ user.getPositionTitle() }}
                                 </dd>
                             {% endif %}
@@ -73,8 +73,8 @@
                             {% if showEmail %}
                                 {% block details_email %}
                                 {% if user.getEmail() %}
-                                <dt class="no-margin small-6 medium-3">Email</dt>
-                                <dd class="no-margin small-6 medium-9">
+                                <dt class="small-6 medium-3">Email</dt>
+                                <dd class="small-6 medium-9">
                                     <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                                 </dd>
                                 {% endif %}
@@ -83,22 +83,22 @@
 
                             {% if showDetails %}
                                 {% block details_studentId %}
-                                <dt class="no-margin small-6 medium-3">Student ID</dt>
-                                <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
+                                <dt class="small-6 medium-3">Student ID</dt>
+                                <dd class="small-6 medium-9">{{ user.getExternalId() }}</dd>
                                 {% endblock details_studentId %}
 
                                 {% block details_dob %}
                                 {% if externalUser.StudentBirthDate %}
-                                <dt class="no-margin small-6 medium-3">Date of Birth</dt>
-                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(dateFormats.dateOnlyFormat) }}</dd>
+                                <dt class="small-6 medium-3">Date of Birth</dt>
+                                <dd class="small-6 medium-9">{{ externalUser.StudentBirthDate|date(dateFormats.dateOnlyFormat) }}</dd>
                                 {% endif %}
                                 {% endblock details_dob %}
 
                                 {% block details_formTeacher %}
                                 {% if showClasses %}
                                     {% if formTeacher %}
-                                    <dt class="no-margin small-6 medium-3">Class Teacher</dt>
-                                    <dd class="no-margin small-6 medium-9">
+                                    <dt class="small-6 medium-3">Class Teacher</dt>
+                                    <dd class="small-6 medium-9">
                                         {% if formTeacher.getId() %}
                                         <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
                                         {% else %}
@@ -111,16 +111,16 @@
 
                                 {% block details_yearLevel %}
                                 {% if externalUser.StudentYearLevel %}
-                                <dt class="no-margin small-6 medium-3">Year Level</dt>
-                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
+                                <dt class="small-6 medium-3">Year Level</dt>
+                                <dd class="small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
                                 {% endif %}
                                 {% endblock details_yearLevel %}
 
                                 {% block details_tutorTeacher %}
                                 {% if showClasses %}
                                     {% if tutorTeacher %}
-                                    <dt class="no-margin small-6 medium-3">Tutor</dt>
-                                    <dd class="no-margin small-6 medium-9">
+                                    <dt class="small-6 medium-3">Tutor</dt>
+                                    <dd class="small-6 medium-9">
                                         {% if tutorTeacher.getId() %}
                                             <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
                                         {% else %}
@@ -146,16 +146,16 @@
 
                                 {% block details_house %}
                                 {% if externalUser.StudentHouseDescription %}
-                                <dt class="no-margin small-6 medium-3">House</dt>
-                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
+                                <dt class="small-6 medium-3">House</dt>
+                                <dd class="small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
                                 {% endif %}
                                 {% endblock details_house %}
 
                                 {% block details_tutorGroup %}
                                 {% if showClasses %}
                                     {% if externalUser.StudentTutorDescription %}
-                                    <dt class="no-margin small-6 medium-3">Tutor Group</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
+                                    <dt class="small-6 medium-3">Tutor Group</dt>
+                                    <dd class="small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
                                     {% endif %}
                                 {% endif %}
                                 {% endblock details_tutorGroup %}
@@ -163,8 +163,8 @@
                                 {% block details_hohTeacher %}
                                 {% if showClasses %}
                                     {% if hohTeacher %}
-                                    <dt class="no-margin small-6 medium-3">Head of House</dt>
-                                    <dd class="no-margin small-6 medium-9">
+                                    <dt class="small-6 medium-3">Head of House</dt>
+                                    <dd class="small-6 medium-9">
                                         {% if hohTeacher.getId() %}
                                             <a href="{{ session.mailhandle }}{{ hohTeacher.getEmail() }}">{{ hohTeacher.formatName() }}</a>
                                         {% else %}
@@ -178,16 +178,16 @@
                                 {% block details_studentForm %}
                                 {% if showClasses %}
                                     {% if externalUser.StudentForm %}
-                                    <dt class="no-margin small-6 medium-3">Class</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
+                                    <dt class="small-6 medium-3">Class</dt>
+                                    <dd class="small-6 medium-9">{{ externalUser.StudentForm }}</dd>
                                     {% endif %}
                                 {% endif %}
                                 {% endblock details_studentForm %}
 
                                 {% block details_studentType %}
                                 {% if boarderType %}
-                                <dt class="no-margin small-6 medium-3">Student Type</dt>
-                                <dd class="no-margin small-6 medium-9">{{ boarderType }}</dd>
+                                <dt class="small-6 medium-3">Student Type</dt>
+                                <dd class="small-6 medium-9">{{ boarderType }}</dd>
                                 {% endif %}
                                 {% endblock details_studentType %}
 
