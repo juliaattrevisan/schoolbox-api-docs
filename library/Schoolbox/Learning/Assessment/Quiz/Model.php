@@ -150,6 +150,15 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
+    public function canLearnerViewInUpcomingList(User $learner)
+    {
+        // Same as canLearnerCreateResponse for now - I can see that this could become true at some point?
+        return $this->canLearnerCreateResponse($learner);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function canLearnerCreateResponse(User $learner)
     {
         // Not open ?

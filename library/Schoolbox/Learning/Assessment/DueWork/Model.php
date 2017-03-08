@@ -265,15 +265,10 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function canLearnerCreateResponse(User $learner)
+    public function canLearnerViewInUpcomingList(User $learner)
     {
         // Not open ?
         if(!$this->isOpen()){
-            return false;
-        }
-
-        // Does this DueWork not accept online responses ?
-        if($this->isAcceptNone()){
             return false;
         }
 
@@ -282,12 +277,28 @@ class Model extends AbstractAssessment
             return false;
         }
 
-        // Has the student already submitted their single permitted response ?
+        // Not allowing any more responses?
         if($this->isAcceptSingle() && $this->getParticipant($learner)->hasSubmittedResponse()) {
             return false;
         }
 
+        // Note that the student CAN view the due work if it doesn't accept
+        // online submission - these are handled outside of Schoolbox.
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canLearnerCreateResponse(User $learner)
+    {
+        // Does this DueWork not accept online responses ?
+        if($this->isAcceptNone()){
+            return false;
+        }
+
+        // Otherwise, the same rules as whether the user can view it
+        return $this->canLearnerViewInUpcomingList($learner);
     }
 
 
