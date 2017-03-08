@@ -450,12 +450,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
                     try {
                         // enqueue to be dispatched
-                        $this->enqueue(
-                            $pipe,
-                            self::PIPE_METHOD_PUSH,
-                            // run the instances through a decorator
-                            (new Decorator())->appendInstances($timer->getData())->renderAsSocketArray(true)
-                        );
+                        $this->enqueueInstances($pipe, $timer->getData());
 
                     } catch (QueueingException $e) {
                         $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage());
@@ -467,6 +462,25 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
 
         return $this->pushTransactions[$userId][$pipeId];
+    }
+
+
+    /**
+     * @param PipeInterface $pipe
+     * @param Instance[]    $instances
+     * @throws InvalidArgumentException
+     * @throws QueueingException
+     */
+    private function enqueueInstances(PipeInterface $pipe, array $instances)
+    {
+        if (empty($unread)) {
+            return;
+        }
+
+        $this->enqueue($pipe, self::PIPE_METHOD_PUSH,
+            // run the instances through a decorator
+            (new Decorator())->appendInstances($instances)->renderAsSocketArray(true)
+        );
     }
 
 
@@ -494,20 +508,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 if ($this->subscriptionManager->subscribeUser($userId)) {
                     $this->sendToPipe($pipe, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
 
-                    $unread = $this->subscriptionManager
+                    $this->enqueueInstances($pipe, $this->subscriptionManager
                         ->getUserSubscription($userId)
-                        ->getUnread();
-
-                    if (empty($unread)) {
-                        break;
-                    }
-
-                    // push all unread messages to this new pipe
-                    $this->enqueue(
-                        $pipe,
-                        static::PIPE_METHOD_PUSH,
-                        (new Decorator())->appendInstances($unread)->renderAsSocketArray(true)
-                    );
+                        ->getUnread());
                 } else {
                     // could not subscribe the user, rabbit-offline has already been reported, just inform the user
                     $this->sendToPipe($pipe, [ $command => false ]);
