@@ -124,8 +124,15 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getDayNumber(Campus $campus, $date = 0)
     {
-        // Use fc.Timetable.ShortName as the campus' name
-        return [];
+        $timetableDates = $this->getTimetableDates($campus);
+        $dateObject     = $date
+            ? new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP)
+            : Alaress_Date_Format::now();
+        $key            = $dateObject->getDatabaseDate();
+
+        return array_key_exists($key, $timetableDates)
+            ? $timetableDates[$key]['SortOrder']
+            : 0;
     }
 
     /**
@@ -133,7 +140,14 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getDayName($dayNumber)
     {
-        return [];
+        // Kind of requires a campus, be this method doesn't have one.
+        return $this->database->getOne("
+            SELECT DISTINCT td.Name
+            FROM       fc.Timetable       t
+            INNER JOIN fc.TimetableDay    td ON t.ID  = td.TimetableId
+            WHERE t.Enabled = 1
+            AND   td.SortOrder = {$this->database->quote($dayNumber)}
+        ");
     }
 
     /**
