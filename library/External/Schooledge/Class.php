@@ -34,7 +34,12 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
         $classQuery = '(';
         $subCodeArray = explode(',', $subCode);
         foreach ($subCodeArray as $code) {
-            $classQuery .= "ts.Code = {$this->getDatabase()->smartQuote($code)} OR ";
+            if (strpos($code, '/') !== false) {
+                $codeArray = explode('/', $code, 2);
+                $classQuery .= "(ts.Code = '{$this->database->quote($codeArray[1])}' AND t.Name = '{$this->database->quote($codeArray[0])}' ) OR ";
+            } else {
+                $classQuery .= "ts.Code = '{$this->database->quote($code)}' OR ";
+            }
         }
         return substr($classQuery, 0, -3) . ')';
     }
