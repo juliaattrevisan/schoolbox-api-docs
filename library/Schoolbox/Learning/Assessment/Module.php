@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
 use Schoolbox\Mapper;
@@ -93,7 +94,7 @@ class Module extends BaseModule
             $this->getAccess()
         );
 
-        $participantView = new Rule\All(
+        $participantView = new Rule\Any(
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new CanSeeAssessment($this->getAccess(), $this->getConfig())
@@ -158,6 +159,7 @@ class Module extends BaseModule
         $this->register('GET',      "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,              $preloadAssessment); // a || c
 
         $this->register('GET',      "$assRoute/$studentParam",          'getSummary',               $participantView,       $preloadParticipant); // s || p
+        $this->register('GET',      "$assRoute/preview",                'getPreview',
         $this->register('GET',      "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,             $preloadParticipant); // p
         $this->register('POST',     "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,             $preloadParticipant); // p
     }
@@ -211,9 +213,14 @@ class Module extends BaseModule
             }
             /* Allow read-accessors to see Summary
              */
-            else {
+            elseif ($access == UserAccess::ACCESS_READ) {
                 /** @var IAssessable $assessment */
                 $participant = $assessment->getParticipant($student);
+            }
+            /* Nobody else allowed
+             */
+            else {
+                throw new Forbidden();
             }
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
