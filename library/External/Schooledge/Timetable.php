@@ -12,6 +12,73 @@ use Schoolbox\Campus;
  */
 class External_Schooledge_Timetable extends External_Humanedge_Timetable implements External_TimetableInterface
 {
+    // Common timetable query parts
+
+    private $classSelect = "
+        t.Name                      AS ClassCampus,
+        ts.Code                     AS ClassCode,
+        ts.Name                     AS ClassName,
+        td.SortOrder                AS DayNumber,
+        tpe.Code                    AS PeriodNumber,
+        td.Name                     AS DayName,
+        CAST(tpe.StartTime AS TIME) AS PeriodStart,
+        CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
+        tpe.Name                    AS PeriodName
+    ";
+    private $baseStaffSelect = "
+        CASE WHEN tcis.TimetableClassStaffID IS NULL
+            THEN 1
+            ELSE 0
+        END                         AS UseBaseStaff,
+        staff_base.Code             AS BaseStaffID,
+        staff_base.FirstName        AS BaseStaffPreferredName,
+        staff_base.LastName         AS BaseStaffSurname,
+        staff_base.Title            AS BaseStaffTitle
+    ";
+    private $replacementStaffSelect = "
+        CASE WHEN staff_replacement.Code IS NOT NULL
+            THEN 1
+            ELSE 0
+        END                         AS UseReplacementStaff,
+        staff_replacement.Code      AS ReplacementStaffID,
+        staff_replacement.FirstName AS ReplacementStaffPreferredName,
+        staff_replacement.LastName  AS ReplacementStaffSurname,
+        staff_replacement.Title     AS ReplacementStaffTitle
+    ";
+    private $baseRoomSelect = "
+        CASE WHEN tcir.TimetableClassRoomID IS NULL
+            THEN 1
+            ELSE 0
+        END                         AS UseBaseRoom,
+        room_base.Code              AS BaseRoom
+    ";
+    private $replacementRoomSelect = "
+        CASE WHEN room_replacement.Code IS NOT NULL
+            THEN 1
+            ELSE 0
+        END                         AS UseReplacementRoom,
+        room_replacement.Code       AS ReplacementRoom
+    ";
+    private $timetableJoin = "INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID";
+    private $baseStaffJoin = "
+        LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
+        LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
+    ";
+    private $replacementStaffJoin = "
+        LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
+        LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
+    ";
+    private $baseRoomJoin = "
+        LEFT  JOIN fc.TimetableClassRoom tcr       ON tc.ID      = tcr.TimetableClassId
+        LEFT  JOIN fc.Room               tcrr      ON tcr.RoomID = tcrr.ID
+        LEFT  JOIN dbo.Room              room_base ON tcrr.ID    = room_base.ID
+    ";
+    private $replacementRoomJoin = "
+        LEFT  JOIN fc.TimetableClassInstanceRoom tcir             ON tci.ID      = tcir.TimetableClassInstanceId AND tcir.RoomSpecified = 1
+        LEFT  JOIN fc.Room                       tcirr            ON tcir.RoomID = tcirr.ID
+        LEFT  JOIN dbo.Room                      room_replacement ON tcirr.ID    = room_replacement.ID
+    ";
+
     /**
      * Timetable date type constant - this date is not in the sequence.
      *
@@ -250,70 +317,6 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         $quotedCampus = $this->database->smartQuote($campus->getExtTimetableCode());
 
         // Sub-parts common to all queries
-        $classSelect = "
-            t.Name                      AS ClassCampus,
-            ts.Code                     AS ClassCode,
-            ts.Name                     AS ClassName,
-            td.SortOrder                AS DayNumber,
-            tpe.Code                    AS PeriodNumber,
-            td.Name                     AS DayName,
-            CAST(tpe.StartTime AS TIME) AS PeriodStart,
-            CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
-            tpe.Name                    AS PeriodName
-        ";
-        $baseStaffSelect = "
-            CASE WHEN tcis.TimetableClassStaffID IS NULL
-                THEN 1
-                ELSE 0
-            END                         AS UseBaseStaff,
-            staff_base.Code             AS BaseStaffID,
-            staff_base.FirstName        AS BaseStaffPreferredName,
-            staff_base.LastName         AS BaseStaffSurname,
-            staff_base.Title            AS BaseStaffTitle
-        ";
-        $replacementStaffSelect = "
-            CASE WHEN staff_replacement.Code IS NOT NULL
-                THEN 1
-                ELSE 0
-            END                         AS UseReplacementStaff,
-            staff_replacement.Code      AS ReplacementStaffID,
-            staff_replacement.FirstName AS ReplacementStaffPreferredName,
-            staff_replacement.LastName  AS ReplacementStaffSurname,
-            staff_replacement.Title     AS ReplacementStaffTitle
-        ";
-        $baseRoomSelect = "
-            CASE WHEN tcir.TimetableClassRoomID IS NULL
-                THEN 1
-                ELSE 0
-            END                         AS UseBaseRoom,
-            room_base.Code              AS BaseRoom
-        ";
-        $replacementRoomSelect = "
-            CASE WHEN room_replacement.Code IS NOT NULL
-                THEN 1
-                ELSE 0
-            END                         AS UseReplacementRoom,
-            room_replacement.Code       AS ReplacementRoom
-        ";
-        $timetableJoin = "INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID";
-        $baseStaffJoin = "
-            LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-            LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
-        ";
-        $replacementStaffJoin = "
-            LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
-            LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
-        ";
-        $baseRoomJoin = "
-            LEFT  JOIN fc.TimetableClassRoom tcr       ON tc.ID      = tcr.TimetableClassId
-            LEFT  JOIN fc.Room               tcrr      ON tcr.RoomID = tcrr.ID
-            LEFT  JOIN dbo.Room              room_base ON tcrr.ID    = room_base.ID
-        ";
-        $replacementRoomJoin = "
-            LEFT  JOIN fc.TimetableClassInstanceRoom tcir             ON tci.ID      = tcir.TimetableClassInstanceId AND tcir.RoomSpecified = 1
-            LEFT  JOIN fc.Room                       tcirr            ON tcir.RoomID = tcirr.ID
-            LEFT  JOIN dbo.Room                      room_replacement ON tcirr.ID    = room_replacement.ID
-        ";
         $timetableFilter = "t.Name = {$quotedCampus} AND t.Enabled = 1";
 
         if ($user->getRole()->isStudent()) {
@@ -321,11 +324,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             // 2nd part: non-blocked classes
             $query = "
                 SELECT
-                    $classSelect,
-                    $baseStaffSelect,
-                    $replacementStaffSelect,
-                    $baseRoomSelect,
-                    $replacementRoomSelect
+                    $this->classSelect,
+                    $this->baseStaffSelect,
+                    $this->replacementStaffSelect,
+                    $this->baseRoomSelect,
+                    $this->replacementRoomSelect
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto student via subject choice
@@ -338,11 +341,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
                 CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
-                $baseStaffJoin
-                $replacementStaffJoin
-                $baseRoomJoin
-                $replacementRoomJoin
-                $timetableJoin
+                $this->baseStaffJoin
+                $this->replacementStaffJoin
+                $this->baseRoomJoin
+                $this->replacementRoomJoin
+                $this->timetableJoin
 
                 WHERE s.Code = {$quotedId}
                 AND   $timetableFilter
@@ -350,11 +353,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 UNION
 
                 SELECT
-                    $classSelect,
-                    $baseStaffSelect,
-                    $replacementStaffSelect,
-                    $baseRoomSelect,
-                    $replacementRoomSelect
+                    $this->classSelect,
+                    $this->baseStaffSelect,
+                    $this->replacementStaffSelect,
+                    $this->baseRoomSelect,
+                    $this->replacementRoomSelect
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto student via year level
@@ -367,11 +370,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
                 CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID    = td.ID
-                $baseStaffJoin
-                $replacementStaffJoin
-                $baseRoomJoin
-                $replacementRoomJoin
-                $timetableJoin
+                $this->baseStaffJoin
+                $this->replacementStaffJoin
+                $this->baseRoomJoin
+                $this->replacementRoomJoin
+                $this->timetableJoin
 
                 WHERE s.Code = {$quotedId}
                 AND   tci.TimetableBlockInstanceID IS NULL
@@ -387,11 +390,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             // I'm guessing we smoosh the staff and student queries together somehow?
             $query = "
                 SELECT
-                    $classSelect,
-                    $baseStaffSelect,
-                    $replacementStaffSelect,
-                    $baseRoomSelect,
-                    $replacementRoomSelect
+                    $this->classSelect,
+                    $this->baseStaffSelect,
+                    $this->replacementStaffSelect,
+                    $this->baseRoomSelect,
+                    $this->replacementRoomSelect
 
                 FROM       fc.TimetableSubject       ts
                 -- Join onto staff
@@ -402,11 +405,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
                 CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
                 INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
-                $baseStaffJoin
-                $replacementStaffJoin
-                $baseRoomJoin
-                $replacementRoomJoin
-                $timetableJoin
+                $this->baseStaffJoin
+                $this->replacementStaffJoin
+                $this->baseRoomJoin
+                $this->replacementRoomJoin
+                $this->timetableJoin
 
                 WHERE (
                     (staff_base.Code = {$quotedId} AND tcis.TimetableClassStaffID IS NULL)
@@ -637,7 +640,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             // Fill in each day with blanks
-            $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], [])
+            $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], []);
             $timetable[$x]['class']          = [];
         }
         return $timetable;
