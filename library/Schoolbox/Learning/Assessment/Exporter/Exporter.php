@@ -39,7 +39,8 @@ class Exporter
             SELECT          u.synergy_id,
                             sr.mark,
                             sb.name,
-                            cc.code
+                            cc.code,
+                            lu_submission_type.name AS type_name
             FROM            submission_return AS sr
             INNER JOIN      submission_box AS sb ON
                             sb.id = sr.box_id
@@ -57,6 +58,8 @@ class Exporter
                             cc.folder_id = c.id
             INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
+            LEFT JOIN       lu_submission_type ON 
+                            lu_submission_type.id = submission_box.type
             WHERE           YEAR(sr.created_at) = :currentYear
                             AND sr.deleted_at IS NULL
                             AND sb.name LIKE '%[%]%'
@@ -87,19 +90,24 @@ class Exporter
             $openBracketPos = strpos($result['name'], '[');
 
             /* Get the assessment code out of the submission box name
+             * Note: this will be phased out once De La Salle have their assessment codes moved from
+             *       assessment titles to assessment types
              */
             $closeBracketPos = strrpos($result['name'], ']');
             $codeLength = $closeBracketPos - $openBracketPos;
             $assessmentCode = substr($result['name'], $openBracketPos+1, $codeLength-1);
 
-            if (strlen($assessmentCode) > 0) {
-                $data[] = [
-                    $headings[0] => $result['synergy_id'],
-                    $headings[1] => $result['code'],
-                    $headings[2] => $assessmentCode,
-                    $headings[3] => $result['mark']
-                ];
+            if (strlen($assessmentCode) == 0) {
+                // Use the assessment type
+                $assessmentCode = trim($result['type_name']);
             }
+
+            $data[] = [
+                $headings[0] => $result['synergy_id'],
+                $headings[1] => $result['code'],
+                $headings[2] => $assessmentCode,
+                $headings[3] => $result['mark']
+            ];
         }
 
         $writer = new CsvWriter($file, $data);
