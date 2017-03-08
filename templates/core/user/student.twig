@@ -209,14 +209,14 @@
             </div>
             
             {% block buttons_island %}
-            <ul class='fat-buttons'>
+            <ul class='flex-list flex-wrap buttons'>
                 {% block buttons %}
                     {% if showButtons %}
                         {% block buttons_dueWork %}
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
                                 <li>
                                     <a href="/learning/due/{{ user.getId() }}"
-                                       class="no-margin button icon-fat icon-due-work" >Due Work</a>
+                                       class="no-margin icon-due-work">Due Work</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_dueWork %}
@@ -227,7 +227,7 @@
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
                                 <li>
                                     <a href="/learning/grades/{{ user.getId() }}"
-                                       class="no-margin button icon-fat icon-tick">Grades</a>
+                                       class="no-margin icon-tick">Grades</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_grades %}
@@ -237,7 +237,7 @@
                         {% block buttons_eportfolio %}
                             <li>
                                 <a href="/eportfolio/{{ user.getId() }}/profile"
-                                   class="no-margin button icon-fat icon-eportfolio">ePortfolio</a>
+                                   class="no-margin icon-eportfolio">ePortfolio</a>
                             </li>
                         {% endblock buttons_eportfolio %}
                     {% endif %}
@@ -246,7 +246,7 @@
                         {% if isStaff or isParentOfStudent %}
                         <li>
                             <a href="/pastoral/{{ user.getId() }}"
-                               class="no-margin button icon-fat icon-pastoral">Pastoral Care</a>
+                               class="no-margin icon-pastoral">Pastoral Care</a>
                         </li>
                         {% endif %}
                     {% endif %}
@@ -255,7 +255,7 @@
                         {% block buttons_calendar %}
                             <li>
                                 <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                   class="no-margin button icon-fat icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a>
+                                   class="no-margin icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a>
                             </li>
                         {% endblock buttons_calendar %}
                     {% endif %}
@@ -265,7 +265,7 @@
                             {% block buttons_timetable %}
                                 <li>
                                     <a href="/timetable/{{ user.getId() }}"
-                                       class="no-margin button icon-fat icon-timetable">Timetable</a>
+                                       class="no-margin icon-timetable">Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
                         {% endif %}
@@ -276,7 +276,7 @@
                             {% if config.boarder_leave_enabled and user.getResidentialHouse().getId() %}
                                 <li>
                                     <a href="/modules/leave/student/{{ user.getId() }}"
-                                       class="no-margin button icon-fat icon-boarder-leave">Boarder Leave</a>
+                                       class="no-margin icon-boarder-leave">Boarder Leave</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_boarderLeave %}
@@ -287,7 +287,7 @@
                             {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
                                 <li>
                                     <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
-                                       class="no-margin button icon-fat icon-modify"
+                                       class="no-margin icon-modify"
                                        target="_blank">Pastoral Care</a>
                                 </li>
                             {% endif %}

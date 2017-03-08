@@ -73,7 +73,7 @@
 
                             {% if showDetails %}
                                 {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
-                                    <dt class="mall-12">Partner</dt>
+                                    <dt class="small-12">Partner</dt>
                                     <dd class="small-12">
                                         <div class="card small-12">
                                             {% if spouse %}
@@ -107,12 +107,12 @@
                     </div>
                 </div>
             </div>
-            <ul class="fat-buttons">
+            <ul class="flex-list flex-wrap buttons">
                 {% if eportfolioAuth %}
                     {% block buttons_eportfolio %}
                         <li>
                             <a href="/eportfolio/{{ user.getId() }}/profile"
-                               class="no-margin button icon-fat icon-eportfolio"
+                               class="no-margin icon-eportfolio"
                             >ePortfolio</a>
                         </li>
                     {% endblock buttons_eportfolio %}
@@ -122,7 +122,7 @@
                     {% block buttons_calendar %}
                         <li>
                             <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                               class="no-margin button icon-fat icon-calendar"
+                               class="no-margin icon-calendar"
                             >Calendar</a>
                         </li>
                     {% endblock buttons_calendar %}

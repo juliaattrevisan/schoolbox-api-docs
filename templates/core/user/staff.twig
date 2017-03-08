@@ -83,13 +83,13 @@
                 </div>
             </div>
             {% block buttons_island %}
-                <ul class='fat-buttons'>
+                <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
                         {% if eportfolioAuth %}
                             {% block buttons_eportfolio %}
                                 <li>
                                     <a href="/eportfolio/{{ user.getId() }}/profile"
-                                       class="no-margin button icon-fat icon-eportfolio"
+                                       class="no-margin icon-eportfolio"
                                     >ePortfolio</a>
                                 </li>
                             {% endblock buttons_eportfolio %}
@@ -99,7 +99,7 @@
                             {% block buttons_calendar %}
                                 <li>
                                     <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                       class="no-margin button icon-fat icon-calendar"
+                                       class="no-margin icon-calendar"
                                     >Calendar</a>
                                 </li>
                             {% endblock buttons_calendar %}
@@ -109,7 +109,7 @@
                             {% block buttons_timetable %}
                                 <li>
                                     <a href="/timetable/{{ user.getId() }}"
-                                       class="no-margin button icon-fat icon-timetable"
+                                       class="no-margin icon-timetable"
                                     >Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
