@@ -31,12 +31,12 @@
 
 {# Render unit selector too #}
 {% if courses|length %}
-    <select data-unit-selector>
-        <option disabled selected>All assessments</option>
+    <select title="Filter by unit" data-unit-selector>
+        <option disabled selected>All Units</option>
         {% for course in courses %}
             <optgroup label="Course: {{ course.specification.folder.title }}">
                 {% for unit in course.units %}
-                    <option>{{ unit.specification.folder.title }}</option>
+                    <option value="{{ unit.id }}">{{ unit.specification.folder.title }}</option>
                 {% endfor %}
             </optgroup>
         {% endfor %}
