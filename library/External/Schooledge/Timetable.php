@@ -361,7 +361,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      * @param Campus $campus
      * @return array
      */
-    protected function getTimetableCalendarList(Campus $campus)
+    protected function getTimetableDates(Campus $campus)
     {
         // Adapted from some C# code SchoolEdge gave us
         $quotedCampus   = $this->database->smartQuote($campus->getExtTimetableCode());
@@ -404,25 +404,24 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         $startDate = new Alaress_Date_Format($timetable['StartDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
         $endDate   = new Alaress_Date_Format($timetable['EndDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
-        $calendarModelList = [];
+        // Fill in missing timetable dates
         for ($currentDate = clone $startDate; $currentDate->lte($endDate); $currentDate = $currentDate->addDays(1)) {
-            $cModel = [
-                'DateValue' => $currentDate->getDatabaseDate(),
-            ];
-            $timetableDate = $timetableDates[$cModel['DateValue']];
-            if ($timetableDate) {
-                $cModel['TimetableDayType'] = $timetableDate['TimetableDateTypeID'];
-                $cModel['TimetableDayID']   = $timetableDate['TimetableDayID'];
-            } else {
-                $cModel['TimetableDayType'] = null;
-                $cModel['TimetableDayID']   = null;
+            $dateString = $currentDate->getDatabaseDate();
+            if (!isset($timetableDates[$dateString])) {
+                $timetableDates[$dateString] = [
+                    'TimetableDate'       => $dateString,
+                    'TimetableDateTypeID' => null,
+                    'TimetableDayID'      => null,
+                ];
             }
-            $calendarModelList[$cModel['DateValue']] = $cModel;
         }
 
-        // get timetable day?
+        // Sort by key for clarity
+        ksort($timetableDates);
+
+        // Add timetable days
         $dayIndex = -1;
-        foreach ($calendarModelList as &$cm) {
+        foreach ($timetableDates as &$timetableDate) {
             $keepIndex = $dayIndex;
             $dayIndex++;
             if ($dayIndex > (count($timetableDays) - 1)) {
@@ -431,7 +430,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             $timetableDay   = $timetableDays[$dayIndex];
             $timetableDayId = $timetableDay['ID'];
 
-            switch ($cm['TimetableDayType']) {
+            switch ($timetableDate['TimetableDateTypeID']) {
                 case self::TIMETABLE_DATE_TYPE_NON_DAY:
                     // Non-day - increment the keep index?
                     $dayIndex = $keepIndex;
@@ -442,7 +441,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
                 case self::TIMETABLE_DATE_TYPE_RESTART_DAY:
                     foreach ($timetableDays as $i => $timetableDay) {
-                        if ($timetableDay['ID'] == $cm['TimetableDayID']) {
+                        if ($timetableDay['ID'] == $timetableDate['TimetableDayID']) {
                             $dayIndex = $i;
                             break;
                         }
@@ -453,18 +452,18 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                     break;
 
                 default:
-                    $cm['TimetableDayID'] = $timetableDayId;
+                    $timetableDate['TimetableDayID'] = $timetableDayId;
                     break;
             }
 
             // Set timetable day fully
-            $cm['TimetableDay'] = isset($cm['TimetableDayID'])
+            $timetableDate['TimetableDay'] = isset($timetableDate['TimetableDayID'])
                 ? $timetableDay
                 : null;
-            unset($cm['TimetableDayID']);
+            unset($timetableDate['TimetableDayID']);
         }
-        unset($cm);
+        unset($timetableDate);
 
-        return $calendarModelList;
+        return $timetableDates;
     }
 }
