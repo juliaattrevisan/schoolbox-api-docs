@@ -220,9 +220,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        $this->log->critical(
-            sprintf('%s: "%s" - %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine())
-        );
+        if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
+            $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
+        } else {
+            $this->log->critical(sprintf('%s: "%s" occurred in %s on line %s',
+                get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()
+            ));
+        }
 
         // process exception needs to be rethrown
         if ($e instanceof ProcessException) {
