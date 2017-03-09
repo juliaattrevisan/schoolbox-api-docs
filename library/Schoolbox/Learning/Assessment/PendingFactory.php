@@ -263,6 +263,7 @@ class PendingFactory
      * * in Projects that are in UnitImplementation on Folders
      *
      * @return GenericCollection|IAssessable[]
+     * @throws \LogicException If assessment type is not recognised
      */
     public function getPendingAssessments()
     {
@@ -306,7 +307,7 @@ class PendingFactory
      */
     private function cacheFolder($id, $name)
     {
-        $id = intval($id);
+        $id = (int)$id;
         if (!$this->foldersCache[$id] instanceof Folder) {
             $this->foldersCache[$id] = $this->folderMapper->createModel($id)->setName($name);
         }
@@ -339,7 +340,7 @@ class PendingFactory
      */
     private function cacheProject($id, $title)
     {
-        $id = intval($id);
+        $id = (int)$id;
         if (!$this->projectCache[$id] instanceof Project) {
             $this->projectCache[$id] = (new Project())->setId($id)->setTitle($title); // TODO SA-2631
         }
@@ -353,7 +354,7 @@ class PendingFactory
      */
     private function cacheCourseSpecification($id)
     {
-        $id = intval($id);
+        $id = (int)$id;
         if (!$this->courseSpecsCache[$id] instanceof CourseSpecification) {
             $this->courseSpecsCache[$id] = (new CourseSpecification())->setId($id); // TODO SA-2631
         }
@@ -367,7 +368,7 @@ class PendingFactory
      */
     private function cacheCourseImplementation($id)
     {
-        $id = intval($id);
+        $id = (int)$id;
         if (!$this->courseImplsCache[$id] instanceof CourseImplementation) {
             $this->courseImplsCache[$id] = (new CourseImplementation())->setId($id); // TODO SA-2631
         }
@@ -381,7 +382,7 @@ class PendingFactory
      */
     private function cacheUnitSpecification($id)
     {
-        $id = intval($id);
+        $id = (int)$id;
         if (!$this->unitSpecsCache[$id] instanceof UnitSpecification) {
             $this->unitSpecsCache[$id] = (new UnitSpecification())->setId($id); // TODO SA-2631
         }
@@ -395,7 +396,7 @@ class PendingFactory
      */
     private function cacheUnitImplementation($id)
     {
-        $id = intval($id);
+        $id = (int)$id;
         if (!$this->unitImplsCache[$id] instanceof UnitImplementation) {
             $this->unitImplsCache[$id] = (new UnitImplementation())->setId($id); // TODO SA-2631
         }
@@ -416,6 +417,8 @@ class PendingFactory
      * Case 2: Assessment in Project that resides on Folder           => Folder name+id + Project name
      * Case 3: Assessment in UnitImpl imported on Folder              => Folder name+id + UnitSpec name+id + ClassSpec name+id
      * Case 4: Assessment in Project in UnitImpl imported on Folder   => Folder name+id + UnitSpec name+id + ClassSpec name+id + Project name
+     *
+     * @throws \LogicException If assessment type is not recognised
      */
     private function getAssessments()
     {
@@ -615,12 +618,13 @@ class PendingFactory
      * Extract and cache any GroupIds or ClassCodes to later retrieve the studentLists
      *
      * @param \PDOStatement $statement
+     * @throws \LogicException If assessment type is not recognised
      */
     private function parseAssessments($statement)
     {
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
-            $assessmentId = intval($row['a.id']);
+            $assessmentId = (int)$row['a.id'];
 
             // Hydrate Assessment
             if (!$this->assessmentsCache[$assessmentId] instanceof IAssessable) {
@@ -628,14 +632,14 @@ class PendingFactory
                 // Create Quiz / DueWork / Task object
 
                 // Add ID to type array for later retrieval of Response / Feedback
-                if (!is_null($row['qz.id'])) {
+                if (null !== $row['qz.id']) {
                     $this->quizAssessmentIds[$assessmentId] = $assessmentId;
                     $this->assessmentsCache[$assessmentId]  = new Quiz();
-                } elseif (!is_null($row['dw.id'])) {
-                    $this->dueWorkAssessmentIds[$assessmentId] = intval($assessmentId);
+                } elseif (null !== $row['dw.id']) {
+                    $this->dueWorkAssessmentIds[$assessmentId] = (int)$assessmentId;
                     $this->assessmentsCache[$assessmentId]     = new DueWork();
-                } elseif (!is_null($row['tk.id'])) {
-                    $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
+                } elseif (null !== $row['tk.id']) {
+                    $this->taskAssessmentIds[$assessmentId] = (int)$assessmentId;
                     $this->assessmentsCache[$assessmentId]  = (new Task())->setIsSelfAssessable(!$row['tk.requires_confirmation']);
                 } else {
                     throw new \LogicException('Assessment must be Quiz, DueWork or Task. row: ' . print_r($row, true));
@@ -648,17 +652,17 @@ class PendingFactory
                 // It is VERY slow to create a new AlaressDateFormat from a DB formatted string.
                 $assessment->setDueAt($this->getDateFromString($row['a.due_date']));
 
-                $projectId            = intval($row['p.id']);
+                $projectId            = (int)$row['p.id'];
                 $projectTitle         = $row['p.title'];
-                $unitImplId           = intval($row['ui.id']);
-                $unitSpecId           = intval($row['us.id']);
-                $courseImplId         = intval($row['ci.id']);
+                $unitImplId           = (int)$row['ui.id'];
+                $unitSpecId           = (int)$row['us.id'];
+                $courseImplId         = (int)$row['ci.id'];
                 $courseSpecId         = $row['cs.id'];
-                $folderId             = intval($row['f.id']);
+                $folderId             = (int)$row['f.id'];
                 $folderName           = $row['f.name'];
-                $unitSpecFolderId     = intval($row['usf.id']);
+                $unitSpecFolderId     = (int)$row['usf.id'];
                 $unitSpecFolderName   = $row['usf.name'];
-                $courseSpecFolderId   = intval($row['csf.id']);
+                $courseSpecFolderId   = (int)$row['csf.id'];
                 $courseSpecFolderName = $row['csf.name'];
 
                 switch ($row['case']) {
@@ -841,11 +845,11 @@ class PendingFactory
             $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
 
             // Was this user from a Group ?
-            if (!is_null($row['g.id'])) {
+            if (null !== $row['g.id']) {
                 if (!is_array($this->folderToStudentListMap[$row['g.id']])) {
                     $this->folderToStudentListMap[$row['g.id']] = [];
                 }
-                $this->folderToStudentListMap[$row['g.id']][$row['u.synergy_id']] = intval($row['u.synergy_id']);
+                $this->folderToStudentListMap[$row['g.id']][$row['u.synergy_id']] = (int)$row['u.synergy_id'];
             }
         }
     }
@@ -1170,6 +1174,7 @@ class PendingFactory
      *
      * @param IAssessable $assessment
      * @return bool
+     * @throws \DomainException
      */
     private function isFeedbackRequired(IAssessable $assessment)
     {
@@ -1374,7 +1379,7 @@ class PendingFactory
     private function findExtraStudentResults($results, $userKey, $assessmentKey)
     {
         foreach ($results as $row) {
-            $studentId    = intval($row[$userKey]);
+            $studentId    = (int)$row[$userKey];
             $participants = $this->assessmentsCache[$row[$assessmentKey]]->getAllParticipants();
             // Are we missing the student and student does not exists in student cache?
             if (!$participants[$studentId] && !$this->studentIntCache[$studentId]) {
@@ -1398,8 +1403,8 @@ class PendingFactory
      */
     private function cacheUser($id, $username, $externalId, $firstname, $lastname, $localEmail, $altEmail)
     {
-        $id         = intval($id);
-        $localEmail = boolval($localEmail);
+        $id         = (int)$id;
+        $localEmail = (bool)$localEmail;
 
         $this->studentInternalIds[$id]         = $id;
         $this->studentExternalIds[$externalId] = $externalId;
