@@ -6,11 +6,11 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
     <title>Your browser is no longer supported</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-au" />
-    <!--[if gt IE 8]> -->
-    <script type="text/javascript">
-        window.location.href='/';
+    <script>
+        if (!Function('/*@cc_on return document.documentMode<=10@*/')()) {
+            window.location.href = '/';
+        }
     </script>
-    <!-- <![endif]-->
     <link rel="stylesheet" type="text/css" media="screen" href="/css/<?php echo Scrub::text(Cfg::get('site_location'));?>/chrome.css" />
 </head>
 <body>
