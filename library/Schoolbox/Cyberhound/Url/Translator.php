@@ -86,19 +86,25 @@ class Translator
                 return $url;
             }
 
-            $urlObject = new Uri($url);
-            if (!$urlObject->isValidRelative()) {
-                // If using Cyberhound: redirect to its proxy rather than the URL directly.
-                // Only redirect for non-local links though.
-                $cyberHoundUrl = new Uri($this->apiUrl);
-                $cyberHoundUrl
-                    ->setPath('/api/overrideurl')
-                    ->setQuery([
-                        'key'  => hash('sha256', $_SERVER['REQUEST_TIME'].$url.$this->apiSharedKey),
-                        'time' => $_SERVER['REQUEST_TIME'],
-                        'base64url'  => base64_encode($url),
-                    ]);
-                $url = $cyberHoundUrl->toString();
+            try {
+                $urlObject = new Uri($url);
+                if (!$urlObject->isValidRelative()) {
+                    // If using Cyberhound: redirect to its proxy rather than the URL directly.
+                    // Only redirect for non-local links though.
+
+                    $cyberHoundUrl = new Uri($this->apiUrl);
+                    $cyberHoundUrl
+                        ->setPath('/api/overrideurl')
+                        ->setQuery([
+                            'key'       => hash('sha256', $_SERVER['REQUEST_TIME'] . $url . $this->apiSharedKey),
+                            'time'      => $_SERVER['REQUEST_TIME'],
+                            'base64url' => base64_encode($url),
+                        ]);
+                    $url = $cyberHoundUrl->toString();
+                }
+            }
+            catch (\InvalidArgumentException $e) {
+                return $url;
             }
         }
         return $url;
