@@ -111,7 +111,7 @@ class Controller extends Assessment\Controller
          * decide which one it is
          */
         if ($task->getUrl()) {
-            $previewFragment = (new PreviewFactory())->urlFragment($task->getUrl(), $this->getUser());
+            $previewFragment = (new PreviewFactory($this->getRouter()))->urlFragment($task->getUrl(), $this->getUser());
 
             if ($previewFragment['type'] == 'redirect' && !$task->getDescription()) {
 

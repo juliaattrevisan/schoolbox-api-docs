@@ -25,7 +25,7 @@
             {% spaceless %}
                 {% if modifyRoute %}
                 <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
-                <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
+                <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>
                 {% endif %}
                 {% if deleteRoute %}
                     <li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>
