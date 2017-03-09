@@ -37,10 +37,13 @@ class Factory
      * This exists separately now so that it can be used in the task screen for displaying URLs inline
      *
      * @param string $encodedUrl
-     * @param User $user
+     * @param User   $user
      * @return array
+     * @throws \DomainException
+     * @throws \InvalidArgumentException if $url is not a string
      */
-    public function urlFragment($encodedUrl, User $user) {
+    public function urlFragment($encodedUrl, User $user)
+    {
         /* Distill a url from an encapsulating structure, if necessary
          */
         $decoderRegistry = new Registry\Registry($encodedUrl);
@@ -53,7 +56,7 @@ class Factory
          * or there was no encapsulating structure: just use the url by
          * default, since nothing can be done about it
          */
-        if (!strlen($testUrl)) {
+        if ('' === $testUrl) {
             $testUrl = $encodedUrl;
         }
 
@@ -68,26 +71,26 @@ class Factory
             if (!$user instanceof User) {
                 $user = new User();
             }
-            $chain = new Internal($url->getUrl(), $user);
+            $chain  = new Internal($url->getUrl(), $user);
             $result = $chain->getResult();
-        }
-        /* External Chain
+        } /* External Chain
          */
         else {
-            $chain = new External($url->getUrl());
+            $chain  = new External($url->getUrl());
             $result = $chain->getResult();
         }
 
         /* Set up html fragment
          */
-        if($result['type'] != 'inline') {
+        $fragment = null;
+        if ($result['type'] !== 'inline') {
             $fragment = $result['src'];
         }
 
         $previewResponse = [
-            'type' => $result['type'],
-            'twig' => $result['twig'],
-            'fragment' => $fragment
+            'type'     => $result['type'],
+            'twig'     => $result['twig'],
+            'fragment' => $fragment,
         ];
 
         return $previewResponse;

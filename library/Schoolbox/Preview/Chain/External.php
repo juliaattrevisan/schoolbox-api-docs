@@ -16,20 +16,22 @@ use Schoolbox\Preview\Chain\Strategy\External\Image;
 use Schoolbox\Preview\Chain\Strategy\External\Embed;
 use Schoolbox\Preview\Chain\Strategy\External\Redirect;
 
-class External extends Base {
+class External extends Base
+{
 
     /**
      * Constructor
      *
      * @param string $url
      */
-    public function __construct($url) {
+    public function __construct($url)
+    {
         $decodedUrl = urldecode($url);
 
         /* Temporarily disabled
          * $headers = $this->findHeaders($decodedUrl);
          */
-        $headers = array();
+        $headers = [];
 
         $this->start([
             new Image($decodedUrl, $headers),
@@ -38,13 +40,15 @@ class External extends Base {
         ]);
     }
 
+
     /**
      * Decode url and format header output
      *
      * Keept his in case you add strats which check for other
      * content-types
      */
-    private function findHeaders($url) {
+    private function findHeaders($url)
+    {
         $headers = get_headers($url, 1);
 
         /* Rebuild array if you got redirected around the place
@@ -56,12 +60,11 @@ class External extends Base {
 
             /* Just get the destination, ignore all the intermediary redirect locations
              */
-            foreach(array_keys($headers) as $currentKey) {
-                if (is_array($headers[$currentKey])) {
-                    $newHeaders[$currentKey] = $headers[$currentKey][$numRedirects-1];
-                }
-                else {
-                    $newHeaders[0] = $headers[$numRedirects-1];
+            foreach ($headers as $key => $val) {
+                if (is_array($val)) {
+                    $newHeaders[$key] = $headers[$key][$numRedirects - 1];
+                } else {
+                    $newHeaders[0] = $headers[$numRedirects - 1];
                 }
             }
 
@@ -73,8 +76,8 @@ class External extends Base {
          */
         $temp = [];
 
-        foreach(array_keys($headers) as $currentKey) {
-            $temp[strtolower($currentKey)] = $headers[$currentKey];
+        foreach ($headers as $key => $val) {
+            $temp[strtolower($key)] = $val;
         }
 
         $headers = $temp;

@@ -11,7 +11,8 @@
 namespace Schoolbox\Preview\Registry\Decoder;
 
 
-abstract class Base {
+abstract class Base
+{
 
     /**
      * Decode the url, distilling the actual url from some
@@ -21,6 +22,7 @@ abstract class Base {
      * @return string
      */
     abstract public function decode($url);
+
 
     /**
      * Get the id out of the url

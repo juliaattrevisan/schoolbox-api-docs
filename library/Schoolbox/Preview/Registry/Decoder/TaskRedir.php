@@ -18,7 +18,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
 
-class TaskRedir extends Base {
+class TaskRedir extends Base
+{
 
     /**
      * Regex
@@ -53,7 +54,7 @@ class TaskRedir extends Base {
         // Try to decode URL using this decoder's regex
         $id = $this->isThisDecoder($url);
 
-        if(!is_numeric($id)){
+        if (!is_numeric($id)) {
             return '';
         }
 
@@ -63,11 +64,11 @@ class TaskRedir extends Base {
         try {
             /** @var Task $task */
             $task = TaskMapper::getInstance()->findById($id);
-        } catch (MapperException $e){
+        } catch (MapperException $e) {
             return '';
         }
 
-        try{
+        try {
             $route = $this->router->generate(
                 'learningAssessment.getSummary',
                 [
@@ -75,7 +76,7 @@ class TaskRedir extends Base {
                     'studentId'    => $user->getId(),
                 ]
             );
-        } catch (RouteNotFound $e){
+        } catch (RouteNotFound $e) {
             return '';
         }
 

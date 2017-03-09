@@ -26,7 +26,8 @@ namespace Schoolbox\Preview\Registry\Decoder;
 use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
 
-class LinkRedir extends Base {
+class LinkRedir extends Base
+{
 
     /**
      * Regex
@@ -34,6 +35,7 @@ class LinkRedir extends Base {
      * @var string
      */
     private $regex = '/redir\.php\?id=(\d+)/';
+
 
     /**
      * Distill a url from a Link instance
@@ -45,7 +47,7 @@ class LinkRedir extends Base {
     {
         $id = $this->isThisDecoder($url);
 
-        if(!is_numeric($id)){
+        if (!is_numeric($id)) {
             return '';
         }
 
@@ -54,8 +56,7 @@ class LinkRedir extends Base {
         try {
             /** @var Link $link */
             $link = $linkMapper->findById($id);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return '';
         }
 

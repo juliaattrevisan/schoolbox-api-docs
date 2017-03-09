@@ -20,8 +20,10 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class TaskMapper extends Schoolbox\Mapper
 {
+
     /**
      * Setup method. Implementing classes to define their SQL map here.
+     *
      * @return void
      * @throws Schoolbox\Mapper\DefinitionException
      */
@@ -35,12 +37,12 @@ class TaskMapper extends Schoolbox\Mapper
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel');
         $this->joins('user_id', Schoolbox\UserMapper::class, 'id', null, null, 'owner');
 
-        $this->hasJoin('completion', array(
+        $this->hasJoin('completion', [
             'multiple'  => true,
             'mapper'    => Task\CompletionMapper::class,
             'this_key'  => 'id',
             'other_key' => 'task_id',
-        ));
+        ]);
 
         // This column is duplicate of assessment.deleted_at, but is required to ensure soft-deletion on this table.
         $this->uses('deleted_at', self::TYPE_TIMESTAMP, self::COLUMN_SOFTDELETE);
@@ -48,6 +50,7 @@ class TaskMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCompletions']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreCompletions']);
     }
+
 
     /**
      * Soft deletes all Completions for the specified Task
@@ -58,7 +61,7 @@ class TaskMapper extends Schoolbox\Mapper
     public function softDeleteCompletions(Task $task)
     {
         $taskCompletionMapper = $this->getJoinMapper('completion');
-        $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
+        $completions          = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
         $taskCompletionMapper->delete($completions);
     }
 
@@ -72,7 +75,7 @@ class TaskMapper extends Schoolbox\Mapper
     public function restoreCompletions(Task $task)
     {
         $taskCompletionMapper = $this->getJoinMapper('completion');
-        $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
+        $completions          = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
         $taskCompletionMapper->restoreSoftDeleted($completions);
     }
 }

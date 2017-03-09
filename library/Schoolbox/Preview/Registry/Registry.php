@@ -17,7 +17,8 @@ namespace Schoolbox\Preview\Registry;
 use Schoolbox\Collection;
 use Schoolbox\Preview\Registry\Decoder\Base as DecoderBase;
 
-class Registry {
+class Registry
+{
 
     /**
      * A Collection of decoders
@@ -33,33 +34,40 @@ class Registry {
      */
     private $url;
 
+
     /**
      * Constructor
+     *
      * @param string $url
      */
-    public function __construct($url) {
-        $this->url = $url;
+    public function __construct($url)
+    {
+        $this->url      = $url;
         $this->decoders = new Collection();
     }
+
 
     /**
      * Add a decoder to the stack
      *
      * @param DecoderBase $decoder
      */
-    public function add(DecoderBase $decoder) {
+    public function add(DecoderBase $decoder)
+    {
         $this->decoders->add($decoder);
     }
+
 
     /**
      * Use the set of decoders to find the first one that
      * can understand the format of the url
      */
-    public function findUrl() {
+    public function findUrl()
+    {
         foreach ($this->decoders as $currentDecoder) {
             $outcome = $currentDecoder->decode($this->url);
 
-            if (strlen($outcome)) {
+            if ('' !== $outcome) {
                 return $outcome;
             }
         }
