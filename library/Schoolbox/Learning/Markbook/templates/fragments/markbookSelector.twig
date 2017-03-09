@@ -138,8 +138,14 @@
          */
         $contextSelector.on('change', function(){
             window.location.hash = $(this).val();
-            applyContextFilter();
         });
+
+        /**
+         * For when a user presses the back button the filter is updated
+         */
+        window.onhashchange = function() {
+            applyContextFilter();
+        }
 
 
         /**
