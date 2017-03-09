@@ -8,9 +8,8 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use InvalidArgumentException;
-use DomainException;
-
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeGroupLevel;
 use Schoolbox\Learning\Assessment\IResponse;
 
 class LetterGrade extends AbstractMarkScheme
@@ -41,8 +40,8 @@ class LetterGrade extends AbstractMarkScheme
      * @param float          $normalisedMark
      * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
-     * @throws DomainException if unable to locate corresponding GradeLevel
-     * @return string
+     * @return string The caption for the first grade level $normalizedMark is not less than,
+     *                or an en-dash if it's not less than none of them.
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
@@ -52,13 +51,19 @@ class LetterGrade extends AbstractMarkScheme
 
         $this->validateNormalisedMark($normalisedMark);
 
+        $lowestGradeLevel = null;
         foreach ($this->getGradeGroup()->getGradeLevels() as $gradeLevel) {
+            $lowestGradeLevel = $gradeLevel;
             if ($normalisedMark >= $gradeLevel->getLowerBound()) {
                 return $gradeLevel->getCaption();
             }
         }
 
-        throw new DomainException("Unable to determine Human-Readable mark. Normalised: $normalisedMark");
+        // Is this mark lower than all marks? Have whatever the lowest mark was.
+        // If somehow this is an empty grade group, have a nully value (in this case, en-dash)
+        return ($lowestGradeLevel instanceof GradeGroupLevel)
+            ? $lowestGradeLevel->getCaption()
+            : '–';
     }
 
     /**
