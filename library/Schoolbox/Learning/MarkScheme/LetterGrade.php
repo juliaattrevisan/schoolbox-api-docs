@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\MarkScheme;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeGroupLevel;
 use Schoolbox\Learning\Assessment\IResponse;
 
 class LetterGrade extends AbstractMarkScheme
@@ -50,14 +51,19 @@ class LetterGrade extends AbstractMarkScheme
 
         $this->validateNormalisedMark($normalisedMark);
 
+        $lowestGradeLevel = null;
         foreach ($this->getGradeGroup()->getGradeLevels() as $gradeLevel) {
+            $lowestGradeLevel = $gradeLevel;
             if ($normalisedMark >= $gradeLevel->getLowerBound()) {
                 return $gradeLevel->getCaption();
             }
         }
 
-        // Is this mark lower than all marks? Have a nully value (in this case, en-dash)
-        return '–';
+        // Is this mark lower than all marks? Have whatever the lowest mark was.
+        // If somehow this is an empty grade group, have a nully value (in this case, en-dash)
+        return ($lowestGradeLevel instanceof GradeGroupLevel)
+            ? $lowestGradeLevel->getCaption()
+            : '–';
     }
 
     /**
