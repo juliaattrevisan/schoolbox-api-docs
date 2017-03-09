@@ -1458,7 +1458,13 @@ dl {
 
     &.profile {
         @extend .inline-dl;
-        margin: 1rem 0;
+        margin: 0;
+        @media #{$small-only} {
+            margin: 1rem 0;
+            dt{
+                padding-left: 0;
+            }
+        }
     }
 
 }
