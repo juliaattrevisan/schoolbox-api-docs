@@ -1128,7 +1128,7 @@ class PendingFactory
             $participants[$userId]->getAllResponses()->add($response);
 
             // In this context, if not 'reviewed', then we interpret this as NO feedback
-            if (!is_null($row['qa.reviewed_at'])) {
+            if (null !== $row['qa.reviewed_at']) {
                 $feedback = new QuizReview(); // TODO SA-2631
                 $feedback->setId($row['qa.attempt_id']);
                 $reviewedAt = $this->getDateFromString($row['qa.reviewed_at']);
@@ -1144,7 +1144,7 @@ class PendingFactory
             }
 
             // Have we reached the last row for an Assessment ?
-            if ($rowIdx == $lastIdx || $quiz->getId() != $quizResults[$rowIdx + 1]['q.assessment_id']) {
+            if ($rowIdx === $lastIdx || $quiz->getId() !== (int)$quizResults[$rowIdx + 1]['q.assessment_id']) {
                 $this->checkAssessmentRelevance($quiz);
             }
         }
@@ -1173,7 +1173,12 @@ class PendingFactory
      */
     private function isFeedbackRequired(IAssessable $assessment)
     {
-        return (new Statistics($assessment))->getCountFeedbackRequired() > 0;
+        foreach ($assessment->getAllParticipants() as $participant) {
+            if ($participant->isFeedbackRequired()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -1185,7 +1190,16 @@ class PendingFactory
      */
     private function isChasingRequired(IAssessable $assessment)
     {
-        return $assessment->getDueAt()->lt($this->toChaseLimit) && (new Statistics($assessment))->getCountResponseRequired() > 0;
+        if (!$assessment->getDueAt()->lt($this->toChaseLimit)){
+            return false;
+        }
+
+        foreach ($assessment->getAllParticipants() as $participant){
+            if($participant->isResponseRequired()){
+                return true;
+            }
+        }
+        return false;
     }
 
 

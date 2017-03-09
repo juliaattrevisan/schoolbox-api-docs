@@ -75,12 +75,11 @@ class Participant
      *
      * Represented as GREY SQUARE
      *
-     * @throws DomainException if $user is not a participant of the participation assessable.
      * @return bool
      */
     public function isResponseRequired()
     {
-        return $this->assessable->isResponseRequired($this->user);
+        return $this->assessable->isResponseRequired($this);
     }
 
 
@@ -97,7 +96,7 @@ class Participant
      */
     public function isFeedbackRequired()
     {
-        return $this->assessable->isFeedbackRequired($this->user);
+        return $this->assessable->isFeedbackRequired($this);
     }
 
 
@@ -110,7 +109,7 @@ class Participant
      */
     public function isReviewComplete()
     {
-        return $this->assessable->isReviewComplete($this->user);
+        return $this->assessable->isReviewComplete($this);
     }
 
 
@@ -126,7 +125,7 @@ class Participant
      */
     public function hasSubmittedResponse()
     {
-        return $this->assessable->hasSubmittedResponse($this->user);
+        return $this->assessable->hasSubmittedResponse($this);
     }
 
 
@@ -141,7 +140,7 @@ class Participant
      */
     public function hasPublishedFeedback()
     {
-        return $this->assessable->hasPublishedFeedback($this->user);
+        return $this->assessable->hasPublishedFeedback($this);
     }
 
 
@@ -157,7 +156,7 @@ class Participant
      */
     public function hasMark()
     {
-        return $this->assessable->hasMark($this->user);
+        return $this->assessable->hasMark($this);
     }
 
 
