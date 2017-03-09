@@ -108,41 +108,40 @@ class Conversation {
 	 * @throws \InvalidArgumentException
 	 * @return Collection[Comment]
 	 */
-	public function getVisibleComments($user) {
+	public function getVisibleComments($user)
+    {
+        $role = $user->getRole()->getType();
 
-		$role = $user->getRole()->getType();
+        // All staff can see all comments
 
-		if ($role == Role::STAFF) {
-			// all staff can see all comments
-			return $this->comments;
-		}
-
-		$visible = new Collection();
-
-		// if the user isn't a participant just return an empty collection
-
-        if (!$this->isParticipant($user)) {
-            return $visible;
+        if ($role == Role::STAFF) {
+            return $this->comments;
         }
 
-        // otherwise return comments based on their role (where applicable)
+        $visible = new Collection();
 
-        if ($role == Role::PARENT) {
-			foreach($this->comments as $c) {
-				/** @var Comment $c */
-				if($c->isVisibleToParent()) {
-					$visible->add($c);
-				}
-			}
-		}
-		elseif ($role == Role::STUDENT) {
-			foreach ($this->comments as $c) {
-				/** @var Comment $c */
-				if($c->isVisibleToStudent()) {
-					$visible->add($c);
-				}
-			}
-		}
+        // The user has to be a participant to see any comments
+
+        if ($this->isParticipant($user))
+        {
+            if ($role == Role::PARENT) {
+                /** @var Comment $c */
+                foreach ($this->comments as $c) {
+                    if ($c->isVisibleToParent()) {
+                        $visible->add($c);
+                    }
+                }
+            } elseif ($role == Role::STUDENT) {
+                /** @var Comment $c */
+                foreach ($this->comments as $c) {
+                    if ($c->isVisibleToStudent()) {
+                        $visible->add($c);
+                    }
+                }
+            }
+        }
+
+        // Return whatever comments (if any) they were entitled to see
 
         return $visible;
 	}
