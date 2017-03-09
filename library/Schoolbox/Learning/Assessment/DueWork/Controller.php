@@ -18,7 +18,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as File;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -31,6 +34,8 @@ use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\Zip\Zip;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -184,8 +189,83 @@ class Controller extends Assessment\Controller
      */
     public function downloadSubmissions(IAssessable $assessment)
     {
-        new \Alaress_Probe($assessment);
-        exit;
+        // Retrieve all participants
+
+        $participants = $assessment->getAllParticipants();
+
+        // Cache users
+
+        /** @var User[] $users */
+        $users = [];
+
+        // Create a zip file to hold the downloaded submissions
+
+        $date = \Alaress_Date_Format::now()->getDatabase();
+        $zip = Zip::CreateArchive("{$assessment->getTitle()} Submissions - {$date}.zip");
+
+        $tempFolder = $this->getConfigLoader()->get('submission_upload_tmp_dir') . "/" . $this->getUser()->getId() . "_" . date("U");
+
+        // Create temporary folder to store submissions
+
+        mkdir($tempFolder);
+
+        // Iterate participants and get their responses
+
+        /** @var Participant $participant */
+        foreach ($participants as $participant)
+        {
+            // Get the users details and generate an appropriate folder name with the date/time stamp of the submission
+
+            if (!isset($users[$participant->getUser()->getId()]))
+            {
+                $users[$participant->getUser()->getId()] = $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
+            }
+
+            $responses = $participant->getAllResponses();
+
+            // Iterate all their responses
+
+            /** @var Submission $response */
+            foreach ($responses as $response)
+            {
+                // If the response is a submission...
+
+                if ($response instanceof Submission)
+                {
+                    $directory = sprintf("%s, %s (%s) - %s",
+                        $users[$participant->getUser()->getId()]->getLastname(),
+                        $users[$participant->getUser()->getId()]->getFirstname(),
+                        $users[$participant->getUser()->getId()]->getId(),
+                        $response->getCreatedAt()->getDatabase()
+                    );
+
+                    mkdir("{$tempFolder}/{$directory}");
+
+                    // ...iterate all files in that submission
+
+                    $files = $response->getAllFiles();
+
+                    /** @var File $file */
+                    foreach ($files as $file)
+                    {
+                        $filename = sprintf("%s/%s.%s",
+                            $directory,
+                            $file->getFilename(),
+                            $file->getExtension()
+                        );
+
+                        // Get the contents of the file and write it to a temporary folder
+
+                        $destination = "{$tempFolder}/{$filename}";
+
+                        file_put_contents($destination, $file->readStream());
+                    }
+                }
+            }
+        }
+
+        $zip->addDirectory($tempFolder);
+        $zip->download();
     }
 
     /**
