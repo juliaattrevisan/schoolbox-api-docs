@@ -38,7 +38,7 @@ class External_Schoolbox_Class implements External_ClassInterface {
 			LEFT JOIN class_user cu ON cu.class_id = c.id
 			LEFT JOIN user u ON u.id = cu.user_id
 			LEFT JOIN groups g ON g.id = u.group_id
-			WHERE c.code IN ({$this->getCodeParams($codes)}) AND g.group_type = :type AND u.deleted_at IS NOT NULL
+			WHERE c.code IN ({$this->getCodeParams($codes)}) AND g.group_type = :type AND u.deleted_at IS NULL
 			ORDER BY u.lastname, u.firstname
 		");
 		return $this->bindCodes($statement, $codes);
@@ -65,7 +65,7 @@ class External_Schoolbox_Class implements External_ClassInterface {
 			FROM class c
 			LEFT JOIN class_period cp ON c.id = cp.class_id
 			INNER JOIN user u ON u.id = cp.teacher_id
-			WHERE c.code IN ({$this->getCodeParams($codes)}) AND u.deleted_at IS NOT NULL
+			WHERE c.code IN ({$this->getCodeParams($codes)}) AND u.deleted_at IS NULL
 			ORDER BY u.lastname, u.firstname
 		");
 		return $this->bindCodes($statement, $codes);
