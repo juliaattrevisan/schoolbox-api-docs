@@ -84,7 +84,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
             })
             ->filter(function (IAssessable $assessable) use ($student, $visibility) {
                 // Only show work that the student has permission to view, and is can accept their submission
-                return $visibility->isVisibleToUser($assessable, $student, false) && $assessable->canLearnerViewInUpcomingList($student);
+                return $visibility->isVisibleToUser($assessable, $student, false);
             })
             ->limit($this->limit ?: null);
 
