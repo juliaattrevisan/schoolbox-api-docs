@@ -57,9 +57,10 @@ class External_Schoolbox_User implements External_UserInterface
                 parent.alt_email AS StudentContactEmail
             FROM `user`
             INNER JOIN user_relation ON user.id = user_relation.relation_id
-            INNER JOIN `user` parent ON parent.id = user_relation.user_id
+            INNER JOIN `user` parent ON parent.id = user_relation.user_id AND parent.deleted_at IS NULL
             WHERE user.synergy_id IN ($id_list)
             AND user_relation.relation_type = :relation_type
+            AND `user`.deleted_at IS NULL
         "
         );
         $statement->execute(array(':relation_type' => self::RELATION_TYPE_PARENT));
@@ -110,6 +111,7 @@ class External_Schoolbox_User implements External_UserInterface
                         FROM `user`
                         LEFT JOIN user_profile ON user.id = user_profile.user_id
                         WHERE user.synergy_id = :externalUserId
+                        AND `user`.deleted_at IS NULL
                     "
         );
         $statement->execute(
@@ -135,11 +137,9 @@ class External_Schoolbox_User implements External_UserInterface
             "
                         SELECT
                             parent.synergy_id AS StudentContactID,
-                            '' AS StudentContactTitle,
-                            '' AS StudentContactPreferred,
-                            '' AS StudentContactSurname,
-                            pp.guardian1Name AS StudentContactPreferred,
-                            '' AS StudentContactSurname,
+                            parent.title AS StudentContactTitle,
+                            parent.firstname AS StudentContactPreferred,
+                            parent.lastname AS StudentContactSurname,
                             pp.guardian1Email AS StudentContactDefaultEmail,
                             pp.guardian1Address AS StudentContactAddress1,
                             pp.guardian1Suburb AS StudentContactSuburb,
@@ -164,9 +164,9 @@ class External_Schoolbox_User implements External_UserInterface
                             pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
                         FROM `user` child
                         INNER JOIN user_relation ur ON child.id = ur.relation_id
-                        INNER JOIN `user` parent ON ur.user_id = parent.id
+                        INNER JOIN `user` parent ON ur.user_id = parent.id AND parent.deleted_at IS NULL
                         LEFT JOIN user_profile pp ON `parent`.id = pp.user_id
-                        WHERE child.synergy_id = :externalUserId
+                        WHERE child.synergy_id = :externalUserId AND child.deleted_at IS NULL
                     "
         );
         $statement->execute(
@@ -200,7 +200,7 @@ class External_Schoolbox_User implements External_UserInterface
             "
                 SELECT u.*
                 FROM user_relation ur
-                LEFT JOIN user u ON u.id = ur.user_id
+                LEFT JOIN `user` u ON u.id = ur.user_id AND u.deleted_at IS NULL
                 WHERE ur.relation_id = {$externalUserId}
                   AND ur.relation_type = " . External_Schoolbox_User::RELATION_TYPE_PARENT . "
             "
@@ -270,6 +270,7 @@ class External_Schoolbox_User implements External_UserInterface
                         INNER JOIN class_user cu ON cu.user_id = u.id
                         INNER JOIN class c ON c.id = cu.class_id
                         WHERE u.synergy_id = :externalUserId
+                        AND u.deleted_at IS NULL
                         ORDER BY c.code ASC, c.name ASC
                     "
         );
@@ -283,6 +284,7 @@ class External_Schoolbox_User implements External_UserInterface
                         INNER JOIN class_period cp ON cp.teacher_id = u.id
                         INNER JOIN class c ON c.id = cp.class_id
                         WHERE u.synergy_id = :externalUserId
+                        AND u.deleted_at IS NULL
                         ORDER BY c.code ASC, c.name ASC
                     "
         );
@@ -297,8 +299,8 @@ class External_Schoolbox_User implements External_UserInterface
             "
                               SELECT c.synergy_id AS RelatedID
                               FROM user_relation ur
-                              LEFT JOIN user p ON p.id = ur.user_id
-                              LEFT JOIN user c ON c.id = ur.relation_id
+                              INNER JOIN user p ON p.id = ur.user_id AND p.deleted_at IS NULL
+                              INNER JOIN user c ON c.id = ur.relation_id AND c.deleted_at IS NULL
                               WHERE p.synergy_id = :externalUserId
                                 AND ur.relation_type = :relationType
                           "
