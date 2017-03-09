@@ -65,15 +65,6 @@ class Project extends AbstractAssessment implements AssessmentContext
     /**
      * @inheritdoc
      */
-    public function canLearnerViewInUpcomingList(User $learner)
-    {
-        // Same as canLearnerCreateResponse for now - I can see that this could become true at some point?
-        return $this->canLearnerCreateResponse($learner);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function canLearnerCreateResponse(User $learner)
     {
         // Project containers cannot have IResponses directly on them. Only their sub-assessments can.
