@@ -105,7 +105,6 @@ class Conversation {
 	 * Returns the comments visible to the given user
 	 *
 	 * @param User $user
-	 * @throws \InvalidArgumentException
 	 * @return Collection[Comment]
 	 */
 	public function getVisibleComments($user)
