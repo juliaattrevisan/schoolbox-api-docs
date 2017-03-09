@@ -109,6 +109,7 @@ class Controller extends Assessment\Controller
              */
             'returnUrl' => Redirect::encode($baseUrl),
             'returnUrlSuffix' => $returnUrlSuffix,
+            'download'    => false
         ];
 
         $this->getResponse()->content->set(

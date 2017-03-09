@@ -105,12 +105,41 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
+        // Only display download link if there are actually files to download
+
+        $download = false;
+
+        /** @var Participant $participant */
+        foreach ($assessment->getAllParticipants() as $participant)
+        {
+            // Iterate all their responses
+
+            /** @var Submission $response */
+            foreach ($participant->getAllResponses() as $response)
+            {
+                // If the response is a submission...
+
+                if ($response instanceof Submission)
+                {
+                    if ($response->getAllFiles()->count() > 0) {
+                        $download = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($download) {
+                break;
+            }
+        }
+
         $twigData = [
             'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
             'type'        => Assessment\AssessmentType::objectToString($assessment),
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
+            'download'    => $download
         ];
 
         $this->getResponse()->content->set(
