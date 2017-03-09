@@ -8,8 +8,12 @@
 namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Web\Controller\Base;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -78,6 +82,7 @@ class Controller extends Base
      * @api   GET /learning/markbook/:classId
      * @level 165
      * @param Folder $class
+     * @throws RouteNotFound
      */
     public function getMarkbook(Folder $class)
     {
@@ -98,6 +103,8 @@ class Controller extends Base
      * @api   GET /learning/markbook/:classId/term/:termCode
      * @param Folder $class
      * @param Term   $term
+     * @throws ServiceNotFound
+     * @throws ApplicationException
      */
     public function getMarkbookForTerm(Folder $class, Term $term)
     {
@@ -129,7 +136,7 @@ class Controller extends Base
         $previousTerm = null;
         $nextTerm     = null;
         foreach ($terms as $i => $termInList) {
-            if ($termInList->getId() == $term->getId()) {
+            if ($termInList->getId() === $term->getId()) {
                 if (isset($terms[$i + 1])) {
                     $previousTerm = $terms[$i + 1];
                 }
@@ -141,8 +148,7 @@ class Controller extends Base
         }
 
         // Can the viewee mark Assessments in for this class ?
-        $writable = !$term->getArchived() &&
-            Access::getInstance()->getFolderAccess($this->getUser(), [$class->getId()]) >= UserAccess::ACCESS_WRITE;
+        $writable = !$term->getArchived() && Access::getInstance()->isInstructor($this->getUser(), $class);
 
         // And output
         $this->getResponse()->content->set(
@@ -157,6 +163,7 @@ class Controller extends Base
                     'nextTerm'     => $nextTerm,
                     'courses'      => $courses,
                     'writable'     => $writable,
+                    'contextTypes' => AssessmentContextType::getInstance(),
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );
@@ -168,6 +175,8 @@ class Controller extends Base
      * @api   GET /learning/markbook/:classId/term/:termCode/export
      * @param Folder $class
      * @param Term   $term
+     * @throws ApplicationException
+     * @throws \UnexpectedValueException
      */
     public function getMarkbookExport(Folder $class, Term $term)
     {
@@ -204,16 +213,16 @@ class Controller extends Base
 
         foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
 
-            $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ")";
+            $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ')';
 
             while (isset($titlesFound[$title])) {
-                $title .= " ";
+                $title .= ' ';
             }
 
             $titlesFound[$title] = true;
             $data[$title] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
-            $data[$title . " (Normalized)"] = '';
-            $data[$title . " (Comment)"] = '';
+            $data[$title . ' (Normalized)'] = '';
+            $data[$title . ' (Comment)'] = '';
         }
 
         $export[] = $data;
@@ -229,10 +238,10 @@ class Controller extends Base
 
             foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
 
-                $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ")";
+                $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ')';
 
                 while (isset($titlesFound[$title])) {
-                    $title .= " ";
+                    $title .= ' ';
                 }
 
                 $titlesFound[$title] = true;
@@ -242,21 +251,17 @@ class Controller extends Base
                     $participant = $assessment->getParticipant($student);
                     $mostRecentFeedback = $participant->findMostRecentFeedback();
 
-                    if ($mostRecentFeedback != null) {
-                        $comment = $mostRecentFeedback->getComment();
-                    } else {
-                        $comment = '';
-                    }
+                    $comment = $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
 
                     $data[$title] = $assessment->getHumanReadableMark($student, true);
-                    $data[$title . " (Normalized)"] = $assessment->getNormalisedMark($student, true);
-                    $data[$title . " (Comment)"] = $comment;
+                    $data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
+                    $data[$title . ' (Comment)'] = $comment;
                 }
                 else
                 {
                     $data[$title] = '';
-                    $data[$title . " (Normalized)"] = '';
-                    $data[$title . " (Comment)"] = '';
+                    $data[$title . ' (Normalized)'] = '';
+                    $data[$title . ' (Comment)'] = '';
                 }
 
             }
@@ -269,9 +274,9 @@ class Controller extends Base
         $writer = new CsvWriter($file, $export);
         $writer->write();
 
-        $filename = strtolower(str_replace(" ", "_", "markbookexport-" . $class->getFolder()->getNameWithCodes()));
+        $filename = strtolower(str_replace(' ', '_', 'markbookexport-' . $class->getFolder()->getNameWithCodes()));
 
-        header('Content-Disposition: attachment;filename="' . $filename . '.csv";');
+        header("Content-Disposition: attachment;filename={$filename}.csv;");
         header('Content-Type: application/csv; charset=UTF-8');
         rewind($file);
         echo stream_get_contents($file);

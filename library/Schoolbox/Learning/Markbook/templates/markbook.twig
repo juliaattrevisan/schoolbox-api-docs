@@ -72,7 +72,7 @@
         <div class="scrollable">
             <table data-mark-sheet>
                 <thead>
-                <tr class="rotate-headers">
+                <tr class="rotate-headers" data-headers data-hidable-columns>
                     <th>&nbsp;</th>
                     <th>
                         <div>
@@ -80,18 +80,23 @@
                         </div>
                     </th>
                     {% for assessment in markbook.assessmentsWithProjectContents  %}
-                    <th>
+                    <th data-assessment="{{ assessment.id }}"
+                        data-context-type="{{ contextTypes.objectToString(assessment.baseContext) }}"
+                        data-context="{{ assessment.baseContext.id }}"
+                    >
                         <div>
                                 <span>
-                                    <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br />
+                                    <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" title="{{ assessment.title }}">
+                                        {{ assessment.title }}
+                                    </a><br/>
                                     <span class="meta">{{ assessment.typeName }}</span>
                                 </span>
                         </div>
                     </th>
                     {% endfor %}
                 </tr>
-                <tr>
-                    <th>
+                <tr data-hidable-columns>
+                    <th style="min-width: 200px;width: 200px;">
                         <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                         Class Average
                     </th>
@@ -101,7 +106,7 @@
                     </th>
                     {% for assessment in markbook.assessmentsWithProjectContents %}
                         {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
-                        <th class="{{ urgency.marks(assessmentMean) }}-bg">
+                        <th class="{{ urgency.marks(assessmentMean) }}-bg" data-assessment="{{ assessment.id }}">
                                 {{ assessmentMean | default('–') }}
                         </th>
                     {% endfor %}
@@ -129,12 +134,12 @@
                 <tbody>
                 {# Need all students that ever participated in any assessments #}
                 {% for student in markbook.students %}
-                <tr data-id="{{ student.id }}">
+                <tr data-student="{{ student.id }}" data-hidable-columns>
                     <th class="no-pad">
                         <div class="compact card no-pad small-12">
                             <a href="/search/user/{{ student.id }}" title="View Profile">
                                 <img src="/portrait.php?userId={{ student.externalId }}&size=square32" alt="View Profile" />
-                                <h3>{{ student.lastname }}, {{ student.firstname }}</h3>
+                                <p>{{ student.lastname }}, {{ student.firstname }}</p>
                             </a>
                         </div>
                     </th>
@@ -150,7 +155,7 @@
                     </th>
 
                     {% for assessment in markbook.assessmentsWithProjectContents  %}
-                        <td class="column-{{ assessment.id }}">
+                        <td class="column-{{ assessment.id }}" data-assessment="{{ assessment.id }}">
                             {% if assessment.isParticipant(student) %}
                                 {% if assessment is task %}
                                     {# An icon that shows if the student has attempted the task or not #}

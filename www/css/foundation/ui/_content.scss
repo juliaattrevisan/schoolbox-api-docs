@@ -1340,6 +1340,7 @@ span.loader{
         transform: scale(0.75);
         opacity: 0.75;
     }
+    margin: -0.5rem;
 }
 
 $progress-tick-size-regular: rem-calc($base-font-size * 2);

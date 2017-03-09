@@ -26,6 +26,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
  */
 class AssessmentContextType implements IType
 {
+    use TypeTrait;
+
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
     const TYPE_FOLDER = 'folder';
@@ -33,13 +35,36 @@ class AssessmentContextType implements IType
     const TYPE_UNIT_IMPLEMENTATION = 'unit';
     const TYPE_UNIT_SPECIFICATION = 'unitspec';
 
-    use TypeTrait;
+    /**
+     * @var static
+     */
+    private static $instance;
+
+
+    /**
+     * Protected constructor to enforce singleton pattern
+     */
+    protected function __construct(){}
+
+    /**
+     * Retrieves the singleton instance of this class.
+     *
+     * @return static
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new static();
+        }
+        return self::$instance;
+    }
 
     /**
      * Get twig template directory for a given AssessmentContext
      *
      * @param AssessmentContext $context
      * @return string
+     * @throws \UnexpectedValueException
      */
     public static function objectToString(AssessmentContext $context)
     {
@@ -61,16 +86,17 @@ class AssessmentContextType implements IType
      *
      * @param string $stringVal
      * @return AssessmentContext
+     * @throws \UnexpectedValueException
      */
     public static function stringToObject($stringVal)
     {
-        if(self::TYPE_FOLDER == $stringVal){
+        if(self::TYPE_FOLDER === $stringVal){
             return new Folder();
-        } elseif(self::TYPE_PROJECT == $stringVal){
+        } elseif(self::TYPE_PROJECT === $stringVal){
             return new Project();
-        } elseif(self::TYPE_UNIT_IMPLEMENTATION == $stringVal){
+        } elseif(self::TYPE_UNIT_IMPLEMENTATION === $stringVal){
             return new UnitImplementation();
-        } elseif(self::TYPE_UNIT_SPECIFICATION == $stringVal){
+        } elseif(self::TYPE_UNIT_SPECIFICATION === $stringVal){
             return new UnitSpecification();
         }
         throw new \UnexpectedValueException("Unknown AssessmentContext: $stringVal");

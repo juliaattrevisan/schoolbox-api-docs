@@ -404,7 +404,7 @@
                                 gradient = v['avg-int'],
                                 letter = v['avg-letter'];
 
-                            var row = tbody.children('tr[data-id=' + userId + ']');
+                            var row = tbody.children('tr[data-student=' + userId + ']');
 
                             row.children('td').last()
                                 .attr('class', 'gradient-' + gradient + '-bg').children('a')
