@@ -187,12 +187,12 @@ function setValue ( element, options, state, date ) {
             var v = moment(value, convertFormat(pickerFormats.convertFrom)).startOf('day').format(convertFormat(pickerFormats.convertTo));
             console.log('v on no endDay: '+v);
         }
-        if(window.pickerInstance[pId] !== undefined) {
-            // window.pickerInstance[pId].input.value = v;
-            window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true);
-            console.log('updating instance value... '+pickerFormats.convertTo+' >> '+'options.databaseFormat');
-            console.log(window.pickerInstance[pId].input.value);
-        }
+        // if(window.pickerInstance[pId] !== undefined) {
+        //     // window.pickerInstance[pId].input.value = v;
+        //     window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true);
+        //     console.log('updating instance value... '+pickerFormats.convertTo+' >> '+'options.databaseFormat');
+        //     console.log(window.pickerInstance[pId].input.value);
+        // }
 
         element.val(v);
         console.log('updating element value...');
@@ -202,12 +202,12 @@ function setValue ( element, options, state, date ) {
         console.log('state > false');
         var v = moment(value, convertFormat(pickerFormats.convertFrom)).format(convertFormat(pickerFormats.convertTo));
         console.log('v: '+v);
-        if(window.pickerInstance[pId] !== undefined) {
-            // window.pickerInstance[pId].input.value = v;
-            window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true);
-            console.log('updating instance value... '+pickerFormats.convertTo+' >> '+'options.databaseFormat');
-            console.log(window.pickerInstance[pId].input.value);
-        }
+        // if(window.pickerInstance[pId] !== undefined) {
+        //     // window.pickerInstance[pId].input.value = v;
+        //     window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true);
+        //     console.log('updating instance value... '+pickerFormats.convertTo+' >> '+'options.databaseFormat');
+        //     console.log(window.pickerInstance[pId].input.value);
+        // }
         element.val(v);
         console.log('updating element value...');
         console.log(element.val());
