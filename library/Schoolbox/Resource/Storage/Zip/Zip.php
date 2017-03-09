@@ -160,6 +160,11 @@ class Zip
                 }
             }
         }
+
+        // Flush the toilet- otherwise if we delete the files before downloading it'll be a blank ZIP
+
+        $this->archive->close();
+        $this->archive->open($this->getTemporaryFilename());
     }
 
     /**
