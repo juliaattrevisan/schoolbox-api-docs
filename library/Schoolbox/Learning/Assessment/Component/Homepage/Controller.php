@@ -75,7 +75,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             ];
 
             if(!$this->getConfig('showClosed')){
-                $options['from'] = \Alaress_Date_Format::now();
+                $options['from_close'] = \Alaress_Date_Format::now();
             }
 
             $this->assessments = $this->getAssessmentMapper()
