@@ -356,7 +356,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 timetable_period.title AS PeriodName
             FROM class_period
             LEFT JOIN user ON
-                class_period.teacher_id = user.id AND user.deleted_at IS NOT NULL
+                class_period.teacher_id = user.id AND user.deleted_at IS NULL
             INNER JOIN timetable_period ON
                 class_period.period_id = timetable_period.id
             INNER JOIN timetable_campus ON
