@@ -96,7 +96,7 @@
                     {% endfor %}
                 </tr>
                 <tr data-hidable-columns>
-                    <th>
+                    <th style="min-width: 200px;width: 200px;">
                         <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                         Class Average
                     </th>
@@ -139,7 +139,7 @@
                         <div class="compact card no-pad small-12">
                             <a href="/search/user/{{ student.id }}" title="View Profile">
                                 <img src="/portrait.php?userId={{ student.externalId }}&size=square32" alt="View Profile" />
-                                <h3>{{ student.lastname }}, {{ student.firstname }}</h3>
+                                <p>{{ student.lastname }}, {{ student.firstname }}</p>
                             </a>
                         </div>
                     </th>
