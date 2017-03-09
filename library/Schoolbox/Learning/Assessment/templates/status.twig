@@ -51,6 +51,7 @@
         {% if routeModify %}
         <li>
             <a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a>
+            <a class="icon-download" href="{{ routeLookup('learningAssessment.downloadSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}">Download All Submissions</a>
         </li>
         {% endif %}
         {% block headerOptions %}{% endblock %}

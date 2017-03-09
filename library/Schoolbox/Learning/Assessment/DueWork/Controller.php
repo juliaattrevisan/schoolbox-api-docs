@@ -177,6 +177,18 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Download all student submissions for a given assessable
+     * @api   GET /learning/assessments/:assessmentId/submissions/download
+     * @level 165
+     * @param IAssessable $assessment
+     */
+    public function downloadSubmissions(IAssessable $assessment)
+    {
+        new \Alaress_Probe($assessment);
+        exit;
+    }
+
+    /**
      * Shows a rubric overview
      *
      * @api   GET /learning/assessments/:assessmentId/overview
