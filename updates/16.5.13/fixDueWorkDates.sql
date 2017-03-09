@@ -1,3 +1,4 @@
+-- Set open = publish, close = due for all due work which don't accept submissions
 UPDATE assessment
   JOIN submission_box sb ON sb.assessment_id = assessment.id
 SET assessment.open_date = assessment.publish_date, assessment.close_date=assessment.due_date
