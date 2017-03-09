@@ -6,7 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
     <title>Your browser is no longer supported</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-au" />
-    <!--[if gt IE 8]> -->
+    <!--[if gt IE 10]> -->
     <script type="text/javascript">
         window.location.href='/';
     </script>
