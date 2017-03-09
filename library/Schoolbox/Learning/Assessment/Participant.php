@@ -15,31 +15,11 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
-use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
-use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
 use \Schoolbox\User;
 use \DomainException;
 
 class Participant
 {
-    /**
-     * Whether when determining the current mark for an Assessment, we prefer
-     * overall feedback over feedback linked to specific Responses.
-     *
-     * @TODO - Needs A/B testing, or make this a user-config option, or provide some UI to give the choice to the user.
-     *
-     * @var bool
-     */
-    const FAVOR_FLOATING = false;
-
-    /**
-     * How to determine what constitutes the current overall mark for a given User and Assessment
-     *
-     * @var IFeedbackTraversalStrategy
-     */
-    protected $feedbackStrategy;
-
     /**
      * The User to whom all these Responses and Feedbacks are relevant
      *
@@ -59,7 +39,7 @@ class Participant
      *
      * Null for Projects
      *
-     * @var GenericCollection|IResponse[]|null
+     * @var GenericCollection|IResponse[]
      */
     protected $allResponses;
 
@@ -68,7 +48,7 @@ class Participant
      *
      * Null for Projects
      *
-     * @var GenericCollection|IFeedback[]|null
+     * @var GenericCollection|IFeedback[]
      */
     protected $allFeedbacks;
 
@@ -85,8 +65,6 @@ class Participant
 
         $this->allResponses = new GenericCollection($assessable->getResponseClass());
         $this->allFeedbacks = new GenericCollection($assessable->getFeedbackClass());
-
-        $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
 
     /**
@@ -223,7 +201,15 @@ class Participant
      */
     public function findMostRecentFeedback()
     {
-        return $this->feedbackStrategy->getMostRecentFeedback($this, false);
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+
+        foreach ($this->allFeedbacks as $feedback) {
+            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
+                $mostRecentFeedback = $feedback;
+            }
+        }
+        return $mostRecentFeedback;
     }
 
     /**
@@ -233,7 +219,15 @@ class Participant
      */
     public function findMostRecentPublishedFeedback()
     {
-        return $this->feedbackStrategy->getMostRecentFeedback($this, true);
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+
+        foreach ($this->allFeedbacks as $feedback) {
+            if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
+                    $mostRecentFeedback = $feedback;
+            }
+        }
+        return $mostRecentFeedback;
     }
 
     /**
