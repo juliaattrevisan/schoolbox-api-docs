@@ -210,7 +210,7 @@ class Controller extends Assessment\Controller
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = '')
+    public function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = '')
     {
         /**
          * Always go to the screen when a quiz has been created,
