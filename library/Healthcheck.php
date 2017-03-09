@@ -700,6 +700,7 @@ class Healthcheck
             "fc.TimetablePeriod",
             "fc.TimetableDate",
             "fc.TimetableBlockInstance",
+            "fc.TimetableBlockInstance tbi CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe"
         ];
 
         $this->selectTest($tables);
