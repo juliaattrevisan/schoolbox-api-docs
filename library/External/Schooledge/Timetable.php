@@ -651,7 +651,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.ID
             -- Expand period
             INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
-            INNER JOIN fc.TImetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
+            INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
             CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
             INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
             $this->baseStaffJoin
@@ -690,7 +690,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
             -- Expand period
             INNER JOIN fc.TimetableClassInstance tci  ON tc.ID                 = tci.TimetableClassID
-            INNER JOIN fc.TImetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
+            INNER JOIN fc.TimetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
             CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
             INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID    = td.ID
             $this->baseStaffJoin
