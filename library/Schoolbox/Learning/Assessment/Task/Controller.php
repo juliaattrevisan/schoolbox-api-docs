@@ -139,7 +139,12 @@ class Controller extends Assessment\Controller
                  * Download them as some kind of attachment
                  */
                 $previewFragment['type'] = 'file';
-                $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
+                try {
+                    $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
+                }
+                catch (\Schoolbox\Mapper\Exception $e) {
+                    unset($previewFragment);
+                }
             }
             elseif ($previewFragment['type'] == 'inline') {
 
