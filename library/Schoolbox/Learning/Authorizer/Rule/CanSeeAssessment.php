@@ -53,8 +53,8 @@ class CanSeeAssessment implements IAuthorizationRule
      */
     public function __construct(Access $access, IConfigLoader $conf)
     {
-//        $this->access = $access;
-//        $this->conf   = $conf;
+        $this->access = $access;
+        $this->conf   = $conf;
     }
 
 
@@ -69,7 +69,6 @@ class CanSeeAssessment implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        return true;
         if (empty($params['assessment'])) {
             if (empty($params['participant'])) {
                 throw new InvalidArgumentException("Cannot check auth, need an assessable param of 'assessment' or participant of 'participant'");

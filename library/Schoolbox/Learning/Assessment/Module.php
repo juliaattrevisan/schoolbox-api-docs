@@ -94,7 +94,9 @@ class Module extends BaseModule
             $this->getAccess()
         );
 
-        $participantView = new Rule\Any(
+        $canRead = new Rule\HasHomepageAccess();
+
+        $participantView = new Rule\All(
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new CanSeeAssessment($this->getAccess(), $this->getConfig())
