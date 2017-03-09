@@ -15,10 +15,11 @@ class Controller extends Base
     /**
      * A list of test urls to try
      * Can delete this later
-     * 
+     *
      * @param $params
      */
-    public function index($params) {
+    public function index($params)
+    {
         $testUrls = [
             ['External Generic url' => "http://www.taylorswift.com/"],
             ['External Generic url' => "http://edition.cnn.com/"],
@@ -63,24 +64,27 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'template' => '@preview/Index.twig',
-            'data' => [
+            'data'     => [
                 'allUrls' => $testUrls,
-            ]
+            ],
         ]);
     }
 
 
     /**
      * Test method
+     * @param array $params
      */
-    public function preview($params) {
+    public function preview($params)
+    {
         /* Regurgitate it
          */
 
-        $previewFragment = (new Factory())->urlFragment($params['encodedUrl'], $this->getUser());
+        $previewFragment = (new Factory($this->getRouter()))->urlFragment($params['encodedUrl'], $this->getUser());
 
-        if($previewFragment['type'] == 'inline') {
-            $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
+        if ($previewFragment['type'] === 'inline') {
+            $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])
+                                                ->getAsString();
         }
 
         //Not required by preview.js
@@ -88,13 +92,9 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             [
-                'data' => $previewFragment
+                'data' => $previewFragment,
             ]
         );
-
-
-
-
 
     }
 }

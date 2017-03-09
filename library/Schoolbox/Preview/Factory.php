@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Preview;
 
+use Aura\Router\Router;
 use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
 use Schoolbox\Preview\Registry\Decoder\LinkRedir;
@@ -15,20 +16,39 @@ use Schoolbox\User;
 
 class Factory
 {
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+
+    /**
+     * @param Router $router
+     */
+    public function __construct(Router $router)
+    {
+        $this->router = $router;
+    }
+
+
     /**
      * Given a URL will create the appropriate preview json array for outputting
      * This exists separately now so that it can be used in the task screen for displaying URLs inline
      *
      * @param string $encodedUrl
-     * @param User $user
+     * @param User   $user
      * @return array
+     * @throws \DomainException
+     * @throws \InvalidArgumentException if $url is not a string
      */
-    public function urlFragment($encodedUrl, User $user) {
+    public function urlFragment($encodedUrl, User $user)
+    {
         /* Distill a url from an encapsulating structure, if necessary
          */
         $decoderRegistry = new Registry\Registry($encodedUrl);
         $decoderRegistry->add(new LinkRedir());
-        $decoderRegistry->add(new TaskRedir());
+        $decoderRegistry->add(new TaskRedir($this->router));
 
         $testUrl = $decoderRegistry->findUrl();
 
@@ -36,7 +56,7 @@ class Factory
          * or there was no encapsulating structure: just use the url by
          * default, since nothing can be done about it
          */
-        if (!strlen($testUrl)) {
+        if ('' === $testUrl) {
             $testUrl = $encodedUrl;
         }
 
@@ -51,26 +71,26 @@ class Factory
             if (!$user instanceof User) {
                 $user = new User();
             }
-            $chain = new Internal($url->getUrl(), $user);
+            $chain  = new Internal($url->getUrl(), $user);
             $result = $chain->getResult();
-        }
-        /* External Chain
+        } /* External Chain
          */
         else {
-            $chain = new External($url->getUrl());
+            $chain  = new External($url->getUrl());
             $result = $chain->getResult();
         }
 
         /* Set up html fragment
          */
-        if($result['type'] != 'inline') {
+        $fragment = null;
+        if ($result['type'] !== 'inline') {
             $fragment = $result['src'];
         }
 
         $previewResponse = [
-            'type' => $result['type'],
-            'twig' => $result['twig'],
-            'fragment' => $fragment
+            'type'     => $result['type'],
+            'twig'     => $result['twig'],
+            'fragment' => $fragment,
         ];
 
         return $previewResponse;

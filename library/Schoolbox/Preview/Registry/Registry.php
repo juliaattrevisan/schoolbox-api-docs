@@ -17,48 +17,57 @@ namespace Schoolbox\Preview\Registry;
 use Schoolbox\Collection;
 use Schoolbox\Preview\Registry\Decoder\Base as DecoderBase;
 
-class Registry {
+class Registry
+{
 
     /**
      * A Collection of decoders
      *
-     * @var Collection
+     * @var Collection|DecoderBase[]
      */
-    private $decoders = null;
+    private $decoders;
 
     /**
-     * The original url to dstill e.g. /task/start/143
+     * The original url to distill e.g. /task/start/143
      *
      * @var string
      */
-    private $url = '';
+    private $url;
+
 
     /**
      * Constructor
+     *
+     * @param string $url
      */
-    public function __construct($url) {
-        $this->setUrl($url);
-        $this->setDecoders(new Collection());
+    public function __construct($url)
+    {
+        $this->url      = $url;
+        $this->decoders = new Collection();
     }
+
 
     /**
      * Add a decoder to the stack
      *
      * @param DecoderBase $decoder
      */
-    public function add(DecoderBase $decoder) {
-        $this->getDecoders()->add($decoder);
+    public function add(DecoderBase $decoder)
+    {
+        $this->decoders->add($decoder);
     }
+
 
     /**
      * Use the set of decoders to find the first one that
      * can understand the format of the url
      */
-    public function findUrl() {
-        foreach ($this->getDecoders() as $currentDecoder) {
-            $outcome = $currentDecoder->decode($this->getUrl());
+    public function findUrl()
+    {
+        foreach ($this->decoders as $currentDecoder) {
+            $outcome = $currentDecoder->decode($this->url);
 
-            if (strlen($outcome)) {
+            if ('' !== $outcome) {
                 return $outcome;
             }
         }
@@ -66,46 +75,4 @@ class Registry {
         return '';
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * Set decoders
-     *
-     * @param Collection $decoders
-     */
-    private function setDecoders($decoders)
-    {
-        $this->decoders = $decoders;
-    }
-
-    /**
-     * Get decoders
-     *
-     * @return Collection
-     */
-    private function getDecoders()
-    {
-        return $this->decoders;
-    }
-
-    /**
-     * Set url
-     *
-     * @param string $url
-     */
-    private function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-    /**
-     * Get url
-     *
-     * @return string
-     */
-    private function getUrl()
-    {
-        return $this->url;
-    }
 }

@@ -23,37 +23,56 @@
 
 namespace Schoolbox\Preview\Registry\Decoder;
 
+use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
 
-class LinkRedir extends Base {
+class LinkRedir extends Base
+{
 
     /**
      * Regex
      *
      * @var string
      */
-    protected $regex = '/redir\.php\?id=(\d+)/';
+    private $regex = '/redir\.php\?id=(\d+)/';
+
 
     /**
      * Distill a url from a Link instance
      *
-     * @param $url
-     * @return mixed|void
+     * @param string $url
+     * @return string
      */
-    public function decode($url) {
-        if ($id = $this->isThisDecoder($url)) {
-            $linkMapper = new LinkMapper();
+    public function decode($url)
+    {
+        $id = $this->isThisDecoder($url);
 
-            try {
-                $link = $linkMapper->findById($id);
-                $linkMapper->logAction($_SESSION['user'], 'access', $link);
-
-                return $link->getUrl();
-            }
-            catch (\Exception $e) {
-            }
+        if (!is_numeric($id)) {
+            return '';
         }
 
-        return '';
+        $linkMapper = LinkMapper::getInstance();
+
+        try {
+            /** @var Link $link */
+            $link = $linkMapper->findById($id);
+        } catch (\Exception $e) {
+            return '';
+        }
+
+        $linkMapper->logAction($_SESSION['user'], 'access', $link);
+        return $link->getUrl();
+
+    }
+
+
+    /**
+     * Get the regex to use when deciding which decoder to use
+     *
+     * @return string
+     */
+    protected function getRegex()
+    {
+        return $this->regex;
     }
 }
