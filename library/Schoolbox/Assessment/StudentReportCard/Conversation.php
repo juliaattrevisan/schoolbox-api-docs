@@ -105,44 +105,43 @@ class Conversation {
 	 * Returns the comments visible to the given user
 	 *
 	 * @param User $user
-	 * @throws \InvalidArgumentException
 	 * @return Collection[Comment]
 	 */
-	public function getVisibleComments($user) {
+	public function getVisibleComments($user)
+    {
+        $role = $user->getRole()->getType();
 
-		$role = $user->getRole()->getType();
+        // All staff can see all comments
 
-		if($role == Role::STAFF) {
-			// all staff can see all comments
-			return $this->comments;
-		}
+        if ($role == Role::STAFF) {
+            return $this->comments;
+        }
 
-		if(!$this->isParticipant($user)) {
-			throw new \InvalidArgumentException("Not a participant of this conversation.");
-		}
+        $visible = new Collection();
 
-		$visible = new Collection();
+        // The user has to be a participant to see any comments
 
-		if($role == Role::PARENT) {
-			foreach($this->comments as $c) {
-				/** @var Comment $c */
-				if($c->isVisibleToParent()) {
-					$visible->add($c);
-				}
-			}
-			return $visible;
-		}
-		elseif($role == Role::STUDENT) {
-			foreach($this->comments as $c) {
-				/** @var Comment $c */
-				if($c->isVisibleToStudent()) {
-					$visible->add($c);
-				}
-			}
-			return $visible;
-		}
-		else {
-			throw new \InvalidArgumentException("Not a participant of this conversation.");
-		}
+        if ($this->isParticipant($user))
+        {
+            if ($role == Role::PARENT) {
+                /** @var Comment $c */
+                foreach ($this->comments as $c) {
+                    if ($c->isVisibleToParent()) {
+                        $visible->add($c);
+                    }
+                }
+            } elseif ($role == Role::STUDENT) {
+                /** @var Comment $c */
+                foreach ($this->comments as $c) {
+                    if ($c->isVisibleToStudent()) {
+                        $visible->add($c);
+                    }
+                }
+            }
+        }
+
+        // Return whatever comments (if any) they were entitled to see
+
+        return $visible;
 	}
 }
