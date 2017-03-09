@@ -1117,7 +1117,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
             $code           = $row['cc.code'];
             $codeCollection = $collection[$id]->getCodes();
-            if (!isset($codeCollection[$code])) {
+            if (isset($code) && !isset($codeCollection[$code])) {
                 $codeCollection[$code] = $this->hydrateJoin($row, 'codes', 'cc');
             }
         }
