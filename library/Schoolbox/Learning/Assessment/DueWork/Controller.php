@@ -182,6 +182,28 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Recursive directory delete
+     * @param $dir
+     */
+    private function deleteDirectory($dir)
+    {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (filetype($dir . "/" . $object) == "dir") {
+                        $this->deleteDirectory($dir . "/" . $object);
+                    } else {
+                        unlink($dir . "/" . $object);
+                    }
+                }
+            }
+            reset($objects);
+            rmdir($dir);
+        }
+    }
+
+    /**
      * Download all student submissions for a given assessable
      * @api   GET /learning/assessments/:assessmentId/submissions/download
      * @level 165
@@ -206,6 +228,10 @@ class Controller extends Assessment\Controller
         $tempFolder = $this->getConfigLoader()->get('submission_upload_tmp_dir') . "/" . $this->getUser()->getId() . "_" . date("U");
 
         // Create temporary folder to store submissions
+
+        if (file_exists($tempFolder)) {
+            $this->deleteDirectory($tempFolder);
+        }
 
         mkdir($tempFolder);
 
@@ -265,6 +291,7 @@ class Controller extends Assessment\Controller
         }
 
         $zip->addDirectory($tempFolder);
+        $this->deleteDirectory($tempFolder);
         $zip->download();
     }
 
