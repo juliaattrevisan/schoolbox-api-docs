@@ -452,7 +452,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '')
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '')
     {
         /**
          * First priority is a the post return URL
