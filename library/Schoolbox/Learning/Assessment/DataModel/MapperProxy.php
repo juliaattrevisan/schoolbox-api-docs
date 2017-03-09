@@ -781,11 +781,13 @@ class MapperProxy
      * Currently:
      * * converts "term" to a due date span
      * * converts "from" and "to" to due date filters
+     * * converts "from_close" and "to_close" to close date filters
      * * converts "type" to a filter which matches only that assessment type
      *   (see AssessmentType::TYPE_* constants)
      *
      * @param array $options
      * @return PredicateBuilder
+     * @throws \InvalidArgumentException
      */
     protected function convertOptionsToPredicateBuilder($options)
     {
@@ -798,12 +800,31 @@ class MapperProxy
             $options['to']   = $term->getActualFinish();
         }
 
+        /* It is not a valid query to filter from/to both a due and close date.
+         * Typically when considering spans of time we are interested in the due date (learning analytics, markbook etc)
+         * Typically when considering points in time (usually now) we are interested in close date (eg current visible DueWork)
+         */
+        if(array_key_exists('from', $options) && array_key_exists('from_close', $options) ){
+            throw new \InvalidArgumentException('Cannot filter from both due and close dates.');
+        }
+        if(array_key_exists('to', $options) && array_key_exists('to_close', $options) ){
+            throw new \InvalidArgumentException('Cannot filter to both due and close dates.');
+        }
+
         // Due before / after filter (an ADF)
         if ($options['from'] instanceof \Alaress_Date_Format && !$options['from']->isNull()) {
             $builder->notLessThan('due_date', $options['from']->getDatabase());
         }
         if ($options['to'] instanceof \Alaress_Date_Format && !$options['to']->isNull()) {
             $builder->notGreaterThan('due_date', $options['to']->getDatabase());
+        }
+
+        if ($options['from_close'] instanceof \Alaress_Date_Format && !$options['from_close']->isNull()) {
+            $builder->notLessThan('close_date', $options['from_close']->getDatabase());
+        }
+
+        if ($options['to_close'] instanceof \Alaress_Date_Format && !$options['to_close']->isNull()) {
+            $builder->notLessThan('close_date', $options['to_close']->getDatabase());
         }
 
         // Assessment type filter
