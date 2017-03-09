@@ -111,7 +111,7 @@ class Controller extends Assessment\Controller
          * decide which one it is
          */
         if ($task->getUrl()) {
-            $previewFragment = (new PreviewFactory())->urlFragment($task->getUrl(), $this->getUser());
+            $previewFragment = (new PreviewFactory($this->getRouter()))->urlFragment($task->getUrl(), $this->getUser());
 
             if ($previewFragment['type'] == 'redirect' && !$task->getDescription()) {
 
@@ -139,7 +139,12 @@ class Controller extends Assessment\Controller
                  * Download them as some kind of attachment
                  */
                 $previewFragment['type'] = 'file';
-                $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
+                try {
+                    $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
+                }
+                catch (\Schoolbox\Mapper\Exception $e) {
+                    unset($previewFragment);
+                }
             }
             elseif ($previewFragment['type'] == 'inline') {
 
