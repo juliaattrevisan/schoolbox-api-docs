@@ -112,37 +112,38 @@ class Conversation {
 
 		$role = $user->getRole()->getType();
 
-		if($role == Role::STAFF) {
+		if ($role == Role::STAFF) {
 			// all staff can see all comments
 			return $this->comments;
 		}
 
-		if(!$this->isParticipant($user)) {
-			throw new \InvalidArgumentException("Not a participant of this conversation.");
-		}
-
 		$visible = new Collection();
 
-		if($role == Role::PARENT) {
+		// if the user isn't a participant just return an empty collection
+
+        if (!$this->isParticipant($user)) {
+            return $visible;
+        }
+
+        // otherwise return comments based on their role (where applicable)
+
+        if ($role == Role::PARENT) {
 			foreach($this->comments as $c) {
 				/** @var Comment $c */
 				if($c->isVisibleToParent()) {
 					$visible->add($c);
 				}
 			}
-			return $visible;
 		}
-		elseif($role == Role::STUDENT) {
-			foreach($this->comments as $c) {
+		elseif ($role == Role::STUDENT) {
+			foreach ($this->comments as $c) {
 				/** @var Comment $c */
 				if($c->isVisibleToStudent()) {
 					$visible->add($c);
 				}
 			}
-			return $visible;
 		}
-		else {
-			throw new \InvalidArgumentException("Not a participant of this conversation.");
-		}
+
+        return $visible;
 	}
 }
