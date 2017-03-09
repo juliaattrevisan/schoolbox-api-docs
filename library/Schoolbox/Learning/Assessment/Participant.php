@@ -164,7 +164,9 @@ class Participant
     {
         /** @var IResponse $mostRecentResponse */
         $mostRecentResponse = null;
-        foreach ($this->allResponses as $response) {
+
+        /** @var IResponse $response */
+        foreach ($this->allResponses->getAll() as $response) {
             if (!$mostRecentResponse || $response->getUpdatedAt()->gt($mostRecentResponse->getUpdatedAt())) {
                 $mostRecentResponse = $response;
             }
@@ -180,7 +182,9 @@ class Participant
     {
         /** @var IResponse|null $mostRecentSubmittedResponse */
         $mostRecentSubmittedResponse = null;
-        foreach($this->allResponses as $response){
+
+        /** @var IResponse $response */
+        foreach($this->allResponses->getAll() as $response){
             if($response->isSubmitted()){
                 if(!$mostRecentSubmittedResponse || $response->getSubmittedAt()->gt($mostRecentSubmittedResponse->getSubmittedAt())){
                     $mostRecentSubmittedResponse = $response;
@@ -200,7 +204,8 @@ class Participant
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
 
-        foreach ($this->allFeedbacks as $feedback) {
+        /** @var IFeedback $feedback */
+        foreach ($this->allFeedbacks->getAll() as $feedback) {
             if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
                 $mostRecentFeedback = $feedback;
             }
@@ -218,7 +223,8 @@ class Participant
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
 
-        foreach ($this->allFeedbacks as $feedback) {
+        /** @var IFeedback $feedback */
+        foreach ($this->allFeedbacks->getAll() as $feedback) {
             if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
                     $mostRecentFeedback = $feedback;
             }
