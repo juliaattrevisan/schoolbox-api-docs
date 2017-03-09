@@ -329,7 +329,7 @@ interface IAssessable extends ISoftDeletable
      */
 
     /**
-     * @var string
+     * @var int
      */
     public function getId();
 

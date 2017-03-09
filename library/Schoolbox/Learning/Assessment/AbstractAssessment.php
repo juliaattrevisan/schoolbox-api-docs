@@ -37,37 +37,37 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @var string
      */
-    protected $title;
+    private $title;
 
     /**
      * @var string
      */
-    protected $description;
+    private $description;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $publishAt;
+    private $publishAt;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $openAt;
+    private $openAt;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $dueAt;
+    private $dueAt;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $closeAt;
+    private $closeAt;
 
     /**
      * @var int
      */
-    protected $weight;
+    private $weight;
 
     /**
      * Number of days an AssessmentSpec is expected to take.
@@ -83,14 +83,14 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @var Collection|Participant[]
      */
-    protected $allParticipants;
+    private $allParticipants;
 
     /**
      * The person who created this Assessable
      *
      * @var User
      */
-    protected $creator;
+    private $creator;
 
     /**
      * @var MarkType
@@ -130,7 +130,7 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @var IAssessable|null
      */
-    private $specificationAssessment = null;
+    private $specificationAssessment;
 
     /**
      * If published, then who can see the feedback for this Assessment.
@@ -167,8 +167,8 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
-        $this->responses = new Collection();
-        $this->feedbacks = new Collection();
+        $this->responses = new GenericCollection($this->getResponseClass());
+        $this->feedbacks = new GenericCollection($this->getFeedbackClass());
         $this->setCurriculumNodes(new Collection());
     }
 

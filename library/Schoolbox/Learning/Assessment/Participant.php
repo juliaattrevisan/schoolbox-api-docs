@@ -25,7 +25,7 @@ class Participant
      *
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * The Assessment which these Responses and Feedbacks relate to
@@ -37,20 +37,16 @@ class Participant
     /**
      * A Collection of IResponse instances that Students spawn
      *
-     * Null for Projects
-     *
      * @var GenericCollection|IResponse[]
      */
-    protected $allResponses;
+    private $allResponses;
 
     /**
      * A Collection of IFeedback instances that Teachers spawn
      *
-     * Null for Projects
-     *
      * @var GenericCollection|IFeedback[]
      */
-    protected $allFeedbacks;
+    private $allFeedbacks;
 
     /**
      * Participant constructor.
@@ -76,6 +72,7 @@ class Participant
      * Represented as GREY SQUARE
      *
      * @return bool
+     * @throws DomainException
      */
     public function isResponseRequired()
     {
