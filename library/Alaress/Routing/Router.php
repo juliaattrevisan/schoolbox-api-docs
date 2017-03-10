@@ -10,6 +10,7 @@ namespace Alaress\Routing;
 
 
 use Alaress\Routing\Dictionary\IDictionary;
+use Alaress\Routing\Route\RouteFactory;
 use InvalidArgumentException;
 use OutOfBoundsException;
 
@@ -29,17 +30,21 @@ class Router implements IRouter
     /** @var Trie[] */
     protected $cache;
 
+    /** @var RouteFactory */
+    private $factory;
+
 
     /**
      * Router constructor.
      *
      * @param IDictionary $dictionary
-     * @throws InvalidArgumentException
+     * @param bool        $isRecursive
      */
-    public function __construct(IDictionary $dictionary)
+    public function __construct(IDictionary $dictionary, $isRecursive = true)
     {
-        $this->root = new Trie('', [ $dictionary, 'sort' ]);
         $this->dictionary = $dictionary;
+        $this->root       = new Trie('', function ($keyA, $keyB) { return $this->dictionary->sort($keyA, $keyB); });
+        $this->factory    = new RouteFactory($this->root, $dictionary->getDelimiter(), $isRecursive);
     }
 
 
@@ -113,9 +118,7 @@ class Router implements IRouter
      */
     public function get($path)
     {
-        $route = new Route($path, $this->root, $this->dictionary->getDelimiter());
-
-        return $route->data();
+        return $this->factory->build($path)->data();
     }
 
 }
