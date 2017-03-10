@@ -33,4 +33,12 @@ interface IRouter
      */
     public function get($path);
 
+
+    /**
+     * If you know you're not going to be adding anything further to this router,
+     * you can lock it, which will optimise internal memory structures.
+     *
+     * @return void
+     */
+    public function lock();
 }

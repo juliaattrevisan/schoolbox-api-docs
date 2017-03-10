@@ -61,6 +61,11 @@ class Router implements IRouter
      */
     public function add($path, $key, $value = null)
     {
+        if ($this->root->isLocked()) {
+            // do nothing
+            return $this;
+        }
+
         $fullRegex = $this->dictionary->translateWhole(str_replace('.', '\.', $path));
 
         // let's not do work we don't have to, eh?
@@ -99,16 +104,6 @@ class Router implements IRouter
 
 
     /**
-     * @return void
-     */
-    public function dropCache()
-    {
-        unset($this->cache);
-        $this->cache = [];
-    }
-
-
-    /**
      * Get the data stored at the end of this path. The return value is an array of key-value pairs as
      * stored by static::add(), or throws an InvalidArgument exception if there is no data (ie. path not declared)
      *
@@ -119,6 +114,19 @@ class Router implements IRouter
     public function get($path)
     {
         return $this->factory->build($path)->data();
+    }
+
+
+    /**
+     * If you know you're not going to be adding anything further to this router,
+     * you can lock it, which will optimise internal memory structures.
+     *
+     * @return void
+     */
+    public function lock()
+    {
+        unset($this->cache);
+        $this->root->lock();
     }
 
 }

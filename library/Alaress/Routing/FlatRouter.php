@@ -22,6 +22,9 @@ class FlatRouter implements IRouter
     /** @var array[] */
     private $paths = [];
 
+    /** @var bool */
+    private $locked = false;
+
     /**
      * Add the given path as a known route, and a key-value pair to be stored at the end of that path.
      * If the key already exists on this path, the new value will replace any existing value.
@@ -32,6 +35,10 @@ class FlatRouter implements IRouter
      */
     public function add($path, $key, $value = null)
     {
+        if ($this->locked) {
+            return $this;
+        }
+
         $this->paths[$path][$key] = $value;
     }
 
@@ -58,6 +65,18 @@ class FlatRouter implements IRouter
     public function getAll()
     {
         return $this->paths;
+    }
+
+
+    /**
+     * If you know you're not going to be adding anything further to this router,
+     * you can lock it, which will optimise internal memory structures.
+     *
+     * @return void
+     */
+    public function lock()
+    {
+        $this->locked = true;
     }
 
 }
