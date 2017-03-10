@@ -6,10 +6,12 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Routing;
+namespace Alaress\Routing\Route;
 
 
-class Route
+use Alaress\Routing\Trie;
+
+class Route implements IRoute
 {
     /** @var string */
     protected $path;

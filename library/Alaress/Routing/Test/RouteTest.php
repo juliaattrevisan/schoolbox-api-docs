@@ -9,7 +9,7 @@
 namespace Alaress\Routing\Test;
 
 
-use Alaress\Routing\Route;
+use Alaress\Routing\Route\Route;
 use Alaress\Routing\Trie;
 
 class RouteTest extends \PHPUnit_Framework_TestCase
