@@ -39,7 +39,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /** @var LoggerInterface */
     protected $log;
 
-    /** @var IMapper */
+    /** @var Mapper */
     protected $mapper;
 
     /** @var NS */
@@ -64,7 +64,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /**
      * @param IConfigLoader $configLoader
      * @param Mapper[]      $dependencies
-     * @throws ScheduleException
      */
     public function __construct($configLoader, $dependencies = array())
     {
@@ -186,13 +185,15 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
         return true;
     }
 
+
     /**
      * Return the list of callbacks that are associated with this trigger.
      * Uses SQL lookup to determine code paths. Dirty and awful, but at the moment the best way forward.
      *
      * @param string $label
+     * @throws Mapper\Exception
      * @throws ScheduleException
-     * @return array
+     * @return callable[]
      */
     public function retrieveCallbacks($label)
     {
@@ -284,7 +285,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
 
     /**
-     * @return IMapper
+     * @return Mapper
      */
     public function getMapper()
     {
