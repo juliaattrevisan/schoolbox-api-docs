@@ -17,6 +17,7 @@ use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
@@ -25,6 +26,7 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
@@ -99,6 +101,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @inheritdoc
      *
      * @throws \Schoolbox\Mapper\Exception
+     * @throws DefinitionException
      */
     protected function mapping()
     {
@@ -191,6 +194,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCategoryCodes']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitSpecification']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
 
         $this->ancestry = new Ancestry($this);
     }
@@ -209,6 +213,23 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $courseSpecMapper = $this->getJoinMapper('course_specification');
         $courseSpec = $courseSpecMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
         $courseSpecMapper->delete($courseSpec);
+        return true;
+    }
+
+    /**
+     * Post soft-delete callback to soft-delete any CourseImpls linked to this Folder
+     *
+     * Intentionally no corresponding 'postRestore' callback.
+     *
+     * @param Model $folder
+     * @return bool
+     */
+    public function softDeleteCourseImplementations(Model $folder)
+    {
+        /** @var CourseSpecificationMapper $courseImplMapper */
+        $courseImplMapper = CourseImplementationMapper::getInstance();
+        $courseImpls = $courseImplMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
+        $courseImplMapper->delete($courseImpls);
         return true;
     }
 
