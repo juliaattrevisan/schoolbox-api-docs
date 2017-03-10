@@ -163,7 +163,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         }
 
         $hostFolderId  = $instance->getIdentifier();
-        $namespaceSlug = $instance->getDefinition()->getNamespace()->getId();
+        $namespaceSlug = $instance->getDefinition()->getNamespace()->getSlug();
 
         foreach ([ UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL ] as $access) {
             $from = "*.notify.service.1.$altSourceId.$access.$namespaceSlug.#";
