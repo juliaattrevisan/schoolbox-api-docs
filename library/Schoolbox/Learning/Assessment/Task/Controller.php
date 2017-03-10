@@ -150,7 +150,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/task/summary/student.twig",
+                "@learningAssessment/fragments/task/summary/preview.twig",
                 $twigData
             )
         );

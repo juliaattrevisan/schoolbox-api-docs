@@ -94,7 +94,22 @@ class Module extends BaseModule
             $this->getAccess()
         );
 
-        $canRead = new Rule\HasHomepageAccess();
+        $canRead = new Rule\HasHomepageAccess (
+                UserAccess::ACCESS_READ,
+                function (array $params)
+                {
+                    if (isset($params['assessment'])) {
+                        $ctx = $params['assessment']->getContext()->getFolder()->getId();
+                    } elseif (isset($params['context'])) {
+                        $ctx = $params['context']->getFolder()->getId();
+                    } else {
+                        throw new NotFound("No assessment or context preloaded");
+                    }
+
+                    return $ctx;
+                },
+                $this->getAccess()
+        );
 
         $participantView = new Rule\All(
             new Rule\Any(
