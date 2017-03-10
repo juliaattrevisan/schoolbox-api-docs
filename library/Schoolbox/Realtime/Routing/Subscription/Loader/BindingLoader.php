@@ -77,6 +77,14 @@ class BindingLoader implements ILoader
 
         $this->log->debug(sprintf("%d subscriptions loaded for %d users in %0.3f seconds", $totalRoutes, $userCount, ($b - $a)));
 
+        // load in the redirects
+        $stmt = $this->userMapper->getDatabase()->query('SELECT `from`, `to` FROM msg_redirect');
+
+        while (list($from, $to) = $stmt->fetch(\PDO::FETCH_NUM)) {
+            $this->log->info("Adding redirect `$from` -> `$to`");
+            $router->add($from, $to);
+        }
+
         return $this;
     }
 
