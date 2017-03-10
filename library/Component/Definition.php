@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\Realtime\Message\NS;
 
 /**
  * 
@@ -54,6 +55,13 @@ class Component_Definition {
 	 * @var string
 	 */
 	protected $componentCategory;
+
+    /**
+     * Message namespace this component resides in (may be null)
+     *
+     * @var NS
+     */
+	protected $namespace;
 
 	/**
 	 * The name of this component's category (as opposed to its ID)
@@ -258,6 +266,24 @@ class Component_Definition {
 	public function getVisible() {
 		return $this->visible;
 	}
+
+    /**
+     * @return NS
+     */
+    public function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * @param NS $namespace   null is permissible
+     * @return $this
+     */
+    public function setNamespace(NS $namespace = null)
+    {
+        $this->namespace = $namespace;
+        return $this;
+    }
 
 	/**
 	 * @param  int   $instanceCount

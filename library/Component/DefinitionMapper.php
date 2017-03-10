@@ -8,16 +8,24 @@
  * @version     SVN: $Id$
  * @
  */
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\PredicateBuilder;
+use Schoolbox\Realtime\Message\NSMapper;
 
 /**
  * Class Component_DefinitionMapper
+ *
  * @method Component_Definition findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
  * @method Component_Definition findById($identifierValue)
+ * @method Component_Definition hydrate(array $row, $alias = '', $callback = null)
  */
 class Component_DefinitionMapper extends Schoolbox\Mapper {
 
-
-	protected function mapping () {
+    /**
+     * Define this mapper's mappings
+     */
+	protected function mapping ()
+    {
 		$this->hasTable('component_definition');
 		$this->hasModel(Component_Definition::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
@@ -28,41 +36,110 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
         $this->uses('visible', self::TYPE_STRING);
         $this->uses('multiple', self::TYPE_STRING);
         $this->uses('component_category', self::TYPE_STRING);
+        $this->joins('msg_namespace_slug', NSMapper::class, 'slug', null, null, 'namespace', 'namespace');
 	}
 
-	/**
-	 * @param array $options
-	 * @return \Schoolbox\Collection
-	 */
-	public function findAll($options = array()) {
-		$statement = $this->database->prepare("
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}` WHERE visible = 'true'
-		");
 
-		$statement->execute();
+    /**
+     * Default to sorting by module, then name
+     *
+     * @param array $options
+     * @return GenericCollection
+     */
+    public function findAll($options = [])
+    {
+        if (empty($options['sort'])) {
+            $options['order'] = [
+                'module' => 'ASC',
+                'name'   => 'ASC'
+            ];
+        }
 
-		$rowset = $statement->fetchAll();
+        return parent::findAll($options);
+    }
 
-		return $this->hydrateList($rowset);
-	}
+    /**
+     * Return the first part of the string required to select from this mapper.
+     * Contains a join to a ridonkeykonk lookup table that defies ALL conventions
+     *
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT {$this->getColumnString()}, 
+                   hcc.homepageComponentCategoryID `hcc.id`, hcc.name `hcc.name`,
+                   {$this->getJoinColumnString('namespace', 'ns')}
+            FROM {$this->getTable()}
+            LEFT JOIN homepageComponentCategory hcc ON component_definition.component_category = hcc.homepageComponentCategoryID
+            LEFT JOIN {$this->getJoinSql('namespace', '', 'ns')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @throws \Schoolbox\Mapper\Exception
+     * @return GenericCollection|Component_Definition[]
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            $model = $this->hydrate($row);
+
+            if ($row['hcc.id']) {
+                // handle the obscene lookup
+                $model->setComponentCategory($row['hcc.id']);
+                $model->setComponentCategoryName($row['hcc.name']);
+            }
+
+            if ($row['ns.slug']) {
+                // if null, leave it as null since it's optional
+                $model->setNamespace($this->hydrateJoin($row, 'namespace', 'ns'));
+            }
+
+            $c->add($model);
+        }
+
+        return $c;
+    }
+
+
+    /**
+     * Builds a where part and params for this query out of a column list
+     *
+     * @param PredicateBuilder $predicate
+     * @param  array           $columnList
+     * @param  array           $options
+     *
+     * @return array where:  The where parts of the query
+     *               params: the parameters
+     * @throws \UnderflowException
+     */
+    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    {
+        // hide invisible components from all queries EXCEPT the ones that explicitly ask for it
+        // it's like a soft-delete, but with an inverted boolenum, because SOMEONE thought that was ever a good idea...
+        if (!(isset($options['hidden']) && $options['hidden'])) {
+            $predicate->equals('visible', 'true'); // boolenums... urgh...
+        }
+
+        return parent::buildWherePart($predicate, $columnList, $options);
+    }
+
 
 	/**
 	 * Find all component definitions including the hidden ones (uses in admin 'Components' list editor)
 	 *
 	 * @return \Schoolbox\Collection
 	 */
-	public function findAllIncludeHidden() {
-		$statement = $this->database->prepare("
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-		");
-
-		$statement->execute();
-
-		$rowset = $statement->fetchAll();
-
-		return $this->hydrateList($rowset);
+	public function findAllIncludeHidden()
+    {
+	    return $this->findAll([ 'hidden' => true ]);
 	}
 
 	/**
@@ -73,58 +150,14 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 	 *
 	 * @return \Schoolbox\Collection
 	 */
-	public function findAllForModule($module, $sortBy = '') {
-		$sort = 'ORDER BY name ASC';
-		if($sortBy) {
-			foreach($this->map as $m)
-			if($m['column'] == $sortBy) {
-				$sort = "ORDER BY $sortBy ASC, name ASC";
-				break;
-			}
-		}
-		$sql = "
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE visible = 'true'
-			AND module = :module
-			$sort
-		";
-
-		$statement = $this->database->prepare($sql);
-
-		$statement->bindParam('module', $module);
-		$statement->execute();
-		$rowset = $statement->fetchAll();
-		$collection = $this->hydrateList($rowset);
-
-		// bail at this point if we don't need to care about component category mappings
-		if($module != 'homepage') {
-			return $collection;
-		}
-
-		// collect the component categories and append the names
-
-		$statement = $this->database->prepare("
-			SELECT homepageComponentCategoryID `id`, `name`
-			FROM homepageComponentCategory
-		");
-		$statement->execute();
-		$rowset = $statement->fetchAll();
-
-		$cats = array();
-		foreach($rowset as $r) {
-			$cats[$r['id']] = $r['name'];
-		}
-
-		foreach($collection as $definition) {
-			/** @var Component_Definition $definition */
-			if(isset($cats[$definition->getComponentCategory()])) {
-				$definition->setComponentCategory($definition->getComponentCategory());
-				$definition->setComponentCategoryName($cats[$definition->getComponentCategory()]);
-			}
-		}
-
-		return $collection;
+	public function findAllForModule($module, $sortBy = '')
+    {
+	    return $this->findByColumn('module', $module, [
+	        'order' => [
+	            $sortBy => 'ASC',
+                'name'  => 'ASC'
+            ]
+        ]);
 	}
 
 
