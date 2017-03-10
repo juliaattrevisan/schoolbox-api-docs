@@ -124,6 +124,9 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
 
         $dueWork = $this->spawnDueWork();
 
+        // This accepts multiple submissions for the purpose of testing
+        $dueWork->setAcceptsMultiple();
+
         /* Details
          */
         $this->assertEquals($title, $dueWork->getTitle());
@@ -163,6 +166,44 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->today->getDatabase(), $dueWork->getCreatedAt()->getDatabase());
         $this->assertEquals($this->today->getDatabase(), $dueWork->getUpdatedAt()->getDatabase());
         $this->assertEquals(null, $dueWork->getDeletedAt());
+    }
+
+    /**
+     * Test that Due Work basic details can be manufactured meaningfully
+     */
+    public function testBuildOfflineSubmission()
+    {
+        $dueWork = $this->spawnDueWork();
+
+        // This doesn't accept submissions
+        $dueWork
+            ->setAcceptsNone()
+            ->setPublishAt($this->thirtyDaysFromNow)
+            ->setOpenAt($this->fortyDaysFromNow)
+            ->setDueAt($this->fiftyDaysFromNow)
+            ->setCloseAt($this->sixtyDaysFromNow);
+
+        // Open is the same as publish date
+        $this->assertEquals($this->thirtyDaysFromNow->getDatabase(), $dueWork->getPublishAt()->getDatabase());
+        $this->assertEquals($this->thirtyDaysFromNow->getDatabase(), $dueWork->getOpenAt()->getDatabase());
+
+        // Close is the same as due date
+        $this->assertEquals($this->fiftyDaysFromNow->getDatabase(), $dueWork->getDueAt()->getDatabase());
+        $this->assertEquals($this->fiftyDaysFromNow->getDatabase(), $dueWork->getCloseAt()->getDatabase());
+
+        $dueWork->setAcceptsSingle();
+        // Now dates are separate
+        $this->assertEquals($this->thirtyDaysFromNow->getDatabase(), $dueWork->getPublishAt()->getDatabase());
+        $this->assertEquals($this->fortyDaysFromNow->getDatabase(), $dueWork->getOpenAt()->getDatabase());
+        $this->assertEquals($this->fiftyDaysFromNow->getDatabase(), $dueWork->getDueAt()->getDatabase());
+        $this->assertEquals($this->sixtyDaysFromNow->getDatabase(), $dueWork->getCloseAt()->getDatabase());
+
+        $dueWork->setAcceptsMultiple();
+        // Dates are still separate
+        $this->assertEquals($this->thirtyDaysFromNow->getDatabase(), $dueWork->getPublishAt()->getDatabase());
+        $this->assertEquals($this->fortyDaysFromNow->getDatabase(), $dueWork->getOpenAt()->getDatabase());
+        $this->assertEquals($this->fiftyDaysFromNow->getDatabase(), $dueWork->getDueAt()->getDatabase());
+        $this->assertEquals($this->sixtyDaysFromNow->getDatabase(), $dueWork->getCloseAt()->getDatabase());
     }
 
     /**
