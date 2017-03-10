@@ -240,6 +240,7 @@ class Module extends BaseModule
                 throw new Forbidden();
             }
         } catch (UnexpectedValueException $e) {
+
             // Student isn't a participant
             throw new Forbidden();
 
