@@ -38,7 +38,8 @@ class Model extends AbstractFeedback
      */
     public function setAssessable($assessable)
     {
-        throw new \BadMethodCallException('You cannot set a TaskFeedback Assessable. It is derived from the TaskResponse.');
+        $this->getResponse()->setAssessable($assessable);
+        return $this;
     }
 
     /**
@@ -93,7 +94,8 @@ class Model extends AbstractFeedback
      */
     public function setId($id)
     {
-        throw new \BadMethodCallException('You cannot set a TaskFeedback Id. It is derived from the TaskResponse.');
+        $this->getResponse()->setId($id);
+        return $this;
     }
 
 
@@ -195,7 +197,8 @@ class Model extends AbstractFeedback
      */
     public function setReviewee($reviewee)
     {
-        throw new \BadMethodCallException('You cannot set a TaskFeedback Reviewee. It is derived from the TaskResponse.');
+        $this->getResponse()->setSubmittedOnBehalfOf($reviewee);
+        return $this;
     }
 
 
@@ -220,7 +223,8 @@ class Model extends AbstractFeedback
      */
     public function setReviewer($reviewer)
     {
-        throw new \BadMethodCallException('You cannot set a TaskFeedback Reviewer. It is derived from the TaskResponse.');
+        $this->getResponse()->setSubmittedBy($reviewer);
+        return $this;
     }
 
     /**
@@ -256,7 +260,8 @@ class Model extends AbstractFeedback
      */
     public function setPublishedAt($publishedAt)
     {
-        throw new \BadMethodCallException('You cannot set a TaskFeedback PublishedAt value. It is derived from the TaskResponse.');
+        // Ignored. Task Feedback are always published.
+        return $this;
     }
 
 
@@ -275,7 +280,8 @@ class Model extends AbstractFeedback
      */
     public function setCreatedAt(\Alaress_Date_Format $createdAt = null)
     {
-        throw new \BadMethodCallException('You cannot set a TaskFeedback CreatedAt value. It is derived from the TaskResponse.');
+        $this->getResponse()->setCreatedAt($createdAt);
+        return $this;
     }
 
 
@@ -295,7 +301,8 @@ class Model extends AbstractFeedback
      */
     public function setUpdatedAt(\Alaress_Date_Format $updatedAt = null)
     {
-        throw new \BadMethodCallException('You cannot set a TaskFeedback UpdatedAt value. It is derived from the TaskResponse.');
+        $this->getResponse()->setUpdatedAt($updatedAt);
+        return $this;
     }
 
 
@@ -314,6 +321,7 @@ class Model extends AbstractFeedback
      */
     public function setDeletedAt(\Alaress_Date_Format $deletedAt = null)
     {
-        throw new \BadMethodCallException('You cannot set a TaskFeedback DeletedAt value. It is derived from the TaskResponse.');
+        $this->getResponse()->setDeletedAt($deletedAt);
+        return $this;
     }
 }
