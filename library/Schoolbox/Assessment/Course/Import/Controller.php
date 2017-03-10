@@ -829,16 +829,34 @@ class Controller extends Base\Base
      * @param IAssessable $assessment
      * @param string[] $dates
      * @return IAssessable
+     * @throws \DomainException if property isn't recognized
      */
     protected function applyDates(IAssessable $assessment, array $dates)
     {
         // Set/Update Dates
         foreach ($dates as $property => $localShort) {
-            $method = "set{$property}At";
-            if (!method_exists($assessment, $method)) {
-                throw new \DomainException("Invalid date property: $property");
+            $date = \Alaress_Date_Format::newLocalShort($localShort);
+            switch (strtolower($property)) {
+                case 'publish':
+                    $assessment->setPublishAt($date->startOfDay());
+                    break;
+
+                case 'open':
+                    $assessment->setOpenAt($date->startOfDay());
+                    break;
+
+                case 'due':
+                    $assessment->setDueAt($date->endOfDay());
+                    break;
+
+                case 'close':
+                    $assessment->setCloseAt($date->endOfDay());
+                    break;
+
+                default:
+                    throw new \DomainException("Invalid date property: set{$property}At");
+                    break;
             }
-            $assessment->$method(\Alaress_Date_Format::newLocalShort($localShort));
         }
         return $assessment;
     }
