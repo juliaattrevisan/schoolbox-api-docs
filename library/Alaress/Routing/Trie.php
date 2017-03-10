@@ -9,6 +9,7 @@
 namespace Alaress\Routing;
 
 
+use Generator;
 use InvalidArgumentException;
 
 class Trie
@@ -27,6 +28,9 @@ class Trie
 
     /** @var callable */
     private $usort;
+
+    /** @var bool */
+    private $writable = true;
 
 
     /**
@@ -56,13 +60,13 @@ class Trie
      */
     public function get($key)
     {
-        // if not sorted, do it now
-        if (!$this->sorted) {
-            $this->sort();
+        if (empty($this->tries)) {
+            throw new InvalidArgumentException('Set is empty');
         }
 
-        if (empty($this->tries)) {
-            throw new InvalidArgumentException("Set is empty");
+        // if not sorted, do it now
+        if (!empty($this->writable) && !$this->sorted) {
+            $this->sort();
         }
 
         // try for a string literal first
@@ -70,14 +74,34 @@ class Trie
             return $this->tries[$key];
         }
 
-        // literal failed, try for regex
-        foreach ($this->tries as $pattern => $trie) {
-            if (preg_match("`^$pattern$`", $key)) {
-                return $trie;
-            }
+        $trie = $this->match($key)->current();
+
+        if ($trie) {
+            return $trie;
         }
 
         throw new InvalidArgumentException("Key '$key' not found");
+    }
+
+
+    /**
+     * For increased utility, this method allows you to bypass ::get() and obtain the iterator
+     * for all matching tries. If nothing matches, an empty Generator will be returned.
+     *
+     * @param string $key
+     * @return Generator|static[]
+     */
+    public function match($key)
+    {
+        if (empty($this->tries)) {
+            return [];
+        }
+
+        foreach ($this->tries as $pattern => $trie) {
+            if (preg_match("`^$pattern$`", $key)) {
+                yield $trie;
+            }
+        }
     }
 
     /**
@@ -86,6 +110,10 @@ class Trie
      */
     public function has($key)
     {
+        if (empty($this->tries)) {
+            return false;
+        }
+
         // try for a string literal first
         if (isset($this->tries[$key])) {
             return true;
@@ -102,6 +130,10 @@ class Trie
      */
     public function put($key)
     {
+        if (empty($this->writable)) {
+            return null;
+        }
+
         // new insertion: no longer can guarantee sorted
         $this->sorted = false;
 
@@ -119,6 +151,10 @@ class Trie
      */
     public function set(array $params, $k, $v)
     {
+        if (empty($this->writable)) {
+            return;
+        }
+
         $node =& $this->data;
 
         foreach ($params as $p) {
@@ -139,11 +175,15 @@ class Trie
      */
     public function fetch(array $params)
     {
+        if (empty($this->data)) {
+            throw new InvalidArgumentException('No data match');
+        }
+
         $node =& $this->data;
 
         foreach ($params as $p) {
             if (empty($node[$p])) {
-                throw new InvalidArgumentException("No data match");
+                throw new InvalidArgumentException('No data match');
             }
             $node =& $node[$p];
         }
@@ -160,6 +200,10 @@ class Trie
      */
     protected function sort()
     {
+        if (empty($this->writable)) {
+            return;
+        }
+
         // recursively sort the entire tree
         foreach ($this->tries as $t) {
             $t->sort();
@@ -170,5 +214,42 @@ class Trie
         }
 
         uksort($this->tries, $this->usort);
+    }
+
+
+    /**
+     * This is a one-way steet. Locks down and memory-optimises this trie and everything below it
+     */
+    public function lock()
+    {
+        if (empty($this->writable)) {
+            return;
+        }
+
+        if (empty($this->data)) {
+            unset($this->data);
+        }
+
+        // finalise sorting
+        $this->sort();
+        unset($this->writable, $this->usort, $this->sorted);
+
+        if (count($this->tries)) {
+            foreach ($this->tries as $t) {
+                $t->lock();
+            }
+        } else {
+            // we are a leaf node, these tidbits are irrelevant
+            unset($this->tries);
+        }
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isLocked()
+    {
+        return empty($this->writable);
     }
 }
