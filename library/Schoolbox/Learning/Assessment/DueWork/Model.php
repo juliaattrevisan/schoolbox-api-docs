@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use Alaress_Date_Format;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
@@ -331,6 +332,19 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Override: change nothing if this doesn't accept submissions
+     * @param Alaress_Date_Format $openAt
+     * @return $this
+     */
+    public function setOpenAt(Alaress_Date_Format $openAt)
+    {
+        if (!$this->isAcceptNone()) {
+            $this->openAt = $openAt;
+        }
+        return $this;
+    }
+
+    /**
      * Override: if this doesn't accept submissions, close is aliased to due
      * @return \Alaress_Date_Format
      */
@@ -341,6 +355,19 @@ class Model extends AbstractAssessment
         } else {
             return $this->closeAt;
         }
+    }
+
+    /**
+     * Override: change nothing if this doesn't accept submissions
+     * @param Alaress_Date_Format $closeAt
+     * @return $this
+     */
+    public function setCloseAt(Alaress_Date_Format $closeAt)
+    {
+        if (!$this->isAcceptNone()) {
+            $this->closeAt = $closeAt;
+        }
+        return $this;
     }
 
     /**
