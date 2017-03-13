@@ -809,7 +809,6 @@ class PendingFactory
         $classWhere = implode(' AND ', $classPb->getWhere());
 
         // Are we getting students in Groups and Classes ?
-        $orClause = null;
         if(!empty($this->foldersCache) && !empty($this->studentExternalIds)){
             $orClause = "(($groupWhere) OR ($classWhere))";
         }
@@ -818,7 +817,7 @@ class PendingFactory
             $orClause = $groupWhere;
         }
         // else just Class
-        elseif (!empty($this->studentExternalIds) ) {
+        else {
             $orClause = $classWhere;
         }
 
