@@ -197,6 +197,8 @@ class Participant
     /**
      * Find the authoritative Feedback for an Assessment for this Participant
      *
+     * Since 16.5.13, this has absorbed the 'no favour' feedback traversal strategy
+     *
      * @return null|IFeedback
      */
     public function findMostRecentFeedback()
@@ -215,6 +217,8 @@ class Participant
 
     /**
      * Find the authoritative published Feedback for an Assessment for this Participant
+     *
+     * Since 16.5.13, this has absorbed the 'no favour' feedback traversal strategy
      *
      * @return null|IFeedback
      */
