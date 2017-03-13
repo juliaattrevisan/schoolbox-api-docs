@@ -325,11 +325,15 @@ class DataTransferObject
                             $start = clone $unitOpen;
                             $end = clone $limit;
                         } else {
+                            // This assessable is open over (span - 1) days.
+                            // (but is open from the start of the open day to the end of the close day)
                             $nextAvailable->addDays($spec->getDefaultOpenSpan() - 1);
                             if($nextAvailable->gt($limit)){
                                 $nextAvailable = $limit;
                             }
                             $end = clone $nextAvailable;
+                            // Next assessable with an open span doesn't open until the next day.
+                            $nextAvailable->addDays(1);
                         }
                     } else {
                         // Recursive Case
