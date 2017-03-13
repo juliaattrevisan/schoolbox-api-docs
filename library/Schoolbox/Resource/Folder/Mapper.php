@@ -554,7 +554,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
                 /** @var \Schoolbox\Resource\Folder\Code\Model $code */
                 $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getFolder()->getId()) {
+                if ($code->getFolder() instanceof Model) {
                     $category->addCode($code);
                 }
                 $collection->add($category);
@@ -853,7 +853,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Hydrate class codes (avoiding duplicates) and cache
             $code = $code_mapper->hydrate($row, 'cc');
 
-            if ($code->getFolder()->getId()) {
+            if ($code->getFolder() instanceof Model) {
                 $addedClassCodes[$testId][$code->getCode()] = $code;
             }
 
