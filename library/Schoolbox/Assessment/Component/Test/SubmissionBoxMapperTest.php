@@ -29,6 +29,7 @@ class SubmissionBoxMapperTest extends TestCase {
 	public function testHydrate() {
 		$data = array(
 			'id'                => 3,
+            'assessment_id'     => 3,
 			'category'          => 11,
 			'name'              => 'Some test',
 			'description'       => 'no description',

@@ -91,7 +91,7 @@ class ModelTest extends TestCase {
      */
 	public function testHydrateNull() {
 		$hydrate = $this->object->hydrate(null, $this->test_mapper);
-		$this->assertSame(null, $hydrate->getId());
+		$this->assertNull($hydrate);
 	}
 
     /**
