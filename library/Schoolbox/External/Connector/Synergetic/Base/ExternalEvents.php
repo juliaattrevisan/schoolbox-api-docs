@@ -101,7 +101,7 @@ class ExternalEvents implements ExternalEventsInterface
               LEFT JOIN dbo.luTeam t ON ss.TeamCode = t.Code AND ss.TeamCode IS NOT NULL AND ss.TeamCode <> ''
               {$join}
               LEFT JOIN dbo.SubjectClasses sc ON ss.SubjectClassesSeq = sc.SubjectClassesSeq AND ss.SubjectClassesSeq IS NOT NULL AND ss.SubjectClassesSeq <> ''
-              WHERE NOT (ss.ScheduleDateTimeFrom < '{$start->getDatabase()}' OR ss.ScheduleDateTimeTo >= '{$finish->getDatabase()}')
+              WHERE NOT (ss.ScheduleDateTimeTo < '{$start->getDatabase()}' OR ss.ScheduleDateTimeFrom >= '{$finish->getDatabase()}')
               {$where}
               ORDER BY ss.StaffScheduleSeq ASC";
         
