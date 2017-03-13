@@ -144,12 +144,6 @@ function getLinkedElements (element, options) {
 
 function setValue ( element, options, state, date ) {
 
-    console.log("setValue");
-    console.log(element);
-    console.log(options);
-    console.log(state);
-    console.log(date);
-
     // Get their pickerIds
     var pId = element.attr('data-datepicker-id');
 
@@ -158,59 +152,35 @@ function setValue ( element, options, state, date ) {
 
     if(date !== undefined) {
         var value = date;
-        console.log('1: '+value);
-
     }
     else if(window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
         var value = window.pickerInstance[pId].input.value;
-        console.log('2: '+value);
-
     }
     else if (element.val() !== undefined && element.val()) {
         var value = element.val();
-        console.log('3: '+value);
-
     }
     else {
         var value = moment();
-        console.log('4: '+value);
-
     }
     // All Day is on
     if(state === true) {
-        console.log('state > true');
         if(options.endDay) {
             var v = moment(value, convertFormat(pickerFormats.convertFrom)).endOf('day').format(convertFormat(pickerFormats.convertTo));
-            console.log('v on endDay: '+v);
         }
         else {
             var v = moment(value, convertFormat(pickerFormats.convertFrom)).startOf('day').format(convertFormat(pickerFormats.convertTo));
-            console.log('v on no endDay: '+v);
         }
-        // if(window.pickerInstance[pId] !== undefined) {
-        //     // window.pickerInstance[pId].input.value = v;
-        //     window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true);
-        //     console.log('updating instance value... '+pickerFormats.convertTo+' >> '+'options.databaseFormat');
-        //     console.log(window.pickerInstance[pId].input.value);
-        // }
-
+        if(window.pickerInstance[pId] !== undefined) {
+            window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
+        }
         element.val(v);
-        console.log('updating element value...');
-        console.log(element.val());
     }
     else {
-        console.log('state > false');
         var v = moment(value, convertFormat(pickerFormats.convertFrom)).format(convertFormat(pickerFormats.convertTo));
-        console.log('v: '+v);
-        // if(window.pickerInstance[pId] !== undefined) {
-        //     // window.pickerInstance[pId].input.value = v;
-        //     window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true);
-        //     console.log('updating instance value... '+pickerFormats.convertTo+' >> '+'options.databaseFormat');
-        //     console.log(window.pickerInstance[pId].input.value);
-        // }
+        if(window.pickerInstance[pId] !== undefined) {
+            window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
+        }
         element.val(v);
-        console.log('updating element value...');
-        console.log(element.val());
     }
     if(options.allDayExt !== false) {
         $('#'+options.allDayExt).val(state?1:0);
@@ -326,7 +296,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                     if (options.allDayExt !== false) {
                         var linkedElements = getLinkedElements( element, options );
                         linkedElements.forEach(function(item) {
-                            console.log(getOptions(item));
                             setValue(item, getOptions(item), $('#hideTime'+pickerId).is(':checked'));
                         });
                     }
