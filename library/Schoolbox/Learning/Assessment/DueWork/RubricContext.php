@@ -97,4 +97,30 @@ class RubricContext
 
         return $context;
     }
+
+    /**
+     * Get a student agnostic readonly grid
+     *
+     * @param DueWork $dueWork
+     * @return array
+     */
+    public function generateBasic(DueWork $dueWork, User $currentUser)
+    {
+        if(!$dueWork->getUseRubric()){
+            return ['rubric' => null];
+        }
+//        $publishedOnly = true;
+//        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
+
+        $context = [
+            'rubric' => $dueWork->getRubric()->toContext($currentUser),
+        ];
+
+        // Hide total mark from students and parents
+        if (!($currentUser->isSuperuser() || $currentUser->getRole()->isStaff())) {
+            unset($context['rubric']['total']);
+        }
+
+        return $context;
+    }
 }
