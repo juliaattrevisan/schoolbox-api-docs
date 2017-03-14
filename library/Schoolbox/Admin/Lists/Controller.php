@@ -10,6 +10,8 @@
 namespace Schoolbox\Admin\Lists;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -42,6 +44,34 @@ class Controller extends Base
     }
 
     /**
+     * Deletes a list item using the specified mapper
+     */
+    public function postDelete()
+    {
+        $result = false;
+        $post = $this->getRequest()->post;
+
+        $tableData = $this->getTableData();
+        $mapper_name = $tableData[$post['table']]['mapper'];
+
+        if (class_exists($mapper_name)) {
+            /** @var Mapper $mapper */
+            $mapper = new $mapper_name;
+            try {
+                $record = $mapper->findById($post['id']);
+                $mapper->delete($record);
+                $result = true;
+            } catch (MapperException $e) {
+            }
+        }
+
+        $this->getResponse()->content->set([
+            'data'   => ['result' => $result],
+            'format' => 'json'
+        ]);
+    }
+
+    /**
      * @api /adminv2/lists/save
      * @level 160
      */
@@ -59,7 +89,7 @@ class Controller extends Base
         $mapper_name     = $tableData[$tableKey]['mapper'];
         $sortable_column = $this->getRequest()->post["sortable_column"];
 
-        /** @var \Schoolbox\Mapper $mapper */
+        /** @var Mapper $mapper */
         $mapper = new $mapper_name;
         $model_name = $mapper->getModel();
 
@@ -162,6 +192,8 @@ class Controller extends Base
         return [
             'roles' => [
                 'title'             => 'Roles',                                 // Title of the tab
+                'delete'            => true,
+                'deleteWarning'     => 'WARNING! Deleting users roles can have a serious impact on your system and may prevent access to various users/records throughout the system- please consult Schoolbox helpdesk if you require more information. Are you sure you want to delete this role?',
                 'mapper'            => RoleMapper::class,                       // Mapper for the list item
                 //'findAllMethod'     => 'findAllIncludeHidden',                // By default it uses the findAll() method of the mapper- however you can override this. Necessary for 'components' page where findAll is overridden to not return items with 'visible = false'
                 'fixed'             => [                                        // This is a list of fixed values added to new items, useful if there are hidden items that need default values
@@ -192,7 +224,7 @@ class Controller extends Base
                             ['key' => 1, 'value' => 'Yes'],
                             ['key' => 0, 'value' => 'No'],
                         ],
-                        'width'     => 3,
+                        'width'     => 2,
                     ]
                 ]
             ],
@@ -419,7 +451,7 @@ class Controller extends Base
             return;
         }
 
-        /** @var \Schoolbox\Mapper $mapper */
+        /** @var Mapper $mapper */
         $mapper     = new $tables[$table]['mapper'];
         $model_name = $mapper->getModel();
         $prototype  = new $model_name;

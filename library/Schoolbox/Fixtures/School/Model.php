@@ -7,9 +7,7 @@
 
 namespace Schoolbox\Fixtures\School;
 
-
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model implements ISoftDeletable

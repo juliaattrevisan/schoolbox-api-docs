@@ -1,6 +1,6 @@
 <?php
 /**
- * Description of the file and what its purpose is
+ * Schoolbox user role mapper
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2013 Alaress Pty Ltd
@@ -8,7 +8,8 @@
  */
 
 namespace Schoolbox;
-use Schoolbox;
+
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
 class RoleMapper extends Mapper {
 
@@ -19,41 +20,26 @@ class RoleMapper extends Mapper {
     const ROLE_STUDENT = 'student';
     const ROLE_GUEST   = 'guest';
 
-    protected function mapping () {
+    /**
+     * Setup mapper
+     */
+    protected function mapping() {
 
         $this->hasTable('groups');
         $this->hasModel(Role::class);
 
-        $this->hasMap(array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => Mapper::TYPE_INTEGER,
-                'identifier' => true
-        ));
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('group_type', self::TYPE_STRING, null, 'type');
+        $this->uses('can_change_password', self::TYPE_BOOLEAN);
+        $this->uses('digest_schedule', self::TYPE_STRING);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->hasMap(array(
-                'column'     => 'name',
-                'property'   => 'name',
-                'type'       => Mapper::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-                'column'     => 'group_type',
-                'property'   => 'type',
-                'type'       => Mapper::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-                'column'     => 'can_change_password',
-                'property'   => 'canChangePassword',
-                'type'       => Mapper::TYPE_BOOL_ENUM,
-        ));
-
-        $this->hasMap(array(
-            'column'   => 'digest_schedule',
-            'property' => 'digestSchedule',
-            'type'     => self::TYPE_STRING,
-        ));
+        $this->registerCallback(
+            self::CALLBACK_POSTSOFTDELETE,
+            function (Role $role) {
+                Pastoral\Access\Mapper::getInstance()->deleteByColumn('role_id', $role->getId());
+            }
+        );
     }
-
 }

@@ -568,29 +568,9 @@ class Mapper extends BaseMapper
         $record->setCommentList($this->getPastoralCommentMapper()->findByColumn("pastoral_id", $record->getId()));
         $record->setAttachmentList($this->getPastoralAttachmentMapper()->findByColumn("pastoral_id", $record->getId()));
 
-        // Grab users and roles
+        // Grab users and roles that have access to the record
 
         $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
-
-        foreach ($record->getAccessList() as $access) {
-            if ($access->getRole()->getId() != '') {
-                try {
-                    /** @var \Schoolbox\Role $role */
-                    $role = $this->getRoleMapper()->findById($access->getRole()->getId());
-                    $access->setRole($role);
-                } catch (MapperException $e) {
-                    throw new MapperException('Instance of object not found');
-                }
-            } else {
-                if ($access->getUser()->getId() != '') {
-                    try {
-                        $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
-                    } catch (MapperException $e) {
-                        throw new MapperException('Instance of object not found');
-                    }
-                }
-            }
-        }
 
         // Grab comment authors
 

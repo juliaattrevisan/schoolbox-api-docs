@@ -1,22 +1,27 @@
 <?php
 /**
- * Description of the file and what its purpose is
+ * Schoolbox user role model
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2013 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  */
 namespace Schoolbox;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Role implements ValueLabelInterface
+class Role implements ValueLabelInterface, ISoftDeletable
 {
+    use ModelTrait\DeletedAtDate;
 
     /** @var int */
     private $id;
+
     /** @var string */
     private $name;
+
     /** @var string */
     private $type; //Type of user group, guest, student, parent, staff
+
     /** @var bool */
     private $canChangePassword; //Users can change passwords (bool)
 
@@ -113,7 +118,6 @@ class Role implements ValueLabelInterface
         ];
     }
 
-
     /* Getters/Setters
      */
 
@@ -188,5 +192,4 @@ class Role implements ValueLabelInterface
     {
         return $this->digestSchedule;
     }
-
 }

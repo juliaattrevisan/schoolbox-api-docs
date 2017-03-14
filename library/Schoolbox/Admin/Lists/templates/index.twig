@@ -47,6 +47,28 @@
             });
         });
 
+        $('[data-delete]').click(function (event) {
+            event.preventDefault();
+
+            var deleteId = $(this).data('delete');
+            var listItem = $(this).closest('li');
+
+            $(this).confirmDialog({
+                    text: '{{ tables[table].deleteWarning }}',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('adminLists.postDelete') }}', {
+                        table: '{{ table }}',
+                        id: deleteId
+                    })
+                    .done(function (response) {
+                        if (response.result !== false) {
+                            listItem.remove();
+                        }
+                    });
+                }
+            });
+        });
+
         {# Wire up colour pickers #}
 
         $("[data-colour-picker]").spectrum({
@@ -120,6 +142,10 @@
                                 {% endif %}
                             {% endfor %}
 
+                            {% if tables[table].delete %}
+                                <div class="hide-for-small-down medium-1 columns">
+                                </div>
+                            {% endif %}
                         </div>
                     </li>
 
@@ -127,7 +153,7 @@
 
                     {% for key,record in records %}
 
-                        <li class="no-border">
+                        <li class="no-border {% if tables[table].delete %}actions-small-1{% endif %}">
                             <input type="hidden" name="id[]" value="{{ key }}">
 
                             {% set recordIndex = loop.index %}
@@ -203,6 +229,11 @@
 
                             </div>
 
+                            {%  if tables[table].delete %}
+                                <nav class="hide-for-small-down">
+                                    <a class="icon-delete no-text" href="#" data-delete="{{ key }}" title="Delete"></a>
+                                </nav>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>

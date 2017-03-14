@@ -10,11 +10,10 @@
 
 namespace Schoolbox\Pastoral\Access;
 
-use Schoolbox\Collection;
+use PDOStatement;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
 
@@ -34,41 +33,71 @@ class Mapper extends BaseMapper
         $this->hasSoftDeleteDateField('deleted_at');
     }
 
+
+    /**
+     * Return the first part of the string required to select from this mapper
+     *
+     * @throws BaseMapper\DefinitionException
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+			SELECT
+				{$this->getColumnString()},
+                {$this->getJoinColumnString('role', 'r')},
+                {$this->getJoinColumnString('user', 'u')}
+			FROM
+				`{$this->getTable()}`
+                LEFT JOIN {$this->getJoinSql('role', '', 'r')}
+                LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @throws Exception
+     * @return GenericCollection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if (empty($row['u.id']) && empty($row['r.id'])) {
+                // this record is invalid and should be deleted; skip
+                continue;
+            }
+
+            /** @var Model $access */
+            $access = $this->hydrate($row);
+
+            if ($row['u.id']) {
+                /** @noinspection PhpParamsInspection */
+                $access->setUser($this->hydrateJoin($row, 'user', 'u'));
+            }
+
+            if ($row['r.id']) {
+                /** @noinspection PhpParamsInspection */
+                $access->setRole($this->hydrateJoin($row, 'role', 'r'));
+            }
+
+            $c->add($access);
+        }
+
+        return $c;
+    }
+
+
     /**
      * Retrieves all access relating to a particular pastoral id
      *
      * @param  int $pastoralId
-     * @return \Schoolbox\Collection
+     * @return GenericCollection
      */
     public function findByPastoralId($pastoralId)
     {
-        $query = "
-			SELECT
-				{$this->getColumnString('r')},
-                {$this->getJoinColumnString('role', 'rl')},
-                {$this->getJoinColumnString('user', 'u')}
-			FROM
-				`{$this->getTable()}` `r`
-                LEFT JOIN {$this->getJoinSql('role', 'r', 'rl')}
-                LEFT JOIN {$this->getJoinSql('user', 'r', 'u')}
-			WHERE
-				`r`.`deleted_at` IS NULL AND
-				`r`.`pastoral_id` = :pastoralId
-			";
-
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(':pastoralId', $pastoralId);
-        $statement->execute();
-
-        $collection = new Collection();
-
-        foreach ($statement as $row) {
-            $pastoral = $this->hydrate($row, 'a');
-            $pastoral->setRole($this->hydrateJoin($row, 'role', 'r'));
-            $pastoral->setUser($this->hydrateJoin($row, 'user', 'u'));
-            $collection->add($pastoral);
-        }
-
-        return $collection;
+        return $this->findByColumn('pastoral_id', $pastoralId);
     }
 }

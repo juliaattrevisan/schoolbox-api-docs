@@ -717,19 +717,20 @@ class Controller extends Base
 
         $accessRoles = $record->getAccessList();
 
-        $deleteIds = [];
+        /* Delete all the individual access instances for this pastoral record
+         */
+        $deleteIds = trim($post['deleteIds']);
+        $individualAccessIds = [];
 
-        if (trim($post["deleteIds"]) != "") {
-            $deleteIds = explode(",", $post["deleteIds"]);
+        if (strlen($deleteIds)) {
+            $individualAccessIds = array_unique(explode(',', $deleteIds));
+        }
 
-            foreach ($deleteIds as $user_id) {
-                foreach ($accessRoles as $role) {
-                    if ($role->getUser()->getId() == $user_id) {
-                        $this->getPastoralAccessMapper()->delete($role);
-                        break;
-                    }
-                }
-            }
+        foreach ($individualAccessIds as $currentAccessId) {
+            $this->getPastoralAccessMapper()->deleteByColumnList([
+                'pastoral_id' => $record->getId(),
+                'user_id'     => $currentAccessId
+            ]);
         }
 
         // Update the authorised users
@@ -742,11 +743,13 @@ class Controller extends Base
 
                     // Don't re-add deleted users
 
-                    foreach ($accessRoles as $role) {
-                        if ($role->getUser()->getId() == $user_id) {
-                            if (in_array($user_id, $deleteIds)) {
-                                $found = true;
-                                break;
+                    if (count($individualAccessIds)) {
+                        foreach ($accessRoles as $role) {
+                            if ($role->getUser()->getId() == $user_id) {
+                                if (in_array($user_id, $individualAccessIds)) {
+                                    $found = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -804,13 +807,10 @@ class Controller extends Base
 
                 // Delete this access if it exists because its no longer ticked
 
-                $access = $this->getPastoralAccessMapper()->findByColumnList([
-                        'pastoral_id' => $record->getId(),
-                        'role_id' => $role_id
-                    ]
-                );
-
-                $this->getPastoralAccessMapper()->delete($access);
+                $this->getPastoralAccessMapper()->deleteByColumnList([
+                    'pastoral_id' => $record->getId(),
+                    'role_id' => $role_id
+                ]);
             }
         }
 

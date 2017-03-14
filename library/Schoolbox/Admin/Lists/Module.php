@@ -29,6 +29,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getIndex', $basePath, "");
         $this->addGetRoute($router, 'getIndex', $basePath, "{/table}");
         $this->addPostRoute($router, 'postSave', $basePath, "/save");
+        $this->addPostRoute($router, 'postDelete', $basePath, "/delete");
     }
 
     /**
