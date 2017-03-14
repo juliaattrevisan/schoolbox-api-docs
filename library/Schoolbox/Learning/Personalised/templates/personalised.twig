@@ -31,18 +31,6 @@
         background-color: #EEEEEE;
     }
 
-    {# Read-only colors #}
-    .fc-event.unit,
-    .fc-event.project {
-        border-color: #111111;
-        background-color: #111111;
-        color: #EEEEEE;
-    }
-    .fc-event.unit:hover,
-    .fc-event.project:hover {
-        color: #EEEEEE;
-    }
-
     {# Assessment status colors #}
     .fc-event.fail {
         border-color: rgb(247, 206, 204);
@@ -72,6 +60,18 @@
         /* pause */
         content: "\e650 ";
         padding-right: .75em;
+    }
+
+    {# Read-only colors - override other colors #}
+    .fc-event.unit,
+    .fc-event.project {
+        border-color: #111111;
+        background-color: #111111;
+        color: #EEEEEE;
+    }
+    .fc-event.unit:hover,
+    .fc-event.project:hover {
+        color: #EEEEEE;
     }
 </style>
 
