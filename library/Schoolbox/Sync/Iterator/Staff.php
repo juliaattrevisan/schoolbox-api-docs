@@ -16,6 +16,7 @@ use Traversable;
 
 class Staff extends IteratorIterator
 {
+    use StackableHelper;
     use StackableTrait;
 
     /**
@@ -46,8 +47,6 @@ class Staff extends IteratorIterator
         // (copypasted from Adapter->getStaffUserAccountInfo)
         $currentResult = current($preStack);
         $staff         = new User\Staff();
-
-
         $staff
             ->setId($currentResult['staff_id'])
             ->setTitle($currentResult['staff_title'])
@@ -58,6 +57,7 @@ class Staff extends IteratorIterator
             ->setPosition($currentResult['staff_position'])
             ->setDepartment($currentResult['staff_department'])
         ;
+
         $staff
             ->getYear()
             ->setLevel($currentResult['staff_year_level'])
@@ -84,51 +84,16 @@ class Staff extends IteratorIterator
 
         /* Email - one for every item in stack
          */
-        $email = [];
-        foreach ($preStack as $result) {
-            $email = array_merge(
-                $email,
-                preg_split('/[,;]/', $result['email'])
-            );
-        }
-        foreach (array_unique($email) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
 
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $staff->addEmail($currentEmail);
-            }
-        }
-
-        /* Work Email - one for every item in stack
-         */
-        $workEmail = [];
-        foreach ($preStack as $result) {
-            $workEmail = array_merge(
-                $workEmail,
-                preg_split('/[,;]/', $result['work_email'])
-            );
-        }
-        foreach (array_unique($workEmail) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
-
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $staff->addWorkEmail($currentEmail);
-            }
-        }
+        array_map([$staff, "addEmail"], $this->columnValuesAsEmail($preStack, 'default_email'));
+        array_map([$staff, "addWorkEmail"], $this->columnValuesAsEmail($preStack, 'work_email'));
+        array_map([$staff, "addHomeEmail"], $this->columnValuesAsEmail($preStack, 'home_email'));
 
         /* Position - one for every item in stack
          */
-        $position = [];
-        foreach ($preStack as $result) {
-            if (!empty($result['staff_position'])) {
-                $position [] = $result['staff_position'];
-            }
-        }
-        $staff->getMeta()->setPosition($position);
+
+        $staff->getMeta()->setPosition($this->columnValuesAsArray($preStack, 'staff_position'));
+
         /* Campus
          */
         $campus = new User\Common\Campus();

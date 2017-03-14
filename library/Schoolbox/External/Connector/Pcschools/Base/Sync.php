@@ -42,7 +42,8 @@ class Sync implements SyncInterface
                 S.GIVEN_NAME    AS student_preferred,
                 S.LEGAL_SURNAME AS student_surname,
                 S.SEX           AS student_gender,
-                S.EMAIL         AS student_email,
+                ''              AS student_home_email,
+                S.EMAIL         AS student_default_email,
                 ''              AS student_work_email,
                 S.CURRENT_YEAR  AS student_year_level,
                 S.HOUSE         AS student_house,
@@ -79,7 +80,9 @@ class Sync implements SyncInterface
                 F.DAD_FIRSTNAME AS student_contact_given_name,
                 F.DAD_FIRSTNAME AS student_contact_preferred,
                 F.DAD_SURNAME   AS student_contact_surname,
+                ''              AS student_contact_home_email,
                 F.DAD_EMAIL     AS student_contact_default_email,
+                ''              AS student_contact_work_email,
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
@@ -95,7 +98,9 @@ class Sync implements SyncInterface
                 F.MUM_FIRSTNAME AS student_contact_given_name,
                 F.MUM_FIRSTNAME AS student_contact_preferred,
                 F.MUM_SURNAME   AS student_contact_surname,
+                ''              AS student_contact_home_email,
                 F.MUM_EMAIL     AS student_contact_default_email,
+                ''              AS student_contact_work_email,
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
@@ -111,7 +116,9 @@ class Sync implements SyncInterface
                 F.CGIVE_FIRSTNAME AS student_contact_given_name,
                 F.CGIVE_FIRSTNAME AS student_contact_preferred,
                 F.CGIVE_SURNAME   AS student_contact_surname,
+                ''                AS student_contact_home_email,
                 F.CGIVE_EMAIL     AS student_contact_default_email,
+                ''                AS student_contact_work_email,
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
@@ -127,7 +134,9 @@ class Sync implements SyncInterface
                 F.GUARD_FIRSTNAME AS student_contact_given_name,
                 F.GUARD_FIRSTNAME AS student_contact_preferred,
                 F.GUARD_SURNAME   AS student_contact_surname,
+                ''                AS student_contact_home_email,
                 F.GUARD_EMAIL     AS student_contact_default_email,
+                ''                AS student_contact_work_email,
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
@@ -154,8 +163,9 @@ class Sync implements SyncInterface
                 T.GIVEN_NAMES    AS staff_preferred_name,
                 T.SURNAME        AS staff_surname,
                 ''               AS default_email_code,
+                ''               AS home_email,
+                T.EMAIL          AS default_email,
                 ''               AS work_email,
-                T.EMAIL          AS email,
                 T.CAMPUS         AS staff_campus,
                 T.CLASSIFICATION AS staff_category_type,
                 T.STATUS         AS staff_category,

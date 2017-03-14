@@ -105,18 +105,25 @@ abstract class Base {
     protected $homeAddress = null;
 
     /**
-     * Email address
+     * Default email address
      *
      * @var \Schoolbox\Collection
      */
     protected $email = '';
 
     /**
-     * Work Email address
+     * Work email address
      *
      * @var \Schoolbox\Collection
      */
     protected $workEmail = '';
+
+    /**
+     * Home email address
+     *
+     * @var \Schoolbox\Collection
+     */
+    protected $homeEmail = '';
 
     /**
      * Home phone
@@ -199,6 +206,23 @@ abstract class Base {
 
         return $this;
     }
+
+    /**
+     * Delegate method
+     *
+     * Add a home email to the collection
+     *
+     * @param Email $homeEmail
+     * @return $this
+     */
+    public function addHomeEmail($homeEmail)
+    {
+        if (strlen(trim($homeEmail->getAddress()))) {
+            $this->getHomeEmail()->add($homeEmail);
+        }
+
+        return $this;
+    }    
 
     /* Getters/Setters
      */
@@ -311,6 +335,28 @@ abstract class Base {
     public function getWorkEmail()
     {
         return $this->workEmail;
+    }
+
+    /**
+     * Set home email
+     *
+     * @param Collection $homeEmail
+     * @return $this
+     */
+    public function setHomeEmail($homeEmail)
+    {
+        $this->homeEmail = $homeEmail;
+        return $this;
+    }
+
+    /**
+     * Get home email
+     *
+     * @return Collection
+     */
+    public function getHomeEmail()
+    {
+        return $this->homeEmail;
     }
 
     /**

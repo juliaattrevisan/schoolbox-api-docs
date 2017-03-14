@@ -20,6 +20,7 @@ use Traversable;
 
 class Guardian extends IteratorIterator
 {
+    use StackableHelper;
     use StackableTrait;
 
     /**
@@ -65,41 +66,10 @@ class Guardian extends IteratorIterator
 
         /* Email - one for every item in stack
          */
-        $email = [];
-        foreach ($preStack as $result) {
-            $email = array_merge(
-                $email,
-                preg_split('/[,;]/', $result['student_contact_default_email'])
-            );
-        }
-        foreach (array_unique($email) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
 
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $guardian->addEmail($currentEmail);
-            }
-        }
-
-        /* Work Email - one for every item in stack
-         */
-        $workEmail = [];
-        foreach ($preStack as $result) {
-            $workEmail = array_merge(
-                $workEmail,
-                preg_split('/[,;]/', $result['student_contact_work_email'])
-            );
-        }
-        foreach (array_unique($workEmail) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
-
-            /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $guardian->addWorkEmail($currentEmail);
-            }
-        }
+        array_map([$guardian, "addEmail"], $this->columnValuesAsEmail($preStack, 'student_contact_default_email'));
+        array_map([$guardian, "addWorkEmail"], $this->columnValuesAsEmail($preStack, 'student_contact_work_email'));
+        array_map([$guardian, "addHomeEmail"], $this->columnValuesAsEmail($preStack, 'student_contact_home_email'));
 
         /* Account
          */
