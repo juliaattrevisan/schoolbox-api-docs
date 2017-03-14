@@ -23,11 +23,13 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
     /**
      * @param string $delimiter
+     * @param bool   $recursive
      * @return Router
      */
-    public static function newRouter($delimiter)
+    public static function newRouter($delimiter, $recursive)
     {
-        return new Router(new SubscriptionDictionary($delimiter));
+        // we are running a
+        return new Router(new SubscriptionDictionary($delimiter), $recursive);
     }
 
 
@@ -39,7 +41,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         // preload a router for use in pattern match tests
-        self::$testGet = $r = self::newRouter(':');
+        self::$testGet = $r = self::newRouter(':', false);
 
         // the order of these patterns is important: by inserting the more generic ones
         // before their specific counterparts it ensures that the sorting works as expected
@@ -65,7 +67,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
      */
     public function testLiteralPathGet()
     {
-        $router = static::newRouter(':');
+        $router = static::newRouter(':', false);
 
         $router->add('foo:42:bar', 'foobar42key', 'foobar42value');
         $router->add('foo:42:baz', 'foobaz42key', 'foobaz42value');

@@ -8,7 +8,6 @@
 
 namespace Alaress\Routing\Route;
 
-use Alaress\Routing\Route;
 use Alaress\Routing\Trie;
 use InvalidArgumentException;
 
