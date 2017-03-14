@@ -22,6 +22,11 @@ if (is_numeric($_SESSION['id'])) {
 else {
     $page->setFile(TEMPLATE_body, 'feedback/thank-you-unauthenticated.html');
 
+    $page->setVar([
+        'FEEDBACK_TEXT' => Cfg::get('feedback_text'),
+        'FEEDBACK_URL' => Cfg::get('feedback_url'),
+    ]);
+
     $page->setLite(true);
     $page->outputPage(true);
 }
