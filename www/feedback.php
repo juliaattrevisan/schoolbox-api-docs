@@ -25,8 +25,6 @@ if (is_numeric($_SESSION['id'])) {
         'TITLE' => Cfg::get('title'),
         'NAME'  => $userHandler->formatName($user),
         'EMAIL' => $email->formatEmailFromArray($user),
-        'FEEDBACK_TEXT' => Cfg::get('feedback_text'),
-        'FEEDBACK_URL' => Cfg::get('feedback_url'),
     ));
 
     $page->setVar('recaptcha_block', '');
