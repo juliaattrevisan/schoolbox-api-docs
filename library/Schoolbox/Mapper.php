@@ -984,6 +984,41 @@ abstract class Mapper implements IMapper, Serializable
         return $this->hasMap($map);
     }
 
+    /**
+     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
+     *
+     * Use this when a parent object has 0|1 relationship to a child object, where
+     * the join is defined on the child's table.
+     *
+     * @param string      $foreignKey      The foreign key on the other table
+     * @param string      $foreignMapper
+     * @param string      $localColumn     The primary key on this table
+     * @param string      $property
+     * @param string      $name
+     * @return bool
+     */
+    protected function joinsReverseSingle($foreignKey, $foreignMapper, $localColumn = null, $property = null, $name = null)
+    {
+        return $this->joinsReverse($foreignKey, $foreignMapper, $localColumn, self::TYPE_MODEL, null, $property, $name);
+    }
+
+    /**
+     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
+     *
+     * Use this when a parent object has a Collection of 0:N children objects associated with it, where
+     * the join is defined on the children's table.
+     *
+     * @param string      $foreignKey      The foreign key on the other table
+     * @param string      $foreignMapper
+     * @param string      $localColumn     The primary key on this table
+     * @param string      $property
+     * @param string      $name
+     * @return bool
+     */
+    protected function joinsReverseMany($foreignKey, $foreignMapper, $localColumn = null, $property = null, $name = null)
+    {
+        return $this->joinsReverse($foreignKey, $foreignMapper, $localColumn, self::TYPE_COLLECTION, null, $property, $name);
+    }
 
     /**
      * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
