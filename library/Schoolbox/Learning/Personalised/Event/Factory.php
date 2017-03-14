@@ -219,7 +219,7 @@ class Factory
 
             } else {
                 // No feedback yet. Is there a response?
-                if (!$participantObject->isFeedbackRequired()) {
+                if ($assessable->isPublished() && !$participantObject->isFeedbackRequired()) {
                     $className[] = 'notmarked';
                 }
 
