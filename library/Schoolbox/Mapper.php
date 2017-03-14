@@ -2729,7 +2729,10 @@ abstract class Mapper implements IMapper, Serializable
     {
         $modelList = $this->createCollection();
         foreach ($rowList as $row) {
-            $modelList->add($this->hydrate($row, $alias, $callback));
+            $model = $this->hydrate($row, $alias, $callback);
+            if($model){
+                $modelList->add($model);
+            }
         }
         return $modelList;
     }
