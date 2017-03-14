@@ -126,6 +126,9 @@
 
             // clear the list
             bulky.list.html('');
+
+            // re-enable submit button
+            bulky.submitButton.removeAttr('disabled');
         });
 
         this.submitButton.on('click', function (e) {
