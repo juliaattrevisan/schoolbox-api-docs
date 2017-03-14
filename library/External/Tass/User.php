@@ -181,36 +181,96 @@ class External_Tass_User implements External_UserInterface
 
     function getStudentContactList($tassID)
     {
-        /* commrules support not added here
-         * based on the ?good/?bad assumption that the contacts to show on a
-         * students profile should only be the primary ones from the parent table
+        /* students profile should provide all parents, but only show contact info if not in a split family
          */
-        $query = "SELECT  'P' + student.par_code as StudentContactID,
-                          parent.f_name StudentContactPreferred,
-                          addr1 StudentContactAddress1,
-                          addr2 StudentContactAddress2,
-                          addr3 StudentContactAddress3,
-                          town_sub StudentContactSuburb,
-                          state_code StudentContactState,
-                          post_code StudentContactPostCode,
-						  home_phone as StudentContactPhoneActual,
-						  bus_phone as StudentContactOccupPhone,
-						  mobile1 as StudentContactMobilePhone,
-						  parent.m_name as StudentContactSpousePreferred,
-                          mobile2 as StudentContactSpouseMobilePhone
-						FROM student
-						JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
-						JOIN paraddress ON parent.par_code = paraddress.par_code AND paraddress.cmpy_code = parent.cmpy_code AND add_num = 1
-						WHERE stud_code = '$tassID'
-					";
+        $query = "SELECT DISTINCT
+                      CASE
+                          WHEN (sf.sfa_num) IS NULL
+                          THEN 'P' + RTRIM(parent.par_code)
+                          ELSE 'P' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
+                      END                 AS StudentContactID,
+                      sf.sfa_num          AS StudentContactSplitFamilyNumber,
+                      pa.add_num          AS StudentContactAddressNumber,
+                      parent.f_name       AS StudentContactPreferred,
+                      pa.addr1            AS StudentContactAddress1,
+                      pa.addr2            AS StudentContactAddress2,
+                      pa.addr3            AS StudentContactAddress3,
+                      pa.town_sub         AS StudentContactSuburb,
+                      pa.state_code       AS StudentContactState,
+                      pa.post_code        AS StudentContactPostCode,
+                      pa.home_phone       AS StudentContactPhoneActual,
+                      pa.bus_phone        AS StudentContactOccupPhone,
+                      CASE
+                          WHEN
+                               RTRIM(pa.mobile1) IS NOT NULL
+                          THEN RTRIM(pa.mobile1)
+                          ELSE RTRIM(pa.mobile2)
+                      END                 AS StudentContactMobilePhone,
+                      pa.mobile2          AS StudentContactSpouseMobilePhone
+                  FROM student
+                  JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
+                  JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ('5','1')
+                  LEFT JOIN pia_sfaccess AS sf
+                      ON parent.par_code = sf.par_code
+                      AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                      AND parent.cmpy_code = sf.cmpy_code
+                  WHERE stud_code = '$tassID'
+
+              UNION
+
+                  SELECT DISTINCT
+                      CASE
+                          WHEN (sf.sfa_num) IS NULL
+                          THEN 'S' + RTRIM(parent.par_code)
+                          ELSE 'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
+                      END                 AS StudentContactID,
+                      sf.sfa_num          AS StudentContactSplitFamilyNumber,
+                      pa.add_num          AS StudentContactAddressNumber,
+                      parent.m_name       AS StudentContactPreferred,
+                      pa.addr1            AS StudentContactAddress1,
+                      pa.addr2            AS StudentContactAddress2,
+                      pa.addr3            AS StudentContactAddress3,
+                      pa.town_sub         AS StudentContactSuburb,
+                      pa.state_code       AS StudentContactState,
+                      pa.post_code        AS StudentContactPostCode,
+                      pa.home_phone       AS StudentContactPhoneActual,
+                      pa.bus_phone        AS StudentContactOccupPhone,
+                      CASE
+                          WHEN
+                               RTRIM(pa.mobile1) IS NOT NULL
+                          THEN RTRIM(pa.mobile1)
+                          ELSE RTRIM(pa.mobile2)
+                      END                 AS StudentContactMobilePhone,
+                      pa.mobile2          AS StudentContactSpouseMobilePhone
+                  FROM student
+                  JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
+                  JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ('4','1')
+                  LEFT JOIN pia_sfaccess AS sf
+                      ON parent.par_code = sf.par_code
+                      AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                      AND parent.cmpy_code = sf.cmpy_code
+                  WHERE stud_code = '$tassID'
+        ";
 
         $parents = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 
-        // Kludge to add spouse ID
-
         foreach ($parents as $key => $parent) {
-            if (!empty($parent['StudentContactSpousePreferred'])) {
-                $parents[$key]['StudentContactSpouseID'] = str_replace("P", "S", $parent['StudentContactID']);
+            /* If a parent is a split family via split family access (SFA) codes
+             * or by communications rules (commrules),
+             * don't display contact information
+             */
+            if (!empty($parent['StudentContactSplitFamilyNumber'])) {
+                unset($parents[$key]);
+            }
+
+            /* Fallback to add_num 1 when there is no add_num 4 or add_num 5
+             */
+            if ($parent['StudentContactAddressNumber'] == '1') {
+                foreach ($parents as $key2 => $parent2) {
+                    if ($parent['StudentContactID'] = $parent2['StudentContactID'] && ($parent2['StudentContactAddressNumber'] = '4' OR $parent2['StudentContactAddressNumber'] = '5')) {
+                        unset($parents[$key]);
+                    }
+                }
             }
         }
 
