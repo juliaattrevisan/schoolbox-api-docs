@@ -373,15 +373,21 @@ class Controller extends Base
             $user = new \Schoolbox\User();
 
             // Set password
-
-            $user->setPassword($post['modpassword'] == '' ? null : $passwordService->hash($post['modpassword']));
+            if ($post['modpassword'] == '') {
+                $user->setRetrievablePassword(null)
+                     ->setPassword(null);
+            } else {
+                $user->setRetrievablePassword($post['modpassword'])
+                     ->setPassword($passwordService->hash($post['modpassword']));
+            }
 
         } else {
 
             // Updating an existing user, only password only if the user edited the textbox
 
             if ($post['modpassword'] != 'donotchange') {
-                $user->setPassword($passwordService->hash($post['modpassword']));
+                $user->setRetrievablePassword($post['modpassword'])
+                     ->setPassword($passwordService->hash($post['modpassword']));
             }
         }
 
