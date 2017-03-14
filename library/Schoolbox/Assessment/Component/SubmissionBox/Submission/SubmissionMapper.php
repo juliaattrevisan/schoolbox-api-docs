@@ -44,15 +44,7 @@ class SubmissionMapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        $this->hasJoin(
-            'file',
-            [
-                'mapper'    => SubmissionFileMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'student_submission_id',
-            ]
-        );
+        $this->joinsReverseMulti('student_submission_id', SubmissionFileMapper::class, 'files', 'files');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
@@ -68,9 +60,11 @@ class SubmissionMapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('box_id', 'b')}
+                {$this->getJoinColumnString('box_id', 'b')},
+                {$this->getJoinColumnString('files', 'f')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('box_id', '', 'b')}
+            LEFT JOIN {$this->getJoinSql('files', '', 'f')}
         ";
     }
 
@@ -82,43 +76,36 @@ class SubmissionMapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Collection|Submission[] $resultSet */
-        $resultSet = $this->createCollection();
-        $ids       = [];
+        /** @var Collection|Submission[] $submissions */
+        $submissions = $this->createCollection();
 
         // Default hydration
-        foreach ($statement as $row) {
-            $result = $this->hydrate($row);
-            $ids[]  = $result->getId();
+        $submission = null;
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
-            // I should never need to know the student's specifics here,
-            // because this object should always be part of a participant's
-            // response or feedback.
+            // First time we've seen this submission ?
+            if(!$submissions->offsetExists($row[$this->getIdentifierColumn()])){
+                $submission = $this->hydrate($row);
+                // I should never need to know the student's specifics here,
+                // because this object should always be part of a participant's
+                // response or feedback.
 
-            // Try to streamline duework+assessment creation too
-            /** @var SubmissionBox $dueWork */
-            $dueWork = $this->createJoinModel('box_id', $row['b.id']);
-            $dueWork->setAssessmentModel($this->createJoinModel('box_id.assessmentModel', $row['b.assessment_id']));
+                // Try to streamline duework+assessment creation too
+                /** @var SubmissionBox $dueWork */
+                $dueWork = $this->createJoinModel('box_id', $row['b.id']);
+                $dueWork->setAssessmentModel($this->createJoinModel('box_id.assessmentModel', $row['b.assessment_id']));
+                $submission->setSubmissionBox($dueWork);
 
-            $resultSet->add(
-                $result
-                    ->setSubmissionBox($dueWork)
-            );
-        }
+                $submissions->setOffset($submission->getId(), $submission);
+            }
 
-        // Fetch and hydrate files
-        $files = $this->getJoinMapper('file')
-            ->findByColumn('student_submission_id', $ids)
-            ->groupByCallback(function($f) {
-                /** @var SingleFile\Model $f */
-                return $f->getSubmission()->getId();
-            });
-        foreach ($resultSet as $result) {
-            if (isset($files[$result->getId()])) {
-                $result->setFiles($files[$result->getId()]);
+            // Hydrate files
+            if(null !== $row['f.id']){
+                $submission->getFiles()->add($this->hydrateJoin($row, 'files', 'f'));
             }
         }
-        return $resultSet;
+
+        return $submissions;
     }
 
 
