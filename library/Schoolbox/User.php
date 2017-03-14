@@ -1309,5 +1309,4 @@ class User implements JsonSerializable, ISoftDeletable
         $this->teacherCollection = $teacherCollection;
         return $this;
     }
-
 }

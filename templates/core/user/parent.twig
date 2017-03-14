@@ -18,8 +18,8 @@
         </div>
     </div>
     <nav>
-        {% if isSuperuser %}
-        <a href="/adminv2/modify-user/{{ user.getId() }}" class="icon-modify" title="Modify User"></a>
+        {% if routeLookupIfAuthorized('adminUser.getModify') %}
+            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User"></a>
         {% endif %}
     </nav>
 </div>

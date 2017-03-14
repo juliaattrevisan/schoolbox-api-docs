@@ -22,7 +22,7 @@
 
         var openModifyScreen = function(event) {
             event.preventDefault();
-            window.location.href = '/adminv2/modify-user/'+modifyForm.find(':input[name="userId"]').val();
+            window.location.href = '/adminv2/user/'+modifyForm.find(':input[name="userId"]').val() + '/modify';
         };
         modifyForm.submit(openModifyScreen);
 
@@ -90,7 +90,7 @@
             <section class="content">
                 <input data-selectizeuser type="text" name="userId" placeholder="Search Users">
                 <button type="submit" class="icon-modify" disabled>Modify</button>
-                <a class="button icon-add" href="/adminv2/modify-user/">Add User</a>
+                <a class="button icon-add" href="/adminv2/user/create">Add User</a>
             </section>
         </form>
 
@@ -113,7 +113,7 @@
             <tr>
                 <td>{SUPERUSER_NAME}</td>
                 <td>{SUPERUSER_LOGIN}</td>
-                <td><a class="no-text icon-modify" title="Modify" href="/adminv2/modify-user/{SUPERUSER_ID}"></a></td>
+                <td><a class="no-text icon-modify" title="Modify" href="/adminv2/user/{SUPERUSER_ID}/modify"></a></td>
             </tr>
             <!-- END superusers -->
             </tbody>
