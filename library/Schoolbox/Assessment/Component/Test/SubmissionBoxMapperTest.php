@@ -22,7 +22,7 @@ class SubmissionBoxMapperTest extends TestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->object = new SubmissionBoxMapper();
+		$this->object = SubmissionBoxMapper::getInstance();
 		$this->object->setConfigLoader(new TestLoader());
 	}
 
