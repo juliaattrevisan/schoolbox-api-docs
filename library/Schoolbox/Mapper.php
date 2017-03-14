@@ -1015,13 +1015,18 @@ abstract class Mapper implements IMapper, Serializable
      * @param string      $name
      * @return bool
      */
-    protected function joinsReverseMany($foreignKey, $foreignMapper, $localColumn = null, $property = null, $name = null)
+    protected function joinsReverseMulti($foreignKey, $foreignMapper, $localColumn = null, $property = null, $name = null)
     {
-        return $this->joinsReverse($foreignKey, $foreignMapper, $localColumn, self::TYPE_COLLECTION, null, $property, $name);
+        return $this->joinsReverse($foreignKey, $foreignMapper, $localColumn, self::TYPE_COLLECTION, self::COLUMN_JOIN_MULTI, $property, $name);
     }
 
     /**
      * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
+     *
+     * Private to prevent direct calls from concrete mappers.
+     * Use the helpers instead as they make the single/multi choice explicit.
+     * @see $this->joinsReverseSingle
+     * @see $this->joinsReverseMany
      *
      * @param string      $foreignKey
      * @param string      $foreignMapper
