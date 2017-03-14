@@ -356,7 +356,7 @@ class Session
             }
         }
 
-        // test authentication in secondary server
+        // test authentication in tertiary server
         if (Cfg::get('ldap_host_ter')) {
             $ds = ldap_connect(Cfg::get('ldap_host_ter'));
             if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user_ter'), Cfg::get('ldap_base_ter'))) {
