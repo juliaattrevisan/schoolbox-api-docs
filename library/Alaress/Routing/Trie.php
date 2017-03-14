@@ -94,7 +94,7 @@ class Trie
     public function match($key)
     {
         if (empty($this->tries)) {
-            return [];
+            return;
         }
 
         foreach ($this->tries as $pattern => $trie) {
