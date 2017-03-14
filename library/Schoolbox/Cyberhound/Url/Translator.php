@@ -78,7 +78,8 @@ class Translator
             /* Test if user is local before using API */
             $local = false;
             foreach($this->whitelist as $range) {
-                if($local = IpUtils::checkIp($this->ip, $range)) {
+                if(IpUtils::checkIp($this->ip, $range)) {
+                    $local = true;
                     break;
                 }
             }
