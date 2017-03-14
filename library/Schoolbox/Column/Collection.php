@@ -41,41 +41,43 @@ class Collection implements IColumnType {
 
 
 	/**
-	 * Translates a value from a database field or other data store, into a
-	 * string, integer or object value for use in a model object.
+	 * Creates an Collection of the specified type.
 	 *
-	 * @param array $value
-	 * @param \Schoolbox\Mapper $mapper
+     * @param array|string      $value Mapper infrastructure always passes a string.
+     * @param \Schoolbox\Mapper $mapper
 	 *
 	 * @return \Schoolbox\Collection
 	 */
-	public function hydrate($value, $mapper = null) {
-
-		// Figure out the identifier property to set on the model.
-		$id_property = $this->getIdentifierProperty();
-		$identifier_method  = isset($id_property) ?
-			$mapper->getSetMethodName($id_property) :
-			$mapper->getSetIdentifierMethodName();
-
-		$collection = $mapper
+	public function hydrate($value, $mapper = null)
+    {
+        $collection = $mapper
             ? new GenericCollection($mapper->getModel())
             : new \Schoolbox\Collection();
 
-		foreach((array)$value as $v) {
-			$model = $mapper->createModel();
-			$model->$identifier_method($v);
-			$collection->add($model);
-		}
+        /* In the current mapper infrastructure, $value is always a string, never an array - so this code
+         * is never executed. It is however retained to make in symmetrical with dehydrate()
+         */
+        if(is_array($value)){
+            // Figure out the identifier property to set on the model.
+            $id_property = $this->getIdentifierProperty();
+            $identifier_method  = isset($id_property) ?
+                $mapper->getSetMethodName($id_property) :
+                $mapper->getSetIdentifierMethodName();
 
+            foreach($value as $v) {
+                $model = $mapper->createModel();
+                $model->$identifier_method($v);
+                $collection->add($model);
+            }
+        }
 
-		return $collection;
+        return $collection;
 	}
 
 
 	/**
-	 * Translates a value from a value in a model object into a value for a
-	 * database field or other data store.
-	 *
+	 * Important! This is called by diff() as well as dehydrate(), so we do need to retain it.
+     *
 	 * @param \Schoolbox\Collection $value
 	 * @param \Schoolbox\Mapper $mapper
 	 *
