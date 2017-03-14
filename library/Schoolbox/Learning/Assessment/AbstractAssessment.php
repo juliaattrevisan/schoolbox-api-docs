@@ -258,15 +258,19 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @return Participant|null
      */
-    protected function findParticipantIfExtant(User $user)
+    protected function findParticipantIfExtant(User $user = null)
     {
-        $userId = $user->getId();
+        if ($user) {
+            $userId = $user->getId();
 
-        /** @var Participant $currentParticipant */
-        foreach ($this->getAllParticipants() as $i => $currentParticipant) {
-            if ($currentParticipant->getUser()->getId() === $userId) {
-                $this->participantCache[$userId] = $i;
-                return $currentParticipant;
+            /** @var Participant $currentParticipant */
+            foreach ($this->getAllParticipants() as $i => $currentParticipant) {
+                if ($currentParticipant->getUser()
+                                       ->getId() == $userId
+                ) {
+                    $this->participantCache[$userId] = $i;
+                    return $currentParticipant;
+                }
             }
         }
 
