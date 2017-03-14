@@ -57,17 +57,11 @@ class Standard extends BaseProcessor
         $streamMetadata = stream_get_meta_data($file->readStream());
         if ($streamMetadata['uri']) {
             // Figure out an image size in megapixels
-            $exifToolOutput = shell_exec(
-                sprintf('exiftool -ImageSize %s', escapeshellarg($streamMetadata['uri']))
-            );
-
-            if (preg_match('/Image Size\s+: (\d+)x(\d+)/', $exifToolOutput, $matches)) {
-                list(, $w, $h) = $matches;
-                $megapixelSize = ($w * $h) / 1000000;
-                if ($megapixelSize >= 50) {
-                    // error out
-                    throw new \OverflowException('File is over 50MP large - aborting');
-                }
+            list($w, $h) = getimagesize($streamMetadata['uri']);
+            $megapixelSize = ($w * $h) / 1000000;
+            if ($megapixelSize >= 50) {
+                // error out
+                throw new \OverflowException('File is over 50MP large - aborting');
             }
         }
 
