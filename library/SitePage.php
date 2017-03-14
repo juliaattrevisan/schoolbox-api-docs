@@ -385,6 +385,8 @@ class SitePage extends Page
             'DATEPICKER_FORMAT' => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
             'MOMENTJS_FORMAT' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
             'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
+            'FEEDBACK_TEXT' => $this->config->get('feedback_text'),
+            'FEEDBACK_URL' => $this->config->get('feedback_url'),
         );
 
         $this->setVar($templateVar);
