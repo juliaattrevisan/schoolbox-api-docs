@@ -47,8 +47,6 @@ class Staff extends IteratorIterator
         // (copypasted from Adapter->getStaffUserAccountInfo)
         $currentResult = current($preStack);
         $staff         = new User\Staff();
-
-
         $staff
             ->setId($currentResult['staff_id'])
             ->setTitle($currentResult['staff_title'])
@@ -59,6 +57,7 @@ class Staff extends IteratorIterator
             ->setPosition($currentResult['staff_position'])
             ->setDepartment($currentResult['staff_department'])
         ;
+
         $staff
             ->getYear()
             ->setLevel($currentResult['staff_year_level'])

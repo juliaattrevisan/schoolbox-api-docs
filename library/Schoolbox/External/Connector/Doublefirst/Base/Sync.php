@@ -70,6 +70,7 @@ class Sync implements SyncInterface
                 ''                                  AS student_home_email,
                 ''                                  AS student_default_email,
                 ''                                  AS student_work_email,
+                ''                                  AS student_occup_email,
                 YearGroup                           AS student_year_level,
                 House                               AS student_house_description,
                 HouseID                             AS student_house,
