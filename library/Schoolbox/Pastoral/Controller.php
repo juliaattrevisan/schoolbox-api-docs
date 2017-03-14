@@ -717,18 +717,18 @@ class Controller extends Base
 
         $accessRoles = $record->getAccessList();
 
-        $deleteIds = [];
+        /* Delete all the individual access instances for this pastoral record
+         */
+        $deleteIds = trim($post['deleteIds']);
 
-        if (trim($post["deleteIds"]) != "") {
-            $deleteIds = explode(",", $post["deleteIds"]);
+        if (strlen($deleteIds)) {
+            $individualAccessIds = array_unique(explode(',', $deleteIds));
 
-            foreach ($deleteIds as $user_id) {
-                foreach ($accessRoles as $role) {
-                    if ($role->getUser()->getId() == $user_id) {
-                        $this->getPastoralAccessMapper()->delete($role);
-                        break;
-                    }
-                }
+            foreach ($individualAccessIds as $currentAccessId) {
+                $this->getPastoralAccessMapper()->deleteByColumnList([
+                    'pastoral_id' => $post['id'],
+                    'user_id'     => $currentAccessId
+                ]);
             }
         }
 
