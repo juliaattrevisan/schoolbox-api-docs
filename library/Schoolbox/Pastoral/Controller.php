@@ -807,13 +807,10 @@ class Controller extends Base
 
                 // Delete this access if it exists because its no longer ticked
 
-                $access = $this->getPastoralAccessMapper()->findByColumnList([
-                        'pastoral_id' => $record->getId(),
-                        'role_id' => $role_id
-                    ]
-                );
-
-                $this->getPastoralAccessMapper()->delete($access);
+                $this->getPastoralAccessMapper()->deleteByColumnList([
+                    'pastoral_id' => $record->getId(),
+                    'role_id' => $role_id
+                ]);
             }
         }
 
