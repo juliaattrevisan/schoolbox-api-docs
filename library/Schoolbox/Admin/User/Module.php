@@ -52,6 +52,7 @@ class Module extends BaseModule
         $this->addPostRoute($router, 'postUpdateGroup', $basePath, "/{userId}/group/{folderId}");
         $this->addPostRoute($router, 'postUpdateService', $basePath, "/{userId}/permission/{service}/{sid}");
 
+        $this->addPostRoute($router, 'postDeleteUser', $basePath, "/{userId}/delete");
         $this->addPostRoute($router, 'postDeletePermission', $basePath, "/{userId}/permission/{service}/{sid}/delete");
         $this->addPostRoute($router, 'postDeleteGroup', $basePath, "/{userId}/group/{folderId}/delete");
         $this->addPostRoute($router, 'postDeleteLinked', $basePath, "/{userId}/linked/{linkedId}/delete");

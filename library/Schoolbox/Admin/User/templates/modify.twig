@@ -26,7 +26,7 @@
             <li><a href="{% if user.enabled %}{{ routeLookup('user.impersonate', {userId: user.id}) }}{% else %}#{% endif %}" class="icon-staff-students" title="{% if user.enabled %}Login as user{% else %}Account Disabled{% endif %}">Impersonate</a>
             </li>
             <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
-            <li><a class="icon-delete" title="Delete User" data-delete>Delete User</a></li>
+            <li><a class="icon-delete" title="Delete User" data-delete data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a></li>
         </ul>
     </div>
 
@@ -610,13 +610,14 @@
             $('[data-delete]').click(function (event) {
                 event.preventDefault();
 
+                var action = $(this).data('action');
+
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this user?',
                     confirmEvent: function () {
-                        var form = $('[data-modify-user-form]');
-
-                        form.find('input[name=type]').val('delete');
-                        form.submit();
+                        $.post(action).done(function() {
+                            window.location = '/adminv2/user'
+                        });
                     }
                 });
             });
