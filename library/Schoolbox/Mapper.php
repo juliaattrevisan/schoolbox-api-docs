@@ -2991,7 +2991,7 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty($this->model)) {
             // no model is defined; explode
-            throw new Exception("Model is undefined, cannot instantiate.");
+            throw new Exception('Model is undefined, cannot instantiate.');
         }
 
         if (!class_exists($this->model)) {
@@ -2999,7 +2999,16 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // create a new, blank model
-        return new $this->model;
+        $model = new $this->model;
+
+        // Ensure any model Collections are instantiated
+        foreach ($this->map as $map){
+            if($map['hydrator'] instanceof Column\Collection){
+                $this->setModelProperty($model, $map['property'], null);
+            }
+        }
+
+        return $model;
     }
 
     /**
