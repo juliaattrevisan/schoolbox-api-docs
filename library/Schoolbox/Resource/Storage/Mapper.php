@@ -26,21 +26,44 @@ use Schoolbox\Mapper\PredicateBuilder;
  */
 class Mapper extends Schoolbox\Mapper implements Receiver
 {
-    /** @var Manager */
-    protected $mgr;
+
+    /**
+     * Lazy-loaded on first use.
+     *
+     * We cannot instantiate during a construct setup hook as it has a dependency on the config loader which will
+     * blow up if getInstance() is called on this class from a php unit test context.
+     ** @var Manager
+    */
+    private $mgr;
 
     /** @var bool */
     private $checkPrevious;
 
     /**
-     * @return void
+     * @return Manager
      */
-    public function setup()
+    public function getManager()
     {
         // TODO this does not belong here, but where does it go
-        $factory = new Schoolbox\Resource\FilesystemFactory();
-        $this->setManager(new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format()));
+
+        if(null === $this->mgr){
+            $factory = new Schoolbox\Resource\FilesystemFactory();
+            $this->mgr = new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format());
+        }
+        return $this->mgr;
     }
+
+
+    /**
+     * @param Manager $mgr
+     * @return self
+     */
+    public function setManager($mgr)
+    {
+        $this->mgr = $mgr;
+        return $this;
+    }
+
 
     /**
      * @param int $idValue
@@ -51,7 +74,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     {
         /** @var Model $model */
         $model = parent::createModel($idValue);
-        $model->setFilesystem($this->mgr->getFilesystem(Manager::FS_STORAGE));
+        $model->setFilesystem($this->getManager()->getFilesystem(Manager::FS_STORAGE));
         return $model;
     }
 
@@ -84,7 +107,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         }
 
         if ($requireSafety) {
-            $this->registerCallback(self::CALLBACK_PRESAVE, [$this->mgr, 'safetyCheck']);
+            $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'safetyCheck']);
         } else {
             $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
                 /** @var Model $model */
@@ -95,8 +118,30 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             });
         }
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, self::CALLBACK_POSTSAVE]);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this->mgr, 'delete']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'deleteStorage' ]);
+    }
+
+
+    /**
+     * Pre-save callback
+     *
+     * @param Model $storage
+     */
+    public function safetyCheck(Model $storage)
+    {
+        $this->getManager()->safetyCheck($storage);
+    }
+
+
+    /**
+     * Post-deletecallback
+     *
+     * @param Model $storage
+     */
+    public function deleteStorage(Model $storage)
+    {
+        $this->getManager()->delete($storage);
     }
 
     /**
@@ -121,7 +166,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             return true;
         }
 
-        return $this->mgr->save($storage);
+        return $this->getManager()->save($storage);
     }
 
     /**
@@ -270,7 +315,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $storage = $this->createModel()->setHash(null);
 
         // explicitly use temporary upload filesystem
-        $storage->setFilesystem($this->mgr->getFilesystem(Manager::FS_TEMP));
+        $storage->setFilesystem($this->getManager()->getFilesystem(Manager::FS_TEMP));
 
         // TODO find a way to remove the need for this truncation
         $tempLocation = str_replace(sys_get_temp_dir(), '', $tempLocation);
@@ -294,23 +339,8 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         return $storage;
     }
 
-    /**
-     * @return Manager
-     */
-    public function getManager()
-    {
-        return $this->mgr;
-    }
 
-    /**
-     * @param Manager $mgr
-     * @return self
-     */
-    public function setManager($mgr)
-    {
-        $this->mgr = $mgr;
-        return $this;
-    }
+
 
     /**
      * @param bool $bool
