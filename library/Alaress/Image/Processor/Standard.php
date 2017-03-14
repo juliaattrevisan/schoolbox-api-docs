@@ -54,15 +54,12 @@ class Standard extends BaseProcessor
         $this->file = $file = $this->getCache()->load();
 
         // Die extremely early if this is corrupted or giant
-        $streamMetadata = stream_get_meta_data($file->readStream());
-        if ($streamMetadata['uri']) {
-            // Figure out an image size in megapixels
-            list($w, $h) = getimagesize($streamMetadata['uri']);
-            $megapixelSize = ($w * $h) / 1000000;
-            if ($megapixelSize >= 50) {
-                // error out
-                throw new \OverflowException('File is over 50MP large - aborting');
-            }
+        // Figure out an image size in megapixels
+        list($w, $h) = getimagesizefromstring($file->read());
+        $megapixelSize = ($w * $h) / 1000000;
+        if ($megapixelSize >= 50) {
+            // error out
+            throw new \OverflowException('File is over 50MP large - aborting');
         }
 
         $mime = $file->getMimetype();
