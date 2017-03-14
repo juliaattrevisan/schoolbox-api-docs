@@ -726,7 +726,7 @@ class Controller extends Base
 
             foreach ($individualAccessIds as $currentAccessId) {
                 $this->getPastoralAccessMapper()->deleteByColumnList([
-                    'pastoral_id' => $post['id'],
+                    'pastoral_id' => $record->getId(),
                     'user_id'     => $currentAccessId
                 ]);
             }
