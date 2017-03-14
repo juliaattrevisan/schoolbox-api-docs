@@ -112,7 +112,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidWebmail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateSynergeticPassword']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateCommunityPortalPassword']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
@@ -126,33 +126,31 @@ class UserMapper extends Mapper
     }
 
     /**
-     * Update password in Synergetic
+     * Update password in community portal
      * @param User $model
      * @return bool
      */
-    public function updateSynergeticPassword(User $model)
+    public function updateCommunityPortalPassword(User $model)
     {
-        if ($this->getConfigLoader()->get('external_enable') && $this->getConfigLoader()->get('external_type') == 'synergetic') {
-            /** @var User $model */
-            if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-                $communityPortalFactory = new CommunityPortalFactory();
-                $communityPortal = $communityPortalFactory->build();
-                try {
-                    $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
-                } catch (\UnexpectedValueException $e) {
-                }
+        /** @var User $model */
+        if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
+            $communityPortalFactory = new CommunityPortalFactory();
+            $communityPortal = $communityPortalFactory->build();
+            try {
+                $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
+            } catch (\UnexpectedValueException $e) {
             }
+        }
 
-            /** @var User $model */
+        /** @var User $model */
 
-            if (!$model->getKey()) {
-                // ensure a key is set when persisting users
-                $model->setKey(substr(md5(uniqid() . time()), 0, 25));
-            }
+        if (!$model->getKey()) {
+            // ensure a key is set when persisting users
+            $model->setKey(substr(md5(uniqid() . time()), 0, 25));
+        }
 
-            if ($model->getRetrievablePassword()) {
-                $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
-            }
+        if ($model->getRetrievablePassword()) {
+            $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
         }
 
         return true;
