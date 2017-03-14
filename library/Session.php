@@ -356,6 +356,14 @@ class Session
             }
         }
 
+        // test authentication in secondary server
+        if (Cfg::get('ldap_host_ter')) {
+            $ds = ldap_connect(Cfg::get('ldap_host_ter'));
+            if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user_ter'), Cfg::get('ldap_base_ter'))) {
+                return true;
+            }
+        }
+
         // failed authentication
         return false;
     }
