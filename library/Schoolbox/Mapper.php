@@ -444,7 +444,6 @@ abstract class Mapper implements IMapper, Serializable
                     if (!(isset($map['join']) && isset($mapper->joins[$map['join']]['multi']))) {
                         throw new Exception("Column must be declared if no multijoin set for it: " . json_encode($map));
                     }
-
                 } else {
                     $columnName = $map['column'];
 
@@ -992,62 +991,34 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param string      $foreignKey      The foreign key on the other table
      * @param string      $foreignMapper
-     * @param string      $localColumn     The primary key on this table
      * @param string      $property
      * @param string      $name
      * @return bool
      */
-    protected function joinsReverseSingle($foreignKey, $foreignMapper, $localColumn = null, $property = null, $name = null)
+    protected function joinsReverseSingle($foreignKey, $foreignMapper, $property = null, $name = null)
     {
-        return $this->joinsReverse($foreignKey, $foreignMapper, $localColumn, self::TYPE_MODEL, null, $property, $name);
+        $localColumn = $this->getIdentifierColumn();
+        $options = self::COLUMN_JOIN_REVERSE;
+        return $this->joins($localColumn, $foreignMapper, $foreignKey, self::TYPE_MODEL, $options, $property, $name);
     }
 
     /**
-     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
+     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE | self::COLUMN_JOIN_MULTI)
      *
      * Use this when a parent object has a Collection of 0:N children objects associated with it, where
      * the join is defined on the children's table.
      *
      * @param string      $foreignKey      The foreign key on the other table
      * @param string      $foreignMapper
-     * @param string      $localColumn     The primary key on this table
      * @param string      $property
      * @param string      $name
      * @return bool
      */
-    protected function joinsReverseMulti($foreignKey, $foreignMapper, $localColumn = null, $property = null, $name = null)
+    protected function joinsReverseMulti($foreignKey, $foreignMapper, $property = null, $name = null)
     {
-        return $this->joinsReverse($foreignKey, $foreignMapper, $localColumn, self::TYPE_COLLECTION, self::COLUMN_JOIN_MULTI, $property, $name);
-    }
-
-    /**
-     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
-     *
-     * Private to prevent direct calls from concrete mappers.
-     * Use the helpers instead as they make the single/multi choice explicit.
-     * @see $this->joinsReverseSingle
-     * @see $this->joinsReverseMany
-     *
-     * @param string      $foreignKey
-     * @param string      $foreignMapper
-     * @param string      $localColumn
-     * @param IColumnType $hydrator
-     * @param int         $options
-     * @param string      $property
-     * @param string      $name
-     * @return bool
-     */
-    protected function joinsReverse($foreignKey, $foreignMapper, $localColumn = null, $hydrator = null, $options = null, $property = null, $name = null)
-    {
-        $localColumn = $localColumn ?: $this->getIdentifierColumn();
-        if(!$localColumn){
-            $msg = 'You must either explicitly set a local column, or previously have set the identifier of this table';
-            throw new \InvalidArgumentException($msg);
-        }
-
-        // enforce reverse joining
-        $options |= self::COLUMN_JOIN_REVERSE;
-        return $this->joins($localColumn, $foreignMapper, $foreignKey, $hydrator, $options, $property, $name);
+        $localColumn = $this->getIdentifierColumn();
+        $options = self::COLUMN_JOIN_REVERSE | self::COLUMN_JOIN_MULTI;
+        return $this->joins($localColumn, $foreignMapper, $foreignKey, self::TYPE_COLLECTION, $options, $property, $name);
     }
 
 

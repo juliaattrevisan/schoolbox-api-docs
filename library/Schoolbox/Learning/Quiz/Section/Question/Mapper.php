@@ -31,7 +31,7 @@ class Mapper extends BaseMapper
         $this->uses('config', self::TYPE_JSON);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->joinsReverseSingle('question_id', QuizSolutionMapper::class, 'question_id', 'solution', 'solution');
+        $this->joinsReverseSingle('question_id', QuizSolutionMapper::class, 'solution', 'solution');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSolution'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSolution'));
