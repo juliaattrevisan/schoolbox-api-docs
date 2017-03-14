@@ -997,8 +997,14 @@ abstract class Mapper implements IMapper, Serializable
      * @param string      $name
      * @return bool
      */
-    protected function joinsReverse($foreignKey, $foreignMapper, $localColumn = 'id', $hydrator = null, $options = null, $property = null, $name = null)
+    protected function joinsReverse($foreignKey, $foreignMapper, $localColumn = null, $hydrator = null, $options = null, $property = null, $name = null)
     {
+        $localColumn = $localColumn ?: $this->getIdentifierColumn();
+        if(!$localColumn){
+            $msg = 'You must either explicitly set a local column, or previously have set the identifier of this table';
+            throw new \InvalidArgumentException($msg);
+        }
+
         // enforce reverse joining
         $options = $options | self::COLUMN_JOIN_REVERSE;
         return $this->joins($localColumn, $foreignMapper, $foreignKey, $hydrator, $options, $property, $name);
