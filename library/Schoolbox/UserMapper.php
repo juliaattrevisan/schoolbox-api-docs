@@ -113,6 +113,8 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateCommunityPortalPassword']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
@@ -126,9 +128,10 @@ class UserMapper extends Mapper
     }
 
     /**
-     * Update password in community portal
+     * Update password in community portal.
+     *
      * @param User $model
-     * @return bool
+     * @return bool Always true
      */
     public function updateCommunityPortalPassword(User $model)
     {
@@ -139,20 +142,38 @@ class UserMapper extends Mapper
             try {
                 $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
             } catch (\UnexpectedValueException $e) {
+                // It wasn't set up properly? noop?
             }
         }
+        return true;
+    }
 
-        /** @var User $model */
-
+    /**
+     * Pre-save hook: Set key in user, if it's not set.
+     *
+     * @param User $model
+     * @return bool Always true
+     */
+    public function updateKey(User $model)
+    {
         if (!$model->getKey()) {
             // ensure a key is set when persisting users
             $model->setKey(substr(md5(uniqid() . time()), 0, 25));
         }
+        return true;
+    }
 
+    /**
+     * Pre-save hook: Set hash if password has changed.
+     *
+     * @param User $model
+     * @return bool Always true
+     */
+    public function updateHash(User $model)
+    {
         if ($model->getRetrievablePassword()) {
             $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
         }
-
         return true;
     }
 
