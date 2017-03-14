@@ -36,7 +36,7 @@ class RoleMapper extends Mapper {
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(
-            self::CALLBACK_POSTDELETE,
+            self::CALLBACK_POSTSOFTDELETE,
             function (Role $role) {
                 Pastoral\Access\Mapper::getInstance()->deleteByColumn('role_id', $role->getId());
             }
