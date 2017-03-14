@@ -431,6 +431,11 @@ abstract class Mapper implements IMapper, Serializable
 
             if (array_key_exists($key, $row) && $this->localBodyCacheBypass == false) {
                 $id = $row[$key];
+
+                // If the identifier is null, just return scalar NULL.
+                if (null === $id) {
+                    return null;
+                }
                 $model = $mapper->createModel($id);
             } else {
                 $model = $mapper->createModel();
@@ -450,6 +455,7 @@ abstract class Mapper implements IMapper, Serializable
                     if (!empty($alias)) {
                         $columnName = "$alias.$columnName";
                     }
+
 
                     $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
 
