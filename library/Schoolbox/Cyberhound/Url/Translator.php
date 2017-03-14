@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Cyberhound\Url;
 
+use Symfony\Component\HttpFoundation\IpUtils;
 use Zend\Uri\Uri;
 
 /**
@@ -31,15 +32,34 @@ class Translator
     protected $apiSharedKey;
 
     /**
+     * The IP of the user, we only use API if internal IP
+     *
+     * @var string
+     */
+    protected $ip;
+
+    /**
+     * List of CIDR ranges that can access the API
+     * @var array
+     */
+    protected $whitelist;
+
+    /**
      * Translator constructor.
      *
+     * @param string $ip
      * @param string $apiUrl
      * @param string $apiSharedKey
      */
-    public function __construct($apiUrl, $apiSharedKey)
+    public function __construct($ip, $apiUrl, $apiSharedKey)
     {
+        $this->ip           = $ip;
         $this->apiUrl       = $apiUrl;
         $this->apiSharedKey = $apiSharedKey;
+
+        $this->whitelist[]  = '192.168.0.0/16';
+        $this->whitelist[]  = '172.16.0.0/12';
+        $this->whitelist[]  = '10.0.0.0/8';
     }
 
     /**
@@ -54,19 +74,38 @@ class Translator
     public function translate($url)
     {
         if ($this->apiSharedKey && $this->apiUrl) {
-            $urlObject = new Uri($url);
-            if (!$urlObject->isValidRelative()) {
-                // If using Cyberhound: redirect to its proxy rather than the URL directly.
-                // Only redirect for non-local links though.
-                $cyberHoundUrl = new Uri($this->apiUrl);
-                $cyberHoundUrl
-                    ->setPath('/api/overrideurl')
-                    ->setQuery([
-                        'key'  => hash('sha256', $_SERVER['REQUEST_TIME'].$url.$this->apiSharedKey),
-                        'time' => $_SERVER['REQUEST_TIME'],
-                        'base64url'  => base64_encode($url),
-                    ]);
-                $url = $cyberHoundUrl->toString();
+
+            /* Test if user is local before using API */
+            $local = false;
+            foreach($this->whitelist as $range) {
+                if(IpUtils::checkIp($this->ip, $range)) {
+                    $local = true;
+                    break;
+                }
+            }
+            if(!$local) {
+                return $url;
+            }
+
+            try {
+                $urlObject = new Uri($url);
+                if (!$urlObject->isValidRelative()) {
+                    // If using Cyberhound: redirect to its proxy rather than the URL directly.
+                    // Only redirect for non-local links though.
+
+                    $cyberHoundUrl = new Uri($this->apiUrl);
+                    $cyberHoundUrl
+                        ->setPath('/api/overrideurl')
+                        ->setQuery([
+                            'key'       => hash('sha256', $_SERVER['REQUEST_TIME'] . $url . $this->apiSharedKey),
+                            'time'      => $_SERVER['REQUEST_TIME'],
+                            'base64url' => base64_encode($url),
+                        ]);
+                    $url = $cyberHoundUrl->toString();
+                }
+            }
+            catch (\InvalidArgumentException $e) {
+                return $url;
             }
         }
         return $url;

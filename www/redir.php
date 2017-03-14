@@ -32,6 +32,7 @@ if ($link instanceof \Schoolbox\Resource\Link) {
 
 if (!empty($url)) {
     $translator = new Schoolbox\Cyberhound\Url\Translator(
+        $_SESSION['ip'],
         Config::get('cyberhound_api_url'),
         Config::get('cyberhound_api_shared_key')
     );
