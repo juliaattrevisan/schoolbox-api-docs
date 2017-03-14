@@ -1046,7 +1046,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // enforce reverse joining
-        $options = $options | self::COLUMN_JOIN_REVERSE;
+        $options |= self::COLUMN_JOIN_REVERSE;
         return $this->joins($localColumn, $foreignMapper, $foreignKey, $hydrator, $options, $property, $name);
     }
 
