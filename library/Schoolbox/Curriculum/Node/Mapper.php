@@ -261,7 +261,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     ) {
         /** @var Model $curriculumNode */
         $curriculumNode = $this->hydrate($row, $alias);
-        if ($curriculumNode->getId()) {
+        if ($curriculumNode) {
             $curriculumNode->setLearningArea(
                 $this->getJoinMapper('area')->hydrate($row, $areaAlias)
                     ->setSource(

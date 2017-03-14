@@ -272,7 +272,7 @@ class UserMapper extends Mapper
 
             $linkedUser = $this->hydrate($row, 'lu');
 
-            if ($linkedUser->getId()) {
+            if ($linkedUser) {
                 // Don't double add
                 $users[$userId]->getLinkedUser()->setOffset($linkedUser->getId(), $linkedUser);
             }
