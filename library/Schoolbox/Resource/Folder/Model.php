@@ -454,7 +454,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @param CourseSpecification $courseSpecification
      * @return static
      */
-    public function setCourseSpecification(CourseSpecification $courseSpecification)
+    public function setCourseSpecification(CourseSpecification $courseSpecification = null)
     {
         $this->courseSpecification = $courseSpecification;
         return $this;
