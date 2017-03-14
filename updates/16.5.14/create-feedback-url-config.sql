@@ -1,7 +1,7 @@
 INSERT INTO `config`
-(`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`)
+(`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`)
 VALUES
-('feedback_url', '/feedback.php', 'Feedback URL', 'URL for the feedback link at the bottom of your Schoolbox instance.', 1, 1, true, false, false);
+('feedback_url', '/feedback.php', 'Feedback URL', 'URL for the feedback link at the bottom of your Schoolbox instance.', 1, 1, true);
 
 -- Update url for jpc
 UPDATE    		`config` AS config1
