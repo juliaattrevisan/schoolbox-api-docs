@@ -82,6 +82,8 @@ class Mapper extends BaseMapper
                 /** @noinspection PhpParamsInspection */
                 $access->setRole($this->hydrateJoin($row, 'role', 'r'));
             }
+
+            $c->add($access);
         }
 
         return $c;
