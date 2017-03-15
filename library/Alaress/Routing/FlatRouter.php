@@ -32,6 +32,7 @@ class FlatRouter implements IRouter
      * @param string $path
      * @param string|int $key
      * @param mixed $value
+     * @return $this
      */
     public function add($path, $key, $value = null)
     {
@@ -40,6 +41,8 @@ class FlatRouter implements IRouter
         }
 
         $this->paths[$path][$key] = $value;
+
+        return $this;
     }
 
     /**
