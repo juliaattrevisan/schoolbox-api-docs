@@ -43,7 +43,7 @@
 
     {% set pActionResponses  = routeLookupIfAuthorized('learningResponse.getParticularResponse', routeArgs) %}
 
-    {% if assessment.acceptsNone %}
+    {% if not assessment.acceptOnline %}
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}

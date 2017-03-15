@@ -49,7 +49,7 @@
         {% set pActionSummary    = '' %}
     {% endif %}
 
-    {% if assessment.acceptsNone %}
+    {% if not assessment.acceptOnline %}
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}

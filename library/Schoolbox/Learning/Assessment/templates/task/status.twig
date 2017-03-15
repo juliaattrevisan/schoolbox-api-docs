@@ -30,7 +30,7 @@
     {% set canPublish   = latestFeedback and not isPublished %}
 
 
-    {% if assessment.acceptsNone %}
+    {% if not assessment.acceptOnline %}
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}
