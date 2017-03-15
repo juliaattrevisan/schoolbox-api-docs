@@ -105,7 +105,7 @@ class Sync implements SyncInterface
 //            $studentjoin .= "
 //                LEFT JOIN student as s
 //                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-//                    OR (scr.par_code = scr.par_code AND scr.cmpy_code = s.cmpy_code)";
+//                    OR (scr.par_code = s.par_code AND scr.cmpy_code = s.cmpy_code)";
 //        } else {
 //            $studentjoin = "LEFT JOIN student as s
 //                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
