@@ -431,7 +431,7 @@ class SitePage extends Page
         $feedbackText = $config->get('feedback_text');
         $feedbackURL = $config->get('feedback_url');
 
-        if (strlen($feedbackText) && strlen($feedbackURL)) {
+        if (strlen(trim($feedbackText)) && strlen(trim($feedbackURL))) {
             $this->parse('feedback_link_block', 'feedback_link');
         } else {
             $this->setVar('feedback_link_block', '');
@@ -1101,7 +1101,7 @@ class SitePage extends Page
         $feedbackText = $config->get('feedback_text');
         $feedbackURL = $config->get('feedback_url');
 
-        if (strlen($feedbackText) && strlen($feedbackURL)) {
+        if (strlen(trim($feedbackText)) && strlen(trim($feedbackURL))) {
             $this->parse('feedback_link_block', 'feedback_link');
         } else {
             $this->setVar('feedback_link_block', '');

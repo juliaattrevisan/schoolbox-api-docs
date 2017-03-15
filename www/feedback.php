@@ -55,7 +55,7 @@ else {
     $feedbackText = $config->get('feedback_text');
     $feedbackURL = $config->get('feedback_url');
 
-    if (strlen($feedbackText) && strlen($feedbackURL)) {
+    if (strlen(trim($feedbackText)) && strlen(trim($feedbackURL))) {
         $page->parse('feedback_link_block', 'feedback_link');
     } else {
         $page->setVar('feedback_link_block', '');
