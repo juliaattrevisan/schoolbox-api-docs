@@ -87,6 +87,12 @@ INNER JOIN student_submission_file ssf ON ssf.student_submission_id = ss.id
 SET ssf.deleted_at = ss.deleted_at
 WHERE ss.deleted_at IS NOT NULL AND ssf.deleted_at IS NULL;
 
+-- Delete PlagScan if Submission File is deleted
+UPDATE student_submission_file ssf
+INNER JOIN plagscan_document pd ON pd.student_submission_file_id = ssf.id
+SET pd.deleted = ssf.deleted_at
+WHERE ssf.deleted_at IS NOT NULL AND pd.deleted IS NULL;
+
 -- Delete Submission Return if Assessment is deleted
 UPDATE assessment a
 INNER JOIN submission_box dw ON dw.assessment_id = a.id
