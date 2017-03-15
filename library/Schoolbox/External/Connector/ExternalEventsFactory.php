@@ -9,13 +9,14 @@
 
 namespace Schoolbox\External\Connector;
 
+use Schoolbox\External\Connector\Offline;
+
 class ExternalEventsFactory
 {
     /**
      * Choose which variant of the sync to spawn
      *
      * @return ExternalEventsInterface
-     * @throws \UnexpectedValueException if nothing can be built
      */
     public function build()
     {
@@ -33,7 +34,6 @@ class ExternalEventsFactory
         } elseif (class_exists($generalClassname)) {
             return new $generalClassname();
         }
-
-        throw new \UnexpectedValueException("Unknown classes: {$specificClassname} {$generalClassname}");
+        return new Offline\Base\ExternalEvents();
     }
 }
