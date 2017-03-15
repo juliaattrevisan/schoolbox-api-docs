@@ -85,7 +85,7 @@ class Mapper extends AbstractUnitMapper
      * @param array     $options
      * @return Collection|Model[]
      */
-    public function findAllByCourseId($courseId, $options = [])
+    public function findAllByCourseId($courseId, array $options = [])
     {
         return $this->findByColumn('course_implementation_id', $courseId, $options);
     }
@@ -117,11 +117,11 @@ class Mapper extends AbstractUnitMapper
                 {$this->getJoinColumnString('specification', 's')},
                 {$this->getJoinColumnString('specification.folder', 'sf')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            LEFT  JOIN {$this->getJoinSql('course', '', 'c')}
-            LEFT  JOIN {$this->getJoinSql('course.folder', 'c', 'cf')}
+            INNER JOIN {$this->getJoinSql('course', '', 'c', true)}
+            INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf', true)}
             LEFT  JOIN {$this->getJoinSql('course.folder.homepages', 'cf', 'cfh')}
             INNER JOIN {$this->getJoinSql('specification', '', 's', true)}
-            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
+            INNER JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
         ";
     }
 
