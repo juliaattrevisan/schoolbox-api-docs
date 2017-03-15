@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\External\Connector\Synergetic\Base\ExternalEvents;
+use Schoolbox\External\Connector\ExternalEventsFactory;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -34,7 +34,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function __construct($user, $config) {
         $this->setUser($user);
-        $this->externalEvents = new ExternalEvents();
+        $this->externalEvents = ExternalEventsFactory::build();
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 
@@ -114,7 +114,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     }
 
     /**
-     * Do we even need this? /TODO
+     * Making the abstract class happy
      *
      */
     public function getEvent($eventId) {
