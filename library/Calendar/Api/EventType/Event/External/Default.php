@@ -34,7 +34,8 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function __construct($user, $config) {
         $this->setUser($user);
-        $this->externalEvents = ExternalEventsFactory::build();
+        $factory = new ExternalEventsFactory();
+        $this->externalEvents = $factory->build();
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 
