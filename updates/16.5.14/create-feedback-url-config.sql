@@ -13,6 +13,6 @@ WHERE     		config1.`name` = 'feedback_url'
 -- Empty url for stkevins, help
 UPDATE    		`config` AS config1
 INNER JOIN		`config` AS config2
-				      ON config2.`value` IN ('stkevins', 'help') AND config2.`name` = 'site_location'
+				      ON config2.`value` IN ('stkevins', 'stbernards', 'help') AND config2.`name` = 'site_location'
 SET       		config1.`value` = ''
 WHERE     		config1.`name` = 'feedback_url'
