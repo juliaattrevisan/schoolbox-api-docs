@@ -40,7 +40,11 @@
                         {% if readOnly == false and assessment is project %}
                             {% set href = routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) %}
                         {% else %}
-                            {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
+                            {% if assessable.isParticipant(USER) %}
+                                {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
+                            {%  else %}
+                                {% set href = routeLookup('learningAssessment.getPreview', {assessmentId: assessment.id}) %}
+                            {% endif %}
                         {% endif %}
 
                         <a title="{{ assessment.typeName }}" href="{{ href }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
