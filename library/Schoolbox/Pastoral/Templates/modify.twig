@@ -318,7 +318,7 @@
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="card small-12">
-                                        <a href="/search/user/{{ person.id }}" title="View Profile">
+                                        <a href="/search/user/{{ access.getUser.getId }}" title="View Profile">
                                             <img src="/portrait.php?userId={{ access.getUser.getExternalId }}&size=square64" alt="View Profile"/>
                                             <p>{{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}</p>
                                         </a>
