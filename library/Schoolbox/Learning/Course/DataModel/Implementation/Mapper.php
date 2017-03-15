@@ -100,10 +100,10 @@ class Mapper extends AbstractCourseMapper
                 {$this->getJoinColumnString('specification', 's')},
                 {$this->getJoinColumnString('specification.folder', 'sf')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            LEFT  JOIN {$this->getJoinSql('folder', '', 'f')}
+            INNER JOIN {$this->getJoinSql('folder', '', 'f', true)}
             LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
             INNER JOIN {$this->getJoinSql('specification', '', 's', true)}
-            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
+            INNER JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
         ";
     }
 
