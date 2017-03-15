@@ -31,18 +31,6 @@
         background-color: #EEEEEE;
     }
 
-    {# Read-only colors #}
-    .fc-event.unit,
-    .fc-event.project {
-        border-color: #111111;
-        background-color: #111111;
-        color: #EEEEEE;
-    }
-    .fc-event.unit:hover,
-    .fc-event.project:hover {
-        color: #EEEEEE;
-    }
-
     {# Assessment status colors #}
     .fc-event.fail {
         border-color: rgb(247, 206, 204);
@@ -51,6 +39,7 @@
     .fc-event.fail .fc-title:before {
         /* cross */
         content: "\e60d ";
+        font-family: "schoolbox";
         padding-right: .75em;
     }
 
@@ -61,6 +50,7 @@
     .fc-event.mastered .fc-title:before {
         /* tick */
         content: "\e604 ";
+        font-family: "schoolbox";
         padding-right: .75em;
     }
 
@@ -71,7 +61,20 @@
     .fc-event.notmarked .fc-title:before {
         /* pause */
         content: "\e650 ";
+        font-family: "schoolbox";
         padding-right: .75em;
+    }
+
+    {# Read-only colors - override other colors #}
+    .fc-event.unit,
+    .fc-event.project {
+        border-color: #111111;
+        background-color: #111111;
+        color: #EEEEEE;
+    }
+    .fc-event.unit:hover,
+    .fc-event.project:hover {
+        color: #EEEEEE;
     }
 </style>
 
