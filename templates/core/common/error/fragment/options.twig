@@ -1,7 +1,7 @@
 <h2 class="subheader">Your Options</h2>
 <section class="content">
     <ul>
-        {% if config.feedback_url|trim is not empty and config.feedback_text|trim is not empty  %}
+        {% if config.feedback_url|trim is not empty and config.feedback_text|trim is not empty %}
             <li>Report the issue to <a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
         {% endif %}
         <li>Return to the <a href="/">welcome page</a></li>
