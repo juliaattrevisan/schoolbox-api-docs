@@ -135,6 +135,11 @@ try {
             $filename =  sprintf('eventType%d', $eventTypeId);
             break;
 
+        case 'external':
+            $api = new Calendar_Api_EventType_Event_External_Default($user, array());
+            $filename =  'external';
+            break;
+
         case 'all':
 
             // All day events, but exclude other sources

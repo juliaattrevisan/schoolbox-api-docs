@@ -41,7 +41,7 @@ trait CSVTrait
             $event->getDetail(),
             $event->getLocation(),
             $event->getType(),
-            $event->getPublishDate()->getLocalShort(),
+            empty($event->getPublishDate()) ? '' : $event->getPublishDate()->getLocalShort(),
             $event->canAttend() ? 1 : 0,
         );
 
