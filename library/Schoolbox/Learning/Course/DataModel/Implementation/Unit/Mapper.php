@@ -85,7 +85,7 @@ class Mapper extends AbstractUnitMapper
      * @param array     $options
      * @return Collection|Model[]
      */
-    public function findAllByCourseId($courseId, $options = [])
+    public function findAllByCourseId($courseId, array $options = [])
     {
         return $this->findByColumn('course_implementation_id', $courseId, $options);
     }

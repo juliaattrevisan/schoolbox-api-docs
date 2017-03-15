@@ -22,5 +22,5 @@ abstract class AbstractUnitMapper extends BaseMapper
      * @param array     $options
      * @return AbstractUnit[]|GenericCollection
      */
-    abstract function findAllByCourseId($courseId, $options = []);
+    abstract public function findAllByCourseId($courseId, array $options = []);
 }
