@@ -46,10 +46,21 @@ class Standard extends BaseProcessor
      * Supports chained methods
      *
      * @return static
+     * @throws \OverflowException if file's too big
+     * @throws \RuntimeException if something goes wrong during building
      */
     public function load()
     {
         $this->file = $file = $this->getCache()->load();
+
+        // Die extremely early if this is corrupted or giant
+        // Figure out an image size in megapixels
+        list($w, $h) = getimagesizefromstring($file->read());
+        $megapixelSize = ($w * $h) / 1000000;
+        if ($megapixelSize >= 50) {
+            // error out
+            throw new \OverflowException('File is over 50MP large - aborting');
+        }
 
         $mime = $file->getMimetype();
 
