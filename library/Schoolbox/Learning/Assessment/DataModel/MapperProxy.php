@@ -506,7 +506,7 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $builder = $this->convertOptionsToPredicateBuilder(['from' => $from, 'to' => $to]);
+        $builder = $this->convertOptionsToPredicateBuilder(['due_after' => $from, 'due_before' => $to]);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
@@ -780,8 +780,8 @@ class MapperProxy
      *
      * Currently:
      * * converts "term" to a due date span
-     * * converts "from" and "to" to due date filters
-     * * converts "from_close" and "to_close" to close date filters
+     * * converts "due_before" and "due_after" to due date filters
+     * * converts "close_before" and "closed_after" to close date filters
      * * converts "type" to a filter which matches only that assessment type
      *   (see AssessmentType::TYPE_* constants)
      *
@@ -796,35 +796,36 @@ class MapperProxy
         // Term filter (overrides due before/after)
         if ($options['term'] instanceof Term) {
             $term = $options['term'];
-            $options['from'] = $term->getStart();
-            $options['to']   = $term->getActualFinish();
+            $options['due_after']  = $term->getStart();
+            $options['due_before'] = $term->getActualFinish();
         }
 
         /* It is not a valid query to filter from/to both a due and close date.
          * Typically when considering spans of time we are interested in the due date (learning analytics, markbook etc)
          * Typically when considering points in time (usually now) we are interested in close date (eg current visible DueWork)
          */
-        if(array_key_exists('from', $options) && array_key_exists('from_close', $options) ){
-            throw new \InvalidArgumentException('Cannot filter from both due and close dates.');
+        if(array_key_exists('due_before', $options) && array_key_exists('close_before', $options) ){
+            throw new \InvalidArgumentException('Cannot filter to before both due and close dates.');
         }
-        if(array_key_exists('to', $options) && array_key_exists('to_close', $options) ){
-            throw new \InvalidArgumentException('Cannot filter to both due and close dates.');
+        if(array_key_exists('due_after', $options) && array_key_exists('closed_after', $options) ){
+            throw new \InvalidArgumentException('Cannot filter to after both due and close dates.');
         }
 
         // Due before / after filter (an ADF)
-        if ($options['from'] instanceof \Alaress_Date_Format && !$options['from']->isNull()) {
-            $builder->notLessThan('due_date', $options['from']->getDatabase());
+        if ($options['due_after'] instanceof \Alaress_Date_Format && !$options['due_after']->isNull()) {
+            $builder->notLessThan('due_date', $options['due_after']->getDatabase());
         }
-        if ($options['to'] instanceof \Alaress_Date_Format && !$options['to']->isNull()) {
-            $builder->notGreaterThan('due_date', $options['to']->getDatabase());
-        }
-
-        if ($options['from_close'] instanceof \Alaress_Date_Format && !$options['from_close']->isNull()) {
-            $builder->notLessThan('close_date', $options['from_close']->getDatabase());
+        if ($options['due_before'] instanceof \Alaress_Date_Format && !$options['due_before']->isNull()) {
+            $builder->notGreaterThan('due_date', $options['due_before']->getDatabase());
         }
 
-        if ($options['to_close'] instanceof \Alaress_Date_Format && !$options['to_close']->isNull()) {
-            $builder->notLessThan('close_date', $options['to_close']->getDatabase());
+        // Close before / after filter (an ADF)
+        if ($options['closed_after'] instanceof \Alaress_Date_Format && !$options['closed_after']->isNull()) {
+            $builder->notLessThan('close_date', $options['closed_after']->getDatabase());
+        }
+
+        if ($options['close_before'] instanceof \Alaress_Date_Format && !$options['close_before']->isNull()) {
+            $builder->notGreaterThan('close_date', $options['close_before']->getDatabase());
         }
 
         // Assessment type filter
