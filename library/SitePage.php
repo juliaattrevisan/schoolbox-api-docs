@@ -422,6 +422,22 @@ class SitePage extends Page
             $this->setVar('INSTANTMESSAGE_BLOCK', '');
         }
 
+        /**
+         * Support and Feedback custom link
+         */
+        $config = new \Schoolbox\Config\Loader();
+        $this->setBlock('footerTpl', 'feedback_link', 'feedback_link_block');
+
+        $feedbackText = $config->get('feedback_text');
+        $feedbackURL = $config->get('feedback_url');
+
+        if (strlen($feedbackText) && strlen($feedbackURL)) {
+            $this->parse('feedback_link_block', 'feedback_link');
+        } else {
+            $this->setVar('feedback_link_block', '');
+        }
+
+
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
