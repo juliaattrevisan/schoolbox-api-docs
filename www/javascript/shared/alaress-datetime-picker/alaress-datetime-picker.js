@@ -182,6 +182,7 @@ function setValue ( element, options, state, date ) {
         }
         element.val(v);
     }
+    element.trigger('change');
     if(options.allDayExt !== false) {
         $('#'+options.allDayExt).val(state?1:0);
     }
@@ -327,6 +328,9 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
             });
 
         } else if (picker.data('status') == 'loaded') {
+
+            // Update picker values, in case element field value has changed
+            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
 
             picker.foundation('reveal', 'open');
 
