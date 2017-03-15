@@ -92,7 +92,7 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         $token = $this->getToken([
             'prod_code' => 'TIA',
             'app_code'  => $this->appCodes['teacherKiosk'],
-            'deep_link' => $this->getRequest()->get['link'],
+            'deep_link' => urlencode($this->getRequest()->query->get['link']),
         ]);
 
         if ($token) {
