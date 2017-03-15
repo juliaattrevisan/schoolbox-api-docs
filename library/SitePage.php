@@ -1077,6 +1077,20 @@ class SitePage extends Page
             ));
         }
 
+        /**
+         * Support and Feedback custom link
+         */
+        $this->setBlock(TEMPLATE_body, 'feedback_link', 'feedback_link_block');
+
+        $feedbackText = $config->get('feedback_text');
+        $feedbackURL = $config->get('feedback_url');
+
+        if (strlen($feedbackText) && strlen($feedbackURL)) {
+            $this->parse('feedback_link_block', 'feedback_link');
+        } else {
+            $this->setVar('feedback_link_block', '');
+        }
+
         // Shove GET params (samlAuth and page at least) into the form
         $getParams = array_intersect_key($_GET, array('page' => true, 'samlAuth' => true));
         $this->setVar('GET_PARAMS', htmlspecialchars(http_build_query($getParams), ENT_QUOTES));
