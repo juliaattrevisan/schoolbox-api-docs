@@ -93,6 +93,33 @@ class Controller extends Assessment\Controller
         $this->participantMapper     = $participantMapper;
     }
 
+    /**
+     * Determine if there are any submission files available for download on the assessment
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    private function hasDownloadableSubmissionFiles($assessment)
+    {
+        // Grab all participants in the assessment
+
+        /** @var Participant $participant */
+        foreach ($assessment->getAllParticipants() as $participant) {
+            // Iterate all their responses
+
+            /** @var Submission $response */
+            foreach ($participant->getAllResponses() as $response) {
+                // If the response is a submission...
+
+                if ($response instanceof Submission) {
+                    if ($response->getAllFiles()->count() > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * This gives you a summary of progress made within an Assessment
@@ -107,39 +134,13 @@ class Controller extends Assessment\Controller
     {
         // Only display download link if there are actually files to download
 
-        $download = false;
-
-        /** @var Participant $participant */
-        foreach ($assessment->getAllParticipants() as $participant)
-        {
-            // Iterate all their responses
-
-            /** @var Submission $response */
-            foreach ($participant->getAllResponses() as $response)
-            {
-                // If the response is a submission...
-
-                if ($response instanceof Submission)
-                {
-                    if ($response->getAllFiles()->count() > 0) {
-                        $download = true;
-                        break;
-                    }
-                }
-            }
-
-            if ($download) {
-                break;
-            }
-        }
-
         $twigData = [
             'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
             'type'        => Assessment\AssessmentType::objectToString($assessment),
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
-            'download'    => $download
+            'download'    => $this->hasDownloadableSubmissionFiles($assessment)
         ];
 
         $this->getResponse()->content->set(
@@ -252,17 +253,8 @@ class Controller extends Assessment\Controller
         // Create a zip file to hold the downloaded submissions
 
         $date = \Alaress_Date_Format::now()->getDatabase();
-        $zip = Zip::CreateArchive("{$assessment->getTitle()} Submissions - {$date}.zip");
 
-        $tempFolder = $this->getConfigLoader()->get('submission_upload_tmp_dir') . "/" . $this->getUser()->getId() . "_" . date("U");
-
-        // Create temporary folder to store submissions
-
-        if (file_exists($tempFolder)) {
-            $this->deleteDirectory($tempFolder);
-        }
-
-        mkdir($tempFolder);
+        $zip = Zip::CreateTemporaryArchive("{$assessment->getTitle()} Submissions - {$date}.zip");
 
         // Iterate participants and get their responses
 
@@ -271,8 +263,7 @@ class Controller extends Assessment\Controller
         {
             // Get the users details and generate an appropriate folder name with the date/time stamp of the submission
 
-            if (!isset($users[$participant->getUser()->getId()]))
-            {
+            if (!isset($users[$participant->getUser()->getId()])) {
                 $users[$participant->getUser()->getId()] = $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
             }
 
@@ -294,33 +285,26 @@ class Controller extends Assessment\Controller
                         $response->getCreatedAt()->getDatabase()
                     );
 
-                    mkdir("{$tempFolder}/{$directory}");
-
-                    // ...iterate all files in that submission
+                    // ...iterate all files in that submission and add them to the ZIP archive
 
                     $files = $response->getAllFiles();
 
                     /** @var File $file */
                     foreach ($files as $file)
                     {
-                        $filename = sprintf("%s/%s.%s",
-                            $directory,
-                            $file->getFilename(),
-                            $file->getExtension()
-                        );
-
-                        // Get the contents of the file and write it to a temporary folder
-
-                        $destination = "{$tempFolder}/{$filename}";
-
-                        file_put_contents($destination, $file->readStream());
+                        $zipFilename = sprintf("%s/%s.%s", $directory, $file->getFilename(), $file->getExtension());
+                        $zip->addStream($file->readStream(), $zipFilename);
                     }
                 }
             }
         }
 
-        $zip->addDirectory($tempFolder);
-        $this->deleteDirectory($tempFolder);
+        // Flush the ZIP file to before deleting the temporary files- otherwise we end up with an empty file
+
+        $zip->persist();
+
+        // Download the sucker
+
         $zip->download();
     }
 

@@ -82,7 +82,8 @@
         "imagine/imagine": "dev-0.6.2-patches",
         "jenssegers/date": "~3.2.8",
         "mpratt/embera": "~1.8.6",
-        "nesbot/carbon": "~1.22.1"
+        "nesbot/carbon": "~1.22.1",
+        "league/flysystem-ziparchive": "^1.0"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

@@ -20,6 +20,9 @@
 {% set labelReviewed   = 'Reviewed' %}
 
 {% block headerOptions %}
+    <li>
+        <a class="icon-download" href="{{ routeLookup('learningAssessment.downloadSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}">Download All Submissions</a>
+    </li>
     {% if assessment.useRubric %}
     <li>
         <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}" class="icon-progress">Rubric Report</a>

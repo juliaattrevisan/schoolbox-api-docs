@@ -158,6 +158,12 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $slug . '-1';
     }
 
+    public function create(&$data)
+    {
+        echo "asdf";
+        exit;
+    }
+
 	/**
 	 * Updates a wiki's data with the latest revision if applicable
 	 * Note that wikis now know whether they are stubs or not

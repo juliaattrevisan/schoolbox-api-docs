@@ -82,7 +82,6 @@ class Controller extends Assessment\Controller
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
-            'download'    => false
         ];
 
         $this->getResponse()->content->set(
