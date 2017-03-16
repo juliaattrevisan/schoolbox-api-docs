@@ -262,6 +262,13 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
             // Update picker status
             picker.data('status', 'loading');
+
+            //Check if the form is inside another modal
+            var reveal = element.parents('*[data-reveal]');
+            if (reveal.length > 0){
+                picker.data('reveal', reveal.attr('id'));
+            }
+
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
             picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
@@ -282,9 +289,10 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 // Capture closure of modal
                 $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
-
-                    // nope
-
+                    // Open back the parent modal, if any
+                    if ((picker.data('reveal').length > 0)) {
+                        $('#'+picker.data('reveal')).foundation('reveal', 'open');
+                    }
                 });
                 // Update picker status
                 picker.data('status', 'loaded');
