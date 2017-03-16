@@ -10,6 +10,7 @@
 namespace Schoolbox\Video;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -398,7 +399,7 @@ class Queue extends ResourceVideo
     }
 
     /**
-     * @param $storage
+     * @param IStorage $storage
      * @return $this
      */
     public function setStorage($storage) {

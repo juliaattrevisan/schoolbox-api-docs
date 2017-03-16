@@ -9,11 +9,19 @@
 
 namespace Schoolbox\Resource\File;
 
+use Alaress_Byte_Format;
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\IHomepageCleanable;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource;
+use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\Manager;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
+use Schoolbox\Video\Queue;
+use Schoolbox\Video\QueueMapper;
 
 /**
  * Class Mapper
@@ -66,6 +74,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 //        );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'ensureOwnerIsNotNull']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
     }
 
     /**
@@ -246,5 +255,44 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      */
     public function homepageClean($cid){
         $this->deleteByColumn('category',$cid);
+    }
+
+    /**
+     * @param Model $file
+     * @param Model $previous
+     * @return bool
+     */
+    protected function postSave(Model $file, Model $previous = null)
+    {
+        // Ram media files into queue for transcoding
+
+        if ($file->getMimetype()->isVideo() || $file->getMimetype()->isAudio()) {
+            $queueMapper = QueueMapper::getInstance();
+
+            // Make sure it hasn't been transcoded successfully already
+
+            try {
+
+                $queueMapper->findOneByColumnList([
+                    'hash' => $file->getHash(),
+                    'status' => [
+                        QueueMapper::STATUS_COMPLETED |
+                        QueueMapper::STATUS_PENDING
+                    ]
+                ]);
+
+            } catch (MapperException $e) {
+                /** @var Queue $queue */
+                $queue = $queueMapper->createModel();
+                $queue->setFile($file);
+                $queue->setStorage($file->getStorage());
+                $queue->setStatus(QueueMapper::STATUS_PENDING);
+                $queue->setCreatedAt(Alaress_Date_Format::now());
+                $queue->setUpdatedAt(Alaress_Date_Format::now());
+                $queueMapper->save($queue);
+            }
+        }
+
+        return true;
     }
 }
