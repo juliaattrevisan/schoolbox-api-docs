@@ -4,7 +4,7 @@
     <div class="column small-12 medium-6">
         <label>
             {{ dateTitle }} Date
-            <input id="{{ dateProperty }}Date" name="{{ dateProperty }}Date" type="text" value="{{ dateValue.local }}" data-datepicker data-datepicker-time data-datepicker-format="datetime" data-datepicker-allday data-datepicker-call="duework" {% if dateProperty == "due" or dateProperty == "late" %} data-datepicker-endofday {% endif %} {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate='{{ syncEndDate }}'{% endif %} />
+            <input id="{{ dateProperty }}Date" name="{{ dateProperty }}Date" type="text" value="{{ dateValue.local }}" data-datepicker data-datepicker-time data-datepicker-format="datetime" data-datepicker-allday data-datepicker-call="duework" {% if dateProperty in ['due','late','close'] %} data-datepicker-endofday {% endif %} {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate='{{ syncEndDate }}'{% endif %} />
         </label>
     </div>
 
