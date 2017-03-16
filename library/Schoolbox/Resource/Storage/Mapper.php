@@ -15,10 +15,10 @@ use PDOStatement;
 use Schoolbox;
 use Schoolbox\File;
 use Schoolbox\Collection;
+use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper\PredicateBuilder;
-use Schoolbox\Video;
-use Schoolbox\Video\QueueMapper;
+
 /**
  * Class Mapper
  *
@@ -28,9 +28,11 @@ use Schoolbox\Video\QueueMapper;
  */
 class Mapper extends Schoolbox\Mapper implements Receiver
 {
-
     /** @var Manager */
     protected $mgr;
+
+    /** @var bool */
+    private $checkPrevious;
 
     /**
      * @return void
@@ -88,7 +90,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         } else {
             $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
                 /** @var Model $model */
-                if (!$model->getMimetype() instanceof File\Mimetype) {
+                if (!$model->getMimetype() instanceof Mimetype) {
                     // for super users only, we allow this
                     $model->setMimetype(MimetypeMapper::getInstance()->getUnknownMime());
                 }
@@ -129,7 +131,9 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      */
     public function findByHash($hash)
     {
-        return $this->findOneByColumn('hash', $hash);
+        /** @var Model $model */
+        $model = $this->findOneByColumn('hash', $hash);
+        return $model;
     }
 
 
@@ -180,7 +184,11 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
             $storage = $this->hydrate($r);
-            $storage->setMimetype($this->hydrateJoin($r, 'allowedFileExtension'));
+
+            /** @var Mimetype $mimeType */
+            $mimeType = $this->hydrateJoin($r, 'allowedFileExtension');
+
+            $storage->setMimetype($mimeType);
 
             $c->add($storage);
         }
@@ -322,5 +330,4 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->checkPrevious = $bool;
         return $this;
     }
-
 }
