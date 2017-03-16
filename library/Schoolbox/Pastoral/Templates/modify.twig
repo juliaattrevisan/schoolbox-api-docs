@@ -41,11 +41,6 @@
             value: [{% for tag in record.tagsList %}'{{ tag.getName | escape('js') }}',{% endfor %}]
         });
 
-        $('[data-cancel]').click(function (event) {
-            event.preventDefault();
-            window.location.href = '{{ routeLookup('pastoral.getIndex', {'studentId': record.getStudent.getId ? record.getStudent.getId : student.getId }) }}';
-        });
-
         {% if record.getId != '' %}
 
         var deleteIds = [];
@@ -355,7 +350,7 @@
                 <div class="small-12 column">
                     <ul class="flex-list buttons">
                         <li><input type="submit" data-submit class="submit" value="Save"></li>
-                        <li><button data-cancel class="button icon-cancel">Cancel Changes</button></li>
+                        <li><a href="{{ routeLookup('pastoral.getIndex', {'studentId': record.getStudent.getId ? record.getStudent.getId : student.getId }) }}" class="button icon-cancel">Cancel Changes</a></li>
                     </ul>
                 </div>
             </div>
