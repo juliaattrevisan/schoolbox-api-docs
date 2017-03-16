@@ -43,7 +43,7 @@
 
         $('[data-cancel]').click(function (event) {
             event.preventDefault();
-            window.location.href = '{{ routeLookup('pastoral.getIndex', {'studentId': record.getStudent.getId}) }}';
+            window.location.href = '{{ routeLookup('pastoral.getIndex', {'studentId': record.getStudent.getId ? record.getStudent.getId : student.getId }) }}';
         });
 
         {% if record.getId != '' %}
@@ -60,7 +60,7 @@
                         id: {{ record.getId() }}
                     })
                     .done(function () {
-                        window.location.href = '{{ routeLookup('pastoral.getInsert', {'studentId': record.getStudent.getId}) }}';
+                        window.location.href = '{{ routeLookup('pastoral.getInsert', {'studentId': record.getStudent.getId ? record.getStudent.getId : student.getId}) }}';
                     });
                 }
             });
@@ -141,7 +141,7 @@
             {{ student.getFirstname }} {{ student.getLastname }}
         </a>
     </li>
-    <li><a href="{{ routeLookup('pastoral.getIndex', {'studentId': record.getStudent.getId}) }}">Pastoral Care</a></li>
+    <li><a href="{{ routeLookup('pastoral.getIndex', {'studentId': record.getStudent.getId ? record.getStudent.getId : student.getId}) }}">Pastoral Care</a></li>
     <li class="active"><a href="#">{% if record.getId == '' %}Add Record{% else %}Modify Record{% endif %}</a></li>
 </ul>
 
