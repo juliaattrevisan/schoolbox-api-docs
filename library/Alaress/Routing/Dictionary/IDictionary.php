@@ -35,7 +35,7 @@ interface IDictionary
      *   *:literal.#   where `*` matches a single word and `#` matches multi-word
      *
      * @param string $shard
-     * @return $this
+     * @return string
      */
     public function translateShard($shard);
 
@@ -45,8 +45,8 @@ interface IDictionary
      * This is useful for being able to define your own "pattern language", such as:
      *   *:literal.#   where `*` matches a single word and `#` matches multi-word
      *
-     * @param $string
-     * @return mixed
+     * @param string $string
+     * @return string
      */
     public function translateWhole($string);
 
