@@ -214,6 +214,8 @@ class Trie
         }
 
         uksort($this->tries, $this->usort);
+
+        $this->sorted = true;
     }
 
 
