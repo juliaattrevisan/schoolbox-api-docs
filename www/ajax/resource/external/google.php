@@ -23,6 +23,13 @@ if (empty($this) || $_SERVER['REQUEST_METHOD'] != 'POST') {
 /** @var IConfigLoader $conf */
 $conf    = $this->getDi()->get('config');
 $headers = apache_request_headers();
+if (function_exists('apache_request_headers')) {
+    $headers = apache_request_headers();
+} else {
+    /* Handle nginx/php-fpm case instead which doesn't have apache specific functions
+     */
+    $headers['Authorization'] = $_SERVER['HTTP_AUTHORIZATION'];
+}
 $proxy   = new Proxy\Server($conf);
 $grive   = new GDriveFetcher(sys_get_temp_dir(), $proxy->curl_init(), $headers['Authorization']);
 $mapper  = Storage\Mapper::getInstance();
