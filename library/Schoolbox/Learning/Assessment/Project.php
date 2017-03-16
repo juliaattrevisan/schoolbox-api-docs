@@ -63,6 +63,16 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
+     * Does this have assessables at all?
+     *
+     * @return bool
+     */
+    public function hasAssessables()
+    {
+        return count($this->assessables) > 0;
+    }
+
+    /**
      * @inheritdoc
      */
     public function canLearnerCreateResponse(User $learner)
@@ -108,6 +118,11 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function isResponseRequired(User $user)
     {
+        // Don't need to respond to an empty project
+        if (!$this->hasAssessables()) {
+            return false;
+        }
+
         // Would a single sub-response indicate the student has responded ?
         $canCompleteAny  = $this->summator->impliesOptionality();
         $mustCompleteAll = !$canCompleteAny;
@@ -152,6 +167,11 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function isFeedbackRequired(User $user)
     {
+        // Don't need feedback on an empty project
+        if (!$this->hasAssessables()) {
+            return false;
+        }
+
         $studentFoundInSubAssessments = false;
         foreach ($this->getAssessables() as $subAssessment) {
             if (!$subAssessment->isParticipant($user)) {
@@ -186,6 +206,11 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function isReviewComplete(User $user)
     {
+        // Empty project is complete, I guess
+        if (!$this->hasAssessables()) {
+            return true;
+        }
+
         // Would a single sub-response indicate the student has responded ?
         $canCompleteAny  = $this->summator->impliesOptionality();
         $mustCompleteAll = !$canCompleteAny;
@@ -288,6 +313,11 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function hasPublishedFeedback(User $user)
     {
+        // I can't have feedback in an empty project
+        if (!$this->hasAssessables()) {
+            return false;
+        }
+
         // Would a single sub-assessment completion imply the project is complete ?
         $canGiveFeedbackToAny  = $this->summator->impliesOptionality();
         $mustGiveFeedbackToAll = !$canGiveFeedbackToAny;
@@ -335,6 +365,11 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function hasMark(User $user)
     {
+        // I can't have a mark on an empty project
+        if (!$this->hasAssessables()) {
+            return false;
+        }
+
         $studentFoundInSubAssessments = false;
 
         foreach ($this->assessables as $subAssessment) {
