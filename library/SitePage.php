@@ -385,6 +385,8 @@ class SitePage extends Page
             'DATEPICKER_FORMAT' => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
             'MOMENTJS_FORMAT' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
             'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
+            'FEEDBACK_TEXT' => Scrub::text($this->config->get('feedback_text')),
+            'FEEDBACK_URL' => Scrub::text($this->config->get('feedback_url')),
         );
 
         $this->setVar($templateVar);
@@ -419,6 +421,22 @@ class SitePage extends Page
             // Go away phantom block
             $this->setVar('INSTANTMESSAGE_BLOCK', '');
         }
+
+        /**
+         * Support and Feedback custom link
+         */
+        $config = new \Schoolbox\Config\Loader();
+        $this->setBlock('footerTpl', 'feedback_link', 'feedback_link_block');
+
+        $feedbackText = $config->get('feedback_text');
+        $feedbackURL = $config->get('feedback_url');
+
+        if (strlen(trim($feedbackText)) && strlen(trim($feedbackURL))) {
+            $this->parse('feedback_link_block', 'feedback_link');
+        } else {
+            $this->setVar('feedback_link_block', '');
+        }
+
 
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
@@ -1073,6 +1091,20 @@ class SitePage extends Page
             $this->setVar(array(
                 'forgotten_password_block' => ''
             ));
+        }
+
+        /**
+         * Support and Feedback custom link
+         */
+        $this->setBlock(TEMPLATE_body, 'feedback_link', 'feedback_link_block');
+
+        $feedbackText = $config->get('feedback_text');
+        $feedbackURL = $config->get('feedback_url');
+
+        if (strlen(trim($feedbackText)) && strlen(trim($feedbackURL))) {
+            $this->parse('feedback_link_block', 'feedback_link');
+        } else {
+            $this->setVar('feedback_link_block', '');
         }
 
         // Shove GET params (samlAuth and page at least) into the form

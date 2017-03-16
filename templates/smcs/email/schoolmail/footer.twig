@@ -14,8 +14,10 @@
         <p>
             &copy; {{ config.year }}
             <a href="{{ config.school_address }}">{{ config.school_name }}</a> |
-            <a href="http://{{ config.fqdn }}/policy.php">Guidelines of Use and Privacy Policy</a> |
-            <a href="http://{{ config.fqdn }}/feedback.php">Support and Feedback</a>
+            <a href="http://{{ config.fqdn }}/policy.php">Guidelines of Use and Privacy Policy</a>
+            {% if config.feedback_url|trim is not empty and config.feedback_text|trim is not empty %}
+                | <a href="http://{{ config.fqdn }}/{{ config.feedback_url|purify }}">{{ config.feedback_text|purify }}</a>
+            {% endif %}
         </p>
     </td>
     {{ fn.spacer(config.fqdn, 0, 8) }}
