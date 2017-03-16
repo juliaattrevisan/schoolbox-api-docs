@@ -175,7 +175,7 @@
                         </h2>
                     </div>
                 </div>
-                {% if isRouteAuthorized('pastoral.postDelete', {record: record}) %}
+                {% if record.getId is not empty and isRouteAuthorized('pastoral.postDelete', {record: record}) %}
                     <nav>
                         <a class="icon-more" title="" data-dropdown="header-options"></a>
                     </nav>
