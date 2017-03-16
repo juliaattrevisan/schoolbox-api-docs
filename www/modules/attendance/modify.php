@@ -25,7 +25,7 @@ $this->setBlock('student', 'reason_options', 'reason_options_block');
 if (count($this->arg) < 3) {
     error(147);
 }
-var_Dump($this->arg[0] . '/' . urldecode(urldecode(urldecode($this->arg[1]))));
+
 /* Get a class list which we'll match up manually with their attendance records
  * but only if this class exists
  */
@@ -36,7 +36,6 @@ if ($this->arg[0]) {
     $class = $externalClass->getClass(urldecode(urldecode($this->arg[1])), $_SESSION['user']);
 }
 
-exit;
 if (!$class) {
     error(148);
 }
