@@ -1,10 +1,8 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Resource\Storage;
@@ -86,7 +84,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         }
 
         if ($requireSafety) {
-            $this->registerCallback(self::CALLBACK_PRESAVE, [ $this->mgr, 'safetyCheck' ]);
+            $this->registerCallback(self::CALLBACK_PRESAVE, [$this->mgr, 'safetyCheck']);
         } else {
             $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
                 /** @var Model $model */
@@ -97,15 +95,16 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             });
         }
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this->mgr, 'delete' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, self::CALLBACK_POSTSAVE]);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this->mgr, 'delete']);
     }
 
     /**
      * Call back hook to clear postsave queue
      * @deprecated
      */
-    public function dePostSave() {
+    public function dePostSave()
+    {
         unset($this->callback_queue[self::CALLBACK_POSTSAVE]);
         unset($this->callback_queue[self::CALLBACK_PRESAVE]);
     }
@@ -136,7 +135,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         return $model;
     }
 
-
     /**
      * Always join onto Mime
      *
@@ -160,8 +158,8 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      * This used to be in `$this->hydrateSelect` - however, that method doesn't
      * get called if this object is hydrated through a join from another mapper.
      *
-     * @param array         $row
-     * @param string        $alias
+     * @param array $row
+     * @param string $alias
      * @param callable|null $callback
      *
      * @return Model
@@ -196,11 +194,10 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         return $c;
     }
 
-
     /**
      * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param array $columnList
+     * @param array $options
      * @return array
      */
     protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
@@ -213,7 +210,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
         return parent::buildWherePart($predicate, $columnList, $options);
     }
-
 
     /**
      * @param Model $object
@@ -237,13 +233,12 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         }
     }
 
-
     /**
      * Accept a datastream (or string file contents) upload
      *
-     * @param string          $filename
+     * @param string $filename
      * @param resource|string $fp
-     * @param bool            $public
+     * @param bool $public
      * @return Model
      */
     public function acceptStream($filename, $fp, $public = false)
@@ -257,13 +252,12 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         return $this->accept($filename, $tempLocation, $public);
     }
 
-
     /**
      * Accept a new file upload
      *
      * @param string $basename
      * @param string $tempLocation
-     * @param bool   $public
+     * @param bool $public
      * @throws File\Exception
      * @return Model
      */
@@ -300,7 +294,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         return $storage;
     }
 
-
     /**
      * @return Manager
      */
@@ -308,7 +301,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     {
         return $this->mgr;
     }
-
 
     /**
      * @param Manager $mgr
@@ -319,7 +311,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->mgr = $mgr;
         return $this;
     }
-
 
     /**
      * @param bool $bool
