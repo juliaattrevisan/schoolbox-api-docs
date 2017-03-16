@@ -209,7 +209,8 @@ class Bootstrap extends AbstractBootstrap {
     {
         $outputStackTrace = Config::get('debug_show_stack_trace');
 
-        if ($e instanceof \Exception) {
+
+        if ($e instanceof \Exception || $e instanceof \Throwable) {
             $error = array(
                 'file'    => $e->getFile(),
                 'message' => $e->getMessage(),
@@ -234,7 +235,7 @@ class Bootstrap extends AbstractBootstrap {
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
             if (
                 (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
-                || $e instanceof \Exception
+                || $e instanceof \Exception || $e instanceof \Throwable
             ) {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
