@@ -53,7 +53,7 @@
                 confirmEvent: function () {
                     $.post('{{ routeLookup('pastoral.postDelete', {'recordId': record.getId}) }}')
                     .done(function () {
-                        window.location.href = '{{ routeLookup('pastoral.getInsert', {'studentId': record.getStudent.getId ? record.getStudent.getId : student.getId}) }}';
+                        window.location.href = '{{ routeLookup('pastoral.getIndex', {'studentId': record.getStudent.getId ? record.getStudent.getId : student.getId}) }}';
                     });
                 }
             });
