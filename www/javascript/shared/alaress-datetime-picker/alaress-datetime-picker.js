@@ -142,7 +142,7 @@ function getLinkedElements (element, options) {
     return linkedElements;
 }
 
-function setValue ( element, options, state, date ) {
+function setValue ( element, options, state, trigger, date ) {
 
     // Get their pickerIds
     var pId = element.attr('data-datepicker-id');
@@ -182,7 +182,9 @@ function setValue ( element, options, state, date ) {
         }
         element.val(v);
     }
-    element.trigger('change');
+    if(trigger === true) {
+        element.trigger('change');
+    }
     if(options.allDayExt !== false) {
         $('#'+options.allDayExt).val(state?1:0);
     }
@@ -233,7 +235,13 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
     // Create click event to open the modal for the element
 
-    element.click(function () {
+    element.change(function() {
+        if(window.pickerInstance[pickerId] !== undefined) {
+            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
+        }
+    });
+
+    element.click(function() {
 
         if (element.val().length > 0) {
             var originalValue = element.val();
@@ -288,16 +296,16 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 $('#byDate-'+pickerId).find('.picker-submit').click(function() {
                     if ($('#hideTime'+pickerId).is(':checked')) {
-                        setValue( element, options, true);
+                        setValue( element, options, true, true );
                     }
                     else {
-                        setValue( element, options, false);
+                        setValue( element, options, false, true );
                     }
 
                     if (options.allDayExt !== false) {
                         var linkedElements = getLinkedElements( element, options );
                         linkedElements.forEach(function(item) {
-                            setValue(item, getOptions(item), $('#hideTime'+pickerId).is(':checked'));
+                            setValue(item, getOptions(item), $('#hideTime'+pickerId).is(':checked'), false);
                         });
                     }
 
@@ -314,12 +322,12 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                         var newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-start'), 'h:mma');
                     }
                     var newDate = moment($(this).attr('data-timetable-value'), convertFormat(options.displayFormatDate)).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
-                    setValue( element, options, false, newDate);
+                    setValue( element, options, false, true, newDate);
 
                     if (options.allDayExt !== false) {
                         var linkedElements = getLinkedElements( element, options );
                         linkedElements.forEach(function(item) {
-                            setValue(item, getOptions(item), false);
+                            setValue(item, getOptions(item), false, false);
                         });
                     }
                     picker.foundation('reveal', 'close');
