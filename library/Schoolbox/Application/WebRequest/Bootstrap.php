@@ -209,7 +209,8 @@ class Bootstrap extends AbstractBootstrap {
     {
         $outputStackTrace = Config::get('debug_show_stack_trace');
 
-        if ($e instanceof \Exception) {
+
+        if ($e instanceof \Exception || $e instanceof \Throwable) {
             $error = array(
                 'file'    => $e->getFile(),
                 'message' => $e->getMessage(),
@@ -234,12 +235,12 @@ class Bootstrap extends AbstractBootstrap {
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
             if (
                 (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
-                || $e instanceof \Exception
+                || $e instanceof \Exception || $e instanceof \Throwable
             ) {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
                 $code    = 400;
-                $info    = "If the problem persists, please contact your System Administrator including the following information:";
+                $info    = 'If the problem persists, please contact your System Administrator including the following information:';
 
                 if ($e instanceof \PDOException){
                     $code = 500;
@@ -265,7 +266,7 @@ class Bootstrap extends AbstractBootstrap {
 
                 // Report to New Relic
                 if (extension_loaded('newrelic')) {
-                    if ($e instanceof \Exception ) {
+                    if ($e instanceof \Exception || $e instanceof \Throwable) {
                         newrelic_notice_error(null, $e);
                     }
                 }
@@ -283,7 +284,7 @@ class Bootstrap extends AbstractBootstrap {
                 // If there's no SitePage in DI yet: just output a styleless error.
                 $di = $this->getKernel()->getDependencyInjector();
 
-                if (!$e instanceof \Exception) {
+                if (!$e instanceof \Exception && !$e instanceof \Throwable) {
                     $e = $error;
                     $e['code'] = $code;
 
