@@ -263,6 +263,11 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function hasSubmittedResponse(User $user)
     {
+        // Student hasn't submitted anything to a empty project
+        if (!$this->hasAssessments()) {
+            return false;
+        }
+
         // Would a single sub-assessment completion imply the project is complete ?
         $canResponseToAny = $this->summator->impliesOptionality();
         $mustRespondToAll = !$canResponseToAny;
