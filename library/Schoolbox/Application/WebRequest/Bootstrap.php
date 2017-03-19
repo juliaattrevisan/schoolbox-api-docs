@@ -240,7 +240,7 @@ class Bootstrap extends AbstractBootstrap {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
                 $code    = 400;
-                $info    = "If the problem persists, please contact your System Administrator including the following information:";
+                $info    = 'If the problem persists, please contact your System Administrator including the following information:';
 
                 if ($e instanceof \PDOException){
                     $code = 500;
@@ -266,7 +266,7 @@ class Bootstrap extends AbstractBootstrap {
 
                 // Report to New Relic
                 if (extension_loaded('newrelic')) {
-                    if ($e instanceof \Exception ) {
+                    if ($e instanceof \Exception || $e instanceof \Throwable) {
                         newrelic_notice_error(null, $e);
                     }
                 }
@@ -284,7 +284,7 @@ class Bootstrap extends AbstractBootstrap {
                 // If there's no SitePage in DI yet: just output a styleless error.
                 $di = $this->getKernel()->getDependencyInjector();
 
-                if (!$e instanceof \Exception) {
+                if (!$e instanceof \Exception && !$e instanceof \Throwable) {
                     $e = $error;
                     $e['code'] = $code;
 
