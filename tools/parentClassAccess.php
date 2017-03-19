@@ -1,6 +1,6 @@
 <?php
 
-require_once('../library/Bootstrap.php');
+require_once __DIR__ . '/library/Bootstrap.php';
 
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Role;
