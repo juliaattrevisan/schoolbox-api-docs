@@ -423,8 +423,6 @@ class External_Isams_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
-        $externalUserId = $this->database->quote($externalUserId);
-
         $query = "
             SELECT      StudentID               AS StudentID,
                         ''                      AS NetworkLogin,
@@ -438,12 +436,11 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentHouse,
                         ''                      AS StudentBoarder,
                         ''                      AS StudentBoardingHouse,
-                        ''                      AS StudentCampus
+                        campus                  AS StudentCampus
             FROM        V_Student
-            WHERE       StudentID = '{$externalUserId}'
         ";
 
-        return $this->getDatabase()->getRow($query);
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
@@ -468,7 +465,7 @@ class External_Isams_User implements External_UserInterface
                         V_ParentFather.ParentSurname        AS StudentContactSpouseSurname,
                         V_ParentFather.CISEmail             AS StudentContactSpouseDefaultEmail,
                         V_Student.Grade                     AS StudentYearLevel,
-                        ''                                  AS StudentCampus,
+                        campus                              AS StudentCampus,
                         Gender                              AS StudentGender
             FROM        V_Student
             LEFT JOIN   V_Parent AS V_ParentMother ON V_ParentMother.StudentID = V_Student.StudentID AND V_ParentMother.Relationship = 'Mother'
