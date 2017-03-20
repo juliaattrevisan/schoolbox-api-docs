@@ -119,6 +119,18 @@ class Controller extends Assessment\Controller
         );
     }
 
+    /**
+     * In cases where no Participant is available a User will get an intro of a quiz with no Begin Quiz button
+     *
+     * @api GET /learning/assessment/:assessmentId/preview
+     * @level 165
+     * @param IAssessable $assessment
+     */
+    public function getPreview(IAssessable $assessment)
+    {
+        // TODO: Implement getPreview() method.
+    }
+
 
     /**
      * Redirect method
