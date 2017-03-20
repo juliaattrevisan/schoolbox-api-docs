@@ -97,21 +97,4 @@ class Controller extends Component_Homepage_ControllerAbstract
             ]
         );
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function setFolderMapper(FolderMapper $folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }    
 }
