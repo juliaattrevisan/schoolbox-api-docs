@@ -140,14 +140,8 @@ function renderStudent(
             }
         }
 
-        $code = $subject['code'];
-
-        if (!empty($subject['campusCode'])) {
-            $code = "{$subject['campusCode']}/{$code}";
-        }
-
         $subject['teachers'] = $userMapper->findByColumnList([
-            'synergy_id' => $classHandler->getTeacherName($code),
+            'synergy_id' => $classHandler->getTeacherName($subject['folder']->getCodeString()),
             'group_id'   => $teacherRoles,
         ]);
 
