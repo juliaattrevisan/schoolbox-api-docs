@@ -58,8 +58,6 @@ class Decorator implements DecoratorInterface
     {
         if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_NONE) {
             $assessment->setAcceptsNone();
-            $assessment->setOpenAt(new \Alaress_Date_NullDate());
-            $assessment->setCloseAt(new \Alaress_Date_NullDate());
         }
         else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE) {
             $assessment->setAcceptsSingle();
