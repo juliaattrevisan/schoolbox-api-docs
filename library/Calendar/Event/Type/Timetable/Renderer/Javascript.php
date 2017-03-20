@@ -23,7 +23,7 @@ class Javascript extends Base
 
             /* Output list button */
             if($this->showAttendanceLink()) {
-                $encodedCode = urlencode(urlencode($this->event->getCode()));
+                $encodedCode = urlencode(urlencode(urlencode($this->event->getCode())));
                 $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$encodedCode}/{$this->event->getStartTime()->getDatabaseDate()}/{$this->event->getPeriod()}/{$this->event->getTimetableCode()}' title='Mark Attendance'>Attendance</a>";
             }
             else {
