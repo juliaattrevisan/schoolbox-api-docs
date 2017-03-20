@@ -132,7 +132,6 @@ class Sync implements SyncInterface
                         teacherfirstname    AS staff_given_name,
                         PreferredName       AS staff_preferred_name,
                         teacherlastname     AS staff_surname,
-                        'o'                 AS default_email_code,
                         Email               AS occup_email,
                         Email               AS work_email,
                         ''                  AS email,
