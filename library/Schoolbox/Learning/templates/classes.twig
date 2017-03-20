@@ -49,9 +49,13 @@
                                     {% endif %}
                                     <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
 
-                                    {% for courseSpecId in courseSpecIds %}
-                                        <li><a href="{{ routeLookup('learningAnalytics.folderWithTerms', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) }}" class="icon-poll">Analytics</a></li>
-                                    {% endfor %}
+                                    {% if courseSpecIds | length %}
+                                        {% for courseSpecId in courseSpecIds %}
+                                            <li><a href="{{ routeLookup('learningAnalytics.folderWithTerms', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) }}" class="icon-poll">Analytics</a></li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li><a><span class="icon-poll" title="No courses imported to class">Analytics (No courses)</span></a></li>
+                                    {% endif %}
 
                                     {% if term.contains(now) %}
                                         <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
