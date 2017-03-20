@@ -128,7 +128,11 @@ class Controller extends Assessment\Controller
      */
     public function getPreview(IAssessable $assessment)
     {
-        // TODO: Implement getPreview() method.
+        $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
+        // TODO: remove buttons from intro.html if the user is not participant
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
+        );
     }
 
 
