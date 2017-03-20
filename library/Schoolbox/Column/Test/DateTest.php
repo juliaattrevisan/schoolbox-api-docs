@@ -124,7 +124,9 @@ class DateTest extends DatetimeTest
      */
     public function testHydrateWithTime(Date $column, $input, $expectedHydratedValue)
     {
-        $this->assertEquals($expectedHydratedValue, $column->hydrate($input)->getDatabase());
+        // Errors are squelched during hydration, as the date and time tests
+        // raise a set of warnings due to trailing data.
+        $this->assertEquals($expectedHydratedValue, @$column->hydrate($input)->getDatabase());
     }
 
     /**

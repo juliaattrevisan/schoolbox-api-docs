@@ -78,7 +78,7 @@ class DatetimeTest extends TestCase {
      */
     public function testHydrate($input = null, $expected_output = null) {
         // Silence errors: date creation warns on invalid but parseable dates
-        $hydrated = $this->object->hydrate($input);
+        $hydrated = @$this->object->hydrate($input);
         $this->assertSame(
             $expected_output,
             $input == null && $hydrated instanceof \Alaress_Date_NullDate ?
