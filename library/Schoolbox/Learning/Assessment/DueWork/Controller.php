@@ -15,13 +15,13 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as File;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -31,19 +31,18 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmis
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 
 class Controller extends Assessment\Controller
 {
-
     /** @var Rubric\ResultMapper */
     private $resultSetMapper;
 
@@ -179,7 +178,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var Submission\File\Model $submission */
+        /** @var File $submission */
         $allResponses = $participant->getAllResponses();
 
         $twigData = [
@@ -512,7 +511,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var Submission\File\Model $submission */
+        /** @var File $submission */
         $allResponses = $participant->getAllResponses();
 
         /* Work out if we are going to accept responses
@@ -538,7 +537,7 @@ class Controller extends Assessment\Controller
         /* Assume the most recent record is the latest submission
          */
         if ($allResponses->count()) {
-            /** @var Submission\Model $latestResponse */
+            /** @var Submission $latestResponse */
             $latestResponse = $participant->findMostRecentResponse();
 
             /* If the latest response is a draft, collect all its contents for editing
@@ -565,7 +564,7 @@ class Controller extends Assessment\Controller
                  * I would not expect it to recycle files from my previous Submitted submission
                  */
                 $latestResponse = null;
-                $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission\Model());
+                $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
             }
         }
         else {
@@ -573,7 +572,7 @@ class Controller extends Assessment\Controller
             /* Init a dangerZone that is ready to accept files for
              * the first ever draft
              */
-            $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission\Model());
+            $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
         }
 
         /* Pump into twig land
@@ -616,7 +615,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var Submission\File\Model $submission */
+        /** @var File $submission */
         $allResponses = $participant->getAllResponses();
 
         /* Work out if we are going to accept responses
@@ -911,14 +910,12 @@ class Controller extends Assessment\Controller
          */
         try {
             /** @var SubmissionBox $submitBox */
-            $submitBox = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
+            $submitBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
             $submitBox->setSkipUnsubmitted($skipUnsubmitted);
-            \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->save($submitBox);
+            SubmissionBoxMapper::getInstance()->save($submitBox);
         }
-        catch (\Schoolbox\Mapper\Exception $e) {
-
-            /* noop - submission box doesn't exist
-             */
+        catch (MapperException $e) {
+            // noop - submission box doesn't exist
         }
 
         $this->getResponse()->status->setCode(204);
