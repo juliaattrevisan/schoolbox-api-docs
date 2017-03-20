@@ -52,13 +52,6 @@ class TimespanTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function testHydrate($input = null, $expected_output = null) {
-        $this->assertEquals($expected_output, $this->object->hydrate($input));
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getTestDehydrate() {
         $invertedInterval = new DateInterval('PT27H15M');
         $invertedInterval->invert = 1;
@@ -95,7 +88,16 @@ class TimespanTest extends TestCase {
     }
 
     /**
-     * @inheritdoc
+     * @param null|int $input
+     * @param null|DateInterval $expected_output
+     */
+    public function testHydrate($input = null, $expected_output = null) {
+        $this->assertEquals($expected_output, $this->object->hydrate($input));
+    }
+
+    /**
+     * @param null|int|DateInterval|string $input
+     * @param null|int $expected_output
      */
     public function testDehydrate($input = null, $expected_output = null) {
         $this->assertEquals($expected_output, $this->object->dehydrate($input));

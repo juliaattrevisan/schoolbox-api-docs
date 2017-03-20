@@ -56,14 +56,16 @@ class DecimalTest extends TestCase {
 	}
 
     /**
-     * @inheritdoc
+     * @param null|string $input
+     * @param null|float $expected_output
      */
     public function testHydrate($input = null, $expected_output = null) {
 		$this->assertSame($expected_output, $this->object->hydrate($input));
 	}
 
     /**
-     * @inheritdoc
+     * @param null|float $input
+     * @param null|float $expected_output
      */
     public function testDehydrate($input = null, $expected_output = null) {
 		$this->assertSame($expected_output, $this->object->dehydrate($input));

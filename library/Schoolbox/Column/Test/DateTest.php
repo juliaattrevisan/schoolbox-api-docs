@@ -96,21 +96,6 @@ class DateTest extends DatetimeTest
     }
 
     /**
-     * @dataProvider getTestHydrateWithTimeData
-     *
-     * @param Date   $column
-     * @param string $input
-     * @param string $expectedHydratedValue
-     */
-    public function testHydrateWithTime(Date $column, $input, $expectedHydratedValue)
-    {
-        // Errors are squelched during hydration, as the date and time tests
-        // raise a set of warnings due to trailing data.
-        $this->assertEquals($expectedHydratedValue, @$column->hydrate($input)->getDatabase());
-    }
-
-
-    /**
      * @return array|array[]
      */
     public function getTestDehydrateWithTimeData()
@@ -128,6 +113,18 @@ class DateTest extends DatetimeTest
             [new Date('00:00:00'), '2011-12-31 23:59:59', '2011-12-31'],
             [new Date('23:59:59'), '2012-01-01 00:00:00', '2012-01-01'],
         ];
+    }
+
+    /**
+     * @dataProvider getTestHydrateWithTimeData
+     *
+     * @param Date   $column
+     * @param string $input
+     * @param string $expectedHydratedValue
+     */
+    public function testHydrateWithTime(Date $column, $input, $expectedHydratedValue)
+    {
+        $this->assertEquals($expectedHydratedValue, $column->hydrate($input)->getDatabase());
     }
 
     /**

@@ -77,7 +77,9 @@ class ModelTest extends TestCase {
 	}
 
     /**
-     * @inheritdoc
+     * Function parameters not used, only kept to maintain compatibility with parent
+     * @param null $input
+     * @param null $expected_output
      */
     public function testHydrate($input = null, $expected_output = null) {
 		$hydrate = $this->object->hydrate(1, $this->test_mapper);
@@ -93,7 +95,9 @@ class ModelTest extends TestCase {
 	}
 
     /**
-     * @inheritdoc
+     * Function parameters not used, only kept to maintain compatibility with parent
+     * @param null $input
+     * @param null $expected_output
      */
     public function testDehydrate($input = null, $expected_output = null) {
 		$this->assertSame(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
@@ -105,6 +109,7 @@ class ModelTest extends TestCase {
 	public function testDehydrateNull() {
 		$this->assertSame(null, $this->object->dehydrate(null, $this->test_mapper));
 	}
+
 	/**
 	 * Test when dehydrating with an alternate field name.
 	 */

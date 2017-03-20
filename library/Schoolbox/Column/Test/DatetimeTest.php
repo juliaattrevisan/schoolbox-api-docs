@@ -73,7 +73,8 @@ class DatetimeTest extends TestCase {
 	}
 
     /**
-     * @inheritdoc
+     * @param null|string $input
+     * @param null|bool $expected_output
      */
     public function testHydrate($input = null, $expected_output = null) {
         // Silence errors: date creation warns on invalid but parseable dates
@@ -86,10 +87,11 @@ class DatetimeTest extends TestCase {
                     $hydrated instanceof DateWrapper && !$hydrated instanceof \Alaress_Date_NullDate
                 )
         );
-	}
+    }
 
     /**
-     * @inheritdoc
+     * @param mixed $input
+     * @param null|string $expected_output
      */
     public function testDehydrate($input = null, $expected_output = null) {
 		//

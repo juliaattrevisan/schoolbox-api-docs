@@ -42,25 +42,26 @@ abstract class TestCase extends BaseTestCase {
 	abstract public function getTestHydrate();
 
 	/**
-	 * @dataProvider getTestHydrate
-     * @param null $input
-     * @param null $expected_output
-     */
-	public function testHydrate($input = null, $expected_output = null) {
-		$this->assertSame($expected_output, $this->object->hydrate($input));
-	}
-
-	/**
 	 * Data provider for $this->testDehydrate().
 	 *
 	 * @return array
 	 */
 	abstract public function getTestDehydrate();
 
-	/**
+
+    /**
+     * @dataProvider getTestHydrate
+     * @param mixed $input
+     * @param mixed $expected_output
+     */
+    public function testHydrate($input = null, $expected_output = null) {
+        $this->assertSame($expected_output, $this->object->hydrate($input));
+    }
+
+    /**
 	 * @dataProvider getTestDehydrate
-     * @param null $input
-     * @param null $expected_output
+     * @param mixed $input
+     * @param mixed $expected_output
      */
 	public function testDehydrate($input = null, $expected_output = null) {
 		$this->assertSame($expected_output, $this->object->dehydrate($input));

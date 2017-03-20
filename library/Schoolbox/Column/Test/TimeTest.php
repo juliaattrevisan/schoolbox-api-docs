@@ -7,7 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-
 namespace Schoolbox\Column\Test;
 
 use Schoolbox\Column\Time;
@@ -16,7 +15,6 @@ use \Alaress_Date_Format as DateWrapper;
 
 class TimeTest extends DatetimeTest
 {
-
     /**
     * @var Time
     */

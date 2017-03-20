@@ -25,6 +25,7 @@ class BinaryTest extends TestCase {
      */
     public function setupObject() {
 		$this->object = new Binary();
+		return [];
 	}
 
     /**

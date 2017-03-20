@@ -33,10 +33,10 @@ class Interval implements IColumnType {
      * Translates a value from a value in a model object into a value for a
      * database field or other data store.
      *
-     * @param IntervalObject    $value
+     * @param IntervalObject|DateInterval|int|string $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return string
+     * @return null|int
      */
     public function dehydrate($value, $mapper = null) {
         if (is_numeric($value)) {
