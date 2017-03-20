@@ -15,7 +15,7 @@
 </div>
 
 <div class="row">
-    {% if classList is empty or hideTimetable %}
+    {% if classList is empty %}
         <div class="small-12 island">
             <div class = "empty-state">
                 <i class="icon-class-list"></i>
@@ -29,52 +29,16 @@
         </div>
     {% else %}
         {% for class in classList %}
-            {% set courseSpecIds = courses[class.id] %}
             <div class="small-6 medium-6 large-4 island">
                 <section>
-                    <div class="card-new small-12">
-                        <a href="/homepage/{{ class.id }}">
-                            <div class="card-feature-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
-                        </a>
-                        <div class="card-content actions-small-1">
-                            <h3><a href="/homepage/{{ class.id }}">{{ class.title }}</a></h3>
-                            <p class="meta">{{ classTypes[class.id] }}</p>
-                            {% if USER.getRole.isStaff == true %}
-                                <nav>
-                                    <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
-                                </nav>
-                                <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                                    {% if term.contains(now) %}
-                                        <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
-                                    {% endif %}
-                                    <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
-
-                                    {% if courseSpecIds | length %}
-                                        {% for courseSpecId in courseSpecIds %}
-                                            <li><a href="{{ routeLookup('learningAnalytics.folderWithTerms', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) }}" class="icon-poll">Analytics</a></li>
-                                        {% endfor %}
-                                    {% else %}
-                                        <li><a><span class="icon-poll" title="No courses imported to class">Analytics (No courses)</span></a></li>
-                                    {% endif %}
-
-                                    {% if term.contains(now) %}
-                                        <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
-                                    {% endif %}
-                                </ul>
-                            {% endif %}
-                            {%  if USER.getRole.isStudent == true %}
-                                <nav>
-                                    <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
-                                </nav>
-                                <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                                    <li><a href="{{ routeLookup('learning.getGradesForSubject', {userId: USER.id, termCode: term.code, subjectId: class.id}) }}" class="icon-approve">Grades</a></li>
-                                </ul>
-                            {% endif %}
-                        </div>
-                    </div>
+                    {% include 'sub/classTile.twig' with {
+                        'term':       term,
+                        'class':      class,
+                        'classType':  classTypes[class.id],
+                        'courses':    courses[class.id],
+                    } only %}
                 </section>
             </div>
         {% endfor %}
-
     {% endif %}
 </div>
