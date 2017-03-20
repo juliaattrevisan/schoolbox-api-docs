@@ -220,7 +220,7 @@ class Trie
 
 
     /**
-     * This is a one-way steet. Locks down and memory-optimises this trie and everything below it
+     * This is a one-way street. Locks down and memory-optimises this trie and everything below it
      */
     public function lock()
     {

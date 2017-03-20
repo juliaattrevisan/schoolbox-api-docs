@@ -96,7 +96,7 @@ class Router implements IRouter
 
         array_shift($matches);
 
-        // $this->cache[$fullRegex] now points to the leaf node (any non-existent intermediate branches were created on the fly)
+        // $this->cache[$fullRegex] now points to the node we want to apply the payload to (any non-existent intermediate branches were created on the fly)
         $this->cache[$fullRegex]->set($matches, $key, $value);
 
         return $this;
