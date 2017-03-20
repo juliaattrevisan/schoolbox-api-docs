@@ -123,7 +123,7 @@ class Queue extends ResourceVideo
         if ($return == 0) {
             return true;
         } else {
-            throw new \RuntimeException($message);
+            throw new \RuntimeException($message[0]);
         }
 
     }
