@@ -1,0 +1,95 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Realtime\Routing\Subscription;
+
+use Alaress\Routing\IRouter;
+use InvalidArgumentException;
+use OverflowException;
+
+/**
+ * Can recursively resolve Trie paths to obtain a list of subscribed users
+ *
+ * @package Schoolbox\Realtime\Routing\Subscription
+ */
+class Resolver
+{
+    /**
+     * @var IRouter
+     */
+    private $router;
+
+
+    /**
+     * Resolver constructor.
+     *
+     * @param IRouter $router
+     */
+    public function __construct(IRouter $router)
+    {
+        $this->router = $router;
+    }
+
+
+    /**
+     * Recursively burrow through redirect topics and compile a list of users ultimately subscribed to the
+     * given topic, whether directly or by proxy.
+     *
+     * @param string $topic
+     * @throws OverflowException   if recursion is detected
+     * @return int[]
+     */
+    public function getSubscribedUserIds($topic)
+    {
+        return $this->resolve($topic, []);
+    }
+
+
+    /**
+     * Internal resursive function
+     *
+     * @param string $topic
+     * @param array  $seenPaths cache of paths seen so far in this traversal in order to protect against recursion
+     * @return int[]
+     * @throws OverflowException
+     */
+    private function resolve($topic, array $seenPaths)
+    {
+        if (isset($seenPaths[$topic])) {
+            throw new OverflowException('Recursion detected: '. implode(' -> ', array_keys($seenPaths)) . " -> $topic");
+        }
+
+        try {
+            $data = array_filter($this->router->get($topic));
+
+            $seenPaths[$topic] = true;
+
+            $userIds = [];
+
+            foreach ($data as $key => $value) {
+                if (is_int($key)) {
+                    // treat integers as user IDs
+                    $userIds[$key] = true;
+
+                } else {
+                    // treat strings as a redirect path
+                    foreach ($this->resolve($key, $seenPaths) as $userId) {
+                        $userIds[$userId] = true;
+                    }
+                }
+            }
+
+            return array_keys($userIds);
+
+        } catch (InvalidArgumentException $e) {
+            // nobody subscribed, and that's totally ok
+            return [];
+        }
+    }
+
+}

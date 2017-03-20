@@ -1,0 +1,90 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Alaress\Routing\Test;
+
+use Alaress\Routing\Route\RecursiveRoute;
+use Alaress\Routing\Trie;
+use InvalidArgumentException;
+
+class RecursiveRouteTest extends \PHPUnit_Framework_TestCase
+{
+    /** @var Trie */
+    private static $root;
+
+    /**
+     * This method is called before the first test of this test class is run.
+     *
+     * @since Method available since Release 3.4.0
+     */
+    public static function setUpBeforeClass()
+    {
+        // this can be static, since the tests will not mutate it
+        self::$root = new Trie('', function () { return 0; });
+
+        // manual construction of the tree foo/(:int)/{bar,baz}
+        $foo = self::$root->put('foo');
+        $int = $foo->put('(\d+)'); // note the capture in the pattern
+        $all = $foo->put('.*');
+        $bar = $int->put('bar');
+        $baz = $int->put('baz');
+        $bin = $baz->put('bin');
+
+        // set data
+        $bar->set([ 2 ], 'barK', 'barV');
+        $baz->set([ 4 ], 'bazK', 'bazV');
+        $bin->set([ 4 ], 'binK', 'binV');
+        $all->set([   ], 'allK', 'allV');
+    }
+
+
+    /**
+     * Helper method to create a new Route object
+     *
+     * @param string $path
+     * @param string $delim
+     * @return RecursiveRoute
+     */
+    private function route($path, $delim)
+    {
+        return new RecursiveRoute($path, self::$root, $delim);
+    }
+
+
+    /**
+     * @return array[]
+     */
+    public function dataMultipleRoutesMatch()
+    {
+        return [
+            [ 'foo:2:bar',      [ 'bar', 'all' ] ],
+            [ 'foo:not:an:int', [        'all' ] ],
+            [ 'foo:4:baz:bin',  [ 'bin', 'all' ] ],
+        ];
+    }
+
+
+    /**
+     * @dataProvider dataMultipleRoutesMatch
+     *
+     * @param string $path
+     * @param array  $expected
+     * @throws InvalidArgumentException
+     */
+    public function testMultipleRoutesMatch($path, array $expected)
+    {
+        $exp = [];
+
+        // flesh out the "compressed" expectation array
+        foreach ($expected as $e) {
+            $exp[$e.'K'] = $e.'V';
+        }
+
+        $this->assertEquals($exp, $this->route($path, ':')->data());
+    }
+}

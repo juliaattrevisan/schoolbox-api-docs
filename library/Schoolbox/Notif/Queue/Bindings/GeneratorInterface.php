@@ -17,6 +17,7 @@ interface GeneratorInterface
 
     /**
      * @param User $user
+     * @return array
      */
     public function generateBindingsForUser(User $user);
 
