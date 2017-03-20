@@ -127,10 +127,10 @@ class Sync implements SyncInterface
     {
         $query =
         "
-            SELECT      StaffID                             AS staff_id,
+            SELECT      V_Staff.StaffID                     AS staff_id,
                         ''                                  AS network_login,
                         1                                   AS active_flag,
-                        title                               AS staff_title,
+                        V_Staff.title                       AS staff_title,
                         teacherfirstname                    AS staff_given_name,
                         PreferredName                       AS staff_preferred_name,
                         teacherlastname                     AS staff_surname,
