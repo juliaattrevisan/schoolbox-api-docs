@@ -271,7 +271,7 @@ class Queue extends ResourceVideo
                 throw new \RuntimeException($output);
             }
         }
-        throw new \RuntimeException($message);
+        throw new \RuntimeException($message[0]);
 
 
     }
