@@ -1,0 +1,10 @@
+/* These rules need to be copied to the Skin Builder custom CSS field at /adminv2/setting/Skin+Config */
+.fail {
+    background-color: rgb(247, 206, 204);
+}
+.mastered {
+    background-color: rgb(213, 231, 212);
+}
+.notmarked {
+    background-color: rgb(255, 242, 205);
+}
