@@ -72,8 +72,9 @@ class Sync implements SyncInterface
                 StudentFirstname         AS student_preferred,
                 StudentSurname           AS student_surname,
                 Gender                   AS student_gender,
-                StudentEmail             AS student_email,
-                ''                       AS student_occup_email,
+                ''                       AS student_home_email,
+                StudentEmail             AS student_default_email,
+                ''                       AS student_work_email,
                 Grade                    AS student_year_level,
                 ''                       AS student_house_description,
                 ''                       AS student_house,
@@ -100,6 +101,7 @@ class Sync implements SyncInterface
                         ParentFirstname                 AS student_contact_preferred,
                         ParentFirstname                 AS student_contact_given_name,
                         ParentSurname                   AS student_contact_surname,
+                        ''                              AS student_contact_home_email,
                         CISEmail                        AS student_contact_default_email,
                         ''                              AS student_contact_work_email,
                         V_Student.campus                AS student_campus,                        
@@ -125,24 +127,25 @@ class Sync implements SyncInterface
     {
         $query =
         "
-            SELECT      StaffID             AS staff_id,
-                        ''                  AS network_login,
-                        1                   AS active_flag,
-                        title               AS staff_title,
-                        teacherfirstname    AS staff_given_name,
-                        PreferredName       AS staff_preferred_name,
-                        teacherlastname     AS staff_surname,
-                        Email               AS occup_email,
-                        Email               AS work_email,
-                        ''                  AS email,
-                        Campus              AS staff_campus,
-                        DivisionID          AS staff_category_type,
-                        ''                  AS staff_category,
-			            ''                  AS staff_position,
-                        ''                  AS staff_department,
-                        ''                  AS staff_year_level,
-                        ''                  AS staff_year_level_description                
+            SELECT      StaffID                             AS staff_id,
+                        ''                                  AS network_login,
+                        1                                   AS active_flag,
+                        title                               AS staff_title,
+                        teacherfirstname                    AS staff_given_name,
+                        PreferredName                       AS staff_preferred_name,
+                        teacherlastname                     AS staff_surname,
+                        V_StaffDirectory.SchoolEmailAddress AS work_email,
+                        V_StaffDirectory.SchoolEmailAddress AS default_email,
+                        ''                                  AS home_email,
+                        Campus                              AS staff_campus,
+                        DivisionID                          AS staff_category_type,
+                        ''                                  AS staff_category,
+			            ''                                  AS staff_position,
+                        ''                                  AS staff_department,
+                        ''                                  AS staff_year_level,
+                        ''                                  AS staff_year_level_description                
             FROM        V_Staff
+            LEFT JOIN   V_StaffDirectory ON V_StaffDirectory.StaffID = V_Staff.StaffID
             ORDER BY    teacherlastname, teacherfirstname
         ";
 
