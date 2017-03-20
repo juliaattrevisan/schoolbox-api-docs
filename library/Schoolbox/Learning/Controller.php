@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Statistics;
+use Schoolbox\Learning\Classes\ClassList;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -33,11 +34,11 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Learning\Assessment\Quiz\Model as AssessmentQuiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use \Alaress_Date_Format;
 
 class Controller extends Base
 {
@@ -94,7 +95,7 @@ class Controller extends Base
     /** @var CourseImplementationMapper */
     private $courseImplementationMapper;
 
-    /** @var CourseSpecification\Mapper */
+    /** @var CourseSpecificationMapper */
     private $courseSpecificationMapper;
 
     /** @var  \External_ClassInterface */
@@ -124,7 +125,7 @@ class Controller extends Base
      * @param QuizAttemptMapper $quizAttemptMapper
      * @param Timetable_ColourMapper $timetableColourMapper
      * @param CourseImplementationMapper $courseImplementationMapper
-     * @param CourseSpecification\Mapper $courseSpecificationMapper
+     * @param CourseSpecificationMapper $courseSpecificationMapper
      * @param \External_ClassInterface $externalClass
      * @param \Database $database
      * @param Access $access
@@ -141,7 +142,7 @@ class Controller extends Base
         QuizAttemptMapper $quizAttemptMapper,
         Timetable_ColourMapper $timetableColourMapper,
         CourseImplementationMapper $courseImplementationMapper,
-        CourseSpecification\Mapper $courseSpecificationMapper,
+        CourseSpecificationMapper $courseSpecificationMapper,
         \External_ClassInterface $externalClass,
         \Database $database,
         Access $access
@@ -304,113 +305,41 @@ class Controller extends Base
      */
     public function getClasses(Term $term)
     {
-        $now           = \Alaress_Date_Format::now();
-        $classTypes    = [];
-        $folderList    = $this->getFolderMapper()->createCollection();
+        $now           = Alaress_Date_Format::now();
         $isTermCurrent = $term->contains($now);
+        $hideTimetable = $this->getUser()->getHideTimetable();
+        $hideClasses   = $isTermCurrent && $hideTimetable;
 
-        // Is 'Hide timetable' true and trying to look at current term ?
-        if ($isTermCurrent && $this->getUser()->getHideTimetable()) {
-            $hideTimetable = true;
+        // Are we not showing classes ?
+        if($hideClasses){
+            $gridData = [
+                'term'       => $term,
+                'classList'  => $this->folderMapper->createCollection(),
+                'classTypes' => [],
+                'courses'    => new Collection(),
+            ];
         } else {
-            $hideTimetable = false;
-
-            // Are we looking at current Classes, or historical ?
-            if ($isTermCurrent) {
-                /* Convert external subjects to folders */
-                foreach ($this->getUser()->getSubjectCollection() as $subject) {
-                    try {
-                        $folder = $this->getFolderMapper()->findByCode($subject['code']);
-                        $folderList->add($folder);
-                        $classTypes[$folder->getId()] = $subject['classType'];
-                    } catch (MapperException $e) {
-                        //not found
-                    }
-                }
-            } else {
-                // Is user a teacher or student ?
-                if ($this->getUser()->getRole()->isStaff()) {
-                    $folderList = $this->getFolderMapper()->findFoldersWithFeedbacksFromTeacher($this->getUser(), $term);
-                } elseif ($this->getUser()->getRole()->isStudent()) {
-                    $folderList = $this->getFolderMapper()->findFoldersWithResponses($this->getUser(), $term);
-                }
-            }
+            $classList = new ClassList(
+                $this->getUser(),
+                $this->folderMapper,
+                $this->timetableColourMapper,
+                $this->courseSpecificationMapper,
+                $this->courseImplementationMapper
+            );
+            $gridData = $classList->getClassList($term, $now);
         }
 
-        $courseSpecs = $this->getCourseSpecsHavingUnitsInTerm($folderList, $term);
 
-        /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = $this->getTimetableColourMapper()->findAll();
-        $colourIndex = 0;
-
-        foreach ($folderList as $folder) {
-            if (!$folder->getColour()) {
-                /* Apply colour from list if no colour exists */
-                $folder->setColour($colourList[$colourIndex]->getHexColour());
-                $colourIndex = ($colourIndex + 1) % $colourList->count();
-            }
-        }
-
-        $data = [
-            'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
+        $gridData = array_merge($gridData, [
             'now'           => $now,
-            'term'          => $term,
-            'classList'     => $folderList,
-            'classTypes'    => $classTypes,
-            'courses'       => $courseSpecs,
+            'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'hideTimetable' => $hideTimetable,
-        ];
+        ]);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $data)->setTab('classes'));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData)->setTab('classes'));
     }
 
 
-    /**
-     * Returns a sets of CourseSpecs, grouped by class folder
-     *
-     * Filters to only return CourseSpecs that have units imported to class folder for specified term
-     *
-     * @param GenericCollection|Folder[] $folderList
-     * @param Term $term
-     * @return Collection|CourseSpecification\Model[][] Grouped by folder.id
-     */
-    public function getCourseSpecsHavingUnitsInTerm(GenericCollection $folderList, Term $term)
-    {
-        $courseSpecsPerFolder = new Collection();
-
-        // Get CourseImpls, then group by Folder
-        $courseImpls = $this->courseImplementationMapper->findByFolderId($folderList->getColumnValues('id'));
-
-        /** @var CourseImplementation[][] $courseImplsPerClass */
-        $courseImplsPerClass = $courseImpls->groupByCallback(function (CourseImplementation $courseImpl) {
-            return $courseImpl->getFolder()->getId();
-        });
-
-        // If a course import has unit implementations that are within the specified
-        // term, add the course spec to the folder.
-        /**
-         * @var CourseImplementation[] $courseImpls
-         */
-        foreach ($courseImplsPerClass as $folderId => $courseImpls) {
-            $courseSpecsPerFolder[$folderId] = $this->courseSpecificationMapper->createCollection();
-            $hasUnitsInTerm = false;
-            foreach ($courseImpls as $courseImpl) {
-                foreach ($courseImpl->getUnits() as $unitImpl) {
-                    if ($unitImpl->getOpenDate()->compareDateOnly($term->getStart()) >= 0) {
-                        if ($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->compareDateOnly($term->getActualFinish()) <= 0) {
-                            $hasUnitsInTerm = true;
-                            break;
-                        }
-                    }
-                }
-                if ($hasUnitsInTerm) {
-                    $courseSpecId = $courseImpl->getSpecification()->getId();
-                    $courseSpecsPerFolder[$folderId][$courseSpecId] = $courseImpl->getSpecification();
-                }
-            }
-        }
-        return $courseSpecsPerFolder;
-    }
 
     /**
      * Displays a list of grades/results for the specified user and term for all subjects
