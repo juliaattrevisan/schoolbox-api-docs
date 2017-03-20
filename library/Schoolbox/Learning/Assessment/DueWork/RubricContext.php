@@ -14,6 +14,8 @@ use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 class RubricContext
 {
@@ -91,7 +93,8 @@ class RubricContext
         ];
 
         // Hide total mark from students and parents
-        if (!($currentUser->isSuperuser() || $currentUser->getRole()->isStaff())) {
+        $access = Access::getInstance()->getFolderAccess($currentUser, [ $dueWork->getBaseContext()->getFolder()->getId() ]);
+        if ($access < UserAccess::ACCESS_WRITE) {
             unset($context['rubric']['total']);
         }
 
@@ -109,17 +112,13 @@ class RubricContext
         if(!$dueWork->getUseRubric()){
             return ['rubric' => null];
         }
-//        $publishedOnly = true;
-//        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext($currentUser),
         ];
 
-        // Hide total mark from students and parents
-        if (!($currentUser->isSuperuser() || $currentUser->getRole()->isStaff())) {
-            unset($context['rubric']['total']);
-        }
+        // Don't show total mark here at all (it's zero anyway when there is no Participant)
+        unset($context['rubric']['total']);
 
         return $context;
     }
