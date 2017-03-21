@@ -18,11 +18,10 @@ use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
 use Schoolbox\Error;
-use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -59,13 +58,13 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/term/{termCode}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param array                           $params
+     * @param CourseSpecification             $courseSpecification
+     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Term                            $term
      * @throws ApplicationException
      */
-    public function courseWithTerms(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function courseWithTerms(array $params, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
     {
         $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTerms');
     }
@@ -97,13 +96,13 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param array                           $params
+     * @param CourseSpecification             $courseSpecification
+     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Term                            $term
      * @throws ApplicationException
      */
-    public function courseWithTaskAndTerms(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function courseWithTaskAndTerms(array $params, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
     {
         $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTaskAndTerms');
     }
@@ -135,14 +134,14 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/term/{termCode}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Folder                                 $selectedClassFolder
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param array                           $params
+     * @param Folder                          $selectedClassFolder
+     * @param CourseSpecification             $courseSpecification
+     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Term                            $term
      * @throws ApplicationException
      */
-    public function folderWithTerms(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function folderWithTerms(array $params, Folder $selectedClassFolder, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
     {
         $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTerms', $selectedClassFolder);
     }
@@ -176,14 +175,14 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Folder                                 $selectedClassFolder
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param array                           $params
+     * @param Folder                          $selectedClassFolder
+     * @param CourseSpecification             $courseSpecification
+     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Term                            $term
      * @throws ApplicationException
      */
-    public function folderWithTaskAndTerms(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function folderWithTaskAndTerms(array $params, Folder $selectedClassFolder, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
     {
         $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTaskAndTerms', $selectedClassFolder);
     }
@@ -282,15 +281,15 @@ class Controller extends Base
      * Both are processed identically as data is grouped based on task
      * instances' originating task id, not the individual instance id
      *
-     * @param array                                  $params                bag of holding
-     * @param Specification\Model                    $courseSpecification   spec from which all data on this page inherits
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations   units that match the term filter
-     * @param Term                                   $term                  term to filter
-     * @param Folder                                 $selectedClassFolder   if given, the class folder to filter
-     * @param string                                 $routeUsed             pass directly through to twig for route lookups
+     * @param array                           $params                bag of holding
+     * @param CourseSpecification             $courseSpecification   spec from which all data on this page inherits
+     * @param Collection|UnitImplementation[] $unitImplementations   units that match the term filter
+     * @param Term                            $term                  term to filter
+     * @param Folder                          $selectedClassFolder   if given, the class folder to filter
+     * @param string                          $routeUsed             pass directly through to twig for route lookups
      * @throws ApplicationException
      */
-    private function process(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term, $routeUsed, Folder $selectedClassFolder = null)
+    private function process(array $params, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term, $routeUsed, Folder $selectedClassFolder = null)
     {
         if (0 === $unitImplementations->count()) {
             throw Error\Mapper::getInstance()->generateException(Error\Mapper::ERROR_NO_ANALYTICS_DATA);
