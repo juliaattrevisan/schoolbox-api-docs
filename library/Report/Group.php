@@ -229,7 +229,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
                 'USER_USERNAME'   => Scrub::text($user['username']),
                 'USER_SYNERGY_ID' => Scrub::text($user['synergy_id']),
                 'USER_EMAIL'      => $email,
-                'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
+                'USER_YEAR'       => empty($user['year']) && (string)$user['year'] != '0' ? '' : "Year {$user['year']}",
                 'USER_CAMPUS'     => Scrub::text($user['campus']),
             ));
 
