@@ -42,15 +42,6 @@ class Metadata
         $this->unitImplementations = $unitImplementations;
     }
 
-    /**
-     * Get the selected submission type to filter by
-     *
-     * @return int|null
-     */
-    public function getSelectedSubmissionTypeFilter()
-    {
-        return $this->submissionTypeFilter;
-    }
 
     /* Getters/Setters
      */
