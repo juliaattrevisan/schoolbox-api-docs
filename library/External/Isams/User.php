@@ -56,34 +56,31 @@ class External_Isams_User implements External_UserInterface
      */
     public function getParent($externalUserId)
     {
-        $externalUserId = $this->database->quote($externalUserId);
-
         $query = "
-            SELECT      V_ParentMother.ParentID             AS ID,
-                        ''                                  AS Title,
-                        V_ParentMother.ParentFirstname      AS Preferred,
-                        V_ParentMother.ParentSurname        AS Surname,
-                        V_ParentMother.CISEmail             AS Email,
-                        ''                                  AS OccupEmail,
-                        ''                                  AS DefaultEmailCode,
-                        ''                                  AS HomePhone,
-                        V_ParentMother.Mobile               AS MobilePhone,
-                        0                                   AS SilentPhoneFlag,
-                        0                                   AS SilentMobilePhoneFlag,
-                        1                                   AS DirectoryIncludeFlag,
-                        V_ParentFather.ParentID             AS SpouseID,
-                        ''                                  AS SpouseTitle,
-                        V_ParentFather.ParentFirstname      AS SpousePreferred,
-                        V_ParentFather.ParentSurname        AS SpouseSurname,
-                        V_ParentFather.CISEmail             AS SpouseEmail,
-                        ''                                  AS SpouseOccupEmail,
-                        ''                                  AS SpouseDefaultEmailCode,
-                        V_ParentFather.Mobile               AS SpouseMobilePhone,
-                        1                                   AS SpouseDirectoryIncludeFlag
+            SELECT      V_Parent.ParentID             AS ID,
+                        ''                            AS Title,
+                        V_Parent.ParentFirstname      AS Preferred,
+                        V_Parent.ParentSurname        AS Surname,
+                        V_Parent.CISEmail             AS Email,
+                        ''                            AS OccupEmail,
+                        ''                            AS DefaultEmailCode,
+                        ''                            AS HomePhone,
+                        V_Parent.Mobile               AS MobilePhone,
+                        0                             AS SilentPhoneFlag,
+                        0                             AS SilentMobilePhoneFlag,
+                        1                             AS DirectoryIncludeFlag,
+                        ''                            AS SpouseID,
+                        ''                            AS SpouseTitle,
+                        ''                            AS SpousePreferred,
+                        ''                            AS SpouseSurname,
+                        ''                            AS SpouseEmail,
+                        ''                            AS SpouseOccupEmail,
+                        ''                            AS SpouseDefaultEmailCode,
+                        ''                            AS SpouseMobilePhone,
+                        1                             AS SpouseDirectoryIncludeFlag
             FROM        V_Student
-            LEFT JOIN   V_Parent AS V_ParentMother ON V_ParentMother.StudentID = '{$externalUserId}' AND V_ParentMother.Relationship = 'Mother'
-            LEFT JOIN   V_Parent AS V_ParentFather ON V_ParentFather.StudentID = '{$externalUserId}' AND V_ParentFather.Relationship = 'Father'
-            WHERE       V_Student.StudentID = '{$externalUserId}'
+            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = '{$this->database->quote($externalUserId)}'
+            WHERE       V_Student.StudentID = '{$this->database->quote($externalUserId)}'
         ";
 
         $parent = $this->getDatabase()->getRow($query);
@@ -142,10 +139,8 @@ class External_Isams_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
-        $externalUserId = $this->database->quote($externalUserId);
-
         $query = "
-            SELECT      StudentID                   AS StudentID,
+            SELECT      StudentID               AS StudentID,
                         StudentFirstname        AS StudentGiven1,
                         StudentSurname          AS StudentSurname,
                         DOB                     AS StudentBirthDate,                
@@ -171,7 +166,7 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentStudiesCode,
                         ''                      AS StudentBoarder
             FROM        V_Student
-            WHERE       StudentID = '{$externalUserId}'
+            WHERE       StudentID = '{$this->database->quote($externalUserId)}'
         ";
 
         return $this->getDatabase()->getRow($query);
@@ -184,8 +179,6 @@ class External_Isams_User implements External_UserInterface
      */
     public function getStaff($externalUserId)
     {
-        $externalUserId = $this->database->quote($externalUserId);
-
         $staff = "
             SELECT          StaffID             AS SchoolStaffCode,
                             ''                  AS StaffBuilding,
@@ -197,7 +190,7 @@ class External_Isams_User implements External_UserInterface
                             ''                  AS StaffDepartment,
                             ''                  AS StaffVoiceMail
             FROM            V_Staff
-            WHERE           StaffID = '{$externalUserId}'
+            WHERE           StaffID = '{$this->database->quote($externalUserId)}'
         ";
 
         return $this->getDatabase()->getRow($staff);
@@ -269,8 +262,7 @@ class External_Isams_User implements External_UserInterface
         ";
 
         if (!empty($yearlevel)) {
-            $yearlevel = $this->getDatabase()->quote($yearlevel);
-            $query .= "WHERE V_Student.Grade = '{$yearlevel}'";
+            $query .= "WHERE V_Student.Grade = '{$this->getDatabase()->quote($yearlevel)}'";
         }
 
         $query .= " ORDER BY StudentSurname, StudentGiven1, StudentID";
@@ -313,7 +305,7 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
             JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
-            WHERE       V_Student.StudentID = '{$externalUserId}'
+            WHERE       V_Student.StudentID = '{$this->database->quote($externalUserId)}'
         ";
 
         return $this->getDatabase()->getAll($query) ?: [];
@@ -355,7 +347,7 @@ class External_Isams_User implements External_UserInterface
             "
           SELECT DISTINCT   V_Class.ClassCode AS code
           FROM              V_Class
-          WHERE             V_Class.StudentID = '{$externalId}'
+          WHERE             V_Class.StudentID = '{$this->database->quote($externalId)}'
         ";
 
         $this->getDatabase()->query($sql);
@@ -384,7 +376,7 @@ class External_Isams_User implements External_UserInterface
         $query = "
             SELECT    StudentID  
             FROM      V_Parent   
-            WHERE     V_Parent.ParentID = '{$externalUserId}'
+            WHERE     V_Parent.ParentID = '{$this->database->quote($externalUserId)}'
         ";
 
         return $this->getDatabase()->getAll($query);
@@ -397,13 +389,11 @@ class External_Isams_User implements External_UserInterface
      */
     public function getEmail($id)
     {
-        $externalUserId = $this->database->quote($id);
-
         $query =
             "
           SELECT  V_Parent.CISEmail 
           FROM    V_Parent 
-          WHERE   V_Parent.ParentID = '{$externalUserId}'
+          WHERE   V_Parent.ParentID = '{$this->database->quote($id)}'
         ";
 
         return $this->getDatabase()->getOne($query);
@@ -445,28 +435,26 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT      
-                        ''                                  AS StudentContactNetworkLogin,
-                        V_ParentMother.ParentID             AS StudentContactID,
-                        ''                                  AS StudentContactTitle,
-                        V_ParentMother.ParentFirstname      AS StudentContactPreferred,
-                        V_ParentMother.ParentSurname        AS StudentContactSurname,
-                        V_ParentMother.CISEmail             AS StudentContactDefaultEmail,
-                        ''                                  AS StudentContactSpouseNetworkLogin,
-                        V_ParentFather.ParentID             AS StudentContactSpouseID,
-                        ''                                  AS StudentContactSpouseTitle,
-                        V_ParentFather.ParentFirstname      AS StudentContactSpousePreferred,
-                        V_ParentFather.ParentSurname        AS StudentContactSpouseSurname,
-                        V_ParentFather.CISEmail             AS StudentContactSpouseDefaultEmail,
-                        V_Student.Grade                     AS StudentYearLevel,
-                        campus                              AS StudentCampus,
-                        Gender                              AS StudentGender
+                        ''                            AS StudentContactNetworkLogin,
+                        V_Parent.ParentID             AS StudentContactID,
+                        ''                            AS StudentContactTitle,
+                        V_Parent.ParentFirstname      AS StudentContactPreferred,
+                        V_Parent.ParentSurname        AS StudentContactSurname,
+                        V_Parent.CISEmail             AS StudentContactDefaultEmail,
+                        ''                            AS StudentContactSpouseNetworkLogin,
+                        ''                            AS StudentContactSpouseID,
+                        ''                            AS StudentContactSpouseTitle,
+                        ''                            AS StudentContactSpousePreferred,
+                        ''                            AS StudentContactSpouseSurname,
+                        ''                            AS StudentContactSpouseDefaultEmail,
+                        V_Student.Grade               AS StudentYearLevel,
+                        campus                        AS StudentCampus,
+                        Gender                        AS StudentGender
             FROM        V_Student
-            LEFT JOIN   V_Parent AS V_ParentMother ON V_ParentMother.StudentID = V_Student.StudentID AND V_ParentMother.Relationship = 'Mother'
-            LEFT JOIN   V_Parent AS V_ParentFather ON V_ParentFather.StudentID = V_Student.StudentID AND V_ParentFather.Relationship = 'Father'
+            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = V_Student.StudentID
         ";
 
         return $this->getDatabase()->getAll($query) ?: [];
-
     }
 
 
