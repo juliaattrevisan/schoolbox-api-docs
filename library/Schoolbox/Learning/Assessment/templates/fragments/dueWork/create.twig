@@ -169,17 +169,25 @@
 
 
     /**
-     * Update max avail mark on descriptor point value changes
+     * Update max available mark on descriptor point value changes
      * Purposefully placed outside of the document.ready in order to work for a rubric grid that is imported via csv
      */
     $(document).on('change', '[data-rb-grid] [data-descriptor-value], [data-rb-grid] [data-criterion-name]', calculateGridTotal);
 
 
     /**
-     * Crawls the rubric grid and finds the highest point value
+     * Catch a custom event that's fired on rubric csv import
+     * Use it to update the max available mark field
+     */
+    $('#rubric-attachable').on('rubric-grid-imported', function () {
+        calculateGridTotal();
+    });
+
+
+    /**
+     * Searches the rubric grid to find the highest sum of points in a capability
      */
     function calculateGridTotal() {
-
         var max = 0;
 
         // iterate the grid, and sum the max of each row
