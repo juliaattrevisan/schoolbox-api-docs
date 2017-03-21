@@ -34,8 +34,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function __construct($user, $config) {
         $this->setUser($user);
-        $factory = new ExternalEventsFactory();
-        $this->externalEvents = $factory->build();
+        $this->externalEvents = ExternalEventsFactory::build();
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 
@@ -94,7 +93,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
                 if(strlen($eventDetail) > 0) {
                     $event->setDetail('<p>'.$eventDetail.'</p>');
                 }
-                $event->setLocation(strlen($externalEvent['location']) > 0 ? $externalEvent['room'] : $externalEvent['location']);
+                $event->setLocation(strlen($externalEvent['location']) > 0 ? $externalEvent['location'] : $externalEvent['room']);
 
                 $event->setEventType('external');
                 $event->setAllday(false);
