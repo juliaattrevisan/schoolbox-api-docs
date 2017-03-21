@@ -2663,6 +2663,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
+
         // Validate fields if this is in debug mode.
         if ($this->getConfigLoader()->get('debug_mode')) {
             // $alias is bad if there are NO fields in $row that match it

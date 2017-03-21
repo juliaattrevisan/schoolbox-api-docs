@@ -1,0 +1,110 @@
+<?php
+/**
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Admin\Video;
+
+use Alaress\Web\Controller\Base;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Video\QueueMapper as VideoQueueMapper;
+use Schoolbox\Video\Queue as VideoQueue;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+
+/**
+ * Controller for managing failed video transcoding through the admin section.
+ * @package Schoolbox\Admin\Video
+ */
+class Controller extends Base
+{
+    const PAGE_CURRENT = 'video';
+
+    /**
+     * Display tree
+     *
+     * @api   GET /adminv2/video
+     * @level 165
+     * @param VideoQueue $queue
+     */
+    public function getIndex($queue)
+    {
+        // Render this thing out
+
+        $statuses = [
+            VideoQueueMapper::STATUS_PROCESSING,
+            VideoQueueMapper::STATUS_PENDING,
+            VideoQueueMapper::STATUS_FAILED
+        ];
+
+        $queueItems = $this->getVideoQueueMapper()->findByStatus($statuses, ['order' => ['createdOn' => 'desc']]);
+
+        $this->getResponse()->content->set([
+            'template' => '@adminVideo/index.twig',
+            'data' => [
+                'pageCurrent' => self::PAGE_CURRENT,
+                'queue' => $queueItems,
+                'log' => $queue,
+                'statusOrder' => $statuses
+            ],
+            'title' => 'Admin - Video Queue'
+        ]);
+    }
+
+    /**
+     * Resubmit video to, or remove it from processing queue
+     */
+    public function postSubmit()
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            /** @var VideoQueue $video */
+            $video = $this->getVideoQueueMapper()->findById($post['videoId']);
+
+            if ($post['videoAction'] == 'resubmit') {
+                $video->setStatus(VideoQueueMapper::STATUS_PENDING);
+                $this->getVideoQueueMapper()->save($video);
+                $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminVideo.getIndex'));
+            } else if ($post['videoAction'] == 'delete') {
+                $this->getVideoQueueMapper()->delete($video);
+            }
+
+            $data = [
+                'result' => 'success'
+            ];
+
+        } catch (MapperException $e) {
+            $this->getResponse()->status->setCode(500);
+            $data = [
+                'result' => 'error'
+            ];
+        }
+
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $data
+            )
+        );
+    }
+
+    /** Here be mappers and stuff */
+
+    /**
+     * @return VideoQueueMapper
+     */
+    public function getVideoQueueMapper()
+    {
+        return $this->getDi()->get('mapperFactory')->get(VideoQueueMapper::class);
+    }
+
+    /**
+     * @return StorageMapper
+     */
+    public function getStorageMapper()
+    {
+        return $this->getDi()->get('mapperFactory')->get(StorageMapper::class);
+    }
+}

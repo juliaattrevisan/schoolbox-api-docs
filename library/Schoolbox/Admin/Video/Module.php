@@ -1,0 +1,112 @@
+<?php
+/**
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Admin\Video;
+
+use Alaress\Authorizer\Authorizer;
+use Alaress\Module\Module as BaseModule;
+use Alaress\Authorizer\Rule;
+use Alaress\Web\Router\PathMatcher;
+use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
+use Schoolbox\Video\QueueMapper;
+use Twig_Loader_Chain;
+use Schoolbox\Mapper\Exception as MapperException;
+/**
+ * The module for managing school terms through the admin section.
+ *
+ * @package Schoolbox\Admin\Menu\Side
+ */
+class Module extends BaseModule
+{
+    protected $basename = 'adminVideo';
+
+    /**
+     * @inheritdoc
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        $routes = [
+            'GET' => [
+                '{/queueId}' => 'getIndex',
+            ],
+            'POST' => [
+                '/submit' => 'postSubmit',
+            ]
+        ];
+
+        foreach ($routes['GET'] as $path => $alias) {
+            $this->addGetRoute($router, $alias, $basePath, $path);
+        }
+
+        foreach ($routes['POST'] as $path => $alias) {
+            $this->addPostRoute($router, $alias, $basePath, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        // Preload required data for the various routes
+
+        $queueMapper = $this->getQueueMapper();
+
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
+            function ($params) use ($queueMapper) {
+
+                $returnArray = [];
+
+                if (array_key_exists('queueId', $params)) {
+                    try {
+                        $returnArray['queue'] = $queueMapper->findById($params['queueId']);
+                    } catch (MapperException $e) {
+                    }
+                }
+
+                return $returnArray;
+            }
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /**
+     * @return QueueMapper
+     */
+    public function getQueueMapper()
+    {
+        return $this->getMapperFactory()->get(QueueMapper::class);
+
+    }
+
+}

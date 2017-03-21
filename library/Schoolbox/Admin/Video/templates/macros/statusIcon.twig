@@ -1,0 +1,9 @@
+{% macro statusIcon(media) -%}
+    {% if media.isPending or media.isProcessing %}
+        icon-clock
+    {% elseif media.isFailed %}
+        icon-alert
+    {% else %}
+        icon-tick
+    {% endif %}
+{%- endmacro %}

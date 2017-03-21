@@ -9,8 +9,16 @@
  */
 
 namespace Schoolbox\Video;
-use Schoolbox\Mapper;
 
+use PDO;
+use PDOStatement;
+use Schoolbox\Collection;
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\File;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class QueueMapper extends Mapper {
 
@@ -26,53 +34,67 @@ class QueueMapper extends Mapper {
 	const FILE_TYPE_SUBMISSION = 'submission';
 	const FILE_TYPE_MYFILE = 'myfile';
 
-    protected function mapping () {
+    /**
+     * Setup mapper
+     */
+    protected function mapping ()
+    {
         $this->hasTable('video_queue');
         $this->hasModel(Queue::class);
-        $this->hasMap(array(
-                'column'     => 'video_queue_id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            ));
-
-        $this->hasMap(array(
-            'column'     => 'hash',
-            'property'   => 'hash',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-                'column'     => 'status',
-                'property'   => 'status',
-                'type'       => self::TYPE_STRING,
-            ));
-	    $this->hasMap(array(
-				'column'     => 'message',
-				'property'   => 'message',
-				'type'       => self::TYPE_STRING,
-			));
-	    $this->hasMap(array(
-	             'column'     => 'duration',
-	             'property'   => 'duration',
-	             'type'       => self::TYPE_INTEGER,
-	        ));
-        $this->hasMap(array(
-                'column'            => 'createdOn',
-                'property'          => 'created',
-                'type'              => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            ));
-        $this->hasMap(array(
-                'column'            => 'modifiedOn',
-                'property'          => 'modified',
-                'type'              => self::TYPE_DATETIME,
-                'updated_timestamp' => true,
-            ));
+        $this->uses('video_queue_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('file_id', File\Mapper::class, 'id', null, null, 'file', 'file');
+        $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
+        $this->uses('status', self::TYPE_STRING);
+        $this->uses('message', self::TYPE_STRING);
+        $this->uses('duration', self::TYPE_INTEGER);
+        $this->uses('createdOn', self::TYPE_DATETIME, null, 'createdAt');
+        $this->uses('modifiedOn', self::TYPE_DATETIME, null, 'updatedAt');
     }
 
+    /**
+     * Return all pending transcodes
+     * @return \Schoolbox\GenericCollection
+     */
     public function getPending() {
         return $this->findByColumn('status', self::STATUS_PENDING);
+    }
+
+    /**
+     * @param string|array $status
+     * @param array|null $options
+     * @return array|\Schoolbox\GenericCollection
+     */
+    public function findByStatus($status, $options = null) {
+        $result = [];
+
+        if (is_array($status)) {
+
+            foreach ($status as $statusCurrent) {
+                $results = $this->findByColumn('status', $statusCurrent, $options);
+
+                if (!empty($results)) {
+                    /** @var \Schoolbox\Video\Queue $videoQueue */
+                    foreach ($results as $videoQueue) {
+                        if (!empty($videoQueue->getStorage()->getFilename())) {
+                            $result[$statusCurrent][] = $videoQueue;
+                        }
+                    }
+                }
+            }
+        } else {
+            $results = $this->findByColumn('status', $status, $options);
+
+            if (!empty($results)) {
+                /** @var \Schoolbox\Video\Queue $videoQueue */
+                foreach ($results as $videoQueue) {
+                    if (!empty($videoQueue->getStorage()->getFilename())) {
+                        $result[] = $videoQueue;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -95,6 +117,87 @@ class QueueMapper extends Mapper {
         $statement->bindValue('timeout',    intval($timeout), \PDO::PARAM_INT);
         $statement->execute();
         return $statement->rowCount();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString()
+    {
+        $table = $this->database->quoteIdentifier($this->table);
+
+        $fileMapper = $this->getJoinMapper('file');
+        $storageMapper = $this->getJoinMapper('storage');
+
+        $query = "
+            SELECT      {$this->getColumnString()},
+                        {$fileMapper->getColumnString('f')},
+                        {$storageMapper->getColumnString('s')},
+				        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
+            FROM        {$table}
+			LEFT JOIN   {$this->getJoinSql('storage', '', 's')}
+			LEFT JOIN   {$this->getJoinSql('file', '', 'f')}
+			LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime', true)}
+        ";
+
+        return $query;
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $hydratedCollection = $this->createCollection();
+
+        // Shut the front door there are a goddamn lot of hoops to jump through to get a mime type!
+        //
+        //        ▄████████████▄▐█▄▄▄▄█▌
+        //        █████▌▄▌▄▐▐▌██▌▀▀██▀▀
+        //        ███▄█▌▄▌▄▐▐▌▀██▄▄█▌
+        //        ▄▄▄▄█████████████
+
+        /** @var Storage\Mapper $storageMapper */
+        $storageMapper = $this->getJoinMapper('storage');
+
+        /** @var MimetypeMapper $mimeMapper */
+        $mimeMapper = $storageMapper->getJoinMapper('allowedFileExtension');
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            /** @var Queue $record */
+            $record = $this->hydrate($row);
+
+            // Can't hydrate storage if there isn't a hash
+
+            /** @var File\Model $fileObject */
+            $fileObject = $this->hydrateJoin($row, 'file', 'f');
+
+            if (!empty($row['hash'])) {
+
+                /** @var Storage\Model $storageObject */
+                $storageObject = $this->hydrateJoin($row, 'storage', 's');
+
+                // Hydrate a mime type if we can find one
+
+                /** @var Mimetype $mime */
+                $mime = $mimeMapper->hydrate($row, 'mime');
+
+                if ($mime instanceof Mimetype) {
+                    $storageObject->setMimetype($mime);
+                }
+
+                $fileObject->setStorage($storageObject);
+
+                $record->setFile($fileObject);
+                $record->setStorage($storageObject);
+            }
+
+            $hydratedCollection->add($record);
+        }
+
+        return $hydratedCollection;
     }
 
 }
