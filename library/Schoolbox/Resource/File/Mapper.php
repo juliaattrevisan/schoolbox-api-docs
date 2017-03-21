@@ -77,7 +77,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'ensureOwnerIsNotNull']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, self::CALLBACK_PRESAVE]);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, self::CALLBACK_POSTSAVE]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, self::CALLBACK_POSTSAVE]);
     }
 
     /**
