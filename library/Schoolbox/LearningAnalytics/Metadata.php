@@ -102,13 +102,13 @@ class Metadata
     }
 
     /**
-     * Get the selected task type to filter by
+     * Get the selected submission type to filter by
      *
-     * @return string|null
+     * @return int|null
      */
-    public function getSelectedActivityTypeFilter()
+    public function getSelectedSubmissionTypeFilter()
     {
-        return $this->params['taskId'];
+        return $this->params['taskId'] ? (int)$this->params['taskId'] : null;
     }
 
     /* Getters/Setters
