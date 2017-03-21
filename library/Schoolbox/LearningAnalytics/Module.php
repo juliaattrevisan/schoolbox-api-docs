@@ -156,8 +156,6 @@ class Module extends BaseModule
 
             $unitImplementations = $this->getUnitImplementationMapper()->findByPredicates($pb);
 
-            $everyInteraction = [];
-
             foreach ($unitImplementations as $unit) {
                 // load up some hydrations
                 $unit->setFolder($this->getFolderMapper()->findById($unit->getFolder()->getId()));
@@ -172,11 +170,9 @@ class Module extends BaseModule
                     foreach ($activity->getAllParticipants() as $participant) {
                         foreach ($participant->getAllFeedbacks() as $feedback) {
                             $activity->getFeedbacks()->add($feedback);
-                            $everyInteraction[] = $feedback;
                         }
                         foreach ($participant->getAllResponses() as $response) {
                             $activity->getResponses()->add($response);
-                            $everyInteraction[] = $response;
                         }
                     }
 
