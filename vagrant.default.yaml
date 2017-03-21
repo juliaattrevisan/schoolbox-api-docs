@@ -1,12 +1,12 @@
 # default settings for vagrant box.
 # To modify, copy to vagrant.yaml and modify settings as needed.
 vagrant_box: "ubuntu-1404-php55"
-download_url: "vagrant.alaress-dev.com.au"
 memory: 1568
 public_network: true
 private_network_ip: "192.168.36.10"
 external_db: "synergetic"
 external_db_host: "172.31.15.10"
 external_db_db: "Synergetic_AUVIC_ALARESS_PRD"
-demo_data_version: "v6.1"
-provision_script: "tools/vagrant-provision-ubuntu-1404.sh"
+provision_script: "tools/vagrant-provision.sh"
+data_source: "https://s3-ap-southeast-2.amazonaws.com/schoolbox-data"
+data_filename: "initial.tar.gz"
