@@ -39,7 +39,7 @@ class Exporter
             SELECT          u.synergy_id,
                             sr.mark,
                             sb.name,
-                            cc.code,
+                            folder_code.code,
                             lu_submission_type.name AS type_name
             FROM            submission_return AS sr
             INNER JOIN      submission_box AS sb ON
@@ -52,10 +52,10 @@ class Exporter
                             cui.id = acui.course_unit_implementation_id
             LEFT JOIN       course_implementation AS ci ON 
                             ci.id = cui.course_implementation_id
-            INNER JOIN      folder AS c ON 
-                            c.id = af.assessment_id OR c.id = ci.folder_id
-            INNER JOIN      folder_code AS cc ON
-                            cc.folder_id = c.id
+            INNER JOIN      folder ON 
+                            folder.id = af.folder_id OR folder.id = ci.folder_id
+            INNER JOIN      folder_code ON
+                            folder_code.folder_id = folder.id
             INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
             LEFT JOIN       lu_submission_type ON 
@@ -64,7 +64,7 @@ class Exporter
                             AND sr.deleted_at IS NULL
                             AND sr.mark != ''
                             AND sr.published_at IS NOT NULL
-            ORDER BY        cc.code
+            ORDER BY        folder_code.code
         ";
 
         $statement = $this->database->prepare($query);
