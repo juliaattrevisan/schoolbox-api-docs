@@ -62,7 +62,6 @@ class Exporter
                             lu_submission_type.id = sb.type
             WHERE           YEAR(sr.created_at) = :currentYear
                             AND sr.deleted_at IS NULL
-                            AND sb.name LIKE '%[%]%'
                             AND sr.mark != ''
                             AND sr.published_at IS NOT NULL
             ORDER BY        cc.code
