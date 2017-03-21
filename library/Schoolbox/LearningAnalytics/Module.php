@@ -33,8 +33,9 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Assessment\Term\Model as TermModel;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
@@ -84,16 +85,9 @@ class Module extends BaseModule
          * will receive scalars and redirect to current term equivalent
          */
         $this->addRoutePreload(
-            $matcher, 'courseWith.*Terms',
+            $matcher, '.*With.*Terms',
             function($params) {
-                return $this->courseDependencies($params);
-            }
-        );
-
-        $this->addRoutePreload(
-            $matcher, 'folderWith.*Terms',
-            function($params) {
-                return $this->folderDependencies($params);
+                return $this->loadDependencies($params);
             }
         );
     }
@@ -114,22 +108,28 @@ class Module extends BaseModule
     }
 
     /**
-     * Pass params when using course view
+     * Loads model graph
      *
      * @param array $params
      * @var int $params['courseSpecId']
      * @var int $params['termCode']
+     * @var int $params['folderId']                Optional
      *
      * @return array
+     * @var string[]                               return['params']
+     * @var CourseSpecification                    return['courseSpecification']
+     * @var GenericCollection|UnitImplementation[] return['unitImplementations']
+     * @var Term                                   return['term']
+     * @var null|Folder                            return['selectedClassFolder']
      * @throws MapperException
      * @throws ApplicationException
      * @throws \InvalidArgumentException
      * @throws ServiceNotFound
      */
-    private function courseDependencies(array $params)
+    private function loadDependencies(array $params)
     {
         try {
-            $term = $this->findTerm($params['termCode']);
+            $term = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
         } catch (MapperException $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
         }
@@ -140,9 +140,24 @@ class Module extends BaseModule
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
+        $classFolder = null;
+        if (isset($params['folderId'])){
+            try {
+                $classFolder = $this->getFolderMapper()->findById($params['folderId']);
+            } catch (MapperException $e) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            }
+        }
+
         // Load CourseImpls imported from specified CourseSpec
         /** @var GenericCollection|CourseImplementation[] $courseImplementations */
-        $courseImplementations = $this->getCourseImplementationMapper()->findAllByCourseSpecificationId($courseSpecification->getId())->indexBy('id');
+        $columnList = [
+            'course_specification_id' => $courseSpecification->getId(),
+        ];
+        if($classFolder){
+            $columnList['folder_id'] = $classFolder->getId();
+        }
+        $courseImplementations = $this->getCourseImplementationMapper()->findByColumnList($columnList)->indexBy('id');
         $courseSpecification->setCourseImplementations($courseImplementations);
 
         // Load UnitImpls inside CourseSpecs
@@ -154,17 +169,16 @@ class Module extends BaseModule
             $unitImplementation->setCourse($courseImplementation);
         }
 
-        // Load all assessments in Unit Impls (regardless of due date - as we need them for navigation)
+        // Load Assessments in Unit Impls (regardless of due date - as we need them for navigation)
         /** @var GenericCollection|IAssessable[] $assessmentImpls */
         $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationId($unitImplementations->getColumnValues('id'))->indexBy('id');
-
         foreach($assessmentImpls as $assessmentImpl){
             $unitImplementation = $unitImplementations[$assessmentImpl->getContext()->getId()];
             $unitImplementation->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);
             $assessmentImpl->setContext($unitImplementation);
         }
 
-        // Get list of assessments due in specified term
+        // Get list of Assessments due in specified Term
         /** @var GenericCollection|IAssessable[] $assessmentsDueInTerm */
         $assessmentsDueInTerm = $assessmentImpls->filter(function(IAssessable $assessment) use ($term) {
             $dueAfterTermStart = $assessment->getDueAt()->gte($term->getStart());
@@ -177,7 +191,7 @@ class Module extends BaseModule
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SUBJECT_NO_TASKS);
         }
 
-        // Load Participants
+        // Load Participants into relevant Assessments
         $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($assessmentsDueInTerm);
         foreach($assessmentsDueInTerm as $assessment){
             foreach ($assessment->getAllParticipants() as $participant) {
@@ -199,48 +213,8 @@ class Module extends BaseModule
             'courseSpecification'          => $courseSpecification,
             'unitImplementations'          => $unitImplementations,
             'term'                         => $term,
+            'selectedClassFolder'          => $classFolder,
         ];
-    }
-
-    /**
-     * Pass params when using folder view
-     *
-     * @param $params
-     * @return array
-     * @throws MapperException
-     * @throws ApplicationException
-     * @throws \InvalidArgumentException
-     * @throws ServiceNotFound
-     */
-    private function folderDependencies($params)
-    {
-        $preload = $this->courseDependencies($params);
-
-        // overlay folder selection
-        try {
-            $preload['selectedClassFolder'] = $this->getFolderMapper()->findById($params['folderId']);
-
-        } catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SUBJECT_NO_TASKS);
-        }
-
-        return $preload;
-    }
-
-
-    /**
-     * @param string $termCode
-     * @return TermModel
-     * @throws MapperException
-     */
-    private function findTerm($termCode)
-    {
-        try {
-            return $this->getTermMapper()->findOneByColumn('code', $termCode);
-
-        } catch (\Exception $e) {
-            throw new MapperException('Invalid date range.');
-        }
     }
 
     /**
