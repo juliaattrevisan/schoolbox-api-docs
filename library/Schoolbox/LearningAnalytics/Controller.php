@@ -196,8 +196,9 @@ class Controller extends Base
      * @param CourseSpecification $courseSpec
      * @param Folder              $class
      * @return Term[]|GenericCollection
+     * @todo - needs to return a list of terms that contain assessments that are due in that term
      */
-    protected function getTermsWithResults(CourseSpecification $courseSpec, Folder $class = null)
+    protected function getSelectableTerms(CourseSpecification $courseSpec, Folder $class = null)
     {
         // Get all courses imported from our courseSpec
         $courseImplMapper = CourseImplementationMapper::getInstance();
@@ -291,13 +292,7 @@ class Controller extends Base
      */
     private function process(array $params, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term, $routeUsed, Folder $selectedClassFolder = null)
     {
-        if (0 === $unitImplementations->count()) {
-            throw Error\Mapper::getInstance()->generateException(Error\Mapper::ERROR_NO_ANALYTICS_DATA);
-        }
-
         $analysis = new CohortAnalysis($courseSpecification, $unitImplementations, $selectedClassFolder, $term);
-
-
         $metadata = new Metadata($params, $courseSpecification, $unitImplementations, $term, $routeUsed, $selectedClassFolder);
 
         /* Get a list of all the students involved in each unit
@@ -313,7 +308,7 @@ class Controller extends Base
         $submissionTypes = new SubmissionTypes($metadata);
 
         /** @var Term[]|GenericCollection $selectableTerms */
-        $selectableTerms = $this->getTermsWithResults($courseSpecification);
+        $selectableTerms = $this->getSelectableTerms($courseSpecification);
 
         /* Twig data
          */
@@ -326,7 +321,7 @@ class Controller extends Base
                 'results' => [
                     'all' => $analysis->getCohortGradesByActivity($registry),
                     'activities' => [
-                        'all'   => $analysis->getActivities($registry, $metadata),
+                        'all'   => $analysis->getActivities($unitImplementations, $term),
                         'types' => [
                             'all'      => $submissionTypes->getSubmissionTypes(),
                             'selected' => $submissionTypes->getSelectedActivityTypeFilter(),

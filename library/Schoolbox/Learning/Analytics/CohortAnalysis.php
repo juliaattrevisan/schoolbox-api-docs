@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Analytics;
 
-use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -16,13 +15,17 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\Course\DataModel\Specification;
-use Schoolbox\LearningAnalytics\Results\TaskList;
+use Schoolbox\LearningAnalytics\Results\AssessmentList;
 use Schoolbox\LearningAnalytics\Results\TaskResults;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\User;
+use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Resource\Folder\Log\Model as FolderLog;
+use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 
 /**
  * Class CohortAnalysis
@@ -36,16 +39,16 @@ use Schoolbox\User;
  */
 class CohortAnalysis
 {
-    /** @var Specification\Model */
+    /** @var CourseSpecification */
     private $courseSpecification;
 
-    /** @var Folder\Model */
+    /** @var Folder */
     private $classFolder;
 
-    /** @var Term\Model */
+    /** @var Term */
     private $term;
 
-    /** @var Collection|Implementation\Unit\Model[] */
+    /** @var Collection|UnitImplementation[] */
     private $unitImplementations;
 
     /** @var array */
@@ -63,16 +66,16 @@ class CohortAnalysis
      * You need to have FULLY hydrated and linked up your units.
      * This class depends on all unit, assessment, participation, response and feedback references being fully accounted for.
      *
-     * @param Specification\Model                    $courseSpecification the course we're analysing
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations ALL the unit implementations pertaining to the given specification
-     * @param Folder\Model                           $classFolder         if given, the individual class to limit participation displayed
-     * @param Term\Model                             $term                if given, the time bounds within which to limit participation displayed
+     * @param CourseSpecification              $courseSpecification the course we're analysing
+     * @param Collection|UnitImplementation[]  $unitImplementations ALL the unit implementations pertaining to the given specification
+     * @param Folder                           $classFolder         if given, the individual class to limit participation displayed
+     * @param Term                             $term                the time bounds within which to limit participation displayed
      */
-    public function __construct(Specification\Model $courseSpecification, Collection $unitImplementations, Folder\Model $classFolder = null, Term\Model $term = null)
+    public function __construct(CourseSpecification $courseSpecification, Collection $unitImplementations, Folder $classFolder = null, Term $term)
     {
         $this->courseSpecification = $courseSpecification;
         $this->unitImplementations = $unitImplementations;
-        $this->unitSpecifications  = $unitImplementations->map(function (Implementation\Unit\Model $unitImpl) { return $unitImpl->getSpecification(); })->indexBy('id');
+        $this->unitSpecifications  = $unitImplementations->map(function (UnitImplementation $unitImpl) { return $unitImpl->getSpecification(); })->indexBy('id');
         $this->classFolder         = $classFolder;
         $this->term                = $term;
     }
@@ -97,7 +100,7 @@ class CohortAnalysis
                 foreach ($unitImpl->getAssessables() as $implActivity) {
 
                     $specActivity   = $implActivity->getSpecificationAssessment();
-                    if($specActivity == null) {
+                    if($specActivity === null) {
                         //skip assessments that have no spec
                         continue;
                     }
@@ -342,14 +345,14 @@ class CohortAnalysis
 
 
     /**
-     * @param $registry
-     * @param $metadata
+     * @param GenericCollection|UnitImplementation[] $unitImplementations
+     * @param Term $term
      * @return Collection|Collection[]|IAssessable[][]
      */
-    public function getActivities($registry, $metadata)
+    public function getActivities(GenericCollection $unitImplementations, Term $term)
     {
         // shim around old code
-        return (new TaskList($registry, $metadata))->getActivities();
+        return (new AssessmentList($unitImplementations, $term))->getAssessments();
     }
 
 
@@ -385,11 +388,11 @@ class CohortAnalysis
             $folderIds = array_unique($this->unitImplementations->map(function (Implementation\Unit\Model $unitImpl) { return $unitImpl->getFolder()->getId(); })->getAll());
         }
 
-        /** @var Collection|Collection[]|Folder\Log\Model[][] $accessLogs */
-        $accessLogs = Folder\Log\Mapper::getInstance()->findByColumnList([
+        /** @var Collection|Collection[]|FolderLog[][] $accessLogs */
+        $accessLogs = FolderLogMapper::getInstance()->findByColumnList([
             'user' => array_keys($cohort),
             'cid'  => $folderIds
-        ])->groupByCallback(function (Folder\Log\Model $log) {
+        ])->groupByCallback(function (FolderLog $log) {
             return $log->getUser()->getId();
         });
 

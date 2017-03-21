@@ -188,7 +188,7 @@ class Module extends BaseModule
 
         // Should never have got to this page if there are no assessments due here
         if (0 === $assessmentsDueInTerm->count()){
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SUBJECT_NO_TASKS);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_NO_ANALYTICS_DATA);
         }
 
         // Load Participants into relevant Assessments
