@@ -62,7 +62,10 @@
             $.post(url, postdata).done(function (data) {
 
                 // dump in the new data
-                target.html(data);
+                target.html(data).promise().done(function() {
+                    // Fire a custom event, this is used on dueWork/create.twig to update a field on import
+                    $('#rubric-attachable{{ idSuffix }}').trigger('rubric-grid-imported');
+                });
 
             }).fail(function (data) {
 
