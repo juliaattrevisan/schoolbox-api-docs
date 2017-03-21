@@ -63,7 +63,7 @@ class ExternalEvents implements ExternalEventsInterface
               ss.StaffScheduleSeq    AS id,
               ss.StaffID             AS owner,
               ss.Comment             AS comment,
-              ss.Room                AS room,
+              r.Description          AS room,
               CONVERT(VARCHAR(20),ss.ScheduleDateTimeFrom,120) AS start,
               CONVERT(VARCHAR(20),ss.ScheduleDateTimeTo,120)   AS finish,
               l.Description          AS location,
@@ -98,13 +98,14 @@ class ExternalEvents implements ExternalEventsInterface
                                     AS title
               FROM dbo.StaffSchedule ss
               LEFT JOIN dbo.luLocation l ON ss.LocationCode = l.Code AND ss.LocationCode IS NOT NULL AND ss.LocationCode <> ''
+              LEFT JOIN dbo.luRoom r ON ss.Room = r.Code AND ss.Room IS NOT NULL AND ss.Room <> ''
               LEFT JOIN dbo.luTeam t ON ss.TeamCode = t.Code AND ss.TeamCode IS NOT NULL AND ss.TeamCode <> ''
               {$join}
               LEFT JOIN dbo.SubjectClasses sc ON ss.SubjectClassesSeq = sc.SubjectClassesSeq AND ss.SubjectClassesSeq IS NOT NULL AND ss.SubjectClassesSeq <> ''
               WHERE NOT (ss.ScheduleDateTimeTo < '{$start->getDatabase()}' OR ss.ScheduleDateTimeFrom >= '{$finish->getDatabase()}')
               {$where}
               ORDER BY ss.StaffScheduleSeq ASC";
-        
+
         return $this->database->getAll($query);
     }
  }
