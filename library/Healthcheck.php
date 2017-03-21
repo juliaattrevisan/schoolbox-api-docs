@@ -1,3 +1,4 @@
+
 <?php
 /**
  *
@@ -572,6 +573,7 @@ class Healthcheck
         $list[] = 'SubjectClasses';
         $list[] = 'luLocation';
         $list[] = 'luTeam';
+        $list[] = 'luRoom';
         sort($list);
 
         foreach ($list as $table) {
