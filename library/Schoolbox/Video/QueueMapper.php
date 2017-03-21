@@ -65,21 +65,36 @@ class QueueMapper extends Mapper {
      * @return array|\Schoolbox\GenericCollection
      */
     public function findByStatus($status, $options = null) {
+        $result = [];
+
         if (is_array($status)) {
-            $result = [];
 
             foreach ($status as $statusCurrent) {
                 $results = $this->findByColumn('status', $statusCurrent, $options);
 
                 if (!empty($results)) {
-                    $result[$statusCurrent] = $results;
+                    /** @var \Schoolbox\Video\Queue $videoQueue */
+                    foreach ($results as $videoQueue) {
+                        if (!empty($videoQueue->getStorage()->getFilename())) {
+                            $result[$statusCurrent][] = $videoQueue;
+                        }
+                    }
                 }
             }
-
-            return $result;
         } else {
-            return $this->findByColumn('status', $status, $options);
+            $results = $this->findByColumn('status', $status, $options);
+
+            if (!empty($results)) {
+                /** @var \Schoolbox\Video\Queue $videoQueue */
+                foreach ($results as $videoQueue) {
+                    if (!empty($videoQueue->getStorage()->getFilename())) {
+                        $result[] = $videoQueue;
+                    }
+                }
+            }
         }
+
+        return $result;
     }
 
     /**
