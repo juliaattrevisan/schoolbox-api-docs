@@ -50,7 +50,6 @@ class Registry {
                 }
             }
 
-            // je ne parle pas...?
             $users[$unitImplId] = new Collection($users[$unitImplId]);
         }
 

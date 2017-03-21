@@ -111,7 +111,7 @@ class Sorter
     {
         if ($a[$this->key] > $b[$this->key]) {
             return -1;
-        } else if ($a[$this->key] === $b[$this->key]) {
+        } elseif ($a[$this->key] === $b[$this->key]) {
             return 0;
         }
 
@@ -130,7 +130,7 @@ class Sorter
     {
         if ($a > $b) {
             return 1;
-        } else if ($a === $b) {
+        } elseif ($a === $b) {
             return 0;
         }
 
