@@ -36,18 +36,18 @@ class AssessmentList
         $this->term = $term;
 
         foreach ($unitImplementations as $unitImplementation) {
-            $this->extractActivities($unitImplementation);
+            $this->extractAssessments($unitImplementation);
         }
     }
 
 
     /**
-     * Extracts AssessmentSpecs (TODO filter by term dates)
+     * Extracts AssessmentSpecs from relevant AssessmentImpls
      *
      * @param AssessmentContext $context
      * @param callable          $filter
      */
-    protected function extractActivities(AssessmentContext $context, callable $filter = null)
+    protected function extractAssessments(AssessmentContext $context, callable $filter = null)
     {
         // by default, leave tasks out of it
         $filter = $filter ?: function ($input) { return is_object($input) && !$input instanceof Task\Model; };
@@ -55,9 +55,16 @@ class AssessmentList
         foreach ($context->getAssessables() as $activity) {
             if ($activity instanceof AssessmentContext) {
                 // recurse into project
-                $this->extractActivities($activity, $filter);
+                $this->extractAssessments($activity, $filter);
 
             } else {
+                // Is the activity due in the specified term ?
+                $dueAfterTermStart = $activity->getDueAt()->gte($this->term->getStart());
+                $dueBeforeTermEnd = $this->term->getActualFinish()->isNull() || $activity->getDueAt()->lt($this->term->getActualFinish());
+                if(!$dueAfterTermStart || !$dueBeforeTermEnd){
+                    continue;
+                }
+
                 $specActivity = $activity->getSpecificationAssessment();
 
                 if ($filter($specActivity)) {
