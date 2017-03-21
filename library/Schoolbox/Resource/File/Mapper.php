@@ -269,19 +269,25 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         if ($file->getMimetype()->isVideo() || $file->getMimetype()->isAudio()) {
             $queueMapper = QueueMapper::getInstance();
 
-            // Make sure it hasn't been transcoded successfully already
-
             try {
+
+                // Check if there is an existing queue item in Complete, Pending or Processing state. If
+                // there is we don't want to add it again
 
                 $queueMapper->findOneByColumnList([
                     'hash' => $file->getHash(),
                     'status' => [
                         QueueMapper::STATUS_COMPLETED |
-                        QueueMapper::STATUS_PENDING
+                        QueueMapper::STATUS_PENDING |
+                        QueueMapper::STATUS_PROCESSING
                     ]
                 ]);
 
             } catch (MapperException $e) {
+
+                // If there was nothing found we will get a mapper exception- add we can add it to the
+                // media processing queue here
+
                 /** @var Queue $queue */
                 $queue = $queueMapper->createModel();
                 $queue->setFile($file);
