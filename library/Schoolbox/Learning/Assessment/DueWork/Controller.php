@@ -275,13 +275,13 @@ class Controller extends Assessment\Controller
             {
                 // If the response is a submission...
 
-                if ($response instanceof Submission)
+                if ($response instanceof Submission && !$response->isDraft())
                 {
                     $directory = sprintf("%s, %s (%s) - %s",
                         $users[$participant->getUser()->getId()]->getLastname(),
                         $users[$participant->getUser()->getId()]->getFirstname(),
                         $users[$participant->getUser()->getId()]->getId(),
-                        $response->getCreatedAt()->getDatabase()
+                        $response->getSubmittedAt()->getDatabase()
                     );
 
                     // ...iterate all files in that submission and add them to the ZIP archive
