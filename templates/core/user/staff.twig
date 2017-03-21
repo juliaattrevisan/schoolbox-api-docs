@@ -35,8 +35,8 @@
                     <div class="small-12 medium-10 columns">
                         <dl class="profile">
                             {% if showTitle %}
-                                <dt class="small-6 medium-3">Position Title</dt>
-                                <dd class="small-6 medium-9">
+                                <dt class="small-12 medium-3">Position Title</dt>
+                                <dd class="small-12 medium-9">
                                     {{ user.getPositionTitle() }}
                                 </dd>
                             {% endif %}
@@ -44,8 +44,8 @@
                             {% if showEmail %}
                                 {% block details_email %}
                                     {% if user.getEmail() %}
-                                        <dt class="small-6 medium-3">Email</dt>
-                                        <dd class="small-6 medium-9">
+                                        <dt class="small-12 medium-3">Email</dt>
+                                        <dd class="small-12 medium-9">
                                             <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                                         </dd>
                                     {% endif %}
@@ -54,28 +54,28 @@
 
                             {% if showDetails %}
                                 {% if externalUser.StaffDepartment %}
-                                    <dt class="small-6 medium-3">Department</dt>
-                                    <dd class="small-6 medium-9">{{ externalUser.StaffDepartment }}</dd>
+                                    <dt class="small-12 medium-3">Department:</dt>
+                                    <dd class="small-12 medium-9">{{ externalUser.StaffDepartment }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffCategoryDescription %}
-                                    <dt class="small-6 medium-3">Type</dt>
-                                    <dd class="small-6 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
+                                    <dt class="small-12 medium-3">Type:</dt>
+                                    <dd class="small-12 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffBuilding %}
-                                    <dt class="small-6 medium-3">Building</dt>
-                                    <dd class="small-6 medium-9">{{ externalUser.StaffBuilding }}</dd>
+                                    <dt class="small-12 medium-3">Building:</dt>
+                                    <dd class="small-12 medium-9">{{ externalUser.StaffBuilding }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffRoom %}
-                                    <dt class="small-6 medium-3">Room</dt>
+                                    <dt class="small-6 medium-3">Room:</dt>
                                     <dd class="small-6 medium-9">{{ externalUser.StaffRoom }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffExtension %}
-                                    <dt class="small-6 medium-3">Extension</dt>
-                                    <dd class="small-6 medium-9">{{ externalUser.StaffExtension }}</dd>
+                                    <dt class="small-12 medium-3">Extension:</dt>
+                                    <dd class="small-12 medium-9">{{ externalUser.StaffExtension }}</dd>
                                 {% endif %}
                                 {% if externalUser.StaffCampusDescription %}
-                                    <dt class="small-6 medium-3">Campus</dt>
-                                    <dd class="small-6 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
+                                    <dt class="small-12 medium-3">Campus:</dt>
+                                    <dd class="small-12 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
                                 {% endif %}
                             {% endif %}
                         </dl>

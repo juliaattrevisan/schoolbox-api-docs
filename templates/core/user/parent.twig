@@ -36,8 +36,8 @@
                     <div class="small-12 medium-10 columns">
                         <dl class="profile">
                             {% if showTitle %}
-                                <dt class="small-6 medium-3">Position Title</dt>
-                                <dd class="small-6 medium-9">
+                                <dt class="small-12 medium-3">Position Title:</dt>
+                                <dd class="small-12 medium-9">
                                     {{ user.getPositionTitle() }}
                                 </dd>
                             {% endif %}
@@ -45,8 +45,8 @@
                             {% if showEmail %}
                                 {% block details_email %}
                                     {% if user.getEmail() %}
-                                        <dt class="small-6 medium-3">Email</dt>
-                                        <dd class="small-6 medium-9">
+                                        <dt class="small-12 medium-3">Email:</dt>
+                                        <dd class="small-12 medium-9">
                                             <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                                         </dd>
                                     {% endif %}
@@ -55,8 +55,8 @@
 
                             {% if showDetails and not externalUser.SilentPhoneFlag %}
                                 {% if externalUser.HomePhone %}
-                                    <dt class="small-6 medium-3">Home Phone</dt>
-                                    <dd class="small-6 medium-9">
+                                    <dt class="small-12 medium-3">Home Phone:</dt>
+                                    <dd class="small-12 medium-9">
                                         <a href="tel:{{ externalUser.HomePhone }}">{{ externalUser.HomePhone }}</a>
                                     </dd>
                                 {% endif %}
@@ -64,8 +64,8 @@
 
                             {% if showDetails and not externalUser.SilentMobilePhoneFlag %}
                                 {% if externalUser.MobilePhone %}
-                                    <dt class="small-6 medium-3">Mobile Phone</dt>
-                                    <dd class="small-6 medium-9">
+                                    <dt class="small-12 medium-3">Mobile Phone:</dt>
+                                    <dd class="small-12 medium-9">
                                         <a href="tel:{{ externalUser.MobilePhone }}">{{ externalUser.MobilePhone }}</a>
                                     </dd>
                                 {% endif %}
@@ -73,7 +73,7 @@
 
                             {% if showDetails %}
                                 {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
-                                    <dt class="small-12">Partner</dt>
+                                    <dt class="small-12">Partner:</dt>
                                     <dd class="small-12">
                                         <div class="card small-12">
                                             {% if spouse %}
