@@ -18,10 +18,16 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Course\DataModel\Implementation;
-use Schoolbox\Learning\Course\DataModel\Specification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -123,65 +129,65 @@ class Module extends BaseModule
     private function courseDependencies(array $params)
     {
         try {
-            $courseSpecification = $this->getCourseSpecificationMapper()->findById($params['courseSpecId']);
-
-            foreach ($courseSpecification->getUnits() as $unit) {
-                // link up the other way around
-                $unit->setAssessables($this->getAssessmentDataSource()->findAllByContext($unit));
-            }
-
+            $term = $this->findTerm($params['termCode']);
         } catch (MapperException $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
         }
 
-        $term = $this->findTerm($params['termCode']);
-
-        /* No acrobatics required
-         */
         try {
-
-            /* All the unit instances associated with the specified folder which used the same
-             * $courseFolder as a source. Filter it based due dates between $from and $to
-             */
-            $from = $term->getStart();
-            $to   = $term->getActualFinish();
-
-            $pb = $this->getUnitImplementationMapper()->getPredicateBuilder()
-                       ->equals('s.course_specification_id', $courseSpecification->getId())
-                       ->notLessThan('open_date', $from->getDatabaseDate());
-
-            if (!$to->isNull()) {
-                $pb->notGreaterThan('due_date', $to->getDatabaseDate());
-            }
-
-            $unitImplementations = $this->getUnitImplementationMapper()->findByPredicates($pb);
-
-            foreach ($unitImplementations as $unit) {
-                // load up some hydrations
-                $unit->setFolder($this->getFolderMapper()->findById($unit->getFolder()->getId()));
-
-                if (isset($params['folderId']) && $unit->getFolder()->getId() !== (int)$params['folderId']) {
-                    // filtering to a specific folder, and it's not this one
-                    continue;
-                }
-
-                foreach ($this->getAssessmentDataSource()->findAllByContext($unit) as $activity) {
-                    $this->getParticipantDataSource()->loadParticipationIntoAssessment($activity);
-                    foreach ($activity->getAllParticipants() as $participant) {
-                        foreach ($participant->getAllFeedbacks() as $feedback) {
-                            $activity->getFeedbacks()->add($feedback);
-                        }
-                        foreach ($participant->getAllResponses() as $response) {
-                            $activity->getResponses()->add($response);
-                        }
-                    }
-
-                    $unit->getAssessables()->add($activity);
-                }
-            }
-
+            $courseSpecification = $this->getCourseSpecificationMapper()->findById($params['courseSpecId']);
         } catch (MapperException $e) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        // Load CourseImpls imported from specified CourseSpec
+        /** @var GenericCollection|CourseImplementation[] $courseImplementations */
+        $courseImplementations = $this->getCourseImplementationMapper()->findAllByCourseSpecificationId($courseSpecification->getId())->indexBy('id');
+        $courseSpecification->setCourseImplementations($courseImplementations);
+
+        // Load UnitImpls inside CourseSpecs
+        /** @var GenericCollection|UnitImplementation[] $unitImplementations */
+        $unitImplementations = $this->getUnitImplementationMapper()->findAllByCourseId($courseImplementations->getColumnValues('id'))->indexBy('id');
+        foreach($unitImplementations as $unitImplementation){
+            $courseImplementation = $courseImplementations[$unitImplementation->getCourse()->getId()];
+            $courseImplementation->getUnits()->setOffset($unitImplementation->getId(), $unitImplementation);
+            $unitImplementation->setCourse($courseImplementation);
+        }
+
+        // Load all assessments in Unit Impls (regardless of due date - as we need them for navigation)
+        /** @var GenericCollection|IAssessable[] $assessmentImpls */
+        $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationId($unitImplementations->getColumnValues('id'))->indexBy('id');
+
+        foreach($assessmentImpls as $assessmentImpl){
+            $unitImplementation = $unitImplementations[$assessmentImpl->getContext()->getId()];
+            $unitImplementation->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);
+            $assessmentImpl->setContext($unitImplementation);
+        }
+
+        // Get list of assessments due in specified term
+        /** @var GenericCollection|IAssessable[] $assessmentsDueInTerm */
+        $assessmentsDueInTerm = $assessmentImpls->filter(function(IAssessable $assessment) use ($term) {
+            $dueAfterTermStart = $assessment->getDueAt()->gte($term->getStart());
+            $dueBeforeTermEnd = $term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($term->getActualFinish());
+            return $dueAfterTermStart && $dueBeforeTermEnd;
+        });
+
+        // Should never have got to this page if there are no assessments due here
+        if (0 === $assessmentsDueInTerm->count()){
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SUBJECT_NO_TASKS);
+        }
+
+        // Load Participants
+        $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($assessmentsDueInTerm);
+        foreach($assessmentsDueInTerm as $assessment){
+            foreach ($assessment->getAllParticipants() as $participant) {
+                foreach ($participant->getAllFeedbacks() as $feedback) {
+                    $assessment->getFeedbacks()->setOffset($feedback->getId(), $feedback);
+                }
+                foreach ($participant->getAllResponses() as $response) {
+                    $assessment->getResponses()->setOffset($response->getId(), $response);
+                }
+            }
         }
 
         /* Inject (this is used in twig)
@@ -293,32 +299,32 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper|Implementation\Mapper
+     * @return Mapper|CourseImplementationMapper
      * @throws \InvalidArgumentException
      */
     protected function getCourseImplementationMapper()
     {
-        return $this->getMapperFactory()->get(Implementation\Mapper::class);
+        return $this->getMapperFactory()->get(CourseImplementationMapper::class);
     }
 
 
     /**
-     * @return Mapper|Specification\Mapper
+     * @return Mapper|CourseSpecificationMapper
      * @throws \InvalidArgumentException
      */
     protected function getCourseSpecificationMapper()
     {
-        return $this->getMapperFactory()->get(Specification\Mapper::class);
+        return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
     }
 
 
     /**
-     * @return Mapper|Implementation\Unit\Mapper
+     * @return Mapper|UnitImplementationMapper
      * @throws \InvalidArgumentException
      */
     protected function getUnitImplementationMapper()
     {
-        return $this->getMapperFactory()->get(Implementation\Unit\Mapper::class);
+        return $this->getMapperFactory()->get(UnitImplementationMapper::class);
     }
 
     /**
