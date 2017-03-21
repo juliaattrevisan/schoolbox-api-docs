@@ -121,10 +121,10 @@ class External_Isams_Timetable implements External_TimetableInterface
      * Retrieve current day number
      *
      * @param CampusModel $campus Campus of the date we are looking at
-     * @param int $date UNIX timestamp of the date we are looking at
-     * @return bool|string              Day number
+     * @param null|int $date UNIX timestamp of the date we are looking at
+     * @return bool|string Day number
      */
-    public function getDayNumber(CampusModel $campus, $date = 0)
+    public function getDayNumber(CampusModel $campus, $date = null)
     {
         // The days in Isams have no correlation to an actual calendar date- it is purely based on the day of the week
         // (Monday - Friday) and a week number (of which there is a single week set up for each campus).
@@ -138,7 +138,11 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         // Add one because ISAMS starts days at 1 and PHP starts at 0
 
-        $dayOfWeek = date("w") + 1;
+        if ($date != null) {
+            $dayOfWeek = date("w", $date) + 1;
+        } else {
+            $dayOfWeek = date("w") + 1;
+        }
 
         $queryDay = "
            SELECT   TblTimetableManagerDaysID as DayID 
