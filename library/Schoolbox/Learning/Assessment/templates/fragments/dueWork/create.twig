@@ -122,7 +122,7 @@
 
         var $maxMarkInput = $('#maxMark');
         var $useRubricSwitch = $('#useRubric');
-        var $grid = $('#rb-{{ rubric.id }}');
+        var $grid = $('[data-rb-grid]');
 
         /**
          * Disable the field, but allow us to show its value
@@ -152,35 +152,6 @@
             }
         }
 
-        function calculateGridTotal() {
-            var max = 0;
-
-            // iterate the grid, and sum the max of each row
-            $grid.find('tr[data-sequencer-group]').each(function () {
-                var $row = $(this),
-                    rowMax = 0;
-
-                if ($row.find('[data-criterion-name]:checked').length == 0) {
-                    return true; // jq.continue
-                }
-
-                $row.find('[data-descriptor-value]').each(function () {
-                    var i = parseInt($(this).val());
-
-                    if (!isNaN(i)) {
-                        rowMax = Math.max(rowMax, i);
-                    }
-
-                });
-
-                max += rowMax;
-            });
-
-            var $maxMark = $('#maxMark');
-
-            $maxMark.val(max);
-        }
-
         /* Rubrics switcher
          */
         $useRubricSwitch.on('click', function () {
@@ -188,15 +159,53 @@
         });
 
         // configure callbacks into the grid
-        $grid
-            .on('change', '[data-descriptor-value], [data-criterion-name]', calculateGridTotal)
-            .rubricEditable({
-                afterApplyResultSet: calculateGridTotal
-            });
+        $grid.rubricEditable({
+            afterApplyResultSet: calculateGridTotal
+        });
 
         // Initiate
         processUseRubricClick($useRubricSwitch);
     });
+
+
+    /**
+     * Update max avail mark on descriptor point value changes
+     * Purposefully placed outside of the document.ready in order to work for a rubric grid that is imported via csv
+     */
+    $(document).on('change', '[data-rb-grid] [data-descriptor-value], [data-rb-grid] [data-criterion-name]', calculateGridTotal);
+
+
+    /**
+     * Crawls the rubric grid and finds the highest point value
+     */
+    function calculateGridTotal() {
+
+        var max = 0;
+
+        // iterate the grid, and sum the max of each row
+        $('[data-rb-grid]').find('tr[data-sequencer-group]').each(function () {
+            var $row = $(this),
+                rowMax = 0;
+
+            if ($row.find('[data-criterion-name]:checked').length == 0) {
+                return true; // jq.continue
+            }
+
+            $row.find('[data-descriptor-value]').each(function () {
+                var i = parseInt($(this).val());
+
+                if (!isNaN(i)) {
+                    rowMax = Math.max(rowMax, i);
+                }
+
+            });
+
+            max += rowMax;
+        });
+
+        $('#maxMark').val(max);
+    }
+
 </script>
 
 
