@@ -5,7 +5,7 @@ helpmsg() {
     echo "  -h | --help      display this help message";
     echo "  -i | --initial   prepare data for using as an initial dataset (more cleaning)";
     echo "  -u | --upload    upload the data for other to use on completion";
-    echo "  -v | --verbose    upload the data for other to use on completion";
+    echo "  -v | --verbose   verbose mode for easier debugging";
 }
 
 if [ -z $1 ];
