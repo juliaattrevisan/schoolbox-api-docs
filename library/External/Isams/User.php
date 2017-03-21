@@ -108,11 +108,11 @@ class External_Isams_User implements External_UserInterface
      */
     public function getParentEmails($synergyIds)
     {
-        $emailList = array();
-        $id_list = implode(',', array_map('intval', $synergyIds));
+        $emailList = [];
+        $id_list = implode(',', array_map([$this->database, 'smartQuote'], $synergyIds));
 
         if (empty($id_list)) {
-            return array();
+            return [];
         }
 
         $query =
@@ -277,7 +277,7 @@ class External_Isams_User implements External_UserInterface
 
         $query .= " ORDER BY StudentSurname, StudentGiven1, StudentID";
 
-        return $this->getDatabase()->getAll($query) ?: array();
+        return $this->getDatabase()->getAll($query) ?: [];
     }
 
     /**
@@ -289,37 +289,36 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT      
-                        V_ParentMother.ParentID             AS StudentContactID,
-                        ''                                  AS StudentContactTitle,
-                        V_ParentMother.ParentFirstname      AS StudentContactPreferred,
-                        V_ParentMother.ParentSurname        AS StudentContactSurname,
-                        V_ParentMother.CISEmail             AS StudentContactDefaultEmail,
-                        1                                   AS ValidAddressFlag,
-                        V_ParentMother.Address1             AS StudentContactAddress1,
-                        V_ParentMother.Address2             AS StudentContactAddress2,
-                        V_ParentMother.Address3             AS StudentcontactAddress3,
-                        ''                                  AS StudentContactSuburb,
-                        V_ParentMother.PostCode             AS StudentContactPostCode,
-                        ''                                  AS StudentContactState,
-                        V_ParentMother.Country              AS StudentContactCountryCode,
-                        V_ParentMother.Mobile               AS StudentContactMobilePhone,
-                        ''                                  AS StudentContactOccupPhone,
-                        ''                                  AS StudentContactPhoneActual,
-                        'Mother'                            AS StudentContactRelation,
-                        V_ParentFather.ParentID             AS StudentContactSpouseID,
-                        ''                                  AS StudentContactSpouseTitle,
-                        V_ParentFather.ParentFirstname      AS StudentContactSpousePreferred,
-                        V_ParentFather.ParentSurname        AS StudentContactSpouseSurname,
-                        V_ParentFather.Mobile               AS StudentContactSpouseMobilePhone,
-                        ''                                  AS StudentContactSpouseOccupPhone, 
-                        V_ParentFather.CISEmail             AS StudentContactSpouseDefaultEmail
+                        V_Parent.ParentID             AS StudentContactID,
+                        ''                            AS StudentContactTitle,
+                        V_Parent.ParentFirstname      AS StudentContactPreferred,
+                        V_Parent.ParentSurname        AS StudentContactSurname,
+                        V_Parent.CISEmail             AS StudentContactDefaultEmail,
+                        1                             AS ValidAddressFlag,
+                        V_Parent.Address1             AS StudentContactAddress1,
+                        V_Parent.Address2             AS StudentContactAddress2,
+                        V_Parent.Address3             AS StudentcontactAddress3,
+                        ''                            AS StudentContactSuburb,
+                        V_Parent.PostCode             AS StudentContactPostCode,
+                        ''                            AS StudentContactState,
+                        V_Parent.Country              AS StudentContactCountryCode,
+                        V_Parent.Mobile               AS StudentContactMobilePhone,
+                        ''                            AS StudentContactOccupPhone,
+                        ''                            AS StudentContactPhoneActual,
+                        V_Parent.Relationship         AS StudentContactRelation,
+                        ''                            AS StudentContactSpouseID,
+                        ''                            AS StudentContactSpouseTitle,
+                        ''                            AS StudentContactSpousePreferred,
+                        ''                            AS StudentContactSpouseSurname,
+                        ''                            AS StudentContactSpouseMobilePhone,
+                        ''                            AS StudentContactSpouseOccupPhone, 
+                        ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
-            LEFT JOIN   V_Parent AS V_ParentMother ON V_ParentMother.StudentID = V_Student.StudentID AND V_ParentMother.Relationship = 'Mother'
-            LEFT JOIN   V_Parent AS V_ParentFather ON V_ParentFather.StudentID = V_Student.StudentID AND V_ParentFather.Relationship = 'Father'
+            JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
             WHERE       V_Student.StudentID = '{$externalUserId}'
         ";
 
-        return $this->getDatabase()->getAll($query) ?: array();
+        return $this->getDatabase()->getAll($query) ?: [];
     }
 
     /**
@@ -362,7 +361,7 @@ class External_Isams_User implements External_UserInterface
         ";
 
         $this->getDatabase()->query($sql);
-        $subjectList = array();
+        $subjectList = [];
 
         while ($subject = $this->getDatabase()->getNextArray()) {
             $subjectList[] = array(
@@ -373,11 +372,7 @@ class External_Isams_User implements External_UserInterface
             );
         }
 
-        if (is_array($subjectList)) {
-            return $subjectList;
-        } else {
-            return [];
-        }
+        return $subjectList;
     }
 
     /**
@@ -472,7 +467,7 @@ class External_Isams_User implements External_UserInterface
             LEFT JOIN   V_Parent AS V_ParentFather ON V_ParentFather.StudentID = V_Student.StudentID AND V_ParentFather.Relationship = 'Father'
         ";
 
-        return $this->getDatabase()->getAll($query) ?: array();
+        return $this->getDatabase()->getAll($query) ?: [];
 
     }
 

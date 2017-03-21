@@ -82,6 +82,7 @@ class Sync implements SyncInterface
                 ''                       AS student_boarding_house,
                 campus                   AS student_campus
             FROM V_Student
+            ORDER BY StudentID
         ";
 
         return new Iterator\Student($this->database->getIterator($query));
@@ -115,6 +116,7 @@ class Sync implements SyncInterface
             FROM        V_Parent
             JOIN        V_Student ON V_Student.StudentID = V_Parent.StudentID
             WHERE       V_Parent.Relationship IN ('Caregiver', 'Father', 'Guardian', 'Legal Guardian', 'Mother', 'Primary Contact')
+            ORDER BY    ParentID
         ";
 
         return new Iterator\Guardian($this->database->getIterator($query));
@@ -146,7 +148,7 @@ class Sync implements SyncInterface
                         ''                                  AS staff_year_level_description                
             FROM        V_Staff
             LEFT JOIN   V_StaffDirectory ON V_StaffDirectory.StaffID = V_Staff.StaffID
-            ORDER BY    teacherlastname, teacherfirstname
+            ORDER BY    V_Staff.StaffID
         ";
 
         return new Iterator\Staff($this->database->getIterator($query));
