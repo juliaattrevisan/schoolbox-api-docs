@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 
 class AssessmentList
 {
+
     /**
      * @var Collection|Collection[]|IAssessable[][]
      */
@@ -26,14 +27,15 @@ class AssessmentList
     /** @var  Term */
     private $term;
 
+
     /**
      * @param GenericCollection|UnitImplementation[] $unitImplementations
-     * @param Term $term
+     * @param Term                                   $term
      */
     public function __construct(GenericCollection $unitImplementations, Term $term)
     {
         $this->assessments = new GenericCollection(IAssessable::class);
-        $this->term = $term;
+        $this->term        = $term;
 
         foreach ($unitImplementations as $unitImplementation) {
             $this->extractAssessments($unitImplementation);
@@ -50,7 +52,10 @@ class AssessmentList
     protected function extractAssessments(AssessmentContext $context, callable $filter = null)
     {
         // by default, leave tasks out of it
-        $filter = $filter ?: function ($input) { return is_object($input) && !$input instanceof Task\Model; };
+        $filter = $filter
+            ?: function ($input) {
+                return is_object($input) && !$input instanceof Task\Model;
+            };
 
         foreach ($context->getAssessables() as $activity) {
             if ($activity instanceof AssessmentContext) {
@@ -60,8 +65,8 @@ class AssessmentList
             } else {
                 // Is the activity due in the specified term ?
                 $dueAfterTermStart = $activity->getDueAt()->gte($this->term->getStart());
-                $dueBeforeTermEnd = $this->term->getActualFinish()->isNull() || $activity->getDueAt()->lt($this->term->getActualFinish());
-                if(!$dueAfterTermStart || !$dueBeforeTermEnd){
+                $dueBeforeTermEnd  = $this->term->getActualFinish()->isNull() || $activity->getDueAt()->lt($this->term->getActualFinish());
+                if (!$dueAfterTermStart || !$dueBeforeTermEnd) {
                     continue;
                 }
 
