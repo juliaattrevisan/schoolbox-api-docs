@@ -59,7 +59,7 @@ class Exporter
             INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
             LEFT JOIN       lu_submission_type ON 
-                            lu_submission_type.id = submission_box.type
+                            lu_submission_type.id = sb.type
             WHERE           YEAR(sr.created_at) = :currentYear
                             AND sr.deleted_at IS NULL
                             AND sb.name LIKE '%[%]%'
