@@ -33,9 +33,9 @@ class AssessmentResults
 
             $result = new Unit($unitImplementation);
 
-            foreach ($result->getResults() as $specActivityId => $activityFeedbacks) {
+            foreach ($result->getResults() as $specAssessmentId => $assessmentFeedbacks) {
                 // flatten
-                $results[$specActivityId] = $activityFeedbacks;
+                $results[$specAssessmentId] = $assessmentFeedbacks;
             }
         }
 

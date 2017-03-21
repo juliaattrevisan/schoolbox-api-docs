@@ -57,23 +57,23 @@ class AssessmentList
                 return is_object($input) && !$input instanceof Task\Model;
             };
 
-        foreach ($context->getAssessables() as $activity) {
-            if ($activity instanceof AssessmentContext) {
+        foreach ($context->getAssessables() as $assessment) {
+            if ($assessment instanceof AssessmentContext) {
                 // recurse into project
-                $this->extractAssessments($activity, $filter);
+                $this->extractAssessments($assessment, $filter);
 
             } else {
-                // Is the activity due in the specified term ?
-                $dueAfterTermStart = $activity->getDueAt()->gte($this->term->getStart());
-                $dueBeforeTermEnd  = $this->term->getActualFinish()->isNull() || $activity->getDueAt()->lt($this->term->getActualFinish());
+                // Is the assessment due in the specified term ?
+                $dueAfterTermStart = $assessment->getDueAt()->gte($this->term->getStart());
+                $dueBeforeTermEnd  = $this->term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($this->term->getActualFinish());
                 if (!$dueAfterTermStart || !$dueBeforeTermEnd) {
                     continue;
                 }
 
-                $specActivity = $activity->getSpecificationAssessment();
+                $specAssessment = $assessment->getSpecificationAssessment();
 
-                if ($filter($specActivity)) {
-                    $this->assessments->offsetSet($specActivity->getId(), $specActivity);
+                if ($filter($specAssessment)) {
+                    $this->assessments->offsetSet($specAssessment->getId(), $specAssessment);
                 }
             }
         }

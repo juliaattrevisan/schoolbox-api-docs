@@ -10,7 +10,7 @@
     courseSpecId:     courseSpec.id,
     folderId:         classFolder.id,
     submissionTypeId: submissionType.Id,
-    termCode:         metadata.term.code
+    termCode:         term.code
 } %}
 
 <script type="text/javascript">
@@ -46,14 +46,14 @@
              * These correspond to a series of data and their respective
              * five-point summaries
              */
-            allAssessments: {{ results.activities.all | column('title') | json_encode | raw }},
+            allAssessments: {{ results.assessments.all | column('title') | json_encode | raw }},
 
             /* All the raw data
              */
             allData: $.fn.boxPlotCalculateAllSeriesData([
-                {% for activity in results.activities.all -%}
+                {% for assessment in results.assessment.all -%}
                 [
-                    {% for feedback in results.all[activity.id] -%}
+                    {% for feedback in results.all[assessment.id] -%}
                     {
                         info: "{{ feedback.reviewee.fullName }}",
                         uid: '{{ feedback.reviewee.id }}',
@@ -254,9 +254,9 @@
         <h3 class="subheader">Top Students</h3>
 
         <section>
-            {% if results.ranking.top | length > 0 %}
+            {% if ranking.top | length > 0 %}
             <ul class="information-list">
-                {% for currentStudent in results.ranking.top | slice(0,3) %}
+                {% for currentStudent in ranking.top | slice(0,3) %}
                 <li>
                     <div class="card small-12">
                         <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
@@ -281,9 +281,9 @@
         <h3 class="subheader">Bottom Students</h3>
 
         <section>
-            {% if results.ranking.bottom | length > 0 %}
+            {% if ranking.bottom | length > 0 %}
             <ul class="information-list">
-                {% for currentStudent in results.ranking.bottom | slice(0,3) %}
+                {% for currentStudent in ranking.bottom | slice(0,3) %}
                 <li>
                     <div class="card small-12">
                         <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
@@ -322,18 +322,10 @@
         <a class="icon-more" title="Filter Options" data-dropdown="result-filter-options"></a>
     </nav>
     <ul id="result-filter-options" class="f-dropdown" data-dropdown-content>
-
-        {% if route == 'course' %}
-            <li><a href="{{ routeLookup('learningAnalytics.course', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
-            {% for submissionType in submissionTypes %}
-            <li><a href="{{ routeLookup('learningAnalytics.courseWithSubmissionType', routeArgs|merge({submissionTypeId: submissionType.id})) }}" class="icon-due-work" title="{{ submissionType.name }}">{{ submissionType.name }}</a></li>
-            {% endfor %}
-        {% elseif route == 'folder' %}
-            <li><a href="{{ routeLookup('learningAnalytics.folder', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
-            {% for submissionType in submissionTypes %}
-            <li><a href="{{ routeLookup('learningAnalytics.folderWithSubmissionType', routeArgs|merge({submissionTypeId: submissionType.id})) }}" class='icon-due-work' title="{{ submissionType.name }}">{{ submissionType.name }}</a></li>
-            {% endfor %}
-        {% endif %}
+        <li><a href="{{ routeLookup('learningAnalytics.'~route~'WithTerm', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
+        {% for submissionType in submissionTypes %}
+        <li><a href="{{ routeLookup('learningAnalytics.'~route~'WithSubmissionTypeAndTerm', routeArgs|merge({submissionTypeId: submissionType.id})) }}" class='icon-due-work' title="{{ submissionType.name }}">{{ submissionType.name }}</a></li>
+        {% endfor %}
     </ul>
 </div>
 

@@ -89,7 +89,7 @@ class CohortAnalysis
         // cache this badboy
         if (empty($this->completionData)) {
 
-            $specActivityComplete = [];
+            $specAssessmentComplete = [];
             $participantProgress  = [];
 
             foreach ($this->unitImplementations as $unitImpl) {
@@ -97,29 +97,29 @@ class CohortAnalysis
                 $unitSpec   = $unitImpl->getSpecification();
                 $unitSpecId = $unitSpec->getId();
 
-                foreach ($unitImpl->getAssessables() as $implActivity) {
+                foreach ($unitImpl->getAssessables() as $implAssessment) {
 
-                    $specActivity   = $implActivity->getSpecificationAssessment();
-                    if($specActivity === null) {
+                    $specAssessment   = $implAssessment->getSpecificationAssessment();
+                    if($specAssessment === null) {
                         //skip assessments that have no spec
                         continue;
                     }
-                    $specActivityId = $specActivity->getId();
+                    $specAssessmentId = $specAssessment->getId();
 
-                    if (empty($specActivityComplete[$unitSpecId][$specActivityId])) {
+                    if (empty($specAssessmentComplete[$unitSpecId][$specAssessmentId])) {
                         // assume complete until told otherwise
-                        $specActivityComplete[$unitSpecId][$specActivityId] = true;
+                        $specAssessmentComplete[$unitSpecId][$specAssessmentId] = true;
                     }
 
-                    foreach ($implActivity->getAllParticipants() as $participant) {
+                    foreach ($implAssessment->getAllParticipants() as $participant) {
 
                         $completed = $participant->getAllResponses()->filter(function (IResponse $response) { return $response->isSubmitted(); })->count() > 0;
 
-                        $participantProgress[$unitSpecId][$participant->getUser()->getId()][$specActivityId] = $completed;
+                        $participantProgress[$unitSpecId][$participant->getUser()->getId()][$specAssessmentId] = $completed;
 
                         if (!$completed) {
-                            // if ANY participant who maps onto a SPEC activity has NO responses, that activity is considered not completed overall.
-                            $specActivityComplete[$unitSpecId][$specActivityId] = false;
+                            // if ANY participant who maps onto a SPEC assessment has NO responses, that assessment is considered not completed overall.
+                            $specAssessmentComplete[$unitSpecId][$specAssessmentId] = false;
                         }
 
                     }
@@ -128,7 +128,7 @@ class CohortAnalysis
 
                 $this->completionData[$unitSpecId] = [
                     'unitSpec'            => $unitSpec,
-                    'activityCompletions' => $specActivityComplete[$unitSpecId],
+                    'assessmentCompletions' => $specAssessmentComplete[$unitSpecId],
                     'participantProgress' => $participantProgress[$unitSpecId]
                 ];
             }
@@ -140,14 +140,14 @@ class CohortAnalysis
 
 
     /**
-     * @param array $activityCompletions
+     * @param array $assessmentCompletions
      * @param array $participantProgress
      * @return array
      */
-    private function reduceCompletion(array $activityCompletions, array $participantProgress)
+    private function reduceCompletion(array $assessmentCompletions, array $participantProgress)
     {
-        if (empty($activityCompletions)) {
-            $activityCompletions = [0];
+        if (empty($assessmentCompletions)) {
+            $assessmentCompletions = [0];
         }
 
         if (empty($participantProgress)) {
@@ -156,7 +156,7 @@ class CohortAnalysis
 
         return [
             'mostAdvancedStudent' => 100 * max(array_map(function (array $progress) { return array_sum($progress) / count($progress); }, $participantProgress)),
-            'classCompletions'    => 100 * array_sum($activityCompletions) / count($activityCompletions),
+            'classCompletions'    => 100 * array_sum($assessmentCompletions) / count($assessmentCompletions),
         ];
     }
 
@@ -174,10 +174,10 @@ class CohortAnalysis
 
         foreach ($this->getCompletionData() as $unitSpecId => $unitCompletionData) {
 
-            $specActivityComplete = $unitCompletionData['activityCompletions'];
+            $specAssessmentComplete = $unitCompletionData['assessmentCompletions'];
             $participantProgress  = $unitCompletionData['participantProgress'];
 
-            $progress[$unitSpecId] = $this->reduceCompletion($specActivityComplete, $participantProgress);
+            $progress[$unitSpecId] = $this->reduceCompletion($specAssessmentComplete, $participantProgress);
             $progress[$unitSpecId]['unit'] = $unitCompletionData['unitSpec'];
         }
 
@@ -196,36 +196,36 @@ class CohortAnalysis
      */
     public function getOverallProgress()
     {
-        $activityCompletions = [];
+        $assessmentCompletions = [];
         $participantProgress = [];
 
         // flatten the unit specs out of the data, accommodating students who exist in more than one unit
         foreach ($this->getCompletionData() as $unitSpecId => $unitCompletionData) {
 
-            // Did this UnitSpec have any ActivitySpecs inside it?
-            if (is_array($unitCompletionData['activityCompletions'])) {
-                foreach ($unitCompletionData['activityCompletions'] as $specActivityId => $activityCompletion) {
-                    if (!array_key_exists($specActivityId, $activityCompletions)) {
-                        $activityCompletions[$specActivityId] = true;
+            // Did this UnitSpec have any AssessmentSpecs inside it?
+            if (is_array($unitCompletionData['assessmentCompletions'])) {
+                foreach ($unitCompletionData['assessmentCompletions'] as $specAssessmentId => $assessmentCompletion) {
+                    if (!array_key_exists($specAssessmentId, $assessmentCompletions)) {
+                        $assessmentCompletions[$specAssessmentId] = true;
                     }
-                    $activityCompletions[$specActivityId] = min($activityCompletions[$specActivityId], $activityCompletion);
+                    $assessmentCompletions[$specAssessmentId] = min($assessmentCompletions[$specAssessmentId], $assessmentCompletion);
                 }
             }
 
-            // Did this UnitSpec have any ActivitySpecs inside it?
+            // Did this UnitSpec have any AssessmentSpecs inside it?
             if (is_array($unitCompletionData['participantProgress'])) {
                 foreach ($unitCompletionData['participantProgress'] as $participantId => $progress) {
-                    foreach ($progress as $specActivityId => $isComplete) {
-                        if (empty($participantProgress[$participantId][$specActivityId])) {
-                            $participantProgress[$participantId][$specActivityId] = false;
+                    foreach ($progress as $specAssessmentId => $isComplete) {
+                        if (empty($participantProgress[$participantId][$specAssessmentId])) {
+                            $participantProgress[$participantId][$specAssessmentId] = false;
                         }
-                        $participantProgress[$participantId][$specActivityId] = max($participantProgress[$participantId][$specActivityId], $isComplete);
+                        $participantProgress[$participantId][$specAssessmentId] = max($participantProgress[$participantId][$specAssessmentId], $isComplete);
                     }
                 }
             }
         }
 
-        return $this->reduceCompletion($activityCompletions, $participantProgress);
+        return $this->reduceCompletion($assessmentCompletions, $participantProgress);
     }
 
 
@@ -243,42 +243,42 @@ class CohortAnalysis
 
             $summator = new WeightedAverage();
 
-            /** @var IAssessable[] $activities */
-            $activities = [];
+            /** @var IAssessable[] $assessments */
+            $assessments = [];
 
             /** @var User[] $participants */
             $users = [];
 
             foreach ($this->unitImplementations as $unitImplementation) {
-                // participants can exist in units simultaneously, so we need to flatten according to specActivity before summating.
-                foreach ($unitImplementation->getAssessables() as $implActivity) {
+                // participants can exist in units simultaneously, so we need to flatten according to specAssessment before summating.
+                foreach ($unitImplementation->getAssessables() as $implAssessment) {
 
-                    if($implActivity->getSpecificationAssessment() == null) {
+                    if(null === $implAssessment->getSpecificationAssessment()) {
                         //skip activities with no specification
                         continue;
                     }
-                    $specActivityId = $implActivity->getSpecificationAssessment()->getId();
+                    $specAssessmentId = $implAssessment->getSpecificationAssessment()->getId();
 
-                    if (empty($activities[$specActivityId])) {
+                    if (empty($assessments[$specAssessmentId])) {
                         // only want one of these
-                        $activities[$specActivityId] = clone $implActivity->getSpecificationAssessment();
+                        $assessments[$specAssessmentId] = clone $implAssessment->getSpecificationAssessment();
                     }
 
-                    $specActivity = $activities[$specActivityId];
+                    $specAssessment = $assessments[$specAssessmentId];
 
-                    foreach ($implActivity->getAllParticipants() as $implParticipant) {
+                    foreach ($implAssessment->getAllParticipants() as $implParticipant) {
 
-                        if (!$specActivity->isParticipant($implParticipant->getUser())) {
-                            // dupe the implParticipant object, linked to the specActivity
-                            $specActivity->getAllParticipants()->add(new Participant(
-                                $implParticipant->getUser(), $specActivity
+                        if (!$specAssessment->isParticipant($implParticipant->getUser())) {
+                            // dupe the implParticipant object, linked to the specAssessment
+                            $specAssessment->getAllParticipants()->add(new Participant(
+                                $implParticipant->getUser(), $specAssessment
                             ));
 
                             // collate deduped list of users
                             $users[$implParticipant->getUser()->getId()] = $implParticipant->getUser();
                         }
 
-                        $specParticipant = $specActivity->getParticipant($implParticipant->getUser());
+                        $specParticipant = $specAssessment->getParticipant($implParticipant->getUser());
 
                         // load in the most recent published feedback if any exists - on collision, take the highest mark
                         $implFeedback = $implParticipant->findMostRecentPublishedFeedback();
@@ -293,29 +293,29 @@ class CohortAnalysis
                             if ($specParticipant->findMostRecentPublishedFeedback()->getNormalisedMark() < $implFeedback->getNormalisedMark()) {
                                 // replace
                                 $specFeedback = clone $implFeedback;
-                                $specFeedback->setAssessable($specActivity);
+                                $specFeedback->setAssessable($specAssessment);
                                 $specParticipant->setAllFeedbacks(new GenericCollection($specFeedback, [$specFeedback]));
-                                $specActivity->getFeedbacks()->add($specFeedback);
+                                $specAssessment->getFeedbacks()->add($specFeedback);
                             }
 
                         } else {
                             // drop that feedback straight in
                             $specFeedback = clone $implFeedback;
-                            $specFeedback->setAssessable($specActivity);
+                            $specFeedback->setAssessable($specAssessment);
                             $specParticipant->setAllFeedbacks(new GenericCollection($specFeedback, [$specFeedback]));
-                            $specActivity->getFeedbacks()->add($specFeedback);
+                            $specAssessment->getFeedbacks()->add($specFeedback);
                         }
                     }
 
                 }
             }
 
-            $activities = new Collection($activities);
+            $assessments = new Collection($assessments);
 
             foreach ($users as $userId => $user) {
                 $this->gradeAverages[$userId] = [
                     'user'    => $user,
-                    'average' => $summator->summateAllAssessablesForUser($activities, $user, true)
+                    'average' => $summator->summateAllAssessablesForUser($assessments, $user, true)
                 ];
             }
         }
@@ -331,13 +331,13 @@ class CohortAnalysis
 
 
     /**
-     * Returns five-point grade data from unit IMPLEMENTATIONS for all participants, indexed by unit SPECIFICATION activity
-     * Applicable to the activity box-and-whisker graph
+     * Returns five-point grade data from unit IMPLEMENTATIONS for all participants, indexed by unit SPECIFICATION assessment
+     * Applicable to the assessment box-and-whisker graph
      *
      * @param GenericCollection|UnitImplementation[] $unitImplementations
      * @return IFeedback[][]
      */
-    public function getCohortGradesByActivity(GenericCollection $unitImplementations)
+    public function getCohortGradesByAssessment(GenericCollection $unitImplementations)
     {
         // shim around old code
         return (new AssessmentResults($unitImplementations))->getResults();
@@ -349,7 +349,7 @@ class CohortAnalysis
      * @param Term $term
      * @return Collection|Collection[]|IAssessable[][]
      */
-    public function getActivities(GenericCollection $unitImplementations, Term $term)
+    public function getAssessments(GenericCollection $unitImplementations, Term $term)
     {
         // shim around old code
         return (new AssessmentList($unitImplementations, $term))->getAssessments();
@@ -360,7 +360,7 @@ class CohortAnalysis
      * Returns five-point grade data from unit implementations for all participants, indexed by rubric indicator
      * Applicable to the rubric box-and-whisker graph
      *
-     * (Cuts the same data as getCohortGradesByActivity() but by indicators instead of activity.)
+     * (Cuts the same data as getCohortGradesByAssessment() but by indicators instead of assessment.)
      *
      * @param GenericCollection|UnitImplementation[] $unitImplementations
      * @param Collection|User[][] $unitImplStudents Grouped by unitImpl.id,

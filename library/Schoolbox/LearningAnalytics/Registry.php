@@ -40,8 +40,8 @@ class Registry {
         foreach ($unitImplementations as $unitImplementation) {
             $unitImplId = $unitImplementation->getId();
 
-            foreach ($unitImplementation->getAssessables() as $activity) {
-                foreach ($activity->getAllParticipants() as $participant) {
+            foreach ($unitImplementation->getAssessables() as $assessment) {
+                foreach ($assessment->getAllParticipants() as $participant) {
                     $user = $participant->getUser();
 
                     if (empty($users[$unitImplId][$user->getId()])) {

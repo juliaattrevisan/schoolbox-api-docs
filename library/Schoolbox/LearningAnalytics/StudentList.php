@@ -134,15 +134,15 @@ class StudentList {
             );
         }
 
-        /* Try loading all the students who have completed a activity for this group, but
+        /* Try loading all the students who have completed a assessment for this group, but
          * may no longer be in the class.
          */
-        foreach ($this->unitImplementation->getAssessables() as $activity) {
-            foreach ($activity->getAllParticipants() as $participant) {
+        foreach ($this->unitImplementation->getAssessables() as $assessment) {
+            foreach ($assessment->getAllParticipants() as $participant) {
 
                 $studentId = $participant->getUser()->getId();
 
-                if (!(in_array($studentId, $classStudentIds) || in_array($studentId, $groupStudentIds))) {
+                if (!(in_array($studentId, $classStudentIds, true) || in_array($studentId, $groupStudentIds, true))) {
                     $removedStudentIds[] = $studentId;
                 }
             }

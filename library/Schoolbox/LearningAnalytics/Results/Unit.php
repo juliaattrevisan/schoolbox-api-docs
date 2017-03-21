@@ -20,12 +20,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 class Unit {
 
     /**
-     * @var UnitImplementation
-     */
-    private $unitImplementation;
-
-    /**
-     * All feedback within the unit implementation, indexed by *SPECIFICATION* activity ID, then student ID
+     * All feedback within the unit implementation, indexed by *SPECIFICATION* assessment.ID, then student.ID
      *
      * @var IFeedback[][]
      */
@@ -36,23 +31,21 @@ class Unit {
      */
     public function __construct(UnitImplementation $unitImplementation)
     {
-        $this->unitImplementation = $unitImplementation;
-
         $results = [];
 
-        foreach ($this->unitImplementation->getAssessables() as $activity) {
+        foreach ($unitImplementation->getAssessables() as $assessment) {
 
-            if($activity->getSpecificationAssessment() === null) {
-                //skip activities with no specification
+            if($assessment->getSpecificationAssessment() === null) {
+                //skip assessments with no specification
                 continue;
             }
 
-            $specActivityId = $activity->getSpecificationAssessment()->getId();
+            $specAssessmentId = $assessment->getSpecificationAssessment()->getId();
 
-            foreach ($activity->getFeedbacks() as $feedback) {
+            foreach ($assessment->getFeedbacks() as $feedback) {
                 $studentId = $feedback->getReviewee()->getId();
 
-                $results[$specActivityId][$studentId] = $feedback;
+                $results[$specAssessmentId][$studentId] = $feedback;
             }
         }
 

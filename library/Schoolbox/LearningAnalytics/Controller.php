@@ -322,26 +322,18 @@ class Controller extends Base
             'currentRoute'     => $this->getRouter()->getMatchedRoute()->name,
             'route'            => $routeType,
             'folders'          => $metadata->getUnitImplementationFolders(),
-
             'term'             => $term,
             'terms'            => $selectableTerms,
-
-
-            'overallProgress' => $analysis->getOverallProgress(),
+            'overallProgress'  => $analysis->getOverallProgress(),
+            'ranking' => [
+                'top'    => $analysis->getCohortRankings(SORT_DESC),
+                'bottom' => $analysis->getCohortRankings(SORT_ASC),
+            ],
             'results' => [
-                'ranking' => [
-                    'top'    => $analysis->getCohortRankings(SORT_DESC),
-                    'bottom' => $analysis->getCohortRankings(SORT_ASC),
+                'all' => $analysis->getCohortGradesByAssessment($unitImplementations),
+                'assessments' => [
+                    'all' => $analysis->getAssessments($unitImplementations, $term),
                 ],
-                'all' => $analysis->getCohortGradesByActivity($unitImplementations),
-                'activities' => [
-                    'all'   => $analysis->getActivities($unitImplementations, $term),
-                    'types' => [
-                        'all'      => $submissionTypes->getSubmissionTypes(),
-                        'selected' => $submissionTypes->getSelectedSubmissionType(),
-                    ],
-                ],
-
             ],
             'progress' => [
                 'allUnits' => $analysis->getProgressByUnit(),
