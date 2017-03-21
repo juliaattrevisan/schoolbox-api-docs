@@ -1,7 +1,5 @@
 <?php
 /**
- * TaskResults
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,29 +8,28 @@
 
 namespace Schoolbox\LearningAnalytics\Results;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\LearningAnalytics\Registry;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
-class TaskResults
+class AssessmentResults
 {
 
     /**
-     * Feedback instances, indexed by assessment, then student
+     * Feedback instances, indexed by assessment.id, then student.id
      *
      * @var IFeedback[][]
      */
-    private $results = [];
+    private $results;
 
     /**
-     * Constructor
-     *
-     * @param Registry $registry
+     * @param GenericCollection|UnitImplementation[] $unitImplementations
      */
-    public function __construct(Registry $registry)
+    public function __construct(GenericCollection $unitImplementations)
     {
         $results = [];
 
-        foreach ($registry->getUnitImplementations() as $unitImplementation) {
+        foreach ($unitImplementations as $unitImplementation) {
 
             $result = new Unit($unitImplementation);
 
@@ -42,21 +39,11 @@ class TaskResults
             }
         }
 
-        $this->setResults($results);
+        $this->results = $results;
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * Set all results
-     *
-     * @param IFeedback[][] $results
-     */
-    private function setResults($results)
-    {
-        $this->results = $results;
-    }
 
     /**
      * Feedback instances, indexed by assessment, then student

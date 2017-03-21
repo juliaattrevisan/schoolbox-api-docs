@@ -29,7 +29,7 @@ class StudentList {
      *
      * @var Folder
      */
-    private $folder = null;
+    private $folder;
 
     /**
      * Unit instance
@@ -43,7 +43,7 @@ class StudentList {
      *
      * @var UserMapper
      */
-    private $userMapper = null;
+    private $userMapper;
 
     /**
      * A collection of User instances
@@ -68,9 +68,9 @@ class StudentList {
      * @param Implementation\Unit\Model $unit
      */
     public function __construct(Folder $folder, Implementation\Unit\Model $unit) {
-        $this->setFolder($folder);
-        $this->setUnitImplementation($unit);
-        $this->setUserMapper(UserMapper::getInstance());
+        $this->folder = $folder;
+        $this->unitImplementation = $unit;
+        $this->userMapper = UserMapper::getInstance();
 
         $this->process();
     }
@@ -80,13 +80,13 @@ class StudentList {
      */
     private function process()
     {
-        $code = $this->getFolder()->getCodeString();
+        $code = $this->folder->getCodeString();
 
         /* A list of schoolbox user ids corresponding to everyone in $students
          */
         $classStudentIds   = [];
 
-        /* A lsit of schoolbox accounts who have been added to this folder.
+        /* A list of schoolbox accounts who have been added to this folder.
          * This may not be exactly the same as $students due to students arriving and leaving
          */
         $groupStudentIds   = [];
@@ -112,14 +112,14 @@ class StudentList {
 
                 /* With those externalIds, get a list of Schoolbox user ids
                  */
-                $classStudentIds = $this->getUserMapper()->findIdsByColumn('synergy_id', $externalIdList);
+                $classStudentIds = $this->userMapper->findIdsByColumn('synergy_id', $externalIdList);
             }
         }
 
         /* A list of students involved in this folder, as
          * known by schoolbox
          */
-        $groupList = (new Group())->getMemberList($this->getFolder()->getId()) ?: [];
+        $groupList = (new Group())->getMemberList($this->folder->getId()) ?: [];
 
         /* Uniquify results
          */
@@ -137,7 +137,7 @@ class StudentList {
         /* Try loading all the students who have completed a activity for this group, but
          * may no longer be in the class.
          */
-        foreach ($this->getUnitImplementation()->getAssessables() as $activity) {
+        foreach ($this->unitImplementation->getAssessables() as $activity) {
             foreach ($activity->getAllParticipants() as $participant) {
 
                 $studentId = $participant->getUser()->getId();
@@ -148,121 +148,18 @@ class StudentList {
             }
         }
 
-        $this->setRemovedStudentIdList($removedStudentIds);
+        $this->removedStudentIdList = $removedStudentIds;
 
         /* Finally get a list of all the schoolbox user accounts who
          * are currently, or have been previously, associated with
          * this folder and unit
          */
-        $userCollection = $this->getUserMapper()->findByColumn(
+        $userCollection = $this->userMapper->findByColumn(
             'id',
             array_merge($classStudentIds, $groupStudentIds, $removedStudentIds),
             array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
         );
 
-        $this->setStudentList($userCollection);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set folder
-     *
-     * @param Folder $folder
-     */
-    private function setFolder(Folder $folder)
-    {
-        $this->folder = $folder;
-    }
-
-    /**
-     * Get folder
-     *
-     * @return Folder
-     */
-    private function getFolder()
-    {
-        return $this->folder;
-    }
-
-    /**
-     * Set unit
-     *
-     * @param Implementation\Unit\Model $unit
-     */
-    private function setUnitImplementation(Implementation\Unit\Model $unit)
-    {
-        $this->unitImplementation = $unit;
-    }
-
-    /**
-     * Get unit
-     *
-     * @return Implementation\Unit\Model
-     */
-    private function getUnitImplementation()
-    {
-        return $this->unitImplementation;
-    }
-
-    /**
-     * Set user mapper
-     *
-     * @param UserMapper $userMapper
-     */
-    private function setUserMapper(UserMapper $userMapper)
-    {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * Get user mapper
-     *
-     * @return UserMapper
-     */
-    private function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * Set student list
-     *
-     * @param Collection|User[] $studentList
-     */
-    private function setStudentList(Collection $studentList)
-    {
-        $this->students = $studentList;
-    }
-
-    /**
-     * Get student list
-     *
-     * @return Collection|User[]
-     */
-    public function getStudents()
-    {
-        return $this->students;
-    }
-
-    /**
-     * Set removed student id list
-     *
-     * @param int[] $removedStudentIdList
-     */
-    private function setRemovedStudentIdList(array $removedStudentIdList)
-    {
-        $this->removedStudentIdList = $removedStudentIdList;
-    }
-
-    /**
-     * Get removed student id list
-     *
-     * @return int[]
-     */
-    public function getRemovedStudentIdList()
-    {
-        return $this->removedStudentIdList;
+        $this->students = $userCollection;
     }
 }

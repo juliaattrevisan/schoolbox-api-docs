@@ -1,7 +1,5 @@
 <?php
 /**
- * Sorter
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,14 +8,15 @@
 
 namespace Schoolbox\LearningAnalytics;
 
-
-class Sorter {
+class Sorter
+{
 
     /**
      * An associative array to uasort
+     *
      * @var array
      */
-    private $data = array();
+    private $data;
 
     /**
      * Array key to sort on
@@ -26,13 +25,17 @@ class Sorter {
      */
     private $key = '';
 
+
     /**
      * Sorter constructor.
+     *
      * @param $data
      */
-    public function __construct($data) {
-        $this->setData($data);
+    public function __construct($data)
+    {
+        $this->data = $data;
     }
+
 
     /**
      * Find ascending
@@ -40,20 +43,21 @@ class Sorter {
      * @param $key
      * @return array
      */
-    public function findAscending($key = null) {
-        $temp = $this->getData();
+    public function findAscending($key = null)
+    {
+        $temp = $this->data;
 
-        if ($key != null) {
-            $this->setKey($key);
+        if ($key !== null) {
+            $this->key = $key;
 
-            uasort($temp, array($this, 'cmpAscendingKey'));
-        }
-        else {
-            uasort($temp, array($this, 'cmpAscending'));
+            uasort($temp, [$this, 'cmpAscendingKey']);
+        } else {
+            uasort($temp, [$this, 'cmpAscending']);
         }
 
         return $temp;
     }
+
 
     /**
      * Find descending
@@ -61,20 +65,21 @@ class Sorter {
      * @param $key
      * @return array
      */
-    public function findDescending($key = null) {
-        $temp = $this->getData();
+    public function findDescending($key = null)
+    {
+        $temp = $this->data;
 
-        if ($key != null) {
-            $this->setKey($key);
+        if ($key !== null) {
+            $this->key = $key;
 
-            uasort($temp, array($this, 'cmpDescendingKey'));
-        }
-        else {
-            uasort($temp, array($this, 'cmpDescending'));
+            uasort($temp, [$this, 'cmpDescendingKey']);
+        } else {
+            uasort($temp, [$this, 'cmpDescending']);
         }
 
         return $temp;
     }
+
 
     /**
      * Custom compare function
@@ -83,17 +88,18 @@ class Sorter {
      * @param $b
      * @return mixed
      */
-    private function cmpAscendingKey($a, $b) {
-        if ($a[$this->getKey()] > $b[$this->getKey()]) {
+    private function cmpAscendingKey($a, $b)
+    {
+        if ($a[$this->key] > $b[$this->key]) {
             return 1;
-        }
-        else if ($a[$this->getKey()] == $b[$this->getKey()]) {
+        } else if ($a[$this->key] === $b[$this->key]) {
             return 0;
         }
 
         return -1;
     }
 
+
     /**
      * Custom compare function
      *
@@ -101,17 +107,18 @@ class Sorter {
      * @param $b
      * @return mixed
      */
-    private function cmpDescendingKey($a, $b) {
-        if ($a[$this->getKey()] > $b[$this->getKey()]) {
+    private function cmpDescendingKey($a, $b)
+    {
+        if ($a[$this->key] > $b[$this->key]) {
             return -1;
-        }
-        else if ($a[$this->getKey()] == $b[$this->getKey()]) {
+        } else if ($a[$this->key] === $b[$this->key]) {
             return 0;
         }
 
         return 1;
     }
 
+
     /**
      * Custom compare function
      *
@@ -119,16 +126,17 @@ class Sorter {
      * @param $b
      * @return mixed
      */
-    private function cmpAscending($a, $b) {
+    private function cmpAscending($a, $b)
+    {
         if ($a > $b) {
             return 1;
-        }
-        else if ($a == $b) {
+        } else if ($a === $b) {
             return 0;
         }
 
         return -1;
     }
+
 
     /**
      * Custom compare function
@@ -137,54 +145,14 @@ class Sorter {
      * @param $b
      * @return mixed
      */
-    private function cmpDescending($a, $b) {
+    private function cmpDescending($a, $b)
+    {
         if ($a < $b) {
             return 1;
-        }
-        else if ($a == $b) {
+        } else if ($a === $b) {
             return 0;
         }
 
         return -1;
-    }
-
-    /**
-     * Set data
-     *
-     * @param array $data
-     */
-    private function setData($data)
-    {
-        $this->data = $data;
-    }
-
-    /**
-     * Get data
-     *
-     * @return array
-     */
-    private function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Set key
-     *
-     * @param string $key
-     */
-    private function setKey($key)
-    {
-        $this->key = $key;
-    }
-
-    /**
-     * Get key
-     *
-     * @return string
-     */
-    private function getKey()
-    {
-        return $this->key;
     }
 }

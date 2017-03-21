@@ -28,7 +28,7 @@
                 {% if courses | length %}
                     <li class="separator">Analytics</li>
                     {% for courseSpec in courses %}
-                        {% set url = routeLookup('learningAnalytics.folderWithTerms', {courseSpecId: courseSpec.id, folderId: class.id, termCode: term.code}) %}
+                        {% set url = routeLookup('learningAnalytics.folderWithTerm', {courseSpecId: courseSpec.id, folderId: class.id, termCode: term.code}) %}
                         <li><a href="{{ url }}" class="icon-poll">{{ courseSpec.title }}</a></li>
                     {% endfor %}
                 {% endif %}

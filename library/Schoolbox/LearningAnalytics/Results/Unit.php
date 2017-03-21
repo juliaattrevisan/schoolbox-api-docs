@@ -13,16 +13,14 @@
 namespace Schoolbox\LearningAnalytics\Results;
 
 use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 
 class Unit {
 
     /**
-     * Unit instance
-     *
-     * @var Implementation\Unit\Model
+     * @var UnitImplementation
      */
     private $unitImplementation;
 
@@ -31,22 +29,20 @@ class Unit {
      *
      * @var IFeedback[][]
      */
-    private $results = [];
+    private $results;
 
     /**
-     * Constructor
-     *
-     * @param Implementation\Unit\Model $unitImplementation
+     * @param UnitImplementation $unitImplementation
      */
-    public function __construct(Implementation\Unit\Model $unitImplementation)
+    public function __construct(UnitImplementation $unitImplementation)
     {
-        $this->setUnitImplementation($unitImplementation);
+        $this->unitImplementation = $unitImplementation;
 
         $results = [];
 
-        foreach ($this->getUnitImplementation()->getAssessables() as $activity) {
+        foreach ($this->unitImplementation->getAssessables() as $activity) {
 
-            if($activity->getSpecificationAssessment() == null) {
+            if($activity->getSpecificationAssessment() === null) {
                 //skip activities with no specification
                 continue;
             }
@@ -60,41 +56,12 @@ class Unit {
             }
         }
 
-        $this->setResults($results);
+        $this->results = $results;
     }
 
     /* Getters/Setters
      */
 
-    /**
-     * Set unit
-     *
-     * @param Implementation\Unit\Model $unitImplementation
-     */
-    private function setUnitImplementation(Implementation\Unit\Model$unitImplementation)
-    {
-        $this->unitImplementation = $unitImplementation;
-    }
-
-    /**
-     * Get unit
-     *
-     * @return Implementation\Unit\Model
-     */
-    private function getUnitImplementation()
-    {
-        return $this->unitImplementation;
-    }
-
-    /**
-     * Set feedback results
-     *
-     * @param IFeedback[][] $results
-     */
-    private function setResults(array $results)
-    {
-        $this->results = $results;
-    }
 
     /**
      * Get all values

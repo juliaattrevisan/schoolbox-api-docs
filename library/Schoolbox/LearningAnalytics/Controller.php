@@ -17,7 +17,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
-use Schoolbox\Error;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -50,7 +49,7 @@ class Controller extends Base
         $currentTerm = $this->termMapper->findForToday();
 
         $data = ['courseSpecId' => $courseSpecId, 'termCode' => $currentTerm->getCode()];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTerms', $data));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTerm', $data));
     }
 
 
@@ -58,53 +57,52 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/term/{termCode}
      * @level 165
      *
-     * @param array                           $params
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplementations
      * @param Term                            $term
      * @throws ApplicationException
      */
-    public function courseWithTerms(array $params, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
+    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTerms');
+        $this->process($courseSpecification, $unitImplementations, $term, 'course');
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}
+     * @api   GET /learning/analytics/course/{courseSpecId}/task/{submissionTypeId}
      * @level 165
      *
      * @param int $courseSpecId
-     * @param int $taskTypeId
+     * @param int $submissionTypeId
      * @throws RouteNotFound
      */
-    public function courseWithTask($courseSpecId, $taskTypeId)
+    public function courseWithSubmissionType($courseSpecId, $submissionTypeId)
     {
         // Redirect to current term
         $currentTerm = $this->termMapper->findForToday();
 
         $data = [
-            'courseSpecId' => $courseSpecId,
-            'taskTypeId'   => $taskTypeId,
-            'termCode'     => $currentTerm->getCode(),
+            'courseSpecId'     => $courseSpecId,
+            'submissionTypeId' => $submissionTypeId,
+            'termCode'         => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTaskAndTerms', $data));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithSubmissionTypeAndTerm', $data));
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}
+     * @api   GET /learning/analytics/course/{courseSpecId}/task/{submissionTypeId}/term/{termCode}
      * @level 165
      *
-     * @param array                           $params
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplementations
      * @param Term                            $term
+     * @param int                             $submissionTypeId
      * @throws ApplicationException
      */
-    public function courseWithTaskAndTerms(array $params, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
+    public function courseWithSubmissionTypeAndTerm(CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term, $submissionTypeId)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTaskAndTerms');
+        $this->process($courseSpecification, $unitImplementations, $term, null, $submissionTypeId);
     }
 
 
@@ -126,7 +124,7 @@ class Controller extends Base
             'folderId'     => $folderId,
             'termCode'     => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTerms', $data));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTerm', $data));
     }
 
 
@@ -134,57 +132,56 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/term/{termCode}
      * @level 165
      *
-     * @param array                           $params
-     * @param Folder                          $selectedClassFolder
+     * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplementations
      * @param Term                            $term
      * @throws ApplicationException
      */
-    public function folderWithTerms(array $params, Folder $selectedClassFolder, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
+    public function folderWithTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTerms', $selectedClassFolder);
+        $this->process($courseSpecification, $unitImplementations, $term, 'folder', $classFolder);
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{submissionTypeId}
      * @level 165
      *
      * @param int $courseSpecId
      * @param int $folderId
-     * @param int $taskTypeId
+     * @param int $submissionTypeId
      * @throws RouteNotFound
      */
-    public function folderWithTask($courseSpecId, $folderId, $taskTypeId)
+    public function folderWithSubmissionType($courseSpecId, $folderId, $submissionTypeId)
     {
         // Redirect to current term
         $currentTerm = $this->termMapper->findForToday();
 
         $data = [
-            'courseSpecId' => $courseSpecId,
-            'folderId'     => $folderId,
-            'taskTypeId'   => $taskTypeId,
-            'termCode'     => $currentTerm->getCode(),
+            'courseSpecId'     => $courseSpecId,
+            'folderId'         => $folderId,
+            'submissionTypeId' => $submissionTypeId,
+            'termCode'         => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTaskAndTerms', $data));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithSubmissionTypeAndTerm', $data));
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{submissionTypeId}/term/{termCode}
      * @level 165
      *
-     * @param array                           $params
-     * @param Folder                          $selectedClassFolder
+     * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplementations
      * @param Term                            $term
+     * @param int                             $submissionTypeId
      * @throws ApplicationException
      */
-    public function folderWithTaskAndTerms(array $params, Folder $selectedClassFolder, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
+    public function folderWithSubmissionTypeAndTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term, $submissionTypeId)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTaskAndTerms', $selectedClassFolder);
+        $this->process($courseSpecification, $unitImplementations, $term, 'folder', $classFolder, $submissionTypeId);
     }
 
 
@@ -282,18 +279,25 @@ class Controller extends Base
      * Both are processed identically as data is grouped based on task
      * instances' originating task id, not the individual instance id
      *
-     * @param array                           $params                bag of holding
      * @param CourseSpecification             $courseSpecification   spec from which all data on this page inherits
      * @param Collection|UnitImplementation[] $unitImplementations   units that match the term filter
      * @param Term                            $term                  term to filter
      * @param Folder                          $selectedClassFolder   if given, the class folder to filter
-     * @param string                          $routeUsed             pass directly through to twig for route lookups
+     * @param string                          $routeType             'course'|'folder'
+     * @param null|int                        $submissionTypeId      if specified, a submission type filter
      * @throws ApplicationException
      */
-    private function process(array $params, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term, $routeUsed, Folder $selectedClassFolder = null)
+    private function process(
+        CourseSpecification $courseSpecification,
+        Collection $unitImplementations,
+        Term $term,
+        $routeType,
+        Folder $selectedClassFolder = null,
+        $submissionTypeId = null
+)
     {
         $analysis = new CohortAnalysis($courseSpecification, $unitImplementations, $selectedClassFolder, $term);
-        $metadata = new Metadata($params, $courseSpecification, $unitImplementations, $term, $routeUsed, $selectedClassFolder);
+        $metadata = new Metadata($unitImplementations, $selectedClassFolder);
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
@@ -305,43 +309,54 @@ class Controller extends Base
          * Results for all the units in each $folder contained in $allFolders
          * (generated by Registry)
          */
-        $submissionTypes = new SubmissionTypes($metadata);
+        $submissionTypes = new SubmissionTypes($submissionTypeId);
 
         /** @var Term[]|GenericCollection $selectableTerms */
         $selectableTerms = $this->getSelectableTerms($courseSpecification);
 
-        /* Twig data
-         */
+        $data = [
+            'courseSpec'       => $courseSpecification,
+            'classFolder'      => $selectedClassFolder,
+            'submissionType'   => $submissionTypes->getSelectedSubmissionType(),
+            'submissionTypes'  => $submissionTypes->getSubmissionTypes(),
+            'currentRoute'     => $this->getRouter()->getMatchedRoute()->name,
+            'route'            => $routeType,
+            'folders'          => $metadata->getUnitImplementationFolders(),
+
+            'term'             => $term,
+            'terms'            => $selectableTerms,
+
+
+            'overallProgress' => $analysis->getOverallProgress(),
+            'results' => [
+                'ranking' => [
+                    'top'    => $analysis->getCohortRankings(SORT_DESC),
+                    'bottom' => $analysis->getCohortRankings(SORT_ASC),
+                ],
+                'all' => $analysis->getCohortGradesByActivity($unitImplementations),
+                'activities' => [
+                    'all'   => $analysis->getActivities($unitImplementations, $term),
+                    'types' => [
+                        'all'      => $submissionTypes->getSubmissionTypes(),
+                        'selected' => $submissionTypes->getSelectedSubmissionType(),
+                    ],
+                ],
+
+            ],
+            'progress' => [
+                'allUnits' => $analysis->getProgressByUnit(),
+            ],
+            'rubrics' => [
+                'allRubrics' => $analysis->getCohortGradesByIndicator($unitImplementations, $registry->getStudents()),
+            ],
+            'effort' => [
+                'allEffort' => $analysis->getEffort(),
+            ],
+        ];
+
         $this->getResponse()->content->set([
             'template' => '@learningAnalytics/course.twig',
-            'data'     => [
-                'terms'           => $selectableTerms,
-                'metadata'        => $metadata,
-                'overallProgress' => $analysis->getOverallProgress(),
-                'results' => [
-                    'all' => $analysis->getCohortGradesByActivity($registry),
-                    'activities' => [
-                        'all'   => $analysis->getActivities($unitImplementations, $term),
-                        'types' => [
-                            'all'      => $submissionTypes->getSubmissionTypes(),
-                            'selected' => $submissionTypes->getSelectedActivityTypeFilter(),
-                        ],
-                    ],
-                    'ranking' => [
-                        'top'    => $analysis->getCohortRankings(SORT_DESC),
-                        'bottom' => $analysis->getCohortRankings(SORT_ASC),
-                    ],
-                ],
-                'progress' => [
-                    'allUnits' => $analysis->getProgressByUnit(),
-                ],
-                'rubrics' => [
-                    'allRubrics' => $analysis->getCohortGradesByIndicator($registry, $metadata),
-                ],
-                'effort' => [
-                    'allEffort' => $analysis->getEffort(),
-                ],
-            ]
+            'data'     => $data,
         ]);
     }
 }

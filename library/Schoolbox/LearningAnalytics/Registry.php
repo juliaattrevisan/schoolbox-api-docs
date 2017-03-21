@@ -1,7 +1,5 @@
 <?php
 /**
- * Registry
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -11,69 +9,56 @@
 namespace Schoolbox\LearningAnalytics;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course;
-use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\User;
 
 class Registry {
 
     /**
-     * An array of unitId-user data
+     * Sets of students indexed by student.id, grouped by unitImplementation.id
      *
      * @var Collection[]|User[][]
      */
     private $students;
 
     /**
-     * A Collection of UnitInstance instances
-     *
-     * @var Collection
+     * @var GenericCollection|UnitImplementation[]
      */
     private $unitImplementations;
 
     /**
-     * Constructor
-     *
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
+     * @param GenericCollection|UnitImplementation[] $unitImplementations
      */
-    public function __construct(Collection $unitImplementations)
+    public function __construct(GenericCollection $unitImplementations)
     {
-        $this->setUnitImplementations($unitImplementations);
+        $this->unitImplementations = $unitImplementations;
 
         $users = [];
 
-        foreach ($unitImplementations as $unit) {
-            $unitId = $unit->getId();
+        foreach ($unitImplementations as $unitImplementation) {
+            $unitImplId = $unitImplementation->getId();
 
-            foreach ($unit->getAssessables() as $activity) {
+            foreach ($unitImplementation->getAssessables() as $activity) {
                 foreach ($activity->getAllParticipants() as $participant) {
-                    $u = $participant->getUser();
+                    $user = $participant->getUser();
 
-                    if (empty($users[$unitId][$u->getId()])) {
-                        $users[$unitId][$u->getId()] = $u;
+                    if (empty($users[$unitImplId][$user->getId()])) {
+                        $users[$unitImplId][$user->getId()] = $user;
                     }
                 }
             }
 
             // je ne parle pas...?
-            $users[$unitId] = new Collection($users[$unitId]);
+            $users[$unitImplId] = new Collection($users[$unitImplId]);
         }
 
-        $this->setStudents(new Collection($users));
+        $this->students = new Collection($users);
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * Set all student registry
-     *
-     * @param Collection|User[] $students
-     */
-    private function setStudents($students)
-    {
-        $this->students = $students;
-    }
 
     /**
      * Get all student registry
@@ -87,28 +72,19 @@ class Registry {
 
 
     /**
-     * @param Implementation\Unit\Model $unitImplementation
+     * @param UnitImplementation $unitImplementation
      * @return Collection|User[]
      */
-    public function getStudentsByUnitImplementation(Implementation\Unit\Model $unitImplementation)
+    public function getStudentsByUnitImplementation(UnitImplementation $unitImplementation)
     {
         return $this->students[$unitImplementation->getId()];
     }
 
-    /**
-     * Set all unit registry
-     *
-     * @param Collection|Implementation\Unit\Model[] $allUnitRegistry
-     */
-    private function setUnitImplementations($allUnitRegistry)
-    {
-        $this->unitImplementations = $allUnitRegistry;
-    }
 
     /**
      * Get all unit registry
      *
-     * @return Collection|Implementation\Unit\Model[]
+     * @return Collection|UnitImplementation[]
      */
     public function getUnitImplementations()
     {

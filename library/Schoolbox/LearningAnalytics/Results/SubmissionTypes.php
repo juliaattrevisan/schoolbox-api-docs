@@ -1,7 +1,5 @@
 <?php
 /**
- * SubmissionTypes
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -13,7 +11,6 @@ namespace Schoolbox\LearningAnalytics\Results;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType as SubmissionType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\LearningAnalytics\Metadata;
 
 class SubmissionTypes {
 
@@ -29,24 +26,23 @@ class SubmissionTypes {
      *
      * @var null|SubmissionType
      */
-    private $selectedSubmissionTypeFilter;
+    private $selectedSubmissionType;
 
 
     /**
      * Constructor
      *
-     * @param Metadata $metadata
+     * @param null|int $submissionTypeId
      */
-    public function __construct(Metadata $metadata)
+    public function __construct($submissionTypeId = null)
     {
         $this->submissionTypes = SubmissionTypeMapper::getInstance()->findAll();
 
         // Was a submission type specified in request ?
-        $submissionTypeId = $metadata->getSelectedSubmissionTypeFilter();
-        if($submissionTypeId){
+        if(null !== $submissionTypeId){
             foreach ($this->submissionTypes as $submissionType) {
                 if ($submissionType->getId() === $submissionTypeId) {
-                    $this->selectedSubmissionTypeFilter = $submissionType;
+                    $this->selectedSubmissionType = $submissionType;
                     break;
                 }
             }
@@ -57,7 +53,7 @@ class SubmissionTypes {
      */
 
     /**
-     * Get all task types
+     * Get all available submission types
      *
      * @return GenericCollection|SubmissionType[]
      */
@@ -67,12 +63,12 @@ class SubmissionTypes {
     }
 
     /**
-     * Get selected task filter
+     * Get selected submissionType filter
      *
-     * @return SubmissionType
+     * @return null|SubmissionType
      */
-    public function getSelectedActivityTypeFilter()
+    public function getSelectedSubmissionType()
     {
-        return $this->selectedSubmissionTypeFilter;
+        return $this->selectedSubmissionType;
     }
 }

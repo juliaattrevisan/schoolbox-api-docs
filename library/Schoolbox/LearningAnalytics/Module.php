@@ -53,16 +53,16 @@ class Module extends BaseModule
     {
         $get = [
             // For a Course - aggregating all Classes which have imported Course
-            'course'                 => '/course/{courseSpecId}',
-            'courseWithTerms'        => '/course/{courseSpecId}/term/{termCode}',
-            'courseWithTask'         => '/course/{courseSpecId}/task/{taskTypeId}',
-            'courseWithTaskAndTerms' => '/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}',
+            'course'                          => '/course/{courseSpecId}',
+            'courseWithTerm'                  => '/course/{courseSpecId}/term/{termCode}',
+            'courseWithSubmissionType'        => '/course/{courseSpecId}/submissionType/{submissionTypeId}',
+            'courseWithSubmissionTypeAndTerm' => '/course/{courseSpecId}/submissionType/{submissionTypeId}/term/{termCode}',
 
             // Per Class that uses a particular Course
-            'folder'                 => '/course/{courseSpecId}/class/{folderId}',
-            'folderWithTerms'        => '/course/{courseSpecId}/class/{folderId}/term/{termCode}',
-            'folderWithTask'         => '/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}',
-            'folderWithTaskAndTerms' => '/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}',
+            'folder'                          => '/course/{courseSpecId}/class/{folderId}',
+            'folderWithTerm'                  => '/course/{courseSpecId}/class/{folderId}/term/{termCode}',
+            'folderWithSubmissionType'        => '/course/{courseSpecId}/class/{folderId}/submissionType/{submissionTypeId}',
+            'folderWithSubmissionTypeAndTerm' => '/course/{courseSpecId}/class/{folderId}/submissionType/{submissionTypeId}/term/{termCode}',
         ];
 
         foreach ($get as $method => $route) {
@@ -85,7 +85,7 @@ class Module extends BaseModule
          * will receive scalars and redirect to current term equivalent
          */
         $this->addRoutePreload(
-            $matcher, '.*With.*Terms',
+            $matcher, '.*With.*Term',
             function($params) {
                 return $this->loadDependencies($params);
             }
@@ -114,6 +114,7 @@ class Module extends BaseModule
      * @var int $params['courseSpecId']
      * @var int $params['termCode']
      * @var int $params['folderId']                Optional
+     * @var int $params['submissionType']          Optional
      *
      * @return array
      * @var string[]                               return['params']
@@ -204,16 +205,12 @@ class Module extends BaseModule
             }
         }
 
-        /* Inject (this is used in twig)
-         */
-        $params['route'] = 'folder';
-
         return [
-            'params'                       => $params,
-            'courseSpecification'          => $courseSpecification,
-            'unitImplementations'          => $unitImplementations,
-            'term'                         => $term,
-            'selectedClassFolder'          => $classFolder,
+            'courseSpecification' => $courseSpecification,
+            'unitImplementations' => $unitImplementations,
+            'term'                => $term,
+            'classFolder'         => $classFolder,
+            'submissionTypeId'    => isset($params['submissionTypeId']) ? (int)$params['submissionTypeId'] : null,
         ];
     }
 

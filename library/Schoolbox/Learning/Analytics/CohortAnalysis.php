@@ -16,7 +16,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\LearningAnalytics\Results\AssessmentList;
-use Schoolbox\LearningAnalytics\Results\TaskResults;
+use Schoolbox\LearningAnalytics\Results\AssessmentResults;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation;
@@ -334,13 +334,13 @@ class CohortAnalysis
      * Returns five-point grade data from unit IMPLEMENTATIONS for all participants, indexed by unit SPECIFICATION activity
      * Applicable to the activity box-and-whisker graph
      *
-     * @param $registry
+     * @param GenericCollection|UnitImplementation[] $unitImplementations
      * @return IFeedback[][]
      */
-    public function getCohortGradesByActivity($registry)
+    public function getCohortGradesByActivity(GenericCollection $unitImplementations)
     {
         // shim around old code
-        return (new TaskResults($registry))->getResults();
+        return (new AssessmentResults($unitImplementations))->getResults();
     }
 
 
@@ -362,14 +362,14 @@ class CohortAnalysis
      *
      * (Cuts the same data as getCohortGradesByActivity() but by indicators instead of activity.)
      *
-     * @param $registry
-     * @param $metadata
+     * @param GenericCollection|UnitImplementation[] $unitImplementations
+     * @param Collection|User[][] $unitImplStudents Grouped by unitImpl.id,
      * @return array
      */
-    public function getCohortGradesByIndicator($registry, $metadata)
+    public function getCohortGradesByIndicator(GenericCollection $unitImplementations, Collection $unitImplStudents)
     {
         // exploit old class
-        return (new AllRubrics($registry, $metadata))->getRubricData();
+        return (new AllRubrics($unitImplementations, $unitImplStudents))->getRubricData();
     }
 
 
