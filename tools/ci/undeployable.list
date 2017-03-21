@@ -13,6 +13,7 @@ tools/pkg-build*
 tools/composer*
 tools/git*
 tools/ci
+tools/save-data.sh
 www/test
 Vagrantfile
 vagrant*yaml
