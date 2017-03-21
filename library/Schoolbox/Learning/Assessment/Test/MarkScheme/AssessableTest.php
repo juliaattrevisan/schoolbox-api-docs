@@ -48,6 +48,7 @@ use \InvalidArgumentException;
  */
 class AssessableTest extends \PHPUnit_Framework_TestCase
 {
+    const FAVOR_FLOATING = false;
     /**
      * Cache so we can re-use User objects
      *
@@ -1129,7 +1130,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$quiz, $this->getDummyStudent(1), null],
                 [$quiz, $this->getDummyStudent(2), '1 / 2'],
@@ -1167,7 +1168,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
 
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$quiz, $this->getDummyStudent(1), null],
                 [$quiz, $this->getDummyStudent(2), 50.0],
@@ -1529,7 +1530,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
@@ -1577,7 +1578,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
@@ -1625,7 +1626,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
@@ -1768,7 +1769,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new Maximum());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
@@ -1821,7 +1822,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new Maximum());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
@@ -1873,7 +1874,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new Average());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
@@ -1926,7 +1927,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new Average());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
@@ -1979,7 +1980,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
@@ -2032,7 +2033,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
-        if(Participant::FAVOR_FLOATING){
+        if(self::FAVOR_FLOATING){
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],

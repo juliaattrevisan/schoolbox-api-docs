@@ -15,37 +15,17 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
-use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
-use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
 use \Schoolbox\User;
 use \DomainException;
 
 class Participant
 {
     /**
-     * Whether when determining the current mark for an Assessment, we prefer
-     * overall feedback over feedback linked to specific Responses.
-     *
-     * @TODO - Needs A/B testing, or make this a user-config option, or provide some UI to give the choice to the user.
-     *
-     * @var bool
-     */
-    const FAVOR_FLOATING = false;
-
-    /**
-     * How to determine what constitutes the current overall mark for a given User and Assessment
-     *
-     * @var IFeedbackTraversalStrategy
-     */
-    protected $feedbackStrategy;
-
-    /**
      * The User to whom all these Responses and Feedbacks are relevant
      *
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * The Assessment which these Responses and Feedbacks relate to
@@ -57,20 +37,16 @@ class Participant
     /**
      * A Collection of IResponse instances that Students spawn
      *
-     * Null for Projects
-     *
-     * @var GenericCollection|IResponse[]|null
+     * @var GenericCollection|IResponse[]
      */
-    protected $allResponses;
+    private $allResponses;
 
     /**
      * A Collection of IFeedback instances that Teachers spawn
      *
-     * Null for Projects
-     *
-     * @var GenericCollection|IFeedback[]|null
+     * @var GenericCollection|IFeedback[]
      */
-    protected $allFeedbacks;
+    private $allFeedbacks;
 
     /**
      * Participant constructor.
@@ -85,8 +61,6 @@ class Participant
 
         $this->allResponses = new GenericCollection($assessable->getResponseClass());
         $this->allFeedbacks = new GenericCollection($assessable->getFeedbackClass());
-
-        $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
 
     /**
@@ -97,12 +71,12 @@ class Participant
      *
      * Represented as GREY SQUARE
      *
-     * @throws DomainException if $user is not a participant of the participation assessable.
      * @return bool
+     * @throws DomainException
      */
     public function isResponseRequired()
     {
-        return $this->assessable->isResponseRequired($this->user);
+        return $this->assessable->isResponseRequired($this);
     }
 
 
@@ -119,7 +93,7 @@ class Participant
      */
     public function isFeedbackRequired()
     {
-        return $this->assessable->isFeedbackRequired($this->user);
+        return $this->assessable->isFeedbackRequired($this);
     }
 
 
@@ -132,7 +106,7 @@ class Participant
      */
     public function isReviewComplete()
     {
-        return $this->assessable->isReviewComplete($this->user);
+        return $this->assessable->isReviewComplete($this);
     }
 
 
@@ -148,7 +122,7 @@ class Participant
      */
     public function hasSubmittedResponse()
     {
-        return $this->assessable->hasSubmittedResponse($this->user);
+        return $this->assessable->hasSubmittedResponse($this);
     }
 
 
@@ -163,7 +137,7 @@ class Participant
      */
     public function hasPublishedFeedback()
     {
-        return $this->assessable->hasPublishedFeedback($this->user);
+        return $this->assessable->hasPublishedFeedback($this);
     }
 
 
@@ -179,7 +153,7 @@ class Participant
      */
     public function hasMark()
     {
-        return $this->assessable->hasMark($this->user);
+        return $this->assessable->hasMark($this);
     }
 
 
@@ -190,6 +164,8 @@ class Participant
     {
         /** @var IResponse $mostRecentResponse */
         $mostRecentResponse = null;
+
+        /** @var IResponse $response */
         foreach ($this->allResponses as $response) {
             if (!$mostRecentResponse || $response->getUpdatedAt()->gt($mostRecentResponse->getUpdatedAt())) {
                 $mostRecentResponse = $response;
@@ -206,6 +182,8 @@ class Participant
     {
         /** @var IResponse|null $mostRecentSubmittedResponse */
         $mostRecentSubmittedResponse = null;
+
+        /** @var IResponse $response */
         foreach($this->allResponses as $response){
             if($response->isSubmitted()){
                 if(!$mostRecentSubmittedResponse || $response->getSubmittedAt()->gt($mostRecentSubmittedResponse->getSubmittedAt())){
@@ -219,21 +197,43 @@ class Participant
     /**
      * Find the authoritative Feedback for an Assessment for this Participant
      *
+     * Since 16.5.13, this has absorbed the 'no favour' feedback traversal strategy
+     *
      * @return null|IFeedback
      */
     public function findMostRecentFeedback()
     {
-        return $this->feedbackStrategy->getMostRecentFeedback($this, false);
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+
+        /** @var IFeedback $feedback */
+        foreach ($this->allFeedbacks as $feedback) {
+            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
+                $mostRecentFeedback = $feedback;
+            }
+        }
+        return $mostRecentFeedback;
     }
 
     /**
      * Find the authoritative published Feedback for an Assessment for this Participant
      *
+     * Since 16.5.13, this has absorbed the 'no favour' feedback traversal strategy
+     *
      * @return null|IFeedback
      */
     public function findMostRecentPublishedFeedback()
     {
-        return $this->feedbackStrategy->getMostRecentFeedback($this, true);
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+
+        /** @var IFeedback $feedback */
+        foreach ($this->allFeedbacks as $feedback) {
+            if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
+                    $mostRecentFeedback = $feedback;
+            }
+        }
+        return $mostRecentFeedback;
     }
 
     /**

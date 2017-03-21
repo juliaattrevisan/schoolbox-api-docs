@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
-use Alaress_Date_Format;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
@@ -327,7 +326,7 @@ class Model extends AbstractAssessment
         if ($this->isAcceptNone()) {
             return $this->getPublishAt();
         } else {
-            return $this->openAt;
+            return parent::getOpenAt();
         }
     }
 
@@ -340,7 +339,7 @@ class Model extends AbstractAssessment
         if ($this->isAcceptNone()) {
             return $this->getDueAt();
         } else {
-            return $this->closeAt;
+            return parent::getCloseAt();
         }
     }
 

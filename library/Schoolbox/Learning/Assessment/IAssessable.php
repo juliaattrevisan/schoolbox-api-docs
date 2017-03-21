@@ -210,6 +210,17 @@ interface IAssessable extends ISoftDeletable
     public function getParticipant(User $user);
 
     /**
+     * Find a reference to a particular Participant in this Assessable
+     * which saves you this traversal in Controllers etc
+     *
+     * Returns null rather than throwing exception if $user is not a participant
+     *
+     * @param User $user
+     * @return Participant|null
+     */
+    public function getParticipantIfExtant(User $user);
+
+    /**
      * @param User $user
      * @param bool $publishedOnly
      * @return string|null
@@ -229,29 +240,29 @@ interface IAssessable extends ISoftDeletable
     /**
      * Does the specified Participant need to submit a response?
      *
-     * @param User $user
-     * @throws DomainException if $user is not a participant
+     * @param Participant $participant
+     * @throws DomainException if participant's assessment is not this assessment
      * @return bool
      */
-    public function isResponseRequired(User $user);
+    public function isResponseRequired(Participant $participant);
 
     /**
      * Does the teacher need to give feedback to a student response?
      *
-     * @param User $user
-     * @throws DomainException if $user is not a participant
+     * @param Participant $participant
+     * @throws DomainException if participant's assessment is not this assessment
      * @return bool
      */
-    public function isFeedbackRequired(User $user);
+    public function isFeedbackRequired(Participant $participant);
 
     /**
      * Has the participant been marked as not-incomplete, and has not subsequently re-submitted ?
      *
-     * @param User $user
-     * @throws DomainException if $user is not a participant
+     * @param Participant $participant
+     * @throws DomainException if participant's assessment is not this assessment
      * @return bool
      */
-    public function isReviewComplete(User $user);
+    public function isReviewComplete(Participant $participant);
 
 
     /**
@@ -261,11 +272,11 @@ interface IAssessable extends ISoftDeletable
      *
      * Important: This will still return TRUE if task has been marked as 'incomplete'.
      *
-     * @param User $user
-     * @throws DomainException if $user is not a participant
+     * @param Participant $participant
+     * @throws DomainException if participant's assessment is not this assessment
      * @return bool
      */
-    public function hasSubmittedResponse(User $user);
+    public function hasSubmittedResponse(Participant $participant);
 
     /**
      * Has a teacher given a published mark to the participant.
@@ -273,11 +284,11 @@ interface IAssessable extends ISoftDeletable
      * For clarity - a self-assessed task, while complete, is not marked by teacher
      * @see $this->hasMark to include self-assessed marks.
      *
-     * @param User $user
-     * @throws DomainException if $user is not a participant
+     * @param Participant $participant
+     * @throws DomainException if participant's assessment is not this assessment
      * @return bool
      */
-    public function hasPublishedFeedback(User $user);
+    public function hasPublishedFeedback(Participant $participant);
 
     /**
      * Does this student have a mark for the assessment.
@@ -285,12 +296,11 @@ interface IAssessable extends ISoftDeletable
      * This includes marks given by the teacher, and
      * self-assessed marks for a task (even if self-assessed as 'Incomplete')
      *
-     * @see $this->isMarkedByTeacher for teacher-assigned-only marks
-     * @param User $user
-     * @throws DomainException if $user is not a participant
+     * @param Participant $participant
+     * @throws DomainException if participant's assessment is not this assessment
      * @return bool
      */
-    public function hasMark(User $user);
+    public function hasMark(Participant $participant);
 
 
     /**
@@ -319,7 +329,7 @@ interface IAssessable extends ISoftDeletable
      */
 
     /**
-     * @var string
+     * @var int
      */
     public function getId();
 

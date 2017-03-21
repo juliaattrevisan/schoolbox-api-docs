@@ -19,6 +19,7 @@ namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -203,20 +204,24 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function isResponseRequired(User $user)
+    public function isResponseRequired(Participant $participant)
     {
+        $this->assertSameAssessment($participant);
+
         /** @var TaskResponse $mostRecentResponse */
-        $mostRecentResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
         return !$mostRecentResponse || !$mostRecentResponse->getMarkedComplete();
     }
 
     /**
      * @inheritdoc
      */
-    public function isFeedbackRequired(User $user)
+    public function isFeedbackRequired(Participant $participant)
     {
+        $this->assertSameAssessment($participant);
+
         /** @var TaskResponse $latestSubmittedResponse */
-        $latestSubmittedResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
         return $latestSubmittedResponse
             && $latestSubmittedResponse->isSelfAssessed()
             && $latestSubmittedResponse->getMarkedComplete();
@@ -225,10 +230,12 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function isReviewComplete(User $user)
+    public function isReviewComplete(Participant $participant)
     {
+        $this->assertSameAssessment($participant);
+
         /** @var TaskResponse $latestSubmittedResponse */
-        $latestSubmittedResponse = $this->getParticipant($user)->findMostRecentSubmittedResponse();
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
         return $latestSubmittedResponse
             && $latestSubmittedResponse->getMarkedComplete()
             && !$latestSubmittedResponse->isSelfAssessed();
@@ -239,12 +246,12 @@ class Model extends AbstractAssessment
      *
      * @inheritdoc
      */
-    public function hasMark(User $user)
+    public function hasMark(Participant $participant)
     {
         // Has the task been marked ?
         // Note this distinguishes between implicit 'Incomplete' and explicit 'Incomplete'.
         // The former returns FALSE, while the latter returns TRUE
-        return $this->getParticipant($user)->getAllResponses()->count() > 0;
+        return $participant->getAllResponses()->count() > 0;
     }
 
 

@@ -7,10 +7,13 @@
 
 namespace Schoolbox\Learning\Assessment\FeedbackStrategy;
 
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 
+/**
+ * @deprecated Logic has been absorbed
+ * @see        Participant
+ */
 interface IFeedbackTraversalStrategy
 {
     /**

@@ -37,37 +37,37 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @var string
      */
-    protected $title;
+    private $title;
 
     /**
      * @var string
      */
-    protected $description;
+    private $description;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $publishAt;
+    private $publishAt;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $openAt;
+    private $openAt;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $dueAt;
+    private $dueAt;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $closeAt;
+    private $closeAt;
 
     /**
      * @var int
      */
-    protected $weight;
+    private $weight;
 
     /**
      * Number of days an AssessmentSpec is expected to take.
@@ -83,14 +83,14 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @var Collection|Participant[]
      */
-    protected $allParticipants;
+    private $allParticipants;
 
     /**
      * The person who created this Assessable
      *
      * @var User
      */
-    protected $creator;
+    private $creator;
 
     /**
      * @var MarkType
@@ -130,7 +130,7 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @var IAssessable|null
      */
-    private $specificationAssessment = null;
+    private $specificationAssessment;
 
     /**
      * If published, then who can see the feedback for this Assessment.
@@ -167,8 +167,8 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
-        $this->responses = new Collection();
-        $this->feedbacks = new Collection();
+        $this->responses = new GenericCollection($this->getResponseClass());
+        $this->feedbacks = new GenericCollection($this->getFeedbackClass());
         $this->setCurriculumNodes(new Collection());
     }
 
@@ -238,6 +238,16 @@ abstract class AbstractAssessment implements IAssessable
         }
         throw new \UnexpectedValueException("{$user->getFullName()} {$user->getId()} is not a participant of {$this->getTitle()}");
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getParticipantIfExtant(User $user)
+    {
+        return $this->findParticipantIfExtant($user);
+    }
+
 
     /**
      * Find a reference to a particular Participant in this Assessable, if they exist.
@@ -409,34 +419,39 @@ abstract class AbstractAssessment implements IAssessable
     /* Traversals
      */
 
+    /**
+     * @param Participant $participant
+     * @throws \DomainException if participant's assessment is not this assessment
+     */
+    protected function assertSameAssessment(Participant $participant)
+    {
+        if($this->id !== $participant->getAssessable()->getId()){
+            $otherId = $participant->getAssessable()->getId();
+            throw new \DomainException("Participant assessment ({$otherId}) must match this assessment ({$this->id}) to ensure assessment-type-specific logic is reliably invoked");
+        }
+    }
+
 
     /**
      * @inheritdoc
      */
-    public function isResponseRequired(User $user)
+    public function isResponseRequired(Participant $participant)
     {
-        $participant = $this->getParticipant($user);
+        $this->assertSameAssessment($participant);
 
         $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
         $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
 
-        // No Responses and No Feedback?
-        if(!$latestSubmittedResponse && !$latestPublishedFeedback){
-            // No interaction yet - waiting for student to submit or teacher to give mark
-            return true;
-        }
-
-        // We either have a submitted response, or a published feedback, or both.
-        // All these scenarios imply student does not need to respond.
-        return false;
+        // No Submitted Responses and No Published Feedback?
+        return !$latestSubmittedResponse && !$latestPublishedFeedback;
     }
 
     /**
      * @inheritdoc
      */
-    public function isFeedbackRequired(User $user)
+    public function isFeedbackRequired(Participant $participant)
     {
-        $participant = $this->getParticipant($user);
+        $this->assertSameAssessment($participant);
 
         // No responses, or latest response has published feedback already ?
         $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
@@ -457,18 +472,21 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isReviewComplete(User $user)
+    public function isReviewComplete(Participant $participant)
     {
-        $participant = $this->getParticipant($user);
+        $this->assertSameAssessment($participant);
+
         return  $participant->hasPublishedFeedback() && !$participant->isFeedbackRequired();
     }
 
     /**
      * @inheritdoc
      */
-    public function hasSubmittedResponse(User $user)
+    public function hasSubmittedResponse(Participant $participant)
     {
-        foreach($this->getParticipant($user)->getAllResponses() as $response){
+        $this->assertSameAssessment($participant);
+
+        foreach($participant->getAllResponses() as $response){
             if($response->isSubmitted()){
                 return true;
             }
@@ -479,9 +497,11 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function hasPublishedFeedback(User $user)
+    public function hasPublishedFeedback(Participant $participant)
     {
-        foreach($this->getParticipant($user)->getAllFeedbacks() as $feedback){
+        $this->assertSameAssessment($participant);
+
+        foreach($participant->getAllFeedbacks() as $feedback){
             if($feedback->isPublished()){
                 return true;
             }
@@ -492,10 +512,12 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function hasMark(User $user)
+    public function hasMark(Participant $participant)
     {
+        $this->assertSameAssessment($participant);
+
         // Default case
-        return $this->hasPublishedFeedback($user);
+        return $this->hasPublishedFeedback($participant);
     }
 
 

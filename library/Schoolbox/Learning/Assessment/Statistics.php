@@ -9,13 +9,25 @@ namespace Schoolbox\Learning\Assessment;
 
 /**
  * Observer able to interrogate an assessment and provide statistical information.
+ *
+ * Caches results so repeated calls to same method do not require re-calculation.
+ * You need to call clearCachedCounts() if you mutate any participant's feedbacks or responses.
  */
 class Statistics
 {
+
     /**
      * @var IAssessable
      */
     private $assessment;
+
+    // null prior to determination, then int.
+    private $cacheCountResponseRequired;
+    private $cacheCountFeedbackRequired;
+    private $cacheCountReviewComplete;
+    private $cacheCountHasSubmittedResponse;
+    private $cacheCountHasPublishedFeedback;
+    private $cacheCountHasMark;
 
 
     /**
@@ -24,6 +36,21 @@ class Statistics
     public function __construct(IAssessable $assessment)
     {
         $this->assessment = $assessment;
+    }
+
+
+    /**
+     * If in the unlikely event you mutate any participant's responses
+     * or feedbacks, you can clear the cache here.
+     */
+    public function clearCachedCounts()
+    {
+        $this->cacheCountResponseRequired     = null;
+        $this->cacheCountFeedbackRequired     = null;
+        $this->cacheCountReviewComplete       = null;
+        $this->cacheCountHasSubmittedResponse = null;
+        $this->cacheCountHasPublishedFeedback = null;
+        $this->cacheCountHasMark              = null;
     }
 
 
@@ -37,55 +64,69 @@ class Statistics
         return $this->assessment->getAllParticipants()->count();
     }
 
+
     /**
      * Returns the number of Participants who have no response to the assessment,
      * or their latest response is explicitly marked as 'incomplete'.
      *
      * @return int
+     * @throws \DomainException
      */
     public function getCountResponseRequired()
     {
-        $count = 0;
-        foreach ($this->assessment->getAllParticipants() as $participant) {
-            if ($participant->isResponseRequired()) {
-                $count++;
+        if (null === $this->cacheCountResponseRequired) {
+            $this->cacheCountResponseRequired = 0;
+            foreach ($this->assessment->getAllParticipants() as $participant) {
+                if ($participant->isResponseRequired()) {
+                    $this->cacheCountResponseRequired++;
+                }
             }
         }
-        return $count;
+
+        return $this->cacheCountResponseRequired;
     }
+
 
     /**
      * How many Participants have Responses that require marking.
      *
      * @return int
+     * @throws \DomainException
      */
     public function getCountFeedbackRequired()
     {
-        $count = 0;
-        foreach ($this->assessment->getAllParticipants() as $participant) {
-            if ($participant->isFeedbackRequired()) {
-                $count++;
+        if (null === $this->cacheCountFeedbackRequired) {
+            $this->cacheCountFeedbackRequired = 0;
+            foreach ($this->assessment->getAllParticipants() as $participant) {
+                if ($participant->isFeedbackRequired()) {
+                    $this->cacheCountFeedbackRequired++;
+                }
             }
         }
-        return $count;
+        return $this->cacheCountFeedbackRequired;
     }
+
 
     /**
      * How many participants has the teacher marked as not-explicitly-incomplete, and
      * the student has not subsequently submitted/re-submitted.
      *
      * @return int
+     * @throws \DomainException
      */
     public function getCountReviewComplete()
     {
-        $count = 0;
-        foreach ($this->assessment->getAllParticipants() as $participant) {
-            if ($participant->isReviewComplete()) {
-                $count++;
+        if (null === $this->cacheCountReviewComplete) {
+            $this->cacheCountReviewComplete = 0;
+            foreach ($this->assessment->getAllParticipants() as $participant) {
+                if ($participant->isReviewComplete()) {
+                    $this->cacheCountReviewComplete++;
+                }
             }
         }
-        return $count;
+        return $this->cacheCountReviewComplete;
     }
+
 
     /**
      * How many participants have submitted ANY kind of response to this assessment?
@@ -93,16 +134,19 @@ class Statistics
      * Includes teacher Submitting-On-Behalf-Of
      *
      * @return int
+     * @throws \DomainException
      */
     public function getCountHasSubmittedResponse()
     {
-        $count = 0;
-        foreach ($this->assessment->getAllParticipants() as $participant) {
-            if ($participant->hasSubmittedResponse()) {
-                $count++;
+        if (null === $this->cacheCountHasSubmittedResponse) {
+            $this->cacheCountHasSubmittedResponse = 0;
+            foreach ($this->assessment->getAllParticipants() as $participant) {
+                if ($participant->hasSubmittedResponse()) {
+                    $this->cacheCountHasSubmittedResponse++;
+                }
             }
         }
-        return $count;
+        return $this->cacheCountHasSubmittedResponse;
     }
 
 
@@ -110,16 +154,19 @@ class Statistics
      * Return the number of participants which have published feedback for this assessment
      *
      * @return int
+     * @throws \DomainException
      */
     public function getCountHasPublishedFeedback()
     {
-        $count = 0;
-        foreach ($this->assessment->getAllParticipants() as $participant) {
-            if ($participant->hasPublishedFeedback()) {
-                $count++;
+        if (null === $this->cacheCountHasPublishedFeedback) {
+            $this->cacheCountHasPublishedFeedback = 0;
+            foreach ($this->assessment->getAllParticipants() as $participant) {
+                if ($participant->hasPublishedFeedback()) {
+                    $this->cacheCountHasPublishedFeedback++;
+                }
             }
         }
-        return $count;
+        return $this->cacheCountHasPublishedFeedback;
     }
 
 
@@ -130,28 +177,32 @@ class Statistics
      * self-assessed marks for a task (even if self-assessed as 'Incomplete')
      *
      * @return int
-     *
+     * @throws \DomainException
      */
     public function getCountHasMark()
     {
-        $count = 0;
-        foreach ($this->assessment->getAllParticipants() as $participant) {
-            if ($participant->hasMark()) {
-                $count++;
+        if (null === $this->cacheCountHasMark) {
+            $this->cacheCountHasMark = 0;
+            foreach ($this->assessment->getAllParticipants() as $participant) {
+                if ($participant->hasMark()) {
+                    $this->cacheCountHasMark++;
+                }
             }
         }
-        return $count;
+        return $this->cacheCountHasMark;
     }
+
 
     /**
      * What percentage of Participants still need to submit a response
      *
      * @return float|null
+     * @throws \DomainException
      */
     public function getPercentageResponseRequired()
     {
         $countParticipants = $this->getCountParticipants();
-        if(!$countParticipants){
+        if (!$countParticipants) {
             return null;
         }
         return 100 * ($this->getCountResponseRequired() / $countParticipants);
@@ -162,67 +213,76 @@ class Statistics
      * What percentage of Participants have Responses that require marking.
      *
      * @return float|null
+     * @throws \DomainException
      */
     public function getPercentageFeedbackRequired()
     {
         $countParticipants = $this->getCountParticipants();
-        if(!$countParticipants){
+        if (!$countParticipants) {
             return null;
         }
         return 100 * ($this->getCountFeedbackRequired() / $countParticipants);
     }
 
+
     /**
      * What percentage of Participants have been review-completed ?
      *
      * @return float|null
+     * @throws \DomainException
      */
     public function getPercentageReviewComplete()
     {
         $countParticipants = $this->getCountParticipants();
-        if(!$countParticipants){
+        if (!$countParticipants) {
             return null;
         }
         return 100 * ($this->getCountReviewComplete() / $countParticipants);
     }
 
+
     /**
      * What percentage of Participants have submitted a response to this assessment ?
      *
      * @return float|null
+     * @throws \DomainException
      */
     public function getPercentageHasSubmittedResponse()
     {
         $countParticipants = $this->getCountParticipants();
-        if(!$countParticipants){
+        if (!$countParticipants) {
             return null;
         }
         return 100 * ($this->getCountHasSubmittedResponse() / $countParticipants);
     }
 
+
     /**
      * What percentage of Participants have received published feedback for this assessment ?
      *
      * @return float|null
+     * @throws \DomainException
      */
     public function getPercentageHasPublishedFeedback()
     {
         $countParticipants = $this->getCountParticipants();
-        if(!$countParticipants){
+        if (!$countParticipants) {
             return null;
         }
         return 100 * ($this->getCountHasPublishedFeedback() / $countParticipants);
     }
 
+
     /**
      * What percentage of Participants have a mark for this assessment ?
      *
      * @return float|null
+     * @throws \DomainException
      */
     public function getPercentageHasMark()
     {
         $countParticipants = $this->getCountParticipants();
-        if(!$countParticipants){
+        if (!$countParticipants) {
             return null;
         }
         return 100 * ($this->getCountHasMark() / $countParticipants);
