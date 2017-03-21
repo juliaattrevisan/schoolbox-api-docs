@@ -34,6 +34,8 @@ use Schoolbox\Video\QueueMapper;
  */
 class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, Searchable, IHomepageCleanable
 {
+    /** @var Queue $queue */
+    protected $queue = null;
 
     /**
      * @return string
@@ -74,8 +76,8 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 //        );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'ensureOwnerIsNotNull']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'checkDuplicate']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, self::CALLBACK_PRESAVE]);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, self::CALLBACK_POSTSAVE]);
     }
 
     /**
@@ -248,28 +250,113 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
     }
 
     /**
-     * Pre-save callback: Makes sure the same file does not already exist in the folder
+     * Pre-save callback: Makes sure the same file does not already exist in the folder, and also handles adding to video queue
+     * if it is required
      *
-     * @param  Model $model
-     * @return bool  Always true
+     * @param Model $model
+     * @return bool NOT always true (Now prevents duplicate files being added to the same folder)
      */
-    public function checkDuplicate(Model $model)
+    public function preSave(Model $model)
     {
+        $queueMapper = QueueMapper::getInstance();
+
+        // Check if the file uploaded was a video/audio file requiring transcoding
+
+        if ($model->getMimetype()->isVideo() || $model->getMimetype()->isAudio()) {
+
+            // Houston- we need a transcode
+
+            try {
+
+                // Check if there is an existing transcode request in Complete/Pending/Processing state. If there is, then we
+                // don't want to create a duplicate transcode request
+
+                $queueMapper->findOneByColumnList([
+                    'hash' => $model->getHash(),
+                    'status' => [
+                        QueueMapper::STATUS_COMPLETED,
+                        QueueMapper::STATUS_PENDING,
+                        QueueMapper::STATUS_PROCESSING
+                    ]
+                ]);
+
+                // There is an existing transcode request for this file that hasn't completed/failed, we don't want to
+                // touch the video_queue table so we leave $this->queue set to null
+
+            } catch (MapperException $e) {
+
+                // There was no existing/outstanding transcode request, so we need to kick one off. Start creating a record
+                // in $this->queue. We might not be able to complete this yet however. To create the record we require a file ID
+                // which we will only have in pre-save if there was an existing file record... which we will find out in a second
+                // when we check for duplicate uploads.
+
+                /** @var Queue $queue */
+                $this->queue = $queueMapper->createModel();
+                $this->queue->setStorage($model->getStorage());
+                $this->queue->setStatus(QueueMapper::STATUS_PENDING);
+                $this->queue->setCreatedAt(Alaress_Date_Format::now());
+                $this->queue->setUpdatedAt(Alaress_Date_Format::now());
+            }
+        }
+
+        // Check if the same file had already been uploaded to the folder so we don't create duplicate files in the same folder
+
         try {
-            $this->findOneByColumnList([
+
+            /** @var Model $existingFile */
+            $existingFile = $this->findOneByColumnList([
                 'category' => $model->getFolder()->getId(),
-                'realname' => $model->getTitle(),
                 'hash' => $model->getHash()
             ]);
 
-            // The file existed, return false because we don't want to add it again
+            // Did we need to create a transcode request?
+
+            if ($this->queue != null) {
+
+                // We need a transcode record to be created...
+
+                // The same file already existed in the file table, we can use it on our transcode request and finish off
+                // the creation of the transcode record now
+
+                $this->queue->setFile($existingFile);
+                $queueMapper->save($this->queue);
+                $this->queue = null;
+            }
+
+            // The file already existed, return false because we don't want to add it again
             return false;
 
         } catch (MapperException $e) {
 
-            // The file did not exist, return true so it gets saved
+            // There is no duplicate file in the file table, so we can go ahead and save this file record.
+
+            // We can't however finish the saving of the transcode request until the file model has been saved, so we will
+            // leave this hanging for now, and finish it off in the postSave() function below...
+
             return true;
         }
+    }
+
+    /**
+     * @param Model $file
+     * @param Model $previous
+     * @return bool
+     */
+    protected function postSave(Model $file, Model $previous = null)
+    {
+        // Check if we left a transcode request hanging...
+
+        if ($this->queue != null) {
+
+            // We did! Now that we have the file record saved we can use it to finish off the video_queue record.
+
+            $queueMapper = QueueMapper::getInstance();
+
+            $this->queue->setFile($file);
+            $queueMapper->save($this->queue);
+        }
+
+        return true;
     }
 
     /**
@@ -280,50 +367,5 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      */
     public function homepageClean($cid){
         $this->deleteByColumn('category',$cid);
-    }
-
-    /**
-     * @param Model $file
-     * @param Model $previous
-     * @return bool
-     */
-    protected function postSave(Model $file, Model $previous = null)
-    {
-        // Ram media files into queue for transcoding
-
-        if ($file->getMimetype()->isVideo() || $file->getMimetype()->isAudio()) {
-            $queueMapper = QueueMapper::getInstance();
-
-            try {
-
-                // Check if there is an existing queue item in Complete, Pending or Processing state. If
-                // there is we don't want to add it again
-
-                $queueMapper->findOneByColumnList([
-                    'hash' => $file->getHash(),
-                    'status' => [
-                        QueueMapper::STATUS_COMPLETED,
-                        QueueMapper::STATUS_PENDING,
-                        QueueMapper::STATUS_PROCESSING
-                    ]
-                ]);
-
-            } catch (MapperException $e) {
-
-                // If there was nothing found we will get a mapper exception- add we can add it to the
-                // media processing queue here
-
-                /** @var Queue $queue */
-                $queue = $queueMapper->createModel();
-                $queue->setFile($file);
-                $queue->setStorage($file->getStorage());
-                $queue->setStatus(QueueMapper::STATUS_PENDING);
-                $queue->setCreatedAt(Alaress_Date_Format::now());
-                $queue->setUpdatedAt(Alaress_Date_Format::now());
-                $queueMapper->save($queue);
-            }
-        }
-
-        return true;
     }
 }
