@@ -74,6 +74,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 //        );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'ensureOwnerIsNotNull']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'checkDuplicate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
     }
 
@@ -246,6 +247,30 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         return true;
     }
 
+    /**
+     * Pre-save callback: Makes sure the same file does not already exist in the folder
+     *
+     * @param  Model $model
+     * @return bool  Always true
+     */
+    public function checkDuplicate(Model $model)
+    {
+        try {
+            $this->findOneByColumnList([
+                'category' => $model->getFolder()->getId(),
+                'realname' => $model->getTitle(),
+                'hash' => $model->getHash()
+            ]);
+
+            // The file existed, return false because we don't want to add it again
+            return false;
+
+        } catch (MapperException $e) {
+
+            // The file did not exist, return true so it gets saved
+            return true;
+        }
+    }
 
     /**
      * Soft-deletes content for specified homepage
@@ -277,8 +302,8 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 $queueMapper->findOneByColumnList([
                     'hash' => $file->getHash(),
                     'status' => [
-                        QueueMapper::STATUS_COMPLETED |
-                        QueueMapper::STATUS_PENDING |
+                        QueueMapper::STATUS_COMPLETED,
+                        QueueMapper::STATUS_PENDING,
                         QueueMapper::STATUS_PROCESSING
                     ]
                 ]);

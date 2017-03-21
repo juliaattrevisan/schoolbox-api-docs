@@ -101,14 +101,18 @@ class ResourceVideoMapper extends Mapper
         $fileMapper = Resource\File\Mapper::getInstance();
 
         $query = "
-            SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
-            FROM `{$this->getTable()}` vq
-            JOIN {$this->getJoinSQL('file', 'vq', 'f')}
+            SELECT    {$this->getJoinMapper('file')->getColumnString('f')}, 
+                      {$this->getColumnString('vq')}, 
+                      {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
+            FROM      `{$this->getTable()}` vq
+            JOIN      {$this->getJoinSQL('file', 'vq', 'f')}
             LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u')}
-            JOIN storage s ON s.hash = f.hash
-            JOIN allowedFileExtension e ON s.ext = e.extension
-            JOIN allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
-            WHERE category = :cat AND vq.status != 'failed' AND ft.mime like :mime
+            JOIN      storage s ON s.hash = f.hash
+            JOIN      allowedFileExtension e ON s.ext = e.extension
+            JOIN      allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
+            WHERE     category = :cat AND 
+                      vq.status != 'failed' AND 
+                      ft.mime like :mime
         ";
 
         /* Sort order
