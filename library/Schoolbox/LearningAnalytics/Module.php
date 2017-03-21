@@ -14,8 +14,10 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation;
@@ -44,16 +46,16 @@ class Module extends BaseModule
     {
         $get = [
             // For a Course - aggregating all Classes which have imported Course
-            'course'                 => "/course/{courseSpecId}",
-            'courseWithTerms'        => "/course/{courseSpecId}/term/{termCode}",
-            'courseWithTask'         => "/course/{courseSpecId}/task/{taskTypeId}",
-            'courseWithTaskAndTerms' => "/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}",
+            'course'                 => '/course/{courseSpecId}',
+            'courseWithTerms'        => '/course/{courseSpecId}/term/{termCode}',
+            'courseWithTask'         => '/course/{courseSpecId}/task/{taskTypeId}',
+            'courseWithTaskAndTerms' => '/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}',
 
             // Per Class that uses a particular Course
-            'folder'                 => "/course/{courseSpecId}/class/{folderId}",
-            'folderWithTerms'        => "/course/{courseSpecId}/class/{folderId}/term/{termCode}",
-            'folderWithTask'         => "/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}",
-            'folderWithTaskAndTerms' => "/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}",
+            'folder'                 => '/course/{courseSpecId}/class/{folderId}',
+            'folderWithTerms'        => '/course/{courseSpecId}/class/{folderId}/term/{termCode}',
+            'folderWithTask'         => '/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}',
+            'folderWithTaskAndTerms' => '/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}',
         ];
 
         foreach ($get as $method => $route) {
@@ -65,6 +67,10 @@ class Module extends BaseModule
      * Inject params into controller
      *
      * {@inheritdoc}
+     * @throws Mapper\Exception
+     * @throws ApplicationException
+     * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
@@ -88,6 +94,7 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -109,6 +116,9 @@ class Module extends BaseModule
      *
      * @return array
      * @throws MapperException
+     * @throws ApplicationException
+     * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
      */
     private function courseDependencies(array $params)
     {
@@ -152,7 +162,7 @@ class Module extends BaseModule
                 // load up some hydrations
                 $unit->setFolder($this->getFolderMapper()->findById($unit->getFolder()->getId()));
 
-                if (isset($params['folderId']) && $unit->getFolder()->getId() != $params['folderId']) {
+                if (isset($params['folderId']) && $unit->getFolder()->getId() !== (int)$params['folderId']) {
                     // filtering to a specific folder, and it's not this one
                     continue;
                 }
@@ -196,6 +206,9 @@ class Module extends BaseModule
      * @param $params
      * @return array
      * @throws MapperException
+     * @throws ApplicationException
+     * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
      */
     private function folderDependencies($params)
     {
@@ -232,6 +245,7 @@ class Module extends BaseModule
      * Template locations for this module
      *
      * {@inheritdoc}
+     * @throws \Twig_Error_Loader
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
@@ -256,6 +270,7 @@ class Module extends BaseModule
 
     /**
      * @return object|Access
+     * @throws \InvalidArgumentException
      */
     protected function getAccess()
     {
@@ -264,6 +279,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
+     * @throws \InvalidArgumentException
      */
     protected function getFolderMapper()
     {
@@ -273,6 +289,7 @@ class Module extends BaseModule
 
     /**
      * @return object|MapperProxy
+     * @throws ServiceNotFound
      */
     protected function getAssessmentDataSource()
     {
@@ -281,6 +298,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|Implementation\Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getCourseImplementationMapper()
     {
@@ -290,6 +308,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|Specification\Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getCourseSpecificationMapper()
     {
@@ -299,6 +318,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|Implementation\Unit\Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getUnitImplementationMapper()
     {
@@ -307,6 +327,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|TermMapper
+     * @throws \InvalidArgumentException
      */
     protected function getTermMapper()
     {
@@ -316,6 +337,7 @@ class Module extends BaseModule
 
     /**
      * @return object|Participant\DataSource
+     * @throws ServiceNotFound
      */
     protected function getParticipantDataSource()
     {

@@ -12,6 +12,7 @@ namespace Schoolbox\LearningAnalytics;
 
 use Alaress\Web\Controller\Base;
 
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -25,6 +26,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
 
 class Controller extends Base
 {
@@ -41,6 +43,7 @@ class Controller extends Base
      * @level 165
      *
      * @param int $courseSpecId
+     * @throws RouteNotFound
      */
     public function course($courseSpecId)
     {
@@ -60,6 +63,7 @@ class Controller extends Base
      * @param Specification\Model                    $courseSpecification
      * @param Collection|Implementation\Unit\Model[] $unitImplementations
      * @param Term                                   $term
+     * @throws ApplicationException
      */
     public function courseWithTerms(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
     {
@@ -73,6 +77,7 @@ class Controller extends Base
      *
      * @param int $courseSpecId
      * @param int $taskTypeId
+     * @throws RouteNotFound
      */
     public function courseWithTask($courseSpecId, $taskTypeId)
     {
@@ -96,6 +101,7 @@ class Controller extends Base
      * @param Specification\Model                    $courseSpecification
      * @param Collection|Implementation\Unit\Model[] $unitImplementations
      * @param Term                                   $term
+     * @throws ApplicationException
      */
     public function courseWithTaskAndTerms(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
     {
@@ -109,6 +115,7 @@ class Controller extends Base
      *
      * @param int $courseSpecId
      * @param int $folderId
+     * @throws RouteNotFound
      */
     public function folder($courseSpecId, $folderId)
     {
@@ -133,6 +140,7 @@ class Controller extends Base
      * @param Specification\Model                    $courseSpecification
      * @param Collection|Implementation\Unit\Model[] $unitImplementations
      * @param Term                                   $term
+     * @throws ApplicationException
      */
     public function folderWithTerms(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
     {
@@ -147,6 +155,7 @@ class Controller extends Base
      * @param int $courseSpecId
      * @param int $folderId
      * @param int $taskTypeId
+     * @throws RouteNotFound
      */
     public function folderWithTask($courseSpecId, $folderId, $taskTypeId)
     {
@@ -172,6 +181,7 @@ class Controller extends Base
      * @param Specification\Model                    $courseSpecification
      * @param Collection|Implementation\Unit\Model[] $unitImplementations
      * @param Term                                   $term
+     * @throws ApplicationException
      */
     public function folderWithTaskAndTerms(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
     {
@@ -220,7 +230,7 @@ class Controller extends Base
         foreach($courseImplsPerClass as $classFolderId => $courseImpls){
 
             // Are we filtering for a specific class ? And it doesn't match this set of courseImports?
-            if($class && $class->getId() != $classFolderId){
+            if($class && $class->getId() !== $classFolderId){
                 continue;
             }
 
@@ -278,10 +288,11 @@ class Controller extends Base
      * @param Term                                   $term                  term to filter
      * @param Folder                                 $selectedClassFolder   if given, the class folder to filter
      * @param string                                 $routeUsed             pass directly through to twig for route lookups
+     * @throws ApplicationException
      */
     private function process(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term, $routeUsed, Folder $selectedClassFolder = null)
     {
-        if ($unitImplementations->count() == 0) {
+        if (0 === $unitImplementations->count()) {
             throw Error\Mapper::getInstance()->generateException(Error\Mapper::ERROR_NO_ANALYTICS_DATA);
         }
 
