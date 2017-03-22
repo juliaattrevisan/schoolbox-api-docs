@@ -15,6 +15,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
@@ -58,13 +59,14 @@ class Controller extends Base
      * @level 165
      *
      * @param CourseSpecification             $courseSpecification
-     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Collection|UnitImplementation[] $unitImplsInTerm
+     * @param Collection|IAssessable[]        $assessmentsInTerm
      * @param Term                            $term
      * @throws ApplicationException
      */
-    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
+    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $assessmentsInTerm, Term $term)
     {
-        $this->process($courseSpecification, $unitImplementations, $term, 'course');
+        $this->process($courseSpecification, $unitImplsInTerm, $assessmentsInTerm, $term, 'course');
     }
 
 
@@ -95,14 +97,15 @@ class Controller extends Base
      * @level 165
      *
      * @param CourseSpecification             $courseSpecification
-     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Collection|UnitImplementation[] $unitImplsInTerm
+     * @param Collection|IAssessable[]        $assessmentsInTerm
      * @param Term                            $term
      * @param int                             $submissionTypeId
      * @throws ApplicationException
      */
-    public function courseWithSubmissionTypeAndTerm(CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term, $submissionTypeId)
+    public function courseWithSubmissionTypeAndTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $assessmentsInTerm, Term $term, $submissionTypeId)
     {
-        $this->process($courseSpecification, $unitImplementations, $term, null, $submissionTypeId);
+        $this->process($courseSpecification, $unitImplsInTerm, $assessmentsInTerm, $term, null, $submissionTypeId);
     }
 
 
@@ -134,13 +137,14 @@ class Controller extends Base
      *
      * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
-     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Collection|UnitImplementation[] $unitImplsInTerm
+     * @param Collection|IAssessable[]        $assessmentsInTerm
      * @param Term                            $term
      * @throws ApplicationException
      */
-    public function folderWithTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term)
+    public function folderWithTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $assessmentsInTerm, Term $term)
     {
-        $this->process($courseSpecification, $unitImplementations, $term, 'folder', $classFolder);
+        $this->process($courseSpecification, $unitImplsInTerm, $assessmentsInTerm, $term, 'folder', $classFolder);
     }
 
 
@@ -174,14 +178,15 @@ class Controller extends Base
      *
      * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
-     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Collection|UnitImplementation[] $unitImplsInTerm
+     * @param Collection|IAssessable[]        $assessmentsInTerm
      * @param Term                            $term
      * @param int                             $submissionTypeId
      * @throws ApplicationException
      */
-    public function folderWithSubmissionTypeAndTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplementations, Term $term, $submissionTypeId)
+    public function folderWithSubmissionTypeAndTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $assessmentsInTerm, Term $term, $submissionTypeId)
     {
-        $this->process($courseSpecification, $unitImplementations, $term, 'folder', $classFolder, $submissionTypeId);
+        $this->process($courseSpecification, $unitImplsInTerm, $assessmentsInTerm, $term, 'folder', $classFolder, $submissionTypeId);
     }
 
 
@@ -280,7 +285,8 @@ class Controller extends Base
      * instances' originating task id, not the individual instance id
      *
      * @param CourseSpecification             $courseSpecification   spec from which all data on this page inherits
-     * @param Collection|UnitImplementation[] $unitImplementations   units that match the term filter
+     * @param Collection|UnitImplementation[] $unitImplsInTerm       units containing assessments due in current term
+     * @param Collection|IAssessable[]        $assessmentsInTerm     assessments due in current Term
      * @param Term                            $term                  term to filter
      * @param Folder                          $selectedClassFolder   if given, the class folder to filter
      * @param string                          $routeType             'course'|'folder'
@@ -289,21 +295,23 @@ class Controller extends Base
      */
     private function process(
         CourseSpecification $courseSpecification,
-        Collection $unitImplementations,
+        Collection $unitImplsInTerm,
+        Collection $assessmentsInTerm,
         Term $term,
         $routeType,
         Folder $selectedClassFolder = null,
         $submissionTypeId = null
-)
-    {
-        $analysis = new CohortAnalysis($courseSpecification, $unitImplementations, $selectedClassFolder, $term);
-        $metadata = new Metadata($unitImplementations, $selectedClassFolder);
+    ) {
+
+
+        $analysis = new CohortAnalysis($courseSpecification, $unitImplsInTerm, $selectedClassFolder, $term);
+        $metadata = new Metadata($unitImplsInTerm, $selectedClassFolder);
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
          * so just hit the external db once
          */
-        $registry = new Registry($unitImplementations);
+        $registry = new Registry($unitImplsInTerm);
 
         /**
          * Results for all the units in each $folder contained in $allFolders
@@ -330,16 +338,16 @@ class Controller extends Base
                 'bottom' => $analysis->getCohortRankings(SORT_ASC),
             ],
             'results' => [
-                'all' => $analysis->getCohortGradesByAssessment($unitImplementations),
+                'all' => $analysis->getCohortGradesByAssessment($unitImplsInTerm),
                 'assessments' => [
-                    'all' => $analysis->getAssessments($unitImplementations, $term),
+                    'all' => $analysis->getAssessments($unitImplsInTerm, $term),
                 ],
             ],
             'progress' => [
                 'allUnits' => $analysis->getProgressByUnit(),
             ],
             'rubrics' => [
-                'allRubrics' => $analysis->getCohortGradesByIndicator($unitImplementations, $registry->getStudents()),
+                'allRubrics' => $analysis->getCohortGradesByIndicator($unitImplsInTerm, $registry->getStudents()),
             ],
             'effort' => [
                 'allEffort' => $analysis->getEffort(),

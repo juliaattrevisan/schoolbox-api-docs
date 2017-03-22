@@ -108,7 +108,7 @@ class Module extends BaseModule
     }
 
     /**
-     * Loads model graph
+     * Loads model graph.
      *
      * @param array $params
      * @var int $params['courseSpecId']
@@ -161,7 +161,7 @@ class Module extends BaseModule
         $courseImplementations = $this->getCourseImplementationMapper()->findByColumnList($columnList)->indexBy('id');
         $courseSpecification->setCourseImplementations($courseImplementations);
 
-        // Load UnitImpls inside CourseSpecs
+        // Load UnitImpls inside CourseImpls
         /** @var GenericCollection|UnitImplementation[] $unitImplementations */
         $unitImplementations = $this->getUnitImplementationMapper()->findAllByCourseId($courseImplementations->getColumnValues('id'))->indexBy('id');
         foreach($unitImplementations as $unitImplementation){
@@ -192,9 +192,19 @@ class Module extends BaseModule
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_NO_ANALYTICS_DATA);
         }
 
+        /**
+         * UnitImpls that contain assessments due in selected Term
+         *
+         * @var GenericCollection|UnitImplementation[] $unitImplsInTerm
+         */
+        $unitImplsInTerm = $this->getUnitImplementationMapper()->createCollection();
+
         // Load Participants into relevant Assessments
         $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($assessmentsDueInTerm);
         foreach($assessmentsDueInTerm as $assessment){
+
+            $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getContext());
+
             foreach ($assessment->getAllParticipants() as $participant) {
                 foreach ($participant->getAllFeedbacks() as $feedback) {
                     $assessment->getFeedbacks()->setOffset($feedback->getId(), $feedback);
@@ -207,7 +217,8 @@ class Module extends BaseModule
 
         return [
             'courseSpecification' => $courseSpecification,
-            'unitImplementations' => $unitImplementations,
+            'unitImplsInTerm'     => $unitImplsInTerm,
+            'assessmentsInTerm'   => $assessmentsDueInTerm,
             'term'                => $term,
             'classFolder'         => $classFolder,
             'submissionTypeId'    => isset($params['submissionTypeId']) ? (int)$params['submissionTypeId'] : null,
