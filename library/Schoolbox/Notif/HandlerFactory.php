@@ -28,6 +28,7 @@ use Schoolbox\Notif\Handler\InstamailHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\Handler\PushHandler;
 use Schoolbox\Notif\Handler\RedisMessageHandler;
+use Schoolbox\Realtime\MessageList\Factory;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_RfcComplianceException;
@@ -73,24 +74,29 @@ class HandlerFactory
     /** @var ClientInterface */
     private $redis;
 
+    /** @var string */
+    private $instanceId;
+
 
     /**
      * HandlerFactory constructor. Loads up a whole bunch of lazy-loaded handlers.
      * TODO: investigate putting all these handlers into DI
      *
+     * @param string          $instanceId
      * @param IConfigLoader   $conf
      * @param Swift_Transport $swift
      * @param LoggerInterface $log
      * @param ClientInterface $redis
      * @param AMQPInterface   $mqc
      */
-    public function __construct(IConfigLoader $conf, Swift_Transport $swift, LoggerInterface $log, ClientInterface $redis, AMQPInterface $mqc = null)
+    public function __construct($instanceId, IConfigLoader $conf, Swift_Transport $swift, LoggerInterface $log, ClientInterface $redis, AMQPInterface $mqc = null)
     {
-        $this->conf  = $conf;
-        $this->redis = $redis;
-        $this->mqc   = $mqc;
-        $this->swift = $swift;
-        $this->log   = $log;
+        $this->conf       = $conf;
+        $this->redis      = $redis;
+        $this->mqc        = $mqc;
+        $this->swift      = $swift;
+        $this->log        = $log;
+        $this->instanceId = $instanceId;
 
         $this->handlerGenerators[self::SYS_FATAL_MAIL] = function ()
         {
@@ -130,7 +136,7 @@ class HandlerFactory
         };
         $this->handlerGenerators[self::USER_UNREAD]  = function ()
         {
-            return new RedisMessageHandler($this->redis, Logger::NOTICE, true);
+            return new RedisMessageHandler($this->redis, new Factory($this->instanceId, $this->redis), Logger::NOTICE, true);
         };
         $this->handlerGenerators[self::USER_INSTANT] = function ()
         {

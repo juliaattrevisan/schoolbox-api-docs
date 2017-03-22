@@ -27,6 +27,8 @@ use Swift_Transport;
 class Notifactory
 {
 
+    /** @var string */
+    protected $instanceId;
     /** @var IConfigLoader */
     protected $conf;
     /** @var ClientInterface */
@@ -44,11 +46,12 @@ class Notifactory
      *
      * @param string        $topic
      * @param IConfigLoader $configLoader
+     * @param string        $instanceId
      * @return NotifInterface
      */
-    public static function create($topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
+    public static function create($topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null, $instanceId = INSTANCE_ID)
     {
-        $self = new self($configLoader);
+        $self = new self($configLoader, $instanceId);
 
         return $self->generateNotif($topic);
     }
@@ -58,18 +61,20 @@ class Notifactory
      * Notifactory constructor.
      *
      * @param IConfigLoader   $configLoader
+     * @param string          $instanceId
      * @param AMQPInterface   $mqc
      * @param ClientInterface $redis
      * @param Swift_Transport $swift
      * @param LoggerInterface $log
      */
-    public function __construct(IConfigLoader $configLoader = null, AMQPInterface $mqc = null, ClientInterface $redis = null, Swift_Transport $swift = null, LoggerInterface $log = null)
+    public function __construct(IConfigLoader $configLoader = null, $instanceId = INSTANCE_ID, AMQPInterface $mqc = null, ClientInterface $redis = null, Swift_Transport $swift = null, LoggerInterface $log = null)
     {
         $this->setConfigLoader($configLoader);
         $this->setRedis($redis);
         $this->setAMQP($mqc);
         $this->setSwiftTransport($swift);
         $this->setLogger($log);
+        $this->setInstanceId($instanceId);
     }
 
 
@@ -88,7 +93,7 @@ class Notifactory
      */
     public function generateHandlerFactory()
     {
-        return new HandlerFactory($this->conf, $this->swift, $this->log, $this->redis, $this->mqc);
+        return new HandlerFactory($this->instanceId, $this->conf, $this->swift, $this->log, $this->redis, $this->mqc);
     }
 
 
@@ -177,6 +182,17 @@ class Notifactory
     public function setLogger(LoggerInterface $log = null)
     {
         $this->log = $log ?: new Lumberjack\Logger(null);
+        return $this;
+    }
+
+
+    /**
+     * @param string $instanceId
+     * @return $this
+     */
+    public function setInstanceId($instanceId)
+    {
+        $this->instanceId = $instanceId;
         return $this;
     }
 
