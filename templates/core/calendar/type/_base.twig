@@ -26,7 +26,7 @@
             <h3>{{ event.title }}</h3>
 
             <ul class="meta">
-                <li class="icon-calendar" title="Date"><time>{{ event.getFullDate() }}</time></li>
+                <li class="icon-calendar" title="Date"><time>{{ event.getFullDate() | raw }}</time></li>
 
                 {% if event.eventType %}
                 <li class="icon-list" title="Type">{{ event.eventType }}</li>

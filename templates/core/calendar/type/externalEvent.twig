@@ -4,7 +4,7 @@
     <h3>{{ event.title }}</h3>
 
     <ul class="meta">
-        <li class="icon-calendar" title="Date"><time>{{ event.startTime.getCalendarDate }}, {{ event.startTime.timeOnly }} - {{ event.endTime.timeOnly }}</time></li>
+        <li class="icon-calendar" title="Date"><time>{{ event.getFullDate()|raw }}</time></li>
 
         {% if event.location %}
             <li class="icon-location" title="Location">{{ event.location }}</li>

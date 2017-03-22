@@ -226,11 +226,26 @@ abstract class EventBase implements EventInterface
      */
     public function getTime()
     {
-        if ($this->getAllDay()) {
-            return false;
-        } else {
-            return $this->getStartTime()->getTimeOnly();
+        // All day event, or does it start and end on a different day?
+        // Show a blank string.
+        if ($this->getAllday()) {
+            return '';
         }
+        if ($this->getStartTime()->getDateOnly() != $this->getEndTime()->getDateOnly()) {
+            return '';
+        }
+
+        $formattedTime = '';
+
+        if(!$this->getStartTime()->isAtStartOfDay()) {
+            $formattedTime = $this->getStartTime()->getTimeOnly();
+
+            if(!$this->getEndTime()->isAtStartOfDay()) {
+                $formattedTime .= "&ndash;". $this->getEndTime()->getTimeOnly();
+            }
+        }
+
+        return $formattedTime;
     }
 
     /**

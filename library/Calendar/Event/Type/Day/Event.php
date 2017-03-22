@@ -142,37 +142,6 @@ class Event extends EventBase implements EventInterface {
         return $eventLevel;
     }
 
-    /**
-     * Some cosmetic derivation. If the start and end time are both 12:00AM,
-     * this will return an empty string. Oddly I wonder if it's possible that
-     * the start time is 12:00AM and the end time is something different.
-     *
-     * @return string
-     */
-    public function getTime() {
-        //
-        // All day event, or does it start and end on a different day?
-        // Show a blank string.
-        if ($this->getAllday()) {
-            return '';
-        }
-        if ($this->getStartTime()->getDateOnly() != $this->getEndTime()->getDateOnly()) {
-            return '';
-        }
-
-        $formattedTime = '';
-
-        if(!$this->getStartTime()->isAtStartOfDay()) {
-            $formattedTime = $this->getStartTime()->getTimeOnly();
-
-            if(!$this->getEndTime()->isAtStartOfDay()) {
-                $formattedTime .= "&ndash;". $this->getEndTime()->getTimeOnly();
-            }
-        }
-
-        return $formattedTime;
-    }
-
     /* Getters/Setters
      */
 
