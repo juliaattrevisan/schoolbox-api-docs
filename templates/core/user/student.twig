@@ -38,17 +38,16 @@
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad">
-            <div class="content no-pad">
+            <div class="profile content">
                 <div class="row no-margin">
-                    <div class="small-12 medium-6 large-4 columns no-pad">
-                        {# as far as I know portrait always shows #}
-                        <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
+                    <div class="small-12 medium-3 columns no-pad">
+                        <img class="full-width" src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=constrain200"/>
                     </div>
 
-                    <div class="small-12 medium-6 large-8 columns no-pad">
+                    <div class="small-12 medium-9 columns no-pad">
                         {% block specialAlert %}
                             {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
-                                <div class="alert-box warning icon-bell no-margin">
+                                <div class="alert-box warning icon-bell">
                                     {{ locale.translate('specialNeeds', false, true) }}
                                 </div>
                             {% endif %}
@@ -56,17 +55,17 @@
 
                         {% block medicalAlert %}
                             {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
-                                <div class="alert-box alert icon-alert no-margin">
+                                <div class="alert-box alert icon-alert">
                                     Medical Note: {{ externalUser.StudentMedicalAlert }}
                                 </div>
                             {% endif %}
                         {% endblock medicalAlert %}
 
                         {% block details %}
-                        <dl class="profile">
+                        <dl>
                             {% if showTitle %}
-                                <dt class="no-margin small-6 medium-3">Position Title</dt>
-                                <dd class="no-margin small-6 medium-9">
+                                <dt class="small-12 medium-3">Position Title:</dt>
+                                <dd class="small-12 medium-9">
                                     {{ user.getPositionTitle() }}
                                 </dd>
                             {% endif %}
@@ -74,8 +73,8 @@
                             {% if showEmail %}
                                 {% block details_email %}
                                 {% if user.getEmail() %}
-                                <dt class="no-margin small-6 medium-3">Email</dt>
-                                <dd class="no-margin small-6 medium-9">
+                                <dt class="small-12 medium-3">Email:</dt>
+                                <dd class="small-12 medium-9">
                                     <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                                 </dd>
                                 {% endif %}
@@ -84,22 +83,22 @@
 
                             {% if showDetails %}
                                 {% block details_studentId %}
-                                <dt class="no-margin small-6 medium-3">Student ID</dt>
-                                <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
+                                <dt class="small-12 medium-3">Student ID:</dt>
+                                <dd class="small-12 medium-9">{{ user.getExternalId() }}</dd>
                                 {% endblock details_studentId %}
 
                                 {% block details_dob %}
                                 {% if externalUser.StudentBirthDate %}
-                                <dt class="no-margin small-6 medium-3">Date of Birth</dt>
-                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(dateFormats.dateOnlyFormat) }}</dd>
+                                <dt class="small-12 medium-3">Date of Birth:</dt>
+                                <dd class="small-12 medium-9">{{ externalUser.StudentBirthDate|date(dateFormats.dateOnlyFormat) }}</dd>
                                 {% endif %}
                                 {% endblock details_dob %}
 
                                 {% block details_formTeacher %}
                                 {% if showClasses %}
                                     {% if formTeacher %}
-                                    <dt class="no-margin small-6 medium-3">Class Teacher</dt>
-                                    <dd class="no-margin small-6 medium-9">
+                                    <dt class="small-12 medium-3">Class Teacher:</dt>
+                                    <dd class="small-12 medium-9">
                                         {% if formTeacher.getId() %}
                                         <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
                                         {% else %}
@@ -112,16 +111,16 @@
 
                                 {% block details_yearLevel %}
                                 {% if externalUser.StudentYearLevel %}
-                                <dt class="no-margin small-6 medium-3">Year Level</dt>
-                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
+                                <dt class="small-12 medium-3">Year Level:</dt>
+                                <dd class="small-12 medium-9">{{ externalUser.StudentYearLevel }}</dd>
                                 {% endif %}
                                 {% endblock details_yearLevel %}
 
                                 {% block details_tutorTeacher %}
                                 {% if showClasses %}
                                     {% if tutorTeacher %}
-                                    <dt class="no-margin small-6 medium-3">Tutor</dt>
-                                    <dd class="no-margin small-6 medium-9">
+                                    <dt class="small-12 medium-3">Tutor:</dt>
+                                    <dd class="small-12 medium-9">
                                         {% if tutorTeacher.getId() %}
                                             <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
                                         {% else %}
@@ -147,16 +146,16 @@
 
                                 {% block details_house %}
                                 {% if externalUser.StudentHouseDescription %}
-                                <dt class="no-margin small-6 medium-3">House</dt>
-                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
+                                <dt class="small-12 medium-3">House:</dt>
+                                <dd class="small-12 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
                                 {% endif %}
                                 {% endblock details_house %}
 
                                 {% block details_tutorGroup %}
                                 {% if showClasses %}
                                     {% if externalUser.StudentTutorDescription %}
-                                    <dt class="no-margin small-6 medium-3">Tutor Group</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
+                                    <dt class="small-12 medium-3">Tutor Group:</dt>
+                                    <dd class="small-12 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
                                     {% endif %}
                                 {% endif %}
                                 {% endblock details_tutorGroup %}
@@ -164,8 +163,8 @@
                                 {% block details_hohTeacher %}
                                 {% if showClasses %}
                                     {% if hohTeacher %}
-                                    <dt class="no-margin small-6 medium-3">Head of House</dt>
-                                    <dd class="no-margin small-6 medium-9">
+                                    <dt class="small-12 medium-3">Head of House:</dt>
+                                    <dd class="small-12 medium-9">
                                         {% if hohTeacher.getId() %}
                                             <a href="{{ session.mailhandle }}{{ hohTeacher.getEmail() }}">{{ hohTeacher.formatName() }}</a>
                                         {% else %}
@@ -179,16 +178,16 @@
                                 {% block details_studentForm %}
                                 {% if showClasses %}
                                     {% if externalUser.StudentForm %}
-                                    <dt class="no-margin small-6 medium-3">Class</dt>
-                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
+                                    <dt class="small-12 medium-3">Class:</dt>
+                                    <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
                                     {% endif %}
                                 {% endif %}
                                 {% endblock details_studentForm %}
 
                                 {% block details_studentType %}
                                 {% if boarderType %}
-                                <dt class="no-margin small-6 medium-3">Student Type</dt>
-                                <dd class="no-margin small-6 medium-9">{{ boarderType }}</dd>
+                                <dt class="small-12 medium-3">Student Type:</dt>
+                                <dd class="small-12 medium-9">{{ boarderType }}</dd>
                                 {% endif %}
                                 {% endblock details_studentType %}
 
@@ -210,35 +209,14 @@
             </div>
             
             {% block buttons_island %}
-            <script type="text/javascript">
-                $(function() {
-                    var minColumns = 1;
-                    var maxColumns = 12;
-
-                    var element = $('#fat-buttons');
-                    var length = element.find('li').length;
-
-                    /* Enforce boundary values
-                     */
-                    if (length < minColumns) {
-                        length = minColumns;
-                    }
-                    else if (length > maxColumns) {
-                        length = maxColumns;
-                    }
-
-                    element.addClass('large-block-grid-' + length);
-                });
-            </script>
-            <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-3" data-equalizer>
+            <ul class='flex-list flex-wrap buttons'>
                 {% block buttons %}
                     {% if showButtons %}
                         {% block buttons_dueWork %}
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="/learning/due/{{ user.getId() }}"
-                                       class="no-margin button fat icon-fat size-32 icon-due-work"
-                                       data-equalizer-watch>Due Work</a>
+                                       class="icon-due-work">Due Work</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_dueWork %}
@@ -247,10 +225,9 @@
                     {% if showButtons %}
                         {% block buttons_grades %}
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="/learning/grades/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat size-32 icon-tick"
-                                       data-equalizer-watch>Grades</a>
+                                       class="icon-tick">Grades</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_grades %}
@@ -258,30 +235,27 @@
 
                     {% if eportfolioAuth %}
                         {% block buttons_eportfolio %}
-                            <li class="no-pad">
+                            <li>
                                 <a href="/eportfolio/{{ user.getId() }}/profile"
-                                   class="no-margin fat button icon-fat size-32 icon-eportfolio"
-                                   data-equalizer-watch>ePortfolio</a>
+                                   class="icon-eportfolio">ePortfolio</a>
                             </li>
                         {% endblock buttons_eportfolio %}
                     {% endif %}
 
                     {% if showButtons and showPastoral %}
                         {% if isStaff or isParentOfStudent %}
-                        <li class="no-pad">
+                        <li>
                             <a href="/pastoral/{{ user.getId() }}"
-                               class="no-margin fat icon-fat button size-32 icon-pastoral"
-                               data-equalizer-watch>Pastoral Care</a>
+                               class="icon-pastoral">Pastoral Care</a>
                         </li>
                         {% endif %}
                     {% endif %}
 
                     {% if showButtons %}
                         {% block buttons_calendar %}
-                            <li class="no-pad">
+                            <li>
                                 <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                   class="no-margin fat button icon-fat size-32 icon-calendar"
-                                   data-equalizer-watch>{TPL_LOCAL_CALENDAR_PC}</a>
+                                   class="icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a>
                             </li>
                         {% endblock buttons_calendar %}
                     {% endif %}
@@ -289,10 +263,9 @@
                     {% if showButtons %}
                         {% if showClasses %}
                             {% block buttons_timetable %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="/timetable/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat size-32 icon-timetable"
-                                       data-equalizer-watch>Timetable</a>
+                                       class="icon-timetable">Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
                         {% endif %}
@@ -301,10 +274,9 @@
                     {% if showButtons %}
                         {% block buttons_boarderLeave %}
                             {% if config.boarder_leave_enabled and user.getResidentialHouse().getId() %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="/modules/leave/student/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat size-32 icon-boarder-leave"
-                                       data-equalizer-watch>Boarder Leave</a>
+                                       class="icon-boarder-leave">Boarder Leave</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_boarderLeave %}
@@ -313,11 +285,10 @@
                     {% if showButtons %}
                         {% block buttons_pastoralCare %}
                             {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
-                                <li class="no-pad">
+                                <li>
                                     <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
-                                       class="no-margin fat button icon-fat size-32 icon-modify"
-                                       target="_blank"
-                                       data-equalizer-watch>Pastoral Care</a>
+                                       class="icon-modify"
+                                       target="_blank">Pastoral Care</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_pastoralCare %}
