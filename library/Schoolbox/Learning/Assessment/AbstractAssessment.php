@@ -684,7 +684,7 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return float
+     * @return int
      */
     public function getWeight()
     {
