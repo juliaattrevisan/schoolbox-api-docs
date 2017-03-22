@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Rerouter;
+namespace Schoolbox\Realtime\Routing;
 
 
 use Alaress\Async\Notification\Instance\Instance;
@@ -20,8 +20,8 @@ use React\Stomp\Protocol\Frame;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
-use Schoolbox\Realtime\Rerouter\Filter\FilterException;
-use Schoolbox\Realtime\Rerouter\Filter\FilterInterface;
+use Schoolbox\Realtime\Routing\Filter\FilterException;
+use Schoolbox\Realtime\Routing\Filter\FilterInterface;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Swift_RfcComplianceException;

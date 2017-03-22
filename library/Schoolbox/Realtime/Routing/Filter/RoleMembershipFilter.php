@@ -7,13 +7,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Rerouter\Filter;
+namespace Schoolbox\Realtime\Routing\Filter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\User;
 
-class CampusMembershipFilter extends ContextFilter {
+class RoleMembershipFilter extends ContextFilter {
 
 	/**
 	 * Returns true if this message is considered valid, or false if it should be dismissed
@@ -25,13 +25,11 @@ class CampusMembershipFilter extends ContextFilter {
 	 * @return bool
 	 */
 	public function validate($message, $formatted, $user) {
-		// if campus set, must be involved in one or more campuses listed
-		if(isset($formatted['context']['campus'])) {
-			$this->assertContextValue($formatted['context']['campus'], $user->getCampusCollection()->getColumnValues('id'), "User not a member of any given campus");
+		// if roletype set, must be of role specified
+		if(isset($formatted['context']['role'])) {
+			$this->assertContextValue($formatted['context']['role'], $user->getRole()->getId(), "User not a member of any given role");
 		}
 		return true;
 	}
 
-
-
-} 
+}

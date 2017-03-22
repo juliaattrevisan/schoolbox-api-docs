@@ -7,13 +7,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Rerouter\Filter;
+namespace Schoolbox\Realtime\Routing\Filter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\User;
 
-class RoleMembershipFilter extends ContextFilter {
+class AlreadyReroutedFilter implements FilterInterface {
 
 	/**
 	 * Returns true if this message is considered valid, or false if it should be dismissed
@@ -25,11 +25,9 @@ class RoleMembershipFilter extends ContextFilter {
 	 * @return bool
 	 */
 	public function validate($message, $formatted, $user) {
-		// if roletype set, must be of role specified
-		if(isset($formatted['context']['role'])) {
-			$this->assertContextValue($formatted['context']['role'], $user->getRole()->getId(), "User not a member of any given role");
+		if(isset($formatted['extra']['rerouted'])) {
+			throw new FilterException("Message has already been rerouted");
 		}
-		return true;
 	}
 
 }

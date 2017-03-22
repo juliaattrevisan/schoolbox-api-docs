@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Rerouter\Filter;
+namespace Schoolbox\Realtime\Routing\Filter;
 
 
 abstract class ContextFilter implements FilterInterface {

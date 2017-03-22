@@ -17,9 +17,9 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
-use Schoolbox\Realtime\Rerouter\QueueSorter;
+use Schoolbox\Realtime\Routing\QueueSorter;
 use Schoolbox\Realtime\Routing;
-use Schoolbox\Realtime\Rerouter\Filter;
+use Schoolbox\Realtime\Routing\Filter;
 use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\UserMapper;
 

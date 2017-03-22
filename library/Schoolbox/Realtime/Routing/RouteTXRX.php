@@ -14,7 +14,7 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use PDOException;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Realtime\Rerouter\QueueSorter;
+use Schoolbox\Realtime\Routing\QueueSorter;
 use Schoolbox\UserMapper;
 
 class RouteTXRX implements TXRX

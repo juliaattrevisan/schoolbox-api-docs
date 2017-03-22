@@ -7,13 +7,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Rerouter\Filter;
+namespace Schoolbox\Realtime\Routing\Filter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\User;
 
-class AlreadyReroutedFilter implements FilterInterface {
+class CampusMembershipFilter extends ContextFilter {
 
 	/**
 	 * Returns true if this message is considered valid, or false if it should be dismissed
@@ -25,9 +25,13 @@ class AlreadyReroutedFilter implements FilterInterface {
 	 * @return bool
 	 */
 	public function validate($message, $formatted, $user) {
-		if(isset($formatted['extra']['rerouted'])) {
-			throw new FilterException("Message has already been rerouted");
+		// if campus set, must be involved in one or more campuses listed
+		if(isset($formatted['context']['campus'])) {
+			$this->assertContextValue($formatted['context']['campus'], $user->getCampusCollection()->getColumnValues('id'), "User not a member of any given campus");
 		}
+		return true;
 	}
 
-}
+
+
+} 

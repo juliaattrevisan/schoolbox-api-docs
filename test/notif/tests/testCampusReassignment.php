@@ -9,11 +9,9 @@
 use Schoolbox\CampusMapper;
 use Schoolbox\News\Article;
 use Schoolbox\News\ArticleMapper;
-use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\UserMapper;
 
 
 /**

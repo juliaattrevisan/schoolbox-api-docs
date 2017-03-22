@@ -7,13 +7,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Rerouter\Filter;
+namespace Schoolbox\Realtime\Routing\Filter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\User;
 
-class SelfSendFilter implements FilterInterface {
+class RoletypeFilter extends ContextFilter {
 
 	/**
 	 * Returns true if this message is considered valid, or false if it should be dismissed
@@ -25,9 +25,9 @@ class SelfSendFilter implements FilterInterface {
 	 * @return bool
 	 */
 	public function validate($message, $formatted, $user) {
-		// if the originating user matches current, dismiss
-		if(isset($formatted['context']['user']) && $formatted['context']['user'] == $user->getId()) {
-			throw new FilterException("User effected this message");
+		// if roletype set, must be of role specified
+		if(isset($formatted['context']['roletype'])) {
+			$this->assertContextValue($formatted['context']['roletype'], $user->getRole()->getType(), "User not a member of any given roletype");
 		}
 		return true;
 	}

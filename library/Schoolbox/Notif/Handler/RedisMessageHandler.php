@@ -16,7 +16,7 @@ use Predis\ClientInterface;
 use Redis;
 use Schoolbox\Realtime\MessageList\IFactory;
 use Schoolbox\Realtime\Pipe\PipeManager;
-use Schoolbox\Realtime\Rerouter\QueueSorter;
+use Schoolbox\Realtime\Routing\QueueSorter;
 
 
 class RedisMessageHandler extends AbstractProcessingHandler
