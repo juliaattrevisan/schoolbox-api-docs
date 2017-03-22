@@ -1455,8 +1455,17 @@ dl {
         }
 
     }
+}
 
-    &.profile {
+// Profiles
+.profile {
+    .alert-box{
+        margin: 0 0 0.75rem 0.75rem;
+        @media #{$small-only} {
+            margin: 0 0 0.75rem 0;
+        }
+    }
+    dl{
         @extend .inline-dl;
         margin: 0;
         @media #{$small-only} {
@@ -1466,7 +1475,6 @@ dl {
             }
         }
     }
-
 }
 
 // gradient 1-10
