@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
 use Alaress\WorkerCrew\Dispatcher;
@@ -17,7 +18,6 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription;
@@ -48,6 +48,9 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         /** @var ClientInterface $redis */
         $redis = $di->get('redis');
 
+        /** @var AMQPInterface $amqp */
+        $amqp = $di->get('amqp');
+
         $loaderFactory = new Subscription\Loader\Factory($redis, $log);
 
         // ensure endpoints exist
@@ -55,9 +58,10 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
             $r = '*.notify.#';
             $q = "$instance.route";
             $x = "sb.$instance.tx";
+
             // TODO make the queues and exchanges instance-agnostic
             $log->info("Ensuring binding exists: '$x' -> ($r) -> '$q'", [ 'char' => '>' ]);
-            Connector::getInstance()->declareQueue($q)->bindQueue($q, $r, $x);
+            $amqp->declareQueue($q)->bindQueue($q, $r, $x);
 
             $loaderFactory->get("m:{$instance}:routes")->loadSubscriptions($router);
         }
@@ -67,7 +71,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
         $handler     = new Subscription\Handler($router, $client, $log, $txrx);
         $dispatcher  = new Dispatcher($loop, $handler, $log, new DispatchStrategy($opts['flags']));
-        $transaction = new DispatchTransaction($loop, $dispatcher, 'route',
+        $transaction = new DispatchTransaction($loop, $dispatcher, DispatchStrategy::TASK_ROUTE,
             Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
             Subscription\Handler::TRANSACTION_COUNT_LIMIT
         );

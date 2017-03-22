@@ -37,7 +37,7 @@ foreach ($fields as $k => $name) {
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Reroute Worker', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Route Worker', array(
     'errors' => E_ALL,
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'fields'  => array_values($fields),
@@ -55,22 +55,22 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $config = $di->get('config');
 
     // obtain filter list
-    $filterFactory = new Filter\FilterFactory($listFactory, $config);
-    $rerouteFilter = $filterFactory->build();
+    $filter = (new Filter\FilterFactory($listFactory, $config))->build();
 
     // create a Notif using the Kernel's logger
     $notif  = (new Notifactory())->setLogger($log)->generateNotif();
 
-    $sorter = new QueueSorter($rerouteFilter, $log, $notif, RoutePermissionMapper::getInstance());
+    // setup a sorter
+    $sorter = new QueueSorter($filter, $log, $notif, $di->get('mapperFactory')->get(RoutePermissionMapper::class));
 
-    // use the reroute strat
+    // use the route strat
     $strat = new Routing\DispatchStrategy();
 
     // we open stream(3) as our data output stream
     $writer = new PipeWriter($strat, $log, fopen('php://fd/3', 'wb'));
 
     // worker-side: dependencies used
-    $txrx = new RouteTXRX(UserMapper::getInstance(), $sorter);
+    $txrx = new RouteTXRX($di->get('mapperFactory')->get(UserMapper::class), $sorter);
 
     new Routing\Worker($txrx, $loop, $log, $writer, $strat);
 });
