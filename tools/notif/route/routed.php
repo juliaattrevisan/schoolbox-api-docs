@@ -42,6 +42,14 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         // the list of instances this particular daemon will listen for
         $instances = [ INSTANCE_ID ];
 
+        // this holds and traverses all our subscription data
+        $router = new Router(new SubscriptionDictionary('.'));
+
+        /** @var ClientInterface $redis */
+        $redis = $di->get('redis');
+
+        $loaderFactory = new Subscription\Loader\Factory($redis, $log);
+
         // ensure endpoints exist
         foreach ($instances as $instance) {
             $r = '*.notify.#';
@@ -50,15 +58,9 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
             // TODO make the queues and exchanges instance-agnostic
             $log->info("Ensuring binding exists: '$x' -> ($r) -> '$q'", [ 'char' => '>' ]);
             Connector::getInstance()->declareQueue($q)->bindQueue($q, $r, $x);
+
+            $loaderFactory->get("m:{$instance}:routes")->loadSubscriptions($router);
         }
-
-        // this holds and traverses all our subscription data
-        $router = new Router(new SubscriptionDictionary('.'));
-
-        /** @var Redis|ClientInterface $redis */
-        $redis = $di->get('redis');
-
-        (new Subscription\Loader\Factory($redis, $log))->get('m:vagrantx:routes')->loadSubscriptions($router);
 
         // daemon-version: no dependencies required
         $txrx = new RouteTXRX();
