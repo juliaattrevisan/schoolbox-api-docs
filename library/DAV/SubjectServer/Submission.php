@@ -20,7 +20,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleCollection
     protected $user;
 
     /**
-     * @var Submission\SingleFile\Model
+     * @var Submission\Submission
      */
     protected $submission;
 
@@ -44,7 +44,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleCollection
     }
 
     /**
-     * @param Submission\SingleFile\Model $submission
+     * @param Submission\Submission $submission
      *
      * @return $this
      */
@@ -55,38 +55,11 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleCollection
     }
 
     /**
-     * @return Submission\SingleFile\Model
+     * @return Submission\Submission
      */
     public function getSubmission()
     {
         return $this->submission;
-    }
-
-    /**
-     * Returns the size of the file
-     * @return int
-     */
-    public function getSize()
-    {
-        return $this->getSubmission()->getStorage()->getSize();
-    }
-
-    /**
-     * Returns the unique file key
-     * @return string
-     */
-    public function getETag()
-    {
-        return $this->getSubmission()->getStorage()->getHash();
-    }
-
-    /**
-     * Returns the mimetype
-     * @return string
-     */
-    public function getContentType()
-    {
-        return $this->getSubmission()->getStorage()->getMime();
     }
 
     /**
@@ -96,56 +69,67 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleCollection
      */
     public function getLastModified()
     {
-        $submission = $this->getSubmission();
-        if ($submission instanceof Submission\SingleFile\Model) {
-            $date = $submission->getCreatedAt();
-            if ($date instanceof Alaress_Date_Format && !$date->isNull()) {
-                return $date->getUnixTimestamp();
-            }
-        }
-        return time();
+        return $this->getSubmission()->getUpdatedAt()->getUnixTimeStamp();
     }
 
     /**
-     * Updates a file that has been created already.
-     * This is required for some WebDAV clients - the iPad Pages client sends an
-     * initial PUT request to create the file, and then sends another with the
-     * actual file contents.
-     * We'll need to have some sort of filtering on this, so that if you're
-     * trying to override a file you submitted previously it should fail.
+     * Loads this submission's files.
      *
-     * @throws Sabre\DAV\Exception\Forbidden if the file can't be updated
-     *
-     * @param resource $data
-     *
-     * @return null
+     * @return $this
      */
-    public function put($data)
+    public function loadChildren()
     {
-
-        //
-        // Does this file belong to this student?
-        if ($this->getUser()->getId() != $this->getSubmission()->getOwner()->getId()) {
-            throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite another student\'s submission');
+        foreach ($this->getSubmission()->getFiles() as $file) {
+            $this->addChild(
+                (new DAV_SubjectServer_SubmissionFile(
+                    $file->getBasename(),
+                    $file->readStream()
+                ))->setSubmissionFile($file)
+            );
         }
-
-        //
-        // If the file was updated less than, say, 5 minutes ago, accept the
-        // request - otherwise, reject it.
-        $submit_time  = $this->getSubmission()->getCreatedAt()->getUnixTimestamp();
-        $current_time = $_SERVER['REQUEST_TIME'];
-        if (($current_time - $submit_time) > 300) {
-            throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite an existing file with the same name');
-        }
-
-        //
-        // Load this file's contents.
-        $storage = Storage\Mapper::getInstance()->acceptStream($this->getName(), $data, false);
-
-        //
-        // And put it in the submission object.
-        $mapper = new Submission\SubmissionMapper();
-        $mapper->save($this->getSubmission()->setStorage($storage));
-        return null;
+        return $this;
     }
+
+//    /**
+//     * Updates a file that has been created already.
+//     * This is required for some WebDAV clients - the iPad Pages client sends an
+//     * initial PUT request to create the file, and then sends another with the
+//     * actual file contents.
+//     * We'll need to have some sort of filtering on this, so that if you're
+//     * trying to override a file you submitted previously it should fail.
+//     *
+//     * @throws Sabre\DAV\Exception\Forbidden if the file can't be updated
+//     *
+//     * @param resource $data
+//     *
+//     * @return null
+//     */
+//    public function put($data)
+//    {
+//
+//        //
+//        // Does this file belong to this student?
+//        if ($this->getUser()->getId() != $this->getSubmission()->getOwner()->getId()) {
+//            throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite another student\'s submission');
+//        }
+//
+//        //
+//        // If the file was updated less than, say, 5 minutes ago, accept the
+//        // request - otherwise, reject it.
+//        $submit_time  = $this->getSubmission()->getCreatedAt()->getUnixTimestamp();
+//        $current_time = $_SERVER['REQUEST_TIME'];
+//        if (($current_time - $submit_time) > 300) {
+//            throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite an existing file with the same name');
+//        }
+//
+//        //
+//        // Load this file's contents.
+//        $storage = Storage\Mapper::getInstance()->acceptStream($this->getName(), $data, false);
+//
+//        //
+//        // And put it in the submission object.
+//        $mapper = new Submission\SubmissionMapper();
+//        $mapper->save($this->getSubmission()->setStorage($storage));
+//        return null;
+//    }
 }

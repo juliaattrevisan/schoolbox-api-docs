@@ -99,7 +99,8 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
             );
             $child
                 ->setUser($this->getUser())
-                ->setSubmission($file);
+                ->setSubmission($file)
+                ->loadChildren();
             $this->addChild($child);
         }
         return $this;
