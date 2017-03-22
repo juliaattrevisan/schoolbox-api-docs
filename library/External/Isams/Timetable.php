@@ -20,21 +20,11 @@
  */
 
 use Schoolbox\Campus as CampusModel;
-use Schoolbox\CampusMapper;
 
 class External_Isams_Timetable implements External_TimetableInterface
 {
     /** @var MSSQL $database */
     private $database;
-
-    /** @var External_UserInterface */
-    private $externalUser;
-
-    /** @var Group */
-    private $groupHandler;
-
-    /** @var CampusMapper */
-    private $campusMapper;
 
     /**
      * External_Doublefirst_Timetable constructor.
@@ -42,9 +32,6 @@ class External_Isams_Timetable implements External_TimetableInterface
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->externalUser = new External_User('isams');
-        $this->groupHandler = new Group();
-        $this->campusMapper = new CampusMapper();
     }
 
     /**
@@ -76,10 +63,6 @@ class External_Isams_Timetable implements External_TimetableInterface
                 $day = intval(Config::get('external_isams_default_day_id'));
             }
         }
-
-        // Get period information from database
-
-        $this->externalUser->getStudent($externalUserId);
 
         $query =
             "
