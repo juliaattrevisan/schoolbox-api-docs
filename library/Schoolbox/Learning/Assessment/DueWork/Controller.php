@@ -233,6 +233,16 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Sanitize a string for use in filename
+     *
+     * @param string $string
+     * @return string
+     */
+    private function sanitizeForFilename($string) {
+        return preg_replace("/[^A-Za-z0-9.]/", '', $string);
+    }
+
+    /**
      * Download all student submissions for a given assessable
      * @api   GET /learning/assessments/:assessmentId/submissions/download
      * @level 165
@@ -251,7 +261,7 @@ class Controller extends Assessment\Controller
 
         // Create a zip file to hold the downloaded submissions
 
-        $titleSanitized = preg_replace("/[^A-Za-z0-9]/", '', $assessment->getTitle());
+        $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
         $dateNow = \Alaress_Date_Format::now()->getUsingFormat('md-His');
 
         $zip = new Zip("{$titleSanitized}-{$dateNow}.zip");
@@ -278,8 +288,8 @@ class Controller extends Assessment\Controller
 
                 if ($response instanceof Submission && !$response->isDraft())
                 {
-                    $lastNameSanitized = preg_replace("/[^A-Za-z0-9]/", '', $users[$participant->getUser()->getId()]->getLastname());
-                    $firstNameSanitized = preg_replace("/[^A-Za-z0-9]/", '', $users[$participant->getUser()->getId()]->getFirstname());
+                    $lastNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getLastname());
+                    $firstNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getFirstname());
 
                     $directory = sprintf("%s_%s_%s-%s",
                         $lastNameSanitized,
@@ -295,7 +305,7 @@ class Controller extends Assessment\Controller
                     /** @var File $file */
                     foreach ($files as $file)
                     {
-                        $filenameSanitized = preg_replace("/[^A-Za-z0-9]/", '', $file->getBasename());
+                        $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
                         $zipFilename = sprintf("%s/%s", $directory, $filenameSanitized);
                         $zip->addStream($file->readStream(), $zipFilename);
                     }
