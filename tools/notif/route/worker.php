@@ -1,21 +1,6 @@
 #!/usr/bin/php
 <?php
 
-use Alaress\WorkerCrew\Worker\PipeWriter;
-use Aura\Di;
-use Predis\ClientInterface;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Notif\Notifactory;
-use Schoolbox\Notif\Queue\QueueFactory;
-use Schoolbox\Notif\UserQueue\UserQueueFactory;
-use Schoolbox\Realtime\Message\RoutePermissionMapper;
-use Schoolbox\Realtime\Rerouter\QueueSorter;
-use Schoolbox\Realtime\Routing;
-use Schoolbox\Realtime\Rerouter\Filter;
-use Schoolbox\Realtime\Routing\RouteTXRX;
-use Schoolbox\UserMapper;
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -24,9 +9,24 @@ use Schoolbox\UserMapper;
  * @version     SVN: $Id$
  */
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+use Alaress\WorkerCrew\Worker\PipeWriter;
+use Aura\Di;
+use Predis\ClientInterface;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
+use Schoolbox\Notif\Notifactory;
+use Schoolbox\Realtime\Message\RoutePermissionMapper;
+use Schoolbox\Realtime\MessageList;
+use Schoolbox\Realtime\Rerouter\QueueSorter;
+use Schoolbox\Realtime\Routing;
+use Schoolbox\Realtime\Rerouter\Filter;
+use Schoolbox\Realtime\Routing\RouteTXRX;
+use Schoolbox\UserMapper;
 
-$opts = getopt('v', $fields);
+/** @var array $fields */
+$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
+
+$opts = getopt('v', $fields, $_);
 
 foreach ($fields as $k => $name) {
     if (!isset($opts[$name])) {
@@ -49,30 +49,25 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var ClientInterface $client */
     $client = $di->get('redis');
 
-    $uqf = new UserQueueFactory();
-    $uqf->setKind(UserQueueFactory::UQ_REROUTE)
-        ->setRedis($client);
-
-    $qf = new QueueFactory();
-    $qf->setRedis($client);
+    $listFactory = new MessageList\Factory(INSTANCE_ID, $client);
 
     // Add the messaging enabled filter
     $config = $di->get('config');
 
     // obtain filter list
-    $filterFactory = new Filter\FilterFactory($uqf, $config);
+    $filterFactory = new Filter\FilterFactory($listFactory, $config);
     $rerouteFilter = $filterFactory->build();
 
-    $notif = Notifactory::create();
-    $notif->setLogger($log);
+    // create a Notif using the Kernel's logger
+    $notif  = (new Notifactory())->setLogger($log)->generateNotif();
 
-    $sorter = new QueueSorter($rerouteFilter, $log, $notif, $qf, RoutePermissionMapper::getInstance());
+    $sorter = new QueueSorter($rerouteFilter, $log, $notif, RoutePermissionMapper::getInstance());
 
     // use the reroute strat
     $strat = new Routing\DispatchStrategy();
 
     // we open stream(3) as our data output stream
-    $writer = new PipeWriter($strat, $log, fopen("php://fd/3", 'w'));
+    $writer = new PipeWriter($strat, $log, fopen('php://fd/3', 'wb'));
 
     // worker-side: dependencies used
     $txrx = new RouteTXRX(UserMapper::getInstance(), $sorter);

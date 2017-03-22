@@ -1,7 +1,6 @@
 <?php
 use Alaress\Redis;
-use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\UserQueue\InstantUserQueue;
+use Schoolbox\Realtime\MessageList\Factory;
 use Schoolbox\Realtime\Notification\Decorator;
 
 /**
@@ -15,7 +14,7 @@ use Schoolbox\Realtime\Notification\Decorator;
 /** @var SitePage $this */
 
 if(!isset($this)) {
-	require_once('../library/Bootstrap.php');
+	require_once __DIR__ . '/../library/Bootstrap.php';
 	error(2);
 	exit;
 }
@@ -31,12 +30,11 @@ $this->setBlock('event', 'abstract', 'abstract_block');
 
 $this->setTitle('All Messages');
 
-$amqp  = Connector::getInstance();
-$queue = new InstantUserQueue(Redis::getClientInstance(), $amqp, $_SESSION['id']);
+$factory = new Factory(INSTANCE_ID, Redis::getClientInstance());
 
 // load the data into your hat, and pull out a rabbit
 $decorator = new Decorator();
-$queue->fetchNotificationsIntoBundle($decorator);
+$factory->listed($_SESSION['id'])->fetchIntoBundle($decorator);
 $notifications = $decorator->renderAsSitePageArray();
 
 $msgsByDay = array();
