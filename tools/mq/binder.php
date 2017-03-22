@@ -130,9 +130,6 @@ EOL;
 
     $log->debug("Finished binding, notifying Rerouter");
 
-    $cmdr = new \Schoolbox\Realtime\Rerouter\RerouterCommander($uMap);
-    $cmdr->adviseReload();
-
     $log->notice("Done.");
 
 });

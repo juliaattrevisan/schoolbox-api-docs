@@ -140,9 +140,7 @@ class CampusReassignment extends AbstractNotificationTest
         $this->moveCampus(self::CAMPUS_TWO);
 
         // signal rerouted to drop the cache and
-        $rc = new RerouterCommander(UserMapper::getInstance());
-
-        $rc->adviseReload();
+        // TODO implement REDIS publish
     }
 
 

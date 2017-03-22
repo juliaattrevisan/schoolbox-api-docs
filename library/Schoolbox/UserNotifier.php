@@ -12,7 +12,6 @@ namespace Schoolbox;
 
 use DomainException;
 use Exception;
-use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 
@@ -125,9 +124,7 @@ class UserNotifier extends AbstractModuleNotifier
      */
     public function notifyCreated($user, $effector, $diff = null)
     {
-        $cmdr = new RerouterCommander($this->mapper);
-        $cmdr->adviseBindUser($user->getId());
-        $cmdr->adviseSubscribeUser($user->getId());
+        // TODO implement REDIS publish
     }
 
 
@@ -138,9 +135,7 @@ class UserNotifier extends AbstractModuleNotifier
      */
     public function notifyUpdated($user, $effector, $diff = null)
     {
-        // as above, only executed if externalId changed
-        $cmdr = new RerouterCommander($this->mapper);
-        $cmdr->adviseBindUser($user->getId());
+        // TODO implement REDIS publish
     }
 
 }

@@ -20,7 +20,6 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
-use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -401,8 +400,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      */
     protected function adviseRerouterCommander($userAccess)
     {
-        $cmdr = new RerouterCommander(UserMapper::getInstance());
-        $cmdr->adviseBindUser($userAccess->getUser()->getId());
+        // TODO implement REDIS publish
     }
 
 

@@ -77,8 +77,7 @@ if ($_SESSION['user']->isSuperuser()) {
 
     // Reload message router
     if ($reloadRerouter) {
-        $commander = new \Schoolbox\Realtime\Rerouter\RerouterCommander(new \Schoolbox\UserMapper());
-        $commander->adviseReload();
+        // TODO implement REDIS publish
     }
 
     $page->backToTheFuture(1);

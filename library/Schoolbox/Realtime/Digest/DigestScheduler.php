@@ -30,8 +30,6 @@ use Schoolbox\RoleMapper;
 
 class DigestScheduler extends CronScheduler {
 
-	const QUEUE_COMMAND  = '.sb.cmd.digest';
-
 	/** @var DigestTrigger[] */
 	protected $triggers = array();
 
@@ -46,12 +44,6 @@ class DigestScheduler extends CronScheduler {
     public function __construct($loop, $dispatchStrategy, $client, $log, $conf = null) {
         parent::__construct($loop, $dispatchStrategy, $log, $conf);
         $this->method = DefaultDispatchStrategy::TASK_DIGEST;
-
-	    $self = $this;
-	    $client->connect()->then(function($client) use ($self) {
-		    /** @var Client $client */
-		    $client->subscribe(INSTANCE_ID.DigestScheduler::QUEUE_COMMAND, array($self, 'onCommand'));
-	    });
 
 		$this->on(SIGHUP, array($this, 'onReload'));
 
@@ -133,14 +125,4 @@ class DigestScheduler extends CronScheduler {
 	}
 
 
-	/**
-	 * @param Frame $frame
-	 */
-	public function onCommand($frame) {
-		$this->log->info("Received command");
-		$commander = new DigestCommander();
-		$body = CompressedFormatter::uncompress($frame->body);
-		$commander->exec($this, $body['message']);
-	}
-
-} 
+}

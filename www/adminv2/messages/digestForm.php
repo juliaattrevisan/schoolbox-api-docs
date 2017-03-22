@@ -35,11 +35,9 @@ foreach($_POST['role'] as $roleId => $data) {
 }
 
 // advise digest daemon to reload
-$cmdr = new \Schoolbox\Realtime\Digest\DigestCommander();
-$cmdr->adviseReload();
+// TODO implement REDIS publish
 
 // advise schedule daemon to reload as well
-$cmdr = new \Schoolbox\Realtime\Rerouter\RerouterCommander(\Schoolbox\UserMapper::getInstance());
-$cmdr->adviseReload();
+// TODO implement REDIS publish
 
 SitePage::localRedir('/adminv2/messages');
