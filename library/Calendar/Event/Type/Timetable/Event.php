@@ -39,6 +39,11 @@ class Event extends DayEvent implements EventInterface {
     protected $code;
 
     /**
+     * @var Campus
+     */
+    protected $campus;
+
+    /**
      * @var Period that this timetable event is in
      */
     protected $period;
@@ -62,6 +67,22 @@ class Event extends DayEvent implements EventInterface {
     public function setCode($code)
     {
         $this->code = $code;
+    }
+
+    /**
+     * @return Campus
+     */
+    public function getCampus()
+    {
+        return $this->campus;
+    }
+
+    /**
+     * @param Campus $campus
+     */
+    public function setCampus($campus)
+    {
+        $this->campus = $campus;
     }
 
     /**
