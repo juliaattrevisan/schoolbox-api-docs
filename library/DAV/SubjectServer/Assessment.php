@@ -110,63 +110,53 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
         return $this;
     }
 
-//    /**
-//     * Uploads a student submission to the assessment.
-//     *
-//     * @throws Sabre\DAV\Exception\Forbidden if the file cannot be uploaded
-//     *
-//     * @param string          $name
-//     * @param string|resource $data
-//     *
-//     * @return null ETags aren't being returned for now.
-//     */
-//    public function createFile($name, $data = null)
-//    {
-//        $storage = Storage\Mapper::getInstance()->acceptStream($name, $data, false);
-//
-//        $submit_date    = new DateTime('now');
-//
-//        $submission = new Submission\Submission();
-//        $submission
-//            ->setSubmissionBox($this->getAssessment())
-//            ->setOwner($this->getUser())
-//            ->setFilename($storage->getFilename())
-//            ->setCreatedAt($submit_date)
-//            ->setStorage($storage);
-//
-//        //
-//        // Reasons a student couldn't submit a file:
-//        // * They aren't in this subject
-//        // * The subject doesn't take submissions online
-//        // * The submission is late
-//        // * They've already submitted and it's not a multi-submission assess
-//        // All of these are covered in SubmissionMapper->checkUploadability
-//        $mapper = new Submission\SubmissionMapper();
-//        try {
-//            SubmissionBoxMapper::getInstance()->checkUploadability($this->getAssessment(), $this->getUser());
-//
-//        } catch (Schoolbox\Resource\Exception $e) {
-//            throw new Sabre\DAV\Exception\Forbidden($e->getMessage(), $e->getCode(), $e);
-//
-//        }
-//
-//
-//        $mapper->save($submission);
-//
-//        // Queue it for Plagscanning as well, if that's supported.
-//        if (Config::get('plagscan_api_key') && Config::get('plagscan_username')) {
-//            $plagdoc = Plagscan_DocumentMapper::getInstance()->createFromSubmission($submission);
-//            Plagscan_DocumentMapper::getInstance()->save($plagdoc);
-//        }
-//
-//        return null;
-//
-////		$dav_file = new Sabre\DAV\SimpleFile(
-////			$submission->getFilename(),
-////			file_get_contents($submission->getFileLocation())
-////		);
-////		return $dav_file->getETag();
-//    }
+    /**
+     * Uploads a student submission to the assessment.
+     *
+     * @throws Sabre\DAV\Exception\Forbidden if the file cannot be uploaded
+     *
+     * @param string          $name
+     * @param string|resource $data
+     *
+     * @return null ETags aren't being returned for now.
+     */
+    public function createFile($name, $data = null)
+    {
+        $storage = Storage\Mapper::getInstance()->acceptStream($name, $data, false);
+
+        // Create a new submission
+        $submission = new Submission\Submission();
+        $submission
+            ->setSubmissionBox($this->getAssessment())
+            ->setOwner($this->getUser())
+            ->setSubmittedAt(Alaress_Date_Format::now());
+
+        // Put a single file in
+        $submissionFile = new Submission\SingleFile\Model();
+        $submissionFile
+            ->setFilename($storage->getFilename())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setStorage($storage);
+
+        //
+        // Reasons a student couldn't submit a file:
+        // * They aren't in this subject
+        // * The subject doesn't take submissions online
+        // * The submission is late
+        // * They've already submitted and it's not a multi-submission assess
+        // All of these are covered in SubmissionMapper->checkUploadability
+        $mapper = new Submission\SubmissionMapper();
+        try {
+            SubmissionBoxMapper::getInstance()->checkUploadability($this->getAssessment(), $this->getUser());
+
+        } catch (Schoolbox\Resource\Exception $e) {
+            throw new Sabre\DAV\Exception\Forbidden($e->getMessage(), $e->getCode(), $e);
+
+        }
+
+        $mapper->save($submission);
+        return null;
+    }
 
     /**
      * Gets the time which this assessment was uploaded.
