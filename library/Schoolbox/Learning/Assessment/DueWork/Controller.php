@@ -295,7 +295,7 @@ class Controller extends Assessment\Controller
                         $lastNameSanitized,
                         $firstNameSanitized,
                         $users[$participant->getUser()->getId()]->getId(),
-                        $response->getSubmittedAt()->getUsingFormat('md-His')
+                        $response->getSubmittedAt()->getUsingFormat('Ymd-His')
                     );
 
                     // ...iterate all files in that submission and add them to the ZIP archive
