@@ -11,25 +11,27 @@ namespace Schoolbox\Realtime\Rerouter\Filter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Schoolbox\Notif\UserQueue\UserQueueFactory;
+use Schoolbox\Realtime\MessageList\IFactory;
 use Schoolbox\User;
 
-class DuplicateFilter implements FilterInterface {
+class DuplicateFilter implements FilterInterface
+{
 
-	/** @var UserQueueFactory */
-	protected $uqf;
+	/** @var IFactory */
+	protected $factory;
 
 
 	/**
-	 * @param UserQueueFactory $uqFactory
+	 * @param IFactory $factory
 	 */
-	public function __construct($uqFactory) {
-		$this->uqf = $uqFactory;
+	public function __construct(IFactory $factory)
+    {
+		$this->factory = $factory;
 	}
 
 
 	/**
-	 * Returns true if this message is considered valid, or false if it should be dismissed
+	 * Throws a FilterException if this message should be DROPPED for this user
 	 *
 	 * @param Instance $message
 	 * @param array    $formatted
@@ -37,11 +39,17 @@ class DuplicateFilter implements FilterInterface {
 	 * @throws FilterException
 	 * @return bool
 	 */
-	public function validate($message, $formatted, $user) {
-		if($this->uqf->buildForUser($user->getId())->contains($message)) {
-			throw new FilterException("User has already seen this message");
-		}
-		return true;
-	}
+	public function validate($message, $formatted, $user)
+    {
+        if ($this->factory->listed($user->getId())->contains($message)) {
+            throw new FilterException('User has already seen this message');
+        }
 
-} 
+        if ($this->factory->digest($user->getId())->contains($message)) {
+            throw new FilterException("This message is already scheduled into this user's digest");
+        }
+
+        return true;
+    }
+
+}

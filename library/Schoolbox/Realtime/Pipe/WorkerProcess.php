@@ -24,7 +24,7 @@ use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\UserQueue\UserQueueFactory;
+use Schoolbox\Realtime\MessageList\IFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -33,11 +33,11 @@ use Schoolbox\User;
 class WorkerProcess extends AbstractProcess
 {
 
-    /** @var UserQueueFactory */
-    protected $uqf;
-
     /** @var Notif */
     protected $notif;
+
+    /** @var IFactory */
+    private $factory;
 
 
     /**
@@ -45,14 +45,14 @@ class WorkerProcess extends AbstractProcess
      * @param LoggerInterface           $log
      * @param PipeWriter                $writer
      * @param DispatchStrategyInterface $strat
-     * @param UserQueueFactory          $uqf
+     * @param IFactory                  $factory
      * @param Notif                     $notif
      */
-    public function __construct($loop, $log, $writer, $strat, $uqf, $notif)
+    public function __construct($loop, $log, $writer, $strat, IFactory $factory, $notif)
     {
         parent::__construct($loop, $log, $writer, $strat);
-        $this->uqf = $uqf;
-        $this->notif = $notif;
+        $this->notif   = $notif;
+        $this->factory = $factory;
     }
 
 
@@ -61,6 +61,8 @@ class WorkerProcess extends AbstractProcess
      * @param array  $args
      * @throws ErrorException
      * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws RuntimeException
      * @return mixed
      */
     protected function process($command, $args)
@@ -69,7 +71,6 @@ class WorkerProcess extends AbstractProcess
 
         try {
             switch ($command) {
-
                 // retrieve messages
                 case DefaultDispatchStrategy::TASK_FETCH:
                     list($userId, $count) = $args;
@@ -78,8 +79,8 @@ class WorkerProcess extends AbstractProcess
                 // publish messages
                 case DefaultDispatchStrategy::TASK_PUBLISH:
                     $data = unserialize($args[0]);
-                    if (!(is_array($data) && count($data) == 4)) {
-                        throw new RuntimeException("Data should be array(4); is " . gettype($data) . "(" . count($data) . ")");
+                    if (!(is_array($data) && count($data) === 4)) {
+                        throw new RuntimeException('Data should be array(4); is ' . gettype($data) . '(' . count($data) . ')');
                     }
                     list($callback, $model, $user, $diff) = $data;
                     return $this->publish($callback, $model, $user, $diff);
@@ -89,14 +90,14 @@ class WorkerProcess extends AbstractProcess
                 case DefaultDispatchStrategy::TASK_TIMETABLE:
                     $data = unserialize($args[0]);
                     if (!(is_array($data) && count($data) >= 2)) {
-                        throw new RuntimeException("Data should be array(2+); is " . gettype($data) . "(" . count($data) . ")");
+                        throw new RuntimeException('Data should be array(2+); is ' . gettype($data) . '(' . count($data) . ')');
                     }
                     return $this->sendTo($data[0], $data[1]);
             }
         } catch (Mapper\Exception $e) {
             // non-fatal
             throw new ErrorException(
-                sprintf("Could not complete '%s': %s", $command, $e->getMessage()),
+                sprintf('Could not complete `%s`: %s', $command, $e->getMessage()),
                 $e->getCode(), E_NOTICE, $e->getFile(), $e->getLine(), $e
             );
         }
@@ -108,25 +109,22 @@ class WorkerProcess extends AbstractProcess
     /**
      * Process fetch
      *
-     * @param $userId
-     * @param $count
+     * @param int $userId
+     * @param int $limit
      * @throws PDOException
      * @return array
      */
-    protected function fetch($userId, $count)
+    protected function fetch($userId, $limit = 0)
     {
-        $this->log->debug("Fetching $count for user $userId");
+        $this->log->debug(sprintf('Fetching %s for user %d', $limit ?: 'all', $userId));
         $decorator = new Decorator();
 
-        // get ALL messages in this queue
-        $queue = $this->uqf->buildForUser($userId);
-
         try {
-            // make messages pretty
-            $queue->fetchNotificationsIntoBundle($decorator, true);
+            // get ALL messages in this queue and make them prettae!
+            $this->factory->listed($userId)->fetchIntoBundle($decorator, true);
 
-            // wrap in an array to preserve keys
-            return array($decorator->renderAsSocketArray(false, $count));
+            // wrap in an array to preserve keys during transport
+            return [ $decorator->renderAsSocketArray(false, $limit) ];
 
         } catch (PredisException $e) {
             // Redis has gone away -_-;
@@ -150,30 +148,30 @@ class WorkerProcess extends AbstractProcess
     {
 
         if (!is_callable($callback)) {
-            throw new RuntimeException("Unable to execute callback, got " . json_encode($callback));
+            throw new RuntimeException('Unable to execute callback, got ' . json_encode($callback));
         }
         
         if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof AbstractModuleNotifier) {
             $callback[0]->enableLogging($this->notif, $this->log);
         }
 
-        $this->log->debug("Executing " . $this->callable2string($callback));
+        $this->log->debug('Executing ' . $this->callable2string($callback));
 
         // this call SHOULD return an instance of InstanceBundle
         $return = call_user_func($callback, $model, $user, $diff);
-        $this->log->debug("Callback complete");
+        $this->log->debug('Callback complete');
 
-        if (is_null($return)) {
-            $this->log->debug("Response is NULL, casting to empty Envelope");
+        if (null === $return) {
+            $this->log->debug('Response is NULL, casting to empty Envelope');
             $return = new Envelope();
         }
 
         if ($return instanceof InstanceBundle) {
-            $this->log->debug("InstanceBundle " . ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
+            $this->log->debug('InstanceBundle ' . ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
 
             $serial = serialize($return);
             if ($serial === false) {
-                throw new RuntimeException("Failed to serialize InstanceBundle");
+                throw new RuntimeException('Failed to serialize InstanceBundle');
             }
 
             return $serial;
@@ -196,7 +194,7 @@ class WorkerProcess extends AbstractProcess
     protected function sendTo($callback, $object)
     {
         if (!is_callable($callback)) {
-            throw new RuntimeException("Unable to execute callback, got " . json_encode($callback));
+            throw new RuntimeException('Unable to execute callback, got ' . json_encode($callback));
         }
 
         // inject the debugger into the notifier if possible
@@ -207,20 +205,19 @@ class WorkerProcess extends AbstractProcess
             }
         }
 
-        $this->log->debug("Executing " . $this->callable2string($callback));
+        $this->log->debug('Executing ' . $this->callable2string($callback));
         // this call MUST return an integer
         $return = call_user_func($callback, $object);
-        $this->log->debug("Callback complete");
+        $this->log->debug('Callback complete');
         // handle standard digest case
 
-        if (is_integer($return)) {
-            $this->log->debug("Response is numeric, returning as is");
-            $serial = serialize($return);
-            return $serial;
+        if (is_int($return)) {
+            $this->log->debug('Response is numeric, returning as is');
+            return serialize($return);
         }
 
         throw new InvalidArgumentException(
-            "Async digest response must be an integer; got "
+            'Async digest response must be an integer; got '
             . (is_object($return) ? get_class($return) : gettype($return))
         );
     }

@@ -10,65 +10,28 @@ namespace Schoolbox\Realtime\Rerouter\Filter;
 
 
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\UserQueue\UserQueueFactory;
+use Schoolbox\Realtime\MessageList;
+
 
 class FilterFactory
 {
 
-    /** @var UserQueueFactory */
-    protected $uqf;
-
-    /** @var bool */
-    protected $lite;
-
     /** @var IConfigLoader */
     protected $conf;
+    /**
+     * @var MessageList\IFactory
+     */
+    private $factory;
 
 
     /**
-     * FilterFactory constructor.
-     *
-     * @param UserQueueFactory $uqf
-     * @param IConfigLoader    $conf
+     * @param MessageList\IFactory $factory
+     * @param IConfigLoader        $conf
      */
-    public function __construct($uqf = null, $conf = null)
+    public function __construct(MessageList\IFactory $factory = null, IConfigLoader $conf = null)
     {
-        $this->setUserQueueFactory($uqf);
-        $this->setConfig($conf);
-        $this->setLiteMode(false);
-    }
-
-
-    /**
-     * @param UserQueueFactory $uqf
-     * @return self
-     */
-    public function setUserQueueFactory($uqf)
-    {
-        $this->uqf = $uqf instanceof UserQueueFactory ? $uqf : null;
-        return $this;
-    }
-
-
-    /**
-     * @param boolean $lite
-     * @return self
-     */
-    public function setLiteMode($lite = true)
-    {
-        $this->lite = $lite;
-        return $this;
-    }
-
-
-    /**
-     * @param IConfigLoader $conf
-     * @return self
-     */
-    public function setConfig($conf)
-    {
-        $this->conf = $conf instanceof IConfigLoader ? $conf : null;
-        return $this;
+        $this->factory = $factory;
+        $this->conf    = $conf;
     }
 
 
@@ -78,11 +41,6 @@ class FilterFactory
     public function build()
     {
         $bundle = new FilterBundle([ new AlreadyReroutedFilter() ]);
-
-        if ($this->lite) {
-            // only check we need for this is already-routed
-            return $bundle;
-        }
 
         if ($this->conf) {
             $bundle->attach(new MessagingEnabledFilter($this->conf));
@@ -96,8 +54,8 @@ class FilterFactory
             new RoletypeFilter(),
         ]);
 
-        if ($this->uqf) {
-            $bundle->attach(new DuplicateFilter($this->uqf));
+        if ($this->factory) {
+            $bundle->attach(new DuplicateFilter($this->factory));
         }
 
         return $bundle;

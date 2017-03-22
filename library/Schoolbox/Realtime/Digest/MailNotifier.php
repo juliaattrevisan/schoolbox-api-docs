@@ -10,47 +10,44 @@
 namespace Schoolbox\Realtime\Digest;
 
 
-use Alaress\Redis;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
-use Schoolbox\Notif\UserQueue\UserQueueFactory;
+use Schoolbox\Realtime\MessageList\IFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class MailNotifier extends WorkNotifier {
-
-    /** @var UserQueueFactory */
-    protected $uqf;
+class MailNotifier extends WorkNotifier
+{
+    /** @var IFactory */
+    private $factory;
 
 
     /**
-     * @return UserQueueFactory
+     * @param IFactory        $factory
+     * @param IConfigLoader   $configLoader
+     * @param LoggerInterface $log
      */
-    public function getUserQueueFactory()
+    public function __construct(IFactory $factory, IConfigLoader $configLoader = null, LoggerInterface $log = null)
     {
-        // lazyload
-        if (empty($this->uqf)) {
-            $this->uqf = new UserQueueFactory();
-            $this->uqf
-                 ->setRedis(Redis::getClientInstance())
-                 ->setKind(UserQueueFactory::UQ_DIGEST);
-        }
-        return $this->uqf;
+        parent::__construct($configLoader, $log);
+        $this->factory = $factory;
     }
 
 
-	/**
+    /**
 	 * This method is executed by a worker using the 'digest' command
 	 *
 	 * @param Role $role - the role to digest
 	 * @return int
 	 */
-	public function process($role) {
-
+	public function process($role)
+    {
 		// get a list of users
         /** @var Collection|User[] $users */
 		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
@@ -62,29 +59,32 @@ class MailNotifier extends WorkNotifier {
         $core   = new CoreContext($this->conf);
 
 		// iterate and digest
-		foreach($users as $user) {
+		foreach ($users as $user) {
 
-            $decorator = new Decorator();
-            $email     = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
-            $uq        = $this->getUserQueueFactory()->buildForUser($user->getId());
+            $decorator  = new Decorator();
+            $email      = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
+            $digestList = $this->factory->digest($user->getId());
 
+            // apply core context to the email
             $email->setCoreContext($core->getContext());
 
-            $uq->fetchNotificationsIntoBundle($decorator, true);
+            // drop all the digest messages into the decorator
+            $digestList->fetchIntoBundle($decorator, true);
 
-			if(!$decorator->count()) {
+			if (!$decorator->count()) {
 				// this user has nothing to digest
 				$this->log()->debug("{$user->getUsername()} has nothing to digest");
-                unset($uq, $decorator, $email, $user);
+                unset($digestList, $decorator, $email, $user);
 				continue;
 			}
 
-            $this->log()->debug(sprintf("Digesting %d item%s for user %s", $decorator->count(), $decorator->count() == 1 ? '' : 's', $user->getUsername()));
+            $this->log()->debug(sprintf('Digesting %d item%s for user %s', $decorator->count(), $decorator->count() === 1 ? '' : 's', $user->getUsername()));
 
-            $emailAddress = $user->getEmail();
-            if (strlen($emailAddress) === 0) {
+            $emailAddress = trim($user->getEmail());
+
+            if (empty($emailAddress)) {
                 $this->log()->warning("{$user->getUsername()} has no email address");
-                unset($uq, $decorator, $email, $user);
+                unset($digestList, $decorator, $email, $user);
                 continue;
             }
 
@@ -92,7 +92,7 @@ class MailNotifier extends WorkNotifier {
 
             try {
                 // explicitly an rfc822 email spec, so it sets, not adds
-                $address = sprintf("%s <%s>", $user->formatName(), $emailAddress);
+                $address = sprintf('%s <%s>', $user->formatName(), $emailAddress);
                 $email->setContext($context)->setTo($address);
 
                 // away she goes
@@ -101,14 +101,14 @@ class MailNotifier extends WorkNotifier {
                 // if email sent successfully, ACK, otherwise NACK
                 if($sent) {
                     $this->log()->notice("Mail sent successfully to $address, dropping messages from queue");
-                    $uq->drain();
+                    $digestList->drain();
                     ++$result;
                 }
                 else {
                     $this->log()->warning("Failed to email to $address");
                 }
 
-                unset($uq, $decorator, $email, $user);
+                unset($digestList, $decorator, $email, $user);
 
             } catch (\Swift_SwiftException $e) {
                 $this->log()->warning(get_class($e) . ': ' . $e->getMessage(), array($e));
@@ -116,7 +116,7 @@ class MailNotifier extends WorkNotifier {
                 $this->log()->error(get_class($e) . ': ' . $e->getMessage(), array($e));
                 if (strpos($e->getMessage(), 'Invalid multibyte sequence in argument') !== false) {
                     // this means the template couldn't render the mail because of bad data, so we have to flush it :/
-                    $uq->drain();
+                    $digestList->drain();
                     $this->log()->warning('Message content cannot be rendered; data lost');
                 }
             }
