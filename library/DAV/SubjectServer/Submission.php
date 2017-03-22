@@ -11,7 +11,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
+class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleCollection
 {
 
     /**
