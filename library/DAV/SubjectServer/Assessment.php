@@ -88,6 +88,10 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
                 continue;
             }
 
+            if ($file->isDraft()) {
+                continue;
+            }
+
             // Build a file name out of the submission's time
             $child = new DAV_SubjectServer_Submission(
                 $nameGenerator->getUniqueChildName(
