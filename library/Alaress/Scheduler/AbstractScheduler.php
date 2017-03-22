@@ -80,6 +80,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * Convenience method to schedule an array of triggers
      *
      * @param TriggerInterface[] $triggers
+     * @throws InvalidArgumentException
      */
     public function scheduleNotifications($triggers)
     {
@@ -93,19 +94,21 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * Schedule a trigger for deferred execution
      *
      * @param TriggerInterface $trigger
+     * @throws InvalidArgumentException
      * @return void
      */
     public function scheduleNotification($trigger)
     {
         if ($trigger instanceof CancelTrigger) { // FIREFIGHT
-            $this->log->info("Unscheduling CancelTrigger"); // FIREFIGHT
+            $this->log->info('Unscheduling CancelTrigger'); // FIREFIGHT
             $this->unschedule($trigger);
             return;
         }
+
         $interval = $trigger->getTimestamp() - $this->clock->time();
 
         if ($interval <= self::IMMEDIATELY) {
-            $this->log->info("Immediately dispatching trigger");
+            $this->log->info('Immediately dispatching trigger');
             $this->dispatchTrigger($trigger);
             return;
         }
@@ -116,16 +119,15 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
 
     /**
      * @return callable
+     * @throws InvalidArgumentException
      */
     protected function timerCallback()
     {
-        $self = $this;
-        return function ($timer) use ($self) {
-            /** @var TimerInterface $timer */
+        return function (TimerInterface $timer) {
             if (!$timer->getData() instanceof TriggerInterface) {
-                throw new InvalidArgumentException("Trigger must be provided to publish data");
+                throw new InvalidArgumentException('Trigger must be provided to publish data');
             }
-            $self->dispatchTrigger($timer->getData());
+            $this->dispatchTrigger($timer->getData());
         };
     }
 
@@ -135,10 +137,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      */
     public function getDispatcher()
     {
-        if (isset($this->dispatcher)) {
-            return $this->dispatcher;
-        }
-        return null;
+        return !isset($this->dispatcher) ? null : $this->dispatcher;
     }
 
 
@@ -152,15 +151,15 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
             $this->getDispatcher()->enqueue(
                 $trigger,
                 $this->method,
-                serialize(array(
+                serialize([
                     $callback,
                     $event->getObject(),
                     $event->getEffector(),
                     $event->getDiff()
-                ))
+                ])
             );
         }
-        if (count($trigger->getCallbacks()) == 0) {
+        if (count($trigger->getCallbacks()) === 0) {
             $this->log->warning("Trigger for '{$trigger->getIdString()}' has no callbacks");
         }
     }
@@ -178,7 +177,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     {
         // can't schedule a cancel trigger
         if ($trigger instanceof CancelTrigger) {
-            $this->log->debug("Cannot schedule CancelTrigger");
+            $this->log->debug('Cannot schedule CancelTrigger');
             return false;
         }
 
@@ -196,7 +195,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
         $this->putTimer($model, $label, $timer);
 
         $this->log->info(sprintf("Scheduling trigger '%s' for %s", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp())),
-            array('char' => '+')
+            [ 'char' => '+' ]
         );
 
         return true;
@@ -220,8 +219,8 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
             $this->loop->cancelTimer($timer);
             return true;
         }
-        return false;
 
+        return false;
     }
 
 
