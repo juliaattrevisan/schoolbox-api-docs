@@ -23,7 +23,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Resource\Folder\Log\Model as FolderLog;
 use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 
@@ -39,14 +38,8 @@ use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
  */
 class CohortAnalysis
 {
-    /** @var CourseSpecification */
-    private $courseSpecification;
-
-    /** @var Folder */
+    /** @var null|Folder */
     private $classFolder;
-
-    /** @var Term */
-    private $term;
 
     /** @var Collection|UnitImplementation[] */
     private $unitImplementations;
@@ -66,18 +59,15 @@ class CohortAnalysis
      * You need to have FULLY hydrated and linked up your units.
      * This class depends on all unit, assessment, participation, response and feedback references being fully accounted for.
      *
-     * @param CourseSpecification              $courseSpecification the course we're analysing
      * @param Collection|UnitImplementation[]  $unitImplementations ALL the unit implementations pertaining to the given specification
      * @param Folder                           $classFolder         if given, the individual class to limit participation displayed
      * @param Term                             $term                the time bounds within which to limit participation displayed
      */
-    public function __construct(CourseSpecification $courseSpecification, Collection $unitImplementations, Folder $classFolder = null, Term $term)
+    public function __construct(Collection $unitImplementations, Folder $classFolder = null, Term $term)
     {
-        $this->courseSpecification = $courseSpecification;
         $this->unitImplementations = $unitImplementations;
         $this->unitSpecifications  = $unitImplementations->map(function (UnitImplementation $unitImpl) { return $unitImpl->getSpecification(); })->indexBy('id');
         $this->classFolder         = $classFolder;
-        $this->term                = $term;
     }
 
 
