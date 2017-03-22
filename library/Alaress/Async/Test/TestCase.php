@@ -16,7 +16,7 @@ interface TestCase
 {
 
     const DAEMON_SCHEDULE = 'scheduled';
-    const DAEMON_REROUTE  = 'rerouted';
+    const DAEMON_ROUTE    = 'routed';
     const DAEMON_SOCKET   = 'socketd';
     const DAEMON_DIGEST   = 'digestd';
     const DAEMON_BELL     = 'belld';

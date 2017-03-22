@@ -330,7 +330,7 @@ class Framework
 
         $map = [
             TestCase::DAEMON_SCHEDULE => "$root/mq/scheduled.php",
-            TestCase::DAEMON_REROUTE  => "$root/notif/reroute/rerouted.php",
+            TestCase::DAEMON_ROUTE  => "$root/notif/reroute/rerouted.php",
             TestCase::DAEMON_DIGEST   => "$root/digest/digestd.php",
             TestCase::DAEMON_SOCKET   => "$root/socket/socketd.php"
         ];

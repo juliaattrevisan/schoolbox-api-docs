@@ -484,10 +484,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Run Notifications binder (in background)";
-cd /vagrant/tools/mq;
-./binder.php &
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-scheduled";
 cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
 cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
@@ -500,9 +496,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-digestd";
 cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
 cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-rerouted";
-cp -f /vagrant/tools/init/upstart-rerouted.conf /etc/init/schoolbox-rerouted.conf;
-cp -f /vagrant/tools/init/upstart-rerouted.override /etc/init/schoolbox-rerouted.override;
+echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-routed";
+cp -f /vagrant/tools/init/upstart-routed.conf /etc/init/schoolbox-routed.conf;
+cp -f /vagrant/tools/init/upstart-routed.override /etc/init/schoolbox-routed.override;
 
 #echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-belld";
 #cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
@@ -528,7 +524,7 @@ service nginx restart > /dev/null 2>&1;
 service schoolbox-scheduled restart > /dev/null 2>/dev/null &
 service schoolbox-socketd restart > /dev/null 2>/dev/null &
 service schoolbox-digestd restart > /dev/null 2>/dev/null &
-service schoolbox-rerouted restart > /dev/null 2>/dev/null &
+service schoolbox-routed restart > /dev/null 2>/dev/null &
 #service schoolbox-belld restart > /dev/null 2>/dev/null &
 
 # call custom provisioning

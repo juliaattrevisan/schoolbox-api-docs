@@ -41,7 +41,6 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     const TASK_FETCH     = 'fetch';
     const TASK_PUBLISH   = 'publish';
     const TASK_DIGEST    = 'digest';
-    const TASK_REROUTE   = 'reroute';
     const TASK_TIMETABLE = 'timetable';
 
     protected $flywheelSpins;
