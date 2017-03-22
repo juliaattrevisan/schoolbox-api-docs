@@ -14,7 +14,7 @@ cd $WD_ROOT;
 
 # slay the demons
 service schoolbox-scheduled stop
-service schoolbox-rerouted stop
+service schoolbox-routed stop
 service schoolbox-socketd stop
 service schoolbox-digestd stop
 
@@ -32,7 +32,7 @@ mysql schoolbox < sql/notifications-all-instant.sql
 
 # create a special hell for yourself (we don't need socket or digest presently)
 service schoolbox-scheduled start
-service schoolbox-rerouted start
+service schoolbox-routed start
 
 # run the test case
 php test/notif/harness.php 2> /dev/null
