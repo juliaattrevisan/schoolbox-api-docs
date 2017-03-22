@@ -28,8 +28,8 @@ class Completion extends AbstractMarkScheme
     /**
      * Returns a string representation of a normalised Mark
      *
-     * @param mixed                       $normalisedMark  - ignored, even if invalid
-     * @param IResponse|null $response
+     * @param mixed          $normalisedMark ignored, even if invalid
+     * @param IResponse|null $response       Most recent submitted IResponse
      * @return string|null
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
