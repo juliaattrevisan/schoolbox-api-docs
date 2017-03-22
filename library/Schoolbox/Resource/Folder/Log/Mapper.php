@@ -93,7 +93,7 @@ class Mapper extends Schoolbox\Mapper
 
         /* Manually construct hierarchy of items
          */
-        $collection = new Schoolbox\Collection();
+        $collection = $this->createCollection();
 
         $categoryMapper = $this->getJoinMapper('category');
         $userMapper     = $this->getJoinMapper('user');
