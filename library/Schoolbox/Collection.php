@@ -49,10 +49,9 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * @param ICollection $collection
      * @return static
      */
-    public function emptyClone(ICollection $collection)
+    public function emptyClone()
     {
         return new static();
     }
@@ -499,7 +498,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function merge(Collection $other)
     {
-        $merged = $this->emptyClone($this);
+        $merged = $this->emptyClone();
         $merged->setStack(array_merge($this->getStack(), $other->getStack()));
         return $merged;
     }
@@ -516,7 +515,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function union(Collection $other)
     {
-        $merged = $this->emptyClone($this);
+        $merged = $this->emptyClone();
         $merged->setStack($this->getStack() + $other->getStack());
         return $merged;
     }
@@ -635,7 +634,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function diff(Collection $otherCollection, $diffMethod = null)
     {
-        $diff = $this->emptyClone($this);
+        $diff = $this->emptyClone();
 
         if (!is_callable($diffMethod)) {
             $diffMethod = function ($a, $b) {
@@ -688,7 +687,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function filter(callable $callback)
     {
-        $return = $this->emptyClone($this);
+        $return = $this->emptyClone();
         foreach ($this as $key => $item) {
             if (call_user_func($callback, $item)) {
                 $return->offsetSet($key, $item);
@@ -761,7 +760,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         foreach ($this as $item) {
             $key = call_user_func($callback, $item);
             if (!isset($result[$key])) {
-                $result[$key] = $this->emptyClone($this);
+                $result[$key] = $this->emptyClone();
             }
             $result[$key]->add($item);
         }
@@ -781,7 +780,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function slice($offset, $count = null, $preserve_keys = false)
     {
-        $copy = $this->emptyClone($this);
+        $copy = $this->emptyClone();
         $copy->stack = array_slice($this->stack, $offset, $count, $preserve_keys);
         return $copy;
     }
@@ -810,7 +809,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function filterByCallback($callback)
     {
-        $result = $this->emptyClone($this);
+        $result = $this->emptyClone();
         foreach ($this as $item) {
             if (call_user_func($callback, $item)) {
                 $result->add($item);
@@ -875,7 +874,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function deepClone()
     {
-        $clone = $this->emptyClone($this);
+        $clone = $this->emptyClone();
         foreach ($this as $key => $value) {
             if (is_object($value)) {
                 $clone[$key] = clone $value;

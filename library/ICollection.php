@@ -26,8 +26,7 @@ interface ICollection extends IteratorAggregate, Countable {
     /**
      * Each ICollection implementation knows how to create an empty clone of itself
      *
-     * @param ICollection $collection
      * @return static
      */
-    public function emptyClone(ICollection $collection);
+    public function emptyClone();
 }
