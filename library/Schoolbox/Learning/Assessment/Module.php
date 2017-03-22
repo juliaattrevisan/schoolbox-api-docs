@@ -211,14 +211,9 @@ class Module extends BaseModule
             }
             /* Allow read-accessors to see Summary
              */
-            elseif ($access == UserAccess::ACCESS_READ) {
+            else {
                 /** @var IAssessable $assessment */
                 $participant = $assessment->getParticipant($student);
-            }
-            /* Nobody else allowed
-             */
-            else {
-                throw new Forbidden();
             }
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
