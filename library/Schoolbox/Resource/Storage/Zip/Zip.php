@@ -44,23 +44,10 @@ class Zip
     private $zipArchiveAdapter;
 
     /**
-     * Create new ZIP file in temporary storage
-     * @param string $filename
-     * @return Zip
-     */
-    public static function CreateTemporaryArchive($filename)
-    {
-        $zip = new Zip();
-        $zip->filename = $filename;
-        $zip->zipArchiveAdapter = new ZipArchiveAdapter($zip->getTemporaryFilename());
-        $zip->zipFilesystem = new Filesystem($zip->zipArchiveAdapter);
-        return $zip;
-    }
-
-    /**
      * Constructor
+     * @param string $filename Optional filename to initialise the archive
      */
-    public function __construct()
+    public function __construct($filename = null)
     {
         $this->configLoader = new ConfigLoader();
         $this->storageMapper = StorageMapper::getInstance();
@@ -68,6 +55,12 @@ class Zip
         $this->mimetypeMapper = MimetypeMapper::getInstance();
 
         register_shutdown_function([$this, 'shutdown']);
+
+        if ($filename != null) {
+            $this->filename = $filename;
+            $this->zipArchiveAdapter = new ZipArchiveAdapter($this->getTemporaryFilename());
+            $this->zipFilesystem = new Filesystem($this->zipArchiveAdapter);
+        }
     }
 
     /**

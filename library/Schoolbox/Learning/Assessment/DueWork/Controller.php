@@ -109,7 +109,7 @@ class Controller extends Assessment\Controller
             foreach ($participant->getAllResponses() as $response) {
                 // If the response is a submission...
 
-                if ($response instanceof Submission) {
+                if ($response instanceof Submission && !$response->isDraft()) {
                     if ($response->getAllFiles()->count() > 0) {
                         return true;
                     }
@@ -251,9 +251,10 @@ class Controller extends Assessment\Controller
 
         // Create a zip file to hold the downloaded submissions
 
-        $date = \Alaress_Date_Format::now()->getDatabase();
+        $titleSanitized = preg_replace("/[^A-Za-z0-9]/", '', $assessment->getTitle());
+        $dateNow = \Alaress_Date_Format::now()->getUsingFormat('md-His');
 
-        $zip = Zip::CreateTemporaryArchive("{$assessment->getTitle()} Submissions - {$date}.zip");
+        $zip = new Zip("{$titleSanitized}-{$dateNow}.zip");
 
         // Iterate participants and get their responses
 
@@ -277,11 +278,14 @@ class Controller extends Assessment\Controller
 
                 if ($response instanceof Submission && !$response->isDraft())
                 {
-                    $directory = sprintf("%s, %s (%s) - %s",
-                        $users[$participant->getUser()->getId()]->getLastname(),
-                        $users[$participant->getUser()->getId()]->getFirstname(),
+                    $lastNameSanitized = preg_replace("/[^A-Za-z0-9]/", '', $users[$participant->getUser()->getId()]->getLastname());
+                    $firstNameSanitized = preg_replace("/[^A-Za-z0-9]/", '', $users[$participant->getUser()->getId()]->getFirstname());
+
+                    $directory = sprintf("%s_%s_%s-%s",
+                        $lastNameSanitized,
+                        $firstNameSanitized,
                         $users[$participant->getUser()->getId()]->getId(),
-                        $response->getSubmittedAt()->getDatabase()
+                        $response->getSubmittedAt()->getUsingFormat('md-His')
                     );
 
                     // ...iterate all files in that submission and add them to the ZIP archive
@@ -291,7 +295,8 @@ class Controller extends Assessment\Controller
                     /** @var File $file */
                     foreach ($files as $file)
                     {
-                        $zipFilename = sprintf("%s/%s.%s", $directory, $file->getFilename(), $file->getExtension());
+                        $filenameSanitized = preg_replace("/[^A-Za-z0-9]/", '', $file->getBasename());
+                        $zipFilename = sprintf("%s/%s", $directory, $filenameSanitized);
                         $zip->addStream($file->readStream(), $zipFilename);
                     }
                 }
