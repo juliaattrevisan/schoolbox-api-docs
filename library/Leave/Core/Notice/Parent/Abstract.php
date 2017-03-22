@@ -74,11 +74,24 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
         $allParents = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getExternalId());
 
         if (is_array($allParents)) {
+            $emailList = Array();
+
             foreach ($allParents as $parent) {
+                $email1 = $parent['StudentContactDefaultEmail'];
+                if (!in_array($email1, $emailList, true)){
+                    $emailList[] = $email1;
+                }
+                $email2 = $parent['StudentContactSpouseDefaultEmail'];
+                if (!in_array($email2, $emailList)){
+                    $emailList[] = $email2;
+                }
+            }
+
+            foreach ($emailList as $parentEmail) {
                 if (Cfg::get('debug_email_address') != '') {
                     $email = new \Email(Cfg::get('debug_email_address'));
                 } else {
-                    $email = new \Email($parent['StudentContactDefaultEmail']);
+                    $email = new \Email($parentEmail);
                 }
 
                 /* Only send if the email is valid
