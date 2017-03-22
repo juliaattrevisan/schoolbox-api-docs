@@ -246,7 +246,7 @@ class DataSource
 
                         // Find participant, creating if required
                         if ($assessment->isParticipant($responseUser)) {
-                            $responseParticipant = $assessment->getParticipant($responseUser);
+                            $responseParticipant = $assessment->getParticipant($this->userMapper->findById($responseUser->getId()));
 
                         } else {
                             // Add them
@@ -276,7 +276,7 @@ class DataSource
 
                         // Find participant, creating if required
                         if ($assessment->isParticipant($feedbackUser)) {
-                            $responseParticipant = $assessment->getParticipant($feedbackUser);
+                            $responseParticipant = $assessment->getParticipant($this->userMapper->findById($feedbackUser->getId()));
 
                         } else {
                             // Add them
