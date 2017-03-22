@@ -11,14 +11,13 @@ namespace Schoolbox\Realtime\Routing\Subscription\Loader;
 use InvalidArgumentException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
-use Redis;
 use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\UserMapper;
 
 class Factory
 {
     /**
-     * @var Redis|ClientInterface
+     * @var ClientInterface
      */
     private $redis;
     /**
@@ -27,8 +26,6 @@ class Factory
     private $log;
 
     /**
-     * Factory constructor.
-     *
      * @param ClientInterface $redis
      * @param LoggerInterface $log
      */
