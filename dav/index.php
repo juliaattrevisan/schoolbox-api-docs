@@ -8,8 +8,6 @@
 
 require_once dirname(__FILE__) . '/../library/Bootstrap.php';
 
-include dirname(__FILE__) . '/../library/Session.php';
-
 $publicdir = new DAV_Folder('');
 
 $server = new Sabre\DAV\Server($publicdir);
