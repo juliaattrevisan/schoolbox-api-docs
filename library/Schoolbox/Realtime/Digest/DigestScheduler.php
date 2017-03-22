@@ -15,41 +15,49 @@ use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pool;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Alaress\WorkerCrew\Worker\Worker;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\Stomp\Client;
-use React\Stomp\Protocol\Frame;
 use RuntimeException;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
+use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
-class DigestScheduler extends CronScheduler {
+class DigestScheduler extends CronScheduler
+{
 
 	/** @var DigestTrigger[] */
 	protected $triggers = array();
 
+	/** @var WorkNotifier */
+	private $workNotifier;
+
 
     /**
-     * @param LoopInterface $loop
+     * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param Client $client
-     * @param LoggerInterface $log
-     * @param IConfigLoader $conf
+     * @param WorkNotifier              $notifier
+     * @param LoggerInterface           $log
+     * @param IConfigLoader             $conf
      */
-    public function __construct($loop, $dispatchStrategy, $client, $log, $conf = null) {
+    public function __construct(
+        LoopInterface $loop,
+        DispatchStrategyInterface $dispatchStrategy,
+        WorkNotifier $notifier,
+        LoggerInterface $log,
+        IConfigLoader $conf = null
+    ) {
         parent::__construct($loop, $dispatchStrategy, $log, $conf);
         $this->method = DefaultDispatchStrategy::TASK_DIGEST;
+        $this->workNotifier = $notifier;
 
-		$this->on(SIGHUP, array($this, 'onReload'));
+		$this->on(SIGHUP, [ $this, 'onReload' ]);
 
 		// instantiate schedule
 		$this->reload();
-	}
+    }
 
 
 	/**
@@ -64,9 +72,10 @@ class DigestScheduler extends CronScheduler {
 	/**
 	 * Drop existing schedule and reinitialise
 	 *
-	 * @return bool
+	 * @return void
 	 */
-	public function reload() {
+	public function reload()
+    {
 		// drop existing
 		foreach($this->triggers as $k => $t) {
 			$this->unschedule($t);
@@ -88,14 +97,14 @@ class DigestScheduler extends CronScheduler {
 			}
 
 			try {
-				$this->triggers[$role->getId()] = new DigestTrigger($schedule, $role);
+				$this->triggers[$role->getId()] = new DigestTrigger($this->workNotifier, $schedule, $role);
 				$this->scheduleNotification($this->triggers[$role->getId()]);
-			}
-			catch(InvalidArgumentException $e) {
-				$this->log->error(get_class($e) . "in DigestScheduler: " . $e->getMessage());
-			}
-			catch(RuntimeException $e) {
-				$this->log->error(get_class($e) . "in DigestScheduler: " . $e->getMessage());
+
+			} catch(InvalidArgumentException $e) {
+				$this->log->error(get_class($e) . 'in DigestScheduler: ' . $e->getMessage());
+
+			} catch(RuntimeException $e) {
+				$this->log->error(get_class($e) . 'in DigestScheduler: ' . $e->getMessage());
 			}
 		}
 	}
@@ -109,7 +118,7 @@ class DigestScheduler extends CronScheduler {
     public function handleError($trigger, $command, $data)
     {
         // we are assured that the worked that caused this error has already died
-        $this->log->warning("Worker failed to complete, resetting digest triggers");
+        $this->log->warning('Worker failed to complete, resetting digest triggers');
         $this->reload();
     }
 
@@ -118,11 +127,11 @@ class DigestScheduler extends CronScheduler {
 	 * Report in an appropriate way, based on the data returned by the worker
 	 *
 	 * @param $data
-	 * @return mixed
+	 * @return void
 	 */
-	protected function report($data) {
-		$this->log->notice("Emails sent: ".unserialize($data[0]));
+	protected function report($data)
+    {
+		$this->log->notice('Emails sent: ' . unserialize($data[0]));
 	}
-
 
 }

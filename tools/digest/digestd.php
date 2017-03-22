@@ -3,12 +3,14 @@
 
 use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Notifactory;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Digest\DigestScheduler;
+use Schoolbox\Realtime\Digest\MailNotifier;
+use Schoolbox\Realtime\MessageList\Factory;
+
 
 /**
  * The Digest Daemon.
@@ -43,42 +45,16 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Digest', array(
 
 
 // CREATE DIGEST APP
-$kernel->run(function($di, $loop, $log, $opts) {
-	/**
-	 * @var Di\Container $di
-	 * @var LoopInterface $loop
-	 * @var LoggerInterface $log
-	 * @var array $opts
-	 */
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
-	try {
+    /** @var IConfigLoader $conf */
+    $conf = $di->get('config');
 
-        // make sure our endpoint exists
-        $mqc = \Schoolbox\Notif\MQ\Connector::getInstance();
-        $q   = INSTANCE_ID . DigestScheduler::QUEUE_COMMAND;
+    /** @var ClientInterface $redis */
+    $redis = $di->get('redis');
 
-        $mqc->declareQueue($q)
-            ->bindQueue($q, '*.' . Notif::TOPIC_CMD_DIGEST);
+    $dispatch = new DefaultDispatchStrategy($opts['flags']);
+    $notifier = new MailNotifier(new Factory(INSTANCE_ID, $redis));
 
-        $conf = new \Schoolbox\Config\Loader();
-
-        $stompFactory = new \React\Stomp\Factory($loop);
-        $client = $stompFactory->createClient(array(
-            'host'      => $conf->get('amqp_host'),
-            'port'      => $conf->get('amqp_stomp_port'),
-            'vhost'     => $conf->get('amqp_vhost'),
-            'login'     => $conf->get('amqp_user'),
-            'passcode'  => $conf->get('amqp_pass'),
-        ));
-
-        new DigestScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $client, $log, $conf);
-	}
-	catch(AMQPRuntimeException $e) {
-		$log->alert("Unable to connect to RabbitMQ: server is offline.");
-		/** @var Notif $n */
-		$n = $di->get('notif');
-		$n->setTopic(Notif::TOPIC_NOTIFICATION)->alert('RabbitMQ is offline');
-		throw $e;
-	}
-
+    new DigestScheduler($loop, $dispatch, $notifier, $log, $conf);
 });
