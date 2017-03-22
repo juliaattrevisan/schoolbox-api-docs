@@ -15,9 +15,12 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as File;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
@@ -28,17 +31,18 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmis
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\Zip\Zip;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 
 class Controller extends Assessment\Controller
 {
-
     /** @var Rubric\ResultMapper */
     private $resultSetMapper;
 
@@ -88,6 +92,33 @@ class Controller extends Assessment\Controller
         $this->participantMapper     = $participantMapper;
     }
 
+    /**
+     * Determine if there are any submission files available for download on the assessment
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    private function hasDownloadableSubmissionFiles($assessment)
+    {
+        // Grab all participants in the assessment
+
+        /** @var Participant $participant */
+        foreach ($assessment->getAllParticipants() as $participant) {
+            // Iterate all their responses
+
+            /** @var Submission $response */
+            foreach ($participant->getAllResponses() as $response) {
+                // If the response is a submission...
+
+                if ($response instanceof Submission && !$response->isDraft()) {
+                    if ($response->getAllFiles()->count() > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * This gives you a summary of progress made within an Assessment
@@ -100,12 +131,15 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
+        // Only display download link if there are actually files to download
+
         $twigData = [
             'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
             'type'        => Assessment\AssessmentType::objectToString($assessment),
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
+            'download'    => $this->hasDownloadableSubmissionFiles($assessment)
         ];
 
         $this->getResponse()->content->set(
@@ -144,7 +178,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var Submission\File\Model $submission */
+        /** @var File $submission */
         $allResponses = $participant->getAllResponses();
 
         $twigData = [
@@ -174,6 +208,118 @@ class Controller extends Assessment\Controller
                 $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
             )
         );
+    }
+
+    /**
+     * Recursive directory delete
+     * @param $dir
+     */
+    private function deleteDirectory($dir)
+    {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (filetype($dir . "/" . $object) == "dir") {
+                        $this->deleteDirectory($dir . "/" . $object);
+                    } else {
+                        unlink($dir . "/" . $object);
+                    }
+                }
+            }
+            reset($objects);
+            rmdir($dir);
+        }
+    }
+
+    /**
+     * Sanitize a string for use in filename
+     *
+     * @param string $string
+     * @return string
+     */
+    private function sanitizeForFilename($string) {
+        return preg_replace("/[^A-Za-z0-9. ]/", '_', $string);
+    }
+
+    /**
+     * Download all student submissions for a given assessable
+     * @api   GET /learning/assessments/:assessmentId/submissions/download
+     * @level 165
+     * @param IAssessable $assessment
+     */
+    public function downloadSubmissions(IAssessable $assessment)
+    {
+        // Retrieve all participants
+
+        $participants = $assessment->getAllParticipants();
+
+        // Cache users
+
+        /** @var User[] $users */
+        $users = [];
+
+        // Create a zip file to hold the downloaded submissions
+
+        $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
+        $dateNow = \Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
+
+        $zip = new Zip("{$titleSanitized}-{$dateNow}.zip");
+
+        // Iterate participants and get their responses
+
+        /** @var Participant $participant */
+        foreach ($participants as $participant)
+        {
+            // Get the users details and generate an appropriate folder name with the date/time stamp of the submission
+
+            if (!isset($users[$participant->getUser()->getId()])) {
+                $users[$participant->getUser()->getId()] = $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
+            }
+
+            $responses = $participant->getAllResponses();
+
+            // Iterate all their responses
+
+            /** @var Submission $response */
+            foreach ($responses as $response)
+            {
+                // If the response is a submission...
+
+                if ($response instanceof Submission && !$response->isDraft())
+                {
+                    $lastNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getLastname());
+                    $firstNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getFirstname());
+
+                    $directory = sprintf("%s_%s_%s-%s",
+                        $lastNameSanitized,
+                        $firstNameSanitized,
+                        $users[$participant->getUser()->getId()]->getId(),
+                        $response->getSubmittedAt()->getUsingFormat('Ymd-His')
+                    );
+
+                    // ...iterate all files in that submission and add them to the ZIP archive
+
+                    $files = $response->getAllFiles();
+
+                    /** @var File $file */
+                    foreach ($files as $file)
+                    {
+                        $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
+                        $zipFilename = sprintf("%s/%s", $directory, $filenameSanitized);
+                        $zip->addStream($file->readStream(), $zipFilename);
+                    }
+                }
+            }
+        }
+
+        // Flush the ZIP file to before deleting the temporary files- otherwise we end up with an empty file
+
+        $zip->persist();
+
+        // Download the sucker
+
+        $zip->download();
     }
 
     /**
@@ -380,7 +526,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var Submission\File\Model $submission */
+        /** @var File $submission */
         $allResponses = $participant->getAllResponses();
 
         /* Work out if we are going to accept responses
@@ -406,7 +552,7 @@ class Controller extends Assessment\Controller
         /* Assume the most recent record is the latest submission
          */
         if ($allResponses->count()) {
-            /** @var Submission\Model $latestResponse */
+            /** @var Submission $latestResponse */
             $latestResponse = $participant->findMostRecentResponse();
 
             /* If the latest response is a draft, collect all its contents for editing
@@ -433,7 +579,7 @@ class Controller extends Assessment\Controller
                  * I would not expect it to recycle files from my previous Submitted submission
                  */
                 $latestResponse = null;
-                $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission\Model());
+                $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
             }
         }
         else {
@@ -441,7 +587,7 @@ class Controller extends Assessment\Controller
             /* Init a dangerZone that is ready to accept files for
              * the first ever draft
              */
-            $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission\Model());
+            $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
         }
 
         /* Pump into twig land
@@ -484,7 +630,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var Submission\File\Model $submission */
+        /** @var File $submission */
         $allResponses = $participant->getAllResponses();
 
         /* Work out if we are going to accept responses
@@ -779,14 +925,12 @@ class Controller extends Assessment\Controller
          */
         try {
             /** @var SubmissionBox $submitBox */
-            $submitBox = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
+            $submitBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
             $submitBox->setSkipUnsubmitted($skipUnsubmitted);
-            \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->save($submitBox);
+            SubmissionBoxMapper::getInstance()->save($submitBox);
         }
-        catch (\Schoolbox\Mapper\Exception $e) {
-
-            /* noop - submission box doesn't exist
-             */
+        catch (MapperException $e) {
+            // noop - submission box doesn't exist
         }
 
         $this->getResponse()->status->setCode(204);

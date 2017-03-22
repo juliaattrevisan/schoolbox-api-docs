@@ -230,8 +230,9 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     }
 
     function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score_title', $sort_dir = 'desc') {
+
         $keyword = $this->db->quote($keyword);
-        $sort_by_quote = Database::quoteIdentifier($sort_by);
+        $sort_by_quote = $this->db->quoteIdentifier($sort_by);
 
         $query = "SELECT `forumThread`.*, `forumPost`.*, `forumThread`.title AS `threadTitle`,
                             `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,

@@ -108,7 +108,7 @@ class Controller extends Assessment\Controller
              * finishing the modification of le quiz
              */
             'returnUrl' => Redirect::encode($baseUrl),
-            'returnUrlSuffix' => $returnUrlSuffix,
+            'returnUrlSuffix' => $returnUrlSuffix
         ];
 
         $this->getResponse()->content->set(
