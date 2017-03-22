@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * Mysql connector statement tests
+ *
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Alaress\Database\Test\Mysql;
+
+use Alaress\Database\Connector\Mysql\Connector;
+use Alaress\Database\Factory;
+use Database;
+use PHPUnit_Framework_TestCase;
+
+class TestConnector extends PHPUnit_Framework_TestCase
+{
+    /**
+     * Ensure we can establish a connection to vagrant Schoolbox database
+     */
+    public function testConnect()
+    {
+        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
+        // it tries to work out if we need to be in debug mode.
+        //
+        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
+
+        $database = Database::getInstance();
+        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
+
+        $schoolbox = Factory::CreateMysql();
+        $result = $schoolbox->connect(
+            '192.168.36.10',
+            'schoolbox',
+            'root',
+            'tnp879'
+        );
+
+        $this->assertTrue($result, "Failed to connect to Schoolbox database");
+    }
+
+    /**
+     * Test serialization of MySQL database connection
+     */
+    public function testSerialize()
+    {
+        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
+        // it tries to work out if we need to be in debug mode.
+        //
+        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
+
+        $database = Database::getInstance();
+        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
+
+        $connectorOriginal = Factory::CreateMysql();
+        $connectorOriginal->connect(
+            '192.168.36.10',
+            'schoolbox',
+            'root',
+            'tnp879'
+        );
+
+        $connectorSerialized = serialize($connectorOriginal);
+
+        /** @var Connector $connectorReconstituted */
+        $connectorReconstituted = unserialize($connectorSerialized);
+
+        $iterator = $connectorReconstituted->executeQueryIterator(
+            'select * from user where lastname = :lastname',
+            ['lastname' => 'rhodes']
+        );
+
+        foreach ($iterator as $row) {
+            $this->assertSame(strtolower($row['lastname']), 'rhodes');
+        }
+    }
+}
