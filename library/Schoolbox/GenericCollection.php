@@ -56,10 +56,9 @@ class GenericCollection extends Collection
     }
 
     /**
-     * @param ICollection $collection
      * @return static
      */
-    public function emptyClone(ICollection $collection)
+    public function emptyClone()
     {
         return new static($this->getElementClass());
     }
