@@ -81,7 +81,7 @@ abstract class AMQPConnector implements AMQPInterface {
 
 	/**
 	 * Closes the existing connection
-	 * @return self
+	 * @return $this
 	 */
 	public function closeConnection() {
 		$this->conn->close();
@@ -118,7 +118,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	 *
 	 * @param AMQPExchange $exchange
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function declareExchange($exchange, $channelId = null) {
 		$this->getChannel($channelId)->exchange_declare(
@@ -135,7 +135,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	 * @param string $name
 	 * @param string $channelId
 	 * @throws RuntimeException
-	 * @return self
+	 * @return $this
 	 */
 	public function declareQueue($name, $channelId = null) {
 		try {
@@ -159,7 +159,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	 * @param string $exchangeName
 	 * @param string $routingKey
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function bindExchange($exchangeName, $routingKey, $channelId = null) {
 		$this->getChannel($channelId)->exchange_bind($exchangeName, $this->getPrimaryExchange()->getName(), $routingKey);
@@ -174,12 +174,12 @@ abstract class AMQPConnector implements AMQPInterface {
 	 * @param string $routingKey
 	 * @param string $exchangeName
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function bindQueue($queueName, $routingKey, $exchangeName = '', $channelId = null) {
 		$exchangeName = $exchangeName ?: $this->getPrimaryExchange()->getName();
 		$this->getChannel($channelId)->queue_bind($queueName, $exchangeName, $routingKey);
-		return $this->getChannel($channelId);
+		return $this;
 	}
 
 
@@ -190,12 +190,12 @@ abstract class AMQPConnector implements AMQPInterface {
 	 * @param string $routingKey
 	 * @param string $exchangeName
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function unbindQueue($queueName, $routingKey, $exchangeName = '', $channelId = null) {
 		$exchangeName = $exchangeName ?: $this->getPrimaryExchange()->getName();
 		$this->getChannel($channelId)->queue_unbind($queueName, $exchangeName, $routingKey);
-		return $this->getChannel($channelId);
+		return $this;
 	}
 
 
@@ -205,11 +205,11 @@ abstract class AMQPConnector implements AMQPInterface {
 	 * @param string $exchangeName
 	 * @param string $routingKey
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function unbindExchange($exchangeName, $routingKey, $channelId = null) {
 		$this->getChannel($channelId)->exchange_unbind($exchangeName, $this->getPrimaryExchange()->getName(), $routingKey);
-		return $this->getChannel($channelId);
+		return $this;
 	}
 
 
@@ -218,7 +218,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	 *
 	 * @param AMQPMessage $message
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function acceptMessage($message, $channelId = null) {
 		$this->getChannel($channelId)->basic_ack($message->delivery_info['delivery_tag']);
@@ -231,7 +231,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	 *
 	 * @param AMQPMessage[] $messages
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function acceptMessages($messages, $channelId = null) {
 		foreach($messages as $m) {
@@ -247,7 +247,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	 * @param AMQPMessage[] $messages
 	 * @param bool $requeue
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function rejectMessages($messages, $requeue = true, $channelId = null) {
 		foreach($messages as $m) {
@@ -263,7 +263,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	 * @param AMQPMessage $message
 	 * @param bool $requeue
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function rejectMessage($message, $requeue = true, $channelId = null) {
 		$this->getChannel($channelId)->basic_reject($message->delivery_info['delivery_tag'], $requeue);
@@ -290,7 +290,7 @@ abstract class AMQPConnector implements AMQPInterface {
      * @param string             $routingKey
      * @param array              $properties
      * @param string             $channelId
-     * @return self
+     * @return $this
      */
 	public function publish($message, $routingKey, $properties = array(), $channelId = null) {
 		// wrap message in object if it's not already
@@ -314,7 +314,7 @@ abstract class AMQPConnector implements AMQPInterface {
      *
      * @param string $queueName
      * @param string $channelId
-     * @return self
+     * @return $this
      */
     public function deleteQueue($queueName, $channelId = null)
     {
@@ -326,7 +326,7 @@ abstract class AMQPConnector implements AMQPInterface {
     /**
      * @param string $exchangeName
      * @param string $channelId
-     * @return self
+     * @return $this
      */
     public function deleteExchange($exchangeName, $channelId = null)
     {

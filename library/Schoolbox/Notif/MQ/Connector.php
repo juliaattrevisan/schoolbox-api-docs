@@ -38,9 +38,6 @@ class Connector extends AMQPConnector {
 	const PRIMARY_EXCHANGE = 'sb.%s.tx';
 	const PRIMARY_TYPE     = 'topic';
 
-	const SECONDARY_NAME   = 'sb.%s.ux.%s';
-	const SECONDARY_TYPE   = 'topic';
-
 	/** @var IConfigLoader */
 	protected $conf;
 
@@ -77,15 +74,6 @@ class Connector extends AMQPConnector {
 	 */
 	public function getPrimaryExchange() {
 		return new AMQPExchange(sprintf(self::PRIMARY_EXCHANGE, INSTANCE_ID), self::PRIMARY_TYPE);
-	}
-
-
-	/**
-	 * @param string $name
-	 * @return AMQPExchange
-	 */
-	public function getSecondaryExchange($name) {
-		return new AMQPExchange(sprintf(self::SECONDARY_NAME, INSTANCE_ID, $name), self::SECONDARY_TYPE);
 	}
 
 
