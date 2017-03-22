@@ -76,10 +76,10 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
             [
                 'owner'  => $this->getUser()->getId(),
                 'box_id' => $this->getAssessment()->getId(),
-                'draft'  => false,
+//                'draft'  => false,
             ],
             [
-                'order' => ['realname' => 'asc', 'id' => 'asc',]
+                'order' => [/*'realname' => 'asc', */'id' => 'asc',]
             ]
         );
         foreach ($files as $file) {
@@ -88,22 +88,23 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
                 continue;
             }
 
-            /** @var Storage\Model $storage */
-            $storage = $file->getStorage();
+            foreach ($file->getFiles() as $subFile) {
+                if ($subFile->exists()) {
+                    $child = new DAV_SubjectServer_Submission(
+                        $nameGenerator->getUniqueChildName(
+                            $this,
+                            $nameGenerator->sanitiseName($subFile->getBasename())
+                        ),
+                        $subFile->readStream()
+                    );
+                    $child
+                        ->setUser($this->getUser())
+                        ->setSubmission($subFile);
+                    $this->addChild($child);
+                }
 
-            if ($storage->exists()) {
-                $child = new DAV_SubjectServer_Submission(
-                    $nameGenerator->getUniqueChildName(
-                        $this,
-                        $nameGenerator->sanitiseName($file->getBasename())
-                    ),
-                    $storage->readStream()
-                );
-                $child
-                    ->setUser($this->getUser())
-                    ->setSubmission($file);
-                $this->addChild($child);
             }
+
         }
         return $this;
     }

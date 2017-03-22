@@ -20,7 +20,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     protected $user;
 
     /**
-     * @var Submission\Submission
+     * @var Submission\SingleFile\Model
      */
     protected $submission;
 
@@ -44,7 +44,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     }
 
     /**
-     * @param Submission\Submission $submission
+     * @param Submission\SingleFile\Model $submission
      *
      * @return $this
      */
@@ -55,7 +55,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     }
 
     /**
-     * @return Submission\Submission
+     * @return Submission\SingleFile\Model
      */
     public function getSubmission()
     {
@@ -97,7 +97,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     public function getLastModified()
     {
         $submission = $this->getSubmission();
-        if ($submission instanceof Submission\Submission) {
+        if ($submission instanceof Submission\SingleFile\Model) {
             $date = $submission->getCreatedAt();
             if ($date instanceof Alaress_Date_Format && !$date->isNull()) {
                 return $date->getUnixTimestamp();
