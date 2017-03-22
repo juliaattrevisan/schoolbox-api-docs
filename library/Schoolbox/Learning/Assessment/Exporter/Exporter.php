@@ -92,7 +92,7 @@ class Exporter
              */
             $openBracketPos = strpos($result['name'], '[');
             $closeBracketPos = strrpos($result['name'], ']');
-            if ($openBracketPos === false && $closeBracketPos === false) {
+            if ($openBracketPos !== false && $closeBracketPos !== false) {
                 $codeLength = $closeBracketPos - $openBracketPos;
                 $assessmentCode = substr($result['name'], $openBracketPos + 1, $codeLength - 1);
             } else {
