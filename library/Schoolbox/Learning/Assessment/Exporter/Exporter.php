@@ -83,13 +83,16 @@ class Exporter
 
         foreach ($statement as $result) {
 
-            /* Get the assessment code out of the submission box name
-             * Note: this will be phased out once De La Salle have their assessment codes moved from
-             *       assessment titles to assessment types
+            /*
+             * Check if there are square brackets inside the submission box name, if so - pull the contents from
+             * inside the square brackets and use as assessment code (original way this was built for DLSC).
+             * If square brackets aren't found then use the assessment type (new way that will be standard).
+             * Note: the square bracket check will be phased out when we have moved De La Salle's assessment codes
+             * from inside the title to assessment types.
              */
             $openBracketPos = strpos($result['name'], '[');
             $closeBracketPos = strrpos($result['name'], ']');
-            if ($openBracketPos === -1 && $closeBracketPos === -1) {
+            if ($openBracketPos === false && $closeBracketPos === false) {
                 $codeLength = $closeBracketPos - $openBracketPos;
                 $assessmentCode = substr($result['name'], $openBracketPos + 1, $codeLength - 1);
             } else {
