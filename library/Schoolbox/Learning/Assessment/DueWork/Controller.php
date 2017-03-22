@@ -262,7 +262,7 @@ class Controller extends Assessment\Controller
         // Create a zip file to hold the downloaded submissions
 
         $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
-        $dateNow = \Alaress_Date_Format::now()->getUsingFormat('md-His');
+        $dateNow = \Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
 
         $zip = new Zip("{$titleSanitized}-{$dateNow}.zip");
 
