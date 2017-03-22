@@ -123,7 +123,7 @@ class Queue extends ResourceVideo
         if ($return == 0) {
             return true;
         } else {
-            throw new \RuntimeException($message);
+            throw new \RuntimeException(implode(' ',$message));
         }
 
     }
@@ -271,7 +271,7 @@ class Queue extends ResourceVideo
                 throw new \RuntimeException($output);
             }
         }
-        throw new \RuntimeException($message);
+        throw new \RuntimeException(implode(' ',$message));
 
 
     }
