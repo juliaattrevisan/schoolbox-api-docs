@@ -57,6 +57,13 @@ class Completion extends AbstractMarkScheme
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getPublishedNormalisedMark(Participant $participant)
+    {
+        return $this->getNormalisedMark(null, $participant->findMostRecentSubmittedResponse());
+    }
 
     /**
      * @inheritdoc
