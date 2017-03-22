@@ -19,7 +19,7 @@
             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
         </div>
     </div>
-    {% if modifyRoute or deleteRoute %}
+    {% if (modifyRoute or deleteRoute) and not readOnly %}
         <nav><a href="#" class="icon-more" data-dropdown="duework-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
             {% spaceless %}
