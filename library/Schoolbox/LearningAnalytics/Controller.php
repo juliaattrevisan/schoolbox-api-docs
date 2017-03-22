@@ -191,82 +191,42 @@ class Controller extends Base
 
 
     /**
-     * Generate a set of terms that have data, so we can insert in navigation context selector
+     * Return a collection of Terms, where each term contains 1 or more assessment due dates
      *
      * Filter by class if supplied.
      *
      * @param CourseSpecification $courseSpec
-     * @param Folder              $class
+     * @param Folder              $classFolder
      * @return Term[]|GenericCollection
-     * @todo - needs to return a list of terms that contain assessments that are due in that term
      */
-    protected function getSelectableTerms(CourseSpecification $courseSpec, Folder $class = null)
+    protected function getNavigableTerms(CourseSpecification $courseSpec, Folder $classFolder = null)
     {
-        // Get all courses imported from our courseSpec
-        $courseImplMapper = CourseImplementationMapper::getInstance();
-        $courseImpls = $courseImplMapper->findAllByCourseSpecificationId($courseSpec->getId(), [], true);
-        $courseImplsPerClass = $courseImpls->groupByCallback(function(CourseImplementation $courseImpl){
-            return $courseImpl->getFolder()->getId();
-        });
-
-        /** @var Term[]|GenericCollection $allTerms */
+        /** @var GenericCollection|Term[] $allTerms */
         $allTerms = $this->termMapper->findAll()->indexBy('id');
+        $navigableTerms = $this->termMapper->createCollection();
 
-        $termsWithResults = $this->filterTermsWithResults($allTerms, $courseImplsPerClass, $class);
-
-        return $termsWithResults->sortByCallback(function(Term $term1, Term $term2){
-            return $term1->compare($term2);
-        });
-    }
-
-    /**
-     * @param Term[]|Collection                               $allTerms
-     * @param CourseImplementation[][]|Collection[]|Collection $courseImplsPerClass
-     * @param Folder|null $class
-     * @return Term[]|GenericCollection $terms
-     */
-    protected function filterTermsWithResults(Collection $allTerms, Collection $courseImplsPerClass, Folder $class = null)
-    {
-        $terms = $this->termMapper->createCollection();
-
-        foreach($courseImplsPerClass as $classFolderId => $courseImpls){
-
-            // Are we filtering for a specific class ? And it doesn't match this set of courseImports?
-            if($class && $class->getId() !== $classFolderId){
+        foreach($courseSpec->getCourseImplementations() as $courseImpl){
+            // Are we in 'class' (not cohort) context? And courseImpl not for this class ?
+            if($classFolder && $courseImpl->getFolder()->getId() !== $classFolder->getId()){
                 continue;
             }
 
-            // Examine all courses imported to this folder
-            /** @var CourseImplementation[] $courseImpls */
-            foreach($courseImpls as $courseImpl){
-                // Examine all unitImpls in the courseImpl
-                foreach($courseImpl->getUnits() as $unitImpl){
-                    // Examine each term that is yet to be confirmed
-                    foreach($allTerms as $term){
-                        // Does this unit start after the term begins?
-                        if($unitImpl->getOpenDate()->compareDateOnly($term->getStart()) >= 0){
-                            // Does the unit end before the term finishes?
-                            if($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->compareDateOnly($term->getActualFinish()) <= 0 ){
-                                // The unit is inside the term.
-
-                                // Add to our list to display
-                                $terms->setOffset($term->getId(), $term);
-
-                                // Remove from available so we don't traverse again
-                                $allTerms->offsetUnset($term->getId());
-
-                                // Have we selected all terms?
-                                if(!$allTerms->count()){
-                                    // We're done. Bug out.
-                                    return $terms;
-                                }
-                            }
+            foreach($courseImpl->getUnits() as $unitImpl){
+                foreach($unitImpl->getAssessables() as $a){
+                    foreach($allTerms as $t){
+                        // Is this Assessment due in this Term?
+                        if($t->getStart()->lte($a->getDueAt()) && ($t->getActualFinish()->isNull() || $t->getActualFinish()->gt($a->getDueAt()))){
+                            $navigableTerms->setOffset($t->getId(), $t);
+                            break;
                         }
                     }
                 }
             }
         }
-        return $terms;
+
+        return $navigableTerms->sortByCallback(function(Term $term1, Term $term2){
+            return $term1->compare($term2);
+        });
     }
 
 
@@ -319,8 +279,8 @@ class Controller extends Base
          */
         $submissionTypes = new SubmissionTypes($submissionTypeId);
 
-        /** @var Term[]|GenericCollection $selectableTerms */
-        $selectableTerms = $this->getSelectableTerms($courseSpecification);
+        /** @var Term[]|GenericCollection $navigableTerms */
+        $navigableTerms = $this->getNavigableTerms($courseSpecification, $selectedClassFolder);
 
         $data = [
             'courseSpec'       => $courseSpecification,
@@ -331,7 +291,7 @@ class Controller extends Base
             'route'            => $routeType,
             'folders'          => $metadata->getUnitImplementationFolders(),
             'term'             => $term,
-            'terms'            => $selectableTerms,
+            'terms'            => $navigableTerms,
             'overallProgress'  => $analysis->getOverallProgress(),
             'ranking' => [
                 'top'    => $analysis->getCohortRankings(SORT_DESC),
