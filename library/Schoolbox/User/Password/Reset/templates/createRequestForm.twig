@@ -20,9 +20,9 @@
                 </div>
             {% endif %}
 
-        {% else %}
+        {% elseif config.forgotten_password_desc|trim is not empty %}
             <div class="alert-box">
-                Please enter your email address or username below - we will send a link for you to reset your password. This feature works for parents only.
+                {{ config.forgotten_password_desc|purify }}
             </div>
         {% endif %}
 
