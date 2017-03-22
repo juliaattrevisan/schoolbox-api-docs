@@ -168,19 +168,15 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getDayName($dayNumber)
     {
-        $queryDay = "
-           SELECT     DayName 
-           FROM       V_TimetableStructure
-           WHERE      DayID = $dayNumber
-        ";
+        $names = [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thusday',
+            'Friday'
+        ];
 
-        $day = $this->getDatabase()->getRow($queryDay);
-
-        if ($day) {
-            return $day['DayName'];
-        }
-
-        return $dayNumber;
+        return $names[($dayNumber - 1) % 5];
     }
 
     /**
