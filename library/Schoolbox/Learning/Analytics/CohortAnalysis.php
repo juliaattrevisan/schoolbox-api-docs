@@ -336,6 +336,9 @@ class CohortAnalysis
             if (!$this->assessmentCache->offsetExists($assessmentSpec->getId())) {
                 // Insert AssessmentSpec into the list.
                 $this->assessmentCache->setOffset($assessmentSpec->getId(), $assessmentSpec);
+            } else {
+                // De-duplicate AssessmentSpec
+                $assessmentSpec = $this->assessmentCache->getOffset($assessmentSpec->getId());
             }
 
             foreach ($assessmentImpl->getAllParticipants() as $implParticipant) {
