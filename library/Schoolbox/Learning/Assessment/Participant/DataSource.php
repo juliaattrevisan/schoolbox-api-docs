@@ -244,6 +244,9 @@ class DataSource
                         /** @var IResponse $response */
                         $responseUser = $response->getSubmittedOnBehalfOf();
 
+                        //Ensure response user is fully hydrated
+                        $responseUser = $this->userMapper->findByIdWithFallback($responseUser->getId());
+
                         // Find participant, creating if required
                         if ($assessment->isParticipant($responseUser)) {
                             $responseParticipant = $assessment->getParticipant($responseUser);
@@ -273,6 +276,9 @@ class DataSource
                     foreach ($allFeedback[$assessment->getId()] as $feedback) {
                         /** @var IFeedback $feedback */
                         $feedbackUser = $feedback->getReviewee();
+
+                        //Ensure response user is fully hydrated
+                        $feedbackUser = $this->userMapper->findByIdWithFallback($feedbackUser->getId());
 
                         // Find participant, creating if required
                         if ($assessment->isParticipant($feedbackUser)) {

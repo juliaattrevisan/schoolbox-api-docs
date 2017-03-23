@@ -759,10 +759,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
         foreach ($this as $item) {
             $key = call_user_func($callback, $item);
-            if (!isset($result[$key])) {
-                $result[$key] = $this->emptyClone();
+            if (isset($key)) {
+                if (!isset($result[$key])) {
+                    $result[$key] = $this->emptyClone();
+                }
+                $result[$key]->add($item);
             }
-            $result[$key]->add($item);
         }
 
         return $result;
