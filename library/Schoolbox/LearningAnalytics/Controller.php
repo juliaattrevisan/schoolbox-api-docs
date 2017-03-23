@@ -13,6 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Alaress\Web\Controller\Base;
 
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -22,10 +23,12 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementa
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\LearningAnalytics\Results\SubmissionTypes;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType as SubmissionType;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
 
 class Controller extends Base
 {
@@ -60,13 +63,14 @@ class Controller extends Base
      *
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
-     * @param Collection|IAssessable[]        $assessmentsInTerm
+     * @param Collection|IAssessable[]        $gradableAssessments
      * @param Term                            $term
      * @throws ApplicationException
+     * @throws \DomainException
      */
-    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $assessmentsInTerm, Term $term)
+    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term)
     {
-        $this->process($courseSpecification, $unitImplsInTerm, $assessmentsInTerm, $term, 'course');
+        $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'course');
     }
 
 
@@ -98,14 +102,20 @@ class Controller extends Base
      *
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
-     * @param Collection|IAssessable[]        $assessmentsInTerm
+     * @param Collection|IAssessable[]        $gradableAssessments
      * @param Term                            $term
-     * @param int                             $submissionTypeId
+     * @param SubmissionType                  $submissionType
      * @throws ApplicationException
+     * @throws \DomainException
      */
-    public function courseWithSubmissionTypeAndTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $assessmentsInTerm, Term $term, $submissionTypeId)
-    {
-        $this->process($courseSpecification, $unitImplsInTerm, $assessmentsInTerm, $term, null, $submissionTypeId);
+    public function courseWithSubmissionTypeAndTerm(
+        CourseSpecification $courseSpecification,
+        Collection $unitImplsInTerm,
+        Collection $gradableAssessments,
+        Term $term,
+        SubmissionType $submissionType
+    ) {
+        $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'course', null, $submissionType);
     }
 
 
@@ -138,13 +148,14 @@ class Controller extends Base
      * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
-     * @param Collection|IAssessable[]        $assessmentsInTerm
+     * @param Collection|IAssessable[]        $gradableAssessments
      * @param Term                            $term
      * @throws ApplicationException
+     * @throws \DomainException
      */
-    public function folderWithTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $assessmentsInTerm, Term $term)
+    public function folderWithTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term)
     {
-        $this->process($courseSpecification, $unitImplsInTerm, $assessmentsInTerm, $term, 'folder', $classFolder);
+        $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'folder', $classFolder);
     }
 
 
@@ -179,19 +190,23 @@ class Controller extends Base
      * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
-     * @param Collection|IAssessable[]        $assessmentsInTerm
+     * @param Collection|IAssessable[]        $gradableAssessments
      * @param Term                            $term
-     * @param int                             $submissionTypeId
+     * @param SubmissionType                  $submissionType
      * @throws ApplicationException
+     * @throws \DomainException
      */
-    public function folderWithSubmissionTypeAndTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $assessmentsInTerm, Term $term, $submissionTypeId)
+    public function folderWithSubmissionTypeAndTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term, SubmissionType $submissionType)
     {
-        $this->process($courseSpecification, $unitImplsInTerm, $assessmentsInTerm, $term, 'folder', $classFolder, $submissionTypeId);
+        $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'folder', $classFolder, $submissionType);
     }
 
 
     /**
-     * Return a collection of Terms, where each term contains 1 or more assessment due dates
+     * Return a collection of Terms that contains 1 or more assessments that:
+     * * are due in that term
+     * * are not a Task, and
+     * * do not have a mark type of 'none'
      *
      * Filter by class if supplied.
      *
@@ -213,10 +228,19 @@ class Controller extends Base
 
             foreach($courseImpl->getUnits() as $unitImpl){
                 foreach($unitImpl->getAssessables() as $a){
+
+                    // Is Assessment a Task or has MarkType of 'None' ?
+                    if($a instanceof Task || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()){
+                        continue;
+                    }
+
                     foreach($allTerms as $t){
                         // Is this Assessment due in this Term?
                         if($t->getStart()->lte($a->getDueAt()) && ($t->getActualFinish()->isNull() || $t->getActualFinish()->gt($a->getDueAt()))){
                             $navigableTerms->setOffset($t->getId(), $t);
+
+                            // Remove from available terms to avoid repeated traversals
+                            $allTerms->offsetUnset($t->getId());
                             break;
                         }
                     }
@@ -244,28 +268,29 @@ class Controller extends Base
      * Both are processed identically as data is grouped based on task
      * instances' originating task id, not the individual instance id
      *
-     * @param CourseSpecification             $courseSpecification   spec from which all data on this page inherits
-     * @param Collection|UnitImplementation[] $unitImplsInTerm       units containing assessments due in current term
-     * @param Collection|IAssessable[]        $assessmentsInTerm     assessments due in current Term
-     * @param Term                            $term                  term to filter
-     * @param Folder                          $selectedClassFolder   if given, the class folder to filter
-     * @param string                          $routeType             'course'|'folder'
-     * @param null|int                        $submissionTypeId      if specified, a submission type filter
+     * @param CourseSpecification             $courseSpecification spec from which all data on this page inherits
+     * @param Collection|UnitImplementation[] $unitImplsInTerm     units containing assessments due in current term
+     * @param Collection|IAssessable[]        $gradableAssessments assessments due in current Term
+     * @param Term                            $term                term to filter
+     * @param Folder                          $ClassFolder         if given, the class folder to filter
+     * @param string                          $routeType           'course'|'folder'
+     * @param null|SubmissionType             $submissionType      if specified, a submission type filter
      * @throws ApplicationException
+     * @throws \DomainException
      */
     private function process(
         CourseSpecification $courseSpecification,
         Collection $unitImplsInTerm,
-        Collection $assessmentsInTerm,
+        Collection $gradableAssessments,
         Term $term,
         $routeType,
-        Folder $selectedClassFolder = null,
-        $submissionTypeId = null
+        Folder $ClassFolder = null,
+        SubmissionType $submissionType = null
     ) {
 
 
-        $analysis = new CohortAnalysis($courseSpecification, $unitImplsInTerm, $selectedClassFolder, $term);
-        $metadata = new Metadata($unitImplsInTerm, $selectedClassFolder);
+        $analysis = new CohortAnalysis($gradableAssessments, $submissionType);
+        $metadata = new Metadata($unitImplsInTerm, $ClassFolder);
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
@@ -273,35 +298,28 @@ class Controller extends Base
          */
         $registry = new Registry($unitImplsInTerm);
 
-        /**
-         * Results for all the units in each $folder contained in $allFolders
-         * (generated by Registry)
-         */
-        $submissionTypes = new SubmissionTypes($submissionTypeId);
-
         /** @var Term[]|GenericCollection $navigableTerms */
-        $navigableTerms = $this->getNavigableTerms($courseSpecification, $selectedClassFolder);
+        $navigableTerms = $this->getNavigableTerms($courseSpecification, $ClassFolder);
 
         $data = [
             'courseSpec'       => $courseSpecification,
-            'classFolder'      => $selectedClassFolder,
-            'submissionType'   => $submissionTypes->getSelectedSubmissionType(),
-            'submissionTypes'  => $submissionTypes->getSubmissionTypes(),
+            'classFolder'      => $ClassFolder,
+            'submissionType'   => $submissionType,
+            'submissionTypes'  => SubmissionTypeMapper::getInstance()->findAll(),
             'currentRoute'     => $this->getRouter()->getMatchedRoute()->name,
             'route'            => $routeType,
             'folders'          => $metadata->getUnitImplementationFolders(),
             'term'             => $term,
             'terms'            => $navigableTerms,
+            'students'         => $analysis->getParticipatingStudents(),
             'overallProgress'  => $analysis->getOverallProgress(),
             'ranking' => [
                 'top'    => $analysis->getCohortRankings(SORT_DESC),
                 'bottom' => $analysis->getCohortRankings(SORT_ASC),
             ],
             'results' => [
-                'all' => $analysis->getCohortGradesByAssessment($unitImplsInTerm),
-                'assessments' => [
-                    'all' => $analysis->getAssessments($unitImplsInTerm, $term),
-                ],
+                'assessments' => $analysis->getDeduplicateAssessments(),
+                'grades'      => $analysis->getAssessmentMarks(),
             ],
             'progress' => [
                 'allUnits' => $analysis->getProgressByUnit(),

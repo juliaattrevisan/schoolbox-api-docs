@@ -46,18 +46,18 @@
              * These correspond to a series of data and their respective
              * five-point summaries
              */
-            allAssessments: {{ results.assessments.all | column('title') | json_encode | raw }},
+            allAssessments: {{ results.assessments | column('title') | json_encode | raw }},
 
             /* All the raw data
              */
             allData: $.fn.boxPlotCalculateAllSeriesData([
-                {% for assessment in results.assessment.all -%}
+                {% for grades in results.grades -%}
                 [
-                    {% for feedback in results.all[assessment.id] -%}
+                    {% for userGrade in grades -%}
                     {
-                        info: "{{ feedback.reviewee.fullName }}",
-                        uid: '{{ feedback.reviewee.id }}',
-                        value: {{ feedback.normalisedMark ?: 'null' }}
+                        info: "{{ userGrade.user.fullName }}",
+                        uid: '{{ userGrade.user.id }}',
+                        value: {{ userGrade.grade }}
                     }{% if not loop.last %}, {% endif -%}
                     {% else %}{# Highcharts won't render without at least one data point -#}
                     {
@@ -223,7 +223,7 @@
             {% if classFolder %}
             <li class="icon-home" title="Class"><a href="/homepage/{{ classFolder.id }}" title="Class Page">{{ classFolder.nameWithCodes }}</a></li>
             {% endif %}
-            <li class="icon-staff-students" title="Students">{{ effort.allEffort | length }} students</li>
+            <li class="icon-staff-students" title="Students">{{ students | length }} students</li>
         </ul>
     </div>
 </div>

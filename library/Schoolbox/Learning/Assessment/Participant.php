@@ -266,6 +266,16 @@ class Participant
     }
 
     /**
+     * Returns this Participant's published normalised mark
+     *
+     * @return null|int
+     */
+    public function getPublishedNormalisedMark()
+    {
+        return $this->assessable->getMarkScheme()->getPublishedNormalisedMark($this);
+    }
+
+    /**
      * Returns this Participant's most recent Human-Readable mark (includes draft marks)
      *
      * @return null|string

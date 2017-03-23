@@ -18,6 +18,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -38,6 +39,9 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType as SubmissionType;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
 
 class Module extends BaseModule
 {
@@ -141,6 +145,15 @@ class Module extends BaseModule
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
+        $submissionType = null;
+        if (isset($params['submissionTypeId'])){
+            try {
+                $submissionType = $this->getSubmissionTypeMapper()->findById($params['submissionTypeId']);
+            } catch (MapperException $e) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            }
+        }
+
         $classFolder = null;
         if (isset($params['folderId'])){
             try {
@@ -179,16 +192,26 @@ class Module extends BaseModule
             $assessmentImpl->setContext($unitImplementation);
         }
 
-        // Get list of Assessments due in specified Term
-        /** @var GenericCollection|IAssessable[] $assessmentsDueInTerm */
-        $assessmentsDueInTerm = $assessmentImpls->filter(function(IAssessable $assessment) use ($term) {
+        /* Get list of Assessments that:
+         * * are due in currently selected Term
+         * * are not a Task
+         * * do not have a mark type of 'None'
+         * * does not have weight = 0
+         */
+
+        /** @var GenericCollection|IAssessable[] $gradableAssessments */
+        $gradableAssessments = $assessmentImpls->filter(function(IAssessable $assessment) use ($term) {
+            // Ignore Tasks, no weight, or MarkType = 'None'
+            if($assessment instanceof Task || 0 === $assessment->getWeight() || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug()){
+                return false;
+            }
             $dueAfterTermStart = $assessment->getDueAt()->gte($term->getStart());
             $dueBeforeTermEnd = $term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($term->getActualFinish());
             return $dueAfterTermStart && $dueBeforeTermEnd;
         });
 
         // Should never have got to this page if there are no assessments due here
-        if (0 === $assessmentsDueInTerm->count()){
+        if (0 === $gradableAssessments->count()){
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_NO_ANALYTICS_DATA);
         }
 
@@ -200,8 +223,8 @@ class Module extends BaseModule
         $unitImplsInTerm = $this->getUnitImplementationMapper()->createCollection();
 
         // Load Participants into relevant Assessments
-        $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($assessmentsDueInTerm);
-        foreach($assessmentsDueInTerm as $assessment){
+        $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($gradableAssessments);
+        foreach($gradableAssessments as $assessment){
 
             $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getContext());
 
@@ -215,13 +238,15 @@ class Module extends BaseModule
             }
         }
 
+
+
         return [
             'courseSpecification' => $courseSpecification,
             'unitImplsInTerm'     => $unitImplsInTerm,
-            'assessmentsInTerm'   => $assessmentsDueInTerm,
+            'gradableAssessments' => $gradableAssessments,
             'term'                => $term,
             'classFolder'         => $classFolder,
-            'submissionTypeId'    => isset($params['submissionTypeId']) ? (int)$params['submissionTypeId'] : null,
+            'submissionType'      => $submissionType,
         ];
     }
 
@@ -316,6 +341,15 @@ class Module extends BaseModule
     protected function getTermMapper()
     {
         return $this->getMapperFactory()->get(TermMapper::class);
+    }
+
+    /**
+     * @return Mapper|SubmissionTypeMapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getSubmissionTypeMapper()
+    {
+        return $this->getMapperFactory()->get(SubmissionTypeMapper::class);
     }
 
 
