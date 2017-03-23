@@ -9,7 +9,6 @@ namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\User;
 
 /**
  * A DAV collection representing a single file within a submission.
@@ -70,6 +69,14 @@ class ResponseFile extends DAV\File
     }
 
     /**
+     * @return resource
+     */
+    public function get()
+    {
+        return $this->getResponseFile()->readStream();
+    }
+
+    /**
      * @inheritdoc
      */
     public function getName()
@@ -111,12 +118,9 @@ class ResponseFile extends DAV\File
      */
     public function getLastModified()
     {
-        $submission = $this->getResponseFile();
-        if ($submission instanceof Submission\SingleFile\Model) {
-            $date = $submission->getCreatedAt();
-            if ($date instanceof \Alaress_Date_Format && !$date->isNull()) {
-                return $date->getUnixTimestamp();
-            }
+        $date = $this->getResponseFile()->getCreatedAt();
+        if ($date instanceof \Alaress_Date_Format && !$date->isNull()) {
+            return $date->getUnixTimeStamp();
         }
         return time();
     }
