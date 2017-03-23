@@ -19,7 +19,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 
 /**
- * Class File
+ * A WebDAV node that represents a file within the Schoolbox file system.
  */
 class File extends DAV\File
 {
