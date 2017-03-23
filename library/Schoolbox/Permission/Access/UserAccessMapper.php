@@ -47,9 +47,9 @@ class UserAccessMapper extends Mapper
         $this->hasTable('userAccess');
         $this->hasModel(UserAccess::class);
 
-        $this->joins('uid', UserMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
-        $this->uses('service', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('sid', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'serviceIdentifier');
+        $this->joins('uid', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->uses('service', self::TYPE_INTEGER, null);
+        $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
     }
 
@@ -113,7 +113,7 @@ class UserAccessMapper extends Mapper
         $internal = $this->findByColumnList([
             'uid' => $user->getId(),
             'type' => [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL],
-        ], ['cache' => false])->map(function ($ua) use ($user) {
+        ])->map(function ($ua) use ($user) {
             /** @var UserAccess $ua */
             // don't needlessly hold stub replicas of the user in memory
             return $ua->setUser($user);
