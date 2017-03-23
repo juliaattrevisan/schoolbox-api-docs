@@ -67,4 +67,19 @@ class Response extends DAV\Collection
         }
         return $children;
     }
+
+    /**
+     * Files may not be created in an existing response - add them to the assessment instead.
+     *
+     * @param string $name
+     * @param null   $data
+     * @throws DAV\Exception\Forbidden
+     * @return null
+     */
+    public function createFile($name, $data = null)
+    {
+        throw new DAV\Exception\Forbidden(
+            'You may not upload files to an existing response - please upload files into the parent folder'
+        );
+    }
 }
