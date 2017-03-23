@@ -323,6 +323,10 @@ class CohortAnalysis
             // Was this AssessmentImpl created in UnitImpl ? (not imported from Spec)
             if (!$assessmentSpec) {
                 $assessmentSpec = clone $assessmentImpl;
+
+                /** @var UnitImplementation $unitImpl */
+                $unitImpl = $assessmentImpl->getBaseContext();
+                $assessmentSpec->setContext($unitImpl->getSpecification());
                 $assessmentSpec->setId($assessmentImpl->getId());
                 $assessmentSpec->setResponses($assessmentSpec->getResponses()->emptyClone());
                 $assessmentSpec->setFeedbacks($assessmentSpec->getFeedbacks()->emptyClone());
