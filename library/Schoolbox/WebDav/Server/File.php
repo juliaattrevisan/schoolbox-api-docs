@@ -8,7 +8,6 @@
 namespace Schoolbox\WebDav\Server;
 
 use Sabre\DAV;
-use Schoolbox\Collection;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
