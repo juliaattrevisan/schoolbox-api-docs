@@ -16,11 +16,21 @@
 
 {% block eventBubbleButtons %}
 <div>
-    {% if renderer.showAttendanceLink() %}
-    <a class="button icon-class-list" href="/modules/attendance/modify/{{ event.getCode()|url_encode| url_encode|url_encode }}/{{ event.getStartTime.getDatabaseDate() }}/{{ event.getPeriod() }}/{{ event.getTimetableCode() }}" title="Mark Attendance">Attendance</a>
-    {% endif %}
+
     {% if event.categoryId > 0 %}
         <a class="button icon-home" href="/homepage/{{ event.categoryId }}">Homepage</a>
     {% endif %}
+
+    {% if renderer.showAttendanceLink() %}
+        {% set encodedClass = event.code|url_encode|url_encode|url_encode %}
+        {% if event.campus is not empty %}
+            {% set classLink = event.campus ~ '/' ~ encodedClass %}
+        {% else %}
+            {% set classLink = '0/' ~ encodedClass %}
+        {% endif %}
+
+        <a class="button icon-class-list" href="/modules/attendance/modify/{{ classLink }}/{{ event.getStartTime.getDatabaseDate() }}/{{ event.getPeriod() }}/{{ event.getTimetableCode() }}" title="Mark Attendance">Attendance</a>
+    {% endif %}
+
 </div>
 {% endblock eventBubbleButtons %}

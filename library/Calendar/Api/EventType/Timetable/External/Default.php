@@ -146,8 +146,8 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             $event->setType($eventType);
 
                             /* Setup attendance button */
-                            $campusCode = $period['campus'] ? $period['campus'] . '/' . $period['code'] : '0/' . $period['code'];
-                            $event->setCode($campusCode);
+                            $event->setCode($period['code']);
+                            $event->setCampus($period['campus']);
                             $event->setPeriod($period['periodNumber']);
                             $event->setPeriodName($period['periodName']);
 
