@@ -29,32 +29,32 @@ class Event extends DayEvent implements EventInterface {
     );
 
     /**
-     * @var string Timetable external definition code
+     * @var string $timetableCode Timetable external definition code
      */
     protected $timetableCode;
 
     /**
-     * @var Class code as set in timetable
+     * @var string $code Class code as set in timetable
      */
     protected $code;
 
     /**
-     * @var Campus
+     * @var string $campus Campus
      */
     protected $campus;
 
     /**
-     * @var Period that this timetable event is in
+     * @var string $period Period that this timetable event is in
      */
     protected $period;
 
     /**
-     * @var Name of period that this class is in
+     * @var string $periodName Name of period that this class is in
      */
     protected $periodName;
 
     /**
-     * @return Class
+     * @return string
      */
     public function getCode()
     {
@@ -62,7 +62,7 @@ class Event extends DayEvent implements EventInterface {
     }
 
     /**
-     * @param Class $code
+     * @param string $code
      */
     public function setCode($code)
     {
@@ -70,7 +70,7 @@ class Event extends DayEvent implements EventInterface {
     }
 
     /**
-     * @return Campus
+     * @return string
      */
     public function getCampus()
     {
@@ -78,7 +78,7 @@ class Event extends DayEvent implements EventInterface {
     }
 
     /**
-     * @param Campus $campus
+     * @param string $campus
      */
     public function setCampus($campus)
     {
@@ -86,7 +86,7 @@ class Event extends DayEvent implements EventInterface {
     }
 
     /**
-     * @return Period
+     * @return string
      */
     public function getPeriod()
     {
@@ -94,7 +94,7 @@ class Event extends DayEvent implements EventInterface {
     }
 
     /**
-     * @param Period $period
+     * @param string $period
      */
     public function setPeriod($period)
     {
@@ -102,7 +102,7 @@ class Event extends DayEvent implements EventInterface {
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPeriodName()
     {
@@ -110,7 +110,7 @@ class Event extends DayEvent implements EventInterface {
     }
 
     /**
-     * @param mixed $periodName
+     * @param string $periodName
      */
     public function setPeriodName($periodName)
     {
@@ -132,7 +132,4 @@ class Event extends DayEvent implements EventInterface {
     {
         $this->timetableCode = $timetable;
     }
-
-
-
 }
