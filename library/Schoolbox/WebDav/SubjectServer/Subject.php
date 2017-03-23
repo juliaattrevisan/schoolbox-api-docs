@@ -122,22 +122,10 @@ class Subject extends DAV\Collection
      */
     public function getChildren()
     {
-        return [];
-//        $mapper        = new SubmissionBoxMapper();
-//        $nameGenerator = new NameGenerator();
-//        foreach ($mapper->getSubmittable($this->getUser(), $this->getCategory()) as $assessment) {
-//            $child = new DAV_SubjectServer_Assessment(
-//                $nameGenerator->getUniqueChildName(
-//                    $this,
-//                    $nameGenerator->sanitiseName($assessment->getName())
-//                )
-//            );
-//            $child
-//                ->setAssessment($assessment)
-//                ->setUser($this->getUser())
-//                ->loadChildren();
-//            $this->addChild($child);
-//        }
-//        return $this;
+        $children = [];
+        foreach ($this->getAssessments() as $assessment) {
+            $children[] = new Assessment($this->getUser(), $assessment);
+        }
+        return $children;
     }
 }
