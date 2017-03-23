@@ -339,6 +339,7 @@
         <div class="empty-state">
             <i class="icon-due-work"></i>
             <p>There are no activity results that match current submission type filter.</p>
+            <p><a href="{{ routeLookup('learningAnalytics.'~route~'WithTerm', routeArgs) }}">Remove filter</a></p>
         </div>
         {% endif %}
     </div>
