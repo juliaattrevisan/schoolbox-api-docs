@@ -91,47 +91,4 @@ class Response extends DAV\Collection
         }
         return $children;
     }
-
-//    /**
-//     * Updates a file that has been created already.
-//     * This is required for some WebDAV clients - the iPad Pages client sends an
-//     * initial PUT request to create the file, and then sends another with the
-//     * actual file contents.
-//     * We'll need to have some sort of filtering on this, so that if you're
-//     * trying to override a file you submitted previously it should fail.
-//     *
-//     * @throws Sabre\DAV\Exception\Forbidden if the file can't be updated
-//     *
-//     * @param resource $data
-//     *
-//     * @return null
-//     */
-//    public function put($data)
-//    {
-//
-//        //
-//        // Does this file belong to this student?
-//        if ($this->getUser()->getId() != $this->getSubmission()->getOwner()->getId()) {
-//            throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite another student\'s submission');
-//        }
-//
-//        //
-//        // If the file was updated less than, say, 5 minutes ago, accept the
-//        // request - otherwise, reject it.
-//        $submit_time  = $this->getSubmission()->getCreatedAt()->getUnixTimestamp();
-//        $current_time = $_SERVER['REQUEST_TIME'];
-//        if (($current_time - $submit_time) > 300) {
-//            throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite an existing file with the same name');
-//        }
-//
-//        //
-//        // Load this file's contents.
-//        $storage = Storage\Mapper::getInstance()->acceptStream($this->getName(), $data, false);
-//
-//        //
-//        // And put it in the submission object.
-//        $mapper = new Submission\SubmissionMapper();
-//        $mapper->save($this->getSubmission()->setStorage($storage));
-//        return null;
-//    }
 }
