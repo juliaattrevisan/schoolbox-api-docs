@@ -372,7 +372,12 @@ class Controller extends Base
 
             $user = new \Schoolbox\User();
 
+            // New users get enabled automatically
+
+            $user->setEnabled(true);
+
             // Set password
+            
             if ($post['modpassword'] == '') {
                 $user->setRetrievablePassword(null)
                      ->setPassword(null);
