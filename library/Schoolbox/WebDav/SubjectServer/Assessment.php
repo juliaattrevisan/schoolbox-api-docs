@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use Sabre\DAV;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -111,20 +112,23 @@ class Assessment extends DAV\Collection
                 $this->assessment->assertAcceptSubmission($allResponses);
 
                 // Create a new response
-                $response = new DueWorkResponse();
-                $response
+                $response = (new DueWorkResponse())
                     ->setAssessable($this->assessment)
                     ->setSubmittedBy($this->user)
                     ->setSubmittedOnBehalfOf($this->user)
                     ->setCreatedAt(Alaress_Date_Format::now())
                     ->setUpdatedAt(Alaress_Date_Format::now())
-                    ->setAllFiles(new GenericCollection(StorageModel::class))
+                    ->setAllFiles(new GenericCollection(DueWorkResponseFile::class))
                     // Not a draft
                     ->setSubmittedAt(Alaress_Date_Format::now());
 
                 // Add a single file
-                $storage = $this->storageDataSource->acceptStream($name, $data, false);
-                $response->getAllFiles()->add($storage);
+                $storage      = $this->storageDataSource->acceptStream($name, $data, false);
+                $attachedFile = (new DueWorkResponseFile())
+                    ->setStorage($storage)
+                    ->setFilename($storage->getFilename())
+                    ->setEditableInline(false);
+                $response->getAllFiles()->add($attachedFile);
 
                 // Save
                 $this->dueWorkResponseDataSource->save($response);
