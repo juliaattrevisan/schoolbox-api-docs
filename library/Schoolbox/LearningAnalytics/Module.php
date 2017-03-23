@@ -40,7 +40,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType as SubmissionType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
 
 class Module extends BaseModule
@@ -269,12 +268,17 @@ class Module extends BaseModule
      * Set up controllers
      *
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            'controller:' . $this->basename,
+            $injector->lazyNew(Controller::class, [
+                'termMapper'           => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'submissionTypeMapper' => $this->getMapperFactory()->getLazy(SubmissionTypeMapper::class),
+            ])
         );
     }
 

@@ -32,13 +32,29 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTyp
 
 class Controller extends Base
 {
+
     /** @var TermMapper $termMapper */
     private $termMapper;
 
-    public function __construct(TermMapper $termMapper)
+    /** @var FolderMapper */
+    private $folderMapper;
+
+    /** @var SubmissionTypeMapper */
+    private $submissionTypeMapper;
+
+
+    /**
+     * @param TermMapper           $termMapper
+     * @param FolderMapper         $folderMapper
+     * @param SubmissionTypeMapper $submissionTypeMapper
+     */
+    public function __construct(TermMapper $termMapper, FolderMapper $folderMapper, SubmissionTypeMapper $submissionTypeMapper)
     {
-        $this->termMapper = $termMapper;
+        $this->termMapper           = $termMapper;
+        $this->folderMapper         = $folderMapper;
+        $this->submissionTypeMapper = $submissionTypeMapper;
     }
+
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}
@@ -156,8 +172,13 @@ class Controller extends Base
      * @throws \DomainException
      * @throws MapperException
      */
-    public function folderWithTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term)
-    {
+    public function folderWithTerm(
+        Folder $classFolder,
+        CourseSpecification $courseSpecification,
+        Collection $unitImplsInTerm,
+        Collection $gradableAssessments,
+        Term $term
+    ) {
         $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'folder', $classFolder);
     }
 
@@ -200,8 +221,14 @@ class Controller extends Base
      * @throws \DomainException
      * @throws MapperException
      */
-    public function folderWithSubmissionTypeAndTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term, SubmissionType $submissionType)
-    {
+    public function folderWithSubmissionTypeAndTerm(
+        Folder $classFolder,
+        CourseSpecification $courseSpecification,
+        Collection $unitImplsInTerm,
+        Collection $gradableAssessments,
+        Term $term,
+        SubmissionType $submissionType
+    ) {
         $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'folder', $classFolder, $submissionType);
     }
 
@@ -221,26 +248,26 @@ class Controller extends Base
     protected function getNavigableTerms(CourseSpecification $courseSpec, Folder $classFolder = null)
     {
         /** @var GenericCollection|Term[] $allTerms */
-        $allTerms = $this->termMapper->findAll()->indexBy('id');
+        $allTerms       = $this->termMapper->findAll()->indexBy('id');
         $navigableTerms = $this->termMapper->createCollection();
 
-        foreach($courseSpec->getCourseImplementations() as $courseImpl){
+        foreach ($courseSpec->getCourseImplementations() as $courseImpl) {
             // Are we in 'class' (not cohort) context? And courseImpl not for this class ?
-            if($classFolder && $courseImpl->getFolder()->getId() !== $classFolder->getId()){
+            if ($classFolder && $courseImpl->getFolder()->getId() !== $classFolder->getId()) {
                 continue;
             }
 
-            foreach($courseImpl->getUnits() as $unitImpl){
-                foreach($unitImpl->getAssessables() as $a){
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                foreach ($unitImpl->getAssessables() as $a) {
 
                     // Is Assessment a Task or has MarkType of 'None' ?
-                    if($a instanceof Task || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()){
+                    if ($a instanceof Task || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
                         continue;
                     }
 
-                    foreach($allTerms as $t){
+                    foreach ($allTerms as $t) {
                         // Is this Assessment due in this Term?
-                        if($t->getStart()->lte($a->getDueAt()) && ($t->getActualFinish()->isNull() || $t->getActualFinish()->gt($a->getDueAt()))){
+                        if ($t->getStart()->lte($a->getDueAt()) && ($t->getActualFinish()->isNull() || $t->getActualFinish()->gt($a->getDueAt()))) {
                             $navigableTerms->setOffset($t->getId(), $t);
 
                             // Remove from available terms to avoid repeated traversals
@@ -252,7 +279,7 @@ class Controller extends Base
             }
         }
 
-        return $navigableTerms->sortByCallback(function(Term $term1, Term $term2){
+        return $navigableTerms->sortByCallback(function (Term $term1, Term $term2) {
             return $term1->compare($term2);
         });
     }
@@ -296,7 +323,7 @@ class Controller extends Base
 
         // Get Classes to which this Course has been imported
         // TODO - what to do if no gradable assessments for current term?
-        $courseImplementationFolders = FolderMapper::getInstance()->createCollection();
+        $courseImplementationFolders = $this->folderMapper->createCollection();
         foreach ($courseSpecification->getCourseImplementations() as $courseImplementation) {
             $courseFolder = $courseImplementation->getFolder();
             $courseImplementationFolders->setOffset($courseFolder->getId(), $courseFolder);
@@ -312,32 +339,32 @@ class Controller extends Base
         $navigableTerms = $this->getNavigableTerms($courseSpecification, $ClassFolder);
 
         $data = [
-            'courseSpec'       => $courseSpecification,
-            'classFolder'      => $ClassFolder,
-            'submissionType'   => $submissionType,
-            'submissionTypes'  => SubmissionTypeMapper::getInstance()->findAll(),
-            'currentRoute'     => $this->getRouter()->getMatchedRoute()->name,
-            'route'            => $routeType,
-            'classFolders'     => $courseImplementationFolders,
-            'term'             => $term,
-            'terms'            => $navigableTerms,
-            'students'         => $analysis->getParticipatingStudents(),
-            'overallProgress'  => $analysis->getOverallProgress(),
-            'ranking' => [
+            'courseSpec'      => $courseSpecification,
+            'classFolder'     => $ClassFolder,
+            'submissionType'  => $submissionType,
+            'submissionTypes' => $this->submissionTypeMapper->findAll(),
+            'currentRoute'    => $this->getRouter()->getMatchedRoute()->name,
+            'route'           => $routeType,
+            'classFolders'    => $courseImplementationFolders,
+            'term'            => $term,
+            'terms'           => $navigableTerms,
+            'students'        => $analysis->getParticipatingStudents(),
+            'overallProgress' => $analysis->getOverallProgress(),
+            'ranking'         => [
                 'top'    => $analysis->getCohortRankings(SORT_DESC),
                 'bottom' => $analysis->getCohortRankings(SORT_ASC),
             ],
-            'results' => [
+            'results'         => [
                 'assessments' => $analysis->getDeduplicateAssessments(),
                 'grades'      => $analysis->getAssessmentMarks(),
             ],
-            'progress' => [
+            'progress'        => [
                 'allUnits' => $analysis->getProgressByUnit(),
             ],
-            'rubrics' => [
+            'rubrics'         => [
                 'allRubrics' => $analysis->getCohortGradesByIndicator($unitImplsInTerm, $registry->getStudents()),
             ],
-            'effort' => [
+            'effort'          => [
                 'allEffort' => $analysis->getEffort(),
             ],
         ];
