@@ -35,8 +35,8 @@ class Assessment extends DAV\Collection
      */
     public function __construct(User $user, IAssessable $assessment)
     {
-        $this->setUser($user);
-        $this->setAssessment($assessment);
+        $this->user       = $user;
+        $this->assessment = $assessment;
     }
 
     /**
@@ -44,45 +44,7 @@ class Assessment extends DAV\Collection
      */
     public function getName()
     {
-        return $this->getAssessment()->getTitle();
-    }
-
-    /**
-     * @param IAssessable $assessment
-     *
-     * @return $this
-     */
-    private function setAssessment($assessment)
-    {
-        $this->assessment = $assessment;
-        return $this;
-    }
-
-    /**
-     * @return IAssessable
-     */
-    private function getAssessment()
-    {
-        return $this->assessment;
-    }
-
-    /**
-     * @param  User $user
-     *
-     * @return $this
-     */
-    private function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    private function getUser()
-    {
-        return $this->user;
+        return $this->assessment->getTitle();
     }
 
     /**
@@ -93,7 +55,7 @@ class Assessment extends DAV\Collection
     public function getChildren()
     {
         $children    = [];
-        $participant = $this->getAssessment()->getParticipantIfExtant($this->getUser());
+        $participant = $this->assessment->getParticipantIfExtant($this->user);
         if ($participant instanceof Participant) {
             foreach ($participant->getAllResponses() as $response) {
                 if ($response->isSubmitted()) {
@@ -159,6 +121,6 @@ class Assessment extends DAV\Collection
      */
     public function getLastModified()
     {
-        return $this->getAssessment()->getPublishAt()->getUnixTimeStamp();
+        return $this->assessment->getPublishAt()->getUnixTimeStamp();
     }
 }

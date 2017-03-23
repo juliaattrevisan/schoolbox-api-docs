@@ -44,67 +44,9 @@ class Subject extends DAV\Collection
         User $user,
         $assessments
     ) {
-        // Params:
-        // User, folder, a list of open assessments within said folder
-        $this->setFolder($folder);
-        $this->setUser($user);
-        $this->setAssessments($assessments);
-    }
-
-    /**
-     * @param Folder $folder
-     *
-     * @return $this
-     */
-    private function setFolder($folder)
-    {
-        $this->folder = $folder;
-        return $this;
-    }
-
-    /**
-     * @return Folder
-     */
-    private function getFolder()
-    {
-        return $this->folder;
-    }
-
-    /**
-     * @param  User $user
-     *
-     * @return $this
-     */
-    private function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    private function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @return IAssessable[]
-     */
-    private function getAssessments()
-    {
-        return $this->assessments;
-    }
-
-    /**
-     * @param IAssessable[] $assessments
-     * @return static
-     */
-    private function setAssessments($assessments)
-    {
+        $this->folder      = $folder;
+        $this->user        = $user;
         $this->assessments = $assessments;
-        return $this;
     }
 
     /**
@@ -112,7 +54,7 @@ class Subject extends DAV\Collection
      */
     public function getName()
     {
-        return $this->getFolder()->getTitle();
+        return $this->folder->getTitle();
     }
 
     /**
@@ -123,8 +65,8 @@ class Subject extends DAV\Collection
     public function getChildren()
     {
         $children = [];
-        foreach ($this->getAssessments() as $assessment) {
-            $children[] = new Assessment($this->getUser(), $assessment);
+        foreach ($this->assessments as $assessment) {
+            $children[] = new Assessment($this->user, $assessment);
         }
         return $children;
     }
