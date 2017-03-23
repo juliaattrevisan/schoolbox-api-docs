@@ -214,8 +214,8 @@ class Module extends BaseModule
             return $dueAfterTermStart && $dueBeforeTermEnd;
         });
 
-        // Should never have got to this page if there are no assessments due here
-        if (0 === $gradableAssessments->count()){
+        // Should never have got to this page the course was not imported
+        if (0 === $unitImplementations->count()){
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_NO_ANALYTICS_DATA);
         }
 
