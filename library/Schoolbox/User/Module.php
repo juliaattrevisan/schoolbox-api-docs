@@ -58,16 +58,19 @@ class Module extends BaseModule
             ->addRoutePermission(
                 $authorizer,
                 'impersonate',
-                new Rule\Callback(
-                    function ($params, User $user) {
-                        // Do not allow unlinked users to switch
-                        foreach ($user->getLinkedUser() as $linkedUser) {
-                            if ($params['userId'] == $linkedUser->getId()) {
-                                return true;
+                new Rule\Any(
+                    new Rule\Callback(
+                        function ($params, User $user) {
+                            // Do not allow unlinked users to switch
+                            foreach ($user->getLinkedUser() as $linkedUser) {
+                                if ($params['userId'] == $linkedUser->getId()) {
+                                    return true;
+                                }
                             }
+                            throw new Unauthorized();
                         }
-                        throw new Unauthorized();
-                    }
+                    ),
+                    new Rule\IsSuperuser()
                 )
             );
     }
