@@ -116,6 +116,14 @@ class Assessment extends DAV\Collection
                 // This could error out, that's intentional
                 $this->assessment->assertAcceptSubmission($allResponses);
 
+                // Get whatever was uploaded.
+                // A 1-byte file will be rejected completely:
+                // this is a stub the iOS client creates which seems to be unnecessary.
+                $storage = $this->storageDataSource->acceptStream($name, $data, false);
+                if ($storage->getSize() <= 1) {
+                    return null;
+                }
+
                 // Create a new response
                 $response = (new DueWorkResponse())
                     ->setAssessable($this->assessment)
@@ -128,7 +136,6 @@ class Assessment extends DAV\Collection
                     ->setSubmittedAt(Alaress_Date_Format::now());
 
                 // Add a single file
-                $storage      = $this->storageDataSource->acceptStream($name, $data, false);
                 $attachedFile = (new DueWorkResponseFile())
                     ->setStorage($storage)
                     ->setFilename($storage->getFilename())
