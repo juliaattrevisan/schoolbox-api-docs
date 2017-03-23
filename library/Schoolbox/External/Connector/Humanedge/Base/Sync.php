@@ -9,23 +9,23 @@
 
 namespace Schoolbox\External\Connector\Humanedge\Base;
 
-use MSSQL;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
 {
     /**
-     * @var MSSQL
+     * @var IConnector
      */
-    protected $database;
+    protected $databaseExternal;
 
     /**
-     * Sync constructor
+     * @inheritdoc
      */
-    public function __construct()
+    public function __construct($di)
     {
-        $this->database = MSSQL::getInstance();
+        $this->databaseExternal = $di->get('databaseExternal');
     }
 
     /**
@@ -54,7 +54,10 @@ class Sync implements SyncInterface
             WHERE s.DateLeft IS NULL
             ORDER BY s.Code ASC
         ";
-        return new Iterator\Student($this->database->getIterator($query));
+
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -102,7 +105,10 @@ class Sync implements SyncInterface
             AND   s.DateLeft IS NULL
             ORDER BY c.Code ASC
         ";
-        return new Iterator\Guardian($this->database->getIterator($query));
+
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -139,6 +145,9 @@ class Sync implements SyncInterface
             AND   t.Active = 'Y'
             ORDER BY t.Code ASC
         ";
-        return new Iterator\Staff($this->database->getIterator($query));
+
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }

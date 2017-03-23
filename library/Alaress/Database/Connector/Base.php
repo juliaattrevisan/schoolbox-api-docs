@@ -185,6 +185,37 @@ abstract class Base implements IConnector
     /**
      * @inheritdoc
      */
+    public function execute($sql)
+    {
+        return $this->prepareQuery($sql)->execute();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
+    {
+        /** @var IStoredProcedure $statement */
+        $statement = $this->broker->prepareFunctionCall($function);
+
+        if ($inputs != null) {
+            $statement->bindInputs($inputs);
+        }
+
+        if ($outputs != null) {
+            $statement->bindOutputs($outputs);
+        }
+
+        if ($return != null) {
+            $statement->bindReturnValue($return);
+        }
+
+        return $statement;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function prepareStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
         /** @var IStoredProcedure $statement */

@@ -7,18 +7,14 @@
  *                                                           *
  ************************************************************/
 
-use Alaress\DebugBar\Instance as DebugBar;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
 {
     use External_Synergetic_ValidateExternalIdTrait;
 
-    /**
-     * @var MSSQL
-     */
+    /** @var MSSQL */
     private $database;
-    private $groupHandler;
 
     /**
      * Constructor
@@ -26,66 +22,12 @@ class External_Synergetic_User implements External_UserInterface
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->setGroup(new Group());
-    }
-
-    /**
-     * Update a particular custom attribute for a specific user
-     *
-     * @param $synergyId
-     * @param $attributeId
-     * @param $newValue
-     */
-    public function updateCustomAttribute($synergyId, $attributeId, $newValue)
-    {
-        if (!$this->isExternalIdValid($synergyId)) {
-            return;
-        }
-        /* First check if there is an Attribute $attributeId for the current person
-         * If there is, update it's fields accordingly; otherwise ignore it
-         *
-         * The alternative is to create it, but where does AttributeCreatedBy come from?
-         * Plus, you need to insert it into the lookup table luCommunityAttributes.
-         * That may not be ideal.
-         *
-         * @pc = Current Parent (this query checks if the current $synergyId is also
-         * an current parent)
-         */
-        $query  = "
-            SELECT COUNT(*) AS num
-            FROM dbo.vCommunityAddresses
-            LEFT JOIN dbo.CommunityAttributes
-              ON dbo.CommunityAttributes.ID = vCommunityAddresses.id
-            WHERE ConstitCodes LIKE '%@pc%'
-            AND CommunityAttributes.AttributeCode = '{$attributeId}'
-            AND vCommunityAddresses.id = '{$synergyId}'
-        ";
-        $result = $this->getDatabase()->getRow($query);
-        if ((int)$result['num']) {
-            $query = "
-                UPDATE dbo.CommunityAttributes
-                SET AttributeValue = \"$newValue\"
-                WHERE ID = '{$synergyId}'
-                AND AttributeCode = '{$attributeId}'
-            ";
-            $this->getDatabase()->query($query);
-        }
-// Deliberately disabled
-//		else {
-//			$query = "
-//				INSERT INTO dbo.CommunityAttributes (ID, AttributeCode, AttributeValue, AttributeCreatedDate, AttributeModifiedDate)
-//				VALUES ('{$synergyId}', '{$attributeId}', '{$newValue}', NOW(), NOW())
-//			";
-//
-//			$this->getDatabase()->query($query);
-//		}
     }
 
     /**
      * Retrieves the user's Synergetic image
      *
      * @param Integer $externalUserId
-     *
      * @return Bool|String
      */
     public function getPortrait($externalUserId)
@@ -102,7 +44,7 @@ class External_Synergetic_User implements External_UserInterface
             else
                 return false;
         }
-        
+
         $query = "
             SELECT vPhotos.ModifiedDate
             FROM dbo.vPhotos vPhotos
@@ -110,29 +52,37 @@ class External_Synergetic_User implements External_UserInterface
         ";
 
         if ($photo = $this->getDatabase()->getRow($query)) {
-            //TODO: delete photos on rollover
-            /* If the cached file doesn't exist, or the synergetic image is more recent than our
-                      * last known cached version, regenerate cached version.
-                      *
-                      * Separate the queries out, fetching the photo data only if it's newer than the cached
-                      * version, or if the cache version doesn't already exist.
-                      */
-            $cacheTime    = @filemtime($photoPath);
-            $modifiedTime = strtotime($photo['ModifiedDate']);
 
-            if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
+            // TODO: delete photos on rollover
+
+            /* If the cached file doesn't exist, or the synergetic image is more recent than our
+            * last known cached version, regenerate cached version.
+            *
+            * Separate the queries out, fetching the photo data only if it's newer than the cached
+            * version, or if the cache version doesn't already exist.
+            */
+
+            if (is_readable($photoPath)) {
+                $cacheTime = filemtime($photoPath);
+                $modifiedTime = strtotime($photo['ModifiedDate']);
+            }
+
+            if (!is_readable($photoPath) || $cacheTime < $modifiedTime) {
                 $query = "
                     SELECT vPhotos.Photo, vPhotos.PhotoType
                     FROM dbo.vPhotos vPhotos
                     WHERE vPhotos.ID = '" . $this->getDatabase()->quote($externalUserId) . "'
                 ";
+
                 $photo = $this->getDatabase()->getRow($query);
-                /* Save the image
-                          */
+
+                // Save the image
+
                 $photoHandle = fopen($photoPath, "w");
-                fwrite($photoHandle, $photo['Photo']);
+                fwrite($photoHandle, hex2bin($photo['Photo']));
                 fclose($photoHandle);
             }
+
             return $photoPath;
         }
 
@@ -152,7 +102,7 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        $query  = "
+        $query = "
             SELECT
                 Contact.Title,
                 Contact.Preferred,
@@ -237,7 +187,7 @@ class External_Synergetic_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = array();
-        $id_list   = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds));
+        $id_list = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds));
         if (empty($id_list)) {
             return array();
         }
@@ -259,10 +209,10 @@ class External_Synergetic_User implements External_UserInterface
                     $emailList[$row['RelatedID']] = $row['Email'];
                     break;
                 case 'D': //Use default email address
-                    if(trim($row['DefaultEmail']) != '') {
-                        $defaultEmail = explode(';',$row['DefaultEmail']);
-                        foreach($defaultEmail as $key=>$email){
-                            $emailList[$row['RelatedID'].'-'.$key] = $email;
+                    if (trim($row['DefaultEmail']) != '') {
+                        $defaultEmail = explode(';', $row['DefaultEmail']);
+                        foreach ($defaultEmail as $key => $email) {
+                            $emailList[$row['RelatedID'] . '-' . $key] = $email;
                         }
                     }
                     break;
@@ -285,9 +235,9 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        $currentYear     = $this->getCurrentYear();
+        $currentYear = $this->getCurrentYear();
         $currentSemester = $this->getCurrentSemester();
-        $query   = "SELECT
+        $query = "SELECT
                     vStudents.StudentID,
                     vStudents.StudentGiven1,
                     vStudents.StudentSurname,
@@ -297,11 +247,11 @@ class External_Synergetic_User implements External_UserInterface
                     House.HeadOfHouseID,
                     vStudents.StudentFormStaffName,
                     vStudents.StudentTutorDescription,
-                    luForm.ID as TeacherFormID,
+                    luForm.ID AS TeacherFormID,
                     vStudents.StudentForm,
-                    luTutor.ID as TeacherTutorID,
+                    luTutor.ID AS TeacherTutorID,
                     vStudents.StudentTutor,
-                    luForm.Description as FormDescription,
+                    luForm.Description AS FormDescription,
                     vStudents.StudentHouseDescription,
                     vStudents.StudentHouse,
                     vStudents.StudentYearLevel,
@@ -326,8 +276,8 @@ class External_Synergetic_User implements External_UserInterface
                 FROM dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts
                         ON CommunityAlerts.ID = StudentID
-                        AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS date))
-                        AND (CommunityAlerts.AlertDateTo IS NULL OR CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS date))
+                        AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS DATE))
+                        AND (CommunityAlerts.AlertDateTo IS NULL OR CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE))
                     LEFT JOIN luForm ON vStudents.StudentForm = luForm.Code
                     LEFT JOIN luTutor ON vStudents.StudentTutor = luTutor.Code
                     LEFT JOIN luYearLevel ON vStudents.StudentCampus = luYearLevel.Campus
@@ -339,7 +289,7 @@ class External_Synergetic_User implements External_UserInterface
                     AND vStudents.FileYear='" . $this->database->quote($currentYear) . "'
         ";
 
-		$student = [];
+        $student = [];
 
         foreach ($this->getDatabase()->getAll($query) ?: array() as $row) {
             if (empty($student)) {
@@ -363,14 +313,14 @@ class External_Synergetic_User implements External_UserInterface
         /* Implode with newlines if you were returned a list of
          * AlertMessages to join - otherwise do nothing to it
          */
-		if (!empty($student) && is_array($student['AlertMessage'])) {
-			$student['AlertMessage'] = implode(
-				"\n",
-				array_unique(array_filter($student['AlertMessage']))
-			);
-		}
+        if (!empty($student) && is_array($student['AlertMessage'])) {
+            $student['AlertMessage'] = implode(
+                "\n",
+                array_unique(array_filter($student['AlertMessage']))
+            );
+        }
 
-        $student = array_map(function($value) {
+        $student = array_map(function ($value) {
             return trim(str_replace('Not Selected', '', $value));
         }, $student);
 
@@ -462,7 +412,7 @@ class External_Synergetic_User implements External_UserInterface
                 StudentContactSpouseDefaultEmail,
                 StudentContactType,
                 StudentContactSilentPhoneFlag,
-                Contact.SilentMobilePhoneFlag as StudentContactSilentMobilePhoneFlag,
+                Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
                 Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
                 Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                 ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
@@ -481,8 +431,7 @@ class External_Synergetic_User implements External_UserInterface
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
             WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
             AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
-        ;
+            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'";
         /* Search for a particular year level
          */
         if (strlen($yearlevel)) {
@@ -547,19 +496,19 @@ class External_Synergetic_User implements External_UserInterface
         $contactList = $this->getDatabase()->getAll($query) ?: array();
         foreach ($contactList as &$row) {
             if ($row['ValidAddressFlag'] == 0 || $row['SilentHomeAddressFlag'] == 1) {
-                $row['StudentContactAddress1']        = '';
-                $row['StudentContactAddress2']        = '';
-                $row['StudentContactAddress3']        = '';
-                $row['StudentContactSuburb']          = '';
-                $row['StudentContactPostCode']        = '';
-                $row['StudentContactState']           = '';
-                $row['StudentContactCountryCode']     = '';
-                $row['StudentContactHomeAddress1']    = '';
-                $row['StudentContactHomeAddress2']    = '';
-                $row['StudentContactHomeAddress3']    = '';
-                $row['StudentContactHomeSuburb']      = '';
-                $row['StudentContactHomePostCode']    = '';
-                $row['StudentContactHomeState']       = '';
+                $row['StudentContactAddress1'] = '';
+                $row['StudentContactAddress2'] = '';
+                $row['StudentContactAddress3'] = '';
+                $row['StudentContactSuburb'] = '';
+                $row['StudentContactPostCode'] = '';
+                $row['StudentContactState'] = '';
+                $row['StudentContactCountryCode'] = '';
+                $row['StudentContactHomeAddress1'] = '';
+                $row['StudentContactHomeAddress2'] = '';
+                $row['StudentContactHomeAddress3'] = '';
+                $row['StudentContactHomeSuburb'] = '';
+                $row['StudentContactHomePostCode'] = '';
+                $row['StudentContactHomeState'] = '';
                 $row['StudentContactHomeCountryCode'] = '';
             }
             $row['StudentContactHomeCountryCode']
@@ -638,7 +587,7 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
-        $query       = "
+        $query = "
             SELECT
                 a.StudentContactID,
                 a.StudentContactTitle,
@@ -676,17 +625,16 @@ class External_Synergetic_User implements External_UserInterface
                 StudentID = '$externalUserId'
                 AND StudentContactType IN ('SC1', 'SC2', 'SC3')
                 AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-                AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
-        ;
+                AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'";
         $contactList = $this->getDatabase()->getAll($query) ?: array();
         foreach ($contactList as &$row) {
             if ($row['ValidAddressFlag'] == 0) {
                 $row['StudentContactAddress1'] = '';
                 $row['StudentContactAddress2'] = '';
                 $row['StudentContactAddress3'] = '';
-                $row['StudentContactSuburb']   = '';
+                $row['StudentContactSuburb'] = '';
                 $row['StudentContactPostCode'] = '';
-                $row['StudentContactState']    = '';
+                $row['StudentContactState'] = '';
             }
         }
         return $contactList;
@@ -698,21 +646,14 @@ class External_Synergetic_User implements External_UserInterface
             if (!$this->isExternalIdValid($externalUserId)) {
                 return [];
             }
-            $result = $this->getDatabase()->executeProcedure(
-                'spsConfigUserDefaultYearSemester',
-                array(
-                    array('@ID', $externalUserId, SQLINT4, false, false, -1),
-                )
-            );
-            if ($result['success']
-                && isset($result['result'][0]['UserFileSemester'])
-                && $result['result'][0]['UserFileSemester']
-                && isset($result['result'][0]['UserFileYear'])
-                && $result['result'][0]['UserFileSemester']
-            ) {
+            $statement = $this->getDatabase()->prepareProcedure('spsConfigUserDefaultYearSemester');
+            $statement->bindInputs(['ID' => $externalUserId]);
+            $statement->execute();
+
+            if ($row = $statement->fetch()) {
                 return array(
-                    'year'     => $result['result'][0]['UserFileYear'],
-                    'semester' => $result['result'][0]['UserFileSemester'],
+                    'year' => $row['UserFileYear'],
+                    'semester' => $row['UserFileSemester'],
                 );
             }
         }
@@ -720,7 +661,7 @@ class External_Synergetic_User implements External_UserInterface
         $query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1";
         if ($semester = $this->getDatabase()->getRow($query)) {
             return array(
-                'year'     => $semester['FileYear'],
+                'year' => $semester['FileYear'],
                 'semester' => $semester['FileSemester'],
             );
         } else {
@@ -811,15 +752,15 @@ class External_Synergetic_User implements External_UserInterface
         $subjectList = array();
         while ($subject = $this->getDatabase()->getNextArray()) {
             $subjectList[] = array(
-                'code'       => $subject['ClassCode'],
-                'name'       => $subject['name'],
-                'classType'  => $subject['classType'],
+                'code' => $subject['ClassCode'],
+                'name' => $subject['name'],
+                'classType' => $subject['classType'],
                 'campusCode' => $subject['ClassCampus']
             );
         }
         if (is_array($subjectList)) {
-            usort($subjectList, function($a, $b) {
-                return strnatcmp($a['name'],$b['name']);
+            usort($subjectList, function ($a, $b) {
+                return strnatcmp($a['name'], $b['name']);
             });
             return $subjectList;
         } else {
@@ -1012,9 +953,9 @@ class External_Synergetic_User implements External_UserInterface
     {
 
         /* Restrict staff categories to provided list */
-        $staffCategory = explode(',',\Config::get('synergetic_staff_dir_restrict'));
+        $staffCategory = explode(',', \Config::get('synergetic_staff_dir_restrict'));
         $scWhere = '';
-        if(is_array($staffCategory) && $staffCategory[0] != '') {
+        if (is_array($staffCategory) && $staffCategory[0] != '') {
             $staffCategoryString = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $staffCategory));
             $scWhere = "AND StaffCategory NOT IN ($staffCategoryString)";
         }
@@ -1112,7 +1053,7 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($staffID)) {
             return [];
         }
-        $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '{$this->database->quote($staffID)}' AND FileYear = ".date('Y');
+        $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '{$this->database->quote($staffID)}' AND FileYear = " . date('Y');
         return $this->getDatabase()->getAll($query);
     }
 
@@ -1176,21 +1117,5 @@ class External_Synergetic_User implements External_UserInterface
     protected function getDatabase()
     {
         return $this->database;
-    }
-
-    /**
-     * @param Group $groupHandler
-     */
-    public function setGroup($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * @return Group
-     */
-    public function getGroup()
-    {
-        return $this->groupHandler;
     }
 }

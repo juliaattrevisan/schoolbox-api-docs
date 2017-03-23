@@ -48,6 +48,8 @@ class Sync extends BaseSync
             AND FileYear = '" . $this->database->quote($this->year) . "'
             ORDER BY vStudents.StudentID ASC
         ";
-        return new Iterator\Student($this->database->getIterator($query));
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }

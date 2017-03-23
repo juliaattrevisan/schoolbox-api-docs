@@ -229,7 +229,11 @@ abstract Class Base implements IStatement
 
             // Bind parameters to the statement
 
+
             $this->bindStatement();
+
+            $this->statement->execute();
+
 
             if ($this->broker->getCollector() instanceof Collector) {
                 return $this->broker->getCollector()->execute($this);
@@ -289,5 +293,43 @@ abstract Class Base implements IStatement
         } catch (PDOException $e) {
             return $this->handleException($e);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getDataTypeName($value, $type = null)
+    {
+        if (empty($type)) {
+
+            // Type is being automatically derived- display the name of the derived type
+
+            switch (true) {
+                case is_int($value):
+                    return 'PARAM_INT';
+                case is_bool($value):
+                    return 'PARAM_BOOL';
+                case is_null($value):
+                    return 'PARAM_NULL';
+                default:
+                    return 'PARAM_STR';
+            }
+        } else {
+
+            // Type was overidden- display the name of the override type
+
+            switch ($type) {
+                case PDO::PARAM_INT:
+                    return 'PARAM_INT';
+                case PDO::PARAM_BOOL:
+                    return 'PARAM_BOOL';
+                case PDO::PARAM_NULL:
+                    return 'PARAM_NULL';
+                case PDO::PARAM_STR:
+                    return 'PARAM_STR';
+            }
+        }
+
+        return $type;
     }
 }

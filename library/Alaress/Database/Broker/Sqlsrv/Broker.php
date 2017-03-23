@@ -13,6 +13,7 @@ namespace Alaress\Database\Broker\Sqlsrv;
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
+use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\Query\Sqlsrv\Query;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
 use PDO;
@@ -62,6 +63,14 @@ class Broker extends Base implements IBroker
     public function prepareQuery($query)
     {
         return new Query($this, $query);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareFunctionCall($function)
+    {
+        return new FunctionCall($this, $function);
     }
 
     /**

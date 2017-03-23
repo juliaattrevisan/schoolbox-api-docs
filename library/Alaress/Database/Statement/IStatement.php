@@ -102,4 +102,14 @@ interface IStatement
      * @return IIterator|bool
      */
     function executeIterator($values = null);
+
+    /**
+     * Returns the data type name as a string for debugging display purposes only, should be no
+     * other reason to use this
+     *
+     * @param mixed $value Value to get data type name for
+     * @param int $type Override data type
+     * @return string
+     */
+    static function getDataTypeName($value, $type = null);
 }

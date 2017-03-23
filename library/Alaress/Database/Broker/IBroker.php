@@ -13,6 +13,7 @@ namespace Alaress\Database\Broker;
 use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
+use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
@@ -80,6 +81,14 @@ interface IBroker
      * @return IQuery
      */
     function prepareQuery($query);
+
+    /**
+     * Prepare database function call
+     *
+     * @param string $function Name of the function to execute
+     * @return IFunctionCall
+     */
+    function prepareFunctionCall($function);
 
     /**
      * Prepare database stored procedure

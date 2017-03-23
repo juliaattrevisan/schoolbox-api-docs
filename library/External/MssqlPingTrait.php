@@ -17,13 +17,6 @@ trait External_MssqlPingTrait
      */
     public function isResponsive()
     {
-        if (function_exists('mssql_connect')) {
-            return mssql_connect(
-                Cfg::get('external_db_host'),
-                Cfg::get('external_db_user'),
-                Cfg::get('external_db_passwd')
-            ) !== false;
-        }
-        return false;
+        return true;
     }
 }

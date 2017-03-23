@@ -16,40 +16,23 @@
 
 namespace Schoolbox\External\Connector\Doublefirst\Base;
 
-use External_User;
-use MSSQL;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
 {
     /**
-     * @var \MSSQL
+     * @var IConnector
      */
-    protected $database;
+    protected $databaseExternal;
 
     /**
-     * @var string
+     * @inheritdoc
      */
-    protected $year;
-
-    /**
-     * @var string
-     */
-    protected $semester;
-
-    /**
-     * Sync constructor
-     */
-    public function __construct()
+    public function __construct($di)
     {
-        $this->database = \MSSQL::getInstance();
-
-        // Figure out the current year and semester
-
-        $externalUser = new \External_User();
-        $this->year     = $externalUser->getCurrentYear();
-        $this->semester = $externalUser->getCurrentSemester();
+        $this->databaseExternal = $di->get('databaseExternal');
     }
 
     /**
@@ -81,7 +64,9 @@ class Sync implements SyncInterface
             AND p.PupilID <> ''
         ";
 
-        return new Iterator\Student($this->database->getIterator($query));
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -120,7 +105,9 @@ class Sync implements SyncInterface
             AND         pc.ContactID <> ''            
         ";
 
-        return new Iterator\Guardian($this->database->getIterator($query));
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -170,7 +157,9 @@ class Sync implements SyncInterface
                         spd.ForeName
         ";
 
-        return new Iterator\Staff($this->database->getIterator($query));
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }
 

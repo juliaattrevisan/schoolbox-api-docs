@@ -9,10 +9,17 @@
 
 namespace Schoolbox\External\Connector;
 
+use Aura\Di\Container as Injector;
 use Schoolbox\External\Normalise\User;
 
 interface SyncInterface
 {
+    /**
+     * Sync constructor
+     * @param Injector $di
+     */
+    public function __construct($di);
+
     /**
      * Gets a collection of normalized student objects.
      *

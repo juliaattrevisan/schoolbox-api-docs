@@ -13,6 +13,7 @@ namespace Alaress\Database\Broker\Mysql;
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Mysql\Iterator;
+use Alaress\Database\Statement\FunctionCall\Mysql\FunctionCall;
 use Alaress\Database\Statement\Query\Mysql\Query;
 use Alaress\Database\Statement\StoredProcedure\Mysql\StoredProcedure;
 
@@ -26,6 +27,14 @@ class Broker extends Base implements IBroker
     public function prepareQuery($query)
     {
         return new Query($this, $query);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareFunctionCall($function)
+    {
+        return new FunctionCall($this, $function);
     }
 
     /**

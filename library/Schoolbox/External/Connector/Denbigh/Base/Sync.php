@@ -9,34 +9,23 @@
 
 namespace Schoolbox\External\Connector\Denbigh\Base;
 
-use Config;
-use Database;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
 {
     /**
-     * @var Database
+     * @var IConnector
      */
-    protected $database;
+    protected $databaseExternal;
 
     /**
-     * Sync constructor
+     * @inheritdoc
      */
-    public function __construct()
+    public function __construct($di)
     {
-        $hostName     = Config::get('external_db_host');
-        $databaseName = Config::get('external_db_db');
-        $username     = Config::get('external_db_user');
-        $password     = Config::get('external_db_passwd');
-        $this->database = new Database();
-        $this->database->connect(
-            "mysql:host=$hostName;dbname=$databaseName",
-            $username,
-            $password,
-            array('throw' => true)
-        );
+        $this->databaseExternal = $di->get('databaseExternal');
     }
 
     /**
@@ -44,7 +33,7 @@ class Sync implements SyncInterface
      */
     public function findAllStudents()
     {
-        $statement = $this->database->prepare("
+        $query = "
             SELECT
                 denbighID      AS student_id,
                 username       AS network_login,
@@ -63,9 +52,11 @@ class Sync implements SyncInterface
                 ''             AS student_campus
             FROM Schoolbox_Students
             ORDER BY denbighID ASC
-        ");
-        $statement->execute();
-        return new Iterator\Student($statement);
+        ";
+
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -73,7 +64,7 @@ class Sync implements SyncInterface
      */
     public function findAllParents()
     {
-        $statement = $this->database->prepare("
+        $query = "
             SELECT
                 par.loginID      AS student_contact_network_login,
                 peo.denbighID    AS student_contact_id,
@@ -98,9 +89,11 @@ class Sync implements SyncInterface
             WHERE peo.id IS NOT NULL
             GROUP BY peo.denbighID
             ORDER BY adr.familyDenbighID ASC, peo.denbighID ASC
-        ");
-        $statement->execute();
-        return new Iterator\Guardian($statement);
+        ";
+
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -108,7 +101,7 @@ class Sync implements SyncInterface
      */
     public function findAllStaff()
     {
-        $statement = $this->database->prepare("
+        $query = "
             SELECT
                 p.denbighID      AS staff_id,
                 s.username       AS network_login,
@@ -131,8 +124,10 @@ class Sync implements SyncInterface
                 
             FROM Staff s
             LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
-        ");
-        $statement->execute();
-        return new Iterator\Staff($statement);
+        ";
+
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }

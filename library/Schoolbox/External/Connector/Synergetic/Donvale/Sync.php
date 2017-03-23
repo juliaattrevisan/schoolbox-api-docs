@@ -39,6 +39,8 @@ class Sync extends BaseSync
             FROM dbo.uvSchoolBox_Parents;
         ";
 
-        return new Iterator\Guardian($this->database->getIterator($query));
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }

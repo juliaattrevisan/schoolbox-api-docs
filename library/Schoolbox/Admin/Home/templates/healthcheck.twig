@@ -1,8 +1,25 @@
 {{ renderAdminNavigation(pageCurrent) }}
+
 <sec class="row">
     <div class="small-12 island">
+        <h2 class="subheader">{{ output['externalType'] }} Database Health Check</h2>
+
+        {% if output['errors'] | length %}
+            <h2 class="subheader">Error Messages</h2>
+            {% for error in output['errors'] %}
+                <section class="content">
+                    <pre>{{ error }}</pre>
+                </section>
+            {% endfor %}
+        {% else %}
+            <div data-alert class="alert-box success">
+                No Errors Detected
+            </div>
+        {% endif %}
+
+        <h2 class="subheader">Test Results</h2>
         <section class="content">
-            {{ output | nl2br }}
+            <pre>{{ output['log'] }}</pre>
         </section>
     </div>
 </sec>

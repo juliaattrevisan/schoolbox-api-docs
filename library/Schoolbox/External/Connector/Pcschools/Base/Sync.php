@@ -9,23 +9,23 @@
 
 namespace Schoolbox\External\Connector\Pcschools\Base;
 
-use MSSQL;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
 {
     /**
-     * @var MSSQL
+     * @var IConnector
      */
-    protected $database;
+    protected $databaseExternal;
 
     /**
-     * Sync constructor
+     * @inheritdoc
      */
-    public function __construct()
+    public function __construct($di)
     {
-        $this->database = MSSQL::getInstance();
+        $this->databaseExternal = $di->get('databaseExternal');
     }
 
     /**
@@ -55,7 +55,10 @@ class Sync implements SyncInterface
             WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
             ORDER BY S.STUDKEY ASC
         ";
-        return new Iterator\Student($this->database->getIterator($query));
+
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -72,6 +75,7 @@ class Sync implements SyncInterface
             S.GIVEN_NAME    AS student_preferred,
             S.LEGAL_SURNAME AS student_surname
         ";
+
         $query = "
             SELECT
                 ''              AS student_contact_network_login,
@@ -145,7 +149,10 @@ class Sync implements SyncInterface
 
             ORDER BY student_contact_id ASC
         ";
-        return new Iterator\Guardian($this->database->getIterator($query));
+
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -178,6 +185,9 @@ class Sync implements SyncInterface
             WHERE (T.DATE_LEFT IS NULL OR DATEDIFF(DAY, T.DATE_LEFT, '1753-01-01') = 0)
             ORDER BY T.TEACHER_CODE ASC
         ";
-        return new Iterator\Staff($this->database->getIterator($query));
+
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }

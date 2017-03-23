@@ -9,20 +9,14 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
+use Alaress\Database\Connector\IConnector;
 use External_User;
-use MSSQL;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
 {
-    /**
-     * @var MSSQL
-     */
-    protected $database;
-
     /**
      * @var IConfigLoader
      */
@@ -39,17 +33,22 @@ class Sync implements SyncInterface
     protected $semester;
 
     /**
-     * Sync constructor
+     * @var IConnector
      */
-    public function __construct()
+    protected $databaseExternal;
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct($di)
     {
-        $this->database = MSSQL::getInstance();
+        $this->databaseExternal = $di->get('databaseExternal');
         // Figure out the current year and semester
-        $externalUser = new \External_User();
+        $externalUser = new External_User();
         $this->year     = $externalUser->getCurrentYear();
         $this->semester = $externalUser->getCurrentSemester();
         // Add config -_-
-        $this->config   = ConfigMapper::getInstance();
+        $this->config   = $di->get('config');
     }
 
     /**
@@ -80,11 +79,14 @@ class Sync implements SyncInterface
             FROM dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = StudentID
             WHERE
-            FileSemester = '" . $this->database->quote($this->semester) . "'
-            AND FileYear = '" . $this->database->quote($this->year) . "'
+            FileSemester = '" . $this->databaseExternal->quote($this->semester) . "'
+            AND FileYear = '" . $this->databaseExternal->quote($this->year) . "'
             ORDER BY vStudents.StudentID ASC
         ";
-        return new Iterator\Student($this->database->getIterator($query));
+
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -97,7 +99,7 @@ class Sync implements SyncInterface
             implode(
                 ',',
                 array_map(
-                    [$this->database, 'smartQuote'],
+                    [$this->databaseExternal, 'smartQuote'],
                     array_map(
                         'trim',
                         explode(',', $this->config->get('external_synergetic_student_contact_types'))
@@ -129,8 +131,8 @@ class Sync implements SyncInterface
             FROM dbo.vStudentContactAllAddress s
             INNER JOIN dbo.Community cp ON s.StudentContactID = cp.ID
             WHERE (s.StudentContactType IN ($studentContactTypes))
-            AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
-            AND   s.FileYear = '" . $this->database->quote($this->year) . "'
+            AND   s.FileSemester = '" . $this->databaseExternal->quote($this->semester) . "'
+            AND   s.FileYear = '" . $this->databaseExternal->quote($this->year) . "'
 
             UNION ALL
 
@@ -154,12 +156,15 @@ class Sync implements SyncInterface
             FROM dbo.vStudentContactAllAddress s
             INNER JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE (s.StudentContactType IN ($studentContactTypes))
-            AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
-            AND   s.FileYear = '" . $this->database->quote($this->year) . "'
+            AND   s.FileSemester = '" . $this->databaseExternal->quote($this->semester) . "'
+            AND   s.FileYear = '" . $this->databaseExternal->quote($this->year) . "'
 
             ORDER BY student_contact_id ASC
         ";
-        return new Iterator\Guardian($this->database->getIterator($query));
+
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -200,6 +205,9 @@ class Sync implements SyncInterface
             WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
             ORDER BY vStaff.StaffID ASC
         ";
-        return new Iterator\Staff($this->database->getIterator($query));
+
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }

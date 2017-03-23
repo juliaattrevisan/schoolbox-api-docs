@@ -46,6 +46,14 @@ interface IConnector {
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Executes a query and returns true/false to indicate success
+     *
+     * @param string $sql
+     * @return bool
+     */
+    function execute($sql);
+
+    /**
      * Prepare database query and return a statement
      *
      * @param string $query
@@ -72,6 +80,17 @@ interface IConnector {
      * @return IIterator
      */
     function executeQueryIterator($sql, $parameters = null);
+
+    /**
+     * Prepare database function call
+     *
+     * @param string $function Name of the function to execute
+     * @param null|array &$inputs
+     * @param null|array &$outputs
+     * @param null|array &$return
+     * @return IStoredProcedure
+     */
+    function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
 
     /**
      * Prepare database stored procedure

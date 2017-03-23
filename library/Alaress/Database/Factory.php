@@ -38,5 +38,6 @@ class Factory
     public static function CreateDb2()
     {
         throw new Exception("DB2 connector not yet implemented");
+        return null;
     }
 }

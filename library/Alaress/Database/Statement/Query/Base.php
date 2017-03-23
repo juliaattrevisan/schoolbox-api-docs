@@ -58,15 +58,15 @@ abstract class Base extends BaseStatement {
             // queries, which breaks if you don't specify the type as PDO::PARAM_INT
 
             if (is_array($value)) {
+
                 $this->parameters['input'][$key] = [];
                 $this->parameters['input'][$key] = [
                     'value' => $value['value'],
                     'type' => isset($value['type']) ? $this->getDataType($value, $value['type']) : null,
                     'length' => isset($value['length']) ? $value['length'] : null
                 ];
-            } else {
 
-                // We force a
+            } else {
 
                 $this->parameters['input'][$key] = [
                     'value' => $value,

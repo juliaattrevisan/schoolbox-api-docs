@@ -542,7 +542,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     ),
                     'externalUserSource' => $di->lazy(function() use ($di) {
                         $source = new \Schoolbox\External\Connector\SyncFactory();
-                        return $source->build();
+                        return $source->build($di);
                     }),
                     'userMapper'     => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
                     'logger'         => $di->lazyGet('ups.logger'),

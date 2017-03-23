@@ -30,6 +30,8 @@ class Controller extends Base
             "SELECT * FROM [dbo].[Community] WHERE [Surname] = 'Rhodes'"
         );
 
+        $user = new \Schoolbox\External\Connector\Synergetic\Base\User();
+
         // Render this thing out
 
         $this->getResponse()->content->set([

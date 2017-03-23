@@ -9,18 +9,18 @@
 
 namespace Schoolbox\External\Connector\Tass\Base;
 
+use Alaress\Database\Connector\IConnector;
 use Config;
 use External_Tass_Helper;
-use MSSQL;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
 {
     /**
-     * @var MSSQL
+     * @var IConnector
      */
-    protected $database;
+    protected $databaseExternal;
 
     /**
      * The TASS company code to use, for queries which require it.
@@ -33,11 +33,11 @@ class Sync implements SyncInterface
     private $helper;
 
     /**
-     * Sync constructor
+     * @inheritdoc
      */
-    public function __construct()
+    public function __construct($di)
     {
-        $this->database    = MSSQL::getInstance();
+        $this->databaseExternal = $di->get('databaseExternal');
         $this->companyCode = Config::get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
     }
@@ -73,7 +73,7 @@ class Sync implements SyncInterface
             AND   (s.dol IS NULL OR s.dol > getdate())
         ";
         return new Iterator\Student(
-            $this->database->getIterator($query)->addMap([$this->database, 'trimRow'])
+            $this->databaseExternal->executeQueryIterator($query)
         );
     }
 
@@ -187,22 +187,7 @@ class Sync implements SyncInterface
         ";
 
         return new Iterator\Guardian(
-            $this->database->getIterator($query)
-                ->addMap([$this->database, 'trimRow'])
-                ->addMap(function ($row) {
-                    list($firstName, $surname)        = preg_split("/\\s+/", $row['student_contact_preferred'], 2);
-                    $row['student_contact_preferred'] = $firstName;
-                    if (strlen(trim($surname)) > 0) {
-                        $row['student_contact_surname'] = $surname;
-                    }
-                    return $row;
-                })
-                ->addMap(function ($row) {
-                    if (isset($row['student_contact_split_family_number'])) {
-                        $row['student_contact_id'] .= $row['student_contact_split_family_number'];
-                    }
-                    return $row;
-                })
+            $this->databaseExternal->executeQueryIterator($query)
         );
     }
 
@@ -256,7 +241,7 @@ class Sync implements SyncInterface
             WHERE t.cust_code = {$this->database->smartQuote($this->companyCode)}
         ";
         return new Iterator\Staff(
-            $this->database->getIterator($query)->addMap([$this->database, 'trimRow'])
+            $this->databaseExternal->executeQueryIterator($query)
         );
     }
 }

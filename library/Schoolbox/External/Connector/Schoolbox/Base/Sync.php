@@ -9,24 +9,23 @@
 
 namespace Schoolbox\External\Connector\Schoolbox\Base;
 
-use Database;
-use IteratorIterator;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
 {
     /**
-     * @var Database
+     * @var IConnector
      */
-    protected $database;
+    protected $databaseExternal;
 
     /**
-     * Sync constructor
+     * @inheritdoc
      */
-    public function __construct()
+    public function __construct($di)
     {
-        $this->database = Database::getInstance();
+        $this->databaseExternal = $di->get('databaseExternal');
     }
 
     /**
@@ -61,9 +60,10 @@ class Sync implements SyncInterface
             AND   g.group_type = 'student'
             ORDER BY u.synergy_id ASC
         ";
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        return new Iterator\Student($statement);
+
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -101,9 +101,10 @@ class Sync implements SyncInterface
             AND   pg.group_type = 'parent'
             ORDER BY p.synergy_id ASC
         ";
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        return new Iterator\Guardian($statement);
+
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -138,8 +139,9 @@ class Sync implements SyncInterface
             WHERE g.group_type = 'staff'
             ORDER BY u.synergy_id ASC
         ";
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        return new Iterator\Staff($statement);
+
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }
