@@ -12,7 +12,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
