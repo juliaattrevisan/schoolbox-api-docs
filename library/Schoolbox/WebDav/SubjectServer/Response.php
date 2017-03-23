@@ -8,23 +8,14 @@
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IResponse;
-use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
 
 /**
  * A DAV collection representing a single submission within an assessment.
  */
 class Response extends DAV\Collection
 {
-//    /**
-//     * @var User
-//     */
-//    protected $user;
-
     /**
      * @var IResponse
      */
@@ -39,25 +30,6 @@ class Response extends DAV\Collection
     {
         $this->setResponse($response);
     }
-
-//    /**
-//     * @param  User $user
-//     *
-//     * @return $this
-//     */
-//    public function setUser($user)
-//    {
-//        $this->user = $user;
-//        return $this;
-//    }
-//
-//    /**
-//     * @return User
-//     */
-//    public function getUser()
-//    {
-//        return $this->user;
-//    }
 
     /**
      * @param IResponse $response

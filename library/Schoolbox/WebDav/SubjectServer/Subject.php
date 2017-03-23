@@ -20,12 +20,12 @@ class Subject extends DAV\Collection
     /**
      * @var Folder
      */
-    protected $folder;
+    private $folder;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * @var IAssessable[]
@@ -56,7 +56,7 @@ class Subject extends DAV\Collection
      *
      * @return $this
      */
-    public function setFolder($folder)
+    private function setFolder($folder)
     {
         $this->folder = $folder;
         return $this;
@@ -65,7 +65,7 @@ class Subject extends DAV\Collection
     /**
      * @return Folder
      */
-    public function getFolder()
+    private function getFolder()
     {
         return $this->folder;
     }
@@ -75,7 +75,7 @@ class Subject extends DAV\Collection
      *
      * @return $this
      */
-    public function setUser($user)
+    private function setUser($user)
     {
         $this->user = $user;
         return $this;
@@ -84,7 +84,7 @@ class Subject extends DAV\Collection
     /**
      * @return User
      */
-    public function getUser()
+    private function getUser()
     {
         return $this->user;
     }

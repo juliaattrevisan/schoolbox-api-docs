@@ -8,13 +8,11 @@
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
-use Schoolbox\WebDav\NameGenerator;
 
 /**
  * A DAV collection representing the list of subjects that the current user has.
@@ -81,7 +79,7 @@ class SubjectList extends DAV\Collection
      *
      * @return bool
      */
-    protected function isThisDirectChildOfPath($path)
+    private function isThisDirectChildOfPath($path)
     {
         $this_path_parts = $this->getPathParts($this->getName());
         $path_parts      = $this->getPathParts($path);
@@ -97,7 +95,7 @@ class SubjectList extends DAV\Collection
      *
      * @return array
      */
-    protected function getPathParts($path)
+    private function getPathParts($path)
     {
         return preg_split('/[\\\\\/]+/', $path, -1, PREG_SPLIT_NO_EMPTY);
     }
@@ -122,11 +120,14 @@ class SubjectList extends DAV\Collection
 
         foreach ($groupedAssessments as $folderId => $assessments) {
             // Have to assume that there's at least one assessment
-            $children[] = new Subject(
-                $assessments->first()->getBaseContext()->getFolder(),
-                $this->getUser(),
-                $assessments
-            );
+            $assessment = $assessments->first();
+            if ($assessment instanceof IAssessable) {
+                $children[] = new Subject(
+                    $assessment->getBaseContext()->getFolder(),
+                    $this->getUser(),
+                    $assessments
+                );
+            }
         }
         return $children;
     }

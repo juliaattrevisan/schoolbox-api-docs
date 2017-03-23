@@ -8,13 +8,9 @@
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Resource\Storage;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
-use Schoolbox\WebDav\NameGenerator;
 
 /**
  * A DAV collection representing a single assessment within a subject.
@@ -24,12 +20,12 @@ class Assessment extends DAV\Collection
     /**
      * @var IAssessable
      */
-    protected $assessment;
+    private $assessment;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * Constructor
@@ -56,7 +52,7 @@ class Assessment extends DAV\Collection
      *
      * @return $this
      */
-    public function setAssessment($assessment)
+    private function setAssessment($assessment)
     {
         $this->assessment = $assessment;
         return $this;
@@ -65,7 +61,7 @@ class Assessment extends DAV\Collection
     /**
      * @return IAssessable
      */
-    public function getAssessment()
+    private function getAssessment()
     {
         return $this->assessment;
     }
@@ -75,7 +71,7 @@ class Assessment extends DAV\Collection
      *
      * @return $this
      */
-    public function setUser($user)
+    private function setUser($user)
     {
         $this->user = $user;
         return $this;
@@ -84,7 +80,7 @@ class Assessment extends DAV\Collection
     /**
      * @return User
      */
-    public function getUser()
+    private function getUser()
     {
         return $this->user;
     }
@@ -96,9 +92,9 @@ class Assessment extends DAV\Collection
      */
     public function getChildren()
     {
-        $children = [];
-        if ($this->getAssessment()->isParticipant($this->getUser())) {
-            $participant = $this->getAssessment()->getParticipant($this->getUser());
+        $children    = [];
+        $participant = $this->getAssessment()->getParticipantIfExtant($this->getUser());
+        if ($participant instanceof Participant) {
             foreach ($participant->getAllResponses() as $response) {
 //                if ($response->isSubmitted()) {
                     $children[] = new Response($response);
@@ -106,44 +102,6 @@ class Assessment extends DAV\Collection
             }
         }
         return $children;
-//        $mapper        = new Submission\SubmissionMapper();
-//        $nameGenerator = new NameGenerator();
-//        $files         = $mapper->findByColumnList(
-//            [
-//                'owner'  => $this->getUser()->getId(),
-//                'box_id' => $this->getAssessment()->getId(),
-////                'draft'  => false,
-//            ],
-//            [
-//                'order' => [/*'realname' => 'asc', */'id' => 'asc',]
-//            ]
-//        );
-//        foreach ($files as $file) {
-//
-//            if (!$file instanceof Submission\Submission) {
-//                continue;
-//            }
-//
-//            if ($file->isDraft()) {
-//                continue;
-//            }
-//
-//            // Build a file name out of the submission's time
-//            $child = new DAV_SubjectServer_Submission(
-//                $nameGenerator->getUniqueChildName(
-//                    $this,
-//                    $nameGenerator->sanitiseName(
-//                        'Submission '.$file->getSubmittedAt()->getDatabase()
-//                    )
-//                )
-//            );
-//            $child
-//                ->setUser($this->getUser())
-//                ->setSubmission($file)
-//                ->loadChildren();
-//            $this->addChild($child);
-//        }
-//        return $this;
     }
 
 //    /**

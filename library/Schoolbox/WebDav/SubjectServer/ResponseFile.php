@@ -15,46 +15,27 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission;
  */
 class ResponseFile extends DAV\File
 {
-//    /**
-//     * @var User
-//     */
-//    protected $user;
-
     /**
      * @var Submission\SingleFile\Model
      */
-    protected $responseFile;
+    private $responseFile;
 
+    /**
+     * Constructor
+     *
+     * @param Submission\SingleFile\Model $responseFile
+     */
     public function __construct(Submission\SingleFile\Model $responseFile)
     {
         $this->setResponseFile($responseFile);
     }
-
-//    /**
-//     * @param  User $user
-//     *
-//     * @return $this
-//     */
-//    public function setUser($user)
-//    {
-//        $this->user = $user;
-//        return $this;
-//    }
-//
-//    /**
-//     * @return User
-//     */
-//    public function getUser()
-//    {
-//        return $this->user;
-//    }
 
     /**
      * @param Submission\SingleFile\Model $responseFile
      *
      * @return $this
      */
-    public function setResponseFile($responseFile)
+    private function setResponseFile($responseFile)
     {
         $this->responseFile = $responseFile;
         return $this;
@@ -63,7 +44,7 @@ class ResponseFile extends DAV\File
     /**
      * @return Submission\SingleFile\Model
      */
-    public function getResponseFile()
+    private function getResponseFile()
     {
         return $this->responseFile;
     }
