@@ -464,7 +464,7 @@ class CohortAnalysis
      *   - the progress of the furthest-completed participant (fewest activities remaining)
      *   - proportion of activities completed by ALL participants
      *
-     * @return array
+     * @return float[]
      * @var float return['mostAdvancedStudent']
      * @var float return['classCompletions']
      */

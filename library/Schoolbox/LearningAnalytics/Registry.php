@@ -14,7 +14,8 @@ use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\User;
 
-class Registry {
+class Registry
+{
 
     /**
      * Sets of students indexed by student.id, grouped by unitImplementation.id
@@ -22,6 +23,7 @@ class Registry {
      * @var Collection[]|User[][]
      */
     private $students;
+
 
     /**
      * @param GenericCollection|UnitImplementation[] $unitImplementations

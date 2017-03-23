@@ -44,8 +44,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTyp
 
 class Module extends BaseModule
 {
+
     /** @var string */
     protected $basename = 'learningAnalytics';
+
 
     /**
      * Basic routes for this module
@@ -73,6 +75,7 @@ class Module extends BaseModule
         }
     }
 
+
     /**
      * Inject params into controller
      *
@@ -89,11 +92,12 @@ class Module extends BaseModule
          */
         $this->addRoutePreload(
             $matcher, '.*With.*Term',
-            function($params) {
+            function ($params) {
                 return $this->loadDependencies($params);
             }
         );
     }
+
 
     /**
      * {@inheritdoc}
@@ -104,20 +108,21 @@ class Module extends BaseModule
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, '.*', new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
-        );
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            );
     }
+
 
     /**
      * Loads model graph.
      *
      * @param array $params
-     * @var int $params['courseSpecId']
-     * @var int $params['termCode']
-     * @var int $params['folderId']                Optional
-     * @var int $params['submissionType']          Optional
+     * @var int     $params ['courseSpecId']
+     * @var int     $params ['termCode']
+     * @var int     $params ['folderId']                Optional
+     * @var int     $params ['submissionType']          Optional
      *
      * @return array
      * @var string[]                               return['params']
@@ -145,7 +150,7 @@ class Module extends BaseModule
         }
 
         $submissionType = null;
-        if (isset($params['submissionTypeId'])){
+        if (isset($params['submissionTypeId'])) {
             try {
                 $submissionType = $this->getSubmissionTypeMapper()->findById($params['submissionTypeId']);
             } catch (MapperException $e) {
@@ -154,7 +159,7 @@ class Module extends BaseModule
         }
 
         $classFolder = null;
-        if (isset($params['folderId'])){
+        if (isset($params['folderId'])) {
             try {
                 $classFolder = $this->getFolderMapper()->findById($params['folderId']);
             } catch (MapperException $e) {
@@ -164,7 +169,7 @@ class Module extends BaseModule
 
         // Load CourseImpls imported from specified CourseSpec
         /** @var GenericCollection|CourseImplementation[] $courseImplementations */
-        $columnList = [
+        $columnList            = [
             'course_specification_id' => $courseSpecification->getId(),
         ];
         $courseImplementations = $this->getCourseImplementationMapper()->findByColumnList($columnList)->indexBy('id');
@@ -175,13 +180,13 @@ class Module extends BaseModule
         $columnList = [
             'course_implementation_id' => $courseImplementations->getColumnValues('id'),
         ];
-        if($classFolder){
+        if ($classFolder) {
             $columnList['c.folder_id'] = $classFolder->getId();
         }
 
         /** @var GenericCollection|UnitImplementation[] $unitImplementations */
         $unitImplementations = $this->getUnitImplementationMapper()->findByColumnList($columnList)->indexBy('id');
-        foreach($unitImplementations as $unitImplementation){
+        foreach ($unitImplementations as $unitImplementation) {
             $courseImplementation = $courseImplementations[$unitImplementation->getCourse()->getId()];
             $courseImplementation->getUnits()->setOffset($unitImplementation->getId(), $unitImplementation);
             $unitImplementation->setCourse($courseImplementation);
@@ -190,7 +195,7 @@ class Module extends BaseModule
         // Load Assessments in Unit Impls (regardless of due date - as we need them for navigation)
         /** @var GenericCollection|IAssessable[] $assessmentImpls */
         $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationId($unitImplementations->getColumnValues('id'))->indexBy('id');
-        foreach($assessmentImpls as $assessmentImpl){
+        foreach ($assessmentImpls as $assessmentImpl) {
             $unitImplementation = $unitImplementations[$assessmentImpl->getContext()->getId()];
             $unitImplementation->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);
             $assessmentImpl->setContext($unitImplementation);
@@ -204,18 +209,18 @@ class Module extends BaseModule
          */
 
         /** @var GenericCollection|IAssessable[] $gradableAssessments */
-        $gradableAssessments = $assessmentImpls->filter(function(IAssessable $assessment) use ($term) {
+        $gradableAssessments = $assessmentImpls->filter(function (IAssessable $assessment) use ($term) {
             // Ignore Tasks, no weight, or MarkType = 'None'
-            if($assessment instanceof Task || 0 === $assessment->getWeight() || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug()){
+            if ($assessment instanceof Task || 0 === $assessment->getWeight() || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug()) {
                 return false;
             }
             $dueAfterTermStart = $assessment->getDueAt()->gte($term->getStart());
-            $dueBeforeTermEnd = $term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($term->getActualFinish());
+            $dueBeforeTermEnd  = $term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($term->getActualFinish());
             return $dueAfterTermStart && $dueBeforeTermEnd;
         });
 
         // Should never have got to this page the course was not imported
-        if (0 === $unitImplementations->count()){
+        if (0 === $unitImplementations->count()) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_NO_ANALYTICS_DATA);
         }
 
@@ -228,7 +233,7 @@ class Module extends BaseModule
 
         // Load Participants into relevant Assessments
         $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($gradableAssessments);
-        foreach($gradableAssessments as $assessment){
+        foreach ($gradableAssessments as $assessment) {
 
             $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getContext());
 
@@ -253,6 +258,7 @@ class Module extends BaseModule
         ];
     }
 
+
     /**
      * Template locations for this module
      *
@@ -263,6 +269,7 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
+
 
     /**
      * Set up controllers
@@ -294,6 +301,7 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(Access::class);
     }
 
+
     /**
      * @return Mapper|FolderMapper
      * @throws \InvalidArgumentException
@@ -312,6 +320,7 @@ class Module extends BaseModule
     {
         return $this->getInjector()->get('assessmentDataSource');
     }
+
 
     /**
      * @return Mapper|CourseImplementationMapper
@@ -342,6 +351,7 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(UnitImplementationMapper::class);
     }
 
+
     /**
      * @return Mapper|TermMapper
      * @throws \InvalidArgumentException
@@ -350,6 +360,7 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(TermMapper::class);
     }
+
 
     /**
      * @return Mapper|SubmissionTypeMapper
