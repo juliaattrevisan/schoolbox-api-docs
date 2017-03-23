@@ -130,4 +130,24 @@ class MailNotifier extends WorkNotifier
 		return $result;
 	}
 
+    /**
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        // no serialization
+        return serialize($this->factory);
+    }
+
+
+    /**
+     * @param string $serialized
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        // no serialization
+        $this->__construct(unserialize($serialized));
+    }
+
 }

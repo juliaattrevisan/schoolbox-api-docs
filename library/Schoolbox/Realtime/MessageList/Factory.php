@@ -9,10 +9,12 @@
 namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Queue\QueueInterface;
+use Alaress\Redis;
 use Predis\ClientInterface;
+use Serializable;
 
 
-class Factory implements IFactory
+class Factory implements IFactory, Serializable
 {
 
     /** @var string */
@@ -62,4 +64,26 @@ class Factory implements IFactory
         return new Digest($this->redis, $this->instanceId, $userId);
     }
 
+
+    /**
+     * String representation of object, or null
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        return $this->instanceId;
+    }
+
+
+    /**
+     * Constructs the object from the serial string given
+     *
+     * @param string $serialized
+     */
+    public function unserialize($serialized)
+    {
+        $this->instanceId = $serialized;
+        $this->redis = Redis::getClientInstance(); // TODO IoC
+    }
 }
