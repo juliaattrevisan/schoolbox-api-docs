@@ -121,6 +121,14 @@ abstract class Base implements IConnector
         return $this->errorCode;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getCollector()
+    {
+        return $this->broker->getCollector();
+    }
+
     // ----------------------------------------------------------------------------------------------------------------
     // Serialization functions
     // ----------------------------------------------------------------------------------------------------------------

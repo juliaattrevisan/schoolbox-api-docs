@@ -35,6 +35,19 @@ class Connector extends Base implements Serializable, IConnector
         return $this->broker->connect($options);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function reconnect($options = null)
+    {
+        if (is_array($options)) {
+            $this->options = $options;
+        }
+
+        unset($this->broker);
+        return $this->broker->connect($this->options);
+    }
+
     // ----------------------------------------------------------------------------------------------------------------
     // Type specific deserialize function
     // ----------------------------------------------------------------------------------------------------------------

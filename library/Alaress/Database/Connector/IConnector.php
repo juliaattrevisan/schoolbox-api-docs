@@ -10,6 +10,7 @@
 
 namespace Alaress\Database\Connector;
 
+use Alaress\Database\Collector;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
@@ -31,6 +32,14 @@ interface IConnector {
      * @return bool
      */
     function connect($hostname, $database, $username, $password, $options = []);
+
+    /**
+     * Reconnect to the database (optionally- with new options)
+     *
+     * @param array|null $options
+     * @return bool
+     */
+    function reconnect($options = null);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Query preparation functions
@@ -150,6 +159,13 @@ interface IConnector {
      * @return string
      */
     function getDatabase();
+
+    /**
+     * Return database collector for debugging
+     *
+     * @return Collector
+     */
+    function getCollector();
 
     // ----------------------------------------------------------------------------------------------------------------
     // Post processor stuff
