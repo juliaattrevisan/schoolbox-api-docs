@@ -94,8 +94,8 @@ class Response extends DAV\Collection
     public function getName()
     {
         $response = $this->getResponse();
-        if ($response->isSubmitted()) {
-            return sprintf('Draft (%s)', $response->getUpdatedAt()->getDatabase());
+        if (!$response->isSubmitted()) {
+            return sprintf('Draft (%s)', $response->getCreatedAt()->getDatabase());
         }
         return sprintf('Submission (%s)', $response->getSubmittedAt()->getDatabase());
     }
@@ -108,12 +108,12 @@ class Response extends DAV\Collection
     public function getChildren()
     {
         $children = [];
-//        $response = $this->getResponse();
-//        if ($response instanceof DueWorkResponse) {
-//            foreach ($response->getAllFiles() as $file) {
-//                $children[] = new ResponseFile($file);
-//            }
-//        }
+        $response = $this->getResponse();
+        if ($response instanceof DueWorkResponse) {
+            foreach ($response->getAllFiles() as $file) {
+                $children[] = new ResponseFile($file);
+            }
+        }
         return $children;
     }
 

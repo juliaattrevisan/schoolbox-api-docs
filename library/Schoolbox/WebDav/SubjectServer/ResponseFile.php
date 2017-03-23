@@ -16,52 +16,57 @@ use Schoolbox\User;
  */
 class ResponseFile extends DAV\File
 {
-    /**
-     * @var User
-     */
-    protected $user;
+//    /**
+//     * @var User
+//     */
+//    protected $user;
 
     /**
      * @var Submission\SingleFile\Model
      */
-    protected $submissionFile;
+    protected $responseFile;
+
+    public function __construct(Submission\SingleFile\Model $responseFile)
+    {
+        $this->setResponseFile($responseFile);
+    }
+
+//    /**
+//     * @param  User $user
+//     *
+//     * @return $this
+//     */
+//    public function setUser($user)
+//    {
+//        $this->user = $user;
+//        return $this;
+//    }
+//
+//    /**
+//     * @return User
+//     */
+//    public function getUser()
+//    {
+//        return $this->user;
+//    }
 
     /**
-     * @param  User $user
+     * @param Submission\SingleFile\Model $responseFile
      *
      * @return $this
      */
-    public function setUser($user)
+    public function setResponseFile($responseFile)
     {
-        $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param Submission\SingleFile\Model $submissionFile
-     *
-     * @return $this
-     */
-    public function setSubmissionFile($submissionFile)
-    {
-        $this->submissionFile = $submissionFile;
+        $this->responseFile = $responseFile;
         return $this;
     }
 
     /**
      * @return Submission\SingleFile\Model
      */
-    public function getSubmissionFile()
+    public function getResponseFile()
     {
-        return $this->submissionFile;
+        return $this->responseFile;
     }
 
     /**
@@ -69,7 +74,7 @@ class ResponseFile extends DAV\File
      */
     public function getName()
     {
-        return $this->getSubmissionFile()->getBasename();
+        return $this->getResponseFile()->getBasename();
     }
 
     /**
@@ -78,7 +83,7 @@ class ResponseFile extends DAV\File
      */
     public function getSize()
     {
-        return $this->getSubmissionFile()->getStorage()->getSize();
+        return $this->getResponseFile()->getStorage()->getSize();
     }
 
     /**
@@ -87,7 +92,7 @@ class ResponseFile extends DAV\File
      */
     public function getETag()
     {
-        return $this->getSubmissionFile()->getStorage()->getHash();
+        return $this->getResponseFile()->getStorage()->getHash();
     }
 
     /**
@@ -96,7 +101,7 @@ class ResponseFile extends DAV\File
      */
     public function getContentType()
     {
-        return $this->getSubmissionFile()->getStorage()->getMime();
+        return $this->getResponseFile()->getStorage()->getMime();
     }
 
     /**
@@ -106,7 +111,7 @@ class ResponseFile extends DAV\File
      */
     public function getLastModified()
     {
-        $submission = $this->getSubmissionFile();
+        $submission = $this->getResponseFile();
         if ($submission instanceof Submission\SingleFile\Model) {
             $date = $submission->getCreatedAt();
             if ($date instanceof \Alaress_Date_Format && !$date->isNull()) {

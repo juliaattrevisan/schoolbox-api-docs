@@ -96,7 +96,16 @@ class Assessment extends DAV\Collection
      */
     public function getChildren()
     {
-        return [];
+        $children = [];
+        if ($this->getAssessment()->isParticipant($this->getUser())) {
+            $participant = $this->getAssessment()->getParticipant($this->getUser());
+            foreach ($participant->getAllResponses() as $response) {
+//                if ($response->isSubmitted()) {
+                    $children[] = new Response($response);
+//                }
+            }
+        }
+        return $children;
 //        $mapper        = new Submission\SubmissionMapper();
 //        $nameGenerator = new NameGenerator();
 //        $files         = $mapper->findByColumnList(
