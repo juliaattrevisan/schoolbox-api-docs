@@ -84,11 +84,7 @@ class Assessment extends DAV\Collection
         if ($participant instanceof Participant) {
             foreach ($participant->getAllResponses() as $response) {
                 if ($response->isSubmitted()) {
-                    $children[] = new Response(
-                        $response,
-                        $this->storageDataSource,
-                        $this->dueWorkResponseDataSource
-                    );
+                    $children[] = new Response($response);
                 }
             }
         }
