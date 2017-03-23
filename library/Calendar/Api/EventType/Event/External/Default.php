@@ -78,6 +78,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
                 $event->setEventId($externalEvent['id']);
                 $event->setType($eventType);
                 $event->setTitle($externalEvent['title']);
+                $event->setIsEditable(false);
                 $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
                 $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
                 // Publish date is not available in Synergetic Staff Scheduler, but may be available elsewhere

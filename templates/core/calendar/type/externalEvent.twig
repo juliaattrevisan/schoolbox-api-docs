@@ -1,1 +1,22 @@
 {% extends 'calendar/type/_base.twig' %}
+
+{% block eventBubbleSummary %}
+    <h3>{{ event.title }}</h3>
+
+    <ul class="meta">
+        <li class="icon-calendar" title="Date"><time>{{ event.getFullDate()|raw }}</time></li>
+
+        {% if event.location %}
+            <li class="icon-location" title="Location">{{ event.location }}</li>
+        {% endif %}
+
+        {% block eventBubbleMeta %}
+            {% if event.authorName %}
+                <li class="icon-staff-students" title="Author">Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
+            {% endif %}
+
+        {% endblock eventBubbleMeta %}
+    </ul>
+    <article>{{ event.detail|purify}}</article>
+
+{% endblock eventBubbleSummary %}
