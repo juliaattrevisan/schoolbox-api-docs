@@ -48,6 +48,7 @@ use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use Schoolbox\WebDav\Server\Folder as WebDavFolder;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
@@ -76,6 +77,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
+     * @throws Di\Exception\ContainerLocked
+     * @throws Di\Exception\ServiceNotObject
      * @return void
      */
     public function installDependencies()
@@ -577,6 +580,26 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 \Calendar_Api_Factory::class,
                 ['assessmentDataSource' => $di->lazyGet('assessmentDataSource'),]
             )
+        );
+
+
+        // Schoolbox WebDAV file server
+        $di->set(
+            'webdav:fileServer',
+            $di->lazy(function() use ($di, $mapperFactory) {
+                // Add subject server as well
+                // Inject $_SESSION[subjects], $_SESSION[user], current term, assessment mapper proxy
+
+                $user = $di->get('user');
+                return new WebDavFolder(
+                    '',
+                    $user,
+                    $mapperFactory->get(\Schoolbox\Resource\Folder\Mapper::class),
+                    $mapperFactory->get(\Schoolbox\Resource\File\Mapper::class),
+                    $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
+                    $mapperFactory->get(\Schoolbox\Permission\Access\Access::class)
+                );
+            })
         );
 
 

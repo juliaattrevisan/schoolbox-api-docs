@@ -6,9 +6,14 @@
  * time: 9:56 pm
  */
 
-require_once dirname(__FILE__) . '/../library/Bootstrap.php';
+use Alaress\Application\Kernel;
+use Schoolbox\WebDav\Server\Folder as WebDavFolder;
 
-$publicdir = new DAV_Folder('');
+/** @var Kernel $kernel */
+$kernel = require_once __DIR__ . '/../library/Bootstrap.php';
+
+/** @var WebDavFolder $publicdir */
+$publicdir = $kernel->get('webdav:fileServer');
 
 $server = new Sabre\DAV\Server($publicdir);
 $plugin = new Sabre\DAV\Browser\Plugin();
