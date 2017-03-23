@@ -241,19 +241,16 @@
     </div>
 </div>
 
-{% if 0 == (assessments | length) %}
+{% if 0 == (dueAssessments | length) %}
 <div class="row">
     <div class="small-12">
         <div class="empty-state">
             <i class="icon-due-work"></i>
-            <p>There are no gradable activities due in this term, maybe try selecting a different term.</p>
-            <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
+            <p>There are no activities due in this term, maybe try selecting a different term.</p>
         </div>
     </div>
 </div>
 {% else %}
-
-
 
 
 <div class="row">
@@ -349,6 +346,12 @@
         <section class="content">
             <div data-graph="boxplots"></div>
         </section>
+        {% elseif 0 == (gradableAssessments | length) %}
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>There are no gradable activities due in this term, maybe try selecting a different term.</p>
+            <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
+        </div>
         {% else %}
         <div class="empty-state">
             <i class="icon-due-work"></i>
@@ -386,9 +389,17 @@
             <span class='hint has-tip tip-top' title="The Effort Graph aggregates data across all terms/semesters" data-tooltip>?</span>
         </h2>
 
+        {% if results.assessments | length %}
         <section class="content">
             <div data-graph="effort"></div>
         </section>
+        {% elseif 0 == (gradableAssessments | length) %}
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>There are no gradable activities due in this term, maybe try selecting a different term.</p>
+            <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endif %}

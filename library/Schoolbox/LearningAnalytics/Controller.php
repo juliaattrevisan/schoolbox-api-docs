@@ -339,33 +339,34 @@ class Controller extends Base
         $navigableTerms = $this->getNavigableTerms($courseSpecification, $ClassFolder);
 
         $data = [
-            'courseSpec'      => $courseSpecification,
-            'classFolder'     => $ClassFolder,
-            'submissionType'  => $submissionType,
-            'submissionTypes' => $this->submissionTypeMapper->findAll(),
-            'currentRoute'    => $this->getRouter()->getMatchedRoute()->name,
-            'route'           => $routeType,
-            'classFolders'    => $courseImplementationFolders,
-            'term'            => $term,
-            'terms'           => $navigableTerms,
-            'students'        => $analysis->getParticipatingStudents(),
-            'overallProgress' => $analysis->getOverallProgress(),
-            'ranking'         => [
+            'courseSpec'          => $courseSpecification,
+            'classFolder'         => $ClassFolder,
+            'submissionType'      => $submissionType,
+            'submissionTypes'     => $this->submissionTypeMapper->findAll(),
+            'currentRoute'        => $this->getRouter()->getMatchedRoute()->name,
+            'route'               => $routeType,
+            'classFolders'        => $courseImplementationFolders,
+            'term'                => $term,
+            'terms'               => $navigableTerms,
+            'students'            => $analysis->getParticipatingStudents(),
+            'overallProgress'     => $analysis->getOverallProgress(),
+            'ranking'             => [
                 'top'    => $analysis->getCohortRankings(SORT_DESC),
                 'bottom' => $analysis->getCohortRankings(SORT_ASC),
             ],
-            'assessments'     => $analysis->getGradableAssessments(false),
-            'results'         => [
+            'dueAssessments'      => $dueAssessments,
+            'gradableAssessments' => $analysis->getGradableAssessments(false),
+            'results'             => [
                 'assessments' => $analysis->getGradableAssessments(true),
                 'grades'      => $analysis->getAssessmentMarks(true),
             ],
-            'progress'        => [
+            'progress'            => [
                 'allUnits' => $analysis->getProgressByUnit(),
             ],
-            'rubrics'         => [
+            'rubrics'             => [
                 'allRubrics' => $analysis->getCohortGradesByIndicator($unitImplsInTerm, $registry->getStudents()),
             ],
-            'effort'          => [
+            'effort'              => [
                 'allEffort' => $analysis->getEffort(),
             ],
         ];
