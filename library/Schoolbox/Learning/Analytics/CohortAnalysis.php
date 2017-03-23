@@ -258,7 +258,7 @@ class CohortAnalysis
                     $countCourseAssessmentsInvolved[$participant->getUser()->getId()]++;
 
                     // Has the participant completed this assessment?
-                    if ($participant->hasSubmittedResponse()) {
+                    if (!$participant->isResponseRequired()) {
                         $countUnitAssessmentsComplete[$participant->getUser()->getId()]++;
                         $countCourseAssessmentsComplete[$participant->getUser()->getId()]++;
                     }
