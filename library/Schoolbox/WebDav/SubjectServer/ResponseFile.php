@@ -8,7 +8,7 @@
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFileModel;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
 use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 
@@ -18,7 +18,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 class ResponseFile extends DAV\File
 {
     /**
-     * @var Submission\SingleFile\Model
+     * @var DueWorkResponseFileModel
      */
     private $responseFile;
 
@@ -35,12 +35,12 @@ class ResponseFile extends DAV\File
     /**
      * Constructor
      *
-     * @param Submission\SingleFile\Model $responseFile
+     * @param DueWorkResponseFileModel    $responseFile
      * @param StorageDataSource           $storageDataSource
      * @param DueWorkResponseDataSource   $dueWorkResponseDataSource
      */
     public function __construct(
-        Submission\SingleFile\Model $responseFile,
+        DueWorkResponseFileModel $responseFile,
         StorageDataSource $storageDataSource,
         DueWorkResponseDataSource $dueWorkResponseDataSource
     ) {
