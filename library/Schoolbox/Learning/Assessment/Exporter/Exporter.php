@@ -101,9 +101,11 @@ class Exporter
 
             // Strip percent sign from mark
             $mark = str_replace('%', '', $result['mark']);
-            
-            $data[] = [
 
+            // If this is a total mark, only show the actual mark (without '/ [total]')
+            list($mark) = explode(' / ', $mark);
+
+            $data[] = [
                 $headings[0] => $result['synergy_id'],
                 $headings[1] => $result['code'],
                 $headings[2] => $assessmentCode,
