@@ -8,6 +8,7 @@
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -27,19 +28,27 @@ class Subject extends DAV\Collection
     protected $user;
 
     /**
+     * @var IAssessable[]
+     */
+    private $assessments;
+
+    /**
      * Constructor
      *
-     * @param Folder $folder
-     * @param User   $user
+     * @param Folder        $folder
+     * @param User          $user
+     * @param IAssessable[] $assessments
      */
     public function __construct(
         Folder $folder,
-        User $user
+        User $user,
+        $assessments
     ) {
         // Params:
         // User, folder, a list of open assessments within said folder
         $this->setFolder($folder);
         $this->setUser($user);
+        $this->setAssessments($assessments);
     }
 
     /**
@@ -78,6 +87,24 @@ class Subject extends DAV\Collection
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * @return IAssessable[]
+     */
+    private function getAssessments()
+    {
+        return $this->assessments;
+    }
+
+    /**
+     * @param IAssessable[] $assessments
+     * @return static
+     */
+    private function setAssessments($assessments)
+    {
+        $this->assessments = $assessments;
+        return $this;
     }
 
     /**
