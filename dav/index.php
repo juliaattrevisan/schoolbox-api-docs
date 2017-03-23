@@ -7,13 +7,13 @@
  */
 
 use Alaress\Application\Kernel;
-use Schoolbox\WebDav\Server\Folder as WebDavFolder;
+use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
 
 /** @var Kernel $kernel */
 $kernel = require_once __DIR__ . '/../library/Bootstrap.php';
 
 /** @var WebDavFolder $publicdir */
-$publicdir = $kernel->get('webdav:fileServer');
+$publicdir = $kernel->get('webdav:server');
 
 $server = new Sabre\DAV\Server($publicdir);
 $plugin = new Sabre\DAV\Browser\Plugin();
