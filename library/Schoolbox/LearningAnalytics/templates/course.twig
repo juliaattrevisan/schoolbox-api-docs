@@ -241,6 +241,20 @@
     </div>
 </div>
 
+{% if 0 == (assessments | length) %}
+<div class="row">
+    <div class="small-12">
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>There are no gradable activities due in this term, maybe try selecting a different term.</p>
+            <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
+        </div>
+    </div>
+</div>
+{% else %}
+
+
+
 
 <div class="row">
     <div class="small-12 large-6 island">
@@ -377,3 +391,4 @@
         </section>
     </div>
 </div>
+{% endif %}

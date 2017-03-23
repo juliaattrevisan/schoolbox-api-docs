@@ -517,14 +517,15 @@ class CohortAnalysis
      * Gets a list of Assessments to render in the 'Results' box-plot
      * Respects SubmissionType filtering
      *
+     * @param bool $filterBySubmissionType
      * @return Collection|IAssessable[]
      */
-    public function getDeduplicateAssessments()
+    public function getDeduplicateAssessments($filterBySubmissionType)
     {
         $filteredAssessments = $this->assessmentCache->emptyClone();
 
         foreach ($this->assessmentCache as $assessment) {
-            if (!$this->isExcludedBySubmissionTypeFilter($assessment)) {
+            if (!$filterBySubmissionType || !$this->isExcludedBySubmissionTypeFilter($assessment)) {
                 $filteredAssessments[$assessment->getId()] = $assessment;
             }
         }
@@ -551,17 +552,18 @@ class CohortAnalysis
      * Gets the student marks to display in the 'Results' box-plot.
      * Respects submission-type filtering
      *
+     * @param bool $filterBySubmissionType
      * @return mixed[][]
      * @var mixed[] $results [$assessmentId]
      * @var User    $results [$assessmentId][$userId]['user']
      * @var float   $results [$assessmentId][$userId]['grade']
      */
-    public function getAssessmentMarks()
+    public function getAssessmentMarks($filterBySubmissionType)
     {
         $results = [];
 
         foreach ($this->assessmentGrades as $assessmentId => $studentMarks) {
-            if (!$this->isExcludedBySubmissionTypeFilter($this->assessmentCache[$assessmentId])) {
+            if (!$filterBySubmissionType || !$this->isExcludedBySubmissionTypeFilter($this->assessmentCache[$assessmentId])) {
                 $results[$assessmentId] = [];
                 foreach ($studentMarks as $userId => $normMark) {
                     $results[$assessmentId][$userId] = [

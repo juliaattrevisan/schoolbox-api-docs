@@ -354,9 +354,10 @@ class Controller extends Base
                 'top'    => $analysis->getCohortRankings(SORT_DESC),
                 'bottom' => $analysis->getCohortRankings(SORT_ASC),
             ],
+            'assessments'     => $analysis->getDeduplicateAssessments(false),
             'results'         => [
-                'assessments' => $analysis->getDeduplicateAssessments(),
-                'grades'      => $analysis->getAssessmentMarks(),
+                'assessments' => $analysis->getDeduplicateAssessments(true),
+                'grades'      => $analysis->getAssessmentMarks(true),
             ],
             'progress'        => [
                 'allUnits' => $analysis->getProgressByUnit(),
