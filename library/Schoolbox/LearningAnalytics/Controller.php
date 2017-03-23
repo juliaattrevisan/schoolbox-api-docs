@@ -322,7 +322,6 @@ class Controller extends Base
         $analysis = new CohortAnalysis($dueAssessments, $ClassFolder, $submissionType);
 
         // Get Classes to which this Course has been imported
-        // TODO - what to do if no gradable assessments for current term?
         $courseImplementationFolders = $this->folderMapper->createCollection();
         foreach ($courseSpecification->getCourseImplementations() as $courseImplementation) {
             $courseFolder = $courseImplementation->getFolder();
