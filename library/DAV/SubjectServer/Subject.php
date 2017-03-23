@@ -10,6 +10,7 @@
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Schoolbox\WebDav\NameGenerator;
 
 class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
 {
@@ -69,7 +70,7 @@ class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
     public function loadChildren()
     {
         $mapper        = new SubmissionBoxMapper();
-        $nameGenerator = new DAV_NameGenerator();
+        $nameGenerator = new NameGenerator();
         foreach ($mapper->getSubmittable($this->getUser(), $this->getCategory()) as $assessment) {
             $child = new DAV_SubjectServer_Assessment(
                 $nameGenerator->getUniqueChildName(

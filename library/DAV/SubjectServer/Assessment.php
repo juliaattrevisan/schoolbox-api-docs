@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\WebDav\NameGenerator;
 
 class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 {
@@ -71,7 +72,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
     public function loadChildren()
     {
         $mapper        = new Submission\SubmissionMapper();
-        $nameGenerator = new DAV_NameGenerator();
+        $nameGenerator = new NameGenerator();
         $files         = $mapper->findByColumnList(
             [
                 'owner'  => $this->getUser()->getId(),
