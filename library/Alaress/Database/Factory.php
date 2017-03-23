@@ -10,6 +10,7 @@
 
 namespace Alaress\Database;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\Mysql\Connector as MysqlConnector;
 use Alaress\Database\Connector\Sqlsrv\Connector as SqlsrvConnector;
 
@@ -29,5 +30,13 @@ class Factory
     public static function CreateSqlsrv()
     {
         return new SqlsrvConnector();
+    }
+
+    /**
+     * TODO: Implement IBM DB2 connector classes
+     */
+    public static function CreateDb2()
+    {
+        throw new Exception("DB2 connector not yet implemented");
     }
 }

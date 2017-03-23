@@ -103,7 +103,11 @@ class Admin implements ModuleConfigInterface
         $routes->init('/adminv2/routes');
 
         // Video Queue
-        $routes = new \Schoolbox\Admin\Video\Module($di);
-        $routes->init('/adminv2/video');
+        $video = new \Schoolbox\Admin\Video\Module($di);
+        $video->init('/adminv2/video');
+
+        // Settings
+        $external = new \Schoolbox\Admin\External\Module($di);
+        $external->init('/adminv2/external');
     }
 } 

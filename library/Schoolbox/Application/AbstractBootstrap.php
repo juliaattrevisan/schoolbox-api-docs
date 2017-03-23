@@ -12,6 +12,9 @@ namespace Schoolbox\Application;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\Application\Kernel;
 use Alaress\Authorizer\Rule;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as DatabaseException;
+use Alaress\Database\Factory as DatabaseFactory;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
@@ -87,6 +90,97 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // How do I get this container elsewhere without using a global?
         // Set up the dependency injector
         $di = new Di\Container(new Di\Factory());
+
+        // Store a connector to the Schoolbox internal database
+
+        $di->set('connectorInternal', function() {
+
+            // The database connection settings are stored in magical global definitions
+
+            $connectorInternal = DatabaseFactory::CreateMysql();
+            if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd)) {
+                throw new DatabaseException("Unable to connect to Schoolbox database.");
+            }
+
+            return $connectorInternal;
+        });
+
+        // Store a connector to the SIS database
+
+        $di->set('databaseExternal', $di->lazy(function() use ($di) {
+
+            // We need to query the internal database to work out what external database
+            // we need to instantiate
+
+            /** @var IConnector $connectorInternal */
+            $connectorInternal = $di->get("connectorInternal");
+
+            // This query gets the external database config values back in a single row for easy
+            // consumption in an array
+
+            $configuration = $connectorInternal->executeQuery("
+                SELECT  `config_type`.`value` AS `type`,
+                        `config_username`.`value` AS `username`,
+                        `config_password`.`value` AS `password`,
+                        `config_hostname`.`value` AS `hostname`,
+                        `config_database`.`value` AS `database`
+                FROM    `config` `config_username`
+                JOIN    `config` `config_password` ON `config_password`.`name` = 'external_db_passwd'
+                JOIN    `config` `config_hostname` ON `config_hostname`.`name` = 'external_db_host'
+                JOIN    `config` `config_database` ON `config_database`.`name` = 'external_db_db'
+                JOIN    `config` `config_type` ON `config_type`.`name` = 'external_type'
+                WHERE   `config_username`.`name` = 'external_db_user';
+            ")->fetch();
+
+            // Work out the database engine based on the SIS they are connecting to
+
+            switch ($configuration['type']) {
+
+                // Microsoft SQL Server
+
+                case 'tass':
+                case 'synergetic':
+                case 'schoolpro':
+                case 'pcschools':
+                case 'maze':
+                case 'isams':
+                case 'humanedge':
+                case 'doublefirst':
+
+                    $connectorExternal = DatabaseFactory::CreateSqlsrv();
+                    break;
+
+                // MySQL
+
+                case 'schoolbox':
+                case 'denbigh':
+
+                    $connectorExternal = DatabaseFactory::CreateMysql();
+                    break;
+
+                // IBM DB2
+
+                case 'edumate':
+
+                    $connectorExternal = DatabaseFactory::CreateDb2();
+                    break;
+            };
+
+            if (!isset($connectorExternal)) {
+                throw new DatabaseException("Unknown external database type.");
+            }
+
+            if (!$connectorExternal->connect(
+                    $configuration['hostname'],
+                    $configuration['database'],
+                    $configuration['username'],
+                    $configuration['password']
+            )) {
+                throw new DatabaseException("Unable to connect to {$configuration['type']} database.");
+            }
+
+            return $connectorExternal;
+        }));
 
         // Database
         $di->set('database', $di->lazy(function() {

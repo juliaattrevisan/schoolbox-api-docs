@@ -165,6 +165,19 @@ abstract class Base implements IConnector
         $this->database = $serialized->database;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function reconnect($options = null)
+    {
+        if (is_array($options)) {
+            $this->options = $options;
+        }
+
+        unset($this->broker);
+        return $this->broker->connect($this->options);
+    }
+
     // ----------------------------------------------------------------------------------------------------------------
     // Database statement generators
     // ----------------------------------------------------------------------------------------------------------------
