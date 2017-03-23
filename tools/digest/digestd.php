@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Date\Clock;
 use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Predis\ClientInterface;
@@ -10,6 +11,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Digest\DigestScheduler;
 use Schoolbox\Realtime\Digest\MailNotifier;
 use Schoolbox\Realtime\MessageList\Factory;
+use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
 
 
 /**
@@ -21,7 +23,7 @@ use Schoolbox\Realtime\MessageList\Factory;
  * @version     SVN: $Id$
  */
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+$fields = array('porcelain', 'mem', 'truemem', 'pid', 'debug-interval:');
 
 $opts = getopt('v', $fields);
 
@@ -37,9 +39,10 @@ require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Digest', array(
-	'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'fields'  => array_values($fields),
-    'flags'   => $flags
+	'verbose'        => isset($opts['v']) ? $opts['v'] : null,
+    'fields'         => array_values($fields),
+    'flags'          => $flags,
+    'debug-interval' => $opts['debug-interval'] ?: null
 ));
 
 
@@ -55,6 +58,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $dispatch = new DefaultDispatchStrategy($opts['flags']);
     $notifier = new MailNotifier(new Factory(INSTANCE_ID, $redis));
+    $factory  = new DigestTriggerFactory($notifier, new Clock(), $opts['debug-interval']);
 
-    new DigestScheduler($loop, $dispatch, $notifier, $log, $conf);
+    new DigestScheduler($loop, $dispatch, $log, $conf, $factory);
 });

@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Digest;
 
 
 use Alaress\Scheduler\CronScheduler;
+use Alaress\Scheduler\Trigger\RecurringTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pool;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
@@ -21,6 +22,7 @@ use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
+use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
 use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -28,30 +30,29 @@ use Schoolbox\RoleMapper;
 class DigestScheduler extends CronScheduler
 {
 
-	/** @var DigestTrigger[] */
-	protected $triggers = array();
+	/** @var RecurringTrigger[] */
+	protected $triggers = [];
 
-	/** @var WorkNotifier */
-	private $workNotifier;
-
+    /** @var DigestTriggerFactory */
+    private $factory;
 
     /**
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param WorkNotifier              $notifier
      * @param LoggerInterface           $log
      * @param IConfigLoader             $conf
+     * @param DigestTriggerFactory      $factory
      */
     public function __construct(
         LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
-        WorkNotifier $notifier,
         LoggerInterface $log,
-        IConfigLoader $conf = null
+        IConfigLoader $conf,
+        DigestTriggerFactory $factory
     ) {
         parent::__construct($loop, $dispatchStrategy, $log, $conf);
         $this->method = DefaultDispatchStrategy::TASK_DIGEST;
-        $this->workNotifier = $notifier;
+        $this->factory = $factory;
 
 		$this->on(SIGHUP, [ $this, 'onReload' ]);
 
@@ -97,7 +98,7 @@ class DigestScheduler extends CronScheduler
 			}
 
 			try {
-				$this->triggers[$role->getId()] = new DigestTrigger($this->workNotifier, $schedule, $role);
+				$this->triggers[$role->getId()] = $this->factory->build($schedule, $role);
 				$this->scheduleNotification($this->triggers[$role->getId()]);
 
 			} catch(InvalidArgumentException $e) {
