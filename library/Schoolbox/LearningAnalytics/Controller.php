@@ -17,11 +17,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Assessment\Term\Model as Term;
@@ -68,6 +67,7 @@ class Controller extends Base
      * @param Term                            $term
      * @throws ApplicationException
      * @throws \DomainException
+     * @throws MapperException
      */
     public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term)
     {
@@ -108,6 +108,7 @@ class Controller extends Base
      * @param SubmissionType                  $submissionType
      * @throws ApplicationException
      * @throws \DomainException
+     * @throws MapperException
      */
     public function courseWithSubmissionTypeAndTerm(
         CourseSpecification $courseSpecification,
@@ -153,6 +154,7 @@ class Controller extends Base
      * @param Term                            $term
      * @throws ApplicationException
      * @throws \DomainException
+     * @throws MapperException
      */
     public function folderWithTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term)
     {
@@ -196,6 +198,7 @@ class Controller extends Base
      * @param SubmissionType                  $submissionType
      * @throws ApplicationException
      * @throws \DomainException
+     * @throws MapperException
      */
     public function folderWithSubmissionTypeAndTerm(Folder $classFolder, CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term, SubmissionType $submissionType)
     {
@@ -278,6 +281,7 @@ class Controller extends Base
      * @param null|SubmissionType             $submissionType      if specified, a submission type filter
      * @throws ApplicationException
      * @throws \DomainException
+     * @throws MapperException
      */
     private function process(
         CourseSpecification $courseSpecification,
