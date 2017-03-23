@@ -484,6 +484,45 @@ class UserMapper extends Mapper
     }
 
     /**
+     * Do a keyword search for students
+     *
+     * @param $search
+     * @return Collection
+     */
+    public function findStudents($search)
+    {
+        $search = trim($search);
+
+        $students = new Collection();
+
+        if (strlen($search) >= 3) {
+
+            // Only search if theres 3 or more characters
+
+            $keywordArray = explode(' ', $search);
+
+            $pb = $this->getPredicateBuilder();
+
+            foreach ($keywordArray as $keyword) {
+
+                $pb->like('firstname', "%{$this->getDatabase()->escapeForLike($keyword)}%")
+                    ->like('lastname', "%{$this->getDatabase()->escapeForLike($keyword)}%");
+            }
+
+            $users = $this->findByPredicates($this->getPredicateBuilder()->any($pb));
+
+            /** @var User $user */
+            foreach ($users as $user) {
+                if ($user->getRole()->isStudent()) {
+                    $students->add($user);
+                }
+            }
+        }
+
+        return $students;
+    }
+
+    /**
      * Retrieves all users who have the given level of access (or higher) to the
      * requested service.
      *

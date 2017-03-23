@@ -1,0 +1,103 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+{% import '@pastoral/macros/paginator.twig' as paginator %}
+
+{# Breadcrumbs #}
+
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
+    <li class="active"><a href="#">{{ student.fullName }}</a></li>
+</ul>
+
+{% include '@pastoral/fragments/studentDetails.twig' with { student: student } %}
+
+{# Pastoral Type Filter Box #}
+
+{% if types | length %}
+
+    <div id="typeSelector">
+        <div class="small-12 island">
+            <label>Filter Pastoral Records By Type</label>
+            <select data-type-filter>
+                <option value="">Show All Pastoral Record Types</option>
+                {% for type in types %}
+                    <option value="{{ type.id }}" {% if typeSelected == type.id %}selected{% endif %}>{{ type.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <script>
+        $(function() {
+            $('[data-type-filter]').change(function () {
+                window.location.href = "?type=" + $(this).val();
+            });
+        });
+    </script>
+
+{% endif %}
+
+{# Empty State #}
+
+<div id="emptyState" class="row{% if records | length %} hide{% endif %}">
+    <div class="small-12 column">
+        <div class="empty-state">
+            <i class="icon-pastoral"></i>
+            <p>There are no pastoral records {% if typeSelected is not empty %}of this type{% endif %} available for {{ student.fullName }}.</p>
+            {% if isRouteAuthorized('pastoral.getStudentRecordInsert') %}
+                <p>
+                    You can <a href="{{ routeLookup('pastoral.getStudentRecordInsert', {'studentId': student.id}) }}">create a new
+                    pastoral record</a> now{% if typeSelected is not empty %} or <a href="{{ routeLookup('pastoral.getStudent', {'studentId': student.id}) }}">remove your pastoral type filter</a>{% endif %}.</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{# Check if there were any records to display #}
+
+{% if records | length %}
+
+    {# Display all pastoral records #}
+
+    <div class="row" id="pastoralRecords">
+        <div class="small-12 island">
+
+            <h2 class="subheader">
+                Pastoral Care Records
+                <span class="hide-for-medium-down right">
+                    {{ paginator.text(pageCurrent, records | length, resultsPerPage) }}
+                </span>
+            </h2>
+
+            {% for record in records %}
+                <section>
+                    {% include '@pastoral/fragments/pastoralCard.twig' with {record: record, showBody: true} %}
+                </section>
+            {% endfor %}
+
+            <div class="right">
+                {{ paginator.buttons(pageCurrent, records | length, resultsPerPage) }}
+            </div>
+        </div>
+    </div>
+
+    {# Delete pastoral record #}
+
+    <script type="text/javascript">
+        $(function () {
+            $('[data-delete]').click(function (e) {
+                e.preventDefault();
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this record?',
+                    confirmEvent: function () {
+                        $('#deletePastoralId').val();
+                        $('#deletePastoralForm').attr('action', '{{ routeLookup('pastoral.postRecordDelete', {recordId: '_recordId'}) }}'.replace(/_recordId/g, e.target.id));
+                        $('#deletePastoralForm').submit();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <form id="deletePastoralForm" method="post" class="hide"></form>
+
+{% endif %}

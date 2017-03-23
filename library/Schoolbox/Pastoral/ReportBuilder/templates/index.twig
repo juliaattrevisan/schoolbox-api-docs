@@ -1,0 +1,56 @@
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
+    <li class="active"><a href="#">Reports</a></li>
+</ul>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Pastoral Care Reports</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h2 class="subheader">Saved Reports</h2>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" class="icon-add" title="New Pastoral Report"></a>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if reports | length %}
+            <section>
+                <ul id="studentsList" class="grid information-list">
+                    {% for report in reports %}
+                        <li class="actions-small-2">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
+                                        <h3>{{ report.name }}</h3>
+                                    </a>
+                                    <p class="meta">{{ report.description }}</p>
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-modify no-text" href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id}) }}" title="Modify Report"></a>
+                                <a class="icon-delete no-text" href="#" title="Delete Report"></a>
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-report"></i>
+                <p>You do not have any saved pastoral care reports.</p>
+                <p><a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" title="New Pastoral Report">Create your first report.</a></p>
+            </div>
+        {% endif %}
+    </div>
+</div>

@@ -1,18 +1,19 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\Log;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+
 class Model {
 
-    /** @var int */
-    protected $id;
+    use Id;
+    use CreatedAtDate;
 
     /** @var int */
     protected $importId;
@@ -34,9 +35,6 @@ class Model {
 
     /** @var string */
     protected $result;
-
-    /** @var \Alaress_Date_Format */
-    protected $createdAt;
 
     /**
      * @param string $heading
@@ -102,22 +100,6 @@ class Model {
     }
 
     /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() {
-        return $this->id;
-    }
-
-    /**
      * @return int
      */
     public function getImportId() {
@@ -163,21 +145,5 @@ class Model {
     public function setUserId($userId) {
         $this->userId = $userId;
         return $this;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt) {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt() {
-        return $this->createdAt;
     }
 }

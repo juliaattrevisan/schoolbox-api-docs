@@ -124,7 +124,7 @@
             <ul class="information-list">
                 <li>
                     <div class="small-5 columns content">
-                        <a href="/adminv2/home/healthcheck">{{ external_db }}</a>
+                        <a href="/adminv2/home/healthcheck">{{ external_db }}{% if external_db_version is not empty %} ({{ external_db_version }}){% endif %}</a>
                     </div>
                     <div class="small-7 columns content">
                         <span class="full-width {{ external_db_light }} label">{{ external_db_status }}</span>

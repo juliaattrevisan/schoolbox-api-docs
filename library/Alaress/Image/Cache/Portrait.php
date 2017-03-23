@@ -59,7 +59,9 @@ class Portrait extends BrokenFS
         $this->setUserMapper(UserMapper::getInstance());
         $this->setExternalUserId($externalId);
 
+
         $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
+
         if (!$portraitPath) {
             throw new \InvalidArgumentException('Portrait not found');
         }

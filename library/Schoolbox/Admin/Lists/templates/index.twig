@@ -14,6 +14,14 @@
         $('[data-button=add-row]').click(function(event) {
             event.preventDefault();
 
+            var listEmptyState = $('#listEmptyState');
+            var listEditor = $('#listEditor');
+
+            if (listEditor.hasClass('hide')) {
+                listEditor.removeClass('hide');
+                listEmptyState.addClass('hide');
+            }
+
             var newRow = $('[data-clone]').find('li').clone()
 
             {#
@@ -45,6 +53,17 @@
                     $(this).val(color.toHexString());
                 }
             });
+
+            {#
+                Attach delete event to new rows, this doesn't ask for confirmation because
+                its not in the database, so its not going to do anything irreversable
+            #}
+
+            $('[data-delete-new]').click(function(event)
+            {
+                event.preventDefault();
+                $(this).closest('li').remove();
+            });
         });
 
         $('[data-delete]').click(function (event) {
@@ -54,17 +73,17 @@
             var listItem = $(this).closest('li');
 
             $(this).confirmDialog({
-                    text: '{{ tables[table].deleteWarning }}',
+                text: '{{ tables[table].deleteWarning }}',
                 confirmEvent: function () {
                     $.post('{{ routeLookup('adminLists.postDelete') }}', {
                         table: '{{ table }}',
                         id: deleteId
                     })
-                    .done(function (response) {
-                        if (response.result !== false) {
-                            listItem.remove();
-                        }
-                    });
+                            .done(function (response) {
+                                if (response.result !== false) {
+                                    listItem.remove();
+                                }
+                            });
                 }
             });
         });
@@ -102,6 +121,18 @@
             {% endfor %}
         </dl>
 
+        {% if records | length > 0 %}
+            {% set emptyStateClass = 'hide' %}
+        {% else %}
+            {% set listClass = 'hide' %}
+        {% endif %}
+
+        <div id="listEmptyState" class="empty-state {{ emptyStateClass }}">
+            <i class="icon-list"></i>
+            <p>The {{ tables[table].title }} list is currently empty.</p>
+        </div>
+
+
         <form method="post" action="/adminv2/lists/save">
             <input name="table" type="hidden" value="{{ table }}" />
             <input name="sortable_column" type="hidden" value="{{ tables[table].sortable }}">
@@ -112,7 +143,7 @@
                 <input type="hidden" name="fixed-{{field_key}}" value="{{ value }}">
             {% endfor %}
 
-            <section>
+            <section id="listEditor" class="{{ listClass }}">
 
                 <ul class="information-list sortable ui-sortable" data-sortable data-list>
 
@@ -142,10 +173,6 @@
                                 {% endif %}
                             {% endfor %}
 
-                            {% if tables[table].delete %}
-                                <div class="hide-for-small-down medium-1 columns">
-                                </div>
-                            {% endif %}
                         </div>
                     </li>
 
@@ -191,14 +218,27 @@
                                                     <label for="{{ field_key }}-{{ recordIndex }}"></label>
                                                 </div>
 
-                                            {% elseif field.lookup is not empty %}
+                                            {% elseif field.lookup is iterable %}
 
                                                 {# Lookup select box #}
 
-                                                <select name="value-{{ field_key }}[]">
-                                                    {% for option in field.lookup %}
-                                                        <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
-                                                    {% endfor %}
+                                                {% if field.lookup | length == 0 %}
+
+                                                    <select name="value-{{ field_key }}[]" disabled>
+                                                        <option value="">None Available</option>
+
+                                                {% else %}
+
+                                                    <select name="value-{{ field_key }}[]">
+                                                        {% if not field.mandatory %}
+                                                            <option value="">Not Selected</option>
+                                                        {% endif %}
+                                                        {% for option in field.lookup %}
+                                                            <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
+                                                        {% endfor %}
+
+                                                {% endif %}
+
                                                 </select>
 
                                             {% elseif field.colour is not empty %}
@@ -228,7 +268,7 @@
 
                             </div>
 
-                            {%  if tables[table].delete %}
+                            {% if tables[table].delete %}
                                 <nav class="hide-for-small-down">
                                     <a class="icon-delete no-text" href="#" data-delete="{{ key }}" title="Delete"></a>
                                 </nav>
@@ -312,9 +352,9 @@
                 </div>
             {% endif %}
         {% endfor %}
-        {%  if tables[table].delete %}
+        {% if tables[table].delete %}
             <nav class="hide-for-small-down">
-
+                <a class="icon-delete no-text" href="#" data-delete-new="#ID#" title="Delete"></a>
             </nav>
         {% endif %}
     </li>

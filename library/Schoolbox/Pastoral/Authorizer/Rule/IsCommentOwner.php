@@ -1,6 +1,6 @@
 <?php
 /**
- * IsCommentOwner - Determine if a pastoral comment is owned by the logged in user
+ * Determine if a pastoral comment is owned by the logged in user
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -24,8 +24,6 @@ class IsCommentOwner implements IAuthorizationRule
         if ($params['comment']->getOwner()->getId() == $user->getId()) {
             return true;
         }
-
-        // BZZZZZT! You're outta here.
 
         throw new Unauthorized();
     }

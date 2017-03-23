@@ -9,10 +9,12 @@ namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Log\Mapper as LogMapper;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule
@@ -26,7 +28,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'getIndex', $basePath, "");
         $this->addGetRoute($router, 'getLog', $basePath, "/log");
-        $this->addGetRoute($router, 'getLogDetail', $basePath, "/log/{id}");
+        $this->addGetRoute($router, 'getLogDetail', $basePath, "/log/{logId}");
         $this->addPostRoute($router, 'postImport', $basePath, "/process");
     }
 
@@ -51,5 +53,30 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload($matcher, '.*', function ($params) {
+
+            $injectedValues = [];
+
+            // Load log entries
+
+            if (array_key_exists('logId', $params)) {
+                try {
+                    /** @var LogMapper $logMapper */
+                    $logMapper = $this->getMapperFactory()->get(LogMapper::class);
+
+                    $injectedValues['log'] = $logMapper->findByColumn('import_id', $params['logId']);
+                } catch (MapperException $e) {
+                }
+            }
+
+            return $injectedValues;
+        });
     }
 }

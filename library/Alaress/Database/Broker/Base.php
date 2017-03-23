@@ -26,6 +26,9 @@ use PDOStatement;
 
 abstract class Base implements IBroker
 {
+    /** @var array $options Connection options */
+    protected $options = [];
+
     /** @var IConnector $connector Link back to the connector object that invoked the broker */
     protected $connector;
 
@@ -74,15 +77,32 @@ abstract class Base implements IBroker
     /**
      * @inheritdoc
      */
+    public function disconnect()
+    {
+        // This personally irks me quite badly as there is no disconnect function in PDO- they just say we need to unset or NULL out the
+        // variable and let PHP garbage collection get around to it. How about you trust us to close the damn socket!
+
+        unset($this->pdo);
+
+        // Force GC because im cynical and don't trust the magical fairies to clean up after me
+
+        gc_collect_cycles();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function connect($options = [])
     {
+        $this->options = $options;
+
         // Close any existing connection (this seems a bit flaky- why is there no close function?)
 
         unset($this->pdo);
 
         // Set any database connection options that we want to allow
 
-        $options = [
+        $connectOptions = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ];
 
@@ -94,7 +114,7 @@ abstract class Base implements IBroker
                 $this->getDsn(),
                 $this->connector->getUsername(),
                 $this->connector->getPassword(),
-                $options
+                $connectOptions
             );
 
             // These will only get called if the child class overrides the values- don't *think*
@@ -128,6 +148,22 @@ abstract class Base implements IBroker
         }
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function enableMultipleActiveResultSets()
+    {
+        // This feature is not supported by all databases, hence the base method does nothing
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function disableMultipleActiveResultSets()
+    {
+        // This feature is not supported by all databases, hence the base method does nothing
     }
 
     // ----------------------------------------------------------------------------------------------------------------

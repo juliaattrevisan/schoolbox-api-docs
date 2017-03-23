@@ -1,6 +1,6 @@
 <?php
 /**
- * IsPastoralModeratorWrite  - Determine if the logged in user is a pastoral moderator with write access
+ * Determine if the logged in user is a pastoral moderator with write access
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd

@@ -1,10 +1,9 @@
 <?php
+
 /**
- * Created by JetBrains PhpStorm.
- * User: aetworowsky
- * Date: 20/10/11
- * Time: 4:40 PM
- * To change this template use File | Settings | File Templates.
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2015, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 class External_Ping implements External_PingInterface {
@@ -37,6 +36,17 @@ class External_Ping implements External_PingInterface {
 		}
 		return $this->database->isResponsive();
 	}
+
+    /**
+     * @inheritdoc
+     */
+    public function getVersion()
+    {
+        if (!isset($this->database)) {
+            return '';
+        }
+        return $this->database->getVersion();
+    }
 
 	/**
 	 * @return External_Offline_Ping

@@ -1,121 +1,161 @@
 <?php
 /**
- * Pastoral care access control
+ * Pastoral care access control. This allows the user to audience a pastoral care record to individual users, system
+ * roles and user defined pastoral care groups.
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\Access;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Pastoral\Group\Member\Mapper as GroupMemberMapper;
+use Schoolbox\Pastoral\Group\Member\Model as GroupMember;
+use Schoolbox\Pastoral\Group\Model as Group;
+use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Role;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable {
+class Model implements ISoftDeletable
+{
+    use Id;
+    use CreatedAtDate;
+    use DeletedAtDate;
 
-    /** @var int */
-    protected $id;
+    /** @var Pastoral */
+    protected $pastoral;
 
-    /** @var int */
-    protected $pastoralId;
-
-    /** @var \Schoolbox\Role */
+    /** @var Role */
     protected $role;
 
-    /** @var \Schoolbox\User */
+    /** @var User */
     protected $user;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
+    
+    /** @var Group */
+    protected $group;
 
     /**
-     * @param string $pastoralId
+     * @param Pastoral $pastoral
      * @return self
      */
-    public function setPastoralId($pastoralId) {
-        $this->pastoralId = $pastoralId;
-        return $pastoralId;
+    public function setPastoral($pastoral) {
+        $this->pastoral = $pastoral;
+        return $this;
     }
 
     /**
-     * @return int
+     * @return Pastoral
      */
-    public function getPastoralId() {
-        return $this->pastoralId;
+    public function getPastoral() {
+        return $this->pastoral;
     }
 
     /**
-     * @param \Schoolbox\Role $role
+     * @param Role $role
      * @return self
      */
     public function setRole($role) {
         $this->role = $role;
-        return $role;
+        return $this;
     }
 
     /**
-     * @return \Schoolbox\Role
+     * @return Role
      */
     public function getRole() {
         return $this->role;
     }
 
     /**
-     * @param \Schoolbox\User $user
+     * @param User $user
      * @return self
      */
     public function setUser($user) {
         $this->user = $user;
-        return $user;
+        return $this;
     }
 
     /**
-     * @return \Schoolbox\User
+     * @return User
      */
     public function getUser() {
         return $this->user;
     }
 
     /**
-     * @param int $id
+     * @param Group $group
      * @return self
      */
-    public function setId($id) {
-        $this->id = $id;
+    public function setGroup($group) {
+        $this->group = $group;
         return $this;
     }
 
     /**
-     * @return int
+     * @return Group
      */
-    public function getId() {
-        return $this->id;
+    public function getGroup() {
+        return $this->group;
     }
 
     /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
+     * Determine if this access record grants the user access to the associated pastoral record
      *
+     * @param User $user
+     * @param bool $checkRole Allows skipping of role check
+     * @param bool $checkUser Allows skipping of user check
+     * @param bool $checkGroup Allows skipping of group check
      * @return bool
      */
-    public function isDeleted() {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
+    public function hasAccess($user, $checkRole = true, $checkUser = true, $checkGroup = true) {
+
+        $groupMemberMapper = GroupMemberMapper::getInstance();
+
+        if ($checkUser && $this->getUser() instanceof User) {
+
+            // This is a user based access record, just match user IDs
+
+            if ($user->getId() == $this->getUser()->getId()) {
+                return true;
+            }
+        }
+
+        if ($checkRole && $this->getRole() instanceof Role) {
+
+            // This is a role based access record, just match role IDs
+
+            if ($user->getRole()->getId() == $this->getRole()->getId()) {
+                return true;
+            }
+        }
+
+        if ($checkGroup && $this->getGroup() instanceof Group) {
+
+            // This is a pastoral group access record, retrieve all of the users pastoral group memberships
+
+            $groups = $groupMemberMapper->findByColumn('user_id', $user->getId());
+
+            // Iterate these groups and try to find a match
+
+            /** @var GroupMember $groupMember */
+            foreach ($groups as $groupMember) {
+
+                if ($groupMember->getGroup() instanceof Group) {
+
+                    if ($groupMember->getGroup()->getId() == $this->getGroup()->getId()) {
+
+                        // User was in a group, they have access
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

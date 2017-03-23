@@ -1,6 +1,6 @@
 <?php
 /**
- * IsParentAccessAllowed - Determine if parent access is allowed in Schoolbox instances config
+ * Determine if parent access is allowed in Schoolbox instances config
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd

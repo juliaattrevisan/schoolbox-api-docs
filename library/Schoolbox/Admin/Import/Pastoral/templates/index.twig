@@ -76,6 +76,7 @@
 {% if externalEnabled == '1' %}
 
     <div class="small-12 island">
+        <h2 class="subheader">Import Pastoral Care Records From SIS</h2>
         <form data-form-import method="post" action="/adminv2/import-pastoral/process">
             <section class="content">
                 <p>
@@ -97,11 +98,25 @@
                     <select id="defaultOwner" name="defaultOwnerId" placeholder="Fallback Record Owner"></select>
                 </label>
 
+                <label for="importParentAccessGroup">
+                    Add parent contacts in your SIS as Individual Access Users in pastoral records
+                    <span class="hint has-tip tip-top" data-tooltip
+                          title="All Schoolbox Users that are listed as Contacts on your SIS' pastoral care records will be added as 'Individual Access Users' on students' pastoral care records. If you do not want parents to have access to these records ensure you disable this option.">?</span>
+                </label>
+                <div class="switch round">
+                    <input id="importParentAccess" type="checkbox" name="importParentAccess" checked="" data-checkbox-group="importParentAccessGroup">
+                    <label for="importParentAccess">
+                        <span>Yes</span>
+                        <span>No</span>
+                    </label>
+                </div>
+
                 <input type="submit" data-import value="Import Pastoral Care Records">
                 <input type="submit" data-import-logs value="View Import Logs">
                 <label id="defaultOwnerError" for="defaultOwner" class="error hide">You must select a fallback record owner before you can proceed.</label>
             </section>
         </form>
+
     </div>
 
 {% else %}
@@ -111,7 +126,7 @@
                 <i class="icon-pastoral"></i>
                 <p>
                     Sorry, importing of pastoral care records is only possible if
-                    <a href='/adminv2/setting/External+DB'>External Pastoral Synchronisation</a> is enabled on the
+                    <a href='/adminv2/setting/External+DB#external_markbook'>External Pastoral Synchronisation</a> is enabled on the
                     External DB configuration screen.
                 </p>
             </div>

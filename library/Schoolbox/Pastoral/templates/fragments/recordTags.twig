@@ -1,0 +1,30 @@
+{% if not user.role.isParent %}
+
+    {% if record.points != 0 or (record.tags | length) or record.private %}
+        <p class="spaced">
+
+            {% if record.private %}
+                <span class="alert label">Private</span>
+            {% endif %}
+            {% if record.severity.dashboard and showSeverity %}
+                <span class="alert label">{{ record.severity.name }}</span>
+            {% endif %}
+            {% if record.points != 0 %}
+                {% if record.points < 0 %}
+                    {% set labelClass='alert' %}
+                {% endif %}
+                {% if record.points > 0 %}
+                    {% set labelClass='success' %}
+                {% endif %}
+                <span class="{{ labelClass }} label">{{ record.points }}
+                    Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
+            {% endif %}
+            {% if record.tags | length > 0 %}
+                {% for tag in record.tags %}
+                    <span class="neutral label">{{ tag.name }}</span>
+                {% endfor %}
+            {% endif %}
+        </p>
+    {% endif %}
+
+{% endif %}

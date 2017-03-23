@@ -1,30 +1,47 @@
 <?php
+
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\Type;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Pastoral\DocumentClassification\Model as DocumentClassification;
 
 class Model implements ISoftDeletable {
 
-    /** @var int */
-    protected $id;
+    use Id;
+    use DeletedAtDate;
 
     /** @var string */
     protected $name;
 
+    /** @var DocumentClassification */
+    protected $documentClassification;
+
     /** @var string */
     protected $externalCode;
 
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
+    /**
+     * @param DocumentClassification $documentClassification
+     * @return self
+     */
+    public function setDocumentClassification($documentClassification) {
+        $this->documentClassification = $documentClassification;
+        return $this;
+    }
+
+    /**
+     * @return DocumentClassification
+     */
+    public function getDocumentClassification() {
+        return $this->documentClassification;
+    }
 
     /**
      * @param string $name
@@ -32,7 +49,7 @@ class Model implements ISoftDeletable {
      */
     public function setName($name) {
         $this->name = $name;
-        return $name;
+        return $this;
     }
 
     /**
@@ -40,22 +57,6 @@ class Model implements ISoftDeletable {
      */
     public function getName() {
         return $this->name;
-    }
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() {
-        return $this->id;
     }
 
     /**
@@ -72,30 +73,5 @@ class Model implements ISoftDeletable {
      */
     public function getExternalCode() {
         return $this->externalCode;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted() {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
     }
 }

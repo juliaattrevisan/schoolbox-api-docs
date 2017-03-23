@@ -1,0 +1,42 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<p class="spaced meta">
+    {# Pastoral event type #}
+
+    {% if not showBody %}
+        Posted {{ record.createdAt.short }} |
+    {% endif %}
+
+    {{ record.type.name }} {% if record.category.name is not empty %}({{ record.category.name }}){% endif %} |
+
+    {# Pastoral event severity #}
+
+    {% if not record.severity.dashboard and showSeverity %}
+        {{ record.severity.name }} |
+    {% endif %}
+
+    {# Only show details of comments if the user is authorized to make comments #}
+
+    {% if isRouteAuthorized('pastoral.postCommentSave') and showBody %}
+        {% if record.comments | length %}
+            {{ record.comments | length }} Comment{% if record.comments | length > 1 %}s{% endif %} |
+        {% endif %}
+    {% endif %}
+
+    {# Show audience for pastoral record #}
+
+    {% if record.access | length == 0 %}
+        No Audience Set
+    {% else -%}
+        {%- for access in record.access -%}
+            {%- if access.role.id is not empty -%}
+                {{ access.role.name }}
+            {%- elseif access.user.id is not empty -%}
+                <a href="{{ _self.userProfileLink(access.user) }}">{{ access.user.fullName }}</a>
+            {%- elseif access.group.id is not empty -%}
+                {{ access.group.name }}
+            {%- endif -%}
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+    {%- endif %}
+</p>

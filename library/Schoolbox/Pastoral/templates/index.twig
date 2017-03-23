@@ -1,0 +1,117 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<ul class="breadcrumb">
+    <li class="active"><a href="#">Pastoral Care</a></li>
+</ul>
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1 class="no-margin">Pastoral Care</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h2 class="subheader">Dashboard</h2>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="Pastoral Report Builder"></a>
+
+        {# Pastoral moderators can manage pastoral groups #}
+
+        {% if isRouteAuthorized('pastoralManagement.getGroups') %}
+            <a href="{{ routeLookup('pastoralManagement.getGroups') }}" class="icon-group" title="Manage Pastoral Groups"></a>
+        {% endif %}
+    </nav>
+</div>
+
+{# If the user has never viewed a pastoral record, show a welcome message #}
+
+{% if recentStudents is empty %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <h2>
+                    Welcome to the Schoolbox Pastoral Care Dashboard!
+                </h2>
+                <p>
+                    It looks like this is the first time you have used the pastoral care system.
+                </p>
+                <p>
+                    Begin by searching for a students name, or the details of a pastoral record in the search box below. Once you start
+                    using the system this page will display your recently viewed students and any items which have been flagged by
+                    yourself and other staff as important.
+                </p>
+            </section>
+        </div>
+    </div>
+
+{% endif %}
+
+{% include '@pastoral/fragments/search.twig' %}
+
+<div class="row">
+    <div class="list-item">
+
+        {# Display recently searched student records #}
+
+        <div class="small-{% if recentDashboard is not empty %}6{% else %}12{% endif %} island">
+
+            {% if recentStudents is not empty %}
+
+            <h2 class="subheader">Recently Viewed Students</h2>
+                <section>
+                    <ul class="action-list">
+                        {% for student in recentStudents %}
+                            <li>
+                                <div class="list-item">
+                                    <div class="card small-12">
+                                        <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
+                                            {{ profile.imageSquare64(student) }}
+                                            <h3>{{ student.fullName }}</h3>
+                                        </a>
+                                        <p class="meta">{{ student.role.name }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+        </div>
+
+        {# Display high priority records #}
+
+        {% if recentDashboard is not empty %}
+
+            <div class="small-6 island">
+                <h2 class="subheader">Important Records</h2>
+
+                <section>
+                    <ul class="action-list">
+                        {% for record in recentDashboard %}
+                            <li>
+                                <div class="list-item">
+                                    <div class="card small-12">
+                                        <a href='{{ routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) }}'>
+                                            {{ profile.imageSquare64(record.student) }}
+                                            <h3>{{ record.student.fullName }}</h3>
+                                        </a>
+                                        <p class="meta">{{ record.heading }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
 
 namespace Schoolbox\Pastoral\Comment;
 
@@ -35,7 +40,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Get the pastoral record the comment relates to
 
-        $pastoral = $this->getPastoralMapper()->findById($model->getPastoralId());
+        $pastoral = $this->getPastoralMapper()->findById($model->getPastoral()->getId());
         $owner = $this->getUserMapper()->findById($model->getOwner()->getId());
 
         // Get the kids teachers
@@ -127,8 +132,8 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param Model $model
-     * @param User $userEffected
+     * @param $model
+     * @param $userEffected
      * @param array $diff
      * @return Envelope
      */

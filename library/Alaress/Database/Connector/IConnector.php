@@ -40,6 +40,18 @@ interface IConnector extends IQuoter
      */
     public function reconnect($options = null);
 
+    /**
+     * Enable the use of multiple active result sets (required if executing a query inside an iterator).
+     *
+     * This may or may not be supported by all database connectors- where it is not it will just do nothing.
+     */
+    public function enableMultipleActiveResultSets();
+
+    /**
+     * Disable the use of multiple active result sets (better performance)
+     */
+    public function disableMultipleActiveResultSets();
+
     // ----------------------------------------------------------------------------------------------------------------
     // Query preparation functions
     // ----------------------------------------------------------------------------------------------------------------
@@ -135,6 +147,14 @@ interface IConnector extends IQuoter
      * @return IIterator
      */
     public function executeStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null);
+
+    /**
+     * Return last inserted record ID
+     *
+     * @param string|null $name
+     * @return string
+     */
+    public function lastInsertId($name = null);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Getters for immutable properties

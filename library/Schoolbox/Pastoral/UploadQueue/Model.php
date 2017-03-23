@@ -1,22 +1,21 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\UploadQueue;
 
+use External_Pastoral;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Storage\IStorage;
 
 class Model implements ISoftDeletable
 {
@@ -25,17 +24,17 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var int */
-    protected $pastoralId;
+    /** @var Pastoral */
+    protected $pastoral;
 
-    /** @var int */
+    /** @var int SIS Pastoral record ID */
     protected $externalId;
 
-    /** @var int */
+    /** @var int SIS Student ID */
     protected $studentExternalId;
 
-    /** @var string */
-    protected $hash;
+    /** @var IStorage $storage */
+    protected $storage;
 
     /** @var string */
     protected $type;
@@ -47,21 +46,35 @@ class Model implements ISoftDeletable
     protected $message;
 
     /**
-     * @return int
+     * @param Pastoral $pastoral
+     * @return self
      */
-    public function getPastoralId()
-    {
-        return $this->pastoralId;
+    public function setPastoral($pastoral) {
+        $this->pastoral = $pastoral;
+        return $this;
     }
 
     /**
-     * @param int $pastoralId
+     * @param IStorage $storage
      * @return self
      */
-    public function setPastoralId($pastoralId)
-    {
-        $this->pastoralId = $pastoralId;
+    public function setStorage($storage) {
+        $this->storage = $storage;
         return $this;
+    }
+
+    /**
+     * @return IStorage
+     */
+    public function getStorage() {
+        return $this->storage;
+    }
+
+    /**
+     * @return Pastoral
+     */
+    public function getPastoral() {
+        return $this->pastoral;
     }
 
     /**
@@ -101,42 +114,6 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $hash
-     * @return self
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->hash;
-    }
-
-    /**
-     * @param string $type
-     * @return self
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
      * @param string $status
      * @return self
      */
@@ -172,113 +149,13 @@ class Model implements ISoftDeletable
         return $this->message;
     }
 
-
     /**
      * Upload this file to Synergetic DocMan
-     * @returns boolean
+     * @returns int
      */
-    public function uploadDocman()
+    public function uploadPastoralDocument()
     {
-        $storageMapper = StorageMapper::getInstance();
-        $storageObject = $storageMapper->findByHash($this->getHash());
-
-        $pastoralMapper = PastoralMapper::getInstance();
-        $pastoral = $pastoralMapper->findById($this->getPastoralId());
-
-        // This whole thing is a bit of an ass, unfortunately Synergetic stores its DocMan files in
-        // the actual database- which means we need to shove the file into a SQL query as a hex string
-        // which is totally inefficient and very slow :(
-
-        // Temporarily increase the memory limit and timeout so we can get the file across to Synergetic
-
-        ini_set('memory_limit', '2048M');
-        set_time_limit(0);
-
-        // Save the file into to the database
-
-        $database = \MSSQL::getInstance();
-
-        $hex = "0x" . bin2hex($storageObject->read());
-        $externalId = $this->getExternalId();
-        $studentExternalId = $this->getStudentExternalId();
-        $date = date("Y-m-d H:i:s");
-        $sourceDate = $storageObject->getCreatedAt()->getDatabase();
-        $extension = strtoupper($storageObject->getExtension());
-        $pastoralExternalId = $pastoral->getExternalId();
-
-        $filename = $database->quote($storageObject->getFilename());
-
-        $query = "
-            INSERT INTO SynergyOneMedia.dbo.tDocuments
-            (
-                Description,
-                DocumentCreatedByID,
-                DocumentModifiedByID,
-                Document,
-                DocumentCreatedDate,
-                DocumentModifiedDate,
-                SourceDate,           
-                DocumentType
-            )
-            VALUES
-            (
-                '{$filename}',
-                {$externalId},
-                {$externalId},
-                {$hex},
-                '{$date}',
-                '{$date}',
-                '{$sourceDate}',
-                '{$extension}'
-            );            
-        ";
-
-        $database->query($query);
-        $documentReferencesSeq = $database->getOne("SELECT @@IDENTITY");
-
-        // Add a document reference to the student so it shows up on their normal community record
-
-        $query =
-            "
-            INSERT INTO SynergyOneMedia.dbo.DocumentReferences
-            (
-                ID,
-                DocumentReferencesSeq
-            )
-            VALUES
-            (
-                {$studentExternalId},
-                {$documentReferencesSeq}
-            );            
-        ";
-
-        $database->query($query);
-
-        // Specifically link it to their pastoral record as well
-
-        $query =
-        "
-            INSERT INTO SynergyOneMedia.dbo.tDocumentReferences
-            (
-                CommunityID,
-                tDocumentsSeq,
-                SynDatabaseCode,
-                RelatedSeqModuleCode,
-                SortOrder,
-                RelatedSeq
-            )
-            SELECT  
-                0,
-                {$documentReferencesSeq},
-                '',
-                'SPC',
-                COALESCE(MAX(SortOrder) + 1, 0),
-                {$pastoralExternalId}
-                
-            FROM    SynergyOneMedia.dbo.tDocumentReferences 
-            WHERE   tDocumentsSeq = {$documentReferencesSeq}
-        ";
-
-        $database->query($query);
+        $pastoralExternal = new External_Pastoral();
+        return $pastoralExternal->uploadPastoralDocument($this);
     }
 }

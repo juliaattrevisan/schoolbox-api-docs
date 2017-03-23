@@ -8,9 +8,10 @@
  * @link       http://selectize.github.io/selectize.js/
  */
 
-use Schoolbox\Pastoral\Tags\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Fixtures\Coach;
 use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
+use Schoolbox\UserMapper;
 
 if(!isset($this)) {
     require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
@@ -23,15 +24,12 @@ $di = $this->getDi();
 
 /* Note: Insert new tag types here. */
 $registry = [
-    'pastoral'       => $di->lazyNew(PastoralMapper::class),
+    'pastoral'       => $di->lazyNew(PastoralTagMapper::class),
     'sport_position' => $di->lazyNew(PositionMapper::class),
-    'sport_coach'    => $di->lazyNew(
-        Coach\TagCloud::class,
-        [
-            'mapper'     => $di->lazy([Coach\Mapper::class, 'getInstance']),
-            'userMapper' => $di->lazy([\Schoolbox\UserMapper::class, 'getInstance']),
-        ]
-    ),
+    'sport_coach'    => $di->lazyNew(Coach\TagCloud::class, [
+        'mapper'     => $di->lazy([Coach\Mapper::class, 'getInstance']),
+        'userMapper' => $di->lazy([UserMapper::class, 'getInstance']),
+    ]),
 ];
 
 // Validate params

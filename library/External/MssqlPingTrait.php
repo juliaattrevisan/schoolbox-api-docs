@@ -1,6 +1,6 @@
 <?php
 /**
- * A trait for pinging a MSSQL database.
+ * A trait for MSSQL databases to return whether or not they are alive and accessible.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -17,5 +17,13 @@ trait External_MssqlPingTrait
     public function isResponsive()
     {
         return MSSQL::getInstance()->isResponsive();
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return '';
     }
 }

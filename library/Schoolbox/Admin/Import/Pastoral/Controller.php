@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Pastoral\Log\Mapper as LogMapper;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Resource\Storage;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\UserMapper;
 
@@ -115,34 +114,6 @@ class Controller extends Base
     }
 
     /**
-     * Start pastoral import in a detached state
-     */
-    public function postImport()
-    {
-        $post = $this->getRequest()->post;
-
-        try {
-            $defaultOwner = $this->getUserMapper()->findById($post["defaultOwnerId"]);
-        } catch (\Exception $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
-
-        // Do the import in a detached state so it doesn't time out
-
-        $this->getResponse()->content->set([
-            'template' => '@adminImportPastoral/importResults.twig',
-            'data'     => array(
-                'pageCurrent' => 'import'
-            ),
-            'postOutput' => [
-                function() use ($defaultOwner) {
-                    $this->importCallback($defaultOwner);
-                }
-            ],
-        ]);
-    }
-
-    /**
      * Display list of available logs
      */
     public function getLog()
@@ -158,29 +129,63 @@ class Controller extends Base
 
     /**
      * Display list of available logs
+     *
+     * @param int $id Pastoral import log ID
      */
-    public function getLogDetail($id)
+    public function getLogDetail($log)
     {
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/logDetail.twig',
             'data'     => array(
                 'pageCurrent' => 'import',
-                'logs' => $this->getLogMapper()->findByColumn("import_id", $id)->sortBy('createdAt', 'asc')
+                'log' => $log
             )
+        ]);
+    }
+
+    /**
+     * Start pastoral import in a detached state
+     */
+    public function postImport()
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            $defaultOwner = $this->getUserMapper()->findById($post["defaultOwnerId"]);
+            $importParentAccess = $post["importParentAccess"];
+        } catch (\Exception $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+
+        // Do the import in a detached state so it doesn't time out
+
+        $this->getResponse()->content->set([
+            'template' => '@adminImportPastoral/log.twig',
+            'data'     => array(
+                'pageCurrent'   => 'import',
+                'logs'          => $this->getLogMapper()->findImportIds(),
+                'message'       => true
+            ),
+            'postOutput' => [
+                function() use ($defaultOwner, $importParentAccess) {
+                    $this->importCallback($defaultOwner, $importParentAccess);
+                }
+            ],
         ]);
     }
 
     /**
      * Do pastoral record import in a detached state so it doesn't block the user
      *
-     * @param \Schoolbox\User $defaultOwner         Fallback owner when cannot be located in Schoolbox
+     * @param User $defaultOwner Fallback owner when cannot be located in Schoolbox
+     * @param bool $importParentAccess Flag indicating if parents should be imported to the pastoral_access table
      */
-    public function importCallback($defaultOwner)
+    public function importCallback($defaultOwner, $importParentAccess)
     {
         try
         {
             $pastoralExternal = new \External_Pastoral();
-            $pastoralExternal->importPastoral($this->getUser()->getId(), $defaultOwner);
+            $pastoralExternal->importPastoral($this->getUser(), $defaultOwner, $importParentAccess);
         }
         catch (\Exception $e)
         {

@@ -14,6 +14,7 @@ use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
 use Alaress\Database\Quoter\Sqlsrv\Quoter as SqlsrvQuoter;
+use Alaress\Database\Statement\Query\Sqlsrv\Query;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
 use PDO;
@@ -55,7 +56,36 @@ class Broker extends Base implements IBroker
         return parent::connect($options);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function enableMultipleActiveResultSets()
+    {
+        // Enabling MARS required disconnect/reconnecting from the database.
+
+        $this->connector->reconnect(['MultipleActiveResultSets' => true]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function disableMultipleActiveResultSets()
+    {
+        // Enabling MARS required disconnect/reconnecting from the database.
+
+        $this->connector->reconnect(['MultipleActiveResultSets' => false]);
+    }
+
     // These return MSSQL specific statement objects
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareQuery($query)
+    {
+        return new Query($this, $query);
+    }
+
 
     /**
      * @inheritdoc
@@ -92,6 +122,12 @@ class Broker extends Base implements IBroker
             $portString = ",{$this->connector->getPort()};";
         }
 
-        return "sqlsrv:Server={$this->connector->getHostname()};{$portString}Database={$this->connector->getDatabase()};MultipleActiveResultSets=0;";
+        if (isset($this->options['MultipleActiveResultSets'])) {
+            $multipleActiveResultsSets = "1";
+        } else {
+            $multipleActiveResultsSets = "0";
+        }
+
+        return "sqlsrv:Server={$this->connector->getHostname()};{$portString}Database={$this->connector->getDatabase()};MultipleActiveResultSets={$multipleActiveResultsSets};";
     }
 }

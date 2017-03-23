@@ -1,24 +1,29 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\Comment;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
+use Schoolbox\Pastoral\Model as Pastoral;
 
 class Model implements ISoftDeletable {
 
-    /** @var int */
-    protected $id;
-
-    /** @var int */
-    protected $pastoralId;
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+    
+    /** @var Pastoral */
+    protected $pastoral;
 
     /** @var int */
     protected $externalId;
@@ -26,32 +31,23 @@ class Model implements ISoftDeletable {
     /** @var string */
     protected $body;
 
-    /** @var \Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $updatedAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
-
     /** @var User */
     protected $owner;
 
     /**
-     * @param string $pastoralId
+     * @param Pastoral $pastoral
      * @return self
      */
-    public function setPastoralId($pastoralId) {
-        $this->pastoralId = $pastoralId;
-        return $pastoralId;
+    public function setPastoral($pastoral) {
+        $this->pastoral = $pastoral;
+        return $this;
     }
 
     /**
-     * @return int
+     * @return Pastoral
      */
-    public function getPastoralId() {
-        return $this->pastoralId;
+    public function getPastoral() {
+        return $this->pastoral;
     }
 
     /**
@@ -60,7 +56,7 @@ class Model implements ISoftDeletable {
      */
     public function setExternalId($externalId) {
         $this->externalId = $externalId;
-        return $externalId;
+        return $this;
     }
 
     /**
@@ -69,22 +65,6 @@ class Model implements ISoftDeletable {
     public function getExternalId() {
         return $this->externalId;
     }    
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() {
-        return $this->id;
-    }
 
     /**
      * @param string $body
@@ -103,7 +83,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param \Schoolbox\User $owner
+     * @param User $owner
      * @return self
      */
     public function setOwner($owner) {
@@ -112,66 +92,9 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return \Schoolbox\User
+     * @return User
      */
     public function getOwner() {
         return $this->owner;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return \Alaress_Date_Format
-     */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $updatedAt
-     * @return \Alaress_Date_Format
-     */
-    public function setUpdatedAt($updatedAt) {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $updatedAt
-     */
-    public function getUpdatedAt() {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return \Alaress_Date_Format
-     */
-    public function setCreatedAt($createdAt) {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt() {
-        return $this->createdAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted() {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
     }
 }

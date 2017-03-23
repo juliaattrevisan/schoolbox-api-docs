@@ -125,8 +125,12 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
                 }
 
                 $return[] = array(
-                    'name' => $person,
-                    'id'   => intval($user['uid']),
+                    'name'          => $person,
+                    'id'            => intval($user['uid']),
+                    'first_name'    => $user['firstname'],
+                    'last_name'     => $user['lastname'],
+                    'role'          => $user['gname'],
+                    'external_id'   => $user['synergy_id']
                 );
             }
         }

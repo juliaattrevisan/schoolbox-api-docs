@@ -1,0 +1,114 @@
+{# TODO: Front-end developer needs to make this thing properly pretty #}
+
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1 class="no-margin">{{ student.fullName }}</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row actions-small-2">
+    <div class="list-item">
+        <div class="small-10 island">
+            <h2 class="subheader">Pastoral Profile</h2>
+        </div>
+    </div>
+    <nav>
+        {# Display linked student records #}
+
+        {% if linkedStudents | length %}
+            <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
+        {% endif %}
+
+        {# Delete record #}
+
+        {% if record is not empty %}
+            {% if isRouteAuthorized('pastoral.postRecordDelete', {record: record}) %}
+                <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+            {% endif %}
+        {% endif %}
+
+        {# Display link to insert pastoral record if the logged in user is authorized to do so #}
+
+        {% if isRouteAuthorized('pastoral.getStudentRecordInsert') %}
+            <a href="{{ routeLookup('pastoral.getStudentRecordInsert', {'studentId': student.id}) }}" class="icon-add" title="Add Pastoral Record"></a>
+        {% endif %}
+
+        {# Modify record #}
+
+        {% if not showBody and record is not empty %}
+            {% if isRouteAuthorized('pastoral.getStudentRecordUpdate', {record: record}) %}
+                <a class="icon-modify no-text"
+                   href="{{ routeLookup('pastoral.getStudentRecordUpdate', {'studentId': record.student.id, 'recordId': record.id}) }}"
+                   title="Modify"></a>
+            {% endif %}
+        {% endif %}
+    </nav>
+    {% if linkedStudents | length %}
+        <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
+            <li class="separator">Students With Linked Records</li>
+            {% for student in linkedStudents %}
+                <li><a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}" class="icon-user">{{ student.first_name }} {{ student.last_name }} ({{ student.count }})</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="profile content">
+                <div class="row no-margin">
+                    <div class="small-12 medium-4 large-2 columns no-pad">
+                        {{ profile.imagePortrait(student) }}
+                    </div>
+                    <div class="small-12 medium-8 large-10 columns">
+                        <dl>
+                            {# Display student name #}
+
+                            <dt class="no-margin small-6 medium-3">Student Name</dt>
+                            <dd class="no-margin small-6 medium-9">
+                                <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
+                            </dd>
+
+                            {# Display links to students parents #}
+
+                            {% for parent in student.parents %}
+                                <dt class="no-margin small-6 medium-3">
+                                    {% if loop.first %}
+                                        Parents
+                                    {% else %}
+                                        &nbsp;
+                                    {% endif %}
+                                </dt>
+                                <dd class="no-margin small-6 medium-9">
+                                    <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a>
+                                </dd>
+                            {% endfor %}
+
+                            {# Display student year level #}
+
+                            <dt class="no-margin small-6 medium-3">Student Year Level</dt>
+                            <dd class="no-margin small-6 medium-9">{{ student.year | default('Unknown') }}</dd>
+
+                            {% if relatedStudents | length %}
+                                <dt class="no-margin small-6 medium-3">
+                                    Students With Linked Records
+                                </dt>
+                                <dd class="no-margin small-6 medium-9">
+                                {% for related in relatedStudents %}
+                                    <a href="{{ routeLookup('pastoral.getStudent', {studentId: related.id}) }}">{{ related.fullName }}</a>
+                                    {% if not loop.last %}<br>{% endif %}
+                                {% endfor %}
+                                </dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

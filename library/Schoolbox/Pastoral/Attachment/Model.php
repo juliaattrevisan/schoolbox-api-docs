@@ -1,177 +1,82 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\Attachment;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Resource\File\Model as File;
+use Schoolbox\Resource\Storage\IStorage;
 
 class Model implements ISoftDeletable {
 
-    /** @var int */
-    protected $id;
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
-    /** @var int */
-    protected $pastoralId;
+    /** @var Pastoral $pastoral */
+    protected $pastoral;
 
-    /** @var string */
-    protected $hash;
-
-    /** @var \Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $updatedAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
-
-    /** @var string */
-    protected $icon;
-
-    /** @var string */
-    protected $filename;
+    /** @var IStorage $storage */
+    protected $storage;
+    
+    /** @var File $file */
+    protected $file;
 
     /**
-     * @param string $hash
+     * @param Pastoral $pastoral
      * @return self
      */
-    public function setHash($hash) {
-        $this->hash = $hash;
+    public function setPastoral($pastoral) {
+        $this->pastoral = $pastoral;
         return $this;
     }
 
     /**
-     * @return string
+     * @return Pastoral
      */
-    public function getHash() {
-        return $this->hash;
+    public function getPastoral() {
+        return $this->pastoral;
     }
 
     /**
-     * @param string $icon
+     * @param IStorage $storage
      * @return self
      */
-    public function setIcon($icon) {
-        $this->icon = $icon;
+    public function setStorage($storage) {
+        $this->storage = $storage;
         return $this;
     }
 
     /**
-     * @return string
+     * @return IStorage
      */
-    public function getIcon() {
-        return $this->icon;
+    public function getStorage() {
+        return $this->storage;
     }
 
     /**
-     * @param string $filename
+     * @param File $file
      * @return self
      */
-    public function setFilename($filename) {
-        $this->filename = $filename;
+    public function setFile($file) {
+        $this->file = $file;
         return $this;
     }
 
     /**
-     * @return string
+     * @return File
      */
-    public function getFilename() {
-        return $this->filename;
-    }
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() {
-        return $this->id;
-    }
-
-    /**
-     * @param int $pastoralId
-     * @return self
-     */
-    public function setPastoralId($pastoralId) {
-        $this->pastoralId = $pastoralId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPastoralId() {
-        return $this->pastoralId;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $updatedAt
-     * @return self
-     */
-    public function setUpdatedAt($updatedAt) {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $updatedAt
-     */
-    public function getUpdatedAt() {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt) {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt() {
-        return $this->createdAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted() {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
-    }
+    public function getFile() {
+        return $this->file;
+    }    
 }

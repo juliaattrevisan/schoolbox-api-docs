@@ -2,9 +2,8 @@
 #
 # Enables Microsoft PDO_SQLSRV Support For PHP 7.1/Ubuntu 14.04
 #
-# This won't be needed once we get 16.04 and native support is available, this downloads, compiles
-# and installs the PHP 7 / Microsoft SQL Server ODBC linux drivers so they will work with Ubuntu 14.04
-# and we can at least test and develop with our Vagrants. 
+# This won't be needed once we get 16.04 and native support is available, this downloads a pre-compiled
+# version of the PDO_SQLSRV driver and its dependencies for use on Ubuntu 14.04.
 #
 # Standard Disclaimer: If it breaks your world, don't come crying!
 #
@@ -19,145 +18,141 @@ echo "--------------------------------------------------------------------------
 echo
 
 {
-echo "-------------------------------------------------------------------------------------------"
-echo "Installation Started"
-echo "-------------------------------------------------------------------------------------------"
-echo
+    echo "-------------------------------------------------------------------------------------------"
+    echo "Installation Started"
+    echo "-------------------------------------------------------------------------------------------"
+    echo
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
 echo "Switching Active PHP Version To 7.1..."
 
 {
-USERPATH=`pwd`
-sudo a2dismod php5
-sudo a2enmod php7.1
-sudo update-alternatives --set php /usr/bin/php7.1
-sudo service apache2 restart 
+    USERPATH=`pwd`
+    sudo a2dismod php5
+    sudo a2enmod php7.1
+    sudo update-alternatives --set php /usr/bin/php7.1
+    sudo service apache2 restart
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
-echo "Adding Ubuntu Toolchain PPA & Updating APT Repositories..."
+eval "cd ${USERPATH}"
+
+echo "Installing driver pre-requisites..."
 
 {
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y 
-sudo apt-get update
+    sudo apt-get -y install libssl1.0.0
+    sudo apt-get -y install libgss3
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
-echo "Installing GCC/G++ Compiler (This will take a few minutes)..."
+echo "Downloading driver files..."
+
 {
-sudo -i export CPPFLAGS="-DSIZEOF_LONG_INT=8"
-sudo apt-get -y install gcc-5 g++-5
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+    cd ~
+    wget https://s3-ap-southeast-2.amazonaws.com/damian-s3-test/db2/pdosqlsrv.tar.gz
+    tar -xzf pdosqlsrv.tar.gz
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
-echo "Downloading unixODBC 2.3.1..."
+echo "Copying driver files..."
 
 {
-cd ~
-wget ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-2.3.1.tar.gz
-tar -xzf unixODBC-2.3.1.tar.gz
+    sudo mkdir -p /usr/lib64
+    sudo mkdir -p /opt/microsoft/msodbcsql
+    sudo bash -c 'echo -e "/usr/lib64" >> /etc/ld.so.conf'
+    sudo cp ~/pdosqlsrv/usr-bin/* /usr/bin
+    sudo cp ~/pdosqlsrv/etc-php-7.1-apache2-conf.d/* /etc/php/7.1/apache2/conf.d
+    sudo cp ~/pdosqlsrv/etc-php-7.1-cli-conf.d/* /etc/php/7.1/cli/conf.d
+    sudo cp ~/pdosqlsrv/usr-lib64/*.a /usr/lib64
+    sudo cp ~/pdosqlsrv/usr-lib64/*.so /usr/lib64
+    sudo cp ~/pdosqlsrv/usr-lib64/*.la /usr/lib64
+    sudo ln -s /usr/lib64/libodbc.so /usr/lib64/libodbc.so.2
+    sudo ln -s /usr/lib64/libodbc.so /usr/lib64/libodbc.so.2.0.0vagrant
+    sudo ln -s /usr/lib64/libodbccr.so /usr/lib64/libodbccr.so.2
+    sudo ln -s /usr/lib64/libodbccr.so /usr/lib64/libodbccr.so.2.0.0
+    sudo ln -s /usr/lib64/libodbcinst.so /usr/lib64/libodbcinst.so.2
+    sudo ln -s /usr/lib64/libodbcinst.so /usr/lib64/libodbcinst.so.2.0.0
+    sudo cp ~/pdosqlsrv/usr-lib-php-20160303/* /usr/lib/php/20160303
+    sudo cp ~/pdosqlsrv/usr-lib-x86_64-linux-gnu/libstdc++.so.6.0.22 /usr/lib/x86_64-linux-gnu
+    sudo cp -a ~/pdosqlsrv/opt-microsoft-msodbcsql/* /opt/microsoft/msodbcsql
+    sudo ln -s /opt/microsoft/msodbcsql/bin/bcp-13.0.0.0 /bin/bcp
+    sudo ln -s /opt/microsoft/msodbcsql/bin/sqlcmd-13.0.0.0 /bin/sqlcmd
+    sudo cp ~/pdosqlsrv/usr-lib-php-20160303/* /usr/lib/php/20160303
+    sudo cp ~/pdosqlsrv/etc/* /etc
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
-echo "Configuring unixODBC 2.3.1..."
+echo "Updating shared library cache..."
 
 {
-cd unixODBC-2.3.1/
-./configure --prefix=/usr --libdir=/usr/lib64 --sysconfdir=/etc --disable-gui --disable-drivers --enable-iconv --with-iconv-char-enc=UTF8 --with-iconv-ucode-enc=UTF16LE 1> odbc_con.log 2> make_err.log
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-echo "Building & Installing unixODBC 2.3.1..."
-
-{
-sudo make 1> make_std.log 2> make_err.log
-sudo make install 1> makeinstall_std.log 2> makeinstall_err.log
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-echo "Downloading Microsoft SQL Server ODBC Driver 13..."
-
-{
-cd ~
-wget "https://meetsstorenew.blob.core.windows.net/contianerhd/Ubuntu%2013.0%20Tar/msodbcsql-13.0.0.0.tar.gz?st=2016-10-18T17%3A29%3A00Z&se=2022-10-19T17%3A29%3A00Z&sp=rl&sv=2015-04-05&sr=b&sig=cDwPfrouVeIQf0vi%2BnKt%2BzX8Z8caIYvRCmicDL5oknY%3D" -O msodbcsql-13.0.0.0.tar.gz
-tar -xzf msodbcsql-13.0.0.0.tar.gz
-cd msodbcsql-13.0.0.0/
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-echo "Installing Additional Dependencies..."
-
-{
-sudo apt-get -y install libssl1.0.0
-sudo apt-get -y install libgss3
-sudo echo "/usr/lib64" >> /etc/ld.so.conf
-sudo ldconfig
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-echo "Installing Microsoft SQL Server ODBC Driver 13..."
-
-{
-sudo bash ./install.sh install --force --accept-license
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-echo "Compiling Driver..."
-
-{
-cd ~
-wget https://github.com/Microsoft/msphpsql/archive/4.0.6-Linux.tar.gz
-tar -xzf 4.0.6-Linux.tar.gz
-cd msphpsql-4.0.6-Linux/source/pdo_sqlsrv/
-phpize && ./configure CXXFLAGS=-std=c++11 && make
-sudo make install
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-echo "Adding Extension To PHP 7.1 Configuration Files..."
-
-{
-sudo bash -c 'echo -e "; configuration for php common module \n; priority=20 \nextension=pdo_sqlsrv.so" > /etc/php/7.1/mods-available/pdo_sqlsrv.ini'
-sudo ln -s /etc/php/7.1/mods-available/pdo_sqlsrv.ini /etc/php/7.1/apache2/conf.d/20-pdo_sqlsrv.ini
-sudo ln -s /etc/php/7.1/mods-available/pdo_sqlsrv.ini /etc/php/7.1/cli/conf.d/20-pdo_sqlsrv.ini
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-echo "Cleaning Up..."
-
-{
-cd ~
-sudo rm -rf msphpsql-4.0.6-Linux/
-sudo rm -rf unixODBC-2.3.1/
-sudo rm -rf msodbcsql-13.0.0.0/
-sudo rm 4.0.6-Linux.tar.gz
-sudo rm msodbcsql-13.0.0.0.tar.gz
-sudo rm unixODBC-2.3.1.tar.gz
+    sudo ldconfig
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
 echo "Changing Schoolbox External Connector To Synergetic V68..."
 
 {
-mysql schoolbox -e "UPDATE config SET value='synergetic.schoolbox.com.au' WHERE name='external_db_host'"
-mysql schoolbox -e "UPDATE config SET value='Synergetic_AUVIC_ALARESS_PRD' WHERE name='external_db_db'"
-mysql schoolbox -e "UPDATE config SET value='http://synergetic.schoolbox.com.au:7008/' WHERE name='external_portal'"
-mysql schoolbox -e "UPDATE config SET value='synergetic' WHERE name='external_type'"
-mysql schoolbox -e "UPDATE config SET value='sa' WHERE name='external_db_user'"
-mysql schoolbox -e "UPDATE config SET value='Synergetic#1' WHERE name='external_db_passwd'"
-mysql schoolbox -e "UPDATE config SET value='0' WHERE name='external_cache_timeout'"
-mysql schoolbox -e "UPDATE config SET value='1' WHERE name='external_pastoral'"
-mysql schoolbox -e "UPDATE config SET value='1' WHERE name='external_pastoral_upload'"
+    mysql schoolbox -e "UPDATE config SET value='synergetic.schoolbox.com.au' WHERE name='external_db_host'"
+    mysql schoolbox -e "UPDATE config SET value='Synergetic_AUVIC_ALARESS_PRD' WHERE name='external_db_db'"
+    mysql schoolbox -e "UPDATE config SET value='http://synergetic.schoolbox.com.au:7008/' WHERE name='external_portal'"
+    mysql schoolbox -e "UPDATE config SET value='synergetic' WHERE name='external_type'"
+    mysql schoolbox -e "UPDATE config SET value='sa' WHERE name='external_db_user'"
+    mysql schoolbox -e "UPDATE config SET value='Synergetic#1' WHERE name='external_db_passwd'"
+    mysql schoolbox -e "UPDATE config SET value='0' WHERE name='external_cache_timeout'"
+    mysql schoolbox -e "UPDATE config SET value='1' WHERE name='external_pastoral'"
+    mysql schoolbox -e "UPDATE config SET value='1' WHERE name='external_pastoral_upload'"
 } &>> ~/php_7.1_pdosqlsrv_install.log
+
+echo "Removing downloaded files..."
+
+{
+    sudo rm ~/pdosqlsrv.tar.gz
+    sudo rm -rf ~/pdosqlsrv
+} &>> ~/php_7.1_pdosqlsrv_install.log
+
+# Lazy hack to upgrade to later v4.1.8
+
+echo "Installing GCC..."
+
+{
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    sudo apt-get update
+    sudo -i export CPPFLAGS="-DSIZEOF_LONG_INT=8"
+    sudo apt-get -y install gcc-5 g++-5
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+} &>> ~/php_7.1_pdosqlsrv_install.log
+
+echo "Building UnixODBC..."
+
+{
+    cd ~
+    wget ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-2.3.1.tar.gz
+    tar -xzf unixODBC-2.3.1.tar.gz
+    cd unixODBC-2.3.1/
+    ./configure --enable-static --prefix=/usr --libdir=/usr/lib64 --sysconfdir=/etc --disable-gui --disable-drivers --enable-iconv --with-iconv-char-enc=UTF8 --with-iconv-ucode-enc=UTF16LE
+    sudo make
+    sudo make install
+} &>> ~/php_7.1_pdosqlsrv_install.log
+
+echo "Building MSSQLPHP v4.1.8..."
+
+{
+    cd ~
+    wget https://github.com/Microsoft/msphpsql/archive/v4.1.8-preview.tar.gz
+    tar -xzf ./v4.1.8-preview.tar.gz
+    cd msphpsql-4.1.8-preview/source
+    chmod +x packagize.sh
+    ./packagize.sh
+    cd pdo_sqlsrv
+    phpize
+    ./configure --enable-static CXXFLAGS=-std=c++11
+    make
+    sudo make install
+} &>> ~/php_7.1_pdosqlsrv_install.log
+
 
 echo "Restarting Apache Service & Schoolbox Daemons..."
 
 {
-sudo service apache2 restart 
-sudo service schoolbox-scheduled restart
-sudo service schoolbox-rerouted restart
-sudo service schoolbox-socketd restart
-sudo service schoolbox-digestd restart
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-{
-echo
-echo php -i | grep 'PDO drivers'
-echo
-echo "-------------------------------------------------------------------------------------------"
-echo "Installation Completed"
-echo "-------------------------------------------------------------------------------------------"
-echo
+    sudo service apache2 restart
+    sudo service schoolbox-scheduled restart
+    sudo service schoolbox-socketd restart
+    sudo service schoolbox-digestd restart
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
 echo
@@ -169,4 +164,3 @@ php -i | grep 'PDO drivers'
 echo "Log file available at: ~/php_7.1_pdosqlsrv_install.log"
 echo
 
-eval "cd ${USERPATH}"

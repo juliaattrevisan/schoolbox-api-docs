@@ -7,73 +7,56 @@
 
 namespace Schoolbox\Pastoral;
 
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
+use External_Pastoral;
+use PDO;
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Pastoral\Access\Model as Access;
+use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
+use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
-use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
-use Schoolbox\Pastoral;
-use Schoolbox\Pastoral\Model as PastoralModel;
-use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
-use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
-use Schoolbox\Pastoral\Category\Model as PastoralCategoryModel;
-use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
-use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
-use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
-use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
-use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
-use Schoolbox\Permission\Access\Access as AccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
+use Schoolbox\Pastoral\Type\Model as Type;
+use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
+use Schoolbox\Pastoral\Category\Model as Category;
+use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
+use Schoolbox\Pastoral\Severity\Model as Severity;
+use Schoolbox\Pastoral\Comment\Mapper as CommentMapper;
+use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
+use Schoolbox\Pastoral\Attachment\Mapper as AttachmentMapper;
+use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
 
 class Mapper extends BaseMapper
 {
     /**
-     * Mapper constructor.
-     */
-    public function __construct()
-    {
-        $this->setUserAccessMapper(UserAccessMapper::getInstance());
-        $this->setUserMapper(UserMapper::getInstance());
-        $this->setAccessMapper(AccessMapper::getInstance());
-        $this->setRoleMapper(RoleMapper::getInstance());
-        $this->setUserMapper(UserMapper::getInstance());
-        $this->setStorageMapper(StorageMapper::getInstance());
-        $this->setPastoralTagsMapper(PastoralTagsMapper::getInstance());
-        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
-        $this->setPastoralAttachmentMapper(PastoralAttachmentMapper::getInstance());
-        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
-
-        parent::__construct();
-    }
-
-    /**
-     * Setup mapper
+     * @inheritdoc
      */
     protected function mapping()
     {
         $this->hasTable('pastoral');
-        $this->hasModel(PastoralModel::class);
+        $this->hasModel(Model::class);
+        $this->joins('parent_id', self::class, 'id', null, null, 'parent', 'parent');
+        $this->joins('type_id', TypeMapper::class, 'id', null, null, 'type', 'type');
+        $this->joins('category_id', CategoryMapper::class, 'id', null, null, 'category', 'category');
+        $this->joins('severity_id', SeverityMapper::class, 'id', null, null, 'severity', 'severity');
+        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('external_id', self::TYPE_INTEGER);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('private', self::TYPE_BOOLEAN);
         $this->uses('points', self::TYPE_INTEGER);
-        $this->uses('created_at', self::TYPE_DATETIME);
-        $this->uses('updated_at', self::TYPE_DATETIME);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->joins('parent_id', self::class, 'id', null, null, 'parent', 'parent');
-        $this->joins('type_id', PastoralTypeMapper::class, 'id', null, null, 'type', 'type');
-        $this->joins('category_id', PastoralCategoryMapper::class, 'id', null, null, 'category', 'category');
-        $this->joins('severity_id', PastoralSeverityMapper::class, 'id', null, null, 'severity', 'severity');
-        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
-        $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
         $this->hasSoftDeleteDateField('deleted_at');
 
         // Anyone got a shorthand version of these?
@@ -81,27 +64,17 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'access',
             array(
-                'mapper' => '\\Schoolbox\\Pastoral\\Access\\Mapper',
+                'mapper' => AccessMapper::class,
                 'other_key' => 'pastoral_id',
                 'this_key' => 'id',
                 'multiple' => true,
             )
         );
 
-//        $this->hasJoin(
-//            'tags',
-//            array(
-//                'mapper' => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
-//                'other_key' => 'pastoral_id',
-//                'this_key' => 'id',
-//                'multiple' => true,
-//            )
-//        );
-
         $this->hasJoin(
             'comments',
             array(
-                'mapper' => '\\Schoolbox\\Pastoral\\Comment\\Mapper',
+                'mapper' => CommentMapper::class,
                 'other_key' => 'pastoral_id',
                 'this_key' => 'id',
                 'multiple' => true,
@@ -111,676 +84,666 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'attachments',
             array(
-                'mapper' => '\\Schoolbox\\Pastoral\\Attachment\\Mapper',
+                'mapper' => AttachmentMapper::class,
                 'other_key' => 'pastoral_id',
                 'this_key' => 'id',
                 'multiple' => true,
             )
         );
+
+        $this->registerCallback(Mapper::CALLBACK_PRESAVE, [$this, 'saveRevision']);
+        $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteReferences']);
     }
 
     /**
-     * Find all pastoral records by student ID number
-     * @param $id
+     * Prior to deleting, make sure we delete anything that is linked to this record
+     *
+     * @param Model $model
+     */
+    public function deleteReferences(Model $model) {
+
+        // Delete comments from record
+
+        $this->getJoinMapper('comments')->deleteByColumn('pastoral_id', $model->getId());
+        $this->getJoinMapper('attachments')->deleteByColumn('pastoral_id', $model->getId());
+        $this->getJoinMapper('access')->deleteByColumn('pastoral_id', $model->getId());
+
+        // Delete related tags
+
+        $pastoralTagMapper = PastoralTagMapper::getInstance();
+        $pastoralTagMapper->deleteForRecord($model);
+        $pastoralTagMapper->purgeUnassociated();
+
+        // Delete record from external database
+
+        $pastoralExternal = new External_Pastoral();
+        $pastoralExternal->deletePastoral($model);
+    }
+
+    /**
+     * Prior to saving changes to a record, we cover out butts and keep a revision history
+     *
+     * @param Model $model
+     */
+    public function saveRevision(Model $model) {
+
+        // This is only applicable if we are updating a record
+
+        if (!empty($model->getId())) {
+
+            $this->getDatabase()->query("
+                INSERT INTO `pastoral_revision` (
+                    user_id,
+                    root_id, 
+                    parent_id, 
+                    owner_id, 
+                    severity_id, 
+                    student_id, 
+                    type_id, 
+                    external_id, 
+                    private, 
+                    heading, 
+                    body, 
+                    created_at, 
+                    updated_at,
+                    category_id, 
+                    points 
+                ) 
+                SELECT 
+                    owner_id,
+                    id, 
+                    parent_id, 
+                    '{$this->getSessionUser()->getId()}', 
+                    severity_id, 
+                    student_id, 
+                    type_id, 
+                    external_id, 
+                    private, 
+                    heading, 
+                    body, 
+                    created_at, 
+                    updated_at,
+                    category_id, 
+                    points 
+                FROM `pastoral` 
+                WHERE `id` = '{$model->getId()}'
+            ");
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString($revisions = false)
+    {
+        $tableName = $revisions ? '`pastoral_revision`' : $this->getTable();
+
+        return
+        "
+            SELECT      `pastoral`.`parent_id`, 
+                        `pastoral`.`type_id`, 
+                        `pastoral`.`category_id`, 
+                        `pastoral`.`severity_id`, 
+                        `pastoral`.`owner_id`, 
+                        `pastoral`.`student_id`, 
+                        `pastoral`.`id`, 
+                        `pastoral`.`external_id`, 
+                        `pastoral`.`body`, 
+                        `pastoral`.`heading`, 
+                        `pastoral`.`private`, 
+                        `pastoral`.`points`, 
+                        `pastoral`.`created_at`, 
+                        `pastoral`.`updated_at`, 
+                        `pastoral`.`deleted_at`, 
+                        {$this->getJoinColumnString('student', 's')},
+                        {$this->getJoinColumnString('severity', 'sv')},
+                        {$this->getJoinColumnString('owner', 'o')},
+                        {$this->getJoinColumnString('type', 't')},
+                        {$this->getJoinColumnString('category', 'c')}
+            FROM        {$tableName} `pastoral`
+            LEFT JOIN   {$this->getJoinSql('student', '', 's')}
+            LEFT JOIN   {$this->getJoinSql('severity', '', 'sv')}
+            LEFT JOIN   {$this->getJoinSql('owner', '', 'o')}
+            LEFT JOIN   {$this->getJoinSql('type', '', 't')}
+            LEFT JOIN   {$this->getJoinSql('category', '', 'c')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        // This internal function exists to stop recursion when hydrating related records
+
+        return $this->hydrateSelectInternal($statement);
+    }
+
+    /**
+     * Hydrate the record. This exists to prevent recursion when hydrating related records.
+     *
+     * @param PDOStatement $statement
+     * @param bool $hydrateRelatedRecords
      * @return Collection
      */
-    public function findByStudentId($id)
+    private function hydrateSelectInternal(PDOStatement $statement, $hydrateRelatedRecords = true)
     {
-        $query = "
-            SELECT
-                {$this->getColumnString('r')},
-                {$this->getJoinColumnString('student', 's')},
-                {$this->getJoinColumnString('severity', 'sv')},
-				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')},
-				{$this->getJoinColumnString('category', 'c')}
-            FROM {$this->getTable()} `r`
-            LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
-            LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
-            LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
-            LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
-            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
-            WHERE s.id = ?
-            AND r.deleted_at IS NULL
-            ORDER BY r.created_at DESC
-        ";
+        // Return pastoral records fully hydrated by default
 
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array($id));
-
-        $records = new Collection();
+        $collection = new Collection();
 
         foreach ($statement as $row) {
-            /** @var Pastoral\Model $record */
-            $record = $this->hydrate($row, 'r');
 
-            // Check permissions
+            // Shortcut hydration if it is a private record and the user is a parent
 
-            if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
-
-                // The record is private and the user does not have access, remove attachments and
-                // override the body
-
-                $record->setAttachmentList(null);
-                $record->setShowPrivate(false);
-                $record->setBody("The contents of this record have been marked as private.");
-            } else {
-                $record->setShowPrivate(true);
-            }
-            $records->add($this->hydrateRecord($record, $row));
-        }
-
-        return $records;
-    }
-
-    /**
-     * Find pastoral record by ID number
-     * @var int $id
-     * @return Pastoral\Model
-     * @throws MapperException
-     */
-    public function findById($id)
-    {
-        $query = "
-            SELECT
-                {$this->getColumnString('r')},
-                {$this->getJoinColumnString('student', 's')},
-                {$this->getJoinColumnString('severity', 'sv')},
-				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')},
-				{$this->getJoinColumnString('category', 'c')}
-            FROM {$this->getTable()} `r`
-            LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
-            LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
-            LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
-            LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
-            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
-            WHERE r.id = ?
-            AND r.deleted_at IS NULL
-        ";
-
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array($id));
-
-        foreach ($statement as $row) {
-            /** @var Pastoral\Model $record */
-            $record = $this->hydrate($row, 'r');
-
-            // Check permissions
-
-            $record = $this->hydrateRecord($record, $row);
-
-            if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
-                $record->setBody("The contents of this record have been marked as private.");
-                $record->setShowPrivate(false);
-            } else {
-                $record->setShowPrivate(true);
+            if ($row['private'] && $this->getSessionUser()->getRole()->isParent()) {
+                continue;
             }
 
-            return $record;
-        }
+            /** @var Model $model */
+            $model = $this->hydrate($row);
 
-        throw new MapperException('Instance of object not found');
-    }
+            /** @var User $owner */
+            $owner = $this->hydrateJoin($row, 'owner', 'o');
+            $model->setOwner($owner);
 
-    /**
-     * Find pastoral record by parent ID number
-     * @param $parentId
-     * @return Collection
-     */
-    public function findByParentId($parentId)
-    {
-        $query = "
-            SELECT
-                {$this->getColumnString('r')},
-                {$this->getJoinColumnString('student', 's')},
-                {$this->getJoinColumnString('severity', 'sv')},
-				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')}
-            FROM {$this->getTable()} `r`
-            LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
-            LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
-            LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
-            LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
-            WHERE r.parent_id = ?
-            AND r.deleted_at IS NULL
-        ";
+            if ($this->getConfigLoader()->get('pastoral_severity')) {
+                /** @var Severity $severity */
+                $severity = $this->hydrateJoin($row, 'severity', 'sv');
+                $model->setSeverity($severity);
+            }
 
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array($parentId));
+            /** @var Type $type */
+            $type = $this->hydrateJoin($row, 'type', 't');
+            $model->setType($type);
 
-        $collection = new Collection;
+            /** @var Category $category */
+            $category = $this->hydrateJoin($row, 'category', 'c');
+            $model->setCategory($category);
 
-        foreach ($statement as $row) {
-            /** @var Pastoral\Model $record */
-            $record = $this->hydrate($row, 'r');
-            $collection->add($this->hydrateRecord($record, $row));
+            /** @var User $student */
+            $student = $this->hydrateJoin($row, 'student', 's');
+            $student->loadParents();
+            $student->loadTeachers();
+            $model->setStudent($student);
+
+            $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
+
+            // If the user is not in the audience- and is not the owner, they can't see the record
+
+            $inAudience = false;
+
+            /** @var Access $access */
+            foreach ($model->getAccess() as $access) {
+                if ($access->hasAccess($this->getSessionUser())) {
+                    $inAudience = true;
+                    break;
+                }
+            }
+
+            if (!$inAudience && $model->getOwner()->getId() != $this->getSessionUser()->getId()) {
+                continue;
+            }
+
+            // If the record is marked as private we may need to blank out its contents if the user does not have sufficent access
+
+            $accessGranted = false;
+
+            if ($model->getPrivate()) {
+
+                if ($model->getOwner()->getId() == $this->getSessionUser()->getId()) {
+
+                    // Owners can see their own records
+
+                    $accessGranted = true;
+
+                } else {
+
+                    // Otherwise, only individually audienced users, or members of audienced groups get access
+                    // to private records
+
+                    foreach ($model->getAccess() as $access) {
+                        if ($access->hasAccess($this->getSessionUser(), false)) {
+                            $accessGranted = true;
+                            break;
+                        }
+                    }
+
+                }
+            } else {
+                $accessGranted = true;
+            }
+
+            if ($accessGranted) {
+                $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
+                $model->setAttachments($this->getJoinMapper('attachments')->findByColumn('pastoral_id', $model->getId()));
+            } else {
+                $model->setBody($this->getConfigLoader()->get('pastoral_private_body'));
+            }
+
+            // Only hydrate related records if we're specifically told to
+
+            if ($hydrateRelatedRecords) {
+                $model->setRelatedRecords($this->getRelatedRecords($model));
+            }
+
+            // Add to collection
+
+            $collection->add($model);
         }
 
         return $collection;
     }
 
     /**
-     * Gets DB records matching report criteria
-     * @param \Schoolbox\User $user
-     * @param $before_date
-     * @param $after_date
-     * @param $severity
-     * @param $types
-     * @param $authors
-     * @param $students
-     * @param $tags
-     * @param $order
-     * @param $involved
-     * @param $years
-     * @return Collection
+     * Load revision history for record
+     *
+     * @param Model $model
+     * @return Model
      */
-    public function findAllReport(
-        $user,
-        $before_date,
-        $after_date,
-        $severity,
-        $types,
-        $authors,
-        $students,
-        $tags,
-        $order,
-        $involved,
-        $years
-    ) {
-        // Create filter SQL
+    public function hydrateRevisions($model)
+    {
+        // Load revision history
 
-        $criteria = [];
-
-        if ($before_date != '') {
-            $before_date = \Alaress_Date_Format::newLocal($before_date . " 12:00AM");
-            $criteria[] = "created_at <= '" . $before_date->getDatabase() . "'";
-        }
-
-        if ($after_date != '') {
-            $after_date = \Alaress_Date_Format::newLocal($after_date . " 11:59PM");
-            $criteria[] = "created_at >= '" . $after_date->getDatabase() . "'";
-        }
-
-        if ($severity != '') {
-            $criteria[] = "sv.order >= '{$severity}'";
-        }
-        if ($students != '') {
-            $criteria[] = "student_id IN ({$students})";
-        }
-        if ($authors != '') {
-            $criteria[] = "owner_id IN ({$authors})";
-        }
-        if ($types != '') {
-            $criteria[] = "type_id IN ({$types})";
-        }
-        else {
-            throw new \InvalidArgumentException('Record type required');
-        }
-
-        $array_years = explode(",", $years);
-
-        $years_sql = '';
-
-        if ($years != '') {
-            $years_sql .= "";
-
-            foreach ($array_years as $year) {
-                if ($years_sql != "") {
-                    $years_sql .= ",";
-                }
-                $years_sql .= "'" . str_replace("'", "''", $year) . "'";
-            }
-
-            $years_sql = "`s`.year IN ({$years_sql})";
-            $criteria[] = $years_sql;
-        }
-        else {
-            throw new \InvalidArgumentException('Year level required');
-        }
-
-
-        $criteria_sql = 'WHERE 1=1';
-
-        foreach ($criteria as $criterion) {
-            $criteria_sql .= ' AND '.$criterion;
-        }
-
-        $order_sql = "";
-        $order_array = explode(",", $order);
-
-        foreach ($order_array as $order_current) {
-            if ($order_sql != "") {
-                $order_sql .= ", ";
-            }
-
-            switch ($order_current) {
-                case 'student':
-                    $order_sql .= "`s`.lastname, `s`.firstname";
-                    break;
-                case 'severity':
-                    $order_sql .= "`sv`.order";
-                    break;
-                case 'date':
-                    $order_sql .= "`r`.created_at";
-                    break;
-                case 'category':
-                    $order_sql .= "`c`.name";
-                    break;
-                case 'author':
-                    $order_sql .= "`o`.lastname, `o`.firstname";
-                    break;
-            }
-        }
-
-        if ($involved == 'true' ||
-            (
-                !$this->getSessionUser()->getSuperuser() ||
-                !$this->getSessionUser()->getAccessList()->filterBy('service',
-                    UserAccess::SERVICE_PASTORAL)->count() > 0
-            )
-        ) {
-
-            // Only show records the logged in user is involved with via audience/role/ownership
-
-            $role_id = $user->getRole()->getId();
-            $user_id = $user->getId();
-
-            $involved_sql = "
-                AND (
-                    (SELECT COUNT(*) FROM pastoral_access WHERE role_id = '{$role_id}' AND pastoral_id = `r`.id) > 0 OR
-                    (SELECT COUNT(*) FROM pastoral_access WHERE user_id = '{$user_id}' AND pastoral_id = `r`.id) > 0 OR
-                    `r`.owner_id = '{$user_id}'
-                )
+        $sql = $this->getSelectString(true) . "
+                WHERE `pastoral`.`root_id` = :root_id
+                ORDER BY `updated_at` DESC
             ";
 
+        $revisionsStatement = $this->getDatabase()->prepare($sql);
+        $revisionsStatement->execute([
+            ':root_id' => $model->getId()
+        ]);
+
+        return $model->setRevisions($this->hydrateSelectInternal($revisionsStatement, false));
+    }
+
+    /**
+     * Return any records immediately related to the supplied pastoral record
+     *
+     * @param Model $record
+     * @return Collection
+     */
+    public function getRelatedRecords(Model $record)
+    {
+        $query = $this->getSelectString();
+
+        if ($record->getParent() instanceof Model) {
+
+            // This is a child item, find its parent and its other siblings
+
+            $query .= "                
+                WHERE   `pastoral`.`id` = :parent_id_0 AND
+                        `pastoral`.`parent_id` = :parent_id_1 AND
+                        `pastoral`.`id` <> :id
+            ";
+
+            $bindings['id'] = $record->getId();
+            $bindings['parent_id_0'] = $record->getParent()->getId();
+            $bindings['parent_id_1'] = $record->getParent()->getId();
+
         } else {
-            $involved_sql = '';
+
+            // This is a parent item, just find its children
+
+            $query .= "WHERE `parent_id` = :parent_id";
+            $bindings['parent_id'] = $record->getId();
+        }
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($bindings);
+
+        // Return hydrated objects- but don't hydrate their children or we'll end up in a recursive loop
+
+        return $this->hydrateSelectInternal($statement, false);
+    }
+
+    /**
+     * Returns a collection of students who have pastoral records linked to this student
+     *
+     * @param User $student
+     * @return array
+     */
+    public function getLinkedStudents($student)
+    {
+        $statement = $this->database->prepare("
+            SELECT DISTINCT   `student_id`,
+                              COUNT(*) AS `count`,
+                              `user`.`lastname` AS `last_name`, 
+                              `user`.`firstname` AS `first_name`
+            FROM              `pastoral`
+            JOIN              `user` ON `user`.`id` = `student_id`
+            WHERE             `parent_id` IN (
+                                  SELECT `id`
+                                  FROM pastoral
+                                  WHERE `student_id` = :student_id_0) OR `pastoral`.`id` IN (SELECT `parent_id`
+                                                                                             FROM pastoral
+                                                                                             WHERE `student_id` = :student_id_1)
+            GROUP BY `student_id`
+            ORDER BY `count` DESC, `user`.`lastname`, `user`.`firstname`
+        ");
+
+        $statement->execute([
+            ':student_id_0' => $student->getId(),
+            ':student_id_1' => $student->getId()
+        ]);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Display the most recent records that are tagged for display on dashboard based on their severity
+     *
+     * @param int $count Number of recent records to display
+     * @return Collection
+     */
+    public function findRecentDashboard($count = 5)
+    {
+        $records = $this->findByColumnList([
+                'sv.dashboard' => 1
+            ], [
+            'limit' => $count,
+            ['order' => ['created_at' => 'DESC']]
+        ]);
+
+        $displayed = new Collection();
+
+        /** @var Model$record */
+        foreach ($records as $record) {
+            /** @var Access $access */
+            foreach ($record->getAccess() as $access) {
+                if ($access->hasAccess($this->getSessionUser())) {
+                    $displayed->add($record);
+                    break;
+                }
+            }
+        }
+
+        return $displayed;
+    }
+
+    /**
+     * Perform a search of pastoral records (currently searches the heading, body and comments)
+     *
+     * @param string $search
+     * @return Collection
+     */
+    public function getSearchResults($search) {
+        
+        $search = trim($search);
+
+        // Keep an audit trail of searches
+
+        $pastoralAuditMapper = PastoralAuditMapper::getInstance();
+
+        $auditRecord = $pastoralAuditMapper->createModel();
+
+        $auditRecord->setUser($this->getSessionUser());
+        $auditRecord->setSearch($search);
+
+        if (strlen($search) >= 3) {
+
+            $searchArray = explode(' ', $search);
+
+            $sql = $this->getSelectString() . " WHERE (";
+
+            // Search heading & body of pastoral record
+
+            foreach ($searchArray as $index => $search) {
+                if ($index > 0) {
+                    $sql .= " OR ";
+                }
+
+                $sql .= "
+                `pastoral`.`body` LIKE :body_{$index} OR 
+                `pastoral`.`heading` LIKE :heading_{$index}
+            ";
+            }
+
+            // Search comments
+
+            $sql .= ") OR (`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE ";
+
+            foreach ($searchArray as $index => $search) {
+                if ($index > 0) {
+                    $sql .= " OR ";
+                }
+
+                $sql .= "`body` LIKE :comment_{$index} ";
+            }
+
+            $sql .= "))";
+
+            // Bind the parameters
+
+            $statement = $this->database->prepare($sql);
+
+            foreach ($searchArray as $index => $search) {
+                $statement->bindValue("body_{$index}", "%{$search}%");
+                $statement->bindValue("heading_{$index}", "%{$search}%");
+                $statement->bindValue("comment_{$index}", "%{$search}%");
+            }
+
+            // Retrieve the hydrated records
+
+            $statement->execute();
+
+            $results = $this->hydrateSelect($statement);
+
+            // Keep a record of all searches performed by users, and what results were displayed
+
+            $searchResults = [];
+
+            /** @var Model $record */
+            foreach ($results as $result) {
+                $searchResults[] = $result->getId();
+            }
+
+            // Record the search results that were returned by the search by imploding their IDs down into CSV
+
+            if (count($searchResults) > 0) {
+                $auditRecord->setSearchResult(implode(',', $searchResults));
+            }
+
+        } else {
+
+            // Search was too short
+
+            $results = new Collection();
+        }
+
+        // Save the audit record of the search
+
+        $pastoralAuditMapper->save($auditRecord);
+
+        return $results;
+    }
+
+    /**
+     * @var int $placeholderIndex This is a static placeholder used to make sure parameters in report filters are given unique names
+     */
+    private static $placeholderIndex = 0;
+
+    /**
+     * Ugly helper function to create report SQL condition
+     *
+     * @param array &$filters
+     * @param array &$bindings
+     * @param Collection $collection
+     * @param string $field
+     */
+    private function addFilter(&$filters, &$bindings, Collection $collection, $field)
+    {
+        $ids = [];
+
+        foreach ($collection as $current) {
+            if (is_object($current) && method_exists($current, 'getId')) {
+                $ids[] = $current->getId();
+            } else {
+                $ids[] = $current;
+            }
+        }
+
+        if (count($ids) > 0)
+        {
+            $pbArray = PredicateBuilder::getArrayBindings(
+                $ids,
+                str_replace(".", "", str_replace("`", "", str_replace("_", "", $field))) . self::$placeholderIndex
+            );
+
+            $bindings = array_merge($bindings, $pbArray['bindings']);
+            $filters[] = "{$field} IN ({$pbArray['placeholders']})";
+        }
+
+        self::$placeholderIndex++;
+    }
+
+    /**
+     * This is the function that gets the report results out of the database
+     *
+     * @param User $user
+     * @param Alaress_Date_Format $before_date
+     * @param Alaress_Date_Format $after_date
+     * @param Severity $severity
+     * @param Collection $types
+     * @param Collection $authors
+     * @param Collection $students
+     * @param Collection $tags
+     * @param Collection $order
+     * @param bool $involved
+     * @param Collection $years
+     *
+     * @return Collection
+     */
+    public function getReportData(
+        User $user,
+        Alaress_Date_Format $before_date,
+        Alaress_Date_Format $after_date,
+        Severity $severity,
+        Collection $types,
+        Collection $authors,
+        Collection $students,
+        Collection $tags,
+        Collection $order,
+        $involved,
+        Collection $years
+    ) {
+        $filters = [];
+        $bindings = [];
+        $criteriaSql = '';
+        $orderSql = '';
+
+        if ($before_date instanceof Alaress_Date_Format && !$before_date instanceof Alaress_Date_NullDate) {
+            $bindings[':beforeDate'] = $before_date->endOfDay()->toIso8601String();
+            $filters[] = '`created_at` <= :beforeDate';
+        }
+
+        if ($after_date instanceof Alaress_Date_Format && !$after_date instanceof Alaress_Date_NullDate) {
+            $bindings[':afterDate'] = $after_date->startOfDay()->toIso8601String();
+            $filters[] = '`created_at` >= :afterDate';
+        }
+
+        if (!empty($severity) && $this->getConfigLoader()->get('pastoral_severity')) {
+            $bindings[':severity'] = $severity->getId();
+            $filters[] = '`sv`.`order` >= :severity';
+        }
+
+        $this->addFilter($filters, $bindings, $students, '`student_id`');
+        $this->addFilter($filters, $bindings, $years, '`s`.`year`');
+        $this->addFilter($filters, $bindings, $types, '`type_id`');
+        $this->addFilter($filters, $bindings, $authors, '`owner_id`');
+
+        foreach ($order as $orderCurrent)
+        {
+            if ($orderSql != "") {
+                $orderSql .= ",";
+            }
+
+            switch ($orderCurrent) {
+                case 'student':     $orderSql .= "`s`.lastname, `s`.firstname"; break;
+                case 'severity':    $orderSql .= "`sv`.order"; break;
+                case 'date':        $orderSql .= "`pastoral`.created_at"; break;
+                case 'category':    $orderSql .= "`c`.name"; break;
+                case 'author':      $orderSql .= "`o`.lastname, `o`.firstname"; break;
+            }
+        }
+
+        // If filtering on involvement, only show records the logged in user is involved with via audience/role/ownership
+
+        if ($involved || !$this->getSessionUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0)
+        {
+            $filters[] = "
+                (
+                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = {$user->getRole()->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
+                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = {$user->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
+                    (
+                        SELECT COUNT(*) FROM `pastoral_access` WHERE `group_id` IN (
+                            SELECT `group_id` 
+                            FROM `pastoral_group_member` 
+                            WHERE `user_id` = {$user->getId()}
+                        ) AND `pastoral_id` = `pastoral`.`id`
+                    ) > 0 OR
+                    `pastoral`.`owner_id` = {$user->getId()}
+                )
+            ";
+        }
+
+        foreach ($filters as $filter) {
+            if ($criteriaSql != '') {
+                $criteriaSql .= ' AND ';
+            }
+            $criteriaSql .= $filter;
+        }
+
+        if ($criteriaSql != '') {
+            $criteriaSql = ' WHERE ' . $criteriaSql;
         }
 
         // Execute SQL
 
-        $query = "
-            SELECT
-                {$this->getColumnString('r')},
-                {$this->getJoinColumnString('student', 's')},
-                {$this->getJoinColumnString('severity', 'sv')},
-				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')},
-				{$this->getJoinColumnString('category', 'c')}
-            FROM {$this->getTable()} `r`
-            LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
-            LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
-            LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
-            LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
-            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
-            {$criteria_sql}
-            {$involved_sql}
-        ";
-        if($order_sql) {
-            $query .= "ORDER BY {$order_sql}";
-        }
-
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute();
+        $statement = $this->getDatabase()->prepare($this->getSelectString() . "{$criteriaSql} ORDER BY {$orderSql}");
+        $statement->execute($bindings);
 
         // Hydrate records for return
 
-        $records = new Collection();
+        $results = $this->hydrateSelect($statement);
 
-        foreach ($statement as $row) {
-            /** @var Pastoral\Model $record */
-            $record = $this->hydrate($row, 'r');
+        // If there are no tags to filter, just return the results now
 
-            // Skip if the record has been deleted
-
-            if ($record->isDeleted()) {
-                continue;
-            }
-
-            // Check tags
-
-            if (trim($tags) != '') {
-                $tagsArray = explode(",", trim($tags));
-
-                /* TODO: Can probably make tags hydrate with pastoral records instead
-                 * but I'll keep doing it this way so the refactor is more familiar
-                 */
-                if (!$this->getPastoralTagsMapper()->isAssociatedWith($record, $tagsArray)) {
-                    continue;
-                }
-            }
-
-            // Check permission
-
-            if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
-                $record->setBody("The contents of this record have been marked as private.");
-                $record->setShowPrivate(false);
-            } else {
-                $record->setShowPrivate(true);
-            }
-            $records->add($this->hydrateRecord($record, $row));
+        if ($tags->count() == 0) {
+            return $results;
         }
 
-        return $records;
-    }
+        // Otherwise, check each record has at least one of the tags we are searching for
 
-    /**
-     * Checks if the logged in user has permission to view private records
-     * @var Pastoral\Model $record
-     * @return bool
-     */
-    public function hasPrivatePermission(Pastoral\Model $record)
-    {
-        // Hack for notifier
+        $pastoralTagMapper = PastoralTagMapper::getInstance();
+        $resultsFiltered = new Collection();
 
-        if (!isset($_SESSION)) {
-            return true;
-        }
+        /** @var Model $result */
+        foreach ($results as $result) {
 
-        $user = $this->getSessionUser();
+            $found = false;
+            $tagsRecord = $pastoralTagMapper->findForRecord($result);
 
-        if ($user instanceof User) {
+            /** @var PastoralTag $tagFilter */
+            foreach ($tags as $tagFilter) {
 
-            // To access a private record you must be a staff member
+                /** @var PastoralTag $tagRecord */
+                foreach ($tagsRecord as $tagRecord) {
 
-            /** @var \Schoolbox\Role $role */
-            $role = $user->getRole();
-
-            if (!$role->isStaff()) {
-                return false;
-            }
-
-            // Pastoral moderators can always access private records
-
-            if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0) {
-                return true;
-            }
-
-            // Give owners permission to their own records regardless of other permissions
-
-            if ($record->getOwner()->getId() == $user->getId()) {
-                return true;
-            }
-
-            // If we get through to here we need to check the audience of item
-
-            $accessRecords = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId());
-
-            foreach ($accessRecords as $accessCurrent) {
-                // Only specifically audienced individuals can access private records, so we are only interested
-                // in records with a numeric `user_id`
-
-                if (is_numeric($accessCurrent->getUser()->getId())) {
-                    if ($accessCurrent->getUser()->getId() == $user->getId()) {
-                        return true;
+                    if ($tagRecord->getId() == $tagFilter->getId()) {
+                        $found = true;
+                        break;
                     }
                 }
+
+                if ($found) {
+                    $resultsFiltered->add($result);
+                    break;
+                }
             }
         }
 
-        return false;
-    }
-
-    /**
-     * Since this hydration is common to all of the methods, shoved it down here
-     * @param Model $record
-     * @param $row
-     * @return Model
-     * @throws MapperException
-     */
-    protected function hydrateRecord(Pastoral\Model $record, $row)
-    {
-        // Hydrate everything on the record
-
-        /** @var User $student */
-        $student = $this->hydrateJoin($row, 'student', 's');
-        /** @var User $owner */
-        $owner = $this->hydrateJoin($row, 'owner', 'o');
-        /** @var PastoralSeverityModel $severity */
-        $severity = $this->hydrateJoin($row, 'severity', 'sv');
-        /** @var PastoralTypeModel $type */
-        $type = $this->hydrateJoin($row, 'type', 't');
-        /** @var PastoralCategoryModel $category */
-        $category = $this->hydrateJoin($row, 'category', 'c');
-
-        $record->setStudent($student);
-        $record->setOwner($owner);
-        $record->setSeverity($severity);
-        $record->setType($type);
-        $record->setCategory($category);
-
-        // Don't know if this is right for the one-to-many joins, but it works
-
-        $record->setTagsList($this->getPastoralTagsMapper()->findForRecord($record->getId()));
-        $record->setCommentList($this->getPastoralCommentMapper()->findByColumn("pastoral_id", $record->getId()));
-        $record->setAttachmentList($this->getPastoralAttachmentMapper()->findByColumn("pastoral_id", $record->getId()));
-
-        // Grab users and roles that have access to the record
-
-        $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
-
-        // Grab comment authors
-
-        foreach ($record->getCommentList() as $comment) {
-            try {
-                $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
-            } catch (MapperException $e) {
-                $comment->setOwner($this->getUserMapper()->getUnknownUser());
-            }
-        }
-
-        // Grab attachment details
-
-        $attachments = $record->getAttachmentList();
-
-        /** @var PastoralAttachmentModel $attachment */
-        foreach ($attachments as $attachment) {
-
-            // Get file icon using mime type
-
-            try {
-                $file = $this->getStorageMapper()->findByHash($attachment->getHash());
-                $attachment->setIcon($file->getMimetype()->getIconFile());
-                $attachment->setFilename($file->getFilename());
-            } catch (MapperException $e) {
-                throw new MapperException('Instance of attached file not found');
-            }
-        }
-
-        return $record;
-    }
-
-    /**
-     * Here be the getters/setters
-     */
-
-    /**
-     * @var RoleMapper
-     */
-    protected $roleMapper;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var UserAccessMapper
-     */
-    protected $userAccessMapper;
-
-    /**
-     * @var AccessMapper
-     */
-    protected $accessMapper;
-
-    /**
-     * @var StorageMapper
-     */
-    protected $storageMapper;
-
-    /**
-     * @var PastoralTagsMapper
-     */
-    protected $pastoralTagsMapper;
-
-    /**
-     * @var PastoralCommentMapper
-     */
-    protected $pastoralCommentMapper;
-
-    /**
-     * @var PastoralAccessMapper
-     */
-    protected $pastoralAccessMapper;
-
-    /**
-     * @var PastoralAttachmentMapper
-     */
-    protected $pastoralAttachmentMapper;
-
-    /**
-     * @param $userAccessMapper
-     */
-    public function setUserAccessMapper($userAccessMapper)
-    {
-        $this->userAccessMapper = $userAccessMapper;
-    }
-
-    /**
-     * @return UserAccessMapper
-     */
-    public function getUserAccessMapper()
-    {
-        return $this->userAccessMapper;
-    }
-
-    /**
-     * @param $accessMapper
-     */
-    public function setAccessMapper($accessMapper)
-    {
-        $this->accessMapper = $accessMapper;
-    }
-
-    /**
-     * @return AccessMapper
-     */
-    public function getAccessMapper()
-    {
-        return $this->accessMapper;
-    }
-
-    /**
-     * @param $roleMapper
-     */
-    public function setRoleMapper($roleMapper)
-    {
-        $this->roleMapper = $roleMapper;
-    }
-
-    /**
-     * @return RoleMapper
-     */
-    public function getRoleMapper()
-    {
-        return $this->roleMapper;
-    }
-
-    /**
-     * @param $userMapper
-     */
-    public function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * @return UserMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param $storageMapper
-     */
-    public function setStorageMapper($storageMapper)
-    {
-        $this->storageMapper = $storageMapper;
-    }
-
-    /**
-     * @return StorageMapper
-     */
-    public function getStorageMapper()
-    {
-        return $this->storageMapper;
-    }
-
-    /**
-     * @param $pastoralCommentMapper
-     */
-    public function setPastoralCommentMapper($pastoralCommentMapper)
-    {
-        $this->pastoralCommentMapper = $pastoralCommentMapper;
-    }
-
-    /**
-     * @return PastoralCommentMapper
-     */
-    public function getPastoralCommentMapper()
-    {
-        return $this->pastoralCommentMapper;
-    }
-
-    /**
-     * @param $pastoralTagsMapper
-     */
-    public function setPastoralTagsMapper($pastoralTagsMapper)
-    {
-        $this->pastoralTagsMapper = $pastoralTagsMapper;
-    }
-
-    /**
-     * @return PastoralTagsMapper
-     */
-    public function getPastoralTagsMapper()
-    {
-        return $this->pastoralTagsMapper;
-    }
-
-    /**
-     * @param $pastoralAttachmentMapper
-     */
-    public function setPastoralAttachmentMapper($pastoralAttachmentMapper)
-    {
-        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
-    }
-
-    /**
-     * @return PastoralAttachmentMapper
-     */
-    public function getPastoralAttachmentMapper()
-    {
-        return $this->pastoralAttachmentMapper;
-    }
-
-    /**
-     * @param $pastoralAccessMapper
-     */
-    public function setPastoralAccessMapper($pastoralAccessMapper)
-    {
-        $this->pastoralAccessMapper = $pastoralAccessMapper;
-    }
-
-    /**
-     * @return PastoralAccessMapper
-     */
-    public function getPastoralAccessMapper()
-    {
-        return $this->pastoralAccessMapper;
+        return $resultsFiltered;
     }
 }
