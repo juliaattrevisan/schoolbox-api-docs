@@ -28,26 +28,7 @@ class Response extends DAV\Collection
      */
     public function __construct(IResponse $response)
     {
-        $this->setResponse($response);
-    }
-
-    /**
-     * @param IResponse $response
-     *
-     * @return $this
-     */
-    private function setResponse($response)
-    {
         $this->response = $response;
-        return $this;
-    }
-
-    /**
-     * @return IResponse
-     */
-    private function getResponse()
-    {
-        return $this->response;
     }
 
     /**
@@ -57,7 +38,7 @@ class Response extends DAV\Collection
      */
     public function getLastModified()
     {
-        return $this->getResponse()->getUpdatedAt()->getUnixTimeStamp();
+        return $this->response->getUpdatedAt()->getUnixTimeStamp();
     }
 
     /**
@@ -65,11 +46,10 @@ class Response extends DAV\Collection
      */
     public function getName()
     {
-        $response = $this->getResponse();
-        if (!$response->isSubmitted()) {
-            return sprintf('Draft (%s)', $response->getCreatedAt()->getDatabase());
+        if (!$this->response->isSubmitted()) {
+            return sprintf('Draft (%s)', $this->response->getCreatedAt()->getDatabase());
         }
-        return sprintf('Submission (%s)', $response->getSubmittedAt()->getDatabase());
+        return sprintf('Submission (%s)', $this->response->getSubmittedAt()->getDatabase());
     }
 
     /**
@@ -80,9 +60,8 @@ class Response extends DAV\Collection
     public function getChildren()
     {
         $children = [];
-        $response = $this->getResponse();
-        if ($response instanceof DueWorkResponse) {
-            foreach ($response->getAllFiles() as $file) {
+        if ($this->response instanceof DueWorkResponse) {
+            foreach ($this->response->getAllFiles() as $file) {
                 $children[] = new ResponseFile($file);
             }
         }

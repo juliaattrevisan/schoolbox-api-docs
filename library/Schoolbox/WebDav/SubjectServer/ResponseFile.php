@@ -27,26 +27,7 @@ class ResponseFile extends DAV\File
      */
     public function __construct(Submission\SingleFile\Model $responseFile)
     {
-        $this->setResponseFile($responseFile);
-    }
-
-    /**
-     * @param Submission\SingleFile\Model $responseFile
-     *
-     * @return $this
-     */
-    private function setResponseFile($responseFile)
-    {
         $this->responseFile = $responseFile;
-        return $this;
-    }
-
-    /**
-     * @return Submission\SingleFile\Model
-     */
-    private function getResponseFile()
-    {
-        return $this->responseFile;
     }
 
     /**
@@ -54,7 +35,7 @@ class ResponseFile extends DAV\File
      */
     public function get()
     {
-        return $this->getResponseFile()->readStream();
+        return $this->responseFile->readStream();
     }
 
     /**
@@ -62,7 +43,7 @@ class ResponseFile extends DAV\File
      */
     public function getName()
     {
-        return $this->getResponseFile()->getBasename();
+        return $this->responseFile->getBasename();
     }
 
     /**
@@ -71,7 +52,7 @@ class ResponseFile extends DAV\File
      */
     public function getSize()
     {
-        return $this->getResponseFile()->getStorage()->getSize();
+        return $this->responseFile->getStorage()->getSize();
     }
 
     /**
@@ -80,7 +61,7 @@ class ResponseFile extends DAV\File
      */
     public function getETag()
     {
-        return $this->getResponseFile()->getStorage()->getHash();
+        return $this->responseFile->getStorage()->getHash();
     }
 
     /**
@@ -89,7 +70,7 @@ class ResponseFile extends DAV\File
      */
     public function getContentType()
     {
-        return $this->getResponseFile()->getStorage()->getMime();
+        return $this->responseFile->getStorage()->getMime();
     }
 
     /**
@@ -99,7 +80,7 @@ class ResponseFile extends DAV\File
      */
     public function getLastModified()
     {
-        $date = $this->getResponseFile()->getCreatedAt();
+        $date = $this->responseFile->getCreatedAt();
         if ($date instanceof \Alaress_Date_Format && !$date->isNull()) {
             return $date->getUnixTimeStamp();
         }
