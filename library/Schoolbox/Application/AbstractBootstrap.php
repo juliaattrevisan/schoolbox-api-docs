@@ -620,6 +620,18 @@ abstract class AbstractBootstrap implements BootstrapInterface
             })
         );
 
+        // Schoolbox WebDAV server
+        $di->set(
+            'webdav:server',
+            $di->lazy(function() use ($di, $mapperFactory) {
+                /** @var WebDavFolder $server */
+                $server = $di->get('webdav:fileServer');
+                $server->addSubjectList($di->get('webdav:subjectServer'));
+                // Inject subject server
+                return $server;
+            })
+        );
+
 
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);

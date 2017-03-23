@@ -17,6 +17,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
+use Schoolbox\WebDav\SubjectServer\SubjectList;
 
 /**
  * A WebDAV node that represents a folder within the Schoolbox file system.
@@ -47,8 +48,10 @@ class Folder extends DAV\Collection
      */
     private $storageMapper;
 
-//    /** @var DAV_SubjectServer_SubjectList */
-//    protected $subject_list;
+    /**
+     * @var SubjectList
+     */
+    private $subjectList;
 
     /**
      * Requested folder path string
@@ -87,6 +90,17 @@ class Folder extends DAV\Collection
 //        $this->subject_list = new DAV_SubjectServer_SubjectList('My Subjects');
     }
 
+    /**
+     * Injects a preconfigured subject list into this folder.
+     *
+     * @param SubjectList $subjectList
+     * @return $this
+     */
+    public function addSubjectList(SubjectList $subjectList)
+    {
+        $this->setSubjectList($subjectList);
+        return $this;
+    }
 
     /**
      * @return DAV\INode[]
@@ -130,10 +144,10 @@ class Folder extends DAV\Collection
             }
         }
 
-//        // Students: get a "My Subjects" folder. (Add to plugin)
-//        if ($this->subject_list->isSubjectListShown($this->myPath)) {
-//            $folders[] = $this->subject_list;
-//        }
+        // Students: get a "My Subjects" folder. (Add to plugin)
+        if ($this->hasSubjectList() && $this->getSubjectList()->isSubjectListShown($this->getPath())) {
+            $folders[] = $this->subjectList;
+        }
 
         // Sort by type and name
         usort($folders, array($this, 'compareChildren'));
@@ -182,13 +196,9 @@ class Folder extends DAV\Collection
             $this_folder = $this->getPath().'/'.$name;
         }
 
-//        if ($this_folder === $this->subject_list->getName()) {
-//            $user_mapper = new UserMapper();
-//            $this->subject_list
-//                ->setUser($user_mapper->findById($_SESSION['id']))
-//                ->loadChildren();
-//            return $this->subject_list;
-//        }
+        if ($this->hasSubjectList() && $this_folder === $this->getSubjectList()->getName()) {
+            return $this->getSubjectList();
+        }
 
         if ($this->isFolder($name, $this->getFolderID())) {
             return new Folder(
@@ -524,5 +534,31 @@ class Folder extends DAV\Collection
     {
         $this->storageMapper = $storageMapper;
         return $this;
+    }
+
+    /**
+     * @return SubjectList
+     */
+    private function getSubjectList()
+    {
+        return $this->subjectList;
+    }
+
+    /**
+     * @param SubjectList $subjectList
+     * @return static
+     */
+    private function setSubjectList($subjectList)
+    {
+        $this->subjectList = $subjectList;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasSubjectList()
+    {
+        return $this->getSubjectList() instanceof SubjectList;
     }
 }
