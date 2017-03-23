@@ -96,9 +96,9 @@ class Assessment extends DAV\Collection
         $participant = $this->getAssessment()->getParticipantIfExtant($this->getUser());
         if ($participant instanceof Participant) {
             foreach ($participant->getAllResponses() as $response) {
-//                if ($response->isSubmitted()) {
+                if ($response->isSubmitted()) {
                     $children[] = new Response($response);
-//                }
+                }
             }
         }
         return $children;
