@@ -24,17 +24,10 @@ class Registry {
     private $students;
 
     /**
-     * @var GenericCollection|UnitImplementation[]
-     */
-    private $unitImplementations;
-
-    /**
      * @param GenericCollection|UnitImplementation[] $unitImplementations
      */
     public function __construct(GenericCollection $unitImplementations)
     {
-        $this->unitImplementations = $unitImplementations;
-
         $users = [];
 
         foreach ($unitImplementations as $unitImplementation) {
@@ -68,25 +61,4 @@ class Registry {
     {
         return $this->students;
     }
-
-
-    /**
-     * @param UnitImplementation $unitImplementation
-     * @return Collection|User[]
-     */
-    public function getStudentsByUnitImplementation(UnitImplementation $unitImplementation)
-    {
-        return $this->students[$unitImplementation->getId()];
-    }
-
-
-    /**
-     * Get all unit registry
-     *
-     * @return Collection|UnitImplementation[]
-     */
-    public function getUnitImplementations()
-    {
-        return $this->unitImplementations;
-    }
-} 
+}
