@@ -43,6 +43,16 @@ class SubjectList extends DAV\Collection
     private $currentTerm;
 
     /**
+     * @var StorageDataSource
+     */
+    private $storageDataSource;
+
+    /**
+     * @var DueWorkResponseDataSource
+     */
+    private $dueWorkResponseDataSource;
+
+    /**
      * Constructor
      *
      * @param                           $name
@@ -60,10 +70,12 @@ class SubjectList extends DAV\Collection
         DueWorkResponseDataSource $dueWorkResponseDataSource,
         Term $currentTerm
     ) {
-        $this->setName($name);
-        $this->setUser($user);
-        $this->setAssessmentDataSource($assessmentDataSource);
-        $this->setCurrentTerm($currentTerm);
+        $this->name                      = $name;
+        $this->user                      = $user;
+        $this->assessmentDataSource      = $assessmentDataSource;
+        $this->currentTerm               = $currentTerm;
+        $this->storageDataSource         = $storageDataSource;
+        $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
     }
 
     /**
@@ -118,9 +130,9 @@ class SubjectList extends DAV\Collection
 
         // Only due works due this term
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
-        $groupedAssessments = $this->getAssessmentDataSource()->findAllByStudent(
-            $this->getUser(),
-            $this->getCurrentTerm(),
+        $groupedAssessments = $this->assessmentDataSource->findAllByStudent(
+            $this->user,
+            $this->currentTerm,
             ['type'  => AssessmentType::TYPE_DUE_WORK,]
         )->groupByCallback(function(IAssessable $assessment) {
             return $assessment->getBaseContext()->getFolder()->getId();
@@ -132,31 +144,12 @@ class SubjectList extends DAV\Collection
             if ($assessment instanceof IAssessable) {
                 $children[] = new Subject(
                     $assessment->getBaseContext()->getFolder(),
-                    $this->getUser(),
+                    $this->user,
                     $assessments
                 );
             }
         }
         return $children;
-    }
-
-    /**
-     * @param  \Schoolbox\User $user
-     *
-     * @return $this
-     */
-    private function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return \Schoolbox\User
-     */
-    private function getUser()
-    {
-        return $this->user;
     }
 
     /**
@@ -174,42 +167,6 @@ class SubjectList extends DAV\Collection
     public function setName($name)
     {
         $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @return AssessmentDataSource
-     */
-    private function getAssessmentDataSource()
-    {
-        return $this->assessmentDataSource;
-    }
-
-    /**
-     * @param AssessmentDataSource $assessmentDataSource
-     * @return static
-     */
-    private function setAssessmentDataSource($assessmentDataSource)
-    {
-        $this->assessmentDataSource = $assessmentDataSource;
-        return $this;
-    }
-
-    /**
-     * @return Term
-     */
-    private function getCurrentTerm()
-    {
-        return $this->currentTerm;
-    }
-
-    /**
-     * @param Term $currentTerm
-     * @return static
-     */
-    private function setCurrentTerm($currentTerm)
-    {
-        $this->currentTerm = $currentTerm;
         return $this;
     }
 }
