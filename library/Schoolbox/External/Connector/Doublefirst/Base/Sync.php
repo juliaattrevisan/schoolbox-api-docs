@@ -70,8 +70,6 @@ class Sync implements SyncInterface
                 ''                                  AS student_home_email,
                 ''                                  AS student_default_email,
                 ''                                  AS student_work_email,
-                ''                                  AS student_occup_email,
-                ''                                  AS student_work_email,
                 YearGroup                           AS student_year_level,
                 House                               AS student_house_description,
                 HouseID                             AS student_house,
@@ -139,12 +137,9 @@ class Sync implements SyncInterface
                         spd.ForeName          AS staff_given_name,
                         CASE WHEN spd.PreferredForeName <> '' AND spd.PreferredForeName IS NOT NULL THEN spd.PreferredForeName ELSE spd.ForeName END AS staff_preferred_name,
                         spd.SurName           AS staff_surname,
-                        'o'                   AS default_email_code,
-                        CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS occup_email,
-                        CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS work_email,
                         ''                    AS home_email,
-                        spd.EmailID           AS default_email,
-                        ''                    AS work_email,
+                        CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS default_email,
+                        CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS work_email,
                         ''                    AS staff_campus,
                         
                         CASE WHEN 
