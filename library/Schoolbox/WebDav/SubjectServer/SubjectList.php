@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 use Schoolbox\WebDav\NameGenerator;
 
@@ -122,19 +123,21 @@ class SubjectList extends DAV\Collection
         ];
 
         // Maybe only assessments due this term
-
-        foreach ($this->getAssessmentDataSource()->findAllByStudent(
+        $groupedAssessments = $this->getAssessmentDataSource()->findAllByStudent(
             $this->getUser(),
             $this->getCurrentTerm(),
             $options
-        ) as $box) {
-            $folder = $box->getBaseContext()->getFolder();
-            if (array_key_exists($folder->getId(), $folders)) {
-                continue;
-            }
-            $folders[$folder->getId()] = true;
+        )->groupByCallback(function(IAssessable $assessment) {
+            return $assessment->getBaseContext()->getFolder()->getId();
+        });
 
-            $children[] = new Subject($folder, $this->getUser());
+        foreach ($groupedAssessments as $folderId => $assessments) {
+            // Have to assume that there's at least one assessment
+            $children[] = new Subject(
+                $assessments->first()->getBaseContext()->getFolder(),
+                $this->getUser(),
+                $assessments
+            );
         }
         return $children;
     }
