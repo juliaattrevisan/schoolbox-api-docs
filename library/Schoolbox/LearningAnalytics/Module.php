@@ -169,13 +169,12 @@ class Module extends BaseModule
 
         // Load CourseImpls imported from specified CourseSpec
         /** @var GenericCollection|CourseImplementation[] $courseImplementations */
-        $columnList            = [
+        $courseImplementations = $this->getCourseImplementationMapper()->findByColumnList([
             'course_specification_id' => $courseSpecification->getId(),
-        ];
-        $courseImplementations = $this->getCourseImplementationMapper()->findByColumnList($columnList)->indexBy('id');
+        ])->indexBy('id');
         $courseSpecification->setCourseImplementations($courseImplementations);
 
-        // Load UnitImpls (filtering if class is selected) inside CourseImpls,
+        // Load UnitImpls (filtering by class if a class is selected) inside CourseImpls,
 
         $columnList = [
             'course_implementation_id' => $courseImplementations->getColumnValues('id'),
@@ -201,19 +200,17 @@ class Module extends BaseModule
             $assessmentImpl->setContext($unitImplementation);
         }
 
-        /* Get list of Assessments that:
-         * * are due in currently selected Term
-         * * are not a Task
-         * * do not have a mark type of 'None'
-         * * does not have weight = 0
-         */
+        // Get the assessments that are due in currently selected term, and match the class if a class filter is applied
+        /** @var GenericCollection|IAssessable[] $dueAssessments */
+        $dueAssessments = $assessmentImpls->filter(function (IAssessable $assessment) use ($term, $classFolder) {
 
-        /** @var GenericCollection|IAssessable[] $gradableAssessments */
-        $gradableAssessments = $assessmentImpls->filter(function (IAssessable $assessment) use ($term) {
-            // Ignore Tasks, no weight, or MarkType = 'None'
-            if ($assessment instanceof Task || 0 === $assessment->getWeight() || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug()) {
+            // If filtering to class, ensure assessment belongs to class
+            /** @param Folder $classFolder */
+            if ($classFolder && $classFolder->getId() !== $assessment->getBaseContext()->getFolder()->getId()){
                 return false;
             }
+
+            // Ensure Assessment is due in term
             $dueAfterTermStart = $assessment->getDueAt()->gte($term->getStart());
             $dueBeforeTermEnd  = $term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($term->getActualFinish());
             return $dueAfterTermStart && $dueBeforeTermEnd;
@@ -232,8 +229,8 @@ class Module extends BaseModule
         $unitImplsInTerm = $this->getUnitImplementationMapper()->createCollection();
 
         // Load Participants into relevant Assessments
-        $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($gradableAssessments);
-        foreach ($gradableAssessments as $assessment) {
+        $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($dueAssessments);
+        foreach ($dueAssessments as $assessment) {
 
             $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getContext());
 
@@ -251,7 +248,7 @@ class Module extends BaseModule
         return [
             'courseSpecification' => $courseSpecification,
             'unitImplsInTerm'     => $unitImplsInTerm,
-            'gradableAssessments' => $gradableAssessments,
+            'dueAssessments'      => $dueAssessments,
             'term'                => $term,
             'classFolder'         => $classFolder,
             'submissionType'      => $submissionType,

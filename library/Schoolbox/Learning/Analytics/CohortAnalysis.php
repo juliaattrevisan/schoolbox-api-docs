@@ -40,20 +40,22 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
  */
 class CohortAnalysis
 {
+    const INCOMPLETE = 0;
+    const COMPLETE = 1;
 
     /**
      * Indexed by unitSpec.id
      *
      * @var Collection|UnitSpecification[]
      */
-    private $units;
+    private $unitSpecCache;
 
     /**
      * Folders relevant for retrieving hit counts from
      *
      * @var Collection|Folder[]
      */
-    private $classFolders;
+    private $classFolderCache;
 
     /**
      * Indexed by user.id
@@ -70,6 +72,24 @@ class CohortAnalysis
      * @var float[][]
      */
     private $assessmentGrades = [];
+
+    /**
+     * Indexed by unitSpec.id, assessment.id, user.id
+     *
+     * Null means no mark
+     *
+     * @var float[][][]|null[][][]
+     */
+    private $grades = [];
+
+    /**
+     * Indexed by unitSpec.id, assessment.id, user.id
+     * Assessment.ID is from Spec if it exists, Impl otherwise
+     *
+     * 0 => incomplete, 1 => complete
+     * @var int[][][]
+     */
+    private $completions = [];
 
     /**
      * @var float[][] indexed by unitSpec.id, then user.id
@@ -98,13 +118,12 @@ class CohortAnalysis
     /**
      * All students participating in the class/course - indexed by user.id
      *
-     * @var Collection $userCache
+     * @var Collection|User[] $userCache
      */
     private $userCache;
 
     /**
-     * Indexed by assessment.ID.
-     * Sorted by sequence, then title
+     * Aggregated Assessments, indexed by assessment.ID, sorted by sequence, then title
      * Spec ID if it exists, Impl.ID if created in UnitImpl
      *
      * @var Collection|IAssessable[]
@@ -116,101 +135,133 @@ class CohortAnalysis
      *
      * @var null|SubmissionType
      */
-    private $resultFilter;
+    private $submissionTypeResultFilter;
+
+    /**
+     * Are we filtering from cohort down to class level?
+     * @var null|Folder
+     */
+    private $classFolder;
 
 
     /**
      * You need to have FULLY hydrated and linked up your units.
      * This class depends on all unit, assessment, participation, response and feedback references being fully accounted for.
      *
-     * @param Collection|IAssessable[] $gradableAssessments IAssessable implementations due in selected Term
-     * @param null|SubmissionType      $resultFilter        If supplied, filter results for box-plot of DueWork that does not match this type
+     * @param Collection|IAssessable[] $dueAssessments IAssessable implementations due in selected Term and cohort/class
+     * @param null|Folder              $classFolder
+     * @param null|SubmissionType      $resultFilter   If supplied, filter results for box-plot of DueWork that does not match this type
      * @throws \DomainException
+     * @todo inject mapper dependencies
      */
-    public function __construct(Collection $gradableAssessments, SubmissionType $resultFilter = null)
+    public function __construct(Collection $dueAssessments, Folder $classFolder = null, SubmissionType $resultFilter = null)
     {
-        $this->resultFilter = $resultFilter;
-        // TODO - inject mapper dependencies
-        $this->units        = UnitSpecificationMapper::getInstance()->createCollection();
-        $this->userCache    = UserMapper::getInstance()->createCollection();
-        $this->classFolders = FolderMapper::getInstance()->createCollection();
-        $this->getClassFolders($gradableAssessments);
-        $this->generateUserCache($gradableAssessments);
-        $this->aggregateAssessmentImplementations($gradableAssessments);
-        $this->calculateProgress();
+        $this->submissionTypeResultFilter = $resultFilter;
+        $this->classFolder                = $classFolder;
+
+        $this->buildCaches($dueAssessments);
+        $this->aggregateAssessments($dueAssessments);
+
+        $this->calculateCompletionProgress();
         $this->calculateNormalisedMarks();
     }
 
 
     /**
-     * Retrieve all Class Folders
+     * Copies all assessments to a cache, indexed by assessment.id, so we can grab retrieve O(1)
      *
-     * @param Collection|IAssessable[] $gradableAssessments
+     * @param Collection|IAssessable[] $dueAssessments
      */
-    protected function getClassFolders(Collection $gradableAssessments)
+    protected function buildCaches(Collection $dueAssessments)
     {
-        foreach ($gradableAssessments as $assessment) {
-            $folder = $assessment->getBaseContext()->getFolder();
-            $this->classFolders->setOffset($folder->getId(), $folder);
-        }
-    }
+        $this->assessmentCache   = $dueAssessments->emptyClone();
+        $this->userCache         = UserMapper::getInstance()->createCollection();
+        $this->classFolderCache  = FolderMapper::getInstance()->createCollection();
+        $this->unitSpecCache     = UnitSpecificationMapper::getInstance()->createCollection();
 
+        foreach($dueAssessments as $assessmentImpl){
 
-    /**
-     * @param Collection|IAssessable[] $gradableAssessments
-     */
-    protected function generateUserCache(Collection $gradableAssessments)
-    {
-        foreach ($gradableAssessments as $assessment) {
-            foreach ($assessment->getAllParticipants() as $participant) {
+            // User Cache
+            foreach ($assessmentImpl->getAllParticipants() as $participant) {
                 $user                            = $participant->getUser();
                 $this->userCache[$user->getId()] = $user;
             }
+
+            // Assessment Cache
+            $this->assessmentCache[$assessmentImpl->getId()] = $assessmentImpl;
+            $assessmentSpec = $assessmentImpl->getSpecificationAssessment();
+            if($assessmentSpec){
+                $this->assessmentCache[$assessmentSpec->getId()] = $assessmentSpec;
+            }
+
+            // Class Folder Cache
+            $folder = $assessmentImpl->getBaseContext()->getFolder();
+            $this->classFolderCache->setOffset($folder->getId(), $folder);
+
+            // UnitSpec Cache
+            /** @var UnitImplementation $unitImpl */
+            $unitImpl = $assessmentImpl->getBaseContext();
+            $unitSpec = $unitImpl->getSpecification();
+            $this->unitSpecCache[$unitSpec->getId()] = $unitSpec;
         }
+
+        // Sort the Assessments by sequence, then title
+        $this->assessmentCache->sortByCallback([$this, 'compareAssessments'])->indexBy('id');
     }
+
 
 
     /**
      * Calculate the normalised marks for:
      * * each student for the course/class
-     * * each student per assessment
+     * * each student per aggregated assessment
+     *
+     * Ignore:
+     * * Tasks
+     * * Assessments with zero-weight
+     * * Assessments with markType = 'None'
      */
     protected function calculateNormalisedMarks()
     {
         /**
-         * Sets of Assessment + normMark, indexed by user.id
+         * Sets of Assessment + normMark, grouped by user.id
          *
-         * @var array $involvedAssessments
+         * @var mixed[][] $involvedAssessments
          */
         $involvedAssessments = [];
 
-        $assessmentGrades = [];
+        foreach ($this->grades as $unitSpecId => $assessmentGrades) {
+            foreach ($assessmentGrades as $assessmentId => $studentGrades) {
 
-        foreach ($this->units as $unit) {
-            foreach ($unit->getAssessables() as $assessment) {
-                $assessmentGrades[$assessment->getId()] = [];
+                // Should we exclude this assessment from report ?
+                $assessment = $this->assessmentCache[$assessmentId];
+                if($this->isExcludedForGrades($assessment)){
+                    continue;
+                }
 
-                foreach ($assessment->getAllParticipants() as $participant) {
-                    $normMark = $participant->getPublishedNormalisedMark();
-                    if (null !== $normMark) {
-                        $assessmentGrades[$assessment->getId()][$participant->getUser()->getId()] = $normMark;
+                $this->assessmentGrades[$assessmentId] = [];
 
-                        if ($assessment->getWeight()) {
-                            $involvedAssessments[$participant->getUser()->getId()][] = [$assessment, $normMark];
-                        }
+                foreach ($studentGrades as $userId => $grade) {
+                    if (null !== $grade) {
+                        $this->assessmentGrades[$assessmentId][$userId] = $grade;
+                        $involvedAssessments[$userId][] = [$assessment, $grade];
                     }
                 }
             }
         }
 
         // Ensure assessment grades are in same order as assessment cache
-        foreach ($this->assessmentCache as $assessmentId => $assessment) {
-            $this->assessmentGrades[$assessmentId] = $assessmentGrades[$assessmentId];
-        }
+        uksort($this->assessmentGrades, function($assessmentId1, $assessmentId2){
+            /** @var IAssessable $assessment1 */
+            $assessment1 = $this->assessmentCache[$assessmentId1];
+            /** @var IAssessable $assessment1 */
+            $assessment2 = $this->assessmentCache[$assessmentId2];
+            return $this->compareAssessments($assessment1, $assessment2);
+        });
 
 
         // Calculate student weighted average mark
-        foreach ($involvedAssessments as $userId => $pairs) {
+        foreach ($involvedAssessments as $userId => $assessmentGradePairs) {
 
             $weightedSum = 0;
             $totalWeight = 0;
@@ -219,7 +270,7 @@ class CohortAnalysis
              * @var array       $pairs
              * @var IAssessable $assessment
              */
-            foreach ($pairs as list($assessment, $normMark)) {
+            foreach ($assessmentGradePairs as list($assessment, $normMark)) {
                 $weight = $assessment->getWeight();
 
                 $weightedSum += $weight * $normMark;
@@ -232,11 +283,33 @@ class CohortAnalysis
 
 
     /**
+     * @param IAssessable $left
+     * @param IAssessable $right
+     * @return int
+     */
+    public function compareAssessments(IAssessable $left, IAssessable $right)
+    {
+        if ($left->getSequence() < $right->getSequence()) {
+            return -1;
+        } elseif ($left->getSequence() > $right->getSequence()) {
+            return +1;
+        } else {
+            return strcasecmp($left->getTitle(), $right->getTitle());
+        }
+    }
+
+
+    /**
      * Calculate student completion progress for course and per unit
+     *
+     * Includes:
+     * * all Assessment types (including Tasks)
+     * * Assessments with weight of 0
+     * * Assessments with MarkType of None
      *
      * @throws \DomainException
      */
-    protected function calculateProgress()
+    protected function calculateCompletionProgress()
     {
         /** @var int[] $countCourseAssessmentsInvolved indexed by user.id */
         $countCourseAssessmentsInvolved = [];
@@ -244,7 +317,9 @@ class CohortAnalysis
         /** @var int[] $countCourseAssessmentsComplete indexed by user.id */
         $countCourseAssessmentsComplete = [];
 
-        foreach ($this->units as $unit) {
+        foreach ($this->completions as $unitSpecId => $assessmentCompletions) {
+
+            $this->unitProgress[$unitSpecId] = [];
 
             /** @var int[] $countUnitAssessmentsInvolved indexed by user.id */
             $countUnitAssessmentsInvolved = [];
@@ -252,29 +327,29 @@ class CohortAnalysis
             /** @var int[] $countUnitAssessmentsComplete indexed by user.id */
             $countUnitAssessmentsComplete = [];
 
-            foreach ($unit->getAssessables() as $assessable) {
-                foreach ($assessable->getAllParticipants() as $participant) {
-                    $countUnitAssessmentsInvolved[$participant->getUser()->getId()]++;
-                    $countCourseAssessmentsInvolved[$participant->getUser()->getId()]++;
+            foreach ($assessmentCompletions as $assessmentId => $studentCompletions) {
+                foreach ($studentCompletions as $userId => $completion) {
+                    $countUnitAssessmentsInvolved[$userId]++;
+                    $countCourseAssessmentsInvolved[$userId]++;
 
                     // Has the participant completed this assessment?
-                    if (!$participant->isResponseRequired()) {
-                        $countUnitAssessmentsComplete[$participant->getUser()->getId()]++;
-                        $countCourseAssessmentsComplete[$participant->getUser()->getId()]++;
+                    if (self::COMPLETE === $completion) {
+                        $countUnitAssessmentsComplete[$userId]++;
+                        $countCourseAssessmentsComplete[$userId]++;
                     }
                 }
             }
 
-            $this->unitProgress[$unit->getId()] = [];
-
+            // Calculate each student's completion for this unitSpec
             foreach ($countUnitAssessmentsInvolved as $userId => $countInvolved) {
-                $countComplete                               = $countUnitAssessmentsComplete[$userId];
-                $this->unitProgress[$unit->getId()][$userId] = 100 * $countComplete / $countInvolved;
+                $countComplete                            = $countUnitAssessmentsComplete[$userId];
+                $this->unitProgress[$unitSpecId][$userId] = 100 * $countComplete / $countInvolved;
             }
         }
 
+        // Calculate each student's course progress, and average student course progress
         $sumCourseProgress     = 0;
-        $highestCourseProgress = 0;
+        $this->highestCourseProgress = 0;
 
         foreach ($countCourseAssessmentsInvolved as $userId => $countInvolved) {
             $countComplete                 = $countCourseAssessmentsComplete[$userId];
@@ -282,10 +357,8 @@ class CohortAnalysis
             $this->courseProgress[$userId] = $courseProgress;
 
             $sumCourseProgress += $courseProgress;
-            $highestCourseProgress = max($highestCourseProgress, $courseProgress);
+            $this->highestCourseProgress = max($this->highestCourseProgress, $courseProgress);
         }
-
-        $this->highestCourseProgress = $highestCourseProgress;
 
         // Protect from DBZ errors (eg if external is down)
         $denominator = count($this->courseProgress);
@@ -295,127 +368,85 @@ class CohortAnalysis
 
 
     /**
-     * Aggregates all student results per Assessment
+     * Aggregates student completions and grades.
      *
      * If AssessmentImpl imported from AssessmentSpec, aggregate by AssessmentSpec
      * If AssessmentImpl created in UnitImpl then index by AssessmentImpl.ID (no aggregation)
      *
-     * If a student has feedback for multiple AssessmentImpls imported from a single AssessmentSpec,
-     * then their highest mark is retained.
+     * If(class)
+     * * copy non-imported Assessments
+     * * use assessment.weight from AssessmentImpl
+     * * student mark = student mark
+     * Else(cohort)
+     * * ignore non-imported Assessments
+     * * use assessment.weight from AssessmentSpec
+     * * student mark = max max from non-zero-weight implementation
      *
-     * @param Collection|IAssessable[] $gradableAssessments Gradable Assessment Implementations
+     * @param Collection|IAssessable[] $dueAssessments
      * @throws \DomainException
-     * @todo consider retaining just the most recent feedback for performance - but fragile if we change traversal logic elsewhere
      */
-    protected function aggregateAssessmentImplementations(Collection $gradableAssessments)
+    protected function aggregateAssessments(Collection $dueAssessments)
     {
-        $this->assessmentCache = new GenericCollection(IAssessable::class);
+        foreach ($dueAssessments as $assessmentImpl) {
 
-        foreach ($gradableAssessments as $assessmentImpl) {
+            /** @var UnitImplementation $unitImpl */
+            $unitImpl   = $assessmentImpl->getBaseContext();
+            $unitSpec   = $unitImpl->getSpecification();
+            $unitSpecId = $unitSpec->getId();
 
-            // Ensure this Assessment is Gradable
-            if ($assessmentImpl instanceof Task || 0 === $assessmentImpl->getWeight() || MarkType::SLUG_NONE === $assessmentImpl->getMarkType()->getSlug()) {
+            // Was this AssessmentImpl created in UnitImpl (not imported from Spec), and we are looking at cohort (not class) ?
+            $assessmentSpec = $assessmentImpl->getSpecificationAssessment();
+            if (!$assessmentSpec && null === $this->classFolder) {
+                // Ignore non-imported assessments when looking at cohort
                 continue;
             }
 
-            $assessmentSpec = $assessmentImpl->getSpecificationAssessment();
-
-            // Was this AssessmentImpl created in UnitImpl ? (not imported from Spec)
-            if (!$assessmentSpec) {
-                $assessmentSpec = clone $assessmentImpl;
-
-                /** @var UnitImplementation $unitImpl */
-                $unitImpl = $assessmentImpl->getBaseContext();
-                $assessmentSpec->setContext($unitImpl->getSpecification());
-                $assessmentSpec->setId($assessmentImpl->getId());
-                $assessmentSpec->setResponses($assessmentSpec->getResponses()->emptyClone());
-                $assessmentSpec->setFeedbacks($assessmentSpec->getFeedbacks()->emptyClone());
+            // First time we've encountered this unitSpec ?
+            if(!is_array($this->completions[$unitSpecId])){
+                $this->completions[$unitSpecId] = [];
+            }
+            if(!is_array($this->grades[$unitSpecId])){
+                $this->grades[$unitSpecId] = [];
             }
 
-            // First time we've encountered this assessmentSpec ?
-            if (!$this->assessmentCache->offsetExists($assessmentSpec->getId())) {
-                // Insert AssessmentSpec into the list.
-                $this->assessmentCache->setOffset($assessmentSpec->getId(), $assessmentSpec);
-            } else {
-                // De-duplicate AssessmentSpec
-                $assessmentSpec = $this->assessmentCache->getOffset($assessmentSpec->getId());
+            // If AssessmentSpec if at Cohort level, AssessmentImpl if at Class level
+            $assessmentId = null === $this->classFolder ? $assessmentSpec->getId() : $assessmentImpl->getId();
+
+            // First time we've encountered this Assessment (or any of its implementations)?
+            if(!is_array($this->completions[$unitSpecId][$assessmentId])){
+                $this->completions[$unitSpecId][$assessmentId] = [];
+            }
+            if(!is_array($this->grades[$unitSpecId][$assessmentId])){
+                $this->grades[$unitSpecId][$assessmentId] = [];
             }
 
-            foreach ($assessmentImpl->getAllParticipants() as $implParticipant) {
 
-                // Is this student not already a Participant of the Spec ?
-                $specParticipant = $assessmentSpec->getAllParticipants()->getOffset($implParticipant->getUser()->getId());
-                if (!$specParticipant) {
-                    // Insert student into Spec participation
-                    $specParticipant = new Participant($implParticipant->getUser(), $assessmentSpec);
-                    $assessmentSpec->getAllParticipants()->setOffset($specParticipant->getUser()->getId(), $specParticipant);
+            foreach ($assessmentImpl->getAllParticipants() as $participant) {
+
+                $userId = $participant->getUser()->getId();
+
+                // First time we've seen this user doing this assessment?
+                if(!isset($this->completions[$unitSpecId][$assessmentId][$userId])){
+                    $this->completions[$unitSpecId][$assessmentId][$userId] = self::INCOMPLETE;
+                }
+                if(!isset($this->grades[$unitSpecId][$assessmentId][$userId])){
+                    $this->grades[$unitSpecId][$assessmentId][$userId] = null;
                 }
 
-                // Has the implParticipant been given a mark ?
-                $implMark = $implParticipant->getPublishedNormalisedMark();
-                if (null !== $implMark) {
+                // Have we not yet concluded the user has completed the assessment ?
+                if(self::INCOMPLETE === $this->completions[$unitSpecId][$assessmentId][$userId]){
+                    $this->completions[$unitSpecId][$assessmentId][$userId] = $participant->isResponseRequired() ? self::INCOMPLETE : self::COMPLETE;
+                }
 
-                    // Does the implParticipant have a higher mark than the current specParticipant?
-                    $specMark = $specParticipant->getPublishedNormalisedMark();
-                    if (null === $specMark || $implMark > $specMark) {
-
-                        // Replace the SpecParticipant's interactions with this ImplParticipant's interactions
-
-                        // Remove existing SpecParticipant Feedback
-                        foreach ($specParticipant->getAllFeedbacks() as $feedbackId => $feedback) {
-                            $assessmentSpec->getFeedbacks()->offsetUnset($feedbackId);
-                        }
-                        $specParticipant->setAllFeedbacks($specParticipant->getAllFeedbacks()->emptyClone());
-
-                        // Remove existing SpecParticipant Feedback
-                        foreach ($specParticipant->getAllResponses() as $responseId => $response) {
-                            $assessmentSpec->getResponses()->offsetUnset($responseId);
-                        }
-                        $specParticipant->setAllResponses($specParticipant->getAllResponses()->emptyClone());
-
-
-                        // Copy IFeedback
-                        foreach ($implParticipant->getAllFeedbacks() as $feedback) {
-                            $specFeedback = clone $feedback;
-                            $specFeedback->setId($feedback->getId());
-                            $specFeedback->setAssessable($assessmentSpec);
-                            $specParticipant->getAllFeedbacks()->setOffset($specFeedback->getId(), $specFeedback);
-                            $assessmentSpec->getFeedbacks()->setOffset($specFeedback->getId(), $specFeedback);
-                        }
-
-                        // Copy IResponse
-                        foreach ($implParticipant->getAllResponses() as $response) {
-                            $specResponse = clone $response;
-                            $specResponse->setId($specResponse->getId());
-                            $specResponse->setAssessable($assessmentSpec);
-                            $specParticipant->getAllResponses()->setOffset($specResponse->getId(), $specResponse);
-                            $assessmentSpec->getResponses()->setOffset($specResponse->getId(), $specResponse);
-                        }
-                    }
+                $normMark = $participant->getPublishedNormalisedMark();
+                // Does user not yet have a mark, or this mark is higher ?
+                if(null === $this->grades[$unitSpecId][$assessmentId][$userId] || $normMark > $this->grades[$unitSpecId][$assessmentId][$userId]){
+                    $this->grades[$unitSpecId][$assessmentId][$userId] = $normMark;
                 }
             }
         }
-
-        // Aggregate by, and insert into, UnitSpec
-        foreach ($this->assessmentCache as $assessment) {
-            $unitSpec = $assessment->getContext();
-            $unitSpec->getAssessables()->setOffset($assessment->getId(), $assessment);
-            $this->units->setOffset($unitSpec->getId(), $unitSpec);
-        }
-
-        // Sort AssessmentCache by sequence, then title
-        $this->assessmentCache
-            ->sortByCallback(function (IAssessable $left, IAssessable $right) {
-                if ($left->getSequence() < $right->getSequence()) {
-                    return -1;
-                } elseif ($left->getSequence() > $right->getSequence()) {
-                    return +1;
-                } else {
-                    return strcasecmp($left->getTitle(), $right->getTitle());
-                }
-            })
-            ->indexBy('id');
     }
+
 
 
     /**
@@ -433,17 +464,17 @@ class CohortAnalysis
     {
         $progress = [];
 
-        foreach ($this->unitProgress as $unitSpecId => $unitProgress) {
+        foreach ($this->unitProgress as $unitSpecId => $studentProgressions) {
             $maxProgress   = 0;
             $sumProgress   = 0;
             $countStudents = 0;
-            foreach ($unitProgress as $userId => $studentProgress) {
+            foreach ($studentProgressions as $userId => $studentProgress) {
                 $countStudents++;
                 $sumProgress += $studentProgress;
                 $maxProgress = max($maxProgress, $studentProgress);
             }
             $progress[$unitSpecId] = [
-                'unit'                => $this->units[$unitSpecId],
+                'unit'                => $this->unitSpecCache[$unitSpecId],
                 'mostAdvancedStudent' => $maxProgress,
                 'classCompletions'    => 0 === $countStudents ? 0 : $sumProgress / $countStudents,
             ];
@@ -520,33 +551,18 @@ class CohortAnalysis
      * @param bool $filterBySubmissionType
      * @return Collection|IAssessable[]
      */
-    public function getDeduplicateAssessments($filterBySubmissionType)
+    public function getGradableAssessments($filterBySubmissionType)
     {
         $filteredAssessments = $this->assessmentCache->emptyClone();
 
-        foreach ($this->assessmentCache as $assessment) {
+        foreach ($this->assessmentGrades as $assessmentId => $studentGrades) {
+            $assessment = $this->assessmentCache[$assessmentId];
             if (!$filterBySubmissionType || !$this->isExcludedBySubmissionTypeFilter($assessment)) {
                 $filteredAssessments[$assessment->getId()] = $assessment;
             }
         }
         return $filteredAssessments;
     }
-
-
-    /**
-     * Should we not include this Assessment in the 'Results' box-plot
-     * because it does not match the submission-type filter ?
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    protected function isExcludedBySubmissionTypeFilter(IAssessable $assessment)
-    {
-        // Exclude if we are filtering results, and this assessment is a dueWork that does not match the filter.
-        // Quizzes are never excluded (for now - at some point SubmissionType should be promoted to IAssessable)
-        return $this->resultFilter && $assessment instanceof DueWork && $assessment->getWorkType()->getId() !== $this->resultFilter->getId();
-    }
-
 
     /**
      * Gets the student marks to display in the 'Results' box-plot.
@@ -562,10 +578,12 @@ class CohortAnalysis
     {
         $results = [];
 
-        foreach ($this->assessmentGrades as $assessmentId => $studentMarks) {
-            if (!$filterBySubmissionType || !$this->isExcludedBySubmissionTypeFilter($this->assessmentCache[$assessmentId])) {
+        foreach ($this->assessmentGrades as $assessmentId => $studentGrades) {
+            $assessment = $this->assessmentCache[$assessmentId];
+
+            if (!$filterBySubmissionType || !$this->isExcludedBySubmissionTypeFilter($assessment)) {
                 $results[$assessmentId] = [];
-                foreach ($studentMarks as $userId => $normMark) {
+                foreach ($studentGrades as $userId => $normMark) {
                     $results[$assessmentId][$userId] = [
                         'user'  => $this->userCache[$userId],
                         'grade' => $normMark,
@@ -575,6 +593,32 @@ class CohortAnalysis
         }
 
         return $results;
+    }
+
+    /**
+     * Should we exclude this assessment from Grades ?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function isExcludedForGrades(IAssessable $assessment)
+    {
+        return $assessment instanceof Task || 0 === $assessment->getWeight() || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug();
+    }
+
+
+    /**
+     * Should we not include this Assessment in the 'Results' box-plot
+     * because it does not match the submission-type filter ?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function isExcludedBySubmissionTypeFilter(IAssessable $assessment)
+    {
+        // Exclude if we are filtering results, and this assessment is a dueWork that does not match the filter.
+        // Quizzes are never excluded (for now - at some point SubmissionType should be promoted to IAssessable)
+        return $this->submissionTypeResultFilter && $assessment instanceof DueWork && $assessment->getWorkType()->getId() !== $this->submissionTypeResultFilter->getId();
     }
 
 
@@ -608,7 +652,7 @@ class CohortAnalysis
     public function getEffort()
     {
         $tally     = [];
-        $folderIds = $this->classFolders->getColumnValues('id');
+        $folderIds = $this->classFolderCache->getColumnValues('id');
         $userIds   = array_keys($this->courseGrades);
 
         /** @var Collection|Collection[]|FolderLog[][] $accessLogs */

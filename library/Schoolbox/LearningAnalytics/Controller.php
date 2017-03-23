@@ -79,15 +79,15 @@ class Controller extends Base
      *
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
-     * @param Collection|IAssessable[]        $gradableAssessments
+     * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
      * @throws ApplicationException
      * @throws \DomainException
      * @throws MapperException
      */
-    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $gradableAssessments, Term $term)
+    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $dueAssessments, Term $term)
     {
-        $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'course');
+        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'course');
     }
 
 
@@ -119,7 +119,7 @@ class Controller extends Base
      *
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
-     * @param Collection|IAssessable[]        $gradableAssessments
+     * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
      * @param SubmissionType                  $submissionType
      * @throws ApplicationException
@@ -129,11 +129,11 @@ class Controller extends Base
     public function courseWithSubmissionTypeAndTerm(
         CourseSpecification $courseSpecification,
         Collection $unitImplsInTerm,
-        Collection $gradableAssessments,
+        Collection $dueAssessments,
         Term $term,
         SubmissionType $submissionType
     ) {
-        $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'course', null, $submissionType);
+        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'course', null, $submissionType);
     }
 
 
@@ -166,7 +166,7 @@ class Controller extends Base
      * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
-     * @param Collection|IAssessable[]        $gradableAssessments
+     * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
      * @throws ApplicationException
      * @throws \DomainException
@@ -176,10 +176,10 @@ class Controller extends Base
         Folder $classFolder,
         CourseSpecification $courseSpecification,
         Collection $unitImplsInTerm,
-        Collection $gradableAssessments,
+        Collection $dueAssessments,
         Term $term
     ) {
-        $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'folder', $classFolder);
+        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'folder', $classFolder);
     }
 
 
@@ -214,7 +214,7 @@ class Controller extends Base
      * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
-     * @param Collection|IAssessable[]        $gradableAssessments
+     * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
      * @param SubmissionType                  $submissionType
      * @throws ApplicationException
@@ -225,11 +225,11 @@ class Controller extends Base
         Folder $classFolder,
         CourseSpecification $courseSpecification,
         Collection $unitImplsInTerm,
-        Collection $gradableAssessments,
+        Collection $dueAssessments,
         Term $term,
         SubmissionType $submissionType
     ) {
-        $this->process($courseSpecification, $unitImplsInTerm, $gradableAssessments, $term, 'folder', $classFolder, $submissionType);
+        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'folder', $classFolder, $submissionType);
     }
 
 
@@ -301,7 +301,7 @@ class Controller extends Base
      *
      * @param CourseSpecification             $courseSpecification spec from which all data on this page inherits
      * @param Collection|UnitImplementation[] $unitImplsInTerm     units containing assessments due in current term
-     * @param Collection|IAssessable[]        $gradableAssessments assessments due in current Term
+     * @param Collection|IAssessable[]        $dueAssessments      assessments due in current Term
      * @param Term                            $term                term to filter
      * @param Folder                          $ClassFolder         if given, the class folder to filter
      * @param string                          $routeType           'course'|'folder'
@@ -313,13 +313,13 @@ class Controller extends Base
     private function process(
         CourseSpecification $courseSpecification,
         Collection $unitImplsInTerm,
-        Collection $gradableAssessments,
+        Collection $dueAssessments,
         Term $term,
         $routeType,
         Folder $ClassFolder = null,
         SubmissionType $submissionType = null
     ) {
-        $analysis = new CohortAnalysis($gradableAssessments, $submissionType);
+        $analysis = new CohortAnalysis($dueAssessments, $ClassFolder, $submissionType);
 
         // Get Classes to which this Course has been imported
         // TODO - what to do if no gradable assessments for current term?
@@ -354,9 +354,9 @@ class Controller extends Base
                 'top'    => $analysis->getCohortRankings(SORT_DESC),
                 'bottom' => $analysis->getCohortRankings(SORT_ASC),
             ],
-            'assessments'     => $analysis->getDeduplicateAssessments(false),
+            'assessments'     => $analysis->getGradableAssessments(false),
             'results'         => [
-                'assessments' => $analysis->getDeduplicateAssessments(true),
+                'assessments' => $analysis->getGradableAssessments(true),
                 'grades'      => $analysis->getAssessmentMarks(true),
             ],
             'progress'        => [
