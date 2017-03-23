@@ -58,6 +58,7 @@ class SubjectList extends DAV\Collection
         $this->setName($name);
         $this->setUser($user);
         $this->setAssessmentDataSource($assessmentDataSource);
+        $this->setCurrentTerm($currentTerm);
     }
 
     /**
@@ -108,25 +109,13 @@ class SubjectList extends DAV\Collection
      */
     public function getChildren()
     {
-        $children      = [];
-//        $nameGenerator = new NameGenerator();
-//        $mapper        = new SubmissionBoxMapper();
-        $folders    = array();
-        // TODO make this use assessment mapper
-//        $b = new MapperProxy();
-        // Get for current term?
-//        $b->findAllByStudent($this->getUser(), );
+        $children = [];
 
-        // Due works only
-        $options = [
-            'type'  => AssessmentType::TYPE_DUE_WORK,
-        ];
-
-        // Maybe only assessments due this term
+        // Only due works due this term
         $groupedAssessments = $this->getAssessmentDataSource()->findAllByStudent(
             $this->getUser(),
             $this->getCurrentTerm(),
-            $options
+            ['type'  => AssessmentType::TYPE_DUE_WORK,]
         )->groupByCallback(function(IAssessable $assessment) {
             return $assessment->getBaseContext()->getFolder()->getId();
         });
