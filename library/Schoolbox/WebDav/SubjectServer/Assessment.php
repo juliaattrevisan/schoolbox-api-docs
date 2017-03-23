@@ -7,9 +7,16 @@
 
 namespace Schoolbox\WebDav\SubjectServer;
 
+use Alaress_Date_Format;
 use Sabre\DAV;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 
 /**
@@ -28,15 +35,31 @@ class Assessment extends DAV\Collection
     private $user;
 
     /**
+     * @var StorageDataSource
+     */
+    private $storageDataSource;
+
+    /**
+     * @var DueWorkResponseDataSource
+     */
+    private $dueWorkResponseDataSource;
+
+    /**
      * Constructor
      *
      * @param User        $user
      * @param IAssessable $assessment
      */
-    public function __construct(User $user, IAssessable $assessment)
-    {
-        $this->user       = $user;
-        $this->assessment = $assessment;
+    public function __construct(
+        User $user,
+        IAssessable $assessment,
+        StorageDataSource $storageDataSource,
+        DueWorkResponseDataSource $dueWorkResponseDataSource
+    ) {
+        $this->user                      = $user;
+        $this->assessment                = $assessment;
+        $this->storageDataSource         = $storageDataSource;
+        $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
     }
 
     /**
@@ -66,53 +89,49 @@ class Assessment extends DAV\Collection
         return $children;
     }
 
-//    /**
-//     * Uploads a student submission to the assessment.
-//     *
-//     * @throws Sabre\DAV\Exception\Forbidden if the file cannot be uploaded
-//     *
-//     * @param string          $name
-//     * @param string|resource $data
-//     *
-//     * @return null ETags aren't being returned for now.
-//     */
-//    public function createFile($name, $data = null)
-//    {
-//        $storage = Storage\Mapper::getInstance()->acceptStream($name, $data, false);
-//
-//        // Create a new submission
-//        $submission = new Submission\Submission();
-//        $submission
-//            ->setSubmissionBox($this->getAssessment())
-//            ->setOwner($this->getUser())
-//            ->setSubmittedAt(Alaress_Date_Format::now());
-//
-//        // Put a single file in
-//        $submissionFile = new Submission\SingleFile\Model();
-//        $submissionFile
-//            ->setFilename($storage->getFilename())
-//            ->setCreatedAt(Alaress_Date_Format::now())
-//            ->setStorage($storage);
-//
-//        //
-//        // Reasons a student couldn't submit a file:
-//        // * They aren't in this subject
-//        // * The subject doesn't take submissions online
-//        // * The submission is late
-//        // * They've already submitted and it's not a multi-submission assess
-//        // All of these are covered in SubmissionMapper->checkUploadability
-//        $mapper = new Submission\SubmissionMapper();
-//        try {
-//            SubmissionBoxMapper::getInstance()->checkUploadability($this->getAssessment(), $this->getUser());
-//
-//        } catch (Schoolbox\Resource\Exception $e) {
-//            throw new Sabre\DAV\Exception\Forbidden($e->getMessage(), $e->getCode(), $e);
-//
-//        }
-//
-//        $mapper->save($submission);
-//        return null;
-//    }
+    /**
+     * Uploads a student submission to the assessment.
+     *
+     * @throws DAV\Exception\Forbidden if the file cannot be uploaded
+     *
+     * @param string          $name
+     * @param string|resource $data
+     *
+     * @return null ETags aren't being returned for now.
+     */
+    public function createFile($name, $data = null)
+    {
+        // TODO this ought to use the same API as saving a file thru the controller
+        if ($this->assessment instanceof DueWork) {
+            $participant = $this->assessment->getParticipantIfExtant($this->user);
+            if ($participant instanceof Participant) {
+                $allResponses = $participant->getAllResponses();
+
+                // This could error out, that's intentional
+                $this->assessment->assertAcceptSubmission($allResponses);
+
+                // Create a new response
+                $response = new DueWorkResponse();
+                $response
+                    ->setAssessable($this->assessment)
+                    ->setSubmittedBy($this->user)
+                    ->setSubmittedOnBehalfOf($this->user)
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now())
+                    ->setAllFiles(new GenericCollection(StorageModel::class))
+                    // Not a draft
+                    ->setSubmittedAt(Alaress_Date_Format::now());
+
+                // Add a single file
+                $storage = $this->storageDataSource->acceptStream($name, $data, false);
+                $response->getAllFiles()->add($storage);
+
+                // Save
+                $this->dueWorkResponseDataSource->save($response);
+            }
+        }
+        return null;
+    }
 
     /**
      * Gets the time which this assessment was uploaded.

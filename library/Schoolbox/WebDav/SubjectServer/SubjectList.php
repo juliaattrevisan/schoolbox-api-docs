@@ -145,7 +145,9 @@ class SubjectList extends DAV\Collection
                 $children[] = new Subject(
                     $assessment->getBaseContext()->getFolder(),
                     $this->user,
-                    $assessments
+                    $assessments,
+                    $this->storageDataSource,
+                    $this->dueWorkResponseDataSource
                 );
             }
         }

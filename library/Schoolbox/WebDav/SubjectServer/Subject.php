@@ -8,7 +8,9 @@
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -33,20 +35,36 @@ class Subject extends DAV\Collection
     private $assessments;
 
     /**
+     * @var StorageDataSource
+     */
+    private $storageDataSource;
+
+    /**
+     * @var DueWorkResponseDataSource
+     */
+    private $dueWorkResponseDataSource;
+
+    /**
      * Constructor
      *
-     * @param Folder        $folder
-     * @param User          $user
-     * @param IAssessable[] $assessments
+     * @param Folder                    $folder
+     * @param User                      $user
+     * @param IAssessable[]             $assessments
+     * @param StorageDataSource         $storageDataSource
+     * @param DueWorkResponseDataSource $dueWorkResponseDataSource
      */
     public function __construct(
         Folder $folder,
         User $user,
-        $assessments
+        $assessments,
+        StorageDataSource $storageDataSource,
+        DueWorkResponseDataSource $dueWorkResponseDataSource
     ) {
-        $this->folder      = $folder;
-        $this->user        = $user;
-        $this->assessments = $assessments;
+        $this->folder                    = $folder;
+        $this->user                      = $user;
+        $this->assessments               = $assessments;
+        $this->storageDataSource         = $storageDataSource;
+        $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
     }
 
     /**
@@ -66,7 +84,12 @@ class Subject extends DAV\Collection
     {
         $children = [];
         foreach ($this->assessments as $assessment) {
-            $children[] = new Assessment($this->user, $assessment);
+            $children[] = new Assessment(
+                $this->user,
+                $assessment,
+                $this->storageDataSource,
+                $this->dueWorkResponseDataSource
+            );
         }
         return $children;
     }
