@@ -393,6 +393,8 @@ class Controller extends Base
                 $user->setRetrievablePassword($post['modpassword'])
                      ->setPassword($passwordService->hash($post['modpassword']));
             }
+
+            $user->setEnabled(isset($post['account_enabled']));
         }
 
         $user->setTitle($post['title']);
@@ -413,7 +415,6 @@ class Controller extends Base
         $user->setWebmail(!empty($post['webmail']));
         $user->setSuperuser(isset($post['superuser']));
         $user->setUsername($post['modusername']);
-        $user->setEnabled(isset($post['account_enabled']));
 
         if (is_array($post['campus']) && count($post['campus']) || $post['defaultCampus']) {
             foreach ($post['campus'] as $campusId) {
