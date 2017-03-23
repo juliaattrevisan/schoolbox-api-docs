@@ -18,6 +18,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -287,10 +288,15 @@ class Controller extends Base
         Folder $ClassFolder = null,
         SubmissionType $submissionType = null
     ) {
-
-
         $analysis = new CohortAnalysis($gradableAssessments, $submissionType);
-        $metadata = new Metadata($unitImplsInTerm, $ClassFolder);
+
+        // Get Classes to which this Course has been imported
+        // TODO - what to do if no gradable assessments for current term?
+        $courseImplementationFolders = FolderMapper::getInstance()->createCollection();
+        foreach ($courseSpecification->getCourseImplementations() as $courseImplementation) {
+            $courseFolder = $courseImplementation->getFolder();
+            $courseImplementationFolders->setOffset($courseFolder->getId(), $courseFolder);
+        }
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
@@ -308,7 +314,7 @@ class Controller extends Base
             'submissionTypes'  => SubmissionTypeMapper::getInstance()->findAll(),
             'currentRoute'     => $this->getRouter()->getMatchedRoute()->name,
             'route'            => $routeType,
-            'folders'          => $metadata->getUnitImplementationFolders(),
+            'classFolders'     => $courseImplementationFolders,
             'term'             => $term,
             'terms'            => $navigableTerms,
             'students'         => $analysis->getParticipatingStudents(),

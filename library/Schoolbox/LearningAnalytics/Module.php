@@ -168,15 +168,20 @@ class Module extends BaseModule
         $columnList = [
             'course_specification_id' => $courseSpecification->getId(),
         ];
-        if($classFolder){
-            $columnList['folder_id'] = $classFolder->getId();
-        }
         $courseImplementations = $this->getCourseImplementationMapper()->findByColumnList($columnList)->indexBy('id');
         $courseSpecification->setCourseImplementations($courseImplementations);
 
-        // Load UnitImpls inside CourseImpls
+        // Load UnitImpls (filtering if class is selected) inside CourseImpls,
+
+        $columnList = [
+            'course_implementation_id' => $courseImplementations->getColumnValues('id'),
+        ];
+        if($classFolder){
+            $columnList['c.folder_id'] = $classFolder->getId();
+        }
+
         /** @var GenericCollection|UnitImplementation[] $unitImplementations */
-        $unitImplementations = $this->getUnitImplementationMapper()->findAllByCourseId($courseImplementations->getColumnValues('id'))->indexBy('id');
+        $unitImplementations = $this->getUnitImplementationMapper()->findByColumnList($columnList)->indexBy('id');
         foreach($unitImplementations as $unitImplementation){
             $courseImplementation = $courseImplementations[$unitImplementation->getCourse()->getId()];
             $courseImplementation->getUnits()->setOffset($unitImplementation->getId(), $unitImplementation);
@@ -237,7 +242,6 @@ class Module extends BaseModule
                 }
             }
         }
-
 
 
         return [

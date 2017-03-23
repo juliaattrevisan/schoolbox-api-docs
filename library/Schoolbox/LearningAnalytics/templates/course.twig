@@ -201,12 +201,12 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
-        {% if folders | length %}
+        {% if classFolders | length %}
         <dl class="sub-nav">
             <dd{% if not classFolder %} class="active"{% endif %}>
                 <a href="{{ routeLookup(currentRoute | replace({'folder': 'course'}), routeArgs) }}" class="button">All classes</a>
             </dd>
-            {% for folder in folders %}
+            {% for folder in classFolders %}
                 {% set active = (folder.id == classFolder.id) and (route == 'folder') %}
                 {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
 
