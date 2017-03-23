@@ -83,6 +83,7 @@ class Response extends DAV\Collection
             foreach ($this->response->getAllFiles() as $file) {
                 $children[] = new ResponseFile(
                     $file,
+                    $this->response,
                     $this->storageDataSource,
                     $this->dueWorkResponseDataSource
                 );
