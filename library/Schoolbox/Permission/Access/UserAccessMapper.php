@@ -47,9 +47,9 @@ class UserAccessMapper extends Mapper
         $this->hasTable('userAccess');
         $this->hasModel(UserAccess::class);
 
-        $this->joins('uid', UserMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
-        $this->uses('service', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('sid', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'serviceIdentifier');
+        $this->joins('uid', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->uses('service', self::TYPE_INTEGER, null);
+        $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
     }
 

@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
+use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
 use Schoolbox\Campus;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Collection;
@@ -30,8 +31,6 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
 use Scrub;
-use Session;
-use User_Logger_AssumeUser;
 
 /**
  * Controller for managing school users through the admin section.
@@ -101,6 +100,7 @@ class Controller extends Base
      * @param UserLogMapper $userLogMapper
      * @param FolderMapper $folderMapper
      * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
      * @param UserAccessMapper $userAccessMapper
      * @param UserTitleMapper $userTitleMapper
      * @param CampusMapper $campusMapper
@@ -178,9 +178,8 @@ class Controller extends Base
 
     /**
      * Insert user screen
-     * @param User $user
      */
-    public function getInsert($user)
+    public function getInsert()
     {
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
@@ -347,7 +346,7 @@ class Controller extends Base
                 $user = $this->userMapper->findById($post['userID']);
             } catch (MapperException $e) {
                 // User could not be found
-                throw new \Schoolbox\Application\Exception\NotFound();
+                throw new ExceptionNotFound();
             }
 
             // Username check - if any other user has this username, abort
@@ -370,9 +369,14 @@ class Controller extends Base
 
             // Creating a new user
 
-            $user = new \Schoolbox\User();
+            $user = new User();
+
+            // New users get enabled automatically
+
+            $user->setEnabled(true);
 
             // Set password
+
             if ($post['modpassword'] == '') {
                 $user->setRetrievablePassword(null)
                      ->setPassword(null);
@@ -389,6 +393,8 @@ class Controller extends Base
                 $user->setRetrievablePassword($post['modpassword'])
                      ->setPassword($passwordService->hash($post['modpassword']));
             }
+
+            $user->setEnabled(isset($post['account_enabled']));
         }
 
         $user->setTitle($post['title']);
@@ -409,7 +415,6 @@ class Controller extends Base
         $user->setWebmail(!empty($post['webmail']));
         $user->setSuperuser(isset($post['superuser']));
         $user->setUsername($post['modusername']);
-        $user->setEnabled(isset($post['account_enabled']));
 
         if (is_array($post['campus']) && count($post['campus']) || $post['defaultCampus']) {
             foreach ($post['campus'] as $campusId) {
