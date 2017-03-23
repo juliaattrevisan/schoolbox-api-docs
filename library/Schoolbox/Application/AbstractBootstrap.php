@@ -48,6 +48,7 @@ use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
 use Schoolbox\WebDav\SubjectServer\SubjectList as WebDavSubjectList;
@@ -608,13 +609,24 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set(
             'webdav:subjectServer',
             $di->lazy(function() use ($di, $mapperFactory) {
-                $user       = $di->get('user');
-                /** @var TermMapper $termMapper */
-                $termMapper = $mapperFactory->get(TermMapper::class);
+                /**
+                 * @var User                                                          $user
+                 * @var TermMapper                                                    $termMapper
+                 * @var AssessmentMapperProxy                                         $assessmentDataSource
+                 * @var \Schoolbox\Resource\Storage\Mapper                            $storageDataSource
+                 * @var \Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy $dueWorkResponseDataSource
+                 */
+                $user                      = $di->get('user');
+                $termMapper                = $mapperFactory->get(TermMapper::class);
+                $assessmentDataSource      = $di->get('assessmentDataSource');
+                $storageDataSource         = $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class);
+                $dueWorkResponseDataSource = $di->get('submissionDataSource');
                 return new WebDavSubjectList(
                     'My Subjects',
                     $user,
-                    $di->get('assessmentDataSource'),
+                    $assessmentDataSource,
+                    $storageDataSource,
+                    $dueWorkResponseDataSource,
                     $termMapper->findForToday()
                 );
             })

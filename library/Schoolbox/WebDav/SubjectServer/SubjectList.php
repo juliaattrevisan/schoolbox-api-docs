@@ -9,9 +9,12 @@ namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\User;
 
 /**
@@ -42,15 +45,19 @@ class SubjectList extends DAV\Collection
     /**
      * Constructor
      *
-     * @param                      $name
-     * @param User                 $user
-     * @param AssessmentDataSource $assessmentDataSource
-     * @param Term                 $currentTerm
+     * @param                           $name
+     * @param User                      $user
+     * @param AssessmentDataSource      $assessmentDataSource
+     * @param StorageDataSource         $storageDataSource
+     * @param DueWorkResponseDataSource $dueWorkResponseDataSource
+     * @param Term                      $currentTerm
      */
     public function __construct(
         $name,
         User $user,
         AssessmentDataSource $assessmentDataSource,
+        StorageDataSource $storageDataSource,
+        DueWorkResponseDataSource $dueWorkResponseDataSource,
         Term $currentTerm
     ) {
         $this->setName($name);
@@ -110,6 +117,7 @@ class SubjectList extends DAV\Collection
         $children = [];
 
         // Only due works due this term
+        /** @var IAssessable[][]|Collection[] $groupedAssessments */
         $groupedAssessments = $this->getAssessmentDataSource()->findAllByStudent(
             $this->getUser(),
             $this->getCurrentTerm(),
