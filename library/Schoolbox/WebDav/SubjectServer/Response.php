@@ -9,7 +9,9 @@ namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 
 /**
  * A DAV collection representing a single submission within an assessment.
@@ -22,13 +24,30 @@ class Response extends DAV\Collection
     private $response;
 
     /**
+     * @var StorageDataSource
+     */
+    private $storageDataSource;
+
+    /**
+     * @var DueWorkResponseDataSource
+     */
+    private $dueWorkResponseDataSource;
+
+    /**
      * Constructor
      *
-     * @param IResponse $response
+     * @param IResponse                 $response
+     * @param StorageDataSource         $storageDataSource
+     * @param DueWorkResponseDataSource $dueWorkResponseDataSource
      */
-    public function __construct(IResponse $response)
-    {
-        $this->response = $response;
+    public function __construct(
+        IResponse $response,
+        StorageDataSource $storageDataSource,
+        DueWorkResponseDataSource $dueWorkResponseDataSource
+    ) {
+        $this->response                  = $response;
+        $this->storageDataSource         = $storageDataSource;
+        $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
     }
 
     /**
@@ -62,7 +81,11 @@ class Response extends DAV\Collection
         $children = [];
         if ($this->response instanceof DueWorkResponse) {
             foreach ($this->response->getAllFiles() as $file) {
-                $children[] = new ResponseFile($file);
+                $children[] = new ResponseFile(
+                    $file,
+                    $this->storageDataSource,
+                    $this->dueWorkResponseDataSource
+                );
             }
         }
         return $children;

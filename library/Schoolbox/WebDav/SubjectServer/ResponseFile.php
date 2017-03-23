@@ -9,6 +9,8 @@ namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
+use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 
 /**
  * A DAV collection representing a single file within a submission.
@@ -21,13 +23,30 @@ class ResponseFile extends DAV\File
     private $responseFile;
 
     /**
+     * @var StorageDataSource
+     */
+    private $storageDataSource;
+
+    /**
+     * @var DueWorkResponseDataSource
+     */
+    private $dueWorkResponseDataSource;
+
+    /**
      * Constructor
      *
      * @param Submission\SingleFile\Model $responseFile
+     * @param StorageDataSource           $storageDataSource
+     * @param DueWorkResponseDataSource   $dueWorkResponseDataSource
      */
-    public function __construct(Submission\SingleFile\Model $responseFile)
-    {
-        $this->responseFile = $responseFile;
+    public function __construct(
+        Submission\SingleFile\Model $responseFile,
+        StorageDataSource $storageDataSource,
+        DueWorkResponseDataSource $dueWorkResponseDataSource
+    ) {
+        $this->responseFile              = $responseFile;
+        $this->storageDataSource         = $storageDataSource;
+        $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
     }
 
     /**

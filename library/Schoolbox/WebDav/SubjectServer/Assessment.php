@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkRespo
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 
 /**
@@ -48,8 +47,10 @@ class Assessment extends DAV\Collection
     /**
      * Constructor
      *
-     * @param User        $user
-     * @param IAssessable $assessment
+     * @param User                      $user
+     * @param IAssessable               $assessment
+     * @param StorageDataSource         $storageDataSource
+     * @param DueWorkResponseDataSource $dueWorkResponseDataSource
      */
     public function __construct(
         User $user,
@@ -83,7 +84,11 @@ class Assessment extends DAV\Collection
         if ($participant instanceof Participant) {
             foreach ($participant->getAllResponses() as $response) {
                 if ($response->isSubmitted()) {
-                    $children[] = new Response($response);
+                    $children[] = new Response(
+                        $response,
+                        $this->storageDataSource,
+                        $this->dueWorkResponseDataSource
+                    );
                 }
             }
         }
