@@ -99,11 +99,15 @@ class Exporter
                 $assessmentCode = trim($result['type_name']);
             }
 
+            // Strip percent sign from mark
+            $mark = str_replace('%', '', $result['mark']);
+            
             $data[] = [
+
                 $headings[0] => $result['synergy_id'],
                 $headings[1] => $result['code'],
                 $headings[2] => $assessmentCode,
-                $headings[3] => $result['mark']
+                $headings[3] => $mark
             ];
         }
 
