@@ -28,6 +28,7 @@ use Database;
 use DeprecatedDatabase;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
 
@@ -49,6 +50,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
+use Schoolbox\WebDav\SubjectServer\SubjectList as WebDavSubjectList;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
@@ -598,6 +600,22 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $mapperFactory->get(\Schoolbox\Resource\File\Mapper::class),
                     $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
                     $mapperFactory->get(\Schoolbox\Permission\Access\Access::class)
+                );
+            })
+        );
+
+        // Schoolbox WebDAV subject server
+        $di->set(
+            'webdav:subjectServer',
+            $di->lazy(function() use ($di, $mapperFactory) {
+                $user       = $di->get('user');
+                /** @var TermMapper $termMapper */
+                $termMapper = $mapperFactory->get(TermMapper::class);
+                return new WebDavSubjectList(
+                    'My Subjects',
+                    $user,
+                    $di->get('assessmentDataSource'),
+                    $termMapper->findForToday()
                 );
             })
         );
