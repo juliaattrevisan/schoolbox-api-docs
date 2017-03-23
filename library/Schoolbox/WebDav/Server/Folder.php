@@ -15,6 +15,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 
 /**
@@ -39,6 +40,13 @@ class Folder extends DAV\Collection
     /** @var FolderMapper */
     private $folderMapper;
 
+    /**
+     * A storage mapper
+     *
+     * @var StorageMapper
+     */
+    private $storageMapper;
+
 //    /** @var DAV_SubjectServer_SubjectList */
 //    protected $subject_list;
 
@@ -56,17 +64,20 @@ class Folder extends DAV\Collection
      * @param User         $user
      * @param FolderMapper $folderMapper
      * @param FileMapper   $fileMapper
-     * @param Access       $accessor
+     * @param StorageMapper $storageMapper
+     * @param Access        $accessor
      */
     public function __construct(
         $path,
         User $user,
         FolderMapper $folderMapper,
         FileMapper $fileMapper,
+        StorageMapper $storageMapper,
         Access $accessor
     ) {
         $this->setFolderMapper($folderMapper);
         $this->setFileMapper($fileMapper);
+        $this->setStorageMapper($storageMapper);
         $this->setAccessor($accessor);
         $this->setUser($user);
         $this->setPath($path);
@@ -82,6 +93,7 @@ class Folder extends DAV\Collection
      */
     public function getChildren()
     {
+        // TODO abstract all folder creation (inc. finding sub-objects) to factories
         $allFolders = $this->getFolderMapper()->findByParent($this->getFolder()->getId());
 
         // Loop through the directory, and create objects for each node that the user has permission to access
@@ -93,6 +105,7 @@ class Folder extends DAV\Collection
                     $this->getUser(),
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
+                    $this->getStorageMapper(),
                     $this->getAccessor()
                 );
             }
@@ -106,7 +119,14 @@ class Folder extends DAV\Collection
             $fileList = $this->getFileMapper()->findByColumn('category', $this->getFolderID());
 
             foreach ($fileList as $file) {
-                $files[] = new File($this->getPath().'/'.$file->getBasename());
+                $files[] = new File(
+                    $this->getPath().'/'.$file->getBasename(),
+                    $this->getUser(),
+                    $this->getFolderMapper(),
+                    $this->getFileMapper(),
+                    $this->getStorageMapper(),
+                    $this->getAccessor()
+                );
             }
         }
 
@@ -171,7 +191,14 @@ class Folder extends DAV\Collection
 //        }
 
         if ($this->isFolder($name, $this->getFolderID())) {
-            return new Folder($this_folder);
+            return new Folder(
+                $this_folder,
+                $this->getUser(),
+                $this->getFolderMapper(),
+                $this->getFileMapper(),
+                $this->getStorageMapper(),
+                $this->getAccessor()
+            );
 
         } else {
 
@@ -185,7 +212,14 @@ class Folder extends DAV\Collection
             ]);
 
             if ($result->count()) {
-                return new File($this->getPath().'/'.$result->first()->getBasename());
+                return new File(
+                    $this->getPath().'/'.$result->first()->getBasename(),
+                    $this->getUser(),
+                    $this->getFolderMapper(),
+                    $this->getFileMapper(),
+                    $this->getStorageMapper(),
+                    $this->getAccessor()
+                );
             } else {
                 throw new DAV\Exception\NotFound('The file with name "' . $name . '" could not be found');
             }
@@ -471,6 +505,24 @@ class Folder extends DAV\Collection
     private function setPath($path)
     {
         $this->path = $path;
+        return $this;
+    }
+
+    /**
+     * @return StorageMapper
+     */
+    private function getStorageMapper()
+    {
+        return $this->storageMapper;
+    }
+
+    /**
+     * @param StorageMapper $storageMapper
+     * @return static
+     */
+    private function setStorageMapper($storageMapper)
+    {
+        $this->storageMapper = $storageMapper;
         return $this;
     }
 }
