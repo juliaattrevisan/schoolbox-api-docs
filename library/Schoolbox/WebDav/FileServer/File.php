@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\WebDav\Server;
+namespace Schoolbox\WebDav\FileServer;
 
 use Sabre\DAV;
 use Schoolbox\File\Exception as FileException;

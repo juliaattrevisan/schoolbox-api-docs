@@ -48,7 +48,7 @@ use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use Schoolbox\WebDav\Server\Folder as WebDavFolder;
+use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
