@@ -1136,10 +1136,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                     }
                 );
             }
-            $code           = $row['cc.code'];
-            $codeCollection = $collection[$id]->getCodes();
-            if (isset($code) && !isset($codeCollection[$code])) {
-                $codeCollection[$code] = $this->hydrateJoin($row, 'codes', 'cc');
+
+            // Add code only if it's not empty
+            $code = $row['cc.code'];
+            if (isset($code)) {
+                $collection[$id]->addCode($this->hydrateJoin($row, 'codes', 'cc'));
             }
         }
         $collection->reindex();
