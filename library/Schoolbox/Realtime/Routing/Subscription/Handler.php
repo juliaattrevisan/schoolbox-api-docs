@@ -9,27 +9,26 @@
 namespace Schoolbox\Realtime\Routing\Subscription;
 
 
-use Alaress\Routing\IRouter;
-use Alaress\WorkerCrew\TaskResponseHandlerInterface;
+use Alaress\Async\Broker\DuplicateResolutionException;
+use Alaress\Async\Broker\IConsumer;
+use Alaress\Async\Broker\IResolver;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\WorkerCrew\Transaction\ITransaction;
 use Alaress\WorkerCrew\TXRX;
 use InvalidArgumentException;
-use LogicException;
+use OverflowException;
 use Psr\Log\LoggerInterface;
-use React\Stomp\AckResolver;
-use React\Stomp\Client;
-use React\Stomp\Protocol\Frame;
 
-class Handler implements TaskResponseHandlerInterface
+class Handler implements IConsumer
 {
     const TRANSACTION_CACHE_TIMEOUT = 0.5;
     const TRANSACTION_COUNT_LIMIT   = 80;
 
-    /** @var IRouter */
-    protected $router;
+    /** @var Resolver */
+    protected $resolver;
 
-    /** @var Client */
-    protected $stomp;
+    /** @var ITransaction */
+    protected $transaction;
 
     /** @var LoggerInterface */
     protected $log;
@@ -39,134 +38,88 @@ class Handler implements TaskResponseHandlerInterface
 
 
     /**
-     * @param IRouter         $router
-     * @param Client          $stomp
+     * @param Resolver        $resolver
      * @param LoggerInterface $log
      * @param TXRX            $txrx
+     * @param ITransaction    $transaction
      */
-    public function __construct(IRouter $router, Client $stomp, LoggerInterface $log, TXRX $txrx)
+    public function __construct(Resolver $resolver, LoggerInterface $log, TXRX $txrx, ITransaction $transaction)
     {
-        $this->router = $router;
-        $this->stomp  = $stomp;
+        $this->resolver = $resolver;
         $this->log    = $log;
         $this->txrx   = $txrx;
+        $this->transaction = $transaction;
     }
 
 
     /**
-     * Start listening to a particular instance
+     * Handle a message sent from a broker to which you've subscribed
      *
-     * @param string        $instanceId
-     * @param ITransaction  $tx
-     * @throws LogicException
+     * @param Instance  $instance
+     * @param IResolver $resolver
+     * @throws DuplicateResolutionException
+     * @return void
      */
-    public function listen($instanceId, ITransaction $tx)
-    {
-        $this->stomp->subscribeWithAck("$instanceId.route", 'client-individual', function (Frame $frame, AckResolver $resolver) use ($tx) {
-            try {
-                $this->assertPayload($frame->body);
-
-                $this->handle($frame, $tx);
-                $resolver->ack();
-                return;
-
-            } catch (InvalidArgumentException $e) {
-                $this->log->warning($e->getMessage());
-                $resolver->ack();
-                return;
-
-            } catch (\Exception $e) {
-                $this->log->error($e->getMessage());
-            }
-
-            $resolver->nack();
-        });
-    }
-
-
-    /**
-     * @param string $payload
-     * @throws InvalidArgumentException
-     */
-    protected function assertPayload($payload)
+    public function onMessage($instance, IResolver $resolver)
     {
         try {
-            $data = json_decode($payload, true);
-
-        } catch (\Exception $e) {
-            // cast exception (most likely ErrorException)
-            throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        // check arrayness
-        if (!is_array($data)) {
-            throw new InvalidArgumentException("Payload must be an array, got ".gettype($data));
-        }
-
-        $requiredKeys = ['level_name', 'channel', 'message', 'context'];
-
-        if (count($diff = array_diff($requiredKeys, array_keys($data)))) {
-            throw new InvalidArgumentException("Keys ".json_encode(array_values($diff))." missing");
-        }
-    }
-
-
-    /**
-     * @param Frame       $frame
-     * @param ITransaction $tx
-     */
-    protected function handle(Frame $frame, ITransaction $tx)
-    {
-        $data = json_decode($frame->body, true);
-
-        $topic = "{$data['level_name']}.{$data['channel']}";
-
-        try {
-            $userIds = array_keys(array_filter($this->router->get($topic)));
-
-            $userCount = count($userIds);
-
-            if ($userCount > 16) {
-                $suffix = "$userCount users";
-            } else {
-                $suffix = json_encode($userIds);
-            }
-
-            $this->log->info("Routing message via '$topic' to $suffix");
-
-            $this->txrx->send($frame, $tx, $userIds);
+            $this->handle($instance);
+            $resolver->acknowledge();
+            return;
 
         } catch (InvalidArgumentException $e) {
-            $this->log->info("Nobody subscribed to '$topic'");
+            $this->log->warning($e->getMessage());
+            $resolver->acknowledge();
+            return;
+
+        } catch (\Exception $e) {
+            $this->log->error($e->getMessage());
+        }
+
+        $resolver->reject();
+    }
+
+
+    /**
+     * @param Instance $instance
+     * @throws InvalidArgumentException
+     */
+    private function handle(Instance $instance)
+    {
+        // typically there's only 1, but the possibility of more
+        foreach ($instance->getTopics() as $topic) {
+            try {
+                $userIds = $this->resolver->getSubscribedUserIds($topic);
+
+                $userCount = count($userIds);
+
+                if ($userCount > 16) {
+                    $suffix = "$userCount users";
+                } else {
+                    $suffix = json_encode($userIds);
+                }
+
+                $this->log->info("Routing message via '$topic' to $suffix");
+
+                $this->txrx->send($instance, $this->transaction, $userIds);
+
+            } catch (OverflowException $e) {
+                // recursion detected
+                $this->log->error($e->getMessage());
+            }
         }
     }
 
 
     /**
-     * Handles a response from a Worker
+     * Handle brokering exceptions
      *
-     * @param object $identifier - the identifier passed as the first argument to Dispatcher::enqueue()
-     * @param string $command    - the command that was executed by the Worker
-     * @param array  $data       - the data with which the Worker responded
-     * @return void              - this method does not return any value
+     * @param \Exception $e
+     * @return void
      */
-    public function handleResponse($identifier, $command, $data)
+    public function onException(\Exception $e)
     {
-        $this->log->notice("Reroute count: $data[0]");
-    }
-
-
-    /**
-     * Handles an error from a Worker
-     *
-     * @param object $identifier - the identifier passed as the first argument to Dispatcher::enqueue()
-     * @param string $command    - the command that was executed by the Worker
-     * @param array  $data       - the data with which the Worker responded
-     * @return void              - this method does not return any value
-     */
-    public function handleError($identifier, $command, $data)
-    {
-        $this->log->notice("Received worker error for '$command': $data");
+        $this->log->error(get_class($e) . ': ' . $e->getMessage());
     }
 
 }
