@@ -52,7 +52,7 @@ class Visibility
         $folderAccessLevel = $this->getAccess()->getFolderAccess($user, [$assessment->getBaseContext()->getFolder()->getId()]);
 
         // Are we hiding assessments past their close date and we are past the close date ?
-        if(!$showClosed && $assessment->isPastClose()){
+        if (!$showClosed && !$assessment->getCloseAt()->isNull() && $assessment->isPastClose()){
             return false;
         }
 
@@ -61,7 +61,7 @@ class Visibility
             return true;
         }
         // Else is user a learner and assessment is published ?
-        elseif($folderAccessLevel == UserAccess::ACCESS_READ && $assessment->isPublished()){
+        elseif ($folderAccessLevel == UserAccess::ACCESS_READ && $assessment->isPublished()){
             return true;
         }
 
