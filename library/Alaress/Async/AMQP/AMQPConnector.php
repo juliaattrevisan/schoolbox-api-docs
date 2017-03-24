@@ -292,7 +292,14 @@ abstract class AMQPConnector implements AMQPInterface {
      * @param string             $channelId
      * @return $this
      */
-	public function publish($message, $routingKey, $properties = array(), $channelId = null) {
+	public function publish($message, $routingKey, $properties = array(), $channelId = null)
+    {
+        $exchange = isset($properties['exchange'])
+            ? $properties['exchange']
+            : $this->getPrimaryExchange()->getName();
+
+        unset ($properties['exchange']);
+
 		// wrap message in object if it's not already
 		if(!$message instanceof AMQPMessage) {
 			$properties = array(
@@ -303,7 +310,7 @@ abstract class AMQPConnector implements AMQPInterface {
 			);
 			$message = new AMQPMessage($message, $properties);
 		}
-		$this->getChannel($channelId)->basic_publish($message, $this->getPrimaryExchange()->getName(), $routingKey);
+		$this->getChannel($channelId)->basic_publish($message, $exchange, $routingKey);
 
 		return $this;
 	}
