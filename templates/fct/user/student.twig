@@ -4,7 +4,7 @@
 {% if showClasses %}
     {% if tutorTeacher %}
     <dt class="small-12 medium-3">Pastoral Care Teacher</dt>
-    <dd class="small-12 medium-3">
+    <dd class="small-12 medium-9">
         {% if tutorTeacher.getId() %}
             <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
         {% else %}
@@ -19,7 +19,7 @@
 {% if showClasses %}
     {% if externalUser.StudentTutorDescription %}
     <dt class="small-12 medium-3">Pastoral Care Group</dt>
-    <dd class="small-12 medium-3">{{ externalUser.StudentTutorDescription }}</dd>
+    <dd class="small-12 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
     {% endif %}
 {% endif %}
 {% endblock details_tutorGroup %}
