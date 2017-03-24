@@ -1,0 +1,156 @@
+<?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\WebDav\SimpleSubjectServer;
+
+use Alaress_Date_Format;
+use Sabre\DAV;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
+
+/**
+ * A DAV collection representing a single assessment within a subject.
+ */
+class Assessment extends DAV\Collection
+{
+    /**
+     * @var IAssessable
+     */
+    private $assessment;
+
+    /**
+     * @var User
+     */
+    private $user;
+
+    /**
+     * @var StorageDataSource
+     */
+    private $storageDataSource;
+
+    /**
+     * @var DueWorkResponseDataSource
+     */
+    private $dueWorkResponseDataSource;
+
+    /**
+     * @var DAV\INode[]
+     */
+    private $children;
+
+    /**
+     * Constructor
+     *
+     * @param User                      $user
+     * @param IAssessable               $assessment
+     * @param StorageDataSource         $storageDataSource
+     * @param DueWorkResponseDataSource $dueWorkResponseDataSource
+     * @param DAV\INode[]               $children
+     */
+    public function __construct(
+        User $user,
+        IAssessable $assessment,
+        StorageDataSource $storageDataSource,
+        DueWorkResponseDataSource $dueWorkResponseDataSource,
+        $children = []
+    ) {
+        $this->user                      = $user;
+        $this->assessment                = $assessment;
+        $this->storageDataSource         = $storageDataSource;
+        $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
+        $this->children                  = $children;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->assessment->getTitle();
+    }
+
+    /**
+     * Loads this student's submissions (and later on, returns).
+     *
+     * @return DAV\INode[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * Uploads a student submission to the assessment.
+     *
+     * @throws DAV\Exception\Forbidden if the file cannot be uploaded
+     *
+     * @param string          $name
+     * @param string|resource $data
+     *
+     * @return null ETags aren't being returned for now.
+     */
+    public function createFile($name, $data = null)
+    {
+        // TODO this ought to use the same API as saving a file thru the controller
+        if ($this->assessment instanceof DueWork) {
+            $participant = $this->assessment->getParticipantIfExtant($this->user);
+            if ($participant instanceof Participant) {
+                $allResponses = $participant->getAllResponses();
+
+                // This could error out, that's intentional
+                $this->assessment->assertAcceptSubmission($allResponses);
+
+                // Get whatever was uploaded.
+                // A 1-byte file will be rejected completely:
+                // this is a stub the iOS client creates which seems to be unnecessary.
+                $storage = $this->storageDataSource->acceptStream($name, $data, false);
+                if ($storage->getSize() <= 1) {
+                    return null;
+                }
+
+                // Create a new response
+                $response = (new DueWorkResponse())
+                    ->setAssessable($this->assessment)
+                    ->setSubmittedBy($this->user)
+                    ->setSubmittedOnBehalfOf($this->user)
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now())
+                    ->setAllFiles(new GenericCollection(DueWorkResponseFile::class))
+                    // Not a draft
+                    ->setSubmittedAt(Alaress_Date_Format::now());
+
+                // Add a single file
+                $attachedFile = (new DueWorkResponseFile())
+                    ->setStorage($storage)
+                    ->setFilename($storage->getFilename())
+                    ->setEditableInline(false);
+                $response->getAllFiles()->add($attachedFile);
+
+                // Save
+                $this->dueWorkResponseDataSource->save($response);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the time which this assessment was uploaded.
+     *
+     * @return int
+     */
+    public function getLastModified()
+    {
+        return $this->assessment->getPublishAt()->getUnixTimeStamp();
+    }
+}

@@ -168,9 +168,11 @@ class Server extends DAV\Collection
                 }
 
                 // /Subject/Assessment/
-                // TODO create a class which allows createFile
-                $assessmentNodes[$assessment->getId()] = new DAV\SimpleCollection(
-                    $assessment->getTitle(),
+                $assessmentNodes[$assessment->getId()] = new Assessment(
+                    $this->user,
+                    $assessment,
+                    $this->storageDataSource,
+                    $this->dueWorkResponseDataSource,
                     $responseNodes
                 );
             }
