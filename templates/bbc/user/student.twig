@@ -3,6 +3,6 @@
 {% if showButtons %}
     {% block buttons_miscellaneous %}
         <!-- Start on School Grades page initially -->
-        <li class="no-pad"><a href="/tassportal/teacherkiosk?link=index.cfm%3Fdo%3Dkiosk.students.main.student.details%26stud_code%3D{{ user.getExternalId() }}" class="no-margin fat icon-fat button size-32 icon-progress" data-equalizer-watch>TASS Profile</a></li>
+        <li><a href="/tassportal/teacherkiosk?link=index.cfm%3Fdo%3Dkiosk.students.main.student.details%26stud_code%3D{{ user.getExternalId() }}" class="icon-progress">TASS Profile</a></li>
     {% endblock buttons_miscellaneous %}
 {% endif %}

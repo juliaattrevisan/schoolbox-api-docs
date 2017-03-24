@@ -10,10 +10,10 @@
 
     {% block buttons_miscellaneous %}
         <!-- Start on School Grades page initially -->
-        <li class="no-pad"><a href="/modules/custom/diocesan/achievementreport/{{ user.getExternalId() }}" class="no-margin fat icon-fat button size-32 icon-progress" data-equalizer-watch>Achievement</a></li>
-        <li class="no-pad"><a href="/synergetic/stures" class="no-margin fat icon-fat button size-32 icon-progress" data-equalizer-watch>Progress</a></li>
-        <li class="no-pad"><a href="/synergetic/contacts" class="no-margin fat icon-fat button size-32 icon-progress" data-equalizer-watch>Contacts</a></li>
-        <li class="no-pad"><a href="/synergetic/attendances2" class="no-margin fat icon-fat button size-32 icon-progress" data-equalizer-watch>Attendance</a></li>
-        <li class="no-pad"><a href="/synergetic/docs" class="no-margin fat icon-fat size-32 button icon-progress" data-equalizer-watch>Documents</a></li>
+        <li><a href="/modules/custom/diocesan/achievementreport/{{ user.getExternalId() }}" class="icon-progress">Achievement</a></li>
+        <li><a href="/synergetic/stures" class="icon-progress">Progress</a></li>
+        <li><a href="/synergetic/contacts" class="icon-progress">Contacts</a></li>
+        <li><a href="/synergetic/attendances2" class="icon-progress">Attendance</a></li>
+        <li><a href="/synergetic/docs" class="icon-progress">Documents</a></li>
     {% endblock buttons_miscellaneous %}
 {% endif %}
