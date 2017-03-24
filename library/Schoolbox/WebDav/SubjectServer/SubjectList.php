@@ -88,7 +88,7 @@ class SubjectList extends DAV\Collection
      */
     public function isSubjectListShown($path)
     {
-        return /*!empty($_SESSION['subjects']) && */$this->isThisDirectChildOfPath($path);
+        return $this->user->getSubjectCollection()->count() > 0 && $this->isThisDirectChildOfPath($path);
     }
 
     /**
