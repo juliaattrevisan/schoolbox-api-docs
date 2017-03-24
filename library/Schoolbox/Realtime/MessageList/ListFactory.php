@@ -14,7 +14,7 @@ use Predis\ClientInterface;
 use Serializable;
 
 
-class Factory implements IFactory, Serializable
+class ListFactory implements IListFactory, Serializable
 {
 
     /** @var string */

@@ -11,7 +11,7 @@ namespace Schoolbox\Realtime\MessageList;
 use Alaress\Async\Queue\QueueInterface;
 
 
-interface IFactory
+interface IListFactory
 {
 
     /**
