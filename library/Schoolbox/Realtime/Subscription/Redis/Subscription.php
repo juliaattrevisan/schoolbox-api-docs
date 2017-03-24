@@ -140,8 +140,7 @@ class Subscription implements ISubscription
     public function getUnread()
     {
         return array_map(function ($messageKey) {
-            $json = json_decode($this->syncClient->get($messageKey), true);
-            return Instance::jsonUnserialize($json['message']);
+            return unserialize(gzuncompress($this->syncClient->get($messageKey)));
         }, $this->syncClient->sMembers($this->getSetIdentifier()));
     }
 

@@ -363,8 +363,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->log->info("Received {$matches[2]} for {$userId}", [ 'char' => '>' ]);
 
             // in all cases, we expect the payload to be a standard message
-            $formatted = json_decode($msg->getPayload(), true);
-            $instance  = Instance::jsonUnserialize($formatted['message']);
+            $instance  = Instance::jsonUnserialize($msg->getPayload());
 
             switch ($matches[2]) {
                 case static::PIPE_METHOD_PUSH:

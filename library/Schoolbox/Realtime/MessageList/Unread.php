@@ -8,6 +8,10 @@
 
 namespace Schoolbox\Realtime\MessageList;
 
+use Alaress\Async\Notification\Instance\Instance;
+use Schoolbox\Realtime\Pipe\PipeManager;
+
+
 class Unread extends AbstractList
 {
     /**
@@ -17,5 +21,24 @@ class Unread extends AbstractList
     {
         return 'unread';
     }
+
+
+    /**
+     * Push the given instance onto this queue
+     *
+     * @param Instance $instance
+     * @return void
+     */
+    public function push(Instance $instance)
+    {
+        parent::push($instance);
+
+        // in addition to whatever our parent is doing, we also want to advise the relevant user
+        // that this message has been published, so it can be pushed to them
+        $topic = "{$this->getNamespace()}:{$this->getUserId()}:".PipeManager::PIPE_METHOD_PUSH;
+
+        $this->redis->publish($topic, "$instance");
+    }
+
 
 }

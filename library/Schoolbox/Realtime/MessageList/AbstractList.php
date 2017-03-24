@@ -75,6 +75,14 @@ abstract class AbstractList extends RedisQueue
 
 
     /**
+     * @return int
+     */
+    protected function getUserId()
+    {
+        return $this->userId;
+    }
+
+    /**
      * Get the suffix for this set
      *
      * @return string
