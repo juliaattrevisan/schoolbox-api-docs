@@ -69,7 +69,7 @@
         "react/dns": "0.4.*",
         "react/socket-client": "0.4.*",
         "mtdowling/cron-expression": "1.0.*",
-        "djfm/cssin": "0.1.0",
+        "tijsverkoyen/css-to-inline-styles": "2.2.0",
         "html2text/html2text": "3.0.*",
         "browscap/browscap-php": "~2.1.1",
         "aura/di": "~2.2.3",
