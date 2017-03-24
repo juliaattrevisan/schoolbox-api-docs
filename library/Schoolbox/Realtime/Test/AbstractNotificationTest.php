@@ -14,7 +14,7 @@ use Alaress\Async\Notification\Notification;
 use Alaress\Async\Test\AbstractTest;
 use Alaress\Redis;
 use OutOfBoundsException;
-use Schoolbox\Realtime\MessageList\Factory;
+use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -57,7 +57,7 @@ abstract class AbstractNotificationTest extends AbstractTest
     /** @var User[] */
     private $userCache;
 
-    /** @var Factory */
+    /** @var ListFactory */
     private $listFactory;
 
 
@@ -71,7 +71,7 @@ abstract class AbstractNotificationTest extends AbstractTest
         parent::__construct($name, $data, $dataName);
 
         $this->redis = Redis::getClientInstance();
-        $this->listFactory = new Factory(INSTANCE_ID, $this->redis);
+        $this->listFactory = new ListFactory(INSTANCE_ID, $this->redis);
     }
 
 

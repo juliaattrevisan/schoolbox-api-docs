@@ -1,6 +1,6 @@
 <?php
 use Alaress\Redis;
-use Schoolbox\Realtime\MessageList\Factory;
+use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 
 /**
@@ -30,7 +30,7 @@ $this->setBlock('event', 'abstract', 'abstract_block');
 
 $this->setTitle('All Messages');
 
-$factory = new Factory(INSTANCE_ID, Redis::getClientInstance());
+$factory = new ListFactory(INSTANCE_ID, Redis::getClientInstance());
 
 // load the data into your hat, and pull out a rabbit
 $decorator = new Decorator();
