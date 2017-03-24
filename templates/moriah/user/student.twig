@@ -2,13 +2,13 @@
 
 {% block buttons_grades %}
     {% if not (config.restrict_parent_grades and session.user.getRole().isParent()) %}
-        <li class="no-pad">
+        <li>
             <a href="/learning/grades/{{ user.getId() }}" class="no-margin fat button icon-fat size-32 icon-tick">Grades</a>
         </li>
     {% endif %}
-    <li class="no-pad"><a href="/synRedir.php?page=Docs&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat size-32 icon-files">Reports</a></li>
-    <li class="no-pad"><a href="/synRedir.php?page=pti&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat size-32 icon-group">PT Interviews</a></li>
-    <li class="no-pad"><a href="/synRedir.php?page=StudentParentContacts&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat size-32 icon-group">Parent Contacts</a></li>
-    <li class="no-pad"><a href="/synRedir.php?page=MyDetails&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat size-32 icon-forms">My Details</a></li>
-    <li class="no-pad"><a href="/synRedir.php?page=ExcursionDetails" target="_blank" class="no-margin fat button icon-fat size-32 icon-location">Excursions &amp; Permissions</a></li>
+    <li><a href="/synRedir.php?page=Docs&menu=&id={{ user.getExternalId() }}" target="_blank" class="icon-files">Reports</a></li>
+    <li><a href="/synRedir.php?page=pti&menu=&id={{ user.getExternalId() }}" target="_blank" class="icon-group">PT Interviews</a></li>
+    <li><a href="/synRedir.php?page=StudentParentContacts&menu=&id={{ user.getExternalId() }}" target="_blank" class="icon-group">Parent Contacts</a></li>
+    <li><a href="/synRedir.php?page=MyDetails&menu=&id={{ user.getExternalId() }}" target="_blank" class="icon-forms">My Details</a></li>
+    <li><a href="/synRedir.php?page=ExcursionDetails" target="_blank" class="icon-location">Excursions &amp; Permissions</a></li>
 {% endblock buttons_grades %}

@@ -2,22 +2,22 @@
 
 {% block buttons %}
     {{ parent() }}
-    <li class="no-pad">
-        <a href="/synergetic/Docs/?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-document" data-equalizer-watch>Reports</a>
+    <li>
+        <a href="/synergetic/Docs/?id={{user.getExternalId()}}" class="icon-document">Reports</a>
     </li>
-    <li class="no-pad">
-        <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-info" data-equalizer-watch>Medical</a>
-    </li>
-
-    <li class="no-pad">
-        <a href="/synergetic/absences?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-user" data-equalizer-watch>Absences</a>
+    <li>
+        <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="icon-info">Medical</a>
     </li>
 
-    <li class="no-pad">
-        <a href="/synergetic/PTI?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-staff" data-equalizer-watch>Parent Teacher</a>
+    <li>
+        <a href="/synergetic/absences?id={{user.getExternalId()}}" class="icon-user">Absences</a>
     </li>
 
-    <li class="no-pad">
-        <a href="/synergetic/StudentParentContacts?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-directory" data-equalizer-watch>Parent Directory</a>
+    <li>
+        <a href="/synergetic/PTI?id={{user.getExternalId()}}" class="icon-staff">Parent Teacher</a>
+    </li>
+
+    <li>
+        <a href="/synergetic/StudentParentContacts?id={{user.getExternalId()}}" class="icon-directory">Parent Directory</a>
     </li>
 {% endblock buttons %}

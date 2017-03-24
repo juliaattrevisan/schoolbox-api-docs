@@ -3,8 +3,8 @@
 {% block details_formTeacher %}
  {% if showClasses %}
      {% if formTeacher %}
-     <dt class="no-margin small-6 medium-3">Mentor</dt>
-     <dd class="no-margin small-6 medium-9">
+     <dt class="small-12 medium-3">Mentor</dt>
+     <dd class="small-12 medium-3">
          {% if formTeacher.getId() %}
          <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
          {% else %}
@@ -17,13 +17,13 @@
 
 {% block details_coordTeacher %}
     {% if coordTeacher %}
-    <dt class="no-margin small-6 medium-3">Year Coordinator:</dt>
-    <dd class="no-margin small-6 medium-9">
-    {% if coordTeacher.getId() %}
-    <a href="{{ session.mailhandle }}{{ coordTeacher.getEmail() }}">{{ coordTeacher.formatName() }}</a>
-    {% else %}
-    {{ coordTeacher.formatName() }}
-    {% endif %}
+    <dt class="small-12 medium-3">Year Coordinator:</dt>
+    <dd class="small-12 medium-3">
+        {% if coordTeacher.getId() %}
+        <a href="{{ session.mailhandle }}{{ coordTeacher.getEmail() }}">{{ coordTeacher.formatName() }}</a>
+        {% else %}
+        {{ coordTeacher.formatName() }}
+        {% endif %}
     </dd>
     {% endif %}
 {% endblock details_coordTeacher %}

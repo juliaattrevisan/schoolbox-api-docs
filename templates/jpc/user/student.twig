@@ -2,8 +2,8 @@
 {% block details_formTeacher %}
 {% if showClasses %}
     {% if formTeacher %}
-    <dt class="no-margin small-6 medium-3">Form Teacher</dt>
-    <dd class="no-margin small-6 medium-9">
+    <dt class="small-12 medium-3">Form Teacher</dt>
+    <dd class="small-12 medium-3">
         {% if formTeacher.getId() %}
         <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
         {% else %}
@@ -17,23 +17,23 @@
 {% block details_studentForm %}
 {% if showClasses %}
     {% if externalUser.StudentForm %}
-    <dt class="no-margin small-6 medium-3">Form</dt>
-    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
+    <dt class="small-12 medium-3">Form</dt>
+    <dd class="small-12 medium-3">{{ externalUser.StudentForm }}</dd>
     {% endif %}
 {% endif %}
 {% endblock details_studentForm %}
 
 {% block buttons %}
 {{ parent() }}
-<li class="no-pad">
-    <a href="/synergetic/Docs/?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-document" data-equalizer-watch>Academic Reports</a>
+<li>
+    <a href="/synergetic/Docs/?id={{user.getExternalId()}}" class="icon-document">Academic Reports</a>
 </li>
-<li class="no-pad">
-    <a href="/synergetic/fin/?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-itineraryitem" data-equalizer-watch>Fees</a>
+<li>
+    <a href="/synergetic/fin/?id={{user.getExternalId()}}" class="icon-itineraryitem">Fees</a>
 </li>
 
-<li class="no-pad">
-    <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="no-margin fat button icon-fat size-32 icon-info" data-equalizer-watch>My Details</a>
+<li>
+    <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="icon-info">My Details</a>
 </li>
 {% endblock buttons %}
 
