@@ -172,7 +172,9 @@ class Server extends DAV\Collection
                     $folderNode = new DAV\SimpleCollection(
                         $this->nameGenerator->getUniqueChildName(
                             $rootNode,
-                            $assessment->getBaseContext()->getFolder()->getTitle()
+                            $this->nameGenerator->sanitiseName(
+                                $assessment->getBaseContext()->getFolder()->getTitle()
+                            )
                         )
                     );
                 } catch (DAV\Exception $e) {
@@ -188,7 +190,10 @@ class Server extends DAV\Collection
                 // /Subject/Assessment/
                 try {
                     $assessmentNode = new Assessment(
-                        $this->nameGenerator->getUniqueChildName($folderNode, $assessment->getTitle()),
+                        $this->nameGenerator->getUniqueChildName(
+                            $folderNode,
+                            $this->nameGenerator->sanitiseName($assessment->getTitle())
+                        ),
                         $this->user,
                         $assessment,
                         $this->storageDataSource,
@@ -208,7 +213,9 @@ class Server extends DAV\Collection
                             $responseNode = new DAV\SimpleCollection(
                                 $this->nameGenerator->getUniqueChildName(
                                     $assessmentNode,
-                                    sprintf('Submission %s', $response->getSubmittedAt()->getDatabase())
+                                    $this->nameGenerator->sanitiseName(
+                                        sprintf('Submission %s', $response->getSubmittedAt()->getDatabase())
+                                    )
                                 )
                             );
                         } catch (DAV\Exception $e) {
@@ -224,7 +231,10 @@ class Server extends DAV\Collection
                                 try {
                                     $responseNode->addChild(
                                         new ResponseFile(
-                                            $this->nameGenerator->getUniqueChildName($responseNode, $file->getBasename()),
+                                            $this->nameGenerator->getUniqueChildName(
+                                                $responseNode,
+                                                $this->nameGenerator->sanitiseName($file->getBasename())
+                                            ),
                                             $file
                                         )
                                     );
