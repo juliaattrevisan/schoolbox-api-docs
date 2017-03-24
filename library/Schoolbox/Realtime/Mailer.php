@@ -65,6 +65,11 @@ class Mailer
             throw new UnderflowException('No messages to deliver');
         }
 
+        if (empty($subject)) {
+            // if no subject given, infer from the notifications compiled
+            $subject = $decorator->renderTitleAsPlaintext($decorator->getNotifications(1)[0]);
+        }
+
         $this->log->debug(sprintf('Compiling %d notification%s for user %s', $decorator->count(), $decorator->count() === 1 ? '' : 's', $user->getUsername()));
 
         $context = $decorator->renderAsTwigContext($this->emailFactory->getCoreContext(), 0, $sortDir);
