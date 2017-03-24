@@ -93,7 +93,18 @@ class Document
 
         $curl->exec();
 
-        /* Unlink copied file after uploading
+        /* Unlink copied file after uploading but only if it exists
+         * it might not, if it's been blown away from storage via gc
+         */
+        if (!file_exists($this->getUrl())) {
+            return [
+                'result'       => null,
+                'errors'       => 'Missing file',
+                'responseCode' => null,
+            ];
+        }
+
+        /* Otherwise continue as intended
          */
         unlink($this->getUrl());
 
