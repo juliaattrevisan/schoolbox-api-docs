@@ -19,6 +19,8 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\MessageList\Unread;
+
 
 $opts = require_once __DIR__ . '/../../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -65,9 +67,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log) {
         if ($queueLength > 0) {
             $log->notice("Processing $queueLength messages on `$queueName`, user ID identified as $userId", [ 'char' => '<' ]);
 
-            $listKey = sprintf('msg:%s:q:%d:unread', INSTANCE_ID, $userId);
-
-            $list = new RedisQueue($redis, $listKey);
+            $list = new Unread($redis, INSTANCE_ID, $userId);
 
             // rip it out of rabbit and ram it into redis
             while ($msg = $amqp->readFromQueue($queueData[ BunnyControl::QUEUE_NAME ])) {
@@ -75,7 +75,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log) {
                     $decoded  = json_decode($msg->body, true);
                     $instance = Instance::jsonUnserialize($decoded['message']);
 
-                    $log->debug("Pushing {$instance->getBaseHash()}:{$instance->getParamHash()} onto `$listKey`");
+                    $log->debug("Pushing {$instance->getBaseHash()}:{$instance->getParamHash()} onto `{$list->getName()}`");
                     $list->push($instance);
 
                     $log->info("Deleting {$instance->getBaseHash()}:{$instance->getParamHash()} from `$queueName`", [ 'char' => '-' ]);
