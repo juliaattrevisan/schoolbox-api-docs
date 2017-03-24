@@ -13,13 +13,11 @@ namespace Schoolbox\Realtime\Routing;
 use Alaress\Async\Notification\Instance\Instance;
 use Exception;
 use InvalidArgumentException;
-use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use React\Stomp\Protocol\Frame;
-use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
+use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing\Filter\FilterException;
 use Schoolbox\Realtime\Routing\Filter\FilterInterface;
 use Schoolbox\Role;
@@ -41,64 +39,81 @@ class QueueSorter implements FilterInterface
 	/** @var RoutePermissionMapper */
 	private $permMapper;
 
-	/** @var NotifInterface */
-	private $notif;
+    /** @var MessageList\IListFactory */
+    private $listFactory;
 
 
     /**
-     * @param FilterInterface       $filter
-     * @param LoggerInterface       $log
-     * @param NotifInterface        $notif
-     * @param RoutePermissionMapper $permMapper
+     * @param FilterInterface                 $filter
+     * @param LoggerInterface                 $log
+     * @param MessageList\IPublicationFactory $listFactory
+     * @param RoutePermissionMapper           $permMapper
      */
     public function __construct(
         FilterInterface $filter,
         LoggerInterface $log,
-        NotifInterface $notif,
+        MessageList\IPublicationFactory $listFactory,
         RoutePermissionMapper $permMapper
     ) {
-        $this->filter     = $filter;
-        $this->log        = $log;
-        $this->permMapper = $permMapper;
-        $this->notif      = $notif;
+        $this->filter      = $filter;
+        $this->log         = $log;
+        $this->listFactory = $listFactory;
+        $this->permMapper  = $permMapper;
     }
 
 
     /**
-	 * @param User $user
-	 * @param Frame $frame
+	 * @param User     $user
+	 * @param Instance $instance
 	 * @throws InvalidArgumentException
      * @throws PDOException
 	 * @return bool
 	 */
-	public function process(User $user, Frame $frame)
+	public function process(User $user, Instance $instance)
     {
-		$formatted = json_decode($frame->body, true);
-		$instance  = Instance::jsonUnserialize($formatted['message'], $formatted['channel']);
+        $userId = $user->getId();
 
 		try {
-			$this->validate($instance, $formatted, $user);
+			$this->validate($instance, $user);
 
-			$outputLevels = $this->getReroutedLevel($user, $formatted['channel']);
-			$method       = $this->getMethod($outputLevels);
-            $newTopic     = "{$method}.user.{$user->getId()}";
+			// just take the first topic
+			$outputLevels = $this->getReroutedLevel($user, $instance->getTopics()[0]);
 
-            $this->log->info(sprintf('SEND %s:%s -> %s @ %s', $instance->getBaseHash(), $instance->getParamHash(), $newTopic, json_encode($outputLevels)));
-
-            // log for each expected output level
-            foreach ($outputLevels as $level) {
-                try {
-                    $this->notif->logTo($newTopic, $this->permMapper->getSeverity($level), $formatted['message'], $formatted['context']);
-
-                } catch (OutOfBoundsException $e) {
-                    $this->log->warning("Unable to SEND: could not map priority '$level'");
-                }
+            if ($this->permMapper->isMuted($outputLevels)) {
+                throw new FilterException('Reroute level is zero');
             }
 
-			return true;
+            $this->log->info(sprintf('SEND %s:%s -> user %d @ %s', $instance->getBaseHash(), $instance->getParamHash(), $userId, json_encode($outputLevels)));
+
+            // push for each output level
+            foreach ($outputLevels as $level) {
+                switch ($level) {
+                    case RoutePermission::DIGEST:
+                        $this->listFactory->digest($userId)->push($instance);
+                        break;
+
+                    case RoutePermission::INSTANT:
+                        $this->listFactory->listed($userId)->push($instance);
+                        $this->listFactory->unread($userId)->push($instance);
+                        break;
+
+                    case RoutePermission::PUSH:
+                        $this->listFactory->mobile($userId)->push($instance);
+                        break;
+
+                    case RoutePermission::EMAIL:
+                        $this->listFactory->email($userId)->push($instance);
+                        break;
+
+                    default:
+                        $this->log->warning("Unable to SEND: could not map priority '$level'");
+                        break;
+                }
+            }
+            return true;
 
 		} catch (FilterException $e) {
-			$this->log->notice(sprintf('DROP %s:%s -> %s: %s', $instance->getBaseHash(), $instance->getParamHash(), $user->getId(), $e->getMessage()));
+			$this->log->notice(sprintf('DROP %s:%s -> user %d: %s', $instance->getBaseHash(), $instance->getParamHash(), $userId, $e->getMessage()));
 			return true;
 
 		} catch (Swift_RfcComplianceException $e) {
@@ -116,53 +131,32 @@ class QueueSorter implements FilterInterface
 	}
 
 
-    /**
-     * @param string[] $outputLevels
-     * @return string
-     * @throws FilterException
-     */
-    private function getMethod(array $outputLevels)
-    {
-        if ($this->permMapper->isMuted($outputLevels)) {
-            throw new FilterException('Reroute level is zero');
-        }
-
-        if ($this->permMapper->isDigest($outputLevels)) {
-            return static::TOPIC_DIGEST;
-        }
-
-        if ($this->permMapper->isInstant($outputLevels)) {
-            return static::TOPIC_INSTANT;
-        }
-
-        throw new FilterException('Reroute level is unacceptable: ' . json_encode($outputLevels));
-    }
-
-
 	/**
 	 * Iterates the installed filters, any of which will throw an exception if the message fails its validation
 	 *
 	 * @param Instance $message
-	 * @param array    $formatted
 	 * @param User     $user
 	 * @throws FilterException
 	 * @return void
 	 */
-	public function validate($message, $formatted, $user)
+	public function validate(Instance $message, User $user)
     {
         // exceptions get thrown if it fails a given filter
-        $this->filter->validate($message, $formatted, $user);
+        $this->filter->validate($message, $user);
 	}
 
 
 	/**
-	 * @param User $user
-	 * @param string $channel
-	 * @return array
+     * Calculate a set of route levels relevant to this user x topic.
+     * Will be a subset of [ MU, DI, IN, MO, EM ]
+     *
+	 * @param User   $user
+	 * @param string $topic
+	 * @return string[]
 	 */
-	private function getReroutedLevel(User $user, $channel)
+	private function getReroutedLevel(User $user, $topic)
     {
-		$intent = $this->permMapper->findRouteLevels($channel, $user->getRole()->getId(), $user->getId());
+		$intent = $this->permMapper->findRouteLevels($topic, $user->getRole()->getId(), $user->getId());
 
 		if (count($intent) === 0) {
 			// if we got nothing back, this user isn't meant to see this message
@@ -170,8 +164,8 @@ class QueueSorter implements FilterInterface
             return [ RoutePermission::MUTE ];
 		}
 
-		// if the user in question has no digest schedule and digest level is selected, escalate to instant
-		if ($this->permMapper->isDigest($intent) && (string)$user->getRole()->getDigestSchedule() === (string)Role::DIGEST_NEVER) {
+		// if the user in question has no digest schedule and digest level is selected, upgrade to instant
+		if ($this->permMapper->isDigest($intent) && (string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER) {
 			$this->log->info("User doesn't have digest schedule: upgrading to instant");
 			$intent = [ RoutePermission::INSTANT ];
 		}
