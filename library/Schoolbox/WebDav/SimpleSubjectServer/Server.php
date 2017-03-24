@@ -161,12 +161,17 @@ class Server extends DAV\Collection
             $assessment = $assessments->first();
             if ($assessment instanceof IAssessable) {
                 // /Subject/
-                $folderNode = new DAV\SimpleCollection(
-                    $nameGenerator->getUniqueChildName(
-                        $rootNode,
-                        $assessment->getBaseContext()->getFolder()->getTitle()
-                    )
-                );
+                try {
+                    $folderNode = new DAV\SimpleCollection(
+                        $nameGenerator->getUniqueChildName(
+                            $rootNode,
+                            $assessment->getBaseContext()->getFolder()->getTitle()
+                        )
+                    );
+                } catch (DAV\Exception $e) {
+                    // can do nothing
+                    continue;
+                }
             } else {
                 continue;
             }
@@ -174,37 +179,52 @@ class Server extends DAV\Collection
             foreach ($assessments as $assessment) {
 
                 // /Subject/Assessment/
-                $assessmentNode = new Assessment(
-                    $nameGenerator->getUniqueChildName($folderNode, $assessment->getTitle()),
-                    $this->user,
-                    $assessment,
-                    $this->storageDataSource,
-                    $this->dueWorkResponseDataSource
-                );
+                try {
+                    $assessmentNode = new Assessment(
+                        $nameGenerator->getUniqueChildName($folderNode, $assessment->getTitle()),
+                        $this->user,
+                        $assessment,
+                        $this->storageDataSource,
+                        $this->dueWorkResponseDataSource
+                    );
+                } catch (DAV\Exception $e) {
+                    // can do nothing
+                    continue;
+                }
 
                 $participant = $assessment->getParticipantIfExtant($this->user);
                 if ($participant instanceof Participant) {
                     foreach ($participant->getAllResponses() as $response) {
 
                         // /Subject/Assessment/Response/
-                        $responseNode = new DAV\SimpleCollection(
-                            $nameGenerator->getUniqueChildName(
-                                $assessmentNode,
-                                sprintf('Submission %s', $response->getSubmittedAt()->getDatabase())
-                            )
-                        );
+                        try {
+                            $responseNode = new DAV\SimpleCollection(
+                                $nameGenerator->getUniqueChildName(
+                                    $assessmentNode,
+                                    sprintf('Submission %s', $response->getSubmittedAt()->getDatabase())
+                                )
+                            );
+                        } catch (DAV\Exception $e) {
+                            // can do nothing
+                            continue;
+                        }
 
                         if ($response instanceof DueWorkResponse && $response->isSubmitted()) {
 
                             foreach ($response->getAllFiles() as $file) {
 
                                 // /Subject/Assessment/Response/File/
-                                $responseNode->addChild(
-                                    new ResponseFile(
-                                        $nameGenerator->getUniqueChildName($responseNode, $file->getBasename()),
-                                        $file
-                                    )
-                                );
+                                try {
+                                    $responseNode->addChild(
+                                        new ResponseFile(
+                                            $nameGenerator->getUniqueChildName($responseNode, $file->getBasename()),
+                                            $file
+                                        )
+                                    );
+                                } catch (DAV\Exception $e) {
+                                    // can do nothing
+                                    continue;
+                                }
                             }
                         }
                         $assessmentNode->addChild($responseNode);
