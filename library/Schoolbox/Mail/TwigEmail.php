@@ -14,6 +14,8 @@ namespace Schoolbox\Mail;
 use Alaress\Mail\TwigMailer;
 use FM\CSSIN;
 use Schoolbox\UserMapper;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+
 
 class TwigEmail extends TwigMailer {
 
@@ -23,8 +25,8 @@ class TwigEmail extends TwigMailer {
     /** @var UserMapper */
     protected $userMapper;
 
-	/** @var CSSIN */
-	protected $cssIn;
+	/** @var CssToInlineStyles */
+	protected $cssInliner;
 
     /**
      * Prepares the email by importing various configurations from the system
@@ -37,7 +39,7 @@ class TwigEmail extends TwigMailer {
     public function __construct($template, $subject = "", $to = "", $host = "") {
         parent::__construct($template, $subject, $to, $host);
         $this->userMapper = UserMapper::getInstance();
-	    $this->cssIn = new CSSIN();
+	    $this->cssInliner = new CssToInlineStyles();
     }
 
 
@@ -50,7 +52,7 @@ class TwigEmail extends TwigMailer {
         $preformat = $this->twig->render($this->templateFilename,
             array_replace_recursive($this->coreContext, $this->context)
         );
-	    $this->rendercache = $this->cssIn->inlineCSS('', $preformat);
+	    $this->rendercache = $this->cssInliner->convert($preformat);
 	    // truncate all sequential whitespace as well as whitespace between tags (will probably result in one line of HTML -_-;)
 	    $this->rendercache = preg_replace(array('`\s\s*`', '`>\s+<`'), array(' ', '><'), $this->rendercache);
 	    return $this->rendercache;
