@@ -184,7 +184,7 @@ abstract class RedisQueue implements QueueInterface
      */
     private function deflate(Instance $instance)
     {
-        return gzcompress("$instance", 9);
+        return gzcompress(serialize($instance), 9);
     }
 
 
@@ -198,7 +198,7 @@ abstract class RedisQueue implements QueueInterface
      */
     private function inflate($data)
     {
-        return Instance::jsonUnserialize(gzuncompress($data));
+        return unserialize(gzuncompress($data));
     }
 
 
