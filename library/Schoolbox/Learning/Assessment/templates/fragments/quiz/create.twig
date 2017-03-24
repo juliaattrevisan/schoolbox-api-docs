@@ -133,7 +133,7 @@
 </label>
 
 {% import 'sub/visibility.twig' as visibility %}
-{{ visibility.dropdown(assessment.markVisibility, availableVisibilities) }}
+{{ visibility.dropdown(markVisibility, availableVisibilities) }}
 
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
 
