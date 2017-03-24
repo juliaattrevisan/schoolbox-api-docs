@@ -4,7 +4,7 @@
     {% if showClasses %}
         {% if externalUser.StudentForm %}
             <dt class="small-12 medium-3">Tutor Group</dt>
-            <dd class="small-12 medium-3">{{ externalUser.StudentForm }}</dd>
+            <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
         {% endif %}
     {% endif %}
 {% endblock details_studentForm %}
@@ -12,7 +12,7 @@
 {% block details_studiesCode %}
     {% if externalUser.StudentStudiesCode %}
     <dt class="small-12 medium-3">TASC Code:</dt>
-    <dd class="small-12 medium-3">{{ externalUser.StudentStudiesCode }}</dd>
+    <dd class="small-12 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
     {% endif %}
 {% endblock details_studiesCode %}
 
