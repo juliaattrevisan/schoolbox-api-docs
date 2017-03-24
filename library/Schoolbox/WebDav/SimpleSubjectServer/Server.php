@@ -20,7 +20,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\User;
 
 /**
- * DAV server for a student's subject
+ * DAV server for a student's My Subjects screen.
  */
 class Server extends DAV\Collection
 {
@@ -53,6 +53,13 @@ class Server extends DAV\Collection
      * @var DueWorkResponseDataSource
      */
     private $dueWorkResponseDataSource;
+
+    /**
+     * A list of child nodes, cached whenever getChildren() is called.
+     *
+     * @var DAV\INode[]
+     */
+    private $childNodeCache = null;
 
     /**
      * Constructor
@@ -128,9 +135,13 @@ class Server extends DAV\Collection
      */
     public function getChildren()
     {
+        if (isset($this->childNodeCache)) {
+            return $this->childNodeCache;
+        }
+
         // Build an entire list of children
         /** @var DAV\SimpleCollection[] $children */
-        $folderNodes = [];
+        $childNodes = [];
 
         // Only due works due this term
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
@@ -181,13 +192,15 @@ class Server extends DAV\Collection
             $assessment = $assessments->first();
             if ($assessment instanceof IAssessable) {
                 // /Subject/
-                $folderNodes[$folderId] = new DAV\SimpleCollection(
+                $childNodes[$folderId] = new DAV\SimpleCollection(
                     $assessment->getBaseContext()->getFolder()->getTitle(),
                     $assessmentNodes
                 );
             }
         }
-        return $folderNodes;
+
+        $this->childNodeCache = $childNodes;
+        return $childNodes;
     }
 
     /**
