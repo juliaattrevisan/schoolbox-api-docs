@@ -35,11 +35,16 @@ $factory = new ListFactory(INSTANCE_ID, Redis::getClientInstance());
 // load the data into your hat, and pull out a rabbit
 $decorator = new Decorator();
 $factory->listed($_SESSION['id'])->fetchIntoBundle($decorator);
-$notifications = $decorator->renderAsSitePageArray();
+$listed = $decorator->renderAsSitePageArray();
+
+$decorator = new Decorator();
+$factory->unread($_SESSION['id'])->fetchIntoBundle($decorator);
+$unread = $decorator->renderAsSitePageArray();
 
 $msgsByDay = array();
 
-foreach($notifications as $id => $notification) {
+foreach($listed as $id => $notification) {
+    $notification['unread'] = isset($unread[$id]);
 	$timestamp = $notification['time'];
 	$day = date('Y-m-d', $timestamp);
 	$msgsByDay[$day][$timestamp][$id] = $notification;
@@ -78,7 +83,7 @@ foreach($msgsByDay as $day => $timestamps) {
 				'EVENT_ICON'     => $n['icon'],
 				'EVENT_TIME'     => $n['timeonly'],
 				'EVENT_LONGTIME' => $n['longtime'],
-				'EVENT_DARK'     => ++$i % 2 ? '' : 'dark',
+                'EVENT_CLASS'    => $n['unread'] ? 'unread' : ''
 			));
 
 			if(isset($n['meta']['body']) && strlen($n['meta']['body'])) {
@@ -97,7 +102,7 @@ foreach($msgsByDay as $day => $timestamps) {
 	$this->parse('day_block', 'day', true);
 }
 
-if(count($notifications)) {
+if(count($listed)) {
 	$this->parse('days_block', 'days');
     $this->setVar(array(
         'no_messages_block' => ''
