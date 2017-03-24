@@ -39,18 +39,18 @@ class NameGenerator
      * @throws DAV\Exception if this method couldn't create a unique name
      *                       after 1000 attempts
      *
-     * @param  DAV\SimpleCollection $node The node to generate a child name for
-     * @param  string               $name The name to uniquify
+     * @param  DAV\Collection $node The node to generate a child name for
+     * @param  string         $name The name to make unique
      *
      * @return string
      */
-    public function getUniqueChildName(DAV\SimpleCollection $node, $name)
+    public function getUniqueChildName(DAV\Collection $node, $name)
     {
         if ($node->childExists($name)) {
             for ($i = 1; $i <= 1000; $i++) {
-                $new_name = $name . '-' . $i;
-                if (!$node->childExists($new_name)) {
-                    return $new_name;
+                $newName = $name . '-' . $i;
+                if (!$node->childExists($newName)) {
+                    return $newName;
                 }
             }
             // Fell through all the way to here? That means we couldn't find a
