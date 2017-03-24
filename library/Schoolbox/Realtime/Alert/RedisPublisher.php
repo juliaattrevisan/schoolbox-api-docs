@@ -37,12 +37,8 @@ class RedisPublisher implements IPublisher
     public function alertUser($userId, Instance $instance)
     {
         $topic = "msg:{$this->instanceId}:{$userId}:alert";
-        // yes, this is double-encoded.
-        $payload = json_encode([
-            'message' => json_encode($instance)
-        ]);
 
-        return (int)$this->redis->publish($topic, $payload);
+        return (int)$this->redis->publish($topic, "$instance");
     }
 
 }

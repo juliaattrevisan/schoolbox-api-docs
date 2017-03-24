@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\User;
 
 use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
 use Alaress\Password\Service as PasswordService;
+use Alaress\Redis;
 use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
@@ -21,6 +22,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Alert\RedisPublisher;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
@@ -465,8 +467,7 @@ class Controller extends Base
             ->putMeta('ttl', 30)
             ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());
 
-        $n = Notifactory::create("instant.user.$userId.alert", ConfigMapper::getInstance());
-        $n->log(Logger::INFO, json_encode($bob->build()->jsonSerialize()));
+        (new RedisPublisher(Redis::getClientInstance(), INSTANCE_ID))->alertUser($userId, $bob->build());
 
         // Redirect back to modify page
 
