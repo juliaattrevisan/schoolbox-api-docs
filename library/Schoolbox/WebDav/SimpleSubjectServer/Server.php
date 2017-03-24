@@ -141,8 +141,7 @@ class Server extends DAV\Collection
         }
 
         // Build an entire list of children
-        /** @var DAV\SimpleCollection[] $children */
-        $childNodes = [];
+        $rootNode = new DAV\SimpleCollection('');
 
         // Only due works due this term
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
@@ -162,8 +161,11 @@ class Server extends DAV\Collection
             $assessment = $assessments->first();
             if ($assessment instanceof IAssessable) {
                 // /Subject/
-                $childNode = new DAV\SimpleCollection(
-                    $assessment->getBaseContext()->getFolder()->getTitle()
+                $folderNode = new DAV\SimpleCollection(
+                    $nameGenerator->getUniqueChildName(
+                        $rootNode,
+                        $assessment->getBaseContext()->getFolder()->getTitle()
+                    )
                 );
             } else {
                 continue;
@@ -173,7 +175,7 @@ class Server extends DAV\Collection
 
                 // /Subject/Assessment/
                 $assessmentNode = new Assessment(
-                    $nameGenerator->getUniqueChildName($childNode, $assessment->getTitle()),
+                    $nameGenerator->getUniqueChildName($folderNode, $assessment->getTitle()),
                     $this->user,
                     $assessment,
                     $this->storageDataSource,
@@ -209,13 +211,13 @@ class Server extends DAV\Collection
                     }
                 }
 
-                $childNode->addChild($assessmentNode);
+                $folderNode->addChild($assessmentNode);
             }
-            $childNodes[] = $childNode;
+            $rootNode->addChild($folderNode);
         }
 
-        $this->childNodeCache = $childNodes;
-        return $childNodes;
+        $this->childNodeCache = $rootNode->getChildren();
+        return $this->childNodeCache;
     }
 
     /**
