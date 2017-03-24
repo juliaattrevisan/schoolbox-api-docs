@@ -9,26 +9,16 @@
 namespace Schoolbox\Notif;
 
 
-use Alaress\Async\AMQP\AMQPInterface;
 use InvalidArgumentException;
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Formatter\CompressedFormatter;
-use Schoolbox\Notif\Handler\AMQPFallbackHandler;
-use Schoolbox\Notif\Handler\AMQPHandler;
-use Schoolbox\Notif\Handler\InstamailHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
-use Schoolbox\Notif\Handler\PushHandler;
-use Schoolbox\Notif\Handler\RedisMessageHandler;
-use Schoolbox\Realtime\MessageList\Factory;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_RfcComplianceException;
@@ -43,17 +33,11 @@ class HandlerFactory
     const SYS_MAIL           = 'sysmailer';
     const SYS_LOG            = 'syslogger';
     const SYS_EXCEPTION_MAIL = 'exceptionmailer';
-    const SYS_AMQP           = 'amqp';
     const SYS_NULL_DEBUG     = 'nulldebug';
     const SYS_DEBUG_MAIL     = 'debugmailer';
 
     const LOG_AUTH           = Notif::TOPIC_AUTH;
     const LOG_CMS            = Notif::TOPIC_CMS;
-
-    const USER_UNREAD        = 'unread';
-    const USER_INSTANT       = 'instant';
-    const USER_PUSH          = 'push';
-    const USER_MAIL          = 'mail';
 
 
     /** @var IConfigLoader */
@@ -71,32 +55,20 @@ class HandlerFactory
     /** @var callable[] */
     protected $handlerGenerators;
 
-    /** @var ClientInterface */
-    private $redis;
-
-    /** @var string */
-    private $instanceId;
-
 
     /**
      * HandlerFactory constructor. Loads up a whole bunch of lazy-loaded handlers.
      * TODO: investigate putting all these handlers into DI
      *
-     * @param string          $instanceId
      * @param IConfigLoader   $conf
      * @param Swift_Transport $swift
      * @param LoggerInterface $log
-     * @param ClientInterface $redis
-     * @param AMQPInterface   $mqc
      */
-    public function __construct($instanceId, IConfigLoader $conf, Swift_Transport $swift, LoggerInterface $log, ClientInterface $redis, AMQPInterface $mqc = null)
+    public function __construct(IConfigLoader $conf, Swift_Transport $swift, LoggerInterface $log)
     {
         $this->conf       = $conf;
-        $this->redis      = $redis;
-        $this->mqc        = $mqc;
         $this->swift      = $swift;
         $this->log        = $log;
-        $this->instanceId = $instanceId;
 
         $this->handlerGenerators[self::SYS_FATAL_MAIL] = function ()
         {
@@ -122,10 +94,6 @@ class HandlerFactory
                 return $this->createMailHandler('Uncaught Exception in Schoolbox', Logger::CRITICAL);
             }
         };
-        $this->handlerGenerators[self::SYS_AMQP] = function ()
-        {
-            return $this->createAmqpHandler(Logger::NOTICE, false, new CompressedFormatter());
-        };
         $this->handlerGenerators[self::SYS_NULL_DEBUG] = function ()
         {
             return new NullHandler(Logger::INFO);
@@ -133,22 +101,6 @@ class HandlerFactory
         $this->handlerGenerators[self::SYS_DEBUG_MAIL] = function ()
         {
             return $this->createMailHandler('Schoolbox Debug', Logger::DEBUG, false);
-        };
-        $this->handlerGenerators[self::USER_UNREAD]  = function ()
-        {
-            return new RedisMessageHandler($this->redis, new Factory($this->instanceId, $this->redis), Logger::NOTICE, true);
-        };
-        $this->handlerGenerators[self::USER_INSTANT] = function ()
-        {
-            return $this->createAmqpHandler(Logger::INFO, true);
-        };
-        $this->handlerGenerators[self::USER_PUSH] = function ()
-        {
-            return new PushHandler($this->log, Logger::WARNING, true);
-        };
-        $this->handlerGenerators[self::USER_MAIL] = function ()
-        {
-            return new InstamailHandler($this->log, Logger::ERROR, true);
         };
         $this->handlerGenerators[self::LOG_AUTH] = function ()
         {
@@ -183,7 +135,7 @@ class HandlerFactory
     {
         $logfile = sprintf("%s/%s.log", $this->conf->get('logs_dir'), $topic);
 
-        if (is_resource($lp = fopen($logfile, 'a'))) {
+        if (is_resource($lp = fopen($logfile, 'ab'))) {
             return new StreamHandler($lp, Logger::INFO, false);
         }
 
@@ -319,28 +271,6 @@ class HandlerFactory
         }
 
         throw new InvalidArgumentException("Cannot handle topic '$topic' with SQL.");
-    }
-
-
-    /**
-     * @param int                $level
-     * @param bool               $bubble
-     * @param FormatterInterface $formatter
-     * @return HandlerInterface
-     */
-    protected function createAmqpHandler($level, $bubble, FormatterInterface $formatter = null)
-    {
-        if ($this->mqc instanceof AMQPInterface) {
-            $amqp = new AMQPHandler($this->mqc, $level, $bubble);
-
-            if ($formatter instanceof FormatterInterface) {
-                $amqp->setFormatter($formatter);
-            }
-
-            return $amqp;
-        }
-
-        return new AMQPFallbackHandler($level, $bubble);
     }
 
 }

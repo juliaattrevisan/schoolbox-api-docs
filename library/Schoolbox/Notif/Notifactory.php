@@ -9,34 +9,25 @@
 namespace Schoolbox\Notif;
 
 
-use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Lumberjack;
-use Alaress\Redis;
 use ConfigFallback;
 use Database;
 use Mailer;
 use PDOException;
-use PhpAmqpLib\Exception\AMQPExceptionInterface;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Swift_Transport;
 
 class Notifactory
 {
 
-    /** @var string */
-    protected $instanceId;
     /** @var IConfigLoader */
     protected $conf;
-    /** @var ClientInterface */
-    protected $redis;
-    /** @var AMQPInterface */
-    protected $mqc;
+
     /** @var Swift_Transport */
     protected $swift;
+
     /** @var LoggerInterface */
     protected $log;
 
@@ -46,35 +37,26 @@ class Notifactory
      *
      * @param string        $topic
      * @param IConfigLoader $configLoader
-     * @param string        $instanceId
      * @return NotifInterface
      */
-    public static function create($topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null, $instanceId = INSTANCE_ID)
+    public static function create($topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
     {
-        $self = new self($configLoader, $instanceId);
+        $self = new self($configLoader);
 
         return $self->generateNotif($topic);
     }
 
 
     /**
-     * Notifactory constructor.
-     *
      * @param IConfigLoader   $configLoader
-     * @param string          $instanceId
-     * @param AMQPInterface   $mqc
-     * @param ClientInterface $redis
      * @param Swift_Transport $swift
      * @param LoggerInterface $log
      */
-    public function __construct(IConfigLoader $configLoader = null, $instanceId = INSTANCE_ID, AMQPInterface $mqc = null, ClientInterface $redis = null, Swift_Transport $swift = null, LoggerInterface $log = null)
+    public function __construct(IConfigLoader $configLoader = null, Swift_Transport $swift = null, LoggerInterface $log = null)
     {
         $this->setConfigLoader($configLoader);
-        $this->setRedis($redis);
-        $this->setAMQP($mqc);
         $this->setSwiftTransport($swift);
         $this->setLogger($log);
-        $this->setInstanceId($instanceId);
     }
 
 
@@ -93,7 +75,7 @@ class Notifactory
      */
     public function generateHandlerFactory()
     {
-        return new HandlerFactory($this->instanceId, $this->conf, $this->swift, $this->log, $this->redis, $this->mqc);
+        return new HandlerFactory($this->conf, $this->swift, $this->log);
     }
 
 
@@ -130,41 +112,6 @@ class Notifactory
 
 
     /**
-     * @param ClientInterface $redis
-     * @return $this
-     */
-    public function setRedis(ClientInterface $redis = null)
-    {
-        $this->redis = $redis ?: Redis::getClientInstance();
-        return $this;
-    }
-
-
-    /**
-     * @param AMQPInterface $mqc
-     * @return self
-     */
-    public function setAMQP(AMQPInterface $mqc = null)
-    {
-        if ($mqc) {
-            $this->mqc = $mqc;
-
-        } else {
-            try {
-                // if the rabbit cannot be contacted, this will throw an exception
-                $this->mqc = MQConnector::getInstance();
-
-            } catch (AMQPExceptionInterface $e) {
-                // we're ok with suppressing this: it will be dealt with appropriately in the handler factory
-                $this->mqc = null;
-            }
-        }
-
-        return $this;
-    }
-
-
-    /**
      * @param Swift_Transport $swift
      * @return self
      */
@@ -182,17 +129,6 @@ class Notifactory
     public function setLogger(LoggerInterface $log = null)
     {
         $this->log = $log ?: new Lumberjack\Logger(null);
-        return $this;
-    }
-
-
-    /**
-     * @param string $instanceId
-     * @return $this
-     */
-    public function setInstanceId($instanceId)
-    {
-        $this->instanceId = $instanceId;
         return $this;
     }
 

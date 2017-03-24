@@ -101,11 +101,7 @@ class Notif implements NotifInterface
         ];
 
         if ($this->isSystemTopic($this->topic)) {
-            if (in_array($this->topic, [self::TOPIC_APPLICATION, self::TOPIC_CMD_REROUTE, self::TOPIC_CMD_DIGEST])) {
-                $stack[] = HandlerFactory::SYS_AMQP;
-            }
-
-            if (in_array($this->topic, [self::TOPIC_AUTH, self::TOPIC_CMS])) {
+            if (in_array($this->topic, [ self::TOPIC_AUTH, self::TOPIC_CMS ], true)) {
                 // this may well come back to bite me
                 $stack[] = $this->topic;
             }
@@ -114,14 +110,9 @@ class Notif implements NotifInterface
             $handlers = $this->factory->getStack($stack);
 
             // append a file logger
-            array_push($handlers, $this->factory->getFileLogHandler($this->topic));
+            $handlers[] = $this->factory->getFileLogHandler($this->topic);
 
         } else {
-            $stack[] = HandlerFactory::USER_UNREAD;
-            $stack[] = HandlerFactory::USER_INSTANT;
-            $stack[] = HandlerFactory::USER_PUSH;
-            $stack[] = HandlerFactory::USER_MAIL;
-
             // resolve the stack so far
             $handlers = $this->factory->getStack($stack);
         }
@@ -149,7 +140,7 @@ class Notif implements NotifInterface
                 $this->topic_cache[$name] = $value;
             }
         }
-        return in_array($topic, $this->topic_cache);
+        return in_array($topic, $this->topic_cache, true);
     }
 
 
