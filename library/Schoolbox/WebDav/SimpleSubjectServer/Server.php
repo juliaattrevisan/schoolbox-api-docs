@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\User;
+use Schoolbox\WebDav\NameGenerator;
 
 /**
  * DAV server for a student's My Subjects screen.
@@ -166,7 +167,10 @@ class Server extends DAV\Collection
 
                             foreach ($response->getAllFiles() as $file) {
                                 // /Subject/Assessment/Response/File/
-                                $responseFileNodes[$file->getId()] = new ResponseFile($file);
+                                $responseFileNodes[$file->getId()] = new ResponseFile(
+                                    $file->getBasename(),
+                                    $file
+                                );
                             }
 
                             // /Subject/Assessment/Response/
@@ -180,6 +184,7 @@ class Server extends DAV\Collection
 
                 // /Subject/Assessment/
                 $assessmentNodes[$assessment->getId()] = new Assessment(
+                    $assessment->getTitle(),
                     $this->user,
                     $assessment,
                     $this->storageDataSource,

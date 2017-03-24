@@ -25,6 +25,11 @@ use Schoolbox\User;
 class Assessment extends DAV\Collection
 {
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
      * @var IAssessable
      */
     private $assessment;
@@ -52,6 +57,7 @@ class Assessment extends DAV\Collection
     /**
      * Constructor
      *
+     * @param string                    $name
      * @param User                      $user
      * @param IAssessable               $assessment
      * @param StorageDataSource         $storageDataSource
@@ -59,12 +65,14 @@ class Assessment extends DAV\Collection
      * @param DAV\INode[]               $children
      */
     public function __construct(
+        $name,
         User $user,
         IAssessable $assessment,
         StorageDataSource $storageDataSource,
         DueWorkResponseDataSource $dueWorkResponseDataSource,
-        $children = []
+        array $children = []
     ) {
+        $this->name                      = $name;
         $this->user                      = $user;
         $this->assessment                = $assessment;
         $this->storageDataSource         = $storageDataSource;
@@ -77,7 +85,7 @@ class Assessment extends DAV\Collection
      */
     public function getName()
     {
-        return $this->assessment->getTitle();
+        return $this->name;
     }
 
     /**
