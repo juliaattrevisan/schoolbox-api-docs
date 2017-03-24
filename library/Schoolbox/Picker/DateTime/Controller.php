@@ -220,7 +220,7 @@ class Controller extends Base
 
         //Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
         $shiftTimetableDays = $daysInCycle*($cycle-1)+$day-$termFirstDay;
-        $date = $termStartDate->addWeekdays($shiftTimetableDays);
+        $date = $termStartDate->addWeekdays($shiftTimetableDays)->getLocalShort();
         return $date;
     }
 
@@ -303,9 +303,6 @@ class Controller extends Base
             UserAccess::ACCESS_READ,
             true
         );
-
-        // Find out the term this date falls in (needed to locate assessments)
-        $term = $this->getTermMapper()->findForDate( \Alaress_Date_Format::newLocalShort($date) );
 
         // Get a lookup array of external IDs for the students in this class
 
