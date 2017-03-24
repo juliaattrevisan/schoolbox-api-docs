@@ -20,14 +20,13 @@ class SelfSendNewsFilter extends SelfSendFilter {
 	 * This is to appease JPC
 	 *
 	 * @param Instance $message
-	 * @param array    $formatted
 	 * @param User     $user
 	 * @throws FilterException
 	 * @return bool
 	 */
-	public function validate($message, $formatted, $user) {
+	public function validate(Instance $message, User $user) {
 		try {
-			$result = parent::validate($message, $formatted, $user);
+			$result = parent::validate($message, $user);
 		}
 		catch(FilterException $e) {
 			// was a self send, but check this isn't news

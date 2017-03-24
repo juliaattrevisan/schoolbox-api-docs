@@ -19,15 +19,15 @@ class RoleMembershipFilter extends ContextFilter {
 	 * Returns true if this message is considered valid, or false if it should be dismissed
 	 *
 	 * @param Instance $message
-	 * @param array    $formatted
 	 * @param User     $user
 	 * @throws FilterException
 	 * @return bool
 	 */
-	public function validate($message, $formatted, $user) {
+	public function validate(Instance $message, User $user) {
+
 		// if roletype set, must be of role specified
-		if(isset($formatted['context']['role'])) {
-			$this->assertContextValue($formatted['context']['role'], $user->getRole()->getId(), "User not a member of any given role");
+		if(isset($message->getContext()['role'])) {
+			$this->assertContextValue($message->getContext()['role'], $user->getRole()->getId(), "User not a member of any given role");
 		}
 		return true;
 	}

@@ -19,16 +19,16 @@ class FilterFactory
     /** @var IConfigLoader */
     protected $conf;
     /**
-     * @var MessageList\IFactory
+     * @var MessageList\IListFactory
      */
     private $factory;
 
 
     /**
-     * @param MessageList\IFactory $factory
-     * @param IConfigLoader        $conf
+     * @param MessageList\IListFactory $factory
+     * @param IConfigLoader            $conf
      */
-    public function __construct(MessageList\IFactory $factory = null, IConfigLoader $conf = null)
+    public function __construct(MessageList\IListFactory $factory = null, IConfigLoader $conf = null)
     {
         $this->factory = $factory;
         $this->conf    = $conf;
@@ -40,7 +40,7 @@ class FilterFactory
      */
     public function build()
     {
-        $bundle = new FilterBundle([ new AlreadyReroutedFilter() ]);
+        $bundle = new FilterBundle([]);
 
         if ($this->conf) {
             $bundle->attach(new MessagingEnabledFilter($this->conf));

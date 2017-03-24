@@ -19,11 +19,10 @@ interface FilterInterface {
 	 * Returns true if this message is considered valid, or false if it should be dismissed
 	 *
 	 * @param Instance $message
-	 * @param array    $formatted
 	 * @param User     $user
 	 * @throws FilterException
 	 * @return bool
 	 */
-	public function validate($message, $formatted, $user);
+	public function validate(Instance $message, User $user);
 
 }

@@ -11,20 +11,20 @@ namespace Schoolbox\Realtime\Routing\Filter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Schoolbox\Realtime\MessageList\IFactory;
+use Schoolbox\Realtime\MessageList\IListFactory;
 use Schoolbox\User;
 
 class DuplicateFilter implements FilterInterface
 {
 
-	/** @var IFactory */
+	/** @var IListFactory */
 	protected $factory;
 
 
 	/**
-	 * @param IFactory $factory
+	 * @param IListFactory $factory
 	 */
-	public function __construct(IFactory $factory)
+	public function __construct(IListFactory $factory)
     {
 		$this->factory = $factory;
 	}
@@ -34,12 +34,11 @@ class DuplicateFilter implements FilterInterface
 	 * Throws a FilterException if this message should be DROPPED for this user
 	 *
 	 * @param Instance $message
-	 * @param array    $formatted
 	 * @param User     $user
 	 * @throws FilterException
 	 * @return bool
 	 */
-	public function validate($message, $formatted, $user)
+	public function validate(Instance $message, User $user)
     {
         if ($this->factory->listed($user->getId())->contains($message)) {
             throw new FilterException('User has already seen this message');

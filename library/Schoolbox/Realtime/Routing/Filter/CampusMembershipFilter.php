@@ -19,15 +19,14 @@ class CampusMembershipFilter extends ContextFilter {
 	 * Returns true if this message is considered valid, or false if it should be dismissed
 	 *
 	 * @param Instance $message
-	 * @param array    $formatted
 	 * @param User     $user
 	 * @throws FilterException
 	 * @return bool
 	 */
-	public function validate($message, $formatted, $user) {
+	public function validate(Instance $message, User $user) {
 		// if campus set, must be involved in one or more campuses listed
-		if(isset($formatted['context']['campus'])) {
-			$this->assertContextValue($formatted['context']['campus'], $user->getCampusCollection()->getColumnValues('id'), "User not a member of any given campus");
+		if(isset($message->getContext()['campus'])) {
+			$this->assertContextValue($message->getContext()['campus'], $user->getCampusCollection()->getColumnValues('id'), "User not a member of any given campus");
 		}
 		return true;
 	}

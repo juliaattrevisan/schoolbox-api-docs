@@ -32,13 +32,12 @@ class MessagingEnabledFilter implements FilterInterface
      * Throws away message if messaging is disabled globally.
      *
      * @param Instance $message
-     * @param array    $formatted
      * @param User     $user
      *
      * @throws FilterException
      * @return bool
      */
-    public function validate($message, $formatted, $user)
+    public function validate(Instance $message, User $user)
     {
         if (!$this->config->get('messaging_enabled')) {
             throw new FilterException("Messaging has been disabled globally");
