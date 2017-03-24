@@ -89,6 +89,18 @@ class Assessment extends DAV\Collection
     }
 
     /**
+     * Add a child
+     *
+     * @param DAV\INode $child
+     * @return $this
+     */
+    public function addChild(DAV\INode $child)
+    {
+        $this->children[] = $child;
+        return $this;
+    }
+
+    /**
      * Loads this student's submissions (and later on, returns).
      *
      * @return DAV\INode[]
