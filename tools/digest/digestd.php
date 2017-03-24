@@ -7,10 +7,11 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\RoleMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Digest\DigestScheduler;
 use Schoolbox\Realtime\Digest\MailNotifier;
-use Schoolbox\Realtime\MessageList\Factory;
+use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
 
 
@@ -42,7 +43,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Digest', array(
 	'verbose'        => isset($opts['v']) ? $opts['v'] : null,
     'fields'         => array_values($fields),
     'flags'          => $flags,
-    'debug-interval' => $opts['debug-interval'] ?: null
+    'debug-interval' => isset($opts['debug-interval']) ? $opts['debug-interval'] : null
 ));
 
 
@@ -56,9 +57,12 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var ClientInterface $redis */
     $redis = $di->get('redis');
 
-    $dispatch = new DefaultDispatchStrategy($opts['flags']);
-    $notifier = new MailNotifier(new Factory(INSTANCE_ID, $redis));
-    $factory  = new DigestTriggerFactory($notifier, new Clock(), $opts['debug-interval']);
+    $clock = new Clock();
 
-    new DigestScheduler($loop, $dispatch, $log, $conf, $factory);
+    $roleMapper = $di->get('mapperFactory')->get(RoleMapper::class);
+    $strat      = new DefaultDispatchStrategy($opts['flags']);
+    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis));
+    $factory    = new DigestTriggerFactory($notifier, $clock, $opts['debug-interval']);
+
+    new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);
 });

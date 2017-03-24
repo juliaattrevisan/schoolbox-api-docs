@@ -10,6 +10,7 @@
  */
 
 use Alaress\Redis;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Aura\Di\ContainerInterface;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
@@ -19,12 +20,10 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\ScheduleException;
-use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 
@@ -37,7 +36,7 @@ error_reporting(E_ALL);
 restore_error_handler();
 restore_exception_handler();
 
-$opts      = getopt('v', [ 'perform' ]);
+$opts      = getopt('v', [ 'perform' ], $_);
 $perform   = isset($opts['perform']);
 $threshold = 0;
 
@@ -235,7 +234,7 @@ function verifyFrameTrigger(Frame $input, LoggerInterface $log)
     $exit = 0;
 
     try {
-        $trigger = Scheduler::frame2trigger(Redis::getClientInstance(), $input);
+        $trigger = frame2trigger(Redis::getClientInstance(), $input);
         $log->info(sprintf("Trigger '%s' will fire at %s; testing callbacks", $trigger->getIdString(), (new Alaress_Date_Format($trigger->getTimestamp(), 'U'))->getDatabase()));
 
         foreach ($trigger->getCallbacks() as $callback) {
@@ -335,7 +334,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 
         $amqp  = Connector::getInstance();
 
-        $splitter = new Splitter($conf, $di, new TriggerFactoryFactory(Scheduler::COMPRESSION_LEVEL >= 0));
+        $splitter = new Splitter($conf, $di, new TriggerFactoryFactory(true));
 
         // handle this message by splitting this event and propagating its triggers
         (new Propagator($splitter, $redis, $amqp, INSTANCE_ID))->propagateEvent($event);
@@ -362,3 +361,31 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 
     exit($exit);
 }
+
+
+/**
+ * @param \Predis\ClientInterface     $redis
+ * @param \React\Stomp\Protocol\Frame $frame
+ * @throws InvalidArgumentException
+ * @throws ErrorException
+ * @return TriggerInterface
+ */
+function frame2trigger(\Predis\ClientInterface $redis, \React\Stomp\Protocol\Frame $frame)
+{
+    $content = $redis->get($frame->body);
+
+    if ($content === '') {
+        throw new InvalidArgumentException("Key `{$frame->body}` is not set");
+    }
+
+    // try to unserialize: depending on kernel, will either throw EE or just emit warning
+    $trigger = unserialize($content);
+
+    // verify it worked
+    if ($trigger instanceof TriggerInterface) {
+        return $trigger;
+    }
+
+    throw new InvalidArgumentException('Could not unserialize trigger');
+}
+

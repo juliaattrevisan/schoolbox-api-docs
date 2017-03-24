@@ -9,18 +9,14 @@
  * @version     SVN: $Id$
  */
 
-use Alaress\WorkerCrew\Worker\PipeWriter;
 use Aura\Di;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Notif\Notifactory;
+use Schoolbox\IConfigLoader;
+use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
-use Schoolbox\Realtime\MessageList;
-use Schoolbox\Realtime\Routing\QueueSorter;
 use Schoolbox\Realtime\Routing;
-use Schoolbox\Realtime\Routing\Filter;
-use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\UserMapper;
 
 /** @var array $fields */
@@ -44,35 +40,28 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Route Worker', array(
 
 ));
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log) {
+
+    // extract things from DI and build the worker
 
     /** @var ClientInterface $client */
     $client = $di->get('redis');
 
-    $listFactory = new MessageList\Factory(INSTANCE_ID, $client);
-
-    // Add the messaging enabled filter
+    /** @var IConfigLoader $config */
     $config = $di->get('config');
 
-    // obtain filter list
-    $filter = (new Filter\FilterFactory($listFactory, $config))->build();
+    /** @var RegistryMapper $registryMapper */
+    $registryMapper = $di->get('mapperFactory')->get(RegistryMapper::class);
 
-    // create a Notif using the Kernel's logger
-    $notif  = (new Notifactory())->setLogger($log)->generateNotif();
+    /** @var UserMapper $userMapper */
+    $userMapper = $di->get('mapperFactory')->get(UserMapper::class);
 
-    // setup a sorter
-    $sorter = new QueueSorter($filter, $log, $notif, $di->get('mapperFactory')->get(RoutePermissionMapper::class));
+    /** @var RoutePermissionMapper $routePermMapper */
+    $routePermMapper = $di->get('mapperFactory')->get(RoutePermissionMapper::class);
 
-    // use the route strat
-    $strat = new Routing\DispatchStrategy();
+    (new Routing\WorkerFactory($config, $log, $client, $registryMapper, $userMapper, $routePermMapper))
+        ->build($loop, INSTANCE_ID);
 
-    // we open stream(3) as our data output stream
-    $writer = new PipeWriter($strat, $log, fopen('php://fd/3', 'wb'));
-
-    // worker-side: dependencies used
-    $txrx = new RouteTXRX($di->get('mapperFactory')->get(UserMapper::class), $sorter);
-
-    new Routing\Worker($txrx, $loop, $log, $writer, $strat);
 });
 
 // yup. that's all you need to do.

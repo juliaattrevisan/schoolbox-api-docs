@@ -18,6 +18,7 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
+use Schoolbox\Realtime\Routing\DispatchResponder;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription;
@@ -39,11 +40,13 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
     $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts) {
 
+        $log->info('Connected to STOMP', [ 'char' => '+' ]);
+
         // the list of instances this particular daemon will listen for
         $instances = [ INSTANCE_ID ];
 
-        // this holds and traverses all our subscription data
-        $router = new Router(new SubscriptionDictionary('.'));
+        // daemon-version: no dependencies required
+        $txrx = new RouteTXRX();
 
         /** @var ClientInterface $redis */
         $redis = $di->get('redis');
@@ -51,33 +54,31 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         /** @var AMQPInterface $amqp */
         $amqp = $di->get('amqp');
 
+        $routeBroker   = new Schoolbox\Realtime\Routing\Broker(INSTANCE_ID, $amqp, $redis, $client);
         $loaderFactory = new Subscription\Loader\Factory($redis, $log);
+        $dispatcher    = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($opts['flags']));
 
         // ensure endpoints exist
         foreach ($instances as $instance) {
-            $r = '*.notify.#';
-            $q = "$instance.route";
-            $x = "sb.$instance.tx";
+            // this holds and traverses all our subscription data
+            $router = new Router(new SubscriptionDictionary('.'));
 
-            // TODO make the queues and exchanges instance-agnostic
-            $log->info("Ensuring binding exists: '$x' -> ($r) -> '$q'", [ 'char' => '>' ]);
-            $amqp->declareQueue($q)->bindQueue($q, $r, $x);
+            $q = "$instance.route";
+
+            $amqp->declareQueue($q);
 
             $loaderFactory->get("m:{$instance}:routes")->loadSubscriptions($router);
-        }
 
-        // daemon-version: no dependencies required
-        $txrx = new RouteTXRX();
+            $transaction = new DispatchTransaction($loop, $dispatcher, DispatchStrategy::TASK_ROUTE,
+                Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
+                Subscription\Handler::TRANSACTION_COUNT_LIMIT
+            );
 
-        $handler     = new Subscription\Handler($router, $client, $log, $txrx);
-        $dispatcher  = new Dispatcher($loop, $handler, $log, new DispatchStrategy($opts['flags']));
-        $transaction = new DispatchTransaction($loop, $dispatcher, DispatchStrategy::TASK_ROUTE,
-            Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
-            Subscription\Handler::TRANSACTION_COUNT_LIMIT
-        );
+            $handler = new Subscription\Handler(new Subscription\Resolver($router), $log, $txrx, $transaction);
 
-        foreach ($instances as $instance) {
-            $handler->listen($instance, $transaction);
+            $routeBroker->registerConsumer($handler);
+
+            $log->debug("Consuming amqp://$q");
         }
     });
 });

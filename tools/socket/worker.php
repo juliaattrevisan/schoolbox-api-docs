@@ -12,7 +12,7 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Realtime\MessageList\Factory;
+use Schoolbox\Realtime\MessageList\ListFactory;
 
 
 /** @var array $fields */
@@ -46,7 +46,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var ClientInterface $redis */
     $redis = $di->get('redis');
 
-    $listFactory = new Factory(INSTANCE_ID, $redis);
+    $listFactory = new ListFactory(INSTANCE_ID, $redis);
 
     /** @var Notif $notif */
     $notif = $di->get('notif');
