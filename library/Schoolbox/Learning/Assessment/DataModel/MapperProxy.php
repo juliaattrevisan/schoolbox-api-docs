@@ -525,49 +525,6 @@ class MapperProxy
     }
 
     /**
-     * Finds all assessables for student that are due on particular date.
-     *
-     * This method loads participation for $student only.
-     *
-     * @param User $student
-     * @param dueDate
-     * @param Term $term to pass to findUniqueAssessmentIdsForStudent
-     * @return Collection|IAssessable[]
-     */
-
-    public function findByDueDateForStudent(User $student, Alaress_Date_Format $dueDate, Term $term)
-    {
-
-        /** @var FolderMapper $folderMapper */
-        $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
-
-        // Find this user's folders from folder mapper
-        $classFolderIds = $folderMapper->findForUser(
-            $student,
-            // Only actual students have classes
-            $student->getRole()->isStudent(),
-            UserAccess::ACCESS_READ,
-            true
-        )->getColumnValues('id');
-        // Find assessments which this student is no longer in the class for,
-        // but has created a response or feedback for.
-        $uniques = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
-
-        $to = new Alaress_Date_Format($dueDate->endOfDay());
-        $from = new Alaress_Date_Format($dueDate->startOfDay());
-
-        // Build a list of parameters to pass to findAllForFolderId
-        $extraParams = $this->convertOptionsToPredicateBuilder(['due_after' => $from, 'due_before' => $to]);
-
-        return $this->loadParticipantsIntoAssessmentCollection(
-            $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams, $uniques)
-            ),
-            $student
-        );
-    }
-
-    /**
      * Finds all assessables for a staff member.
      *
      * This method does not loads participation.

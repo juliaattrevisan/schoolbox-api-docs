@@ -318,15 +318,15 @@ class Controller extends Base
         $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
         // Iterate each student in the class
 
-        $date = new Alaress_Date_Format($date, 'd/m/Y');
+        $from = new Alaress_Date_Format($date, 'd/m/Y');
+        $to = new Alaress_Date_Format($date, 'd/m/Y');
+
         foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $from->startOfDay(), $to->endOfDay());
 
-//            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $date, $date);
-            $assessments = $this->getAssessmentMapperProxy()->findByDueDateForStudent($studentCurrent, $date, $term);
             // Count how many assessments are due on the specified date
-
             $assessmentsDue = count($assessments);
             $assessmentList = Array();
             foreach ($assessments as $assessment) {
@@ -367,7 +367,7 @@ class Controller extends Base
                 'format' => 'json',
                 'data' => [
                     'students' => $students,
-                    'date' => $date->getLocalShort()
+                    'date' => $date
                 ]
             )
         );
