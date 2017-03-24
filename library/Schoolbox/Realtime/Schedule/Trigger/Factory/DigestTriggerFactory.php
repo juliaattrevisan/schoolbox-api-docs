@@ -36,8 +36,8 @@ class DigestTriggerFactory
      */
     public function __construct(WorkNotifier $notifier, IClock $clock, $debugInterval = null)
     {
-        $this->notifier  = $notifier;
-        $this->clock = $clock;
+        $this->notifier      = $notifier;
+        $this->clock         = $clock;
         $this->debugInterval = $debugInterval;
     }
 
