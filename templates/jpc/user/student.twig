@@ -3,7 +3,7 @@
 {% if showClasses %}
     {% if formTeacher %}
     <dt class="small-12 medium-3">Form Teacher</dt>
-    <dd class="small-12 medium-3">
+    <dd class="small-12 medium-9">
         {% if formTeacher.getId() %}
         <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
         {% else %}
@@ -18,7 +18,7 @@
 {% if showClasses %}
     {% if externalUser.StudentForm %}
     <dt class="small-12 medium-3">Form</dt>
-    <dd class="small-12 medium-3">{{ externalUser.StudentForm }}</dd>
+    <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
     {% endif %}
 {% endif %}
 {% endblock details_studentForm %}
