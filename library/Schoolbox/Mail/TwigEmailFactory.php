@@ -6,6 +6,8 @@
  */
 
 namespace Schoolbox\Mail;
+use Psr\Log\LoggerInterface;
+
 
 /**
  * Builder for Twig email objects.
@@ -19,17 +21,24 @@ class TwigEmailFactory
      *
      * @var CoreContext
      */
-    protected $context;
+    private $context;
+
+    /** @var LoggerInterface */
+    private $log;
+
 
     /**
      * Constructor
      *
-     * @param CoreContext $context
+     * @param CoreContext     $context
+     * @param LoggerInterface $log
      */
-    public function __construct(CoreContext $context)
+    public function __construct(CoreContext $context, LoggerInterface $log)
     {
         $this->context = $context;
+        $this->log     = $log;
     }
+
 
     /**
      * Builder
@@ -40,13 +49,22 @@ class TwigEmailFactory
      * @param string $subject
      * @param string $to
      * @param string $host
-     *
      * @return TwigEmail
      */
     public function build($template, $subject = "", $to = "", $host = "")
     {
         $twigEmail = new TwigEmail($template, $subject, $to, $host);
+        $twigEmail->setLogger($this->log);
         $twigEmail->setCoreContext($this->context->getContext());
         return $twigEmail;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getCoreContext()
+    {
+        return $this->context->getContext();
     }
 }
