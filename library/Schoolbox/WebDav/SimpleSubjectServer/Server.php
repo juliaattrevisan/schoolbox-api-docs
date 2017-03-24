@@ -154,54 +154,64 @@ class Server extends DAV\Collection
             return $assessment->getBaseContext()->getFolder()->getId();
         });
 
+        // Name generator
+        $nameGenerator = new NameGenerator();
+
         foreach ($groupedAssessments as $folderId => $assessments) {
-            $assessmentNodes = [];
 
-            foreach ($assessments as $assessment) {
-                $responseNodes = [];
-                $participant   = $assessment->getParticipantIfExtant($this->user);
-                if ($participant instanceof Participant) {
-                    foreach ($participant->getAllResponses() as $response) {
-                        $responseFileNodes = [];
-                        if ($response instanceof DueWorkResponse && $response->isSubmitted()) {
-
-                            foreach ($response->getAllFiles() as $file) {
-                                // /Subject/Assessment/Response/File/
-                                $responseFileNodes[$file->getId()] = new ResponseFile(
-                                    $file->getBasename(),
-                                    $file
-                                );
-                            }
-
-                            // /Subject/Assessment/Response/
-                            $responseNodes[$response->getId()] = new DAV\SimpleCollection(
-                                sprintf('Submission %s', $response->getSubmittedAt()->getDatabase()),
-                                $responseFileNodes
-                            );
-                        }
-                    }
-                }
-
-                // /Subject/Assessment/
-                $assessmentNodes[$assessment->getId()] = new Assessment(
-                    $assessment->getTitle(),
-                    $this->user,
-                    $assessment,
-                    $this->storageDataSource,
-                    $this->dueWorkResponseDataSource,
-                    $responseNodes
-                );
-            }
-
-            // Have to assume that there's at least one assessment
             $assessment = $assessments->first();
             if ($assessment instanceof IAssessable) {
                 // /Subject/
-                $childNodes[$folderId] = new DAV\SimpleCollection(
-                    $assessment->getBaseContext()->getFolder()->getTitle(),
-                    $assessmentNodes
+                $childNode = new DAV\SimpleCollection(
+                    $assessment->getBaseContext()->getFolder()->getTitle()
                 );
+            } else {
+                continue;
             }
+
+            foreach ($assessments as $assessment) {
+
+                // /Subject/Assessment/
+                $assessmentNode = new Assessment(
+                    $nameGenerator->getUniqueChildName($childNode, $assessment->getTitle()),
+                    $this->user,
+                    $assessment,
+                    $this->storageDataSource,
+                    $this->dueWorkResponseDataSource
+                );
+
+                $participant = $assessment->getParticipantIfExtant($this->user);
+                if ($participant instanceof Participant) {
+                    foreach ($participant->getAllResponses() as $response) {
+
+                        // /Subject/Assessment/Response/
+                        $responseNode = new DAV\SimpleCollection(
+                            $nameGenerator->getUniqueChildName(
+                                $assessmentNode,
+                                sprintf('Submission %s', $response->getSubmittedAt()->getDatabase())
+                            )
+                        );
+
+                        if ($response instanceof DueWorkResponse && $response->isSubmitted()) {
+
+                            foreach ($response->getAllFiles() as $file) {
+
+                                // /Subject/Assessment/Response/File/
+                                $responseNode->addChild(
+                                    new ResponseFile(
+                                        $nameGenerator->getUniqueChildName($responseNode, $file->getBasename()),
+                                        $file
+                                    )
+                                );
+                            }
+                        }
+                        $assessmentNode->addChild($responseNode);
+                    }
+                }
+
+                $childNode->addChild($assessmentNode);
+            }
+            $childNodes[] = $childNode;
         }
 
         $this->childNodeCache = $childNodes;
