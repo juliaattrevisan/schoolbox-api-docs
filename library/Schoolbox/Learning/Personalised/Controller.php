@@ -153,15 +153,13 @@ class Controller extends Base
      */
     public function getCalendarForStudent(User $student)
     {
-        // This will contain a from and to date.
-        $term = (new Term())
-            ->setStart(new Alaress_Date_Format($this->getRequest()->query->get('start'), Alaress_Date_Format::TIMESTAMP))
-            ->setActualFinish(new Alaress_Date_Format($this->getRequest()->query->get('end'), Alaress_Date_Format::TIMESTAMP))
-        ;
-
         // Build the list
         $eventFactory  = new Event\Factory($this->getRouter());
-        $assessments   = $this->assessmentDataSource->findAllByStudent($student, $term);
+        $assessments   = $this->assessmentDataSource->findAllByStudentWithinWindow(
+            $student,
+            new Alaress_Date_Format($this->getRequest()->query->get('start'), Alaress_Date_Format::TIMESTAMP),
+            new Alaress_Date_Format($this->getRequest()->query->get('end'), Alaress_Date_Format::TIMESTAMP)
+        );
 
         // All participations, including for projects
         $assessmentIds = [];
