@@ -11,26 +11,31 @@
 namespace Alaress\Async\Notification;
 
 
+use Alaress\Async\Broker\IBroker;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Notif\Notif;
 
-class Postman {
 
-	/** @var Notif */
-	protected $notif;
+class Postman
+{
 
-	/** @var LoggerInterface */
-	protected $log;
+    /** @var IBroker */
+    private $broker;
 
-	/**
-	 * @param Notif $notif
-	 * @param LoggerInterface $log
-	 */
-	public function __construct($notif, $log) {
-		$this->notif = $notif;
-		$this->log = $log;
-	}
+    /** @var LoggerInterface */
+    private $log;
+
+
+    /**
+     * @param IBroker         $broker
+     * @param LoggerInterface $log
+     */
+	public function __construct(IBroker $broker, LoggerInterface $log)
+    {
+        $this->broker = $broker;
+        $this->log    = $log;
+    }
 
 
 	/**
@@ -40,22 +45,31 @@ class Postman {
 	 * @param array $appendContext
 	 * @return int
 	 */
-	public function deliver($bundle, $appendContext = array()) {
+	public function deliver(InstanceBundle $bundle, array $appendContext = [])
+    {
 		$i = 0;
-		foreach($bundle->getAll() as $destination => $instance) {
-            $json = "$instance";
 
-            if (strlen($json) == 0) {
+		foreach ($bundle->getAll() as $routeKey => $instance) {
+            $array = $instance->jsonSerialize();
+		    $json = json_encode($array);
+
+            if ($json === '') {
                 // message could not be serialized, therefore cannot be delivered
-                $this->log->notice("Broken message, was unable to json_encode", array('char' => '?'));
+                $this->log->notice('Broken message, was unable to json_encode', array('char' => '?'));
                 continue;
             }
 
-			$this->notif->setTopic($destination)->log($instance->getSeverity(), $json, $instance->getContext() + $appendContext);
-			$this->log->info("Broadcast a message to '$destination' at level {$instance->getSeverity()}", array('char' => '<'));
+            try {
+                $this->broker->publish(Instance::jsonUnserialize($json, "INFO.$routeKey"));
+            } catch (\InvalidArgumentException $e) {
+                $this->log->notice('Broken message, was unable to json_decode', array('char' => '?'));
+            }
+
+			$this->log->info("Broadcast a message to '$routeKey'", array('char' => '<'));
 			++$i;
 		}
+
 		return $i;
 	}
 
-} 
+}
