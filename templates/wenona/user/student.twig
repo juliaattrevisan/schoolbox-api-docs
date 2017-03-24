@@ -6,7 +6,7 @@
 {% block details_tutorTeacher %}
     {% if showClasses %}
         {% if tutorTeacher %}
-            <dt class="small-12 medium-3">Pastoral Care Teacher</dt>
+            <dt class="small-12 medium-3">Pastoral Care Teacher:</dt>
             <dd class="small-12 medium-9">
                 {% if tutorTeacher.getId() %}
                     <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
