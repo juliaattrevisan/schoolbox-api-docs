@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\WebDav\SimpleSubjectServer;
+namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
 use Schoolbox\Assessment\Term\Model as Term;

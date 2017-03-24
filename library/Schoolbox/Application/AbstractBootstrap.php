@@ -52,7 +52,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
 use Schoolbox\WebDav\NameGenerator as WebDavNameGenerator;
-use Schoolbox\WebDav\SimpleSubjectServer\Server as WebDavSubjectList;
+use Schoolbox\WebDav\SubjectServer\Server as WebDavSubjectList;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;

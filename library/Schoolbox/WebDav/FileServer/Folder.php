@@ -17,7 +17,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
-use Schoolbox\WebDav\SimpleSubjectServer\Server as SubjectList;
+use Schoolbox\WebDav\SubjectServer\Server as SubjectList;
 
 /**
  * A WebDAV node that represents a folder within the Schoolbox file system.

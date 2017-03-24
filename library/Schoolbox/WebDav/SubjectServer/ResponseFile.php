@@ -16,6 +16,11 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkRespon
 class ResponseFile extends DAV\File
 {
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
      * @var DueWorkResponseFile
      */
     private $responseFile;
@@ -23,10 +28,12 @@ class ResponseFile extends DAV\File
     /**
      * Constructor
      *
+     * @param string              $name         Usually the file's name, but can be changed to be made unique
      * @param DueWorkResponseFile $responseFile
      */
-    public function __construct(DueWorkResponseFile $responseFile)
+    public function __construct($name, DueWorkResponseFile $responseFile)
     {
+        $this->name         = $name;
         $this->responseFile = $responseFile;
     }
 
@@ -43,7 +50,7 @@ class ResponseFile extends DAV\File
      */
     public function getName()
     {
-        return $this->responseFile->getBasename();
+        return $this->name;
     }
 
     /**

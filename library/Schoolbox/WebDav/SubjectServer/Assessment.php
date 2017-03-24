@@ -25,6 +25,11 @@ use Schoolbox\User;
 class Assessment extends DAV\Collection
 {
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
      * @var IAssessable
      */
     private $assessment;
@@ -45,23 +50,34 @@ class Assessment extends DAV\Collection
     private $dueWorkResponseDataSource;
 
     /**
+     * @var DAV\INode[]
+     */
+    private $children;
+
+    /**
      * Constructor
      *
+     * @param string                    $name
      * @param User                      $user
      * @param IAssessable               $assessment
      * @param StorageDataSource         $storageDataSource
      * @param DueWorkResponseDataSource $dueWorkResponseDataSource
+     * @param DAV\INode[]               $children
      */
     public function __construct(
+        $name,
         User $user,
         IAssessable $assessment,
         StorageDataSource $storageDataSource,
-        DueWorkResponseDataSource $dueWorkResponseDataSource
+        DueWorkResponseDataSource $dueWorkResponseDataSource,
+        array $children = []
     ) {
+        $this->name                      = $name;
         $this->user                      = $user;
         $this->assessment                = $assessment;
         $this->storageDataSource         = $storageDataSource;
         $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
+        $this->children                  = $children;
     }
 
     /**
@@ -69,7 +85,19 @@ class Assessment extends DAV\Collection
      */
     public function getName()
     {
-        return $this->assessment->getTitle();
+        return $this->name;
+    }
+
+    /**
+     * Add a child
+     *
+     * @param DAV\INode $child
+     * @return $this
+     */
+    public function addChild(DAV\INode $child)
+    {
+        $this->children[] = $child;
+        return $this;
     }
 
     /**
@@ -79,16 +107,7 @@ class Assessment extends DAV\Collection
      */
     public function getChildren()
     {
-        $children    = [];
-        $participant = $this->assessment->getParticipantIfExtant($this->user);
-        if ($participant instanceof Participant) {
-            foreach ($participant->getAllResponses() as $response) {
-                if ($response->isSubmitted()) {
-                    $children[] = new Response($response);
-                }
-            }
-        }
-        return $children;
+        return $this->children;
     }
 
     /**
