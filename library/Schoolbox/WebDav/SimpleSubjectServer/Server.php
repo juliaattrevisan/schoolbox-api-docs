@@ -155,11 +155,7 @@ class Server extends DAV\Collection
 
                             foreach ($response->getAllFiles() as $file) {
                                 // /Subject/Assessment/Response/File/
-                                // TODO create a class which wraps around a storage object
-                                $responseFileNodes[$file->getId()] = new DAV\SimpleFile(
-                                    $file->getBasename(),
-                                    $file->read()
-                                );
+                                $responseFileNodes[$file->getId()] = new ResponseFile($file);
                             }
 
                             // /Subject/Assessment/Response/
