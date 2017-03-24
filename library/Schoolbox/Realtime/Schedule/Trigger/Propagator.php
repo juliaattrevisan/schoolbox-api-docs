@@ -8,10 +8,9 @@
 
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
-use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\Broker\IBroker;
 use JsonSerializable;
 use Predis\ClientInterface;
-use Redis;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 use Schoolbox\Realtime\Schedule\Event\Event;
@@ -25,16 +24,14 @@ use Schoolbox\User;
  */
 class Propagator
 {
-    const AMQP_TOPIC = 'trigger.sb';
-
     /** @var Splitter */
     private $splitter;
 
-    /** @var Redis|ClientInterface */
+    /** @var ClientInterface */
     private $redis;
 
-    /** @var AMQPInterface */
-    private $amqp;
+    /** @var IBroker */
+    private $broker;
 
     /** @var string */
     private $instanceId;
@@ -43,14 +40,14 @@ class Propagator
     /**
      * @param Splitter        $splitter
      * @param ClientInterface $redis
-     * @param AMQPInterface   $amqp
+     * @param IBroker         $broker
      * @param string          $instanceId
      */
-    public function __construct(Splitter $splitter, ClientInterface $redis, AMQPInterface $amqp, $instanceId)
+    public function __construct(Splitter $splitter, ClientInterface $redis, IBroker $broker, $instanceId)
     {
         $this->splitter   = $splitter;
         $this->redis      = $redis;
-        $this->amqp       = $amqp;
+        $this->broker     = $broker;
         $this->instanceId = $instanceId;
     }
 
@@ -80,16 +77,13 @@ class Propagator
      */
     public function propagateEvent(CrudEventInterface $event)
     {
+        $namespace = "msg:{$this->instanceId}:";
+
         // drop event serial into redis
-        $redisKey = $this->toRedis($event, "e:{$this->instanceId}");
-        $triggers = $this->splitter->generateTriggers($event);
+        $redisKey = $this->toRedis($event, "{$namespace}e");
 
-        foreach ($triggers as $trigger) {
-            // drop trigger serial into redis
-            $triggerKey = $this->toRedis($trigger, "t:{$this->instanceId}");
-
-            // push trigger key onto rabbit
-            $this->toAmqp($triggerKey, self::AMQP_TOPIC);
+        foreach ($this->splitter->generateTriggers($event) as $trigger) {
+            $this->broker->publish($trigger, $namespace);
         }
 
         return $redisKey;
@@ -116,16 +110,6 @@ class Propagator
         $this->redis->set($key, $serial);
 
         return $key;
-    }
-
-
-    /**
-     * @param string $payload
-     * @param string $topic
-     */
-    private function toAmqp($payload, $topic)
-    {
-        $this->amqp->publish($payload, $topic);
     }
 
 }

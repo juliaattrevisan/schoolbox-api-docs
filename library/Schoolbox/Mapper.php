@@ -29,8 +29,8 @@ use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\NotifInterface;
+use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
-use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Serializable;
@@ -240,7 +240,7 @@ abstract class Mapper implements IMapper, Serializable
         self::$columnFactory = new ColumnFactory();
 
         // only functional in development
-        self::$perfmon = (INSTANCE_ID == 'vagrantx' && self::isWithinWebRequest())
+        self::$perfmon = (INSTANCE_ID === 'vagrantx' && self::isWithinWebRequest())
             ? new DevMonitor(DebugBar::getInstance())
             : new LiveMonitor()
         ;
@@ -252,7 +252,11 @@ abstract class Mapper implements IMapper, Serializable
                 'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
             ]),
             'redis'      => $di->lazyGet('redis'),
-            'amqp'       => $di->lazyGet('amqp'),
+            'broker'     => $di->lazyNew(Broker::class, [
+                'amqp'       => $di->lazyGet('amqp'),
+                'redis'      => $di->lazyGet('redis'),
+                // no 'stomp'
+            ]),
             'instanceId' => INSTANCE_ID,
         ]);
     }
