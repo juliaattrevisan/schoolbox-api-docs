@@ -10,8 +10,8 @@
 namespace Schoolbox\Realtime\Digest;
 
 
+use Alaress\Date\IClock;
 use Alaress\Scheduler\CronScheduler;
-use Alaress\Scheduler\Trigger\RecurringTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pool;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
@@ -21,25 +21,29 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
 use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
-use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
 class DigestScheduler extends CronScheduler
 {
 
-	/** @var RecurringTrigger[] */
-	protected $triggers = [];
-
     /** @var DigestTriggerFactory */
     private $factory;
+
+    /** @var IConfigLoader */
+    private $conf;
+
+    /** @var RoleMapper */
+    private $roleMapper;
+
 
     /**
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
+     * @param IClock                    $clock
+     * @param RoleMapper                $roleMapper
      * @param IConfigLoader             $conf
      * @param DigestTriggerFactory      $factory
      */
@@ -47,14 +51,15 @@ class DigestScheduler extends CronScheduler
         LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
         LoggerInterface $log,
+        IClock $clock,
+        RoleMapper $roleMapper,
         IConfigLoader $conf,
         DigestTriggerFactory $factory
     ) {
-        parent::__construct($loop, $dispatchStrategy, $log, $conf);
-        $this->method = DefaultDispatchStrategy::TASK_DIGEST;
-        $this->factory = $factory;
-
-		$this->on(SIGHUP, [ $this, 'onReload' ]);
+        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+        $this->roleMapper = $roleMapper;
+        $this->conf       = $conf;
+        $this->factory    = $factory;
 
 		// instantiate schedule
 		$this->reload();
@@ -62,52 +67,38 @@ class DigestScheduler extends CronScheduler
 
 
 	/**
-	 * Callback executed when SIGHUP received by process
+     * (Re)compute the triggers for this particular scheduler
+     *
+	 * @return TriggerInterface[]
 	 */
-	public function onReload() {
-		$this->conf->dropCache();
-		$this->reload();
-	}
-
-
-	/**
-	 * Drop existing schedule and reinitialise
-	 *
-	 * @return void
-	 */
-	public function reload()
+	protected function computeTriggers()
     {
-		// drop existing
-		foreach($this->triggers as $k => $t) {
-			$this->unschedule($t);
-			unset($this->triggers[$k]);
-		}
+        $triggers = [];
 
         // gently release workers in case they're digesting
         $this->getDispatcher()->releaseWorkerPool(Pool::RELEASE_SOFT);
 
 		// read each role entry, and schedule a cron based on it
-		foreach(RoleMapper::getInstance()->findAll() as $role) {
-			/** @var Role $role */
-
+		foreach ($this->roleMapper->findAll() as $role) {
 			$schedule = $role->getDigestSchedule();
 
 			// cast 0 to "0", because loose typing equality because PHP -_-
-			if($schedule == (string)Role::DIGEST_NEVER) {
+			if ((string)$schedule === (string)Role::DIGEST_NEVER) {
 				continue;
 			}
 
 			try {
-				$this->triggers[$role->getId()] = $this->factory->build($schedule, $role);
-				$this->scheduleNotification($this->triggers[$role->getId()]);
+				$triggers[$role->getId()] = $this->factory->build($schedule, $role);
 
-			} catch(InvalidArgumentException $e) {
-				$this->log->error(get_class($e) . 'in DigestScheduler: ' . $e->getMessage());
+			} catch (InvalidArgumentException $e) {
+			    $this->logException($e);
 
-			} catch(RuntimeException $e) {
-				$this->log->error(get_class($e) . 'in DigestScheduler: ' . $e->getMessage());
+			} catch (RuntimeException $e) {
+                $this->logException($e);
 			}
 		}
+
+		return $triggers;
 	}
 
 
@@ -134,5 +125,23 @@ class DigestScheduler extends CronScheduler
     {
 		$this->log->notice('Emails sent: ' . unserialize($data[0]));
 	}
+
+
+    /**
+     * @return string
+     */
+    protected function getMethod()
+    {
+        return DefaultDispatchStrategy::TASK_DIGEST;
+    }
+
+
+    /**
+     * @return void
+     */
+    protected function dropCache()
+    {
+        $this->conf->dropCache();
+    }
 
 }

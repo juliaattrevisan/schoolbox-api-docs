@@ -10,81 +10,79 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
+use Alaress\Async\Broker\DuplicateResolutionException;
+use Alaress\Async\Broker\IConsumer;
+use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\IClock;
+use Alaress\Scheduler\AbstractScheduler;
 use Alaress\Scheduler\Cache\ICache;
 use Alaress\Scheduler\Stomp\ResolutionManager;
-use Alaress\Scheduler\StompScheduler;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use ErrorException;
-use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PDOException;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\Stomp\AckResolver;
-use React\Stomp\Client;
-use React\Stomp\Factory;
-use React\Stomp\Protocol\Frame;
-use Redis;
 use RuntimeException;
 use Schoolbox\External;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Formatter\CompressionException;
-use Schoolbox\Notif\Notif;
 
 /**
- * This class is meant to hold a list of notifications that are pending for broadcast, and at the appropriate time,
- * forward the message to RabbitMQ.
- *
- * Class Scheduler
+ * The scheduler is a consumer of brokered Triggers. It holds them until the time they are scheduled to fire (hence
+ * the name) and then fires them. The notification bundles that result from that are then fired into the next part
+ * of the notification chain (routing)
  *
  * @package Schoolbox\Realtime\Schedule
  */
-class Scheduler extends StompScheduler
+class Scheduler extends AbstractScheduler implements IConsumer
 {
-    const COMPRESSION_LEVEL = 9;
-
-    /** @var Notif */
-    protected $notif;
-
     /** @var ResolutionManager */
-    protected $resolvers;
+    private $resolvers;
+
+    /** @var Postman */
+    private $postman;
 
     /**
      * JIT handler to take care of unexpected shutdown
      *
      * @var ICache
      */
-    protected $jit;
+    private $jit;
 
-    /** @var Redis|ClientInterface */
-    protected $redis;
+    /** @var IConfigLoader */
+    private $conf;
+
 
     /**
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
-     * @param string                    $scheduleQueue - don't forget to declare this in rabbit!
      * @param IConfigLoader             $conf
-     * @param Notif                     $notif
-     * @param ClientInterface           $redis
      * @param IClock                    $clock
+     * @param ResolutionManager         $resolutionManager
+     * @param Postman                   $postman
      */
-    public function __construct($loop, $dispatchStrategy, $log, $scheduleQueue, $conf, $notif, $redis, $clock = null)
-    {
-        $this->notif = $notif;
-        $this->redis = $redis;
-
-        // run construction
-        parent::__construct($loop, $dispatchStrategy, $scheduleQueue, $log, $conf, $clock);
-        $this->resolvers = new ResolutionManager();
+    public function __construct(
+        LoopInterface $loop,
+        DispatchStrategyInterface $dispatchStrategy,
+        LoggerInterface $log,
+        IClock $clock,
+        IConfigLoader $conf,
+        ResolutionManager $resolutionManager,
+        Postman $postman
+    ) {
+        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+        $this->conf      = $conf;
+        $this->resolvers = $resolutionManager;
+        $this->postman   = $postman;
 
         // register signal listeners
         $this->on(SIGHUP, array($this, 'onHangup'));
@@ -105,30 +103,14 @@ class Scheduler extends StompScheduler
 
 
     /**
-     * @return Client
-     */
-    protected function getStompConnection()
-    {
-        $stompFactory = new Factory($this->loop);
-        return $stompFactory->createClient(array(
-            'host'     => $this->getConfig()->get('amqp_host'),
-            'port'     => $this->getConfig()->get('amqp_stomp_port'),
-            'vhost'    => $this->getConfig()->get('amqp_vhost'),
-            'login'    => $this->getConfig()->get('amqp_user'),
-            'passcode' => $this->getConfig()->get('amqp_pass'),
-        ));
-    }
-
-
-    /**
      * Callback executed when an exception bubbles to the top of the loop
      *
-     * @param Exception $e
+     * @param \Exception $e
      * @throws PDOException
      * @throws External\Exception
      * @return void
      */
-    public function onException($e)
+    public function onException(\Exception $e)
     {
         $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()));
         // we need the daemon to crash if there's a database issue
@@ -139,25 +121,24 @@ class Scheduler extends StompScheduler
 
 
     /**
-     * Callback executed when a message is received from RabbitMQ on the schedule queue
+     * Callback executed when a payload is received from the Broker
      *
-     * @param Frame       $frame
-     * @param AckResolver $resolver
+     * @param TriggerInterface $trigger
+     * @param IResolver        $resolver
+     * @throws DuplicateResolutionException
      * @throws PDOException
      * @return void
      */
-    public function onMessage($frame, $resolver)
+    public function onMessage($trigger, IResolver $resolver)
     {
-        $this->log->info("Received event from $this->scheduleQueue", array('char' => '>'));
-        try {
-            // either it will be a compressed payload (event, deprecated), or a redis key (trigger, new format)
-            if (preg_match('`:[0-9a-f]{40}$`', $frame->body)) {
-                $trigger = $this->frame2trigger($this->redis, $frame);
-                $this->scheduleNotification($trigger, $resolver);
+        $this->log->info("Received trigger to schedule: {$trigger->getIdString()}", array('char' => '>'));
 
-                // notice that we don't ACK the resolver here before returning
-                return;
-            }
+        try {
+            // attempt to schedule this trigger - there are a fair few things that could go wrong...
+            $this->scheduleNotification($trigger, $resolver);
+
+            // notice that we don't acknowledge the resolver here before returning
+            return;
 
         } catch (InvalidArgumentException $e) {
             $this->log->error($e->getMessage(), [ $e ]);
@@ -167,7 +148,7 @@ class Scheduler extends StompScheduler
             throw $e;
 
         } catch (RuntimeException $e) {
-            $truncated = substr($frame->body, 0, 64);
+            $truncated = substr($trigger, 0, 64);
             $this->log->critical("Could not decode '$truncated...' to schedule event", array($e));
             // this message is can't be parsed, so we ACK it to make it go away
 
@@ -178,36 +159,7 @@ class Scheduler extends StompScheduler
             $this->log->critical('Error Exception: '. $e->getMessage(), array($e));
         }
 
-        $resolver->ack();
-    }
-
-
-    /**
-     * This is static so that safe-restart has access
-     *
-     * @param Redis|ClientInterface $redis
-     * @param Frame                 $frame
-     * @throws InvalidArgumentException
-     * @throws ErrorException
-     * @return TriggerInterface
-     */
-    public static function frame2trigger(ClientInterface $redis, Frame $frame)
-    {
-        $content = $redis->get($frame->body);
-
-        if (strlen($content) == 0) {
-            throw new InvalidArgumentException("Key `{$frame->body}` is not set");
-        }
-
-        // try to unserialize: depending on kernel, will either throw EE or just emit warning
-        $trigger = unserialize($content);
-
-        // verify it worked
-        if ($trigger instanceof TriggerInterface) {
-            return $trigger;
-        }
-
-        throw new InvalidArgumentException("Could not unserialize trigger");
+        $resolver->acknowledge();
     }
 
 
@@ -216,11 +168,11 @@ class Scheduler extends StompScheduler
      */
     public function onHangup()
     {
-        $this->log->notice("HUP received", array('char' => '>'));
-        $this->log->debug("Invalidating config cache");
-        $this->getConfig()->dropCache();
-        $this->log->debug("Releasing workers");
-        $this->dispatcher->releaseWorkerPool(false);
+        $this->log->notice('HUP received', array('char' => '>'));
+        $this->log->debug('Invalidating config cache');
+        $this->conf->dropCache();
+        $this->log->debug('Releasing workers');
+        $this->getDispatcher()->releaseWorkerPool(false);
     }
 
 
@@ -229,7 +181,7 @@ class Scheduler extends StompScheduler
      */
     public function onInterrupt()
     {
-        $this->log->notice("Interrupting starfish!", array('char' => '>'));
+        $this->log->notice('Interrupting starfish!', array('char' => '>'));
         // for now, just treat as a termination request
         $this->onTerminate();
     }
@@ -240,43 +192,51 @@ class Scheduler extends StompScheduler
      */
     public function onTerminate()
     {
-        $this->log->error("Cleaning up and terminating");
+        $this->log->error('Cleaning up and terminating');
         // die safely
-        $this->dispatcher->releaseWorkerPool(false);
+        $this->getDispatcher()->releaseWorkerPool(false);
 
         // if possible, rescue the schedule queue from certain destruction
-        $this->log->debug("Attempting save of queue");
+        $this->log->debug('Attempting save of queue');
 
         // if we have a just-in-time handler, use it
         if ($this->jit) {
             if ($this->jit->saveSchedule($this->resolvers)) {
-                $this->log->debug("Queue save successful");
+                $this->log->debug('Queue save successful');
 
             } else {
-                $this->log->alert("Failed to save queue!");
+                $this->log->alert('Failed to save queue!');
             }
         }
 
-        $this->loop->stop();
+        $this->stop();
     }
 
 
     /**
      * @param TriggerInterface[] $triggers
-     * @param AckResolver        $resolver
+     * @param IResolver          $resolver
+     * @throws InvalidArgumentException
+     * @throws DuplicateResolutionException
+     * @return void
      */
-    public function scheduleNotifications($triggers, $resolver = null)
+    public function scheduleNotifications(array $triggers, IResolver $resolver = null)
     {
         $c = count($triggers);
-        if ($c == 0) {
-            $this->log->info("No triggers to schedule");
-            if ($resolver instanceof AckResolver) {
-                $resolver->ack();
-                $this->log->debug("Resolver acknowledged");
+
+        if ($c === 0) {
+            $this->log->info('No triggers to schedule');
+
+            if ($resolver instanceof IResolver) {
+                $resolver->acknowledge();
+                $this->log->debug('Resolver acknowledged');
             }
+
             return;
         }
-        $this->log->info(sprintf('Scheduling %s trigger%s', $c, $c == 1 ? '' : 's'));
+
+        $this->log->info(sprintf('Scheduling %s trigger%s', $c, $c === 1 ? '' : 's'));
+
         foreach ($triggers as $trigger) {
             $this->scheduleNotification($trigger, $resolver);
         }
@@ -285,20 +245,21 @@ class Scheduler extends StompScheduler
 
     /**
      * @param TriggerInterface $trigger
-     * @param AckResolver      $resolver
+     * @param IResolver        $resolver
+     * @throws InvalidArgumentException
      */
-    public function scheduleNotification($trigger, $resolver = null)
+    public function scheduleNotification(TriggerInterface $trigger, $resolver = null)
     {
         // if this is a cancel trigger, we're not going to even attempt attaching a resolver for it
         if (!$trigger instanceof CancelTrigger) {
 
             // if we have a resolver, attach it
-            if ($resolver instanceof AckResolver) {
+            if ($resolver instanceof IResolver) {
                 $this->attachResolverTrigger($resolver, $trigger);
 
             } else {
                 // it's not the end of the world, but it might indicate a problem
-                $this->log->warning("No resolver supplied for attaching trigger");
+                $this->log->warning('No resolver supplied for attaching trigger');
             }
         }
 
@@ -309,9 +270,9 @@ class Scheduler extends StompScheduler
     /**
      * @param TriggerInterface $trigger
      */
-    public function dispatchTrigger($trigger)
+    public function dispatchTrigger(TriggerInterface $trigger)
     {
-        if (count($trigger->getCallbacks()) == 0) {
+        if (count($trigger->getCallbacks()) === 0) {
             $this->log->warning("Trigger '{$trigger->getIdString()}' has no callbacks");
             $this->detachTrigger($trigger);
         } else {
@@ -324,7 +285,7 @@ class Scheduler extends StompScheduler
      * @param TriggerInterface $trigger
      * @return bool
      */
-    protected function unschedule($trigger)
+    protected function unschedule(TriggerInterface $trigger)
     {
         // if a trigger was legitimately unscheduled, also attempt to detach it from its resolver
         if (parent::unschedule($trigger)) {
@@ -341,9 +302,8 @@ class Scheduler extends StompScheduler
      * @param TriggerInterface $trigger - the identifier passed as the first argument to Dispatcher::enqueue()
      * @param string           $command - the command that was executed by the Worker
      * @param array            $data    - the data with which the Worker responded - array wrapping around (InstanceBundle or NULL, serialized)
+     * @throws InvalidArgumentException
      * @throws ScheduleException
-     * @throws RuntimeException
-     * @return void                       - this method does not return any value
      */
     public function handleResponse($trigger, $command, $data)
     {
@@ -356,13 +316,13 @@ class Scheduler extends StompScheduler
         $bundle = unserialize($data[0]);
 
         // method not implemented or nothing to send, this is fine
-        if (is_null($bundle)) {
-            $this->log->debug("No messages to broadcast");
+        if (null === $bundle) {
+            $this->log->debug('No messages to broadcast');
             return;
         }
         // worker died midflight and nothing valid was returned
         if ($bundle === false) {
-            $this->log->error("No messages to broadcast: worker did not complete execution");
+            $this->log->error('No messages to broadcast: worker did not complete execution');
             return;
         }
         // check that a bundle was returned
@@ -375,34 +335,32 @@ class Scheduler extends StompScheduler
 
         // if there are no messages, just ignore this callback and move on
         if ($bundle->isEmpty()) {
-            $this->log->debug("No messages to broadcast");
+            $this->log->debug('No messages to broadcast');
             return;
         }
 
-        $postman = new Postman($this->notif, $this->log);
-
-        $count = $postman->deliver($bundle, array(
+        $count = $this->postman->deliver($bundle, [
             'user' => $trigger->getEvent()->getEffector()->getId()
-        ));
+        ]);
 
-        if (is_null($count)) {
-            $this->log->debug("No messages to broadcast");
+        if ($count === 0) {
+            $this->log->debug('No messages to broadcast');
             return;
         }
 
-        $this->log->info(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), array('char' => '<'));
+        $this->log->info(sprintf('%s message%s broadcast', $count, $count === 1 ? '' : 's'), array('char' => '<'));
     }
 
 
     /**
      * Attach a trigger to a resolver
      *
-     * @param AckResolver      $ackResolver
+     * @param IResolver        $resolver
      * @param TriggerInterface $trigger
      */
-    protected function attachResolverTrigger($ackResolver, $trigger)
+    protected function attachResolverTrigger(IResolver $resolver, $trigger)
     {
-        $this->resolvers->attachTriggerToResolver($ackResolver, $trigger);
+        $this->resolvers->attachTriggerToResolver($resolver, $trigger);
         $this->log->debug("Attached trigger '{$trigger->getIdString()}' to resolver");
     }
 
@@ -418,13 +376,13 @@ class Scheduler extends StompScheduler
 
             switch ($count) {
                 case -1:
-                    $msg = "resolver now empty; acknowledged";
+                    $msg = 'resolver now empty; acknowledged';
                     break;
                 case 0:
-                    $msg = "resolver now empty, but not acknowledged...?";
+                    $msg = 'resolver now empty, but not acknowledged...?';
                     break;
                 default:
-                    $msg = "resolver still contains $count trigger" . ($count == 1 ? '' : 's');
+                    $msg = "resolver still contains $count trigger" . ($count === 1 ? '' : 's');
                     break;
             }
 
@@ -441,13 +399,14 @@ class Scheduler extends StompScheduler
 
     /**
      * @param TriggerInterface $trigger
+     * @throws InvalidArgumentException
      * @return int
      */
     protected function processCompletedTrigger(TriggerInterface $trigger)
     {
         // this is in the future; reschedule that!
-        if ($trigger->getTimestamp() > $this->clock->time()) {
-            $this->log->info("Trigger not complete, rescheduling");
+        if ($trigger->getTimestamp() > $this->getClock()->time()) {
+            $this->log->info('Trigger not complete, rescheduling');
 
             try {
                 $this->schedule($trigger, $this->timerCallback(), false);
@@ -467,12 +426,12 @@ class Scheduler extends StompScheduler
 
 
     /**
-     * @return IConfigLoader
+     * @return string
      */
-    protected function getConfig()
+    protected function getMethod()
     {
-        /** @var IConfigLoader $c */
-        $c = $this->conf;
-        return $c;
+        return DefaultDispatchStrategy::TASK_PUBLISH;
     }
+
+
 }
