@@ -8,13 +8,12 @@
 
 namespace Schoolbox\Realtime\Routing;
 
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\WorkerCrew\Transaction\ITransaction;
 use Alaress\WorkerCrew\TXRX;
 use BadMethodCallException;
 use InvalidArgumentException;
 use PDOException;
-use React\Stomp\Protocol\Frame;
-use Schoolbox\Realtime\Routing\QueueSorter;
 use Schoolbox\UserMapper;
 
 class RouteTXRX implements TXRX
@@ -44,23 +43,25 @@ class RouteTXRX implements TXRX
      * EXECUTED DAEMON-SIDE
      * Send the work from the daemon to the worker
      *
-     * @param Frame        $frame
+     * @param Instance     $instance
      * @param ITransaction $tx
      * @param array        $userIds
      * @throws InvalidArgumentException
      * @return void
      */
-    public function send(Frame $frame, ITransaction $tx, $userIds)
+    public function send($instance, ITransaction $tx, $userIds)
     {
         if (!is_array($userIds)) {
-            throw new InvalidArgumentException("Payload must be an array of user IDs");
+            throw new InvalidArgumentException('Payload must be an array of user IDs');
         }
 
-        $key = sha1($frame->dump());
+        $key = $instance->getBaseHash().$instance->getParamHash();
 
         // rather than dump everyone in together, allow the transaction to batch the users
+        // the implication of this is that if the user count exceeds the limit placed on the transaction,
+        // users will be batched through multiple transactions
         foreach ($userIds as $userId) {
-            $tx->put("$key-$userId", [ $frame, (int)$userId ]);
+            $tx->put("$key-$userId", [ $instance, (int)$userId ]);
         }
     }
 
@@ -77,16 +78,16 @@ class RouteTXRX implements TXRX
      */
     public function receive(array $args)
     {
-        if (empty($this->mapper) || empty($this->sorter)) {
-            throw new BadMethodCallException("Not configured");
+        if (null === $this->mapper || null === $this->sorter) {
+            throw new BadMethodCallException('Not configured');
         }
 
         $count = 0;
 
-        foreach ($args as list($frame, $userId)) {
+        foreach ($args as list($instance, $userId)) {
             // this is the payload from $tx->put() above
             $user   = $this->mapper->findById($userId);
-            $count += $this->sorter->process($user, $frame) ? 1 : 0;
+            $count += $this->sorter->process($user, $instance) ? 1 : 0;
         }
 
         return $count;

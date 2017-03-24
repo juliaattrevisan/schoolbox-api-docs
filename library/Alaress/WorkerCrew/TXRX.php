@@ -26,13 +26,13 @@ interface TXRX
      * EXECUTED DAEMON-SIDE
      * Send the work from the daemon to the worker
      *
-     * @param Frame        $frame
+     * @param mixed        $identifier
      * @param ITransaction $tx
      * @param mixed        $payload
      * @throws InvalidArgumentException if the payload is in an unacceptable format
      * @return void
      */
-    public function send(Frame $frame, ITransaction $tx, $payload);
+    public function send($identifier, ITransaction $tx, $payload);
 
     /**
      * EXECUTED WORKER-SIDE
