@@ -51,6 +51,7 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
+use Schoolbox\WebDav\NameGenerator as WebDavNameGenerator;
 use Schoolbox\WebDav\SimpleSubjectServer\Server as WebDavSubjectList;
 use Scrub;
 use Twig_Extension_Debug;
@@ -627,7 +628,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $assessmentDataSource,
                     $storageDataSource,
                     $dueWorkResponseDataSource,
-                    $termMapper->findForToday()
+                    $termMapper->findForToday(),
+                    new WebDavNameGenerator()
                 );
             })
         );

@@ -63,6 +63,13 @@ class Server extends DAV\Collection
     private $childNodeCache = null;
 
     /**
+     * A name generator, for sanitising and deduping names.
+     *
+     * @var NameGenerator
+     */
+    private $nameGenerator;
+
+    /**
      * Constructor
      *
      * @param                           $name
@@ -71,6 +78,7 @@ class Server extends DAV\Collection
      * @param StorageDataSource         $storageDataSource
      * @param DueWorkResponseDataSource $dueWorkResponseDataSource
      * @param Term                      $currentTerm
+     * @param NameGenerator             $nameGenerator
      */
     public function __construct(
         $name,
@@ -78,7 +86,8 @@ class Server extends DAV\Collection
         AssessmentDataSource $assessmentDataSource,
         StorageDataSource $storageDataSource,
         DueWorkResponseDataSource $dueWorkResponseDataSource,
-        Term $currentTerm
+        Term $currentTerm,
+        NameGenerator $nameGenerator
     ) {
         $this->name                      = $name;
         $this->user                      = $user;
@@ -86,6 +95,7 @@ class Server extends DAV\Collection
         $this->currentTerm               = $currentTerm;
         $this->storageDataSource         = $storageDataSource;
         $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
+        $this->nameGenerator             = $nameGenerator;
     }
 
     /**
@@ -153,9 +163,6 @@ class Server extends DAV\Collection
             return $assessment->getBaseContext()->getFolder()->getId();
         });
 
-        // Name generator
-        $nameGenerator = new NameGenerator();
-
         foreach ($groupedAssessments as $folderId => $assessments) {
 
             $assessment = $assessments->first();
@@ -163,7 +170,7 @@ class Server extends DAV\Collection
                 // /Subject/
                 try {
                     $folderNode = new DAV\SimpleCollection(
-                        $nameGenerator->getUniqueChildName(
+                        $this->nameGenerator->getUniqueChildName(
                             $rootNode,
                             $assessment->getBaseContext()->getFolder()->getTitle()
                         )
@@ -181,7 +188,7 @@ class Server extends DAV\Collection
                 // /Subject/Assessment/
                 try {
                     $assessmentNode = new Assessment(
-                        $nameGenerator->getUniqueChildName($folderNode, $assessment->getTitle()),
+                        $this->nameGenerator->getUniqueChildName($folderNode, $assessment->getTitle()),
                         $this->user,
                         $assessment,
                         $this->storageDataSource,
@@ -199,7 +206,7 @@ class Server extends DAV\Collection
                         // /Subject/Assessment/Response/
                         try {
                             $responseNode = new DAV\SimpleCollection(
-                                $nameGenerator->getUniqueChildName(
+                                $this->nameGenerator->getUniqueChildName(
                                     $assessmentNode,
                                     sprintf('Submission %s', $response->getSubmittedAt()->getDatabase())
                                 )
@@ -217,7 +224,7 @@ class Server extends DAV\Collection
                                 try {
                                     $responseNode->addChild(
                                         new ResponseFile(
-                                            $nameGenerator->getUniqueChildName($responseNode, $file->getBasename()),
+                                            $this->nameGenerator->getUniqueChildName($responseNode, $file->getBasename()),
                                             $file
                                         )
                                     );
