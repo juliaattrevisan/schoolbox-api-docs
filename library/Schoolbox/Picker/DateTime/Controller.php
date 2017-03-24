@@ -144,6 +144,7 @@ class Controller extends Base
      * Return a first timetable day for a term
      * @param object $campus
      * @param string $termStartDate
+     * @return Alaress_Date_Format $date
      */
     public function  getFirstDayOfTerm($campus, $termStartDate) {
 
@@ -219,7 +220,7 @@ class Controller extends Base
 
         //Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
         $shiftTimetableDays = $daysInCycle*($cycle-1)+$day-$termFirstDay;
-        $date = $termStartDate->addWeekdays($shiftTimetableDays)->getLocalShort();
+        $date = $termStartDate->addWeekdays($shiftTimetableDays);
         return $date;
     }
 
@@ -317,12 +318,13 @@ class Controller extends Base
         $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
         // Iterate each student in the class
 
+        $date = new Alaress_Date_Format($date, 'd/m/Y');
         foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
 
+//            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $date, $date);
             $assessments = $this->getAssessmentMapperProxy()->findByDueDateForStudent($studentCurrent, $date, $term);
-
             // Count how many assessments are due on the specified date
 
             $assessmentsDue = count($assessments);
@@ -365,7 +367,7 @@ class Controller extends Base
                 'format' => 'json',
                 'data' => [
                     'students' => $students,
-                    'date' => $date
+                    'date' => $date->getLocalShort()
                 ]
             )
         );

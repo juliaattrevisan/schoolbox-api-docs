@@ -535,8 +535,9 @@ class MapperProxy
      * @return Collection|IAssessable[]
      */
 
-    public function findByDueDateForStudent(User $student, $dueDate, Term $term)
+    public function findByDueDateForStudent(User $student, Alaress_Date_Format $dueDate, Term $term)
     {
+
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
@@ -548,19 +549,15 @@ class MapperProxy
             UserAccess::ACCESS_READ,
             true
         )->getColumnValues('id');
-
-
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
         $uniques = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
 
-        $from = new Alaress_Date_Format($dueDate, 'd/m/Y');
-        $from = $from->startOfDay();
-        $to = new Alaress_Date_Format($dueDate, 'd/m/Y');
-        $to = $to->endOfDay();
+        $to = new Alaress_Date_Format($dueDate->endOfDay());
+        $from = new Alaress_Date_Format($dueDate->startOfDay());
 
         // Build a list of parameters to pass to findAllForFolderId
-        $extraParams = $this->convertOptionsToPredicateBuilder(['from' => $from, 'to' => $to]);
+        $extraParams = $this->convertOptionsToPredicateBuilder(['due_after' => $from, 'due_before' => $to]);
 
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection(
@@ -838,7 +835,6 @@ class MapperProxy
     protected function convertOptionsToPredicateBuilder($options)
     {
         $builder = $this->baseMapper->getPredicateBuilder();
-
         // Term filter (overrides due before/after)
         if ($options['term'] instanceof Term) {
             $term = $options['term'];
@@ -894,7 +890,6 @@ class MapperProxy
             default:
                 break;
         }
-
         return $builder;
     }
 
