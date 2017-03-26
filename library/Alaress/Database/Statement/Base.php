@@ -59,6 +59,10 @@ abstract Class Base implements IStatement
     }
 
     /**
+     * Do not use this on threat of death. This thing is the definition of pure evil, and
+     * you should be iterating instead.
+     *
+     * @deprecated
      * @inheritdoc
      */
     public function fetchAll()
