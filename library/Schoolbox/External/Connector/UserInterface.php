@@ -9,93 +9,74 @@
 
 namespace Schoolbox\External\Connector;
 
+use Aura\Di\Container as Injector;
+use Schoolbox\Collection;
 use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Tutor;
 use Schoolbox\External\Normalise\User\Student;
-use Schoolbox\External\Normalise\
-use Schoolbox\User;
 
 interface UserInterface
 {
     /**
-     * Retrieves user photo if one exists
+     * Constructor
+     *
+     * @param Injector $di
+     */
+    function __construct($di);
+
+    /**
+     * Retrieves path on disk to user photo if one exists. If no images exists
+     * or the file is not accessible by the server this will return false.
      *
      * @param int|string $externalId The external SIS ID of the user whose photo we want
-     * @return bool|string
+     * @return false|string
      */
     function getPortrait($externalId);
 
     /**
-     * Retrieve the contact information of a students guardian
+     * Retrieve the contact information of one or more student guardians
      *
-     * @param int|string $externalId The external SIS ID of the guardian
-     * @return bool|Guardian
+     * @param int|string|int[]|string[] $externalIds The external SIS IDs of the guardians to retrieve
+     * @param bool $hydrateStudents If set, any students linked to the guardian records will also be retrieved and hydrated
+     * @return Collection|Guardian
      */
-    function getGuardian($externalId);
+    function getGuardians($externalIds, $hydrateStudents = false);
 
     /**
-     * Get all the guardian emails for the specified students
+     * Retrieve all information required to render the guardian directory, unlike the name suggests this is actually a
+     * collection of students with hydrated guardian records
      *
-     * The returned array is structured as follows
-     * [
-     *      'Bailey, Sam'        => 'sam.bailey@alaress.com.au',
-     *      'Day, Matt'          => 'matt.day@alaress.com.au',
-     *      'MacKenzie, Douglas' => 'doug.mackenzie@alaress.com.au'
-     * ]
-     * 
-     * @param int[]|string[] $externalIds Array containing the external ID of one or more students
-     * @return array An array containing the guardians email addresses 
-     */
-    function getGuardianEmails($externalIds);
-    
-    /**
-     * Retrieve a student record from the SIS
-     *
-     * @param int|string $externalID The external SIS ID of the student
-     * @return bool|Student
-     */
-    function getStudent($externalID);
-
-    /**
-     * Retrieve a staff record from the SIS
-     *
-     * @param int|string $externalId The external SIS ID of the staff
-     * @return bool|Staff
-     */
-    function getStaff($externalId);
-
-    /**
-     * Retrieve a tutor record from the SIS
-     *
-     * @param int|string $externalId The external SIS ID of the tutor
-     * @return bool|Tutor
-     */
-    function getTutor($externalId);
-
-    /**
-     * Retrieve all information required to render the student directory
-     *
-     * The filter array contains any search filters that should be applied to the returned
-     * data set. Filter criteria are applied using a logical OR within the criteria, and a
-     * logical AND beteween the criteria- for example, the following filter array:
-     * 
-     *     'YearLevel'         => '7,8,9',
-     *     'Name'              => 'Bailey',
-     *     'BoardingStatus'    => 'B',
-     *     'Form'              => '7B,8A'
-     * 
-     * ...would translate to the following psuedo-SQL:
-     * 
-     *     (`YearLevel` = 7 OR `YearLevel` = '8' OR `YearLevel` = '9') AND
-     *     (`Name` LIKE '%Bailey%') AND
-     *     (`BoardingStatus` = 'B') AND
-     *     (`Form` = '7B' OR `Form` = '8A')
-     * 
      * @param array $filter
-     * @return array
+     * @return Collection Collection of hydrated student records
      */
-    function getStudentDirectory($filter = []);
+    function getGuardianDirectory($filter = []);
+
+    /**
+     * Retrieve one or more student records from the SIS
+     *
+     * @param int|string|int[]|string[] $externalIds The external SIS IDs of the students to retrieve
+     * @param bool $hydrateGuardians If set, any guardians linked to the student records will also be retrieved and hydrated
+     * @return bool|Student|Collection
+     */
+    function getStudents($externalIds, $hydrateGuardians = false);
+
+    /**
+     * Get an array of students whose details should be accessible inside Schoolbox to
+     * the specified person
+     *
+     * @param int|string $externalId This is the external ID of the guardian
+     * @return Collection Collection of hydrated student records
+     */
+    function getStudentsAccessible($externalId);
+
+    /**
+     * Retrieve staff records from the SIS
+     *
+     * @param int|string|int[]|string[] $externalIds The external SIS ID of the staff member/members to retrieve
+     * @return bool|Staff|Collection
+     */
+    function getStaff($externalIds);
 
     /**
      * Retrieve all information required to render the staff directory
@@ -106,75 +87,43 @@ interface UserInterface
     function getStaffDirectory($filter = []);
 
     /**
-     * Retrieves the current semester from the SIS.
+     * Retrieve one or more tutor records from the SIS
      *
-     * This optionally accepts the ID of an external SIS user, and where supported by the SIS,
-     * if supplied this will return the semester that this user currently has set as their
-     * default. If the SIS does not support this, then it will return the current semester
-     * based on the current calendar date.
-     *
-     * The return value is either a string/int based on the format the external SIS uses
-     *
-     * @param null|int|string $externalId Optional external user ID
-     * @return string|int
+     * @param int|string|int[]|string[] $externalIds The external SIS ID of the tutors
+     * @return bool|Tutor|Collection
      */
-    function getCurrentSemester($externalId = null);
+    function getTutors($externalIds);
 
     /**
-     * Retrieves the current year from the SIS.
+     * Get a list of valid sanitized email addresses for the specified user(s)
      *
-     * This optionally accepts the ID of an external SIS user, and where supported by the SIS,
-     * if supplied this will return the year that this user currently has set as their
-     * default. If the SIS does not support this, then it will return the current year
-     * based on the current calendar date.
+     * The returned array is structured as follows
+     * [
+     *      'Bailey, Sam'        => 'sam.bailey@alaress.com.au',
+     *      'Day, Matt'          => 'matt.day@alaress.com.au',
+     *      'MacKenzie, Douglas' => 'doug.mackenzie@alaress.com.au'
+     * ]
      *
-     * @param null|int|string $externalId Optional external user ID
-     * @return int
+     * @param int|string|int[]|string[] $externalIds Array or string containing the external ID of one or more students
+     * @return array An array containing the guardians email addresses
      */
-    function getCurrentYear($externalId = null);
+    function getEmails($externalIds);
 
     /**
-     * Get a list of subjects for the specified user
-     *
-     * @param int|string $externalID
-     * @return array
-     */
-    function getSubjectList($externalID);
-
-    /**
-     * Get an array of students whose details are accessible to the specified guardian
-     *
-     * @param int|string $externalID This is the external ID of the guardian
-     * @return bool|Student[]
-     */
-    function getAccessibleStudents($externalID);
-
-    /**
-     * Retrieves the default contact email address for the specified user
-     *
-     * @param $externalId
-     * @return null|string
-     */
-    function getEmail($externalId);
-
-    /**
-     * Retrieves the list of campuses that the specified user is involved in based on their
+     * Retrieves the list of campuses that the specified users are involved in based on their
      * timetabled classes
      *
-     * @param int|string $externalId
-     * @return bool|array
+     * @param int|string|int[]|string[] $externalIds Array or string containing the external ID of one or more users
+     * @return Collection
      */
-    function getCampusInvolvement($externalId);
-    
-    /**
-     * Determine the boarder type based on a value
-     * Returns a human-readable string
-     *
-     * @param $boarderValue
-     *
-     * @return string
-     */
-    function determineBoarderType($boarderValue);
-    function getHousemasterByHouseId($houseID);
-    function getStudentForms();
+    function getCampusInvolvement($externalIds);
+
+    // These sort of things should go into a lookup table external class
+    //
+    // function getStudentForms();
+    // function determineBoarderType($boarderValue);
+    //
+    // This should go into a house class
+    //
+    // function getHousemasterByHouseId($houseID);
 }

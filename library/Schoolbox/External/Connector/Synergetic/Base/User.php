@@ -26,13 +26,81 @@ class User implements UserInterface
     protected $config;
 
     /**
-     * Constructor
+     * @inheritdoc
      */
-    public function __construct()
+    public function __construct($di)
     {
-        // Grab a connection to the external database
+        $this->config = $di->get('config');
+        $this->databaseExternal = $di->get('databaseExternal');
+    }
 
-        var_dump(debug_backtrace());
-        exit;
+    /**
+     * @inheritdoc
+     */
+    function getPortrait($externalId) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getGuardians($externalIds, $hydrateStudents = false) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getGuardianDirectory($filter = []) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getStudents($externalIds, $hydrateGuardians = false) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getStudentsAccessible($externalID) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getStaff($externalId) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getStaffDirectory($filter = []) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getTutors($externalIds) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getEmails($externalIds) {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getCampusInvolvement($externalId) {
+
     }
 }

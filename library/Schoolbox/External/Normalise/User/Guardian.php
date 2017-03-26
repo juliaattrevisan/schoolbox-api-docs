@@ -192,7 +192,7 @@ class Guardian extends Base {
      *
      * @param Collection|Student[] $students
      */
-    private function setStudents($students)
+    public function setStudents($students)
     {
         $this->students = $students;
     }
