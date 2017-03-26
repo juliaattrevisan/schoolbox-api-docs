@@ -29,8 +29,12 @@ interface IStatement
     function fetch();
 
     /**
-     * Get all records from last executed query
+     * Get all records from last executed query.
      *
+     * Do not use this on threat of death. This thing is the definition of pure evil, and
+     * you should be iterating instead.
+     *
+     * @deprecated
      * @return mixed
      */
     function fetchAll();
