@@ -185,11 +185,35 @@ abstract Class Base implements IStatement
     }
 
     /**
-     * This function does nothing in the base statement. The Query/StoredProcedure overrides should implement parameter
-     * binding appropriately.
+     * The should be completed in the statement class to bind the appropriate values
      */
-    protected function bindStatement()
-    {
+    protected abstract function bindStatement();
+
+    /**
+     * Prepare a statement for execution and bind input parameters
+     *
+     * @param $values
+     * @return bool
+     */
+    private function prepareExecution($values) {
+        if (empty($this->statement)) {
+            try {
+                $this->statement = $this->broker->prepare($this->sql, [PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL]);
+            } catch (PDOException $e) {
+                $this->handleException($e);
+                return false;
+            }
+        }
+
+        if (is_array($values)) {
+            foreach ($values as $key => $value) {
+                $this->statement->bindValue($key, $value);
+            }
+        }
+
+        // Bind parameters to the statement
+
+        $this->bindStatement();
     }
 
     /**
@@ -198,25 +222,7 @@ abstract Class Base implements IStatement
     public function execute($values = null)
     {
         try {
-            if (empty($this->statement)) {
-                try {
-                    $this->statement = $this->broker->prepare($this->sql, [PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL]);
-                } catch (PDOException $e) {
-                    $this->handleException($e);
-                    return false;
-                }
-            }
-
-            if (is_array($values)) {
-                foreach ($values as $key => $value) {
-                    $this->statement->bindValue($key, $value);
-                }
-            }
-
-            // Bind parameters to the statement
-
-
-            $this->bindStatement();
+            $this->prepareExecution($values);
 
             if ($this->broker->getCollector() instanceof Collector) {
                 return $this->broker->getCollector()->execute($this);
@@ -234,43 +240,19 @@ abstract Class Base implements IStatement
     public function executeIterator($values = null)
     {
         try {
-            // Make sure the statement has been prepared
-
-            if (empty($this->statement)) {
-                try {
-                    $this->statement = $this->broker->prepare($this->sql, [PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL]);
-                } catch (PDOException $e) {
-                    $this->handleException($e);
-                    return false;
-                }
-            }
-
-            // Bind any last minute input parameters from the values array passed to this function
-
-            if (is_array($values)) {
-                foreach ($values as $key => $value) {
-                    $this->statement->bindValue($key, $value);
-                }
-            }
-
-            // Bind parameters to the statement
-
-            $this->bindStatement();
+            $this->prepareExecution($values);
 
             // Grab iterator
-
             $iterator = $this->broker->getIterator($this, $this->statement);
 
             // Execute the statement
-
             if (!$iterator->execute()) {
 
                 // Query execution failed
-
                 return false;
             }
-            // If we got to this point we got a valid iterator which had rows
 
+            // If we got to this point we got a valid iterator which had rows
             return $iterator;
 
         } catch (PDOException $e) {
