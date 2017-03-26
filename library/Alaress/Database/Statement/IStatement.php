@@ -61,9 +61,27 @@ interface IStatement
     function fetchColumnArray($column, $index = null);
 
     /**
-     * Get a rows in arrayed indexed by specified field
+     * Returns all query results in an array indexed by a single columns value.
      *
-     * @param null|string $index Column name/index to be used as array index
+     * Example SQL: SELECT id, `firstname`, `lastname` FROM `user`
+     * Example PHP: var_dump(fetchRowArray('id'));
+     *
+     * Psuedo-Execution Result
+     *
+     * [
+     *   173 => [
+     *      `id` => 173,
+     *      'firstname' => 'Rachel',
+     *      'lastname' => 'Rhodes'
+     *   ],
+     *   203 => [
+     *      `id` => 203,
+     *      'firstname' => 'David',
+     *      'lastname' => 'Rhodes'
+     *   ]
+     * ]
+     *
+     * @param string $index Column name/index to be used as array index
      * @return array
      */
     function fetchRowArray($index);
