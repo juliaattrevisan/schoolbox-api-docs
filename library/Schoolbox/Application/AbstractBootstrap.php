@@ -70,15 +70,12 @@ abstract class AbstractBootstrap implements BootstrapInterface
     /** @var bool  */
     private $debugEnabled = false;
 
-
     /**
      * @param Kernel $kernel
      */
     public function __construct($kernel) {
         $this->kernel = $kernel;
     }
-
-
 
     /**
      * Install any internal dependencies into the kernel (routing, etc.)

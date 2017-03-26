@@ -1,16 +1,16 @@
 <?php
 
 /**
- * MySQL Query
+ * IBM DB2 Query
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\Statement\Query\Mysql;
+namespace Alaress\Database\Statement\Query\Db2;
 
-use Alaress\Database\Broker\Mysql\Broker;
+use Alaress\Database\Broker\Db2\Broker;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\Query\Base;
 
