@@ -1,3 +1,186 @@
 <?php
+/**
+ * Schoolbox implementation of timetable connector
+ *
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
-// All the stuff from existing Timetable.php
+namespace Schoolbox\External\Connector\Synergetic\Base;
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Collection;
+use Schoolbox\External\Connector\TimetableInterface;
+use Schoolbox\External\Normalise\Timetable\Lesson;
+use Schoolbox\IConfigLoader;
+
+class Timetable implements TimetableInterface
+{
+    /**
+     * @var IConnector
+     */
+    protected $databaseExternal;
+
+    /**
+     * @var IConfigLoader
+     */
+    protected $config;
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct($di)
+    {
+        $this->config = $di->get('config');
+        $this->databaseExternal = $di->get('databaseExternal');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentSemester($externalId = null)
+    {
+        if (!empty($externalUserId)) {
+
+            // Get user specific file semester
+
+            $semesterStatement = $this->databaseExternal->executeStoredProcedure(
+                'spsConfigUserDefaultYearSemester',
+                ['ID', $externalUserId]
+            );
+
+            if ($row = $semesterStatement->fetch()) {
+                return $row['UserFileSemester'];
+            }
+        }
+
+        // Get current default file semester
+
+        $semesterStatement = $this->databaseExternal->executeQuery("
+            SELECT    FileSemester 
+            FROM      FileSemesters   
+            WHERE     SystemCurrentFlag = 1
+        ");
+
+        if ($row = $semesterStatement->fetch()) {
+            return $row['FileSemester'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentYear($externalId = null)
+    {
+        if (!empty($externalUserId)) {
+
+            // Get user specific file year
+
+            $semesterStatement = $this->databaseExternal->executeStoredProcedure(
+                'spsConfigUserDefaultYearSemester',
+                ['ID', $externalUserId]
+            );
+
+            if ($row = $semesterStatement->fetch()) {
+                return $row['UserFileYear'];
+            }
+        }
+
+        // Get current default file year
+
+        $semesterStatement = $this->databaseExternal->executeQuery("
+            SELECT    FileYear
+            FROM      FileSemesters   
+            WHERE     SystemCurrentFlag = 1
+        ");
+
+        if ($row = $semesterStatement->fetch()) {
+            return $row['FileYear'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLessons($externalIds)
+    {
+        $externalIdBindings1 = $this->databaseExternal->prepareInBindings($externalIds);
+        $externalIdBindings2 = $this->databaseExternal->prepareInBindings($externalIds);
+
+        $subjectIterator = $this->databaseExternal->executeQueryIterator(
+            "
+                SELECT          SubjectClasses.SubjectClassesSeq AS id,
+                                StudentClasses.ClassCode AS code,
+                                SubjectClasses.ClassCampus AS campus,
+                                SubjectClasses.Description AS name,
+                                luFileType.Description AS classType
+                FROM            StudentClasses
+                INNER JOIN      SubjectClasses ON
+                                    StudentClasses.FileType = SubjectClasses.FileType AND
+                                    StudentClasses.FileYear = SubjectClasses.FileYear AND
+                                    StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+                                    StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+                                    StudentClasses.ClassCode = SubjectClasses.ClassCode AND
+                                    StudentClasses.FileSemester = :fileSemester1 AND
+                                    StudentClasses.FileYear = :fileYear1 AND
+                                    StudentClasses.ID IN ({$externalIdBindings1['sql']})
+                LEFT JOIN       luFileType ON StudentClasses.FileType = luFileType.Code
+                WHERE           StudentClasses.StartDate <= getdate() AND
+                                (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+                ORDER BY        SubjectClasses.FileType ASC, 
+                                SubjectClasses.Description ASC
+                
+                UNION ALL 
+                
+                SELECT DISTINCT c2.SubjectClassesSeq AS id,
+                                c1.ClassCode AS code,
+                                c1.ClassCampus AS campus,
+                                c2.description AS name,
+                                luFileType.Description AS type
+                FROM            SubjectClassStaff c1
+                INNER JOIN      SubjectClasses c2 ON
+                                    c1.FileType = c2.FileType AND
+                                    c1.FileYear = c2.FileYear AND
+                                    c1.FileSemester = c2.FileSemester AND
+                                    c1.ClassCampus = c2.ClassCampus AND
+                                    c1.ClassCode = c2.ClassCode AND
+                                    c1.FileSemester = :fileSemester2 AND
+                                    c1.FileYear = :fileYear2 AND 
+                                    c1.StaffID IN ({$externalIdBindings2['sql']})
+                LEFT JOIN       luFileType ON c2.FileType = luFileType.Code
+                ORDER BY        luFileType.Description ASC, 
+                                c2.Description ASC
+            ",
+            array_merge
+            (
+                $externalIdBindings1['bindings'],
+                $externalIdBindings2['bindings'],
+                [
+                    'fileYear1' => $this->getCurrentYear(),
+                    'fileSemester1' => $this->getCurrentSemester(),
+                    'fileYear2' => $this->getCurrentYear(),
+                    'fileSemester2' => $this->getCurrentSemester()
+                ]
+            )
+        );
+
+        $results = new Collection();
+
+        foreach ($subjectIterator as $lessonRow) {
+            $lesson = new Lesson();
+            $lesson->setId($lessonRow['id']);
+            $lesson->setName($lessonRow['name']);
+            $lesson->setCode($lessonRow['code']);
+            $lesson->setCampus($lessonRow['campus']);
+            $lesson->setType($lessonRow['type']);
+            $results->add($lesson);
+        }
+
+        return $results;
+    }
+}

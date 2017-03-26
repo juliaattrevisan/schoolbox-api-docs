@@ -1,24 +1,30 @@
 <?php
-/************************************************************
- *                                                           *
- *        Copyright (c) 2013 Alaress Pty Ltd                *
- *                                                           *
- *    This file provides abstraction of the  MSSQL database.    *
- *    This used for Synergetic connections.                    *
- *    It also includes error handling and a debug mode.        *
- *                                                           *
- ************************************************************/
+/**
+ * This class is now deprecated. Use a DI injected \Alaress\Database\IConnector class instead.
+ *
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ */
 
-use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Connector\Sqlsrv\Connector;
 use Alaress\Database\Factory as DatabaseFactory;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 
+/**
+ * @deprecated
+ * Class MSSQL
+ */
 class MSSQL
 {
-
-    /** @var IConnector */
+    /** @var Connector */
     protected $connector;
+
+    /** @var IConfigLoader $config */
+    protected $config;
 
     /**
      * Database host address
@@ -46,20 +52,17 @@ class MSSQL
 
     /**
      * Static instance of this class
+     *
+     * @deprecated
      * @var self
      */
     protected static $instance = null;
 
     /**
-     * Most recent statement executed
-     * @var IStatement
-     */
-    protected $result = null;
-
-    /**
      * Gets static instance of this class (with default settings). Should be
      * alright as this never gets called
      *
+     * @deprecated
      * @return self
      */
     public static function getInstance()
@@ -71,12 +74,14 @@ class MSSQL
     }
 
     /**
+     * @deprecated
      * @param bool $db
      * @param bool $optionalConfig
      */
     function __construct($db = false, $optionalConfig = false)
     {
         $this->connector = DatabaseFactory::CreateSqlsrv();
+        $this->config = ConfigMapper::getInstance();
 
         if (is_array($optionalConfig)) {
             $this->host = $optionalConfig['host'];
@@ -84,10 +89,10 @@ class MSSQL
             $this->passwd = $optionalConfig['passwd'];
             $this->db = $optionalConfig['db'];
         } else {
-            $this->host = Cfg::get('external_db_host');
-            $this->user = Cfg::get('external_db_user');
-            $this->passwd = Cfg::get('external_db_passwd');
-            $this->db = $db ? $db : Cfg::get('external_db_db');
+            $this->host = $this->config->get('external_db_host');
+            $this->user = $this->config->get('external_db_user');
+            $this->passwd = $this->config->get('external_db_passwd');
+            $this->db = $db ? $db : $this->config->get('external_db_db');
         }
 
         $this->connect();
@@ -95,8 +100,7 @@ class MSSQL
 
     /**
      * Connect to database
-     *
-     * @throws Schoolbox\External\Exception
+     * @deprecated
      */
     function connect()
     {
@@ -109,19 +113,23 @@ class MSSQL
     }
 
     /**
+     * Executes a query, returns the statement
+     *
+     * @deprecated
      * @param string $sql_q
-     * @return bool|resource
+     * @return bool|IStatement
      */
     function query($sql_q)
     {
-        $this->result = $this->connector->prepareQuery($sql_q);
-        $this->result->execute();
-        return $this->result;
+        $result = $this->connector->prepareQuery($sql_q);
+        $result->execute();
+        return $result;
     }
 
     /**
      * Runs a stored procedure
      *
+     * @deprecated
      * @param string $name The name of the stored procedure.
      * @return IStoredProcedure
      */
@@ -134,6 +142,7 @@ class MSSQL
      * Gets the first result returned by the query. Returns an associative array of row,
      * false if none exists
      *
+     * @deprecated
      * @param string $sql_q
      * @return array|bool
      */
@@ -147,6 +156,7 @@ class MSSQL
      * Gets the first value of the first result returned by the query. Returns an associative
      * array of row, false if none exists
      *
+     * @deprecated
      * @param string $sql_q
      * @return array|bool
      */
@@ -160,8 +170,7 @@ class MSSQL
      * Gets an 3 dimensional associative array of all rows returned by query,
      * returns false if no rows
      *
-     * @deprecated Use getIterator() instead if possible.
-     *
+     * @deprecated
      * @param string $sql_q
      * @return array|bool
      */
@@ -174,6 +183,7 @@ class MSSQL
     /**
      * Gets an iterator over a query.
      *
+     * @deprecated
      * @param string $sql_q
      * @return MssqlResultIterator
      */
@@ -183,27 +193,10 @@ class MSSQL
     }
 
     /**
-     * Returns the next result from a query result resource
-     * Can be optionally passed a result resource otherwise it uses current result resource
-     *
-     * @param int $result The resource to use, or 0 to use $this->result
-     * @return array|bool
-     */
-    function getNextArray($result = 0)
-    {
-        if ($result instanceof IStatement) {
-            return $result->fetch();
-        } elseif ($result == 0 && $this->result instanceof IStatement) {
-            return $this->result->fetch();
-        }
-
-        return false;
-    }
-
-    /**
      * Calls trimRow() on all rows from a rowset (returned by $this->fetchAll())
      * @see $this->trimRow()
      *
+     * @deprecated
      * @param  array $rowset
      * @return array
      */
@@ -220,6 +213,7 @@ class MSSQL
      *
      * Needed by TASS because most of its fields are CHAR instead of VARCHAR.
      *
+     * @deprecated
      * @param  array $row
      * @return array
      */
@@ -234,6 +228,7 @@ class MSSQL
     /**
      * Trims a single field value.
      *
+     * @deprecated
      * @param  mixed $fieldValue
      * @return mixed Trimmed value if $fieldValue was set, null otherwise.
      */
@@ -243,28 +238,11 @@ class MSSQL
     }
 
     /**
-     * Returns the number of rows returned by the query
-     *
-     * @param int $result
-     *
-     * @return bool|int
-     */
-    function countRows($result = 0)
-    {
-        if ($result instanceof IStatement)
-            return $result->rowCount();
-        else if ($this->result instanceof IStatement)
-            return $this->result->rowCount();
-
-        return false;
-    }
-
-    /**
      * Escapes a value for safe usage in a query. The only escape needed is a
      * single apostrophe for two ("'" => "''")
      *
+     * @deprecated
      * @param string $value The string to escape.
-     *
      * @return string
      */
     public function quote($value)
@@ -276,8 +254,8 @@ class MSSQL
      * Escapes a value for safe usage in a query, and wraps in quotes so that
      * it can be interposed directly into a string.
      *
+     * @deprecated
      * @param string $value The string to escape.
-     *
      * @return string
      */
     public function smartQuote($value)
@@ -286,18 +264,9 @@ class MSSQL
     }
 
     /**
-     * Check whether a db resource was spawned
-     *
-     * @return bool
-     */
-    public function isConnected()
-    {
-        return $this->connector !== null;
-    }
-
-    /**
      * Return last error from connector
      *
+     * @deprecated
      * @return string
      */
     public function getError()

@@ -29,10 +29,11 @@ use Alaress_Date_Locale_Config;
 use Aura\Di;
 use Config;
 use Database;
-use DeprecatedDatabase;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
+use Schoolbox\External\Connector\TimetableFactory;
+use Schoolbox\External\Connector\UserFactory;
 use Schoolbox\L10n\RosettaStone;
 
 // Learning related uses
@@ -557,6 +558,19 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
 
+
+        // Register external NDS object services
+
+        $di->set('externalNDSUser', $di->lazy(function () use ($di) {
+            $source = new UserFactory();
+            return $source->build($di);
+        }));
+
+        $di->set('externalNDSTimetable', $di->lazy(function () use ($di) {
+            $source = new TimetableFactory();
+            return $source->build($di);
+        }));
+        
         // LTI Provider mapper
         $di->set('providerMapper', $di->lazyNew(\Schoolbox\LTI\Provider\Mapper::class));
 

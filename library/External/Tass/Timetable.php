@@ -68,9 +68,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                 WHERE tt_id = '" . $timetableCode . "' AND cmpy_code = '$campusCode' AND day_code='$day'
                 ORDER BY prd_code";
 
-        $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
         $periodCount = 0;
-        while ($period = $this->getDatabase()->getNextArray()) {
+        while ($period = $statement->fetch()) {
             preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['prd_end'], $TimeToMatches);
             preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['prd_start'], $TimeFromMatches);
 
@@ -212,7 +212,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                          ORDER BY prd_code";
         }
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         $timetable = array();
 
@@ -227,7 +227,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
 
         // Add classes into it
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        while ($desc = $statement->fetch()) {
             $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['prd_code'] == $timetablePeriod['periodNumber']
@@ -298,7 +298,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
 
         $dayCount  = $timetabledef['dayCount'];
-        $result    = $this->getDatabase()->query($query);
+        $statement    = $this->getDatabase()->query($query);
         $timetable = array();
 
         // Build the timetable
@@ -313,7 +313,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
 
         // Build the class list
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        while ($desc = $statement->fetch()) {
             $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['prd_code'] == $timetablePeriod['periodNumber']

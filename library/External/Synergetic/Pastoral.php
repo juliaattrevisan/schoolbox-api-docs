@@ -466,15 +466,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 )";
 
         $this->getDatabase()->query($query);
-        $result = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
-        $row = mssql_fetch_object($result);
-
-        $pastoral->setExternalId($row->insert_id);
+        $statement = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
+        $pastoral->setExternalId($statement->fetchColumn());
         $this->getPastoralMapper()->save($pastoral);
 
         $this->updatePastoralCareContacts($pastoral);
 
-        return $result;
+        return $statement;
     }
 
     /**
@@ -522,13 +520,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         )";
 
             $this->getDatabase()->query($query);
-            $result = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
-            $row = mssql_fetch_object($result);
-
-            $comment->setExternalId($row->insert_id);
+            $statement = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
+            $comment->setExternalId($statement->fetchColumn());
             $this->getPastoralCommentMapper()->save($comment);
 
-            return $result;
+            return $statement;
         }
         return false;
     }

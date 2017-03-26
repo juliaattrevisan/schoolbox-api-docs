@@ -199,8 +199,8 @@ class External_Synergetic_User implements External_UserInterface
                 JOIN dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
             WHERE
                 r.ID IN ($id_list)";
-        $this->getDatabase()->query($query);
-        while ($row = $this->getDatabase()->getNextArray()) {
+        $statement = $this->getDatabase()->query($query);
+        while ($row = $statement->fetch()) {
             switch (strtoupper($row['UseEmail'])) {
                 case 'O': //Use occupation email address
                     $emailList[$row['RelatedID']] = $row['OccupEmail'];
@@ -748,9 +748,9 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
 
-        $this->getDatabase()->query($sql);
+        $statement = $this->getDatabase()->query($sql);
         $subjectList = array();
-        while ($subject = $this->getDatabase()->getNextArray()) {
+        while ($subject = $statement->fetch()) {
             $subjectList[] = array(
                 'code' => $subject['ClassCode'],
                 'name' => $subject['name'],
@@ -964,7 +964,7 @@ class External_Synergetic_User implements External_UserInterface
 
         $statement = $this->getDatabase()->query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'uStaffPosition'");
 
-        if ($this->getDatabase()->countRows($statement) > 0) {
+        if ($statement->rowCount() > 0) {
 
             // If the custom table exists, override the 'JobPositionDescription' field
 

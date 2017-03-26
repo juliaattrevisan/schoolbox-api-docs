@@ -232,9 +232,6 @@ abstract Class Base implements IStatement
 
             $this->bindStatement();
 
-            $this->statement->execute();
-
-
             if ($this->broker->getCollector() instanceof Collector) {
                 return $this->broker->getCollector()->execute($this);
             } else {

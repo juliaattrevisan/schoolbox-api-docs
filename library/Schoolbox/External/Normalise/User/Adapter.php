@@ -1372,6 +1372,8 @@ class Adapter  implements \External_UserInterface {
      * @return Collection
      */
     public function getSubjectList(\Schoolbox\User $user) {
+
+        exit;
         $collection = new Collection();
 
         $allResults = $this->getHandler()->getSubjectList($user);

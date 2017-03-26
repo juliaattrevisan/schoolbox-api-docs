@@ -43,9 +43,6 @@ class Base implements IIterator
     /** @var string $errorCode If the last statement execution returned an error- this is its code */
     protected $errorCode;
 
-    /** @var Base This is a hack to get rewinding to work in the absence of cursors */
-    protected $rewindClone;
-
     /**
      * @inheritdoc
      */

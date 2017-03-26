@@ -37,9 +37,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         if ($date != null)
         {
-            $this->getDatabase()->query("SELECT CalendarType FROM CalendarEvents WHERE CalendarDate = '{$date}' AND CalendarType LIKE 'D=D%'");
+            $statement = $this->getDatabase()->query("SELECT CalendarType FROM CalendarEvents WHERE CalendarDate = '{$date}' AND CalendarType LIKE 'D=D%'");
 
-            if ($row = $this->getDatabase()->getNextArray()) {
+            if ($row = $statement->fetch()) {
                 $overrideDay = trim(substr($row["CalendarType"], 3));
                 if (!empty($overrideDay) && is_numeric($overrideDay)) {
 
@@ -61,11 +61,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						(TimetableDefinition.DayNumber = '$day' )
 					ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 					";
-        $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         $periodCount = 0;
 
-        while ($period = $this->getDatabase()->getNextArray()) {
+        while ($period = $statement->fetch()) {
 
 
             $timetableDef['desc'][]     = $period['Description'];
@@ -259,9 +259,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 			WHERE (CalendarEvents.CalendarType LIKE '" . $campus->getExtTimetableCode() . "_D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
 			ORDER BY CalendarEvents.CalendarDate DESC";
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
         //Cache all date and days into variable
-        while ($day = $this->getDatabase()->getNextArray($result)) {
+        while ($day = $statement->fetch()) {
             //cut out d from CalenderType string
             preg_match('/d([0-9]+)/i', $day['type'], $match);
             if ($match[1] > 0 and $match[1] <= $days) {
@@ -281,9 +281,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 WHERE (CalendarEvents.CalendarType LIKE 'D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
                 ORDER BY CalendarEvents.CalendarDate DESC";
 
-            $result = $this->getDatabase()->query($query);
+            $statement = $this->getDatabase()->query($query);
             //Cache all date and days into variable
-            while ($day = $this->getDatabase()->getNextArray($result)) {
+            while ($day = $statement->fetch()) {
                 //cut out d from CalenderType string
                 preg_match('/d([0-9]+)/i', $day['type'], $match);
                 if ($match[1] > 0 and $match[1] <= $days) {
@@ -546,7 +546,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				ORDER BY Timetable.PeriodNumber";
         }
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         //for each period
         $timetable = array();
@@ -564,7 +564,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         // Add classes into it
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
@@ -664,7 +664,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $dayCount = $timetabledef['dayCount'];
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         // Build the timetable
         $timetable = array();
@@ -680,7 +680,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         // Add classes for each day into it
 
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2

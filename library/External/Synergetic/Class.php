@@ -129,9 +129,9 @@ class External_Synergetic_Class implements External_ClassInterface
                     AND FileSemester='{$fileSemester}'
                     ORDER BY StaffSeq";
 
-        $this->getDatabase()->query($msQuery);
+        $statement = $this->getDatabase()->query($msQuery);
 
-        while ($synrow = $this->getDatabase()->getNextArray()) {
+        while ($synrow = $statement->fetch()) {
             if (is_numeric($synrow['StaffID'])) {
                 $teachers[] = $synrow['StaffID'];
             }

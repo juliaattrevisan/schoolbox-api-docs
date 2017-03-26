@@ -162,6 +162,7 @@ class Provisioner
                 $created = $updated = $skipped = $errors = 0;
 
                 foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
+
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
                     if (!$externalUserId) {

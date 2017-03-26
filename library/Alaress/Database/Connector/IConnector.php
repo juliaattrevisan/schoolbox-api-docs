@@ -197,4 +197,20 @@ interface IConnector {
      * @param callable $callable
      */
     function addPostProcessor($callable);
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Lazy temporary clutch to build IN portion of queries, should integrate this things into the
+    // predicate builder
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Create an array with SQL and matching bindings for an IN query
+     * TODO: Investigate that predicate builder thing
+     *
+     * @param $externalIds
+     * @param string $prefix
+     * @return mixed
+     */
+    function prepareInBindings($externalIds, $prefix = 'param');
+
 }

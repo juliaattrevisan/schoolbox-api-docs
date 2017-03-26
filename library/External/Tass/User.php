@@ -102,8 +102,8 @@ class External_Tass_User implements External_UserInterface
             ";
         }
 
-        $this->getDatabase()->query($query);
-        while ($row = $this->getDatabase()->getNextArray()) {
+        $statement = $this->getDatabase()->query($query);
+        while ($row = $statement->fetch()) {
             if(stristr($row['e_mail'],';')) {
                 $i=0;
                 foreach(explode(';',$row['e_mail']) as $email) {
@@ -271,9 +271,9 @@ class External_Tass_User implements External_UserInterface
             return [];
         }
 
-        $this->getDatabase()->query($sql);
+        $statement = $this->getDatabase()->query($sql);
         $subjectList = array();
-        while ($subject = $this->getDatabase()->trimRow($this->getDatabase()->getNextArray())) {
+        while ($subject = $this->getDatabase()->trimRow($statement->fetch())) {
             if (Cfg::get('external_tass_year_in_class_code') == '0') {
                 $subject['year_grp'] = '';
             }

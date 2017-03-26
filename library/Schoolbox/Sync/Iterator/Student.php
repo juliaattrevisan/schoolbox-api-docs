@@ -86,6 +86,7 @@ class Student extends IteratorIterator
             ->getCampus()
             ->add($campus)
         ;
+
         return $student;
     }
 }

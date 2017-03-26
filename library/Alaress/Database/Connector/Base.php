@@ -325,4 +325,40 @@ abstract class Base implements IConnector
     {
         return $this->broker->rollBack();
     }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Lazy temporary clutch to build IN portion of queries, should integrate this things into the
+    // predicate builder
+    // ----------------------------------------------------------------------------------------------------------------
+
+    private $count = 0;
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareInBindings($externalIds, $prefix = 'param')
+    {
+        if (!is_array($externalIds)) {
+            $externalIds = [$externalIds];
+        }
+
+        $sql = "";
+        $bindings = [];
+
+        foreach ($externalIds as $externalId) {
+            if (!empty($sql)) {
+                $sql .= ',';
+            }
+
+            $sql .= ":{$prefix}{$this->count}";
+            $bindings[":{$prefix}{$this->count}"] = $externalId;
+
+            $this->count++;
+        }
+
+        return [
+            'sql' => $sql,
+            'bindings' => $bindings
+        ];
+    }
 }
