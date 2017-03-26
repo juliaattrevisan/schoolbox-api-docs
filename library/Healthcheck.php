@@ -40,6 +40,8 @@ class Healthcheck
      */
     public function __construct()
     {
+        $factory = new DatabaseFactory();
+
         $this->configMapper = ConfigMapper::getInstance();
         $this->externalType = $this->configMapper->get('external_type');
 
@@ -55,14 +57,14 @@ class Healthcheck
             case 'pcschools':
             case 'doublefirst':
 
-                $this->connector = DatabaseFactory::CreateSqlsrv();
+                $this->connector = $factory->createSqlsrv();
                 break;
 
             // This one is a special little potato with two connections
 
             case 'humanedge':
 
-                $this->connector = DatabaseFactory::CreateSqlsrv();
+                $this->connector = $factory->createSqlsrv();
 
                 $this->secondaryConnectors[$this->configMapper->get('external_humanedge_aplus_db_db')] = DatabaseFactory::CreateSqlsrv();
                 $this->secondaryConnectors[$this->configMapper->get('external_humanedge_aplus_db_db')]
@@ -77,12 +79,12 @@ class Healthcheck
 
             case 'denbigh':
 
-                $this->connector = DatabaseFactory::CreateMysql();
+                $this->connector = $factory->createMysql();
                 break;
 
             case 'edumate':
 
-                $this->connector = DatabaseFactory::CreateDb2();
+                $this->connector = $factory->createDb2();
                 break;
 
             default:

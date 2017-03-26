@@ -21,7 +21,7 @@ class Factory
      *
      * @return MysqlConnector
      */
-    public function CreateMysql()
+    public function createMysql()
     {
         return new MysqlConnector();
     }
@@ -31,7 +31,7 @@ class Factory
      *
      * @return SqlsrvConnector
      */
-    public function CreateSqlsrv()
+    public function createSqlsrv()
     {
         return new SqlsrvConnector();
     }
@@ -41,7 +41,7 @@ class Factory
      *
      * @return Db2Connector
      */
-    public function CreateDb2()
+    public function createDb2()
     {
         return new Db2Connector();
     }

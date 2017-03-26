@@ -80,7 +80,8 @@ class MSSQL
      */
     function __construct($db = false, $optionalConfig = false)
     {
-        $this->connector = DatabaseFactory::CreateSqlsrv();
+        $factory = new DatabaseFactory();
+        $this->connector = $factory->createSqlsrv();
         $this->config = ConfigMapper::getInstance();
 
         if (is_array($optionalConfig)) {

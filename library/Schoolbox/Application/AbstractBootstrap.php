@@ -103,9 +103,13 @@ abstract class AbstractBootstrap implements BootstrapInterface
             return $connectorInternal;
         });
 
+        $di->set('databaseFactory', $di->lazyNew(DatabaseFactory::class));
+
         // Store a connector to the SIS database
 
         $di->set('databaseExternal', $di->lazy(function() use ($di) {
+
+            $factory = new DatabaseFactory();
 
             // We need to query the internal database to work out what external database
             // we need to instantiate
@@ -145,7 +149,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 case 'humanedge':
                 case 'doublefirst':
 
-                    $connectorExternal = DatabaseFactory::CreateSqlsrv();
+                    $connectorExternal =  $factory->createSqlsrv();
                     break;
 
                 // MySQL
@@ -153,14 +157,14 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 case 'schoolbox':
                 case 'denbigh':
 
-                    $connectorExternal = DatabaseFactory::CreateMysql();
+                    $connectorExternal = $factory->createMysql();
                     break;
 
                 // IBM DB2
 
                 case 'edumate':
 
-                    $connectorExternal = DatabaseFactory::CreateDb2();
+                    $connectorExternal = $factory->createDb2();
                     break;
             };
 
