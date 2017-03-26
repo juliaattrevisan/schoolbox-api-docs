@@ -43,34 +43,7 @@ class StoredProcedure extends Base implements IStoredProcedure
     /**
      * @inheritdoc
      */
-    public function execute($values = null) {
-
-        // We need to create the stored procedure SQL dynamically based on the parameters we chose to bind, then we can
-        // just execute as per normal
-
-        $this->sql = $this->createStoredProcedureSQL();
-        return parent::execute($values);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function executeIterator($values = null) {
-
-        // We need to create the stored procedure SQL dynamically based on the parameters we chose to bind, then we can
-        // just execute as per normal
-
-        $this->sql = $this->createStoredProcedureSQL();
-        return parent::executeIterator($values);
-    }
-
-    /**
-     * This creates the SQL to execute a stored procedure
-     *
-     * @return string
-     * @throws DatabaseException
-     */
-    private function createStoredProcedureSQL()
+    public function getSql()
     {
         // Create input/output parameter placeholders
 
@@ -96,16 +69,14 @@ class StoredProcedure extends Base implements IStoredProcedure
 
         // Cobble everything together into SQL statement
 
-        $this->sql = "CALL ";
+        $sql = "CALL";
 
         if (isset($this->parameters['return'])) {
-            $this->sql .= ":return = ";
+            $sql .= " :return =";
         }
 
         // Add the function name and its parameter placeholders
 
-        $this->sql .= "{$this->name}({$parameterPlaceholders})";
-
-        return $this->sql;
+        return "{$sql} {$this->name} {$parameterPlaceholders}";
     }
 }

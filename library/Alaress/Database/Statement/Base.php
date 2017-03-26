@@ -47,6 +47,13 @@ abstract Class Base implements IStatement
     /**
      * @inheritdoc
      */
+    public function getSql() {
+        return $this->sql;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function fetch($fetchStyle = PDO::FETCH_ASSOC)
     {
         $result = $this->statement->fetch($fetchStyle);
@@ -163,14 +170,6 @@ abstract Class Base implements IStatement
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getSql()
-    {
-        return $this->sql;
-    }
-
-    /**
      * If we get a PDO exception running a query we don't want to terminate application
      * execution, instead we store the error message/code on the statement and returns false
      *
@@ -195,10 +194,11 @@ abstract Class Base implements IStatement
      * @param $values
      * @return bool
      */
-    private function prepareExecution($values) {
+    private function prepareExecution($values)
+    {
         if (empty($this->statement)) {
             try {
-                $this->statement = $this->broker->prepare($this->sql, [PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL]);
+                $this->statement = $this->broker->prepare($this->getSql(), [PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL]);
             } catch (PDOException $e) {
                 $this->handleException($e);
                 return false;
@@ -214,6 +214,7 @@ abstract Class Base implements IStatement
         // Bind parameters to the statement
 
         $this->bindStatement();
+        return true;
     }
 
     /**

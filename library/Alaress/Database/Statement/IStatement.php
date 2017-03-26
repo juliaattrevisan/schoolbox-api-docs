@@ -108,7 +108,8 @@ interface IStatement
     function nextRowset();
 
     /**
-     * This returns the SQL that the statement executed. Can only really see this being used for debugging purposes.
+     * This function should manipulate/generate and return the SQL statement to be executed
+     *
      * @return string
      */
     function getSql();

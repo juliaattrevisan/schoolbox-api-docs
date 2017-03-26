@@ -43,34 +43,7 @@ class FunctionCall extends Base implements IFunctionCall
     /**
      * @inheritdoc
      */
-    public function execute($values = null) {
-
-        // We need to create the function call SQL dynamically based on the parameters we chose to bind, then we can
-        // just execute as per normal
-
-        $this->sql = $this->createFunctionCallSQL();
-        return parent::execute($values);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function executeIterator($values = null) {
-
-        // We need to create the function call SQL dynamically based on the parameters we chose to bind, then we can
-        // just execute as per normal
-
-        $this->sql = $this->createFunctionCallSQL();
-        return parent::executeIterator($values);
-    }
-
-    /**
-     * This creates the SQL to execute a function call
-     *
-     * @return string
-     * @throws DatabaseException
-     */
-    private function createFunctionCallSQL()
+    public function getSql()
     {
         // Create input/output parameter placeholders
 
@@ -96,16 +69,14 @@ class FunctionCall extends Base implements IFunctionCall
 
         // Cobble everything together into SQL statement
 
-        $this->sql = "SELECT ";
+        $sql = "SELECT";
 
         if (isset($this->parameters['return'])) {
-            $this->sql .= ":return = ";
+            $sql .= ":return =";
         }
 
         // Add the function name and its parameter placeholders
 
-        $this->sql .= "{$this->name}({$parameterPlaceholders})";
-
-        return $this->sql;
+        return "{$sql} {$this->name}({$parameterPlaceholders})";
     }
 }

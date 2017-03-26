@@ -8,9 +8,9 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\Statement\Query\Db2;
+namespace Alaress\Database\Statement\Query\Mysql;
 
-use Alaress\Database\Broker\Db2\Broker;
+use Alaress\Database\Broker\Mysql\Broker;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\Query\Base;
 
