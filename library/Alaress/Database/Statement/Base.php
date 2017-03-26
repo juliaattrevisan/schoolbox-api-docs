@@ -47,9 +47,9 @@ abstract Class Base implements IStatement
     /**
      * @inheritdoc
      */
-    public function fetch()
+    public function fetch($fetchStyle = PDO::FETCH_ASSOC)
     {
-        $result = $this->statement->fetch(PDO::FETCH_ASSOC);
+        $result = $this->statement->fetch($fetchStyle);
 
         foreach ($this->broker->getPostProcessors() as $callable) {
             $result = call_user_func($callable, $result);
@@ -65,9 +65,9 @@ abstract Class Base implements IStatement
      * @deprecated
      * @inheritdoc
      */
-    public function fetchAll()
+    public function fetchAll($fetchStyle = PDO::FETCH_ASSOC)
     {
-        $result = $this->statement->fetchAll(PDO::FETCH_ASSOC);
+        $result = $this->statement->fetchAll($fetchStyle);
 
         foreach ($this->broker->getPostProcessors() as $callable) {
             $result = call_user_func($callable, $result);
@@ -95,35 +95,21 @@ abstract Class Base implements IStatement
      */
     public function fetchColumnArray($column, $index = null)
     {
-        $results = $this->statement->fetchAll(PDO::FETCH_ASSOC);
+        $returnArray = [];
 
-        foreach ($this->broker->getPostProcessors() as $callable) {
-            $results = call_user_func($callable, $results);
-        }
-
-        if ($index == null) {
-
-            // This returned a boring old ordered list
-
-            return array_map(
-                function ($row) use ($column) {
-                    return $row[$column];
-                },
-                $results
-            );
-
-        } else {
-
-            // This returns using the specified column as the array index
-
-            $returnArray = [];
-
-            foreach ($results as $row) {
-                $returnArray[$row[$index]] = $row[$column];
+        while ($row = $this->statement->fetch(PDO::FETCH_ASSOC)) {
+            foreach ($this->broker->getPostProcessors() as $callable) {
+                $row = call_user_func($callable, $row);
             }
 
-            return $returnArray;
+            if ($index == null) {
+                $returnArray[] = $row[$column];
+            } else {
+                $returnArray[$row[$index]] = $row[$column];
+            }
         }
+
+        return $returnArray;
     }
 
     /**
@@ -131,17 +117,13 @@ abstract Class Base implements IStatement
      */
     public function fetchRowArray($index)
     {
-        $results = $this->statement->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($this->broker->getPostProcessors() as $callable) {
-            $results = call_user_func($callable, $results);
-        }
-
-        // This returns using the specified column as the array index
-
         $returnArray = [];
 
-        foreach ($results as $row) {
+        while ($row = $this->statement->fetch(PDO::FETCH_ASSOC)) {
+            foreach ($this->broker->getPostProcessors() as $callable) {
+                $row = call_user_func($callable, $row);
+            }
+
             $returnArray[$row[$index]] = $row;
         }
 

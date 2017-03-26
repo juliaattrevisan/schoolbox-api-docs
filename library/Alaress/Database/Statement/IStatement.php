@@ -11,6 +11,7 @@
 namespace Alaress\Database\Statement;
 
 use Alaress\Database\Iterator\IIterator;
+use PDO;
 
 interface IStatement
 {
@@ -24,9 +25,10 @@ interface IStatement
     /**
      * Get single record from last executed query
      *
+     * @param int $fetchStyle PDO fetch style
      * @return mixed
      */
-    function fetch();
+    function fetch($fetchStyle = PDO::FETCH_ASSOC);
 
     /**
      * Get all records from last executed query.
@@ -34,10 +36,12 @@ interface IStatement
      * Do not use this on threat of death. This thing is the definition of pure evil, and
      * you should be iterating instead.
      *
+     * @param int $fetchStyle PDO fetch style
+     *
      * @deprecated
      * @return mixed
      */
-    function fetchAll();
+    function fetchAll($fetchStyle = PDO::FETCH_ASSOC);
 
     /**
      * Get single column denoted by its index for the next row in the query
