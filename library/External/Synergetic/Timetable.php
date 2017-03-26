@@ -7,8 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Alaress\DebugBar\Instance as DebugBar;
-
 class External_Synergetic_Timetable implements External_TimetableInterface
 {
     use External_Synergetic_ValidateExternalIdTrait;

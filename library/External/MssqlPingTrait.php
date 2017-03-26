@@ -10,13 +10,12 @@
 trait External_MssqlPingTrait
 {
     /**
-     * Connects to MSSQL database, and returns whether the database is
-     * responsive.
+     * Connects to MSSQL database, and returns whether the database is responsive.
      *
      * @return bool
      */
     public function isResponsive()
     {
-        return true;
+        return MSSQL::getInstance()->connect();
     }
 }
