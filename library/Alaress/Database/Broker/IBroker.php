@@ -25,14 +25,6 @@ use DebugBar\DataCollector\PDO as DebugPDO;
 interface IBroker
 {
     /**
-     * Constructor. Sets up the statement cache, and grabs a handle to the connector that holds all
-     * of the relevant information we require to connect
-     *
-     * @param IConnector $connector The connector that this broker belongs to
-     */
-    function __construct($connector);
-
-    /**
      * Create DSN string from connector properties
      *
      * @return string

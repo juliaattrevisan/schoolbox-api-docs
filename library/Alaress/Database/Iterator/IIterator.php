@@ -19,15 +19,6 @@ use PDOStatement;
 interface IIterator extends BaseIterator
 {
     /**
-     * Database statement constructor
-     *
-     * @param IBroker $broker
-     * @param IStatement &$statement
-     * @param PDOStatement &$pdoStatement
-     */
-    function __construct($broker, $statement, $pdoStatement);
-
-    /**
      * Execute iterator
      *
      * @return bool

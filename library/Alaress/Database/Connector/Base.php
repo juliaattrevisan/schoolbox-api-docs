@@ -331,6 +331,9 @@ abstract class Base implements IConnector
     // predicate builder
     // ----------------------------------------------------------------------------------------------------------------
 
+    /**
+     * @var int $count
+     */
     private $count = 0;
 
     /**

@@ -44,7 +44,11 @@ class Base implements IIterator
     protected $errorCode;
 
     /**
-     * @inheritdoc
+     * Database statement constructor
+     *
+     * @param IBroker $broker
+     * @param IStatement &$statement
+     * @param PDOStatement &$pdoStatement
      */
     public function __construct($broker, $statement, $pdoStatement)
     {

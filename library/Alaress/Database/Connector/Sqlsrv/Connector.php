@@ -21,7 +21,14 @@ class Connector extends Base implements Serializable, IConnector
     protected $broker;
 
     /**
-     * @inheritdoc
+     * Connect to the database
+     *
+     * @param string $hostname
+     * @param string $database
+     * @param string $username
+     * @param string $password
+     * @param array $options Database connection options
+     * @return bool
      */
     public function connect($hostname, $database, $username, $password, $options = [])
     {

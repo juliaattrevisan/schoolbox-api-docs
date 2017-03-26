@@ -15,24 +15,8 @@ use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 
-interface IConnector {
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // The function that actually starts the ball rolling
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Connect to the database
-     *
-     * @param string $hostname
-     * @param string $database
-     * @param string $username
-     * @param string $password
-     * @param array $options Database connection options
-     * @return bool
-     */
-    function connect($hostname, $database, $username, $password, $options = []);
-
+interface IConnector
+{
     /**
      * Reconnect to the database (optionally- with new options)
      *

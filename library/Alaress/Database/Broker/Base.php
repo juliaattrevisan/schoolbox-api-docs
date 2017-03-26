@@ -46,7 +46,10 @@ abstract class Base implements IBroker
     protected $postProcessors = [];
 
     /**
-     * @inheritdoc
+     * Constructor. Sets up the statement cache, and grabs a handle to the connector that holds all
+     * of the relevant information we require to connect
+     *
+     * @param IConnector $connector The connector that this broker belongs to
      */
     public function __construct($connector)
     {
