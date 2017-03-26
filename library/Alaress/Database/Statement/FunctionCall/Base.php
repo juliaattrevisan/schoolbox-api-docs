@@ -25,6 +25,15 @@ abstract class Base extends BaseQuery implements IFunctionCall {
             foreach ($outputs as $name => $output) {
                 $this->parameters['output'][$name] = [
                     'value' => &$output['value'],
+
+                    // Bit-wise logic is intended here, output parameter type requires
+                    // PDO::PARAM_INPUT_OUTPUT to be OR'd with the actual type, eg:
+                    //
+                    // 'type' => (PDO::PARAM_STR | PDO::PARAM_INPUT_OUTPUT)
+                    //
+                    // This just means we don't have to remember to do that, and it
+                    // doesn't break anything if we do remember to
+
                     'type' => $output['type'] | PDO::PARAM_INPUT_OUTPUT,
                     'length' => $output['length']
                 ];
