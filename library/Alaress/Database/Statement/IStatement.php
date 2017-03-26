@@ -26,7 +26,7 @@ interface IStatement
      * Get single record from last executed query
      *
      * @param int $fetchStyle PDO fetch style
-     * @return mixed
+     * @return array
      */
     function fetch($fetchStyle = PDO::FETCH_ASSOC);
 
