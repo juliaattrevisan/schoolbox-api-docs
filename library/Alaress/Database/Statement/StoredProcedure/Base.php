@@ -33,7 +33,7 @@ abstract class Base extends BaseQuery implements IStoredProcedure {
                     //
                     // This just means we don't have to remember to do that, and it
                     // doesn't break anything if we do remember to
-                    
+
                     'type' => $output['type'] | PDO::PARAM_INPUT_OUTPUT,
                     'length' => $output['length']
                 ];

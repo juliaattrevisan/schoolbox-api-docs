@@ -38,9 +38,6 @@ try {
 /* When you cannot access the requested image (access denied)
  */
 catch (\RuntimeException $e) {
-
-   var_dump($e);
-    exit;
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
 }
 /* Image/Portrait not found
