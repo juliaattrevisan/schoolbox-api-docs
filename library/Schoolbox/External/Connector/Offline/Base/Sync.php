@@ -14,6 +14,13 @@ use Schoolbox\External\Connector\SyncInterface;
 class Sync implements SyncInterface
 {
     /**
+     * @inheritdoc
+     */
+    public function __construct($di)
+    {
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function findAllStudents()

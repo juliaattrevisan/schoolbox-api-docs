@@ -66,12 +66,14 @@ class TestPostProcessor extends PHPUnit_Framework_TestCase
             SELECT '  doctor    ' AS name UNION 
             SELECT '  steve' AS name UNION 
             SELECT ' andy    ' AS name UNION 
+            SELECT ' nat    ' AS name UNION 
             SELECT 'amri    ' AS name UNION 
-            SELECT 'stu ' AS name 
+            SELECT 'stu ' AS name UNION
+            SELECT 'zfuturedevs' AS name 
         ");
 
         $count = 0;
-        $expectedResult = ['douglas', 'damian', 'doctor', 'steve', 'andy', 'amri', 'stu'];
+        $expectedResult = ['douglas', 'damian', 'doctor', 'steve', 'andy', 'nat', 'amri', 'stu', 'zfuturedevs'];
 
         while ($row = $statement->fetch()) {
             $this->assertSame(strtolower($row['name']), $expectedResult[$count]);
