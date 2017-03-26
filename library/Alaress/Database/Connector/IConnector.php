@@ -12,6 +12,7 @@ namespace Alaress\Database\Connector;
 
 use Alaress\Database\Collector;
 use Alaress\Database\Iterator\IIterator;
+use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 
@@ -75,6 +76,17 @@ interface IConnector
      * @return IStoredProcedure
      */
     function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
+
+    /**
+     * Convenience method to prepare and execute a function call with the supplied parameters
+     *
+     * @param string $function
+     * @param null|array &$inputs
+     * @param null|array &$outputs
+     * @param null|array &$return
+     * @return IFunctionCall
+     */
+    function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
 
     /**
      * Prepare database stored procedure

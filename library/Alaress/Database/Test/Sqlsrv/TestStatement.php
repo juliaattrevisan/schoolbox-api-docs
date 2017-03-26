@@ -255,5 +255,16 @@ class TestStatement extends PHPUnit_Framework_TestCase
         foreach ($iterator as $row) {
             $this->assertSame($expectedResults[$count++], $row['test']);
         }
+
+        // ----------------------------------------------------------------------------------------------------------------
+        // Test function call
+        // ----------------------------------------------------------------------------------------------------------------
+
+        $function = $this->synergetic68->executeFunctionCall('dbo.fnTimeStr', [
+             'ADateTime' => '2016-01-05 13:47:27'
+        ]);
+
+        $this->assertSame($function->fetchColumn(), "1:47pm");
+
     }
 }

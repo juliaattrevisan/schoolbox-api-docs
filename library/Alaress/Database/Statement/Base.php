@@ -24,9 +24,6 @@ abstract Class Base implements IStatement
     /** @var PDOStatement This is the PDO statement that will do the actual work */
     protected $statement;
 
-    /** @var string This is the SQL string the statement generated */
-    protected $sql;
-
     /** @var string $errorInfo If the last statement execution returned an error- this is its message */
     protected $errorInfo;
 
@@ -42,13 +39,6 @@ abstract Class Base implements IStatement
     public function rowCount()
     {
         return $this->statement->rowCount();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSql() {
-        return $this->sql;
     }
 
     /**

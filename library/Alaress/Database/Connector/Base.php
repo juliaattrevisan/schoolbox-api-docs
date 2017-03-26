@@ -11,6 +11,7 @@
 namespace Alaress\Database\Connector;
 
 use Alaress\Database\Broker\IBroker;
+use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Statement\Query\IQuery;
 
@@ -213,6 +214,16 @@ abstract class Base implements IConnector
         return $statement;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
+    {
+        /** @var IFunctionCall $function */
+        $function = $this->prepareFunctionCall($function, $inputs, $outputs, $return);
+        $function->execute();
+        return $function;
+    }
     /**
      * @inheritdoc
      */

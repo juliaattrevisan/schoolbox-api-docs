@@ -16,6 +16,16 @@ use Alaress\Database\Statement\Base as BaseStatement;
 
 abstract class Base extends BaseStatement {
 
+    /** @var string $sql */
+    protected $sql;
+
+    /**
+     * @inheritdoc
+     */
+    public function getSql() {
+        return $this->sql;
+    }
+
     /**
      * Bind array of input values. This doesn't bind to the PDO statement, just stores the intention in an array.
      * @param array $values
