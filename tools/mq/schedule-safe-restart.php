@@ -20,6 +20,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
@@ -336,8 +337,12 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 
         $splitter = new Splitter($conf, $di, new TriggerFactoryFactory(true));
 
+        $instanceId = INSTANCE_ID;
+
+        $broker = new Broker($instanceId, $amqp, $redis);
+
         // handle this message by splitting this event and propagating its triggers
-        (new Propagator($splitter, $redis, $amqp, INSTANCE_ID))->propagateEvent($event);
+        (new Propagator($splitter, $redis, $broker, $instanceId))->propagateEvent($event);
 
     } catch (CompressionException $e) {
         $log->debug($e->getMessage());
