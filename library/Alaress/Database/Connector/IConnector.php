@@ -15,7 +15,6 @@ use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
-use PDO;
 
 interface IConnector
 {
@@ -209,38 +208,4 @@ interface IConnector
      * @return mixed
      */
     function prepareInBindings($externalIds, $prefix = 'param');
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Parameter quoting functions for those unsafe queries we like to run. These should not be
-    // used in anything new- everything should be passed as a parameter to ensure we stay sanitary
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Return quoted string
-     *
-     * @deprecated
-     * @param $value
-     * @param int $parameter_type
-     * @return string
-     */
-    function quote($value, $parameter_type = PDO::PARAM_STR);
-
-    /**
-     * Surround the supplied database column/table name with appropriate quotation marks
-     *
-     * @deprecated
-     * @param string $value
-     * @return string
-     */
-    function quoteIdentifier($value);
-
-    /**
-     * Escapes _ and % characters within $string, so they don't have unintended
-     * effects in LIKE queries.
-     *
-     * @deprecated
-     * @param string $value
-     * @return string
-     */
-    function escapeForLike($value);
 }

@@ -14,7 +14,6 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Statement\Query\IQuery;
-use PDO;
 
 abstract class Base implements IConnector
 {
@@ -375,34 +374,5 @@ abstract class Base implements IConnector
             'sql' => $sql,
             'bindings' => $bindings
         ];
-    }
-
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Those horrible quoting functions which we shall never speak of again
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function quote($value, $parameter_type = PDO::PARAM_STR)
-    {
-        return $this->broker->quote($value, $parameter_type);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function quoteIdentifier($value)
-    {
-        return $this->broker->quoteIdentifier($value);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function escapeForLike($value)
-    {
-        return $this->broker->escapeForLike($value);
     }
 }

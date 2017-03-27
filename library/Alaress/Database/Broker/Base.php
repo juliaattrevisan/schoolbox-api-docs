@@ -227,32 +227,4 @@ abstract class Base implements IBroker
     {
         return $this->postProcessors;
     }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Those horrible quoting functions which we shall never speak of again
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function quote($value, $parameter_type = PDO::PARAM_STR)
-    {
-        return $this->pdo->quote($value, $parameter_type);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function quoteIdentifier($value)
-    {
-        return "`{$value}`";
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function escapeForLike($value)
-    {
-        return strtr($value, ['_' => '\\_', '%' => '\\%']);
-    }
 }
