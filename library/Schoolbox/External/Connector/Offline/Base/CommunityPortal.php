@@ -14,6 +14,13 @@ use Schoolbox\External\Connector\CommunityPortalInterface;
 class CommunityPortal implements CommunityPortalInterface
 {
     /**
+     * @inheritdoc
+     */
+    public function __construct($databaseExternal, $key, $initializationVector)
+    {
+    }
+
+    /**
      * @inheritDoc
      */
     public function changePassword($communityId, $newPassword)

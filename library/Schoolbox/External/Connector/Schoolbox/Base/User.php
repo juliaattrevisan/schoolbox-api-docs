@@ -46,23 +46,19 @@ class User implements UserInterface
     // characters stored in the fields values we use the ASCII character 30 (0x1E) which is a
     // non-printable character specifically designated for the purpose of being a record separator
 
-    /**
-     * @var IConnector
-     */
+    /** @var IConnector */
     protected $databaseExternal;
 
-    /**
-     * @var IConfigLoader
-     */
+    /** @var IConfigLoader */
     protected $config;
 
     /**
-     * Constructor
+     * @inheritdoc
      */
-    public function __construct($di)
+    public function __construct($config, $databaseExternal, $timetableExternal)
     {
-        $this->config = $di->get('config');
-        $this->databaseExternal = $di->get('databaseExternal');
+        $this->config = $config;
+        $this->databaseExternal = $databaseExternal;
     }
 
     /**
@@ -433,7 +429,7 @@ class User implements UserInterface
      */
     public function getStudentsAccessible($externalId)
     {
-        $studentIterator = $this->databaseExternal->executeIterator('
+        $studentIterator = $this->databaseExternal->executeQueryIterator('
 
             SELECT      `user`.`synergy_id` as `externalId`,
                         `user`.`title` AS `title`,
@@ -748,7 +744,7 @@ class User implements UserInterface
 
         $student->setId($studentRow['externalId']);
         $student->setTitle($studentRow['title']);
-        $student->setFirstName($studentRow['firstName']);
+        $student->setGivenName($studentRow['firstName']);
         $student->setPreferredName($studentRow['firstName']);
         $student->setLastName($studentRow['lastName']);
         $student->setEmail($studentRow['email']);
@@ -866,7 +862,7 @@ class User implements UserInterface
         $staff = new Staff();
         $staff->setId($staffRow['externalId']);
         $staff->setTitle($staffRow['title']);
-        $staff->setFirstName($staffRow['firstName']);
+        $staff->setGivenName($staffRow['firstName']);
         $staff->setPreferredName($staffRow['firstName']);
         $staff->setLastName($staffRow['lastName']);
         $staff->setEmail($staffRow['email']);
@@ -953,7 +949,7 @@ class User implements UserInterface
 
         $guardian->setId($guardianRow['externalId']);
         $guardian->setTitle($guardianRow['title']);
-        $guardian->setFirstName($guardianRow['givenName']);
+        $guardian->setGivenName($guardianRow['givenName']);
         $guardian->setPreferredName($guardianRow['givenName']);
         $guardian->setLastName($guardianRow['lastName']);
         $guardian->setEmail($guardianRow['email']);

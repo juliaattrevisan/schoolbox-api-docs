@@ -9,8 +9,19 @@
 
 namespace Schoolbox\External\Connector;
 
+use Alaress\Database\Connector\IConnector;
+
 interface CommunityPortalInterface
 {
+    /**
+     * Constructor
+     *
+     * @param array|IConnector $databaseExternal External database connector(s)
+     * @param string $key The password encryption key. This must be secret and not stored in code.
+     * @param string $initializationVector The hard-coded IV for the password. This does not need to be secret.
+     */
+    function __construct($databaseExternal, $key, $initializationVector);
+
     /**
      * Updates the community portal password for this user.
      *
@@ -18,5 +29,5 @@ interface CommunityPortalInterface
      * @param string $newPassword
      * @return bool
      */
-    public function changePassword($communityId, $newPassword);
+    function changePassword($communityId, $newPassword);
 }

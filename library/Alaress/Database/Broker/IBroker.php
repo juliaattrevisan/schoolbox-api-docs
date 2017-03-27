@@ -11,7 +11,6 @@
 namespace Alaress\Database\Broker;
 
 use Alaress\Database\Collector;
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;

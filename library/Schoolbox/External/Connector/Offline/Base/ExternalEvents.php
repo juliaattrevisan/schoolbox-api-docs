@@ -19,6 +19,13 @@ use Schoolbox\External\Connector\ExternalEventsInterface;
 class ExternalEvents implements ExternalEventsInterface
 {
     /**
+     * @inheritdoc
+     */
+    public function __construct($config, $databaseExternal, $timetableExternal)
+    {
+    }
+
+    /**
      * @param  object $user
      * @param  string $startDate
      * @param  string $endDate

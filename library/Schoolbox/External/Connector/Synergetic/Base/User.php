@@ -15,23 +15,19 @@ use Schoolbox\IConfigLoader;
 
 class User implements UserInterface
 {
-    /**
-     * @var IConnector
-     */
+    /** @var IConnector $databaseExternal */
     protected $databaseExternal;
 
-    /**
-     * @var IConfigLoader
-     */
+    /** @var IConfigLoader $config */
     protected $config;
 
     /**
      * @inheritdoc
      */
-    public function __construct($di)
+    public function __construct($config, $databaseExternal, $timetableExternal)
     {
-        $this->config = $di->get('config');
-        $this->databaseExternal = $di->get('databaseExternal');
+        $this->config = $config;
+        $this->databaseExternal = $databaseExternal;
     }
 
     /**

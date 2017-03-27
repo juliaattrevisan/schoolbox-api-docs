@@ -12,15 +12,14 @@
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress_Date_Format;
-use Alaress\DebugBar\Instance as DebugBar;
-use MSSQL;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\CommunityPortalInterface;
 use UnexpectedValueException;
 
 class CommunityPortal implements CommunityPortalInterface
 {
-    /** @var MSSQL $database */
-    private $database;
+    /** @var IConnector $databaseExternal */
+    private $databaseExternal;
 
     /** @var string $key The password encryption key. This must be secret and not stored in code. */
     private $key;
@@ -28,33 +27,18 @@ class CommunityPortal implements CommunityPortalInterface
     /** @var string $initializationVector The hard-coded IV for the password. This does not need to be secret. */
     private $initializationVector;
 
-    /**
-     * @var bool
-     */
+    /** @var bool $allowCreateUser */
     private $allowCreateUser;
 
     /**
-     * Constructor
-     *
-     * @param string $key
-     * @param string $initializationVector
-     * @param bool   $allowCreateUser      Can this object create new users in the community portal?
+     * @inheritdoc
      */
-    public function __construct($key, $initializationVector, $allowCreateUser)
+    public function __construct($databaseExternal, $key, $initializationVector)
     {
         $this->key = $key;
         $this->initializationVector = $initializationVector;
-        $this->database = MSSQL::getInstance();
         $this->allowCreateUser = $allowCreateUser;
-
-        if (DebugBar::isEnabled()) {
-            $this->database->installCollector();
-            /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
-            $collector = $this->database->getCollector();
-            if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
-                DebugBar::getInstance()->addCollector($collector);
-            }
-        }
+        $this->databaseExternal = $databaseExternal;
     }
 
     /**
@@ -216,6 +200,7 @@ class CommunityPortal implements CommunityPortalInterface
         if (empty($this->key)) {
             throw new UnexpectedValueException('Key was not set in constructor');
         }
+
         if (empty($this->initializationVector)) {
             throw new UnexpectedValueException('Initialization vector was not set in constructor');
         }

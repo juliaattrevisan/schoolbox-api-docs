@@ -9,6 +9,7 @@
 
 namespace Schoolbox\External\Connector;
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
@@ -26,11 +27,13 @@ class Factory
      * Return the correct version of the requested external object
      *
      * @param IConfigLoader $config
+     * @param array|IConnector $databaseExternal External database connection(s)
+     * @param TimetableInterface $timetableExternal External timetable connector
      * @param string $type Type of external object we want (one of the constants above)
      * @return mixed
      * @throws UnexpectedValueException If nothing can be built
      */
-    public function build($config, $type)
+    public function build($config, $databaseExternal, $timetableExternal, $type)
     {
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type')) . "\\";
         $prefixSchool = $prefixBase . ucwords($config->get('site_location')) . "\\";
@@ -76,7 +79,7 @@ class Factory
                         trigger_error('Cannot read community portal key - password will not be changed', E_USER_WARNING);
                     }
 
-                    return new Synergetic\Base\CommunityPortal($key, $iv);
+                    return new Synergetic\Base\CommunityPortal($databaseExternal, $key, $iv);
 
                 }
 
@@ -89,9 +92,9 @@ class Factory
         }
 
         if (class_exists($classSchool)) {
-            return new $classSchool($config);
+            return new $classSchool($config, $databaseExternal, $timetableExternal);
         } elseif (class_exists($classBase)) {
-            return new $classBase($config);
+            return new $classBase($config, $databaseExternal, $timetableExternal);
         }
 
         throw new UnexpectedValueException("Could not located requested external object class: '{$classBase}'");

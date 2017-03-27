@@ -11,20 +11,23 @@ namespace Schoolbox\External\Connector\Schoolpro\Base;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\IConfigLoader;
 
 class Sync implements SyncInterface
 {
-    /**
-     * @var IConnector
-     */
+    /** @var IConnector $databaseExternal */
     protected $databaseExternal;
+
+    /** @var IConfigLoader $config */
+    protected $config;
 
     /**
      * @inheritdoc
      */
-    public function __construct($di)
+    public function __construct($config, $databaseExternal, $timetableExternal)
     {
-        $this->databaseExternal = $di->get('databaseExternal');
+        $this->config = $config;
+        $this->databaseExternal = $databaseExternal;
     }
 
     /**

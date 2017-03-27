@@ -21,7 +21,7 @@ class Sync implements SyncInterface
     protected $databaseExternal;
 
     /** @var TimetableInterface */
-    protected $externalTimetable;
+    protected $timetableExternal;
 
     /** @var IConfigLoader */
     protected $config;
@@ -35,13 +35,13 @@ class Sync implements SyncInterface
     /**
      * @inheritdoc
      */
-    public function __construct($di)
+    public function __construct($config, $databaseExternal, $timetableExternal)
     {
-        $this->config = $di->get('config');
-        $this->databaseExternal = $di->get('databaseExternal');
-        $this->externalTimetable = $di->get('externalNDSTimetable');
-        $this->fileYear = $this->externalTimetable->getCurrentYear();
-        $this->fileSemester = $this->externalTimetable->getCurrentSemester();
+        $this->config = $config;
+        $this->databaseExternal = $databaseExternal;
+        $this->timetableExternal = $timetableExternal;
+        $this->fileYear = $this->timetableExternal->getCurrentYear();
+        $this->fileSemester = $this->timetableExternal->getCurrentSemester();
     }
 
     /**

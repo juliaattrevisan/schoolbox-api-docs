@@ -9,17 +9,20 @@
 
 namespace Schoolbox\External\Connector;
 
-use Aura\Di\Container as Injector;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
 
 interface TimetableInterface
 {
     /**
      * Constructor
      *
-     * @param Injector $di
+     * @param IConfigLoader $config
+     * @param array|IConnector $databaseExternal External database connector(s)
+     * @param TimetableInterface $timetableExternal External timetable connector
      */
-    function __construct($di);
+    function __construct($config, $databaseExternal, $timetableExternal);
 
     /**
      * Retrieves the current semester from the SIS.

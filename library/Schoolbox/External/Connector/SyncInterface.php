@@ -9,16 +9,20 @@
 
 namespace Schoolbox\External\Connector;
 
-use Aura\Di\Container as Injector;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Normalise\User;
+use Schoolbox\IConfigLoader;
 
 interface SyncInterface
 {
     /**
-     * Sync constructor
-     * @param Injector $di
+     * Constructor
+     *
+     * @param IConfigLoader $config
+     * @param array|IConnector $databaseExternal External database connector(s)
+     * @param TimetableInterface $timetableExternal External timetable connector
      */
-    public function __construct($di);
+    function __construct($config, $databaseExternal, $timetableExternal);
 
     /**
      * Gets a collection of normalized student objects.

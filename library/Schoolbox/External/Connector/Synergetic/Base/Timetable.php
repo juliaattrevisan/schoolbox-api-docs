@@ -17,23 +17,19 @@ use Schoolbox\IConfigLoader;
 
 class Timetable implements TimetableInterface
 {
-    /**
-     * @var IConnector
-     */
+    /** @var IConnector */
     protected $databaseExternal;
 
-    /**
-     * @var IConfigLoader
-     */
+    /** @var IConfigLoader */
     protected $config;
 
     /**
      * @inheritdoc
      */
-    public function __construct($di)
+    public function __construct($config, $databaseExternal, $timetableExternal)
     {
-        $this->config = $di->get('config');
-        $this->databaseExternal = $di->get('databaseExternal');
+        $this->config = $config;
+        $this->databaseExternal = $databaseExternal;
     }
 
     /**

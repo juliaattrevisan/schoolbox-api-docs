@@ -16,7 +16,7 @@ class Sync implements SyncInterface
     /**
      * @inheritdoc
      */
-    public function __construct($di)
+    public function __construct($config, $databaseExternal, $timetableExternal)
     {
     }
 

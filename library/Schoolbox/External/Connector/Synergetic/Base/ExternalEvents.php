@@ -9,9 +9,10 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use MSSQL;
+use Alaress_Date_Format;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\ExternalEventsInterface;
-use \Alaress_Date_Format;
+use Schoolbox\IConfigLoader;
 
 /**
  * Class ExternalEvents
@@ -20,21 +21,20 @@ use \Alaress_Date_Format;
  */
 class ExternalEvents implements ExternalEventsInterface
 {
-    /**
-     * @var MSSQL
-     */
-    private $database;
+    /** @var IConfigLoader */
+    protected $config;
 
+    /** @var IConnector */
+    private $databaseExternal;
 
     /**
-     * Constructor
-     *
+     * @inheritdoc
      */
-    public function __construct()
+    public function __construct($config, $databaseExternal, $timetableExternal)
     {
-        $this->database = MSSQL::getInstance();
+        $this->config = $config;
+        $this->databaseExternal = $databaseExternal;
     }
-
 
     /**
      * Getting events for a user (a teacher or a student) for a specific time interval
@@ -106,6 +106,6 @@ class ExternalEvents implements ExternalEventsInterface
               {$where}
               ORDER BY ss.StaffScheduleSeq ASC";
 
-        return $this->database->getAll($query);
+        return $this->databaseExternal->executeQuery($query)->fetchAll();
     }
  }
