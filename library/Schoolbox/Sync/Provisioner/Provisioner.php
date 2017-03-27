@@ -51,7 +51,7 @@ class Provisioner
     /**
      * A connection to an external database - retrieves users from the external DB.
      *
-     * @var SyncInterface
+     * @var ISync
      */
     protected $externalUserSource;
 
