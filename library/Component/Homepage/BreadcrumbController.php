@@ -25,6 +25,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
 
         $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->parseConfig();
 
         if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
             /* Remove headers */
@@ -34,8 +35,6 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
             $this->setVar('header_block', '');
             $this->setVar('dashboard_header_block', '');
         }
-
-        $this->parseConfig();
 
         if(!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailable();
