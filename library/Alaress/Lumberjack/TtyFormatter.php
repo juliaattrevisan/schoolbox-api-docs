@@ -26,6 +26,11 @@ class TtyFormatter extends CliFormatter
         parent::__construct($porcelain, $outputContext);
         if (posix_isatty($out)) {
             try {
+                if (!getcwd()) {
+                    // there's this bizarre quirk where SOMETIMES cwd might not be set
+                    // or points to an invalid directory - ensure this is not the case
+                    chdir('/');
+                }
                 $this->tty = (int)`tput cols`;
             } catch (\ErrorException $e) {
                 // noop - just leave tty as 0
