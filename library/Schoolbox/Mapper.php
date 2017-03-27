@@ -256,6 +256,7 @@ abstract class Mapper implements IMapper, Serializable
                 ]),
                 'redis'      => $di->lazyGet('redis'),
                 'broker'     => $di->lazyNew(Broker::class, [
+                    'instanceId' => INSTANCE_ID,
                     'amqp'       => $di->lazyGet('amqp'),
                     'redis'      => $di->lazyGet('redis'),
                     // no 'stomp'
