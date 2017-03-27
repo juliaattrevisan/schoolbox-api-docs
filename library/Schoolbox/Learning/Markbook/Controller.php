@@ -160,9 +160,9 @@ class Controller extends Base
         $writable = !$term->getArchived() && Access::getInstance()->isInstructor($this->getUser(), $class);
 
         // What text should we display if student has submitted but not been marked?
-        try{
+        try {
             $pendingLabel = $this->dueWorkErrorMapper->findDefaultForNewSubmissions()->getDisplayAs();
-        } catch (MapperException $e){
+        } catch (MapperException $e) {
             $pendingLabel = 'Pending';
         }
 

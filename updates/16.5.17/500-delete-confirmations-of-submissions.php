@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Soft-Delete Confirmation of Submissions', [
-    'verbose' => [ false, false, false ],
+    'verbose' => [false, false, false],
     'errors'  => E_ALL,
 ]);
 
@@ -21,7 +21,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Soft-Delete Confirmation of S
  * Soft-Deletes all 'Confirmation of Submission' submission returns.
  * Wrapped in a PHP script to insert a little extra log info
  */
-$kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
+$kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
     $db = Database::getInstance();
 
@@ -41,7 +41,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     $log->info(sprintf("Attempting to update confirmation of submissions to soft-deleted at '%s'", $now->getDatabase()));
 
-    try{
+    try {
         $updateQuery->execute(['deleted_at' => $now->getDatabase()]);
         $log->info(sprintf("%d rows soft-deleted at '%s'", $updateQuery->rowCount(), $now->getDatabase()));
         $successCount++;
@@ -53,7 +53,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
 
     $message = sprintf('%d queries executed (%d warnings), %d failures', $successCount, $warningCount, $failureCount);
-    $level = $failureCount ? Logger::ERROR : ($warningCount ? Logger::WARNING : Logger::INFO);
+    $level   = $failureCount ? Logger::ERROR : ($warningCount ? Logger::WARNING : Logger::INFO);
     $log->log($level, $message);
 
     exit(($warningCount || $failureCount) ? 1 : 0);
