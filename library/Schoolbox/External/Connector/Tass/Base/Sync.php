@@ -11,10 +11,10 @@ namespace Schoolbox\External\Connector\Tass\Base;
 
 use External_Tass_Helper;
 use Schoolbox\External\Connector\Base;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\ISync;
 use Schoolbox\Sync\Iterator;
 
-class Sync extends Base implements SyncInterface
+class Sync extends Base implements ISync
 {
     /** @var string $companyCode The TASS company code to use, for queries which require it. */
     protected $companyCode;

@@ -10,9 +10,9 @@
 namespace Schoolbox\External\Connector\Maze\Base;
 
 use Schoolbox\External\Connector\Base;
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Schoolbox\External\Connector\ICommunityPortal;
 
-class CommunityPortal extends Base implements CommunityPortalInterface
+class CommunityPortal extends Base implements ICommunityPortal
 {
     /**
      * @inheritDoc

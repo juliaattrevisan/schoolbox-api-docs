@@ -9,18 +9,18 @@
 
 namespace Schoolbox\External;
 
-use External_TimetableInterface;
+use External_ITimetable;
 use Schoolbox\Campus;
 use Schoolbox\User;
 
 class TimetableArrayExporter
 {
     /**
-     * @var External_TimetableInterface
+     * @var External_ITimetable
      */
     protected $timetableHandler;
 
-    public function __construct(External_TimetableInterface $timetableHandler)
+    public function __construct(External_ITimetable $timetableHandler)
     {
         $this->timetableHandler = $timetableHandler;
     }

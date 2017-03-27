@@ -11,7 +11,7 @@ namespace Schoolbox\External\Connector;
 
 use Schoolbox\Collection;
 
-interface TimetableInterface
+interface ITimetable
 {
     /**
      * Retrieves the current semester from the SIS.

@@ -11,9 +11,9 @@ namespace Schoolbox\External\Connector\Offline\Base;
 
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Base;
-use Schoolbox\External\Connector\TimetableInterface;
+use Schoolbox\External\Connector\ITimetable;
 
-class Timetable extends Base implements TimetableInterface
+class Timetable extends Base implements ITimetable
 {
     /**
      * @inheritdoc

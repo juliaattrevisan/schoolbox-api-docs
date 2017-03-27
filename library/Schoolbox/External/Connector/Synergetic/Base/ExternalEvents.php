@@ -10,10 +10,10 @@
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress_Date_Format;
-use Schoolbox\External\Connector\ExternalEventsInterface;
+use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 
-class ExternalEvents extends Base implements ExternalEventsInterface
+class ExternalEvents extends Base implements IExternalEvents
 {
     /**
      * @inheritdoc

@@ -10,9 +10,9 @@
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Schoolbox\External\Connector\Base;
-use Schoolbox\External\Connector\UserInterface;
+use Schoolbox\External\Connector\IUser;
 
-class User extends Base implements UserInterface
+class User extends Base implements IUser
 {
     /**
      * @inheritdoc

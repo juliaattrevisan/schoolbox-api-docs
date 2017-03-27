@@ -15,7 +15,7 @@ use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Tutor;
 use Schoolbox\External\Normalise\User\Student;
 
-interface UserInterface
+interface IUser
 {
     /**
      * Retrieves path on disk to user photo if one exists. If no images exists

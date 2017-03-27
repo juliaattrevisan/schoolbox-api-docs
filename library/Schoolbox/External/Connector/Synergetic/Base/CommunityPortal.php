@@ -13,10 +13,10 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress_Date_Format;
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Schoolbox\External\Connector\ICommunityPortal;
 use UnexpectedValueException;
 
-class CommunityPortal implements CommunityPortalInterface
+class CommunityPortal extends Base implements ICommunityPortal
 {
     /** @var IConnector $databaseExternal */
     private $databaseExternal;

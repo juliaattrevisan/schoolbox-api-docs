@@ -11,7 +11,7 @@ namespace Schoolbox\External\Connector;
 
 use Alaress\Database\Iterator\IIterator;
 
-interface ExternalEventsInterface
+interface IExternalEvents
 {
     /**
      * Get events from external database

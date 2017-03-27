@@ -17,10 +17,10 @@
 namespace Schoolbox\External\Connector\Doublefirst\Base;
 
 use Schoolbox\External\Connector\Base;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\ISync;
 use Schoolbox\Sync\Iterator;
 
-class Sync extends Base implements SyncInterface
+class Sync extends Base implements ISync
 {
     /**
      * {@inheritdoc}

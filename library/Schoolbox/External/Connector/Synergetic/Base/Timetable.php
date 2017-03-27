@@ -11,10 +11,10 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Base;
-use Schoolbox\External\Connector\TimetableInterface;
+use Schoolbox\External\Connector\ITimetable;
 use Schoolbox\External\Normalise\Timetable\Lesson;
 
-class Timetable extends Base implements TimetableInterface
+class Timetable extends Base implements ITimetable
 {
     /**
      * @inheritdoc

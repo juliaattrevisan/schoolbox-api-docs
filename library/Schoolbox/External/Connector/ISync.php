@@ -11,7 +11,7 @@ namespace Schoolbox\External\Connector;
 
 use Schoolbox\External\Normalise\User;
 
-interface SyncInterface
+interface ISync
 {
     /**
      * Gets a collection of normalized student objects.

@@ -9,7 +9,7 @@
 
 namespace Schoolbox\External\Connector;
 
-interface CommunityPortalInterface
+interface ICommunityPortal
 {
     /**
      * Updates the community portal password for this user.

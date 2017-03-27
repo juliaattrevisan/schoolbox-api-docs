@@ -12,7 +12,7 @@ namespace Schoolbox\External\Connector\Schoolbox\Base;
 use Group;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Base;
-use Schoolbox\External\Connector\UserInterface;
+use Schoolbox\External\Connector\IUser;
 use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Normalise\User\Common\House;
@@ -21,7 +21,7 @@ use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UserRelation;
 
-class User extends Base implements UserInterface
+class User extends Base implements IUser
 {
     // This particular class is a bit of a head-f**k in that this it represents the internal database
     // but is being treated as an external . This creates confusion as to which ID we should be using

@@ -9,10 +9,10 @@
 
 namespace Schoolbox\External\Connector\Tass\Base;
 
-use Schoolbox\External\Connector\ExternalEventsInterface;
+use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 
-class ExternalEvents extends Base implements ExternalEventsInterface
+class ExternalEvents extends Base implements IExternalEvents
 {
     /**
      * @inheritdoc
