@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,54 +7,82 @@
 
 namespace Schoolbox\Application;
 
-
+use Alaress_Date_Locale_Config;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\Application\Kernel;
 use Alaress\Authorizer\Rule;
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
+use Alaress\Session\Factory;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
-use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
-use DebugBar\Bridge\Twig\TwigCollector;
-use Alaress\Session\Factory;
 use Alaress\Web\Output;
 use Alaress\Web\Router\RouterFactory;
-use Alaress_Date_Locale_Config;
 use Aura\Di;
-use Config;
 use Database;
+use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
+use DebugBar\Bridge\Twig\TwigCollector;
 use PDO;
+use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\External\Connector\SyncFactory;
 use Schoolbox\External\Connector\TimetableFactory;
 use Schoolbox\External\Connector\UserFactory;
+use Schoolbox\Error;
+use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
-
-// Learning related uses
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-
-
+use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
+use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork as DueWorkTranslator;
+use Schoolbox\Learning\Assessment\DataModel\Translator\Project as ProjectTranslator;
+use Schoolbox\Learning\Assessment\DataModel\Translator\Quiz as QuizTranslator;
+use Schoolbox\Learning\Assessment\DataModel\Translator\Task as TaskTranslator;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkSubmissionMapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as FeedbackSubSourceDueWork;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
-
+use Schoolbox\Learning\Assessment\Response\DataSource as AssessmentResponseDataSource;
+use Schoolbox\Learning\Assessment\Response\SubSource\DueWork as ResponseSubSourceDueWork;
+use Schoolbox\Learning\Assessment\Response\SubSource\Quiz as ResponseSubSourceQuiz;
+use Schoolbox\Learning\Assessment\Response\SubSource\Task as ResponseSubSourceTask;
+use Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy as TaskFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseMapperProxy;
+use Schoolbox\Learning\Assessment\Transactor as LearningAssessmentTransactor;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-
-use Schoolbox\Error;
 use Schoolbox\Mapper;
+use Schoolbox\Learning\Renderer as LearningRenderer;
+use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
+use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
+use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
+use Schoolbox\Sync\Log\Mapper as SyncLogMapper;
+use Schoolbox\Sync\Provisioner\Provisioner;
+use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\UserMapper;
 use Scrub;
+use Twig_Extension_Core;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
 use Twig_Loader_Filesystem;
@@ -91,11 +118,12 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
         // Store a connector to the Schoolbox internal database
 
-        $di->set('connectorInternal', function() {
+        $di->set('databaseInternal', function() {
 
             // The database connection settings are stored in magical global definitions
 
-            $connectorInternal = DatabaseFactory::CreateMysql();
+            $factory = new DatabaseFactory();
+            $connectorInternal = $factory->createMysql();
             if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd)) {
                 throw new DatabaseException("Unable to connect to Schoolbox database.");
             }
@@ -103,91 +131,16 @@ abstract class AbstractBootstrap implements BootstrapInterface
             return $connectorInternal;
         });
 
-        $di->set('databaseFactory', $di->lazyNew(DatabaseFactory::class));
-
-        // Store a connector to the SIS database
+        // Store a connector to the SIS database(s)
 
         $di->set('databaseExternal', $di->lazy(function() use ($di) {
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
 
-            $factory = new DatabaseFactory();
-
-            // We need to query the internal database to work out what external database
-            // we need to instantiate
-
-            /** @var IConnector $connectorInternal */
-            $connectorInternal = $di->get("connectorInternal");
-
-            // This query gets the external database config values back in a single row for easy
-            // consumption in an array
-
-            $configuration = $connectorInternal->executeQuery("
-                SELECT  `config_type`.`value` AS `type`,
-                        `config_username`.`value` AS `username`,
-                        `config_password`.`value` AS `password`,
-                        `config_hostname`.`value` AS `hostname`,
-                        `config_database`.`value` AS `database`
-                FROM    `config` `config_username`
-                JOIN    `config` `config_password` ON `config_password`.`name` = 'external_db_passwd'
-                JOIN    `config` `config_hostname` ON `config_hostname`.`name` = 'external_db_host'
-                JOIN    `config` `config_database` ON `config_database`.`name` = 'external_db_db'
-                JOIN    `config` `config_type` ON `config_type`.`name` = 'external_type'
-                WHERE   `config_username`.`name` = 'external_db_user';
-            ")->fetch();
-
-            // Work out the database engine based on the SIS they are connecting to
-
-            switch ($configuration['type']) {
-
-                // Microsoft SQL Server
-
-                case 'tass':
-                case 'synergetic':
-                case 'schoolpro':
-                case 'pcschools':
-                case 'maze':
-                case 'isams':
-                case 'humanedge':
-                case 'doublefirst':
-
-                    $connectorExternal =  $factory->createSqlsrv();
-                    break;
-
-                // MySQL
-
-                case 'schoolbox':
-                case 'denbigh':
-
-                    $connectorExternal = $factory->createMysql();
-                    break;
-
-                // IBM DB2
-
-                case 'edumate':
-
-                    $connectorExternal = $factory->createDb2();
-                    break;
-            };
-
-            if (!isset($connectorExternal)) {
-                throw new DatabaseException("Unknown external database type.");
-            }
-
-            if (!$connectorExternal->connect(
-                    $configuration['hostname'],
-                    $configuration['database'],
-                    $configuration['username'],
-                    $configuration['password']
-            )) {
-                throw new DatabaseException("Unable to connect to {$configuration['type']} database.");
-            }
-
-            return $connectorExternal;
+            $factory = new \Schoolbox\Database\Factory();
+            return $factory->getExternalDatabase($config);
         }));
 
-        // Database
-        $di->set('database', $di->lazy(function() {
-            return Database::getInstance();
-        }));
 
         // Configuration
         $di->set('config', $di->lazyNew(\Schoolbox\Config\Loader::class));
@@ -216,6 +169,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         Database::getInstance()->setTimezone($timezone);
         DeprecatedDatabase::getInstance()->setTimezone($timezone);
 
+        $di->set('config', $di->lazyNew(ConfigLoader::class));
         $di->set('notif', $di->lazy(function () {
             // replace this with $di->lazyGetCall() once we upgrade Aura.Di
             return Notifactory::create();
@@ -237,9 +191,12 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'session',
             $di->lazy(
                 function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+
                     $factory = new Factory(
                         $_COOKIE,
-                        $di->get('config'),
+                        $config,
                         $_SERVER['REQUEST_TIME']
                     );
                     $session = $factory->build();
@@ -388,6 +345,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'templateEngine',
             $di->lazy(
                 function () use ($di) {
+                    /** @var IConfigLoader $config */
                     $config = $di->get('config');
 
                     $options = [
@@ -408,15 +366,18 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
                     $twig->addExtension(new Twig_Extension_Debug());
                     $twig->addExtension(new Twig_Extensions_Extension_Text());
-                    $twig->addExtension(new \Schoolbox\Admin\Navigation\Renderer());
-                    $twig->addExtension(new \Schoolbox\Learning\Renderer());
+                    $twig->addExtension(new AdminNavigationRenderer());
+                    $twig->addExtension(new LearningRenderer());
 
                     // HTML Purifier escape strategy
                     // Please use the filter below instead.
-                    $twig->getExtension('core')
-                         ->setEscaper('purify', function ($twig, $string) {
-                             return Scrub::html($string);
-                         });
+
+                    /** @var Twig_Extension_Core $twigCore */
+                    $twigCore = $twig->getExtension('core');
+
+                    $twigCore->setEscaper('purify', function ($twig, $string) {
+                         return Scrub::html($string);
+                     });
 
                     // HTML Purifier filter - known to output safe HTML
                     $twig->addFilter(
@@ -513,9 +474,9 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // TODO unify this definition and the one in Daemon\Bootstrap
         $di->set('ups.logger',
             $di->lazyNew(
-                \Schoolbox\Notif\StorefileLogger::class,
+                NotifStorefileLogger::class,
                 [
-                    'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
+                    'receiver' => $di->lazyNew(StorageMapper::class),
                     'filename' => $di->lazy(function () {
                         return tempnam(sys_get_temp_dir(), 'sb-storefile-');
                     }),
@@ -527,11 +488,11 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set(
             'ups.provisioner',
             $di->lazyNew(
-                \Schoolbox\Sync\Provisioner\Provisioner::class,
+                Provisioner::class,
                 [
                     'rulesetFactory' => $di->lazyNew(\Schoolbox\Sync\Ruleset\Factory::class),
                     'grammarFactory' => $di->lazyNew(
-                        \Schoolbox\Sync\Grammar\Factory::class,
+                        SyncGrammarFactory::class,
                         [
                             'log'        => $di->lazyGet('ups.logger'),
                             'userMapper' => $di->lazy(function () {
@@ -539,16 +500,16 @@ abstract class AbstractBootstrap implements BootstrapInterface
                                 $map->setNotifier(new SilentNotif());
                                 return $map;
                             }),
-                            'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
+                            'ruleMapper' => $di->lazyNew(SyncRuleMapper::class),
                         ]
                     ),
                     'externalUserSource' => $di->lazy(function() use ($di) {
-                        $source = new \Schoolbox\External\Connector\SyncFactory();
+                        $source = new SyncFactory();
                         return $source->build($di);
                     }),
                     'userMapper'     => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
                     'logger'         => $di->lazyGet('ups.logger'),
-                    'logMapper'      => $di->lazyNew(\Schoolbox\Sync\Log\Mapper::class),
+                    'logMapper'      => $di->lazyNew(SyncLogMapper::class),
                 ]
             )
         );
@@ -573,7 +534,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         }));
         
         // LTI Provider mapper
-        $di->set('providerMapper', $di->lazyNew(\Schoolbox\LTI\Provider\Mapper::class));
+        $di->set('providerMapper', $di->lazyNew(LTIProviderMapper::class));
 
         // Register External_Class service
         $di->set('externalClass', $di->lazyNew(\External_Class::class));
@@ -582,14 +543,14 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set(
             'assessmentTranslator',
             $di->lazy(function () use ($di) {
-                $translator = new \Schoolbox\Learning\Assessment\DataModel\Translator(
+                $translator = new AssessmentDataModelTranslator(
                     new \Schoolbox\Learning\MarkScheme\Factory()
                 );
                 $translator
-                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Task())
-                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\DueWork())
-                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Quiz())
-                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Project($translator))
+                    ->addSubTranslator(new TaskTranslator())
+                    ->addSubTranslator(new DueWorkTranslator())
+                    ->addSubTranslator(new QuizTranslator())
+                    ->addSubTranslator(new ProjectTranslator($translator))
                 ;
                 return $translator;
             })
@@ -615,27 +576,27 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
 
         /* DUE WORK SOURCES */
-        $di->set('submissionDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy::class));
-        $di->params[\Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::class);
+        $di->set('submissionDataSource', $di->lazyNew(DueWorkSubmissionMapperProxy::class));
+        $di->params[DueWorkSubmissionMapperProxy::class]['mapper'] = $mapperFactory->getLazy(SubmissionMapper::class);
 
-        $di->set('returnDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy::class));
-        $di->params[\Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::class);
+        $di->set('returnDataSource', $di->lazyNew(DueWorkFeedbackMapperProxy::class));
+        $di->params[DueWorkFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(ReturnedWorkMapper::class);
 
 
         /* QUIZ SOURCES */
-        $di->set('attemptDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy::class));
-        $di->params[\Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(QuizAttemptMapper::class);
+        $di->set('attemptDataSource', $di->lazyNew(QuizAttemptMapperProxy::class));
+        $di->params[QuizAttemptMapperProxy::class]['mapper'] = $mapperFactory->getLazy(QuizAttemptMapper::class);
 
-        $di->set('reviewDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy::class));
-        $di->params[\Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(QuizAttemptMapper::class);
+        $di->set('reviewDataSource', $di->lazyNew(QuizFeedbackMapperProxy::class));
+        $di->params[QuizFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(QuizAttemptMapper::class);
 
 
         /* TASK SOURCES */
-        $di->set('completionDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\Task\Response\MapperProxy::class));
-        $di->params[\Schoolbox\Learning\Assessment\Task\Response\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(\Schoolbox\Assessment\Course\Task\CompletionMapper::class);
+        $di->set('completionDataSource', $di->lazyNew(TaskResponseMapperProxy::class));
+        $di->params[TaskResponseMapperProxy::class]['mapper'] = $mapperFactory->getLazy(TaskCompletionMapper::class);
 
-        $di->set('ratificationDataSource', $di->lazyNew(\Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy::class));
-        $di->params[\Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy::class]['mapper'] = $mapperFactory->getLazy(\Schoolbox\Assessment\Course\Task\CompletionMapper::class);
+        $di->set('ratificationDataSource', $di->lazyNew(TaskFeedbackMapperProxy::class));
+        $di->params[TaskFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(TaskCompletionMapper::class);
 
 
         // Register response data source
@@ -643,10 +604,20 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'responseDataSource',
             $di->lazy(
                 function () use ($di) {
-                    return (new \Schoolbox\Learning\Assessment\Response\DataSource())
-                        ->addSubSource(new \Schoolbox\Learning\Assessment\Response\SubSource\DueWork($di->get('submissionDataSource')))
-                        ->addSubSource(new \Schoolbox\Learning\Assessment\Response\SubSource\Task($di->get('completionDataSource')))
-                        ->addSubSource(new \Schoolbox\Learning\Assessment\Response\SubSource\Quiz($di->get('attemptDataSource')));
+
+                    /** @var \Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy $submissionDataSource  */
+                    $submissionDataSource = $di->get('submissionDataSource');
+
+                    /** @var \Schoolbox\Learning\Assessment\Task\Response\MapperProxy $completionDataSource */
+                    $completionDataSource = $di->get('completionDataSource');
+
+                    /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy $attemptDataSource */
+                    $attemptDataSource = $di->get('attemptDataSource');
+
+                    return (new AssessmentResponseDataSource())
+                        ->addSubSource(new ResponseSubSourceDueWork($submissionDataSource))
+                        ->addSubSource(new ResponseSubSourceTask($completionDataSource))
+                        ->addSubSource(new ResponseSubSourceQuiz($attemptDataSource));
                 }
             )
         );
@@ -656,23 +627,33 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'feedbackDataSource',
             $di->lazy(
                 function () use ($di) {
-                    return (new \Schoolbox\Learning\Assessment\Feedback\DataSource())
-                        ->addSubSource(new \Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork($di->get('returnDataSource')))
-                        ->addSubSource(new \Schoolbox\Learning\Assessment\Feedback\SubSource\Task($di->get('ratificationDataSource')))
-                        ->addSubSource(new \Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz($di->get('reviewDataSource')));
+
+                    /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy $returnDataSource */
+                    $returnDataSource = $di->get('returnDataSource');
+
+                    /** @var \Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy $ratificationDataSource */
+                    $ratificationDataSource = $di->get('ratificationDataSource');
+
+                    /** @var \Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy $reviewDataSource */
+                    $reviewDataSource = $di->get('reviewDataSource');
+
+                    return (new AssessmentFeedbackDataSource())
+                        ->addSubSource(new FeedbackSubSourceDueWork($returnDataSource))
+                        ->addSubSource(new FeedbackSubSourceTask($ratificationDataSource))
+                        ->addSubSource(new FeedbackSubSourceQuiz($reviewDataSource));
                 }
             )
         );
 
-        $di->params[\Schoolbox\Learning\Assessment\Transactor::class] = [
-            'folderMapper'                  => $di->get('mapperFactory')->getLazy(\Schoolbox\Resource\Folder\Mapper::class),
+        $di->params[LearningAssessmentTransactor::class] = [
+            'folderMapper'                  => $di->get('mapperFactory')->getLazy(FolderMapper::class),
             'unitImplementationMapperProxy' => $di->lazyGet('unitImplementationDataSource'),
             'unitSpecificationMapperProxy'  => $di->lazyGet('unitSpecificationDataSource'),
             'assessmentMapperProxy'         => $di->lazyGet('assessmentDataSource'),
             'router'                        => $di->lazyGet('router'),
         ];
 
-        $di->set('transactor', $di->lazyNew(\Schoolbox\Learning\Assessment\Transactor::class));
+        $di->set('transactor', $di->lazyNew(LearningAssessmentTransactor::class));
 
         // Register default grade group
         $di->set(
