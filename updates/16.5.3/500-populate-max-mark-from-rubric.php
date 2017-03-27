@@ -129,7 +129,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $log->log($logLevel, $logMessage);
 
     // Log 'MarkType' results at appropriate level
-    $logMessage = sprintf('%d rubric_descriptors updated (%d warnings), %d failures', $successMarkTypeCount, $warningMarkTypeCount, $failureMarkTypeCount);
+    $logMessage = sprintf('%d mark_type updated (%d warnings), %d failures', $successMarkTypeCount, $warningMarkTypeCount, $failureMarkTypeCount);
     $logLevel = $failureMarkTypeCount ? Logger::ERROR : ($warningMarkTypeCount ? Logger::WARNING : Logger::INFO);
     $log->log($logLevel, $logMessage);
 
