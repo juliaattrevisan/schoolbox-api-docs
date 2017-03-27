@@ -569,7 +569,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
             if ($groupHandler->isParent()) {
                 $paths = array(
-                    $settings['baseUri'] . '/reports/'. $_SESSION['year'] . '/',
+                    $settings['baseUri'] . '/reports/'. $_SESSION['username'] . '/',
                 );
             }
         } elseif ($site_location == 'sicol') {
