@@ -11,7 +11,7 @@ use Alaress\Rules\Lang\SkipException;
 use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
@@ -102,25 +102,26 @@ class Provisioner
      *
      * @param Ruleset\Factory $rulesetFactory
      * @param Grammar\Factory $grammarFactory
-     * @param SyncInterface   $externalUserSource
-     * @param UserMapper      $userMapper
+     * @param ISync $externalUserSource
+     * @param UserMapper $userMapper
      * @param CacheableLoggerInterface $logger
-     * @param Log\Mapper      $logMapper
+     * @param Log\Mapper $logMapper
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
         Grammar\Factory $grammarFactory,
-        SyncInterface $externalUserSource,
+        ISync $externalUserSource,
         UserMapper $userMapper,
         CacheableLoggerInterface $logger,
         Log\Mapper $logMapper
-    ) {
-        $this->rulesetFactory     = $rulesetFactory;
-        $this->grammarFactory     = $grammarFactory;
+    )
+    {
+        $this->rulesetFactory = $rulesetFactory;
+        $this->grammarFactory = $grammarFactory;
         $this->externalUserSource = $externalUserSource;
-        $this->userMapper         = $userMapper;
-        $this->logger             = $logger;
-        $this->logMapper          = $logMapper;
+        $this->userMapper = $userMapper;
+        $this->logger = $logger;
+        $this->logMapper = $logMapper;
     }
 
     /**
@@ -138,7 +139,7 @@ class Provisioner
     /**
      * Runs the UPS.
      *
-     * @param bool   $update      If true, updates - otherwise, performs a dry run.
+     * @param bool $update If true, updates - otherwise, performs a dry run.
      * @param string $forRoleType If set, provisions this role type
      *                            (and only this role type) regardless of if
      *                            it's enabled or not.
@@ -219,20 +220,20 @@ class Provisioner
                         $ruleset->hydrate($externalUser, $internalUser);
                     } catch (SkipException $e) {
                         $commonContext['action'] = 'skip';
-                        $this->logger->notice("Skipping user: ".$e->getMessage(), $commonContext);
+                        $this->logger->notice("Skipping user: " . $e->getMessage(), $commonContext);
                         ++$skipped;
                         continue;
 
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
-                        $this->logger->error("Error provisioning user: ".$e->getMessage(), array_merge($commonContext, [ 'error' => $e ]));
+                        $this->logger->error("Error provisioning user: " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
                         ++$skipped;
                         ++$errors;
                         continue;
                     }
 
                     // get a diff of the original user and what we've ended up with
-                    $diff = $this->userMapper->diff($originalUser, $internalUser, ['old','new']);
+                    $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
                     $originalName = ($action == 'create') ? "New user ({$internalUser->formatName()})" : $originalUser->formatName();
 
@@ -241,9 +242,9 @@ class Provisioner
                         || count($internalUser->getUserAccessWrite())
                         || count($internalUser->getUserAccessRemove())
                     ) {
-                        $level   = Logger::NOTICE;
+                        $level = Logger::NOTICE;
                         $message = $update ? "Preparing to $action $originalName" : "$originalName would have been {$action}d";
-                        $context = array_merge($commonContext, [ 'diff' => $diff ]);
+                        $context = array_merge($commonContext, ['diff' => $diff]);
 
                         if ($action == 'update') {
                             ++$updated;
@@ -252,7 +253,7 @@ class Provisioner
                         }
 
                     } else {
-                        $level   = Logger::DEBUG;
+                        $level = Logger::DEBUG;
                         $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': data is unchanged';
                         $context = $commonContext;
 
@@ -261,23 +262,22 @@ class Provisioner
 
                     $this->logger->log($level, $message, $context);
 
-                    try{
-                        if(!$update){
+                    try {
+                        if (!$update) {
                             // Dry Run
                             $this->sanityCheck($internalUser);
                             $this->logger->debug("User record passes sanity check", $commonContext);
-                        }
-                        else {
+                        } else {
                             // Save includes pre-save sanity check
                             $this->userMapper->save($internalUser);
                             $this->logger->debug("User record passes sanity check", $commonContext);
                             $this->logger->debug("User record saved", $commonContext);
                         }
                     } catch (UnexpectedValueException $e) {
-                        $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
+                        $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, ['error' => $e]));
                         continue;
                     } catch (\Exception $e) {
-                        $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e->getMessage() ]));
+                        $this->logger->error("User record save failed!", array_merge($commonContext, ['error' => $e->getMessage()]));
                     }
                 }
 
@@ -369,12 +369,13 @@ class Provisioner
      * @throws UnexpectedValueException if multiple new users were created with same username
      * @return bool Always true, as long as it doesn't throw
      */
-    protected function verifyUniqueNewUserUsername(User $internalUser){
+    protected function verifyUniqueNewUserUsername(User $internalUser)
+    {
 
         // Is this a new user?
-        if(null === $internalUser->getId()){
+        if (null === $internalUser->getId()) {
             // Have we already created a new user with this username?
-            if(isset($this->newUsernameCache[$internalUser->getUsername()])){
+            if (isset($this->newUsernameCache[$internalUser->getUsername()])) {
                 throw new UnexpectedValueException(
                     sprintf('A new user with username "%s" was already created. Other user external id: "%s"',
                         $internalUser->getUsername(),
