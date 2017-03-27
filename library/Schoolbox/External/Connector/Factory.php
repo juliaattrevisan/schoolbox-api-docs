@@ -35,28 +35,28 @@ class Factory
     public function build($config, $databaseExternal, $type)
     {
         $offlineBase = "\\Schoolbox\\External\\Connector\\Offline\\";
-        $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type')) . "\\";
-        $prefixSchool = $prefixBase . ucwords($config->get('site_location')) . "\\";
+        $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type'));
+        $schoolCode = ucwords($config->get('site_location'));
 
         switch ($type) {
             case self::EXTERNAL_USER:
-                $classBase = "{$prefixBase}User";
-                $classSchool = "{$prefixSchool}\\User";
+                $classBase = "{$prefixBase}\\Base\\User";
+                $classSchool = "{$prefixBase}\\{$schoolCode}\\User";
                 break;
 
             case self::EXTERNAL_TIMETABLE:
-                $classBase = "{$prefixBase}Timetable";
-                $classSchool = "{$prefixSchool}Timetable";
+                $classBase = "{$prefixBase}\\Base\\Timetable";
+                $classSchool = "{$prefixBase}\\{$schoolCode}\\Timetable";
                 break;
 
             case self::EXTERNAL_SYNC:
-                $classBase = "{$prefixBase}Sync";
-                $classSchool = "{$prefixSchool}Sync";
+                $classBase = "{$prefixBase}\\Base\\Sync";
+                $classSchool = "{$prefixBase}\\{$schoolCode}\\Sync";
                 break;
 
             case self::EXTERNAL_EVENTS:
-                $classBase = "{$prefixBase}ExternalEvents";
-                $classSchool = "{$prefixSchool}ExternalEvents";
+                $classBase = "{$prefixBase}\\Base\\ExternalEvents";
+                $classSchool = "{$prefixBase}\\{$schoolCode}\\ExternalEvents";
                 break;
 
             case self::EXTERNAL_COMMUNITY_PORTAL:
@@ -65,15 +65,15 @@ class Factory
 
                 if ($config->get('external_type') == 'Synergetic' && $config->get('synergetic_password_reset')) {
 
-                    $classBase = "{$prefixBase}ExternalEvents";
-                    $classSchool = "{$prefixSchool}ExternalEvents";
+                    $classBase = "{$prefixBase}\\Base\\ExternalEvents";
+                    $classSchool = "{$prefixBase}\\{$schoolCode}\\ExternalEvents";
 
                 } else {
 
                     // Everyone else can just get the offline class
 
-                    $classBase = "{$offlineBase}ExternalEvents";
-                    $classSchool = "{$offlineBase}ExternalEvents";
+                    $classBase = "{$offlineBase}\\Base\\ExternalEvents";
+                    $classSchool = "{$offlineBase}\\{$schoolCode}\\ExternalEvents";
                 }
 
                 break;
