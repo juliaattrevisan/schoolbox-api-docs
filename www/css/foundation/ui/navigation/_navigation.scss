@@ -247,7 +247,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 	@media #{$small-only} {
-		height: $tabbar-height * 2;
 		ul{
 			padding: 0;
 			position: absolute;
