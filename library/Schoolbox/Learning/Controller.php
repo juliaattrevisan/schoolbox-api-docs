@@ -610,7 +610,7 @@ class Controller extends Base
 
         // Grab the students conversation history
 
-        $conversation = new Conversation($viewee, $subject);
+        $conversation = new Conversation($this->getConfigLoader(), $viewee, $subject);
 
         // Squeeze it on out
 

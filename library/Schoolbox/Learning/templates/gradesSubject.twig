@@ -315,10 +315,9 @@
             </div>
         </div>
     {% endif %}
-
+    {% if canComment %}
     <div class="row">
         <div class="small-12 columns">
-            {% if canComment %}
                 <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                     <input type="hidden" name="studentId" value="{{ student.id }}"/>
                     <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
@@ -335,10 +334,10 @@
                     </div>
                     <a class="button expand submit" data-comment-post="new">Post</a>
                 </form>
-            {% endif %}
+
         </div>
     </div>
-
+    {% endif %}
     <div class="row">
         <div class="small-12 island">
             <section>
