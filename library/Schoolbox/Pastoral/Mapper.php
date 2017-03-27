@@ -303,7 +303,7 @@ class Mapper extends BaseMapper
         }
 
         if ($severity != '') {
-            $criteria[] = "sv.order >= '{$severity}''";
+            $criteria[] = "sv.order >= '{$severity}'";
         }
         if ($students != '') {
             $criteria[] = "student_id IN ({$students})";
