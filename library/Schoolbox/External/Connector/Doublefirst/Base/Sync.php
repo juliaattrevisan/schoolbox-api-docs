@@ -162,8 +162,8 @@ class Sync implements SyncInterface
             FROM        StaffPersonalDetails  spd
             JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
             LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
-            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = '2'
-            LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = 'D321'
+            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = 'D321'
+            LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = '2'
             LEFT JOIN   LookupDetails cat ON cat.LookupID = '1203' AND cat.LookupDetailsID = spd.StaffCategory
             LEFT JOIN   LookupDetails title ON title.LookupID = '3012' AND title.LookupDetailsID = spd.Title
             ORDER BY    spd.SurName, 
