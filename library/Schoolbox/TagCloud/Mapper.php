@@ -54,7 +54,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      *
      * @return static
      */
-    public static function getInstance($tableName, $fieldId, $fieldName)
+    public static function getInstanceByName($tableName, $fieldId, $fieldName)
     {
         $instance_name = get_called_class()."_".$tableName."_".$fieldId."_".$fieldName;
 
@@ -63,8 +63,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             self::$instance[$instance_name]->postSetup();
         }
 
-        return self::$instance[$instance_name];
-    }
+        return self::$instance[$instance_name];    }
 
     /**
      * Setup mapping using the table/field names specified during construction

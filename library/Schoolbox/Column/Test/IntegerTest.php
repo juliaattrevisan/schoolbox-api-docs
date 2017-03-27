@@ -18,11 +18,17 @@ class IntegerTest extends TestCase {
 	 */
 	protected $object;
 
-	public function setupObject() {
+    /**
+     * @inheritdoc
+     */
+    public function setupObject() {
 		$this->object = new Integer();
 	}
 
-	public function getTestHydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestHydrate() {
 		return array(
 			array(true, null),
 			array(false, null),
@@ -43,7 +49,10 @@ class IntegerTest extends TestCase {
 		);
 	}
 
-	public function getTestDehydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestDehydrate() {
 		return array(
 			array(true, null),
 			array(false, null),

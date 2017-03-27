@@ -7,7 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-
 namespace Schoolbox\Column\Test;
 
 use Schoolbox\Column\Time;
@@ -16,17 +15,22 @@ use \Alaress_Date_Format as DateWrapper;
 
 class TimeTest extends DatetimeTest
 {
-
     /**
     * @var Time
     */
     protected $object;
 
+    /**
+     * @inheritdoc
+     */
     public function setupObject()
     {
         $this->object = new Time();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestHydrate()
     {
         return array(
@@ -46,6 +50,9 @@ class TimeTest extends DatetimeTest
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestDehydrate()
     {
         return array(

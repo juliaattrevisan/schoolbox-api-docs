@@ -16,10 +16,10 @@ class Timespan implements IColumnType {
      * Translates a value from a database field or other data store, into a
      * string, integer or object value for use in a model object.
      *
-     * @param string            $value
+     * @param null|int            $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return DateInterval
+     * @return null|DateInterval
      */
     public function hydrate($value, $mapper = null) {
         if (!is_numeric($value)) {
@@ -44,10 +44,10 @@ class Timespan implements IColumnType {
      * Translates a value from a value in a model object into a value for a
      * database field or other data store.
      *
-     * @param DateInterval      $value
+     * @param null|int|DateInterval|string $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return string
+     * @return int|null
      */
     public function dehydrate($value, $mapper = null) {
         $hours    = null;

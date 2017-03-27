@@ -18,10 +18,16 @@ class TimespanTest extends TestCase {
      */
     protected $object;
 
+    /**
+     * @inheritdoc
+     */
     public function setupObject() {
         $this->object = new Timespan();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTestHydrate() {
         $invertedInterval1 = new DateInterval('PT23H59M59S');
         $invertedInterval1->invert = 1;
@@ -44,12 +50,8 @@ class TimespanTest extends TestCase {
     }
 
     /**
-     * @dataProvider getTestHydrate
+     * @inheritdoc
      */
-    public function testHydrate($input, $expected_output) {
-        $this->assertEquals($expected_output, $this->object->hydrate($input));
-    }
-
     public function getTestDehydrate() {
         $invertedInterval = new DateInterval('PT27H15M');
         $invertedInterval->invert = 1;
@@ -86,9 +88,18 @@ class TimespanTest extends TestCase {
     }
 
     /**
-     * @dataProvider getTestDehydrate
+     * @param null|int $input
+     * @param null|DateInterval $expected_output
      */
-    public function testDehydrate($input, $expected_output) {
+    public function testHydrate($input = null, $expected_output = null) {
+        $this->assertEquals($expected_output, $this->object->hydrate($input));
+    }
+
+    /**
+     * @param null|int|DateInterval|string $input
+     * @param null|int $expected_output
+     */
+    public function testDehydrate($input = null, $expected_output = null) {
         $this->assertEquals($expected_output, $this->object->dehydrate($input));
     }
 }

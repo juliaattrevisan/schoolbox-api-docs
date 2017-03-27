@@ -12,7 +12,6 @@ use Component_Homepage_ControllerAbstract;
 use Schoolbox\Permission\Access\UserAccess;
 use News;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Category\NewsMapper;
 
 class Controller extends Component_Homepage_ControllerAbstract
@@ -33,12 +32,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     protected $source;
 
     /**
-     * @var FolderMapper
-     */
-    protected $folderMapper = null;    
-
-
-    /**
      * Loads the grid component into its set configuration.
      *
      * @return true
@@ -46,8 +39,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function execute()
     {
         $this->newsHandler  = new CategoryNews();
-        $this->setFolderMapper(new FolderMapper());
-
         $this->source = $this->getContext();
 
         if (is_numeric($this->getConfig('src'))) {

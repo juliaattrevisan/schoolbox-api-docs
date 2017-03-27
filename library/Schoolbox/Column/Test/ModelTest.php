@@ -30,6 +30,9 @@ class ModelTest extends TestCase {
 	 */
 	protected $test_mapper;
 
+    /**
+     * @inheritdoc
+     */
 	public function setupObject() {
 		$this->object = new Model();
 		$this->test_model = new TestModel();
@@ -59,31 +62,54 @@ class ModelTest extends TestCase {
 			->will($this->returnValue($this->test_model));
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function getTestHydrate() {
 		return array();
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function getTestDehydrate() {
 		return array();
 	}
 
-	public function testHydrate() {
+    /**
+     * Function parameters not used, only kept to maintain compatibility with parent
+     * @param null $input
+     * @param null $expected_output
+     */
+    public function testHydrate($input = null, $expected_output = null) {
 		$hydrate = $this->object->hydrate(1, $this->test_mapper);
 		$this->assertSame(1, $hydrate->getId());
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function testHydrateNull() {
 		$hydrate = $this->object->hydrate(null, $this->test_mapper);
 		$this->assertSame(null, $hydrate->getId());
 	}
 
-	public function testDehydrate() {
+    /**
+     * Function parameters not used, only kept to maintain compatibility with parent
+     * @param null $input
+     * @param null $expected_output
+     */
+    public function testDehydrate($input = null, $expected_output = null) {
 		$this->assertSame(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function testDehydrateNull() {
 		$this->assertSame(null, $this->object->dehydrate(null, $this->test_mapper));
 	}
+
 	/**
 	 * Test when dehydrating with an alternate field name.
 	 */
