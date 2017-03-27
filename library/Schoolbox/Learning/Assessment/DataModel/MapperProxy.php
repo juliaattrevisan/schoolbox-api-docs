@@ -880,8 +880,10 @@ class MapperProxy
         }
 
         // Window before / after filter (an ADF)
-        if ($options['window_open'] instanceof \Alaress_Date_Format && !$options['window_open']->isNull()
-            && $options['window_close'] instanceof \Alaress_Date_Format && !$options['window_close']->isNull()
+        if ($options['window_open'] instanceof \Alaress_Date_Format
+            && $options['window_close'] instanceof \Alaress_Date_Format
+            && !$options['window_open']->isNull()
+            && !$options['window_close']->isNull()
         ) {
             // NOT (assess.end < window.open OR assess.start >= window.close)
             $builder->notAny(
