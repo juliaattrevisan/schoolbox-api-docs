@@ -11,6 +11,7 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
+use Alaress_Date_Format;
 use Alaress\DebugBar\Instance as DebugBar;
 use MSSQL;
 use Schoolbox\External\Connector\CommunityPortalInterface;
@@ -35,9 +36,9 @@ class CommunityPortal implements CommunityPortalInterface
      */
     public function __construct($key, $initializationVector)
     {
-        $this->key                  = $key;
+        $this->key = $key;
         $this->initializationVector = $initializationVector;
-        $this->database             = MSSQL::getInstance();
+        $this->database = MSSQL::getInstance();
 
         if (DebugBar::isEnabled()) {
             $this->database->installCollector();
@@ -52,8 +53,8 @@ class CommunityPortal implements CommunityPortalInterface
     /**
      * Updates the community portal password for this user.
      *
-     * @param  string $communityId
-     * @param  string $newPassword
+     * @param string $communityId
+     * @param string $newPassword
      * @return bool
      * @throws UnexpectedValueException if either key or IV was not set
      */
@@ -61,20 +62,71 @@ class CommunityPortal implements CommunityPortalInterface
     {
         $encryptedPassword = $this->encryptPassword($newPassword);
 
-        $query = "
-            UPDATE CommunityLogins
-            SET    Password = {$this->database->smartQuote($encryptedPassword)}
-            WHERE  ID = {$this->database->smartQuote($communityId)}
-        ";
+        // Check to see if they have an existing record in the 'CommunityLogins' table
+
+        $result = $this->database->query(
+            "
+                SELECT    COUNT(*) 
+                FROM      [dbo].[CommunityLogins] 
+                WHERE     [ID] = {$this->database->smartQuote($communityId)}
+            "
+        );
+
+        $count = $this->database->getOne($result);
+
+        if ($count > 0) {
+
+            // Existing community login record, just update the password
+
+            $query = "
+                UPDATE    [dbo].[CommunityLogins]
+                SET       [Password] = {$this->database->smartQuote($encryptedPassword)}
+                WHERE     [ID] = {$this->database->smartQuote($communityId)}
+            ";
+
+        } else {
+
+            // No existing community login record, need to insert one for this to have any chance of doing something
+
+            $date = Alaress_Date_Format::now()->getDatabase();
+
+            $query = "
+                INSERT INTO [dbo].[CommunityLogins]
+                (
+                    [ID],
+                    [Type],
+                    [Password],
+                    [LastLoginDate],
+                    [LoginType],
+                    [SecurityTokenGuid],
+                    [SecurityTokenIssueDateTime],
+                    [PasswordHashed],
+                )
+                VALUES
+                (
+                    {$this->database->smartQuote($communityId)},
+                    'CP',
+                    {$this->database->smartQuote($encryptedPassword)},
+                    {$date},
+                    '',
+                    NULL,
+                    NULL,
+                    ''
+                )
+            ";
+        }
 
         $this->database->query($query);
+
+        // If one or more rows were affected then this must have done something positive... right?
+
         return intval($this->database->getOne('SELECT @@ROWCOUNT')) > 0;
     }
 
     /**
      * Encrypts this plaintext password.
      *
-     * @param  string $plaintext
+     * @param string $plaintext
      * @return string
      * @throws UnexpectedValueException if either key or IV was not set
      */
