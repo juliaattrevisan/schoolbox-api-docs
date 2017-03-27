@@ -48,22 +48,22 @@ if (isset($opts['v'])) {
     }
 }
 
-$limits = array(
+$limits = [
     0 => 500, // nil verbosity: exceptional behaviour only
     1 => 250, // min verbosity: significant events
     2 => 200, // mod verbosity: most things
     3 => 100  // max verbosity: EV-ER-Y-THING...
-);
+];
 
-$d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$threshold], array('truemem'));
+$d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$threshold], [ 'truemem' ]);
 
-$d->info("Starting schedule diagnostics...");
+$d->info('Starting schedule diagnostics...');
 
 if ($perform) {
-    $d->warning("Running with the safety off, you have 3 seconds to change your mind");
+    $d->warning('Running with the safety off, you have 3 seconds to change your mind');
     sleep(3);
 } else {
-    $d->notice("Doing diagnostic only, no data will be harmed (despite what messages say)");
+    $d->notice('Doing diagnostic only, no data will be harmed (despite what messages say)');
 }
 
 set_error_handler(
@@ -83,7 +83,7 @@ DeprecatedDatabase::getInstance();
 foreach ($sqlq as $qi) {
 
     // do this for every message that comes in
-    $d->info("Processing message from SQL", array('char' => '>'));
+    $d->info('Processing message from SQL', [ 'char' => '>' ]);
 
     Database::reinitialise();
     DeprecatedDatabase::reinitialise();
@@ -93,7 +93,7 @@ foreach ($sqlq as $qi) {
 
         // if the interrogation says to dismiss the message, we do
         if (interrogate($event, $d, $kernel->getDependencyInjector())) {
-            $d->error("Message broken");
+            $d->error('Message broken');
 
             if ($perform) {
                 // split this message off onto a special queue
@@ -102,23 +102,23 @@ foreach ($sqlq as $qi) {
             }
         }
         else {
-            $d->notice("Message retained", array('char' => '+'));
+            $d->notice('Message retained', [ 'char' => '+' ]);
         }
 
     } catch (RuntimeException $e) {
         // this message is can't be parsed, so we ACK it to make it go away
-        $d->error("RuntimeException: ".$e->getMessage());
-        $d->notice("Message unparseable", array('char' => '-'));
+        $d->error('RuntimeException: ' . $e->getMessage());
+        $d->notice('Message unparseable', [ 'char' => '-' ]);
 
     } catch (ScheduleException $e) {
         // we're happy to ignore this, it just means no scheduling strategy exists for this Model
         $d->warning('Schedule Exception: ' . $e->getMessage());
-        $d->notice("Message ignorable", array('char' => '-'));
+        $d->notice('Message ignorable', [ 'char' => '-' ]);
 
     } catch (CompressionException $e) {
         // this message is unparseable, so we'll eventually ACK it to make it go away
         $d->error('Compression Exception: ' . $e->getMessage());
-        $d->notice("Message unparseable", array('char' => '-'));
+        $d->notice('Message unparseable', [ 'char' => '-' ]);
 
     }
 
@@ -134,13 +134,13 @@ $loop = \React\EventLoop\Factory::create();
 
 $stompFactory = new \React\Stomp\Factory($loop);
 
-$stomp = $stompFactory->createClient(array(
+$stomp = $stompFactory->createClient([
     'host'      => Cfg::get('amqp_host'),
     'port'      => Cfg::get('amqp_stomp_port'),
     'vhost'     => Cfg::get('amqp_vhost'),
     'login'     => Cfg::get('amqp_user'),
     'passcode'  => Cfg::get('amqp_pass'),
-));
+]);
 
 $amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
 $amqpConn->declareQueue(INSTANCE_ID.'.sb.reviewsched');
@@ -164,7 +164,7 @@ $stomp->connect()->then(function (Stomp\Client $stomp) use ($d, $loop, $perform,
         $date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
 
         // do this for every message that comes in
-        $d->info("Processing message (arrived at $date)", array('char' => '>'));
+        $d->info("Processing message (arrived at $date)", [ 'char' => '>' ]);
 
         Database::reinitialise();
         DeprecatedDatabase::reinitialise();
@@ -183,7 +183,7 @@ $stomp->connect()->then(function (Stomp\Client $stomp) use ($d, $loop, $perform,
             }
 
         } else {
-            $d->notice("Message retained", array('char' => '+'));
+            $d->notice("Message retained", [ 'char' => '+' ]);
         }
 
     });
@@ -219,10 +219,10 @@ function extractEvent($object)
             return $event;
         }
 
-        throw new RuntimeException("Could not unserialize message data");
+        throw new RuntimeException('Could not unserialize message data');
     }
 
-    throw new RuntimeException("Cannot extract event data from given object");
+    throw new RuntimeException('Cannot extract event data from given object');
 }
 
 /**
@@ -265,7 +265,7 @@ function verifyFrameTrigger(Frame $input, LoggerInterface $log)
                 }
 
             } else {
-                $log->warning("Could not test callback, is not an array");
+                $log->warning('Could not test callback, is not an array');
             }
         }
 
@@ -303,7 +303,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
             $exitCode = pcntl_wexitstatus($status);
             // if zero exit code, we want to retain this message
             if ($exitCode === 0) {
-                $log->notice("All clear!");
+                $log->notice('All clear!');
                 return false;
             }
 
@@ -318,8 +318,8 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
     register_shutdown_function(function (LoggerInterface $d) {
         $last = error_get_last();
 
-        if (in_array($last['type'], array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR))) {
-            $d->error(sprintf("%s in %s:%s", $last['message'], $last['file'], $last['line']));
+        if (in_array($last['type'], [ E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR ], true)) {
+            $d->error(sprintf('%s in %s:%s', $last['message'], $last['file'], $last['line']));
             exit(1);
         }
     }, $log);

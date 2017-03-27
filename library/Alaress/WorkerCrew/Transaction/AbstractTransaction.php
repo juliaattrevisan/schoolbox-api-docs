@@ -74,7 +74,7 @@ abstract class AbstractTransaction implements ITransaction
         if(!$this->isTicking()) {
             $this->resetTimer();
         }
-        $data = $this->timer->getData() ?: array();
+        $data = $this->timer->getData() ?: [];
         $data[$key] = $value;
         $this->timer->setData($data);
 

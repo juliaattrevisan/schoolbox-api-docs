@@ -55,7 +55,7 @@ abstract class AMQPConnector implements AMQPInterface {
 	/**
 	 * @param array $settings
 	 */
-	public function __construct($settings = array()) {
+	public function __construct($settings = []) {
 		foreach($settings as $property => $value) {
 			if(property_exists($this, $property)) {
 				$this->$property = $value;
@@ -64,7 +64,7 @@ abstract class AMQPConnector implements AMQPInterface {
 
 		// override any naughty settings
 		$this->conn = null;
-		$this->channels = array();
+		$this->channels = [];
 	}
 
 
@@ -292,7 +292,7 @@ abstract class AMQPConnector implements AMQPInterface {
      * @param string             $channelId
      * @return $this
      */
-	public function publish($message, $routingKey, $properties = array(), $channelId = null)
+	public function publish($message, $routingKey, $properties = [], $channelId = null)
     {
         $exchange = isset($properties['exchange'])
             ? $properties['exchange']
@@ -302,12 +302,12 @@ abstract class AMQPConnector implements AMQPInterface {
 
 		// wrap message in object if it's not already
 		if(!$message instanceof AMQPMessage) {
-			$properties = array(
+			$properties = [
 				'message_id'    => $this->hashMessage($message, $channelId),
 				'delivery_mode' => $this->persist,
 				'timestamp'     => isset($properties['timestamp']) ? $properties['timestamp'] : time(),
 				'expiration'    => isset($properties['expiration']) ? $properties['expiration'] : $this->expiry
-			);
+            ];
 			$message = new AMQPMessage($message, $properties);
 		}
 		$this->getChannel($channelId)->basic_publish($message, $exchange, $routingKey);

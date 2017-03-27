@@ -33,12 +33,12 @@ foreach ($fields as $k => $name) {
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Route Worker', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Route Worker', [
     'errors' => E_ALL,
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'fields'  => array_values($fields),
 
-));
+]);
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log) {
 

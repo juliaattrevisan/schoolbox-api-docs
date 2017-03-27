@@ -107,7 +107,7 @@ class Dispatcher implements DispatcherInterface
         $this->strat->penqueue($identifier, $command, [ $data ]);
 
         // store the element locally
-        $this->q->enqueue(array($identifier, $command, $data));
+        $this->q->enqueue([ $identifier, $command, $data ]);
         $this->log->info("Enqueued '$command': queue length is " . $this->q->count());
 
         if ($qLength >= $this->strat->getWarningQueueLength()) {
@@ -140,7 +140,7 @@ class Dispatcher implements DispatcherInterface
         // if there's a timer, use it, otherwise create it
         if (!($this->timer instanceof TimerInterface)) {
             $this->log->debug("Creating timer to fire at {$rate}ms intervals");
-            $this->timer = $this->loop->addPeriodicTimer($rate / 1000, array($this, 'dispatch'));
+            $this->timer = $this->loop->addPeriodicTimer($rate / 1000, [ $this, 'dispatch' ]);
         }
     }
 
@@ -204,7 +204,7 @@ class Dispatcher implements DispatcherInterface
                 throw $e;
             } catch(Exception $e) {
                 // we need to catch (almost) any and all exception here, lest we explode our reactor
-                $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), array($e));
+                $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ $e ]);
             }
             // regardless of whether or not we succeeded, we've finished handling this message, so dequeue it
             $this->strat->pdequeue($identifier);
@@ -217,9 +217,9 @@ class Dispatcher implements DispatcherInterface
             $this->log->debug("No workers available, setting healthcheck timeout for {$timeout}ms");
             // detach and wait for pool to notify us of a free worker
             $this->detach();
-            $this->pool->once('ready', array($this, 'attach'));
+            $this->pool->once('ready', [ $this, 'attach' ]);
             // attach a timer to check the health of the pool every minute until a worker returns and cancels it
-            $this->timer = $this->loop->addPeriodicTimer($timeout / 1000, array($this->pool, 'healthCheck'));
+            $this->timer = $this->loop->addPeriodicTimer($timeout / 1000, [ $this->pool, 'healthCheck' ]);
             return;
         }
 
@@ -228,14 +228,14 @@ class Dispatcher implements DispatcherInterface
             // we obtained the data from q::bottom() so just drop the reference
             $this->q->dequeue();
             $pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
-            $this->log->info("Command '$cmd' pushed to worker {{$pid}}", array('char' => '>'));
+            $this->log->info("Command '$cmd' pushed to worker {{$pid}}", [ 'char' => '>' ]);
         } catch(IOException $e) {
             $this->log->warning("Could not communicate with worker: " . $e->getMessage());
         } catch(RuntimeException $e) {
             $this->log->critical("Failed to spawn worker: " . $e->getMessage());
         } catch(Exception $e) {
             // we need to catch any and all exception here, lest we explode our reactor
-            $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), array($e));
+            $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ $e ]);
         }
 
     }

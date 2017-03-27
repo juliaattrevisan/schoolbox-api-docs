@@ -24,7 +24,7 @@ use Schoolbox\Realtime\Timetable\TimetableScheduler;
  * @version     SVN: $Id$
  */
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
 $opts   = getopt('v', $fields);
 
 foreach ($fields as $k => $name) {
@@ -38,11 +38,11 @@ $flags = implode(' ', array_slice($argv, 1));
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Bell', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Bell', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'fields'  => array_values($fields),
     'flags'   => $flags
-));
+]);
 
 
 

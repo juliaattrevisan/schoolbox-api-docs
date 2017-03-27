@@ -27,12 +27,12 @@ $flags = implode(' ', array_slice($argv, 1));
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'errors'  => E_ALL,
     'fields'  => array_keys($opts),
     'flags'   => $flags,
-));
+]);
 
 
 // ROUTING APP

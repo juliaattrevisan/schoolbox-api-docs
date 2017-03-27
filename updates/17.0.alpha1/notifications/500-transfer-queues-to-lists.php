@@ -13,7 +13,6 @@
 use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\Bunny\BunnyControl;
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Queue\RedisQueue;
 use Aura\Di;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
@@ -22,14 +21,14 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\MessageList\Unread;
 
 
-$opts = require_once __DIR__ . '/../../../conf/core/require-cli.php';
+$opts = require  __DIR__ . '/../../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'errors'  => E_ALL,
     'fields'  => array_keys($opts),
-));
+]);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log) {
 
@@ -81,7 +80,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log) {
                     $log->info("Deleting {$instance->getBaseHash()}:{$instance->getParamHash()} from `$queueName`", [ 'char' => '-' ]);
 
                 } catch (InvalidArgumentException $e) {
-                    $log->warning("Invalid message payload, deleting message");
+                    $log->warning('Invalid message payload, deleting message');
                 }
 
                 // goodbye mr anderson

@@ -85,9 +85,9 @@ class Scheduler extends AbstractScheduler implements IConsumer
         $this->postman   = $postman;
 
         // register signal listeners
-        $this->on(SIGHUP, array($this, 'onHangup'));
-        $this->on(SIGINT, array($this, 'onInterrupt'));
-        $this->on(SIGTERM, array($this, 'onTerminate'));
+        $this->on(SIGHUP, [ $this, 'onHangup' ]);
+        $this->on(SIGINT, [ $this, 'onInterrupt' ]);
+        $this->on(SIGTERM, [ $this, 'onTerminate' ]);
     }
 
 
@@ -131,7 +131,7 @@ class Scheduler extends AbstractScheduler implements IConsumer
      */
     public function onMessage($trigger, IResolver $resolver)
     {
-        $this->log->info("Received trigger to schedule: {$trigger->getIdString()}", array('char' => '>'));
+        $this->log->info("Received trigger to schedule: {$trigger->getIdString()}", [ 'char' => '>' ]);
 
         try {
             // attempt to schedule this trigger - there are a fair few things that could go wrong...
@@ -149,14 +149,14 @@ class Scheduler extends AbstractScheduler implements IConsumer
 
         } catch (RuntimeException $e) {
             $truncated = substr($trigger, 0, 64);
-            $this->log->critical("Could not decode '$truncated...' to schedule event", array($e));
+            $this->log->critical("Could not decode '$truncated...' to schedule event", [ $e ]);
             // this message is can't be parsed, so we ACK it to make it go away
 
         } catch (CompressionException $e) {
-            $this->log->debug('Failed to inflate message: ' . $e->getMessage(), array($e));
+            $this->log->debug('Failed to inflate message: ' . $e->getMessage(), [ $e ]);
 
         } catch (ErrorException $e) {
-            $this->log->critical('Error Exception: '. $e->getMessage(), array($e));
+            $this->log->critical('Error Exception: '. $e->getMessage(), [ $e ]);
         }
 
         $resolver->acknowledge();
@@ -168,7 +168,7 @@ class Scheduler extends AbstractScheduler implements IConsumer
      */
     public function onHangup()
     {
-        $this->log->notice('HUP received', array('char' => '>'));
+        $this->log->notice('HUP received', [ 'char' => '>' ]);
         $this->log->debug('Invalidating config cache');
         $this->conf->dropCache();
         $this->log->debug('Releasing workers');
@@ -181,7 +181,7 @@ class Scheduler extends AbstractScheduler implements IConsumer
      */
     public function onInterrupt()
     {
-        $this->log->notice('Interrupting starfish!', array('char' => '>'));
+        $this->log->notice('Interrupting starfish!', [ 'char' => '>' ]);
         // for now, just treat as a termination request
         $this->onTerminate();
     }
@@ -348,7 +348,7 @@ class Scheduler extends AbstractScheduler implements IConsumer
             return;
         }
 
-        $this->log->info(sprintf('%s message%s broadcast', $count, $count === 1 ? '' : 's'), array('char' => '<'));
+        $this->log->info(sprintf('%s message%s broadcast', $count, $count === 1 ? '' : 's'), [ 'char' => '<' ]);
     }
 
 

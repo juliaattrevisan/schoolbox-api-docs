@@ -24,7 +24,7 @@ use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
  * @version     SVN: $Id$
  */
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid', 'debug-interval:');
+$fields = [ 'porcelain', 'mem', 'truemem', 'pid', 'debug-interval:' ];
 
 $opts = getopt('v', $fields);
 
@@ -39,12 +39,12 @@ $flags = implode(' ', array_slice($argv, 1));
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Digest', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Digest', [
 	'verbose'        => isset($opts['v']) ? $opts['v'] : null,
     'fields'         => array_values($fields),
     'flags'          => $flags,
     'debug-interval' => isset($opts['debug-interval']) ? $opts['debug-interval'] : null
-));
+]);
 
 
 

@@ -31,7 +31,7 @@ use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
  */
 
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
 
 $opts = getopt('v', $fields);
 
@@ -46,12 +46,12 @@ $flags = implode(' ', array_slice($argv, 1));
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', [
 	'verbose' => isset($opts['v']) ? $opts['v'] : null,
 	'errors'  => E_ALL,
     'fields'  => array_values($fields),
     'flags'   => $flags
-));
+]);
 
 $sched = null;
 
@@ -110,7 +110,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         });
 
     } catch (ConnectionException $e) {
-        $log->alert('AMQP server is offline or STOMP misconfigured: '. $e->getMessage(), array($e));
+        $log->alert('AMQP server is offline or STOMP misconfigured: '. $e->getMessage(), [ $e ]);
 
     } catch (AMQPRuntimeException $e) {
         $log->alert('Unable to connect to AMQP server: server is offline.');

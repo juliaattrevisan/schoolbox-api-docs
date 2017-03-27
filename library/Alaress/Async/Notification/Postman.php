@@ -55,17 +55,17 @@ class Postman
 
             if ($json === '') {
                 // message could not be serialized, therefore cannot be delivered
-                $this->log->notice('Broken message, was unable to json_encode', array('char' => '?'));
+                $this->log->notice('Broken message, was unable to json_encode', ['char' => '?']);
                 continue;
             }
 
             try {
                 $this->broker->publish(Instance::jsonUnserialize($json, "INFO.$routeKey"));
             } catch (\InvalidArgumentException $e) {
-                $this->log->notice('Broken message, was unable to json_decode', array('char' => '?'));
+                $this->log->notice('Broken message, was unable to json_decode', ['char' => '?']);
             }
 
-			$this->log->info("Broadcast a message to '$routeKey'", array('char' => '<'));
+			$this->log->info("Broadcast a message to '$routeKey'", ['char' => '<']);
 			++$i;
 		}
 

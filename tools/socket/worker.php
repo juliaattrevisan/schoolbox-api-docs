@@ -16,7 +16,7 @@ use Schoolbox\Realtime\MessageList\ListFactory;
 
 
 /** @var array $fields */
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
 
 $opts = getopt('v', $fields, $_);
 
@@ -29,11 +29,11 @@ foreach($fields as $k => $name) {
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Worker', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel("Worker", [
     'errors' => E_ALL,
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'fields'  => array_values($fields),
-));
+]);
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
