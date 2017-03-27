@@ -157,19 +157,22 @@
                     {% for assessment in markbook.assessmentsWithProjectContents  %}
                         <td class="column-{{ assessment.id }}" data-assessment="{{ assessment.id }}">
                             {% if assessment.isParticipant(student) %}
+                                {% set participant = assessment.getParticipant(student) %}
                                 {% if assessment is task %}
                                     {# An icon that shows if the student has attempted the task or not #}
                                     {% include '@learningAssessment/task/progressTickForm.twig' with {
-                                        participant: assessment.getParticipant(student),
+                                        participant: participant,
                                         disabled: not writable
                                     } only %}
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
+                                    {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
+                                        ? pendingLabel
+                                        : assessment.getHumanReadableMark(student, true) | default('–')
+                                    %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
-                                       title="{{ participant.mostRecentFeedback.comment }}">
-                                        {{ assessment.getHumanReadableMark(student, true) | default('–') }}
-                                    </a>
+                                       title="{{ participant.mostRecentFeedback.comment }}">{{ label }}</a>
                                 {% endif %}
                             {% else %}
                                 –
