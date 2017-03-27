@@ -474,7 +474,7 @@ class Controller extends Base
             ]
         );
 
-        $assessments = $assessments->filter( function($activity) {
+        $assessments = $assessments->filter( function(IAssessable $activity) {
             return $activity->isPublished();
         });
 
