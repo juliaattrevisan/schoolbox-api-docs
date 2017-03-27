@@ -209,7 +209,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => '',
     ],
     [
-        'text' => Scrub::text($thread['title']),
+        'text' => $thread['title'],
         'href' => '',
         'class' => 'active',
     ]
