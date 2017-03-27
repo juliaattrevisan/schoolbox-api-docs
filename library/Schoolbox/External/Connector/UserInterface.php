@@ -3,7 +3,7 @@
  * Interface for external database user
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright 2017 Alaress Pty Ltd
+ * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au
  */
 
@@ -109,13 +109,4 @@ interface UserInterface
      * @return Collection
      */
     function getCampusInvolvement($externalIds);
-
-    // These sort of things should go into a lookup table external class
-    //
-    // function getStudentForms();
-    // function determineBoarderType($boarderValue);
-    //
-    // This should go into a house class
-    //
-    // function getHousemasterByHouseId($houseID);
 }

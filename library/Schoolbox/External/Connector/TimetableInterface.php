@@ -3,7 +3,7 @@
  * Interface for external timetable
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright 2017 Alaress Pty Ltd
+ * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au
  */
 

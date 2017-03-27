@@ -17,11 +17,11 @@ class Factory
 {
     // Types of external objects this thing can construct
 
-    const EXTERNAL_USER = 1;
-    const EXTERNAL_TIMETABLE = 2;
-    const EXTERNAL_SYNC = 3;
-    const EXTERNAL_EVENTS = 4;
-    const EXTERNAL_COMMUNITY_PORTAL = 5;
+    const EXTERNAL_USER = 'User';
+    const EXTERNAL_TIMETABLE = 'Timetable';
+    const EXTERNAL_SYNC = 'Sync';
+    const EXTERNAL_EVENTS = 'ExternalEvents';
+    const EXTERNAL_COMMUNITY_PORTAL = 'CommunityPortal';
 
     /**
      * Return the correct version of the requested external object
@@ -34,53 +34,11 @@ class Factory
      */
     public function build($config, $databaseExternal, $type)
     {
-        $offlineBase = "\\Schoolbox\\External\\Connector\\Offline\\";
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type'));
         $schoolCode = ucwords($config->get('site_location'));
 
-        switch ($type) {
-            case self::EXTERNAL_USER:
-                $classBase = "{$prefixBase}\\Base\\User";
-                $classSchool = "{$prefixBase}\\{$schoolCode}\\User";
-                break;
-
-            case self::EXTERNAL_TIMETABLE:
-                $classBase = "{$prefixBase}\\Base\\Timetable";
-                $classSchool = "{$prefixBase}\\{$schoolCode}\\Timetable";
-                break;
-
-            case self::EXTERNAL_SYNC:
-                $classBase = "{$prefixBase}\\Base\\Sync";
-                $classSchool = "{$prefixBase}\\{$schoolCode}\\Sync";
-                break;
-
-            case self::EXTERNAL_EVENTS:
-                $classBase = "{$prefixBase}\\Base\\ExternalEvents";
-                $classSchool = "{$prefixBase}\\{$schoolCode}\\ExternalEvents";
-                break;
-
-            case self::EXTERNAL_COMMUNITY_PORTAL:
-
-                // Community portal is Synergetic only
-
-                if ($config->get('external_type') == 'Synergetic' && $config->get('synergetic_password_reset')) {
-
-                    $classBase = "{$prefixBase}\\Base\\ExternalEvents";
-                    $classSchool = "{$prefixBase}\\{$schoolCode}\\ExternalEvents";
-
-                } else {
-
-                    // Everyone else can just get the offline class
-
-                    $classBase = "{$offlineBase}\\Base\\ExternalEvents";
-                    $classSchool = "{$offlineBase}\\{$schoolCode}\\ExternalEvents";
-                }
-
-                break;
-
-            default:
-                throw new UnexpectedValueException("Unknown external object type requested: '{$type}'");
-        }
+        $classBase = "{$prefixBase}\\Base\\{$type}";
+        $classSchool = "{$prefixBase}\\{$schoolCode}\\{$type}";
 
         if (class_exists($classSchool)) {
             return new $classSchool($config, $databaseExternal);

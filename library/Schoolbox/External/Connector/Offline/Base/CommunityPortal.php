@@ -1,6 +1,6 @@
 <?php
 /**
- * Offline stub implementation of community portal connector.
+ * Stub implementation of Community Portal connector
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
@@ -19,7 +19,6 @@ class CommunityPortal extends Base implements CommunityPortalInterface
      */
     public function changePassword($communityId, $newPassword)
     {
-        // If there's nothing here, nothing went wrong, so...
         return true;
     }
 }
