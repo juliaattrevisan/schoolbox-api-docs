@@ -127,3 +127,12 @@ $notification-header-background: $navigation-background !default;
         }
     }
 }
+
+.notification-list {
+    .unread {
+        background-color: $accent-background;
+        a {
+            font-weight: bold;
+        }
+    }
+}

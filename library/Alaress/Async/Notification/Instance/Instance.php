@@ -140,7 +140,7 @@ class Instance implements JsonSerializable
         $context = null
     ) {
 
-        if (preg_match_all('`:([A-Za-z_][A-Za-z0-9_]*)`', $text, $matches)) {
+        if (preg_match_all('`:([A-Za-z_]\w*)`', $text, $matches)) {
             $this->tokens = $matches[1];
 
         } else {

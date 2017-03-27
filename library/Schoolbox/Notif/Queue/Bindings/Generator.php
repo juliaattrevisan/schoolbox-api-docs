@@ -191,9 +191,7 @@ class Generator implements GeneratorInterface
     public function generateBindingsForUser(User $user)
     {
         $bindings = [
-            'user' => [
-                'id' => "{$user->getId()}.#"
-            ]
+            'user' => [ "{$user->getId()}.#" ]
         ];
 
         // superuser bindings

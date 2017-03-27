@@ -10,102 +10,95 @@
 namespace Schoolbox\Realtime\Digest;
 
 
+use Alaress\Date\IClock;
 use Alaress\Scheduler\CronScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pool;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Alaress\WorkerCrew\Worker\Worker;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\Stomp\Client;
-use React\Stomp\Protocol\Frame;
 use RuntimeException;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Formatter\CompressedFormatter;
-use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
+use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
-class DigestScheduler extends CronScheduler {
+class DigestScheduler extends CronScheduler
+{
 
-	const QUEUE_COMMAND  = '.sb.cmd.digest';
+    /** @var DigestTriggerFactory */
+    private $factory;
 
-	/** @var DigestTrigger[] */
-	protected $triggers = array();
+    /** @var IConfigLoader */
+    private $conf;
+
+    /** @var RoleMapper */
+    private $roleMapper;
 
 
     /**
-     * @param LoopInterface $loop
+     * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param Client $client
-     * @param LoggerInterface $log
-     * @param IConfigLoader $conf
+     * @param LoggerInterface           $log
+     * @param IClock                    $clock
+     * @param RoleMapper                $roleMapper
+     * @param IConfigLoader             $conf
+     * @param DigestTriggerFactory      $factory
      */
-    public function __construct($loop, $dispatchStrategy, $client, $log, $conf = null) {
-        parent::__construct($loop, $dispatchStrategy, $log, $conf);
-        $this->method = DefaultDispatchStrategy::TASK_DIGEST;
-
-	    $self = $this;
-	    $client->connect()->then(function($client) use ($self) {
-		    /** @var Client $client */
-		    $client->subscribe(INSTANCE_ID.DigestScheduler::QUEUE_COMMAND, array($self, 'onCommand'));
-	    });
-
-		$this->on(SIGHUP, array($this, 'onReload'));
+    public function __construct(
+        LoopInterface $loop,
+        DispatchStrategyInterface $dispatchStrategy,
+        LoggerInterface $log,
+        IClock $clock,
+        RoleMapper $roleMapper,
+        IConfigLoader $conf,
+        DigestTriggerFactory $factory
+    ) {
+        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+        $this->roleMapper = $roleMapper;
+        $this->conf       = $conf;
+        $this->factory    = $factory;
 
 		// instantiate schedule
 		$this->reload();
-	}
+    }
 
 
 	/**
-	 * Callback executed when SIGHUP received by process
+     * (Re)compute the triggers for this particular scheduler
+     *
+	 * @return TriggerInterface[]
 	 */
-	public function onReload() {
-		$this->conf->dropCache();
-		$this->reload();
-	}
-
-
-	/**
-	 * Drop existing schedule and reinitialise
-	 *
-	 * @return bool
-	 */
-	public function reload() {
-		// drop existing
-		foreach($this->triggers as $k => $t) {
-			$this->unschedule($t);
-			unset($this->triggers[$k]);
-		}
+	protected function computeTriggers()
+    {
+        $triggers = [];
 
         // gently release workers in case they're digesting
         $this->getDispatcher()->releaseWorkerPool(Pool::RELEASE_SOFT);
 
 		// read each role entry, and schedule a cron based on it
-		foreach(RoleMapper::getInstance()->findAll() as $role) {
-			/** @var Role $role */
-
+		foreach ($this->roleMapper->findAll() as $role) {
 			$schedule = $role->getDigestSchedule();
 
 			// cast 0 to "0", because loose typing equality because PHP -_-
-			if($schedule == (string)Role::DIGEST_NEVER) {
+			if ((string)$schedule === (string)Role::DIGEST_NEVER) {
 				continue;
 			}
 
 			try {
-				$this->triggers[$role->getId()] = new DigestTrigger($schedule, $role);
-				$this->scheduleNotification($this->triggers[$role->getId()]);
-			}
-			catch(InvalidArgumentException $e) {
-				$this->log->error(get_class($e) . "in DigestScheduler: " . $e->getMessage());
-			}
-			catch(RuntimeException $e) {
-				$this->log->error(get_class($e) . "in DigestScheduler: " . $e->getMessage());
+				$triggers[$role->getId()] = $this->factory->build($schedule, $role);
+
+			} catch (InvalidArgumentException $e) {
+			    $this->logException($e);
+
+			} catch (RuntimeException $e) {
+                $this->logException($e);
 			}
 		}
+
+		return $triggers;
 	}
 
 
@@ -117,7 +110,7 @@ class DigestScheduler extends CronScheduler {
     public function handleError($trigger, $command, $data)
     {
         // we are assured that the worked that caused this error has already died
-        $this->log->warning("Worker failed to complete, resetting digest triggers");
+        $this->log->warning('Worker failed to complete, resetting digest triggers');
         $this->reload();
     }
 
@@ -126,21 +119,29 @@ class DigestScheduler extends CronScheduler {
 	 * Report in an appropriate way, based on the data returned by the worker
 	 *
 	 * @param $data
-	 * @return mixed
+	 * @return void
 	 */
-	protected function report($data) {
-		$this->log->notice("Emails sent: ".unserialize($data[0]));
+	protected function report($data)
+    {
+		$this->log->notice('Emails sent: ' . unserialize($data[0]));
 	}
 
 
-	/**
-	 * @param Frame $frame
-	 */
-	public function onCommand($frame) {
-		$this->log->info("Received command");
-		$commander = new DigestCommander();
-		$body = CompressedFormatter::uncompress($frame->body);
-		$commander->exec($this, $body['message']);
-	}
+    /**
+     * @return string
+     */
+    protected function getMethod()
+    {
+        return DefaultDispatchStrategy::TASK_DIGEST;
+    }
 
-} 
+
+    /**
+     * @return void
+     */
+    protected function dropCache()
+    {
+        $this->conf->dropCache();
+    }
+
+}

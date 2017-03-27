@@ -47,6 +47,29 @@ class CliFormatter extends NormalizerFormatter {
     /** @const int how many decimals of time you want */
     const TIME_RESOLUTION = 5;
 
+    /** @var array */
+    protected static $formats = [
+        // regular colours
+        Monolog\Logger::DEBUG     => [ 'd', self::cyan, '' ],
+        Monolog\Logger::INFO      => [ ' ', '', '' ],
+        Monolog\Logger::NOTICE    => [ ' ', '', '' ],
+        Monolog\Logger::WARNING   => [ '*', self::black, self::bg_yellow ],
+        Monolog\Logger::ERROR     => [ '*', self::red, '' ],
+        Monolog\Logger::CRITICAL  => [ '!', self::light_red, '' ],
+        Monolog\Logger::ALERT     => [ '!', self::white, self::bg_red ],
+        Monolog\Logger::EMERGENCY => [ '!', self::white, self::bg_magenta ],
+
+        // custom character colours
+        '>' => [ '>', self::white, '' ],
+        '<' => [ '<', self::white, '' ],
+        '-' => [ '-', self::blue, '' ],
+        '+' => [ '+', self::green, '' ],
+        '?' => [ '?', self::yellow, '' ],
+        'e' => [ 'e', self::yellow, '' ],
+        '~' => [ '~', self::light_red, '' ]
+    ];
+
+
     /** @var bool */
     protected $porcelain;
 
@@ -71,11 +94,21 @@ class CliFormatter extends NormalizerFormatter {
      */
     public function format(array $record)
     {
-        $map = array(
+        return $this->decorate($this->generateRecord($record), $record['level'], $record['context']);
+    }
+
+
+    /**
+     * @param array $record
+     * @return mixed|string
+     */
+    protected function generateRecord(array $record)
+    {
+        $map = [
             'memory_usage'      => 'mem',
             'memory_peak_usage' => 'mempeak',
             'process_id'        => 'pid'
-        );
+        ];
 
         // if this is already formatted like a log, don't reformat it
         if(preg_match("`\[.\].* => `", $record['message'])) {
@@ -114,10 +147,27 @@ class CliFormatter extends NormalizerFormatter {
             }
         }
 
-        $result = $this->decorate(implode('', $pieces), $record['level'], $record['context']);
+        return implode('', $pieces);
+    }
 
 
-        return $result;
+    /**
+     * @param string $string
+     * @param $level
+     * @return string
+     */
+    protected function prependSeverity($string, $level)
+    {
+        $severity = $level;
+        $char     = self::$formats[$level][0];
+
+        if ($level <= Monolog\Logger::NOTICE && $level >= Monolog\Logger::INFO && isset($context['char'])) {
+            $char = $context['char'][0];
+        }
+
+        $severity = $this->porcelain ? "[@$severity]" : '';
+
+        return "[$char]$severity$string";
     }
 
 
@@ -127,48 +177,22 @@ class CliFormatter extends NormalizerFormatter {
      * @param array $context
      * @return string
      */
-    protected function decorate($string, $level, $context) {
-        $formats = array(
-            // regular colours
-            Monolog\Logger::DEBUG     => array('d', self::cyan,       ''),
-            Monolog\Logger::INFO      => array(' ', '',               ''),
-            Monolog\Logger::NOTICE    => array(' ', '',               ''),
-            Monolog\Logger::WARNING   => array('*', self::black,      self::bg_yellow),
-            Monolog\Logger::ERROR     => array('*', self::red,        ''),
-            Monolog\Logger::CRITICAL  => array('!', self::light_red,  ''),
-            Monolog\Logger::ALERT     => array('!', self::white,      self::bg_red),
-            Monolog\Logger::EMERGENCY => array('!', self::white,      self::bg_magenta),
-
-            // custom character colours
-            '>' => array('>', self::white,      ''),
-            '<' => array('<', self::white,      ''),
-            '-' => array('-', self::blue,       ''),
-            '+' => array('+', self::green,      ''),
-            '?' => array('?', self::yellow,     ''),
-            'e' => array('e', self::yellow,     ''),
-            '~' => array('~', self::light_red,  '')
-        );
-
-        $severity = $level;
-
-        $char = $formats[$level][0];
-
+    protected function decorate($string, $level, $context)
+    {
         if($level <= Monolog\Logger::NOTICE && $level >= Monolog\Logger::INFO && isset($context['char'])) {
             $char = $context['char'][0];
-            if(array_key_exists($char, $formats)) {
+            if(array_key_exists($char, self::$formats)) {
                 $level = $char;
             }
         }
 
-        $severity = $this->porcelain ? "[@$severity]" : '';
-
-        $string = "[$char]$severity$string";
+        $string = $this->prependSeverity($string, $level);
 
         if(!$this->porcelain) {
             if($level >= Monolog\Logger::ALERT) {
                 $string = "\n$string\n";
             }
-            $string = $this->applyFormat($string, $formats[$level][1], $formats[$level][2]);
+            $string = $this->applyFormat($string, self::$formats[$level][1], self::$formats[$level][2]);
         }
 
         return "$string\n";

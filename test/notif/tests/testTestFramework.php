@@ -36,7 +36,7 @@ class TestFramework extends AbstractNotificationTest
     {
         return [
             self::DAEMON_SCHEDULE,
-            self::DAEMON_REROUTE,
+            self::DAEMON_ROUTE,
             self::DAEMON_DIGEST,
             self::DAEMON_SOCKET,
         ];

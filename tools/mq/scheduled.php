@@ -1,14 +1,22 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\Notification\Postman;
+use Alaress\Date\Clock;
 use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
+use Alaress\Scheduler\Stomp\ResolutionManager;
 use Aura\Di;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
+use React\Stomp\Exception\ConnectionException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Realtime\Routing;
+use Schoolbox\Realtime\Schedule;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
@@ -23,7 +31,7 @@ use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
  */
 
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
 
 $opts = getopt('v', $fields);
 
@@ -38,63 +46,77 @@ $flags = implode(' ', array_slice($argv, 1));
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', [
 	'verbose' => isset($opts['v']) ? $opts['v'] : null,
 	'errors'  => E_ALL,
     'fields'  => array_values($fields),
     'flags'   => $flags
-));
+]);
 
 $sched = null;
 
 $kernel->registerCustomShutdown(function() use (&$sched) {
-	if(!$sched instanceof Scheduler) {
-		return;
-	}
+    if (!$sched instanceof Scheduler) {
+        return;
+    }
 
-	if($d = $sched->getDispatcher()) {
-		$d->releaseWorkerPool();
-	}
+    if ($d = $sched->getDispatcher()) {
+        $d->releaseWorkerPool();
+    }
 });
 
 // CREATE SCHEDULER APP
-$kernel->run(function($di, $loop, $log, $opts) use (&$sched) {
-	/**
-	 * @var Di\Container $di
-	 * @var LoopInterface $loop
-	 * @var LoggerInterface $log
-	 * @var array $opts
-	 */
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) use (&$scheduler) {
 
-    // make sure our endpoint exists
-    $mqc = \Schoolbox\Notif\MQ\Connector::getInstance();
-    $q   = INSTANCE_ID . '.sb.sched';
+    /** @var Notif $notif */
+    $notif = $di->get('notif');
 
-    $mqc->declareQueue($q)
-        ->bindQueue($q, '*.' . Notif::TOPIC_APPLICATION);
+    /** @var IConfigLoader $conf */
+    $conf = $di->get('config');
 
-	/** @var Notif $notif */
-	$notif = $di->get('notif');
+    /** @var ClientInterface $redis */
+    $redis = $di->get('redis');
 
-	/** @var IConfigLoader $conf */
-	$conf = $di->get('config');
+    /** @var React\Stomp\Client $stomp */
+    $stomp = $di->get('stomp');
 
-	try {
-		$strat = new SchedulerDispatchStrategy($notif, new QueueItemMapper(), $opts['flags']);
-		$sched = new Scheduler($loop, $strat, $log, $q, $conf, $notif);
 
-        $sched->setJitCache(new RedisCache(Redis::getClientInstance(), $log, INSTANCE_ID));
+    try {
+        /** @var AMQPInterface $amqp */
+        $amqp = $di->get('amqp');
 
-		// read STDIN in the stream loop so we can communicate with it in dev mode
-		$stdin = new \React\Stream\Stream(STDIN, $loop);
-		$stdin->on('data', function($data) use ($sched) {
-			$sched->_stdincmd($data);
-		});
-	}
-	catch(AMQPRuntimeException $e) {
-		$log->alert("Unable to connect to RabbitMQ: server is offline.");
-		$notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert('RabbitMQ is offline');
-		throw $e;
-	}
+        // we'll be using the schedule broker for receiving...
+        $scheduleBroker = new Schedule\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
+
+        // ...and the route broker for sending
+        $routeBroker    = new Routing\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
+
+
+        $postman        = new Postman($routeBroker, $log);
+
+        $strat          = new SchedulerDispatchStrategy($notif, new QueueItemMapper(), $opts['flags']);
+        $scheduler      = new Scheduler($loop, $strat, $log, new Clock(), $conf, new ResolutionManager(), $postman);
+
+        $scheduler->setJitCache(new RedisCache(Redis::getClientInstance(), $log, INSTANCE_ID));
+
+
+        // due to the async nature of STOMP, only register the consumer once the connection is actually established
+        $stomp->connect()->then(function () use ($scheduleBroker, $scheduler, $log) {
+            $log->info('Connected to STOMP', [ 'char' => '+' ]);
+
+            $scheduleBroker->registerConsumer($scheduler);
+
+            $log->debug('Consuming amqp://' . Schedule\Broker::QUEUE);
+        });
+
+    } catch (ConnectionException $e) {
+        $log->alert('AMQP server is offline or STOMP misconfigured: '. $e->getMessage(), [ $e ]);
+
+    } catch (AMQPRuntimeException $e) {
+        $log->alert('Unable to connect to AMQP server: server is offline.');
+        $notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert('RabbitMQ is offline');
+
+        throw $e;
+    }
 
 });

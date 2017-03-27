@@ -11,6 +11,7 @@ namespace Alaress\Async\Queue;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\NotificationBundle;
 
 interface QueueInterface
 {
@@ -21,14 +22,6 @@ interface QueueInterface
      * @return string
      */
     public function getName();
-
-
-    /**
-     * Will returns all the messages this queue contains, parsed as Instance objects
-     *
-     * @return Instance[]
-     */
-    public function fetch();
 
 
     /**
@@ -46,4 +39,24 @@ interface QueueInterface
      * @return void
      */
     public function drain();
+
+
+    /**
+     * Push the given instance onto this queue
+     *
+     * @param Instance $instance
+     * @return void
+     */
+    public function push(Instance $instance);
+
+
+    /**
+     * Populates the given Bundle with all the notifications this queue contains
+     *
+     * @param NotificationBundle $bundle     the bundle to populate
+     * @param bool               $dropCache  whether or not any internally-held cache should be dropped
+     * @return void
+     */
+    public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false);
+
 }

@@ -20,7 +20,7 @@ use External_Timetable;
 use External_TimetableInterface;
 use OutOfBoundsException;
 use Schoolbox\Campus;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Timetable\TimetableNotifier;
 use Schoolbox\Realtime\WorkNotifier;
 

@@ -611,17 +611,17 @@ then
 	/usr/sbin/service schoolboxdev-digestd restart >/dev/null 2>&1;
 	/usr/sbin/service schoolboxdev-scheduled restart >/dev/null 2>&1;
 	/usr/sbin/service schoolboxdev-socketd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolboxdev-rerouted restart >/dev/null 2>&1;
+	/usr/sbin/service schoolboxdev-routed restart >/dev/null 2>&1;
 else
 	/usr/sbin/service schoolbox-digestd restart >/dev/null 2>&1;
 	/usr/sbin/service schoolbox-scheduled restart >/dev/null 2>&1;
 	/usr/sbin/service schoolbox-socketd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolbox-rerouted restart >/dev/null 2>&1;
+	/usr/sbin/service schoolbox-routed restart >/dev/null 2>&1;
 fi
 
 ## Run Notifications Binder so RabbitMQ has all the latest bindings for the new data
-echo -e "\nRunning Notifications Binder";
-php $instdir/tools/mq/binder.php -vvv 2>/dev/null;
+echo -e "\nReload the subscription cache";
+php $instdir/tools/notif/route/refresh-binding-cache.php --instance=vagrantx -vvv 2>/dev/null;
 
 # Cleanup
 umount $backup_dir 2>/dev/null;

@@ -34,7 +34,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
         $this->setup();
         $this->initCaches();
         $this->setConfigLoader($this); // this line will possibly blow up in my face
-        $this->setMonitor(self::$perfmon);
         $this->setColumnFactory(new ColumnFactory());
 
         $w = realpath(__DIR__ . "/../../..");

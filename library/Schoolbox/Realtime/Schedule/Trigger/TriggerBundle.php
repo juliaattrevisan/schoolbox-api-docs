@@ -11,7 +11,7 @@ namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
 use Alaress\Scheduler\Trigger\TriggerInterface;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 
 class TriggerBundle implements TriggerBundleInterface {
 

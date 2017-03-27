@@ -309,7 +309,7 @@ class RoutePermissionMapper extends Mapper {
 	 */
 	public function isMuted($mask)
 	{
-		return in_array(RoutePermission::MUTE, $mask);
+		return in_array(RoutePermission::MUTE, $mask, false);
 	}
 
 
@@ -319,7 +319,7 @@ class RoutePermissionMapper extends Mapper {
 	 */
 	public function isDigest($mask)
 	{
-		return in_array(RoutePermission::DIGEST, $mask);
+		return in_array(RoutePermission::DIGEST, $mask, false);
 	}
 
 
@@ -329,7 +329,7 @@ class RoutePermissionMapper extends Mapper {
 	 */
 	public function isInstant($mask)
 	{
-		return in_array(RoutePermission::INSTANT, $mask);
+		return in_array(RoutePermission::INSTANT, $mask, false);
 	}
 
 
@@ -339,7 +339,7 @@ class RoutePermissionMapper extends Mapper {
 	 */
 	public function isPush($mask)
 	{
-		return in_array(RoutePermission::PUSH, $mask);
+		return in_array(RoutePermission::PUSH, $mask, false);
 	}
 
 
@@ -349,7 +349,7 @@ class RoutePermissionMapper extends Mapper {
 	 */
 	public function isEmail($mask)
 	{
-		return in_array(RoutePermission::EMAIL, $mask);
+		return in_array(RoutePermission::EMAIL, $mask, false);
 	}
 
 }

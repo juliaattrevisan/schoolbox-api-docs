@@ -32,11 +32,11 @@ interface ModuleNotifierInterface extends Serializable {
     /**
      * Switch logging on
      *
-     * @param NotifInterface  $notif
      * @param LoggerInterface $log
+     * @param bool            $allowPropagation  whether or not the notifier should propagate messages in this context
      * @return void
      */
-    public function enableLogging(NotifInterface $notif, LoggerInterface $log);
+    public function enableLogging(LoggerInterface $log, $allowPropagation);
 
 	/**
 	 * Instantiate all your dependencies within yourself.

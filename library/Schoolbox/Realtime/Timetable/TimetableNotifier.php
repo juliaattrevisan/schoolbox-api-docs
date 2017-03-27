@@ -13,19 +13,22 @@ namespace Schoolbox\Realtime\Timetable;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Date\Clock;
 use Alaress\Date\IClock;
+use Alaress\Redis;
+use InvalidArgumentException;
 use Monolog\Logger;
+use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Notifactory;
+use Schoolbox\Realtime\Alert\IPublisher;
+use Schoolbox\Realtime\Alert\RedisPublisher;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 use Schoolbox\Realtime\WorkNotifier;
 
 class TimetableNotifier extends WorkNotifier {
 
-    /** @var Notif */
-    protected $notifier;
+    /** @var IPublisher */
+    private $publisher;
 
     /** @var IClock */
     protected $clock;
@@ -35,26 +38,32 @@ class TimetableNotifier extends WorkNotifier {
      * @param IConfigLoader   $configLoader
      * @param LoggerInterface $log
      * @param IClock          $clock
+     * @param IPublisher      $publisher
      */
-    public function __construct($configLoader = null, $log = null, IClock $clock = null)
+    public function __construct($configLoader = null, $log = null, IClock $clock = null, IPublisher $publisher = null)
     {
         parent::__construct($configLoader, $log);
+
         if ($clock instanceof IClock) {
             $this->clock = $clock;
+        }
+
+        if ($publisher instanceof IPublisher) {
+            $this->publisher = $publisher;
         }
     }
 
 
     /**
-     * @return Notif
+     * @return IPublisher
      */
-    public function notifier()
+    public function publisher()
     {
         // lazyload
-        if (empty($this->notifier)) {
-            $this->notifier = Notifactory::create('alert', $this->conf);
+        if ($this->publisher === null) {
+            $this->publisher = new RedisPublisher(Redis::getClientInstance(), INSTANCE_ID);
         }
-        return $this->notifier;
+        return $this->publisher;
     }
 
 
@@ -64,7 +73,7 @@ class TimetableNotifier extends WorkNotifier {
     public function clock()
     {
         // lazyload
-        if (empty($this->clock)) {
+        if ($this->clock === null) {
             $this->clock = new Clock();
         }
         return $this->clock;
@@ -76,6 +85,8 @@ class TimetableNotifier extends WorkNotifier {
      *
      * @param Campus $campus
      * @return int the number of actions taken
+     * @throws InvalidArgumentException
+     * @throws OutOfBoundsException
      */
     public function processStart($campus)
     {
@@ -85,11 +96,14 @@ class TimetableNotifier extends WorkNotifier {
         return 0;
     }
 
+
     /**
      * This method is executed by a worker
      *
      * @param Campus $campus
      * @return int the number of actions taken
+     * @throws InvalidArgumentException
+     * @throws OutOfBoundsException
      */
     public function processWarn($campus)
     {
@@ -134,12 +148,18 @@ class TimetableNotifier extends WorkNotifier {
             return 0;
         }
 
-        $handler = new \External_Timetable();
+        try {
+            $handler = new \External_Timetable();
+        } catch (\Exception $e) {
+            $this->log()->critical('Failed to connect to external timetable, no alerts sent');
+            return 0;
+        }
+
         $day     = $handler->getDayNumber($campus);
         $defn    = $handler->getTimetableDefinition(null, $campus, $day);
         $len     = count($defn['number']);
         $stamp   = $this->clock()->time();
-        $stamp   = $stamp - ($stamp % 60);
+        $stamp  -= ($stamp % 60);
 
         for ($i = 0; $i < $len; ++$i) {
             $start    = strtotime($defn['start'][$i]);
@@ -153,7 +173,7 @@ class TimetableNotifier extends WorkNotifier {
                 continue;
             }
 
-            if ($target == TimetableTrigger::TARGET_END) {
+            if ($target === TimetableTrigger::TARGET_END) {
                 // if we're inside this period (excepting margin for error)
                 if ($inside) {
                     // Apparently they care about breaks now, this should probably be an option in the config
@@ -170,7 +190,7 @@ class TimetableNotifier extends WorkNotifier {
                         return '';
                     }*/
                 }
-            } elseif ($target == TimetableTrigger::TARGET_START) {
+            } elseif ($target === TimetableTrigger::TARGET_START) {
                 // if we're within the MOE window ahead of the start of this period
                 if ($inFuture) {
                     // Apparently they care about breaks now, this should probably be an option in the config
@@ -187,7 +207,7 @@ class TimetableNotifier extends WorkNotifier {
                         return '';
                     }*/
                 }
-            } elseif ($target == TimetableTrigger::TARGET_WARN) {
+            } elseif ($target === TimetableTrigger::TARGET_WARN) {
                 // if we're within the warning period
                 if ($inFuture) {
                     // Apparently they care about breaks now, this should probably be an option in the config
@@ -228,13 +248,15 @@ class TimetableNotifier extends WorkNotifier {
 
 
     /**
-     * @param Campus  $campus
-     * @param string  $body
-     * @param string  $title
-     * @param string  $icon
+     * @param Campus $campus
+     * @param string $body
+     * @param string $title
+     * @param string $icon
+     * @throws OutOfBoundsException
+     * @throws InvalidArgumentException
      * @return int
      */
-    protected function sendAlert($campus, $body, $title = '', $icon = '')
+    protected function sendAlert(Campus $campus, $body, $title = '', $icon = '')
     {
         $campusId = $campus->getId();
 
@@ -242,28 +264,28 @@ class TimetableNotifier extends WorkNotifier {
 
         $bob = $this->newBob()
                     ->setTitle($body)
-                    ->setTopics(array("notify.campus.$campusId"))
+                    ->setTopics([ "notify.campus.$campusId" ])
                     ->putMeta('title', $title ?: 'Timetable')
-                    ->setIcon($icon ?: "/images/icon.php?icon=clock&size=64"); // {$this->iconSize}
+                    ->setIcon($icon ?: '/images/icon.php?icon=clock&size=64'); // {$this->iconSize}
 
-        $json = $bob->build()->jsonSerialize();
+        $instance = $bob->build();
 
         // get the IDs of all users in this campus
-        $stmt = \Database::getInstance()->prepare("
+        $stmt = \Database::getInstance()->prepare('
             SELECT u.id
             FROM `user` u
             LEFT JOIN userCampus c on u.id = c.uid
             WHERE c.campus = ?
-        ");
+        ');
 
-        $stmt->execute(array($campusId));
+        $stmt->execute([ $campusId ]);
 
         $i = 0;
-        $n = $this->notifier();
 
-        while (++$i && $id = $stmt->fetchColumn()) {
-            $n->logTo("instant.user.$id.alert", Logger::INFO, json_encode($json));
+        while ($id = $stmt->fetchColumn()) {
+            $i += $this->publisher()->alertUser($id, $instance);
         }
+
         $this->log()->debug("Alerted $i users");
 
         return $i;

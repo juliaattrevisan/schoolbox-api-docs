@@ -14,6 +14,8 @@ namespace Schoolbox\Mail;
 use Alaress\Mail\TwigMailer;
 use FM\CSSIN;
 use Schoolbox\UserMapper;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+
 
 class TwigEmail extends TwigMailer {
 
@@ -23,8 +25,8 @@ class TwigEmail extends TwigMailer {
     /** @var UserMapper */
     protected $userMapper;
 
-	/** @var CSSIN */
-	protected $cssIn;
+	/** @var CssToInlineStyles */
+	protected $cssInliner;
 
     /**
      * Prepares the email by importing various configurations from the system
@@ -34,10 +36,12 @@ class TwigEmail extends TwigMailer {
      * @param string $to       - the defailt recipient, can be changed after construction
      * @param string $host     - deprecated, does nothing
      */
-    public function __construct($template, $subject = "", $to = "", $host = "") {
+    public function __construct($template, $subject = "", $to = "", $host = "")
+    {
         parent::__construct($template, $subject, $to, $host);
+
         $this->userMapper = UserMapper::getInstance();
-	    $this->cssIn = new CSSIN();
+	    $this->cssInliner = new CssToInlineStyles();
     }
 
 
@@ -46,13 +50,14 @@ class TwigEmail extends TwigMailer {
      *
      * @return string
      */
-    public function composeHTML() {
+    public function composeHTML()
+    {
         $preformat = $this->twig->render($this->templateFilename,
             array_replace_recursive($this->coreContext, $this->context)
         );
-	    $this->rendercache = $this->cssIn->inlineCSS('', $preformat);
+	    $this->rendercache = $this->cssInliner->convert($preformat);
 	    // truncate all sequential whitespace as well as whitespace between tags (will probably result in one line of HTML -_-;)
-	    $this->rendercache = preg_replace(array('`\s\s*`', '`>\s+<`'), array(' ', '><'), $this->rendercache);
+	    $this->rendercache = preg_replace([ '`\s\s*`', '`>\s+<`' ], [ ' ', '><' ], $this->rendercache);
 	    return $this->rendercache;
     }
 
@@ -71,7 +76,8 @@ class TwigEmail extends TwigMailer {
 	 *
 	 * @return array
 	 */
-	public function getCoreContext() {
+	public function getCoreContext()
+    {
         return $this->coreContext;
     }
 
@@ -81,9 +87,10 @@ class TwigEmail extends TwigMailer {
 	 *
 	 * @param $subject
 	 */
-	public function setSubject($subject) {
+	public function setSubject($subject)
+    {
         parent::setSubject($subject);
-        $this->setCoreContext(array('config' => array('subject' => $subject)));
+        $this->setCoreContext([ 'config' => [ 'subject' => $subject ] ]);
     }
 
 }

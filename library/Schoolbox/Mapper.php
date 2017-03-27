@@ -12,6 +12,7 @@ namespace Schoolbox;
 use Alaress\Cache;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
+use Aura\Di;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -28,7 +29,12 @@ use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\NotifInterface;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Broker;
+use Schoolbox\Realtime\Schedule\Event\Splitter;
+use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
+use Schoolbox\Realtime\Schedule\Trigger\Propagator;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Serializable;
 use Traversable;
 use UnderflowException;
@@ -166,10 +172,13 @@ abstract class Mapper implements IMapper, Serializable
     static protected $instance;
 
     /** @var IFactory */
-    static private $columnFactory;
+    protected static $columnFactory;
 
     /** @var IMonitor */
     protected static $perfmon;
+
+    /** @var IPropagator */
+    protected static $prop;
 
     /**
      * Factory for building column hydrators.
@@ -210,6 +219,9 @@ abstract class Mapper implements IMapper, Serializable
     /** @var IMonitor */
     protected $monitor;
 
+    /** @var Propagator */
+    protected $propagator;
+
     /** @var bool */
     private $localBodyCacheBypass = false;
 
@@ -220,6 +232,44 @@ abstract class Mapper implements IMapper, Serializable
      * @var bool
      */
     protected $cacheEnabled = true;
+
+    /**
+     * @param Di\ContainerInterface $di
+     * @throws Di\Exception
+     */
+    public static function di(Di\ContainerInterface $di)
+    {
+        self::$columnFactory = new ColumnFactory();
+
+        // only functional in development
+        self::$perfmon = (INSTANCE_ID === 'vagrantx' && self::isWithinWebRequest())
+            ? new DevMonitor(DebugBar::getInstance())
+            : new LiveMonitor()
+        ;
+
+        try {
+            self::$prop = $di->newInstance(Propagator::class, [
+                'splitter'   => $di->lazyNew(Splitter::class, [
+                    'conf'        => $di->lazyGet('config'),
+                    'di'          => $di,
+                    'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
+                ]),
+                'redis'      => $di->lazyGet('redis'),
+                'broker'     => $di->lazyNew(Broker::class, [
+                    'instanceId' => INSTANCE_ID,
+                    'amqp'       => $di->lazyGet('amqp'),
+                    'redis'      => $di->lazyGet('redis'),
+                    // no 'stomp'
+                ]),
+                'instanceId' => INSTANCE_ID,
+            ]);
+        } catch (Di\Exception\ServiceNotFound $e) {
+            // in PHPUnit land, we do not have external services.
+            // this catch is merely to accommodate that case, it should not be
+            // relied upon in development
+            self::$prop = new MockPropagator();
+        }
+    }
 
     /**
      * Is this mapper being instantiated within a web request?
@@ -246,19 +296,6 @@ abstract class Mapper implements IMapper, Serializable
      */
     public static function getInstance()
     {
-        if (empty(self::$columnFactory)) {
-            // we want this to exist once ever
-            self::$columnFactory = new ColumnFactory();
-        }
-
-        if (empty(self::$perfmon)) {
-            // we want this to exist once ever, and only functional in development
-            self::$perfmon = (INSTANCE_ID == 'vagrantx' && self::isWithinWebRequest())
-                ? new DevMonitor(DebugBar::getInstance())
-                : new LiveMonitor()
-            ;
-        }
-
         $class_name = get_called_class();
         if (!isset(self::$instance[$class_name])) {
             self::$instance[$class_name] = new static();
@@ -276,7 +313,6 @@ abstract class Mapper implements IMapper, Serializable
         $this->database = \Database::getInstance();
         $this->map      = new MappingCollection();
 
-
         $this->initCaches();
         // Switch on the cache if this is a web request: otherwise switch off
         if (self::isWithinWebRequest()) {
@@ -288,6 +324,7 @@ abstract class Mapper implements IMapper, Serializable
         $this->setup();
         $this->setColumnFactory(self::$columnFactory);
         $this->setMonitor(self::$perfmon);
+        $this->setEventPropagator(self::$prop);
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
 
@@ -553,6 +590,25 @@ abstract class Mapper implements IMapper, Serializable
     {
         $this->monitor = $monitor;
     }
+
+    /**
+     * @return IPropagator
+     */
+    public function getEventPropagator()
+    {
+        return $this->propagator;
+    }
+
+    /**
+     * @param IPropagator $propagator
+     * @return static
+     */
+    protected function setEventPropagator(IPropagator $propagator = null)
+    {
+        $this->propagator = $propagator;
+        return $this;
+    }
+
 
     /**
      * Gets a single object as a collection, if it isn't one already.
@@ -1039,6 +1095,15 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty($map['hydrator'])) {
             $map['hydrator'] = $this->column_factory->build($map['type']);
+
+        } elseif (empty($map['type'])) {
+            // hydrator specified, but no type: assume model
+            $map['type'] = self::TYPE_MODEL;
+        }
+
+        if (empty($map['type'])) {
+            // both hydrator and type cannot be empty
+            return false;
         }
 
         // if property is empty, derive it from the column, converting snake_case to camelCase
@@ -3175,7 +3240,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param object $object
      * @param string $verb
      * @param object $previous
-     *
+     * @throws Exception
      * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)
@@ -3183,10 +3248,12 @@ abstract class Mapper implements IMapper, Serializable
         if (!isset($this->sessionData['user'])) {
             return false;
         }
+
         $diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diff($object, $previous) : null;
+
         // create a new event, and send it to the scheduler
-        $event = new Event($this->sessionData['user'], $verb, $object, $this, $diff);
-        $this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
+        $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
+
         return true;
     }
 

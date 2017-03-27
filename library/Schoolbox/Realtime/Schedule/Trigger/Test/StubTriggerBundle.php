@@ -10,7 +10,7 @@
 namespace Schoolbox\Realtime\Schedule\Trigger\Test;
 
 
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 
 class StubTriggerBundle implements TriggerBundleInterface {

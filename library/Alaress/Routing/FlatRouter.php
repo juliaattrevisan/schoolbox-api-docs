@@ -29,9 +29,9 @@ class FlatRouter implements IRouter
      * Add the given path as a known route, and a key-value pair to be stored at the end of that path.
      * If the key already exists on this path, the new value will replace any existing value.
      *
-     * @param string $path
+     * @param string     $path
      * @param string|int $key
-     * @param mixed $value
+     * @param mixed      $value
      * @return $this
      */
     public function add($path, $key, $value = null)
@@ -63,6 +63,8 @@ class FlatRouter implements IRouter
     }
 
     /**
+     * Retrieve all the routes contained in this router
+     *
      * @return array[]
      */
     public function getAll()

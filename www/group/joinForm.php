@@ -4,7 +4,7 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 
 require_once('../../library/Bootstrap.php');
 
