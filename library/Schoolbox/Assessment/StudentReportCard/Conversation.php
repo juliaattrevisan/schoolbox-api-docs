@@ -10,7 +10,6 @@ namespace Schoolbox\Assessment\StudentReportCard;
 
 
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
