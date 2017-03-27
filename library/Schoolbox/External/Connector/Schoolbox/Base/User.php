@@ -730,7 +730,7 @@ class User extends Base implements UserInterface
         $student->setTitle($studentRow['title']);
         $student->setGivenName($studentRow['firstName']);
         $student->setPreferredName($studentRow['firstName']);
-        $student->setLastName($studentRow['lastName']);
+        $student->setLastname($studentRow['lastName']);
         $student->setEmail($studentRow['email']);
         $student->setYear($studentRow['year']);
 
@@ -848,7 +848,7 @@ class User extends Base implements UserInterface
         $staff->setTitle($staffRow['title']);
         $staff->setGivenName($staffRow['firstName']);
         $staff->setPreferredName($staffRow['firstName']);
-        $staff->setLastName($staffRow['lastName']);
+        $staff->setLastname($staffRow['lastName']);
         $staff->setEmail($staffRow['email']);
         $staff->setWorkEmail($staffRow['email']);
         $staff->setYear($staffRow['year']);
@@ -935,7 +935,7 @@ class User extends Base implements UserInterface
         $guardian->setTitle($guardianRow['title']);
         $guardian->setGivenName($guardianRow['givenName']);
         $guardian->setPreferredName($guardianRow['givenName']);
-        $guardian->setLastName($guardianRow['lastName']);
+        $guardian->setLastname($guardianRow['lastName']);
         $guardian->setEmail($guardianRow['email']);
         $guardian->setPubliclyVisible($guardianRow['visible']);
         $guardian->setTitle($guardianRow['positionTitle']);

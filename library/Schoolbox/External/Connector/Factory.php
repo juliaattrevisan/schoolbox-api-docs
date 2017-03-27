@@ -28,12 +28,11 @@ class Factory
      *
      * @param IConfigLoader $config
      * @param array|IConnector $databaseExternal External database connection(s)
-     * @param TimetableInterface $timetableExternal External timetable connector
      * @param string $type Type of external object we want (one of the constants above)
      * @return mixed
      * @throws UnexpectedValueException If nothing can be built
      */
-    public function build($config, $databaseExternal, $timetableExternal, $type)
+    public function build($config, $databaseExternal, $type)
     {
         $offlineBase = "\\Schoolbox\\External\\Connector\\Offline\\";
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type')) . "\\";
@@ -84,9 +83,9 @@ class Factory
         }
 
         if (class_exists($classSchool)) {
-            return new $classSchool($config, $databaseExternal, $timetableExternal);
+            return new $classSchool($config, $databaseExternal);
         } elseif (class_exists($classBase)) {
-            return new $classBase($config, $databaseExternal, $timetableExternal);
+            return new $classBase($config, $databaseExternal);
         }
 
         throw new UnexpectedValueException("Could not located requested external object class: '{$classBase}'");

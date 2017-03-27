@@ -9,13 +9,12 @@
 
 namespace Schoolbox\External\Connector\Tass\Base;
 
-use Alaress\Database\Connector\IConnector;
 use External_Tass_Helper;
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\SyncInterface;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Sync\Iterator;
 
-class Sync implements SyncInterface
+class Sync extends Base implements SyncInterface
 {
     /** @var string $companyCode The TASS company code to use, for queries which require it. */
     protected $companyCode;
@@ -23,19 +22,13 @@ class Sync implements SyncInterface
     /** @var External_Tass_Helper $helper */
     private $helper;
 
-    /** @var IConnector $databaseExternal */
-    protected $databaseExternal;
-
-    /** @var IConfigLoader $config */
-    protected $config;
-
     /**
      * @inheritdoc
      */
     public function __construct($config, $databaseExternal)
     {
-        $this->config = $config;
-        $this->databaseExternal = $databaseExternal;
+        parent::__construct($config, $databaseExternal);
+
         $this->companyCode = $config->get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
     }

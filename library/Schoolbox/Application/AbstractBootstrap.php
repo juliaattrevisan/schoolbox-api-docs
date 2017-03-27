@@ -39,7 +39,6 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Error;
-use Schoolbox\External\Connector\TimetableInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -492,14 +491,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         /** @var array|IConnector $databaseExternal */
                         $databaseExternal = $di->get('databaseExternal');
 
-                        /** @var TimetableInterface $timetableExternal */
-                        $timetableExternal = $di->get('externalNDSTimetable');
-
                         $factory = new ExternalConnectorFactory();
                         return $factory->build(
                             $config,
                             $databaseExternal,
-                            $timetableExternal,
                             ExternalConnectorFactory::EXTERNAL_SYNC
                         );
                     }),
@@ -523,14 +518,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
             /** @var array|IConnector $databaseExternal */
             $databaseExternal = $di->get('databaseExternal');
 
-            /** @var TimetableInterface $timetableExternal */
-            $timetableExternal = $di->get('externalNDSTimetable');
-
             $factory = new ExternalConnectorFactory();
             return $factory->build(
                 $config,
                 $databaseExternal,
-                $timetableExternal,
                 ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
             );
         }));
@@ -544,14 +535,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
             /** @var array|IConnector $databaseExternal */
             $databaseExternal = $di->get('databaseExternal');
 
-            /** @var TimetableInterface $timetableExternal */
-            $timetableExternal = $di->get('externalNDSTimetable');
-
             $factory = new ExternalConnectorFactory();
             return $factory->build(
                 $config,
                 $databaseExternal,
-                $timetableExternal,
                 ExternalConnectorFactory::EXTERNAL_USER
             );
         }));
@@ -563,14 +550,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
             /** @var array|IConnector $databaseExternal */
             $databaseExternal = $di->get('databaseExternal');
 
-            /** @var TimetableInterface $timetableExternal */
-            $timetableExternal = $di->get('externalNDSTimetable');
-
             $factory = new ExternalConnectorFactory();
             return $factory->build(
                 $config,
                 $databaseExternal,
-                $timetableExternal,
                 ExternalConnectorFactory::EXTERNAL_TIMETABLE
             );
         }));

@@ -44,14 +44,10 @@ class Sync extends BaseSync
             LEFT JOIN CommunityAttributes ca ON ca.ID = vStudents.StudentID
                 AND ca.AttributeCode = '10'
             WHERE
-            FileSemester = :fileSemester
-            AND FileYear = :fileYear
+            FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1)
+            AND FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
             ORDER BY vStudents.StudentID ASC
-        ",
-        [
-            'fileYear' => $this->fileYear,
-            'fileSemester' => $this->fileSemester
-        ]);
+        ");
         return new Iterator\Student($iterator);
     }
 }

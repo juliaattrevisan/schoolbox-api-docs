@@ -30,7 +30,6 @@ class ExternalEvents extends Base implements ExternalEventsInterface
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
-
         $start = new Alaress_Date_Format($startDate, 'U');
         $finish = new Alaress_Date_Format($endDate, 'U');
 

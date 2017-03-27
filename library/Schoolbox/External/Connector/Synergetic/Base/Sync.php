@@ -15,23 +15,6 @@ use Schoolbox\Sync\Iterator;
 
 class Sync extends Base implements SyncInterface
 {
-    /** @var int */
-    protected $fileYear;
-
-    /** @var string */
-    protected $fileSemester;
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config, $databaseExternal, $timetableExternal)
-    {
-        parent::__construct($config, $databaseExternal, $timetableExternal);
-
-        $this->fileYear = $this->timetableExternal->getCurrentYear();
-        $this->fileSemester = $this->timetableExternal->getCurrentSemester();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -61,13 +44,10 @@ class Sync extends Base implements SyncInterface
                             StudentCampus                                 AS student_campus
             FROM            dbo.vStudents vStudents
             LEFT JOIN       Community ON Community.ID = StudentID
-            WHERE           FileSemester = :fileSemester AND 
-                            FileYear = :fileYear
+            WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+                            FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
             ORDER BY        vStudents.StudentID ASC
-        ", [
-            'fileYear'     => $this->fileYear,
-            'fileSemester' => $this->fileSemester
-        ]);
+        ");
 
         return new Iterator\Student($studentIterator);
     }
@@ -109,8 +89,8 @@ class Sync extends Base implements SyncInterface
             FROM            dbo.vStudentContactAllAddress s
             INNER JOIN      dbo.Community cp ON s.StudentContactID = cp.ID
             WHERE           s.StudentContactType IN ({$contactTypeBindings1['sql']}) AND
-                            FileSemester = :fileSemester1 AND 
-                            FileYear = :fileYear1
+                            FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+                            FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
             
             UNION ALL
             
@@ -133,20 +113,15 @@ class Sync extends Base implements SyncInterface
             FROM            dbo.vStudentContactAllAddress s
             INNER JOIN      dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE           s.StudentContactType IN ({$contactTypeBindings2['sql']}) AND
-                            FileSemester = :fileSemester2 AND 
-                            FileYear = :fileYear2
+                            FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+                            FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
 
             ORDER BY        student_contact_id ASC
             
         ", array_merge(
-            $contactTypeBindings1['bindings'],
-            $contactTypeBindings2['bindings'],
-            [
-                'fileYear1'     => $this->fileYear,
-                'fileSemester1' => $this->fileSemester,
-                'fileYear2'     => $this->fileYear,
-                'fileSemester2' => $this->fileSemester
-            ])
+                $contactTypeBindings1['bindings'],
+                $contactTypeBindings2['bindings']
+            )
         );
 
         return new Iterator\Guardian($guardianIterator);

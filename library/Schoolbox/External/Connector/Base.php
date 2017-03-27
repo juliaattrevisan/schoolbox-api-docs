@@ -1,6 +1,6 @@
 <?php
 /**
- * Factory for building external connector classes
+ * Base external connector class
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
@@ -17,9 +17,6 @@ abstract class Base
     /** @var IConnector */
     protected $databaseExternal;
 
-    /** @var TimetableInterface */
-    protected $timetableExternal;
-
     /** @var IConfigLoader */
     protected $config;
 
@@ -28,12 +25,10 @@ abstract class Base
      *
      * @param IConfigLoader $config
      * @param array|IConnector $databaseExternal External database connector(s)
-     * @param TimetableInterface $timetableExternal External timetable connector
      */
-    public function __construct($config, $databaseExternal, $timetableExternal)
+    public function __construct($config, $databaseExternal)
     {
         $this->config = $config;
         $this->databaseExternal = $databaseExternal;
-        $this->timetableExternal = $timetableExternal;
     }
 }
