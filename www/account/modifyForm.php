@@ -2,13 +2,13 @@
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmail;
+use Schoolbox\External\Connector\CommunityPortalInterface;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 
 $page = new SitePage();
 $userHandler = new User();
 $groupHandler = new Group();
+$configMapper = ConfigMapper::getInstance();
 
 if (!in_array($_SESSION['gid'], $groupHandler->canChangePassword()) && !$_SESSION['su']) {
     error(19);
@@ -32,7 +32,7 @@ if (isset($_POST['current_password'])) {
         $user                = $_SESSION['user'];
         $userMapper          = Schoolbox\UserMapper::getInstance();
         $passwordService     = new \Alaress\Password\Service();
-        $passwordMailService = new \Schoolbox\User\Password\MailService(ConfigMapper::getInstance());
+        $passwordMailService = new \Schoolbox\User\Password\MailService($configMapper);
         // Test password against existing
         $currentHash = $user->getPassword();
         if ($passwordService->verify($_POST['current_password'], $currentHash)
@@ -54,8 +54,12 @@ if (isset($_POST['current_password'])) {
         // I shouldn't have to send all those damn password change mails anymore either
         $redirect = '/account/modify/success';
         if ($user->getRole()->isParent()) {
-            $communityPortalFactory = new \Schoolbox\External\Connector\CommunityPortalFactory(ConfigMapper::getInstance());
-            $communityPortal        = $communityPortalFactory->build();
+
+            $factory = new ExternalConnectorFactory();
+
+            /** @var CommunityPortalInterface $communityPortal */
+            $communityPortal = $factory->build($configMapper, ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL);
+
             try {
                 $communityPortal->changePassword($user->getExternalId(), $_POST['new_password']);
             } catch (\UnexpectedValueException $e) {

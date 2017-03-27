@@ -33,9 +33,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\External\Connector\SyncFactory;
-use Schoolbox\External\Connector\TimetableFactory;
-use Schoolbox\External\Connector\UserFactory;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
@@ -504,8 +502,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         ]
                     ),
                     'externalUserSource' => $di->lazy(function() use ($di) {
-                        $source = new SyncFactory();
-                        return $source->build($di);
+                        /** @var IConfigLoader $config */
+                        $config = $di->get('config');
+                        $factory = new ExternalConnectorFactory();
+                        return $factory->build($config, ExternalConnectorFactory::EXTERNAL_SYNC);
                     }),
                     'userMapper'     => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
                     'logger'         => $di->lazyGet('ups.logger'),
@@ -520,17 +520,27 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
 
+        $di->set('externalCommunityPortal', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
+            $factory = new ExternalConnectorFactory();
+            return $factory->build($config, ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL);
+        }));
 
         // Register external NDS object services
 
         $di->set('externalNDSUser', $di->lazy(function () use ($di) {
-            $source = new UserFactory();
-            return $source->build($di);
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
+            $factory = new ExternalConnectorFactory();
+            return $factory->build($config, ExternalConnectorFactory::EXTERNAL_USER);
         }));
 
         $di->set('externalNDSTimetable', $di->lazy(function () use ($di) {
-            $source = new TimetableFactory();
-            return $source->build($di);
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
+            $factory = new ExternalConnectorFactory();
+            return $factory->build($config, ExternalConnectorFactory::EXTERNAL_TIMETABLE);
         }));
         
         // LTI Provider mapper

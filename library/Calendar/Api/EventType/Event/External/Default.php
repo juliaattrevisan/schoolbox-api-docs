@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\External\Connector\ExternalEventsFactory;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -34,8 +34,8 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function __construct($user, $config) {
         $this->setUser($user);
-        $factory = new ExternalEventsFactory();
-        $this->externalEvents = $factory->build();
+        $factory = new ExternalConnectorFactory();
+        $this->externalEvents = $factory->build($config, ExternalConnectorFactory::EXTERNAL_EVENTS);
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 
@@ -117,7 +117,8 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
     /**
      * Making the abstract class happy
-     *
+     * @param int $eventId
+     * @return string
      */
     public function getEvent($eventId) {
         return '';
