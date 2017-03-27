@@ -9,15 +9,17 @@
 
 namespace Schoolbox\External\Connector;
 
+use Alaress\Database\Iterator\IIterator;
+
 interface ExternalEventsInterface
 {
     /**
      * Get events from external database
      *
-     * @param  object $user
-     * @param  string $startDate
-     * @param  string $endDate
-     * @return array
+     * @param object $user
+     * @param string $startDate
+     * @param string $endDate
+     * @return IIterator
      */
     public function getExternalEvents($user, $startDate, $endDate);
 }

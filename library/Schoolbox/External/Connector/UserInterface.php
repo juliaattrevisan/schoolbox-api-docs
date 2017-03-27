@@ -74,7 +74,7 @@ interface UserInterface
      * Retrieve all information required to render the staff directory
      *
      * @param array $filter
-     * @return array
+     * @return Collection
      */
     function getStaffDirectory($filter = []);
 

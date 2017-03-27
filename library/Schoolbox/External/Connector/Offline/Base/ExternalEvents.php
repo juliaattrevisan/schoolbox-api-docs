@@ -1,6 +1,6 @@
 <?php
 /**
- * Offline Scheduler Events stub
+ * Offline implementation of external events
  *
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
@@ -9,24 +9,16 @@
 
 namespace Schoolbox\External\Connector\Offline\Base;
 
-use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ExternalEventsInterface;
+use Schoolbox\External\Connector\Base;
 
-/**
- * Class ExternalEvents
- *
- * @package Schoolbox\External\Connector\Synergetic\Base
- */
 class ExternalEvents extends Base implements ExternalEventsInterface
 {
     /**
-     * @param  object $user
-     * @param  string $startDate
-     * @param  string $endDate
-     * @return array|bool
+     * @inheritdoc
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
-        return [];
+        return false;
     }
 }

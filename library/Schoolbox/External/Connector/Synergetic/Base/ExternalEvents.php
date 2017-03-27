@@ -13,20 +13,10 @@ use Alaress_Date_Format;
 use Schoolbox\External\Connector\ExternalEventsInterface;
 use Schoolbox\External\Connector\Base;
 
-/**
- * Class ExternalEvents
- *
- * @package Schoolbox\External\Connector\Synergetic\Base
- */
 class ExternalEvents extends Base implements ExternalEventsInterface
 {
     /**
-     * Getting events for a user (a teacher or a student) for a specific time interval
-     *
-     * @param  object $user
-     * @param  string $startDate
-     * @param  string $endDate
-     * @return array|bool
+     * @inheritdoc
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
@@ -89,6 +79,6 @@ class ExternalEvents extends Base implements ExternalEventsInterface
               {$where}
               ORDER BY ss.StaffScheduleSeq ASC";
 
-        return $this->databaseExternal->executeQuery($query)->fetchAll();
+        return $this->databaseExternal->executeQueryIterator($query);
     }
  }
