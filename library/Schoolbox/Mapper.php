@@ -31,7 +31,9 @@ use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
+use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Serializable;
 use Traversable;
@@ -175,7 +177,7 @@ abstract class Mapper implements IMapper, Serializable
     /** @var IMonitor */
     protected static $perfmon;
 
-    /** @var Propagator */
+    /** @var IPropagator */
     protected static $prop;
 
     /**
@@ -245,20 +247,27 @@ abstract class Mapper implements IMapper, Serializable
             : new LiveMonitor()
         ;
 
-        self::$prop = $di->newInstance(Propagator::class, [
-            'splitter'   => $di->lazyNew(Splitter::class, [
-                'conf'        => $di->lazyGet('config'),
-                'di'          => $di,
-                'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
-            ]),
-            'redis'      => $di->lazyGet('redis'),
-            'broker'     => $di->lazyNew(Broker::class, [
-                'amqp'       => $di->lazyGet('amqp'),
+        try {
+            self::$prop = $di->newInstance(Propagator::class, [
+                'splitter'   => $di->lazyNew(Splitter::class, [
+                    'conf'        => $di->lazyGet('config'),
+                    'di'          => $di,
+                    'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
+                ]),
                 'redis'      => $di->lazyGet('redis'),
-                // no 'stomp'
-            ]),
-            'instanceId' => INSTANCE_ID,
-        ]);
+                'broker'     => $di->lazyNew(Broker::class, [
+                    'amqp'       => $di->lazyGet('amqp'),
+                    'redis'      => $di->lazyGet('redis'),
+                    // no 'stomp'
+                ]),
+                'instanceId' => INSTANCE_ID,
+            ]);
+        } catch (Di\Exception\ServiceNotFound $e) {
+            // in PHPUnit land, we do not have external services.
+            // this catch is merely to accommodate that case, it should not be
+            // relied upon in development
+            self::$prop = new MockPropagator();
+        }
     }
 
     /**
@@ -582,7 +591,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @return Propagator
+     * @return IPropagator
      */
     public function getEventPropagator()
     {
@@ -590,10 +599,10 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @param Propagator $propagator
+     * @param IPropagator $propagator
      * @return static
      */
-    protected function setEventPropagator($propagator)
+    protected function setEventPropagator(IPropagator $propagator = null)
     {
         $this->propagator = $propagator;
         return $this;

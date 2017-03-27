@@ -22,7 +22,7 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Realtime\Schedule\Trigger
  */
-class Propagator
+class Propagator implements IPropagator
 {
     /** @var Splitter */
     private $splitter;
