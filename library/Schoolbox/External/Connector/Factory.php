@@ -35,6 +35,7 @@ class Factory
      */
     public function build($config, $databaseExternal, $timetableExternal, $type)
     {
+        $offlineBase = "\\Schoolbox\\External\\Connector\\Offline\\";
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type')) . "\\";
         $prefixSchool = $prefixBase . ucwords($config->get('site_location')) . "\\";
 
@@ -65,27 +66,18 @@ class Factory
 
                 if ($config->get('external_type') == 'Synergetic' && $config->get('synergetic_password_reset')) {
 
-                    $key = false;
-                    $iv = false;
+                    $classBase = "{$prefixBase}ExternalEvents";
+                    $classSchool = "{$prefixSchool}ExternalEvents";
 
-                    $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
+                } else {
 
-                    if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
-                        $config = json_decode(file_get_contents($webServicesKeyFile), true);
-                        $key = base64_decode($config['key']);
-                        $iv = base64_decode($config['iv']);
-                    } else {
-                        // can't read file, that's a warning at least.
-                        trigger_error('Cannot read community portal key - password will not be changed', E_USER_WARNING);
-                    }
+                    // Everyone else can just get the offline class
 
-                    return new Synergetic\Base\CommunityPortal($databaseExternal, $key, $iv);
-
+                    $classBase = "{$offlineBase}ExternalEvents";
+                    $classSchool = "{$offlineBase}ExternalEvents";
                 }
 
-                // Everyone else can just get the offline class
-
-                return new Offline\Base\CommunityPortal();
+                break;
 
             default:
                 throw new UnexpectedValueException("Unknown external object type requested: '{$type}'");

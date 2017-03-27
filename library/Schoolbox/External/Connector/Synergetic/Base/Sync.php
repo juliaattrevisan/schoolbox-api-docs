@@ -9,23 +9,12 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use Alaress\Database\Connector\IConnector;
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\SyncInterface;
-use Schoolbox\External\Connector\TimetableInterface;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Sync\Iterator;
 
-class Sync implements SyncInterface
+class Sync extends Base implements SyncInterface
 {
-    /** @var IConnector */
-    protected $databaseExternal;
-
-    /** @var TimetableInterface */
-    protected $timetableExternal;
-
-    /** @var IConfigLoader */
-    protected $config;
-
     /** @var int */
     protected $fileYear;
 
@@ -37,9 +26,8 @@ class Sync implements SyncInterface
      */
     public function __construct($config, $databaseExternal, $timetableExternal)
     {
-        $this->config = $config;
-        $this->databaseExternal = $databaseExternal;
-        $this->timetableExternal = $timetableExternal;
+        parent::__construct($config, $databaseExternal, $timetableExternal);
+
         $this->fileYear = $this->timetableExternal->getCurrentYear();
         $this->fileSemester = $this->timetableExternal->getCurrentSemester();
     }

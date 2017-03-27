@@ -9,28 +9,12 @@
 
 namespace Schoolbox\External\Connector\Denbigh\Base;
 
-use Alaress\Database\Connector\IConnector;
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\SyncInterface;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Sync\Iterator;
 
-class Sync implements SyncInterface
+class Sync extends Base implements SyncInterface
 {
-    /** @var IConnector */
-    protected $databaseExternal;
-
-    /** @var IConfigLoader */
-    protected $config;
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config, $databaseExternal, $timetableExternal)
-    {
-        $this->config = $config;
-        $this->databaseExternal = $databaseExternal;
-    }
-
     /**
      * {@inheritdoc}
      */

@@ -9,6 +9,7 @@
 
 namespace Schoolbox\External\Connector\Offline\Base;
 
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ExternalEventsInterface;
 
 /**
@@ -16,15 +17,8 @@ use Schoolbox\External\Connector\ExternalEventsInterface;
  *
  * @package Schoolbox\External\Connector\Synergetic\Base
  */
-class ExternalEvents implements ExternalEventsInterface
+class ExternalEvents extends Base implements ExternalEventsInterface
 {
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config, $databaseExternal, $timetableExternal)
-    {
-    }
-
     /**
      * @param  object $user
      * @param  string $startDate

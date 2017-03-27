@@ -9,17 +9,11 @@
 
 namespace Schoolbox\External\Connector\Offline\Base;
 
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\SyncInterface;
 
-class Sync implements SyncInterface
+class Sync extends Base implements SyncInterface
 {
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config, $databaseExternal, $timetableExternal)
-    {
-    }
-
     /**
      * {@inheritdoc}
      */

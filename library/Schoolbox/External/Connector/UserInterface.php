@@ -9,25 +9,14 @@
 
 namespace Schoolbox\External\Connector;
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Tutor;
 use Schoolbox\External\Normalise\User\Student;
-use Schoolbox\IConfigLoader;
 
 interface UserInterface
 {
-    /**
-     * Constructor
-     *
-     * @param IConfigLoader $config
-     * @param array|IConnector $databaseExternal External database connector(s)
-     * @param TimetableInterface $timetableExternal External timetable connector
-     */
-    function __construct($config, $databaseExternal, $timetableExternal);
-
     /**
      * Retrieves path on disk to user photo if one exists. If no images exists
      * or the file is not accessible by the server this will return false.

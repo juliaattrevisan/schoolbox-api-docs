@@ -10,32 +10,16 @@
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress_Date_Format;
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\ExternalEventsInterface;
-use Schoolbox\IConfigLoader;
+use Schoolbox\External\Connector\Base;
 
 /**
  * Class ExternalEvents
  *
  * @package Schoolbox\External\Connector\Synergetic\Base
  */
-class ExternalEvents implements ExternalEventsInterface
+class ExternalEvents extends Base implements ExternalEventsInterface
 {
-    /** @var IConfigLoader */
-    protected $config;
-
-    /** @var IConnector */
-    private $databaseExternal;
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config, $databaseExternal, $timetableExternal)
-    {
-        $this->config = $config;
-        $this->databaseExternal = $databaseExternal;
-    }
-
     /**
      * Getting events for a user (a teacher or a student) for a specific time interval
      *

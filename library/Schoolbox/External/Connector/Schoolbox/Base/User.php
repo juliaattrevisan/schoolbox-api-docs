@@ -9,9 +9,9 @@
 
 namespace Schoolbox\External\Connector\Schoolbox\Base;
 
-use Alaress\Database\Connector\IConnector;
 use Group;
 use Schoolbox\Collection;
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\UserInterface;
 use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Campus;
@@ -20,9 +20,8 @@ use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UserRelation;
-use Schoolbox\IConfigLoader;
 
-class User implements UserInterface
+class User extends Base implements UserInterface
 {
     // This particular class is a bit of a head-f**k in that this it represents the internal database
     // but is being treated as an external . This creates confusion as to which ID we should be using
@@ -45,21 +44,6 @@ class User implements UserInterface
     // We obviously need to be able to explode these out to use them, so to avoid conflicts with
     // characters stored in the fields values we use the ASCII character 30 (0x1E) which is a
     // non-printable character specifically designated for the purpose of being a record separator
-
-    /** @var IConnector */
-    protected $databaseExternal;
-
-    /** @var IConfigLoader */
-    protected $config;
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config, $databaseExternal, $timetableExternal)
-    {
-        $this->config = $config;
-        $this->databaseExternal = $databaseExternal;
-    }
 
     /**
      * @inheritdoc

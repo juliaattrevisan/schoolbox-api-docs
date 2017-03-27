@@ -9,94 +9,88 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use Alaress\Database\Connector\IConnector;
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\UserInterface;
-use Schoolbox\IConfigLoader;
 
-class User implements UserInterface
+class User extends Base implements UserInterface
 {
-    /** @var IConnector $databaseExternal */
-    protected $databaseExternal;
-
-    /** @var IConfigLoader $config */
-    protected $config;
-
     /**
      * @inheritdoc
      */
-    public function __construct($config, $databaseExternal, $timetableExternal)
+    function getPortrait($externalId)
     {
-        $this->config = $config;
-        $this->databaseExternal = $databaseExternal;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    function getPortrait($externalId) {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getGuardians($externalIds, $hydrateStudents = false) {
+    function getGuardians($externalIds, $hydrateStudents = false)
+    {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getGuardianDirectory($filter = []) {
+    function getGuardianDirectory($filter = [])
+    {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getStudents($externalIds, $hydrateGuardians = false) {
+    function getStudents($externalIds, $hydrateGuardians = false)
+    {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getStudentsAccessible($externalID) {
+    function getStudentsAccessible($externalID)
+    {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getStaff($externalId) {
+    function getStaff($externalId)
+    {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getStaffDirectory($filter = []) {
+    function getStaffDirectory($filter = [])
+    {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getTutors($externalIds) {
+    function getTutors($externalIds)
+    {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getEmails($externalIds) {
+    function getEmails($externalIds)
+    {
 
     }
 
     /**
      * @inheritdoc
      */
-    function getCampusInvolvement($externalId) {
+    function getCampusInvolvement($externalId)
+    {
 
     }
 }

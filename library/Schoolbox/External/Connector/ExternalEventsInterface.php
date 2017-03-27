@@ -9,20 +9,8 @@
 
 namespace Schoolbox\External\Connector;
 
-use Alaress\Database\Connector\IConnector;
-use Schoolbox\IConfigLoader;
-
 interface ExternalEventsInterface
 {
-    /**
-     * Constructor
-     *
-     * @param IConfigLoader $config
-     * @param array|IConnector $databaseExternal External database connector(s)
-     * @param TimetableInterface $timetableExternal External timetable connector
-     */
-    function __construct($config, $databaseExternal, $timetableExternal);
-
     /**
      * Get events from external database
      *

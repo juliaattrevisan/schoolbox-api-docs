@@ -9,17 +9,11 @@
 
 namespace Schoolbox\External\Connector\Offline\Base;
 
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\CommunityPortalInterface;
 
-class CommunityPortal implements CommunityPortalInterface
+class CommunityPortal extends Base implements CommunityPortalInterface
 {
-    /**
-     * @inheritdoc
-     */
-    public function __construct($databaseExternal, $key, $initializationVector)
-    {
-    }
-
     /**
      * @inheritDoc
      */

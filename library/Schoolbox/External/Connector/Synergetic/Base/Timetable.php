@@ -9,29 +9,13 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\TimetableInterface;
 use Schoolbox\External\Normalise\Timetable\Lesson;
-use Schoolbox\IConfigLoader;
 
-class Timetable implements TimetableInterface
+class Timetable extends Base implements TimetableInterface
 {
-    /** @var IConnector */
-    protected $databaseExternal;
-
-    /** @var IConfigLoader */
-    protected $config;
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config, $databaseExternal, $timetableExternal)
-    {
-        $this->config = $config;
-        $this->databaseExternal = $databaseExternal;
-    }
-
     /**
      * @inheritdoc
      */

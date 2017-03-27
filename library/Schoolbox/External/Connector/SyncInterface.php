@@ -9,21 +9,10 @@
 
 namespace Schoolbox\External\Connector;
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Normalise\User;
-use Schoolbox\IConfigLoader;
 
 interface SyncInterface
 {
-    /**
-     * Constructor
-     *
-     * @param IConfigLoader $config
-     * @param array|IConnector $databaseExternal External database connector(s)
-     * @param TimetableInterface $timetableExternal External timetable connector
-     */
-    function __construct($config, $databaseExternal, $timetableExternal);
-
     /**
      * Gets a collection of normalized student objects.
      *
