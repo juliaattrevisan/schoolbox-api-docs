@@ -54,6 +54,19 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
     const PIPE_METHOD_WAIT        = 'wait';
 
+    /**
+     * On the matter of File Descriptors: one or more file descriptors are opened by this process every time...
+     *  - guzzle creates a HTTP responses (in-memory tempfile)
+     *  - a websocket connects (duplex socket)
+     *  - a worker is spawned (triplex socket)
+     *
+     * The operating system places limits on the number of file descriptors a process may have open at any one time,
+     * and will mercilessly punish processes that attempt to exceed their limit. In the interests of stability, this
+     * is undesirable. This limit buffer is to mitigate any possible race condition between sockets opening and
+     * others closing.
+     */
+    const FD_LIMIT_BUFFER = 16;
+
     /** @var string[] */
     private static $headerMap = [
         400 => 'Bad Request',
@@ -107,7 +120,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $this->subscriptionManager = $subscriptionManager;
         $this->pipes               = $pipes;
         $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
-        $this->fdLimit             = $fdLimit - 16;
+        $this->fdLimit             = $fdLimit - self::FD_LIMIT_BUFFER;
 
         $this->log->debug('Instantiated PipeManager');
     }
