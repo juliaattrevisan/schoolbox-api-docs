@@ -42,7 +42,7 @@ class Postman
 	 * Delivers the contents of the given bundle, according to the notifier given
 	 *
 	 * @param InstanceBundle $bundle
-	 * @param array $appendContext
+	 * @param array          $appendContext
 	 * @return int
 	 */
 	public function deliver(InstanceBundle $bundle, array $appendContext = [])
@@ -51,6 +51,10 @@ class Postman
 
 		foreach ($bundle->getAll() as $routeKey => $instance) {
             $array = $instance->jsonSerialize();
+
+            // merge the context appendation
+            $array['context'] = array_merge($array['context'], $appendContext);
+
 		    $json = json_encode($array);
 
             if ($json === '') {
