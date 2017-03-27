@@ -73,6 +73,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['curriculumNodes'] = $context->getFolder()->getCurriculumNodes();
 
+        /* Default Visibility comes from an LMS Policy setting in config
+         */
+        $data['markVisibility'] = $this->getConfigLoader()->get('submission_access');
+
         // Did the caller request a returnUrl?
         $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
@@ -83,7 +87,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
             $content = $this->buildUnthemedHtmlOutput("@learningAssessment/fragments/$type/create.twig", $data);
-
         } else {
             $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
         }
