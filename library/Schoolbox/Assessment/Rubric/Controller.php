@@ -44,7 +44,7 @@ class Controller extends BaseController
      * @param Factory $factory
      * @return self
      */
-    public function setFactory($factory)
+    public function setFactory(Factory $factory)
     {
         $this->factory = $factory;
         return $this;
@@ -64,7 +64,7 @@ class Controller extends BaseController
      * @param RubricMapper $mapper
      * @return self
      */
-    public function setMapper($mapper)
+    public function setMapper(RubricMapper $mapper)
     {
         $this->mapper = $mapper;
         return $this;
@@ -193,7 +193,7 @@ class Controller extends BaseController
      *
      * @param File $file
      */
-    public function import($file)
+    public function import(File $file)
     {
         $post = $this->getRequest()->post;
 

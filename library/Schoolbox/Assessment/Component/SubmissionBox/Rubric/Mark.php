@@ -50,7 +50,7 @@ class Mark
      * @param User $student
      * @return static
      */
-    public function setStudent($student)
+    public function setStudent(User $student)
     {
         $this->student = $student;
         return $this;
@@ -68,7 +68,7 @@ class Mark
      * @param Descriptor $descriptor
      * @return static
      */
-    public function setDescriptor($descriptor)
+    public function setDescriptor(Descriptor $descriptor)
     {
         $this->descriptor = $descriptor;
         return $this;

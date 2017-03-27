@@ -82,7 +82,7 @@ class RubricMapper
 
     /**
      * @param AssessmentContext $context
-     * @param array             $levelNames
+     * @param string[]          $levelNames
      * @return Rubric
      */
     public function createForContext(AssessmentContext $context, array $levelNames = [])
@@ -208,7 +208,7 @@ class RubricMapper
      * @param bool          $editMode          - whether to include criteria not in use on box
      * @return Rubric
      */
-    public function findBySubmissionBox($box, $getParentCriteria = false, $editMode = false)
+    public function findBySubmissionBox(SubmissionBox $box, $getParentCriteria = false, $editMode = false)
     {
         list ($groups, $criteria) = $this->findCriteria($box, $getParentCriteria);
         $descriptors = $this->findDescriptors($box);
@@ -429,10 +429,10 @@ class RubricMapper
 
     /**
      * @param Rubric $grid
-     * @param array  $selectedDescriptorIds
+     * @param int[]  $selectedDescriptorIds
      * @return Rubric
      */
-    public function applyMark($grid, $selectedDescriptorIds)
+    public function applyMark(Rubric $grid, array $selectedDescriptorIds)
     {
         foreach ($grid->getAllDescriptors() as $descriptor) {
             $selected = in_array($descriptor->getId(), $selectedDescriptorIds);
@@ -448,7 +448,7 @@ class RubricMapper
      * @param bool   $publishedOnly       Whether to exclude draft marks
      * @return Rubric
      */
-    public function applyStudentMark($grid, $student, $publishedOnly)
+    public function applyStudentMark(Rubric $grid, User $student, $publishedOnly)
     {
         if (!$grid->getSubmissionBox() instanceof SubmissionBox) {
             throw new \InvalidArgumentException("Cannot apply marks without a submission box");
@@ -499,7 +499,7 @@ class RubricMapper
      * @param User $student
      * @return Rubric
      */
-    public function findBySubmissionBoxAndStudent($box, $student)
+    public function findBySubmissionBoxAndStudent(SubmissionBox $box, User $student)
     {
         $grid = $this->findBySubmissionBox($box);
         return $this->applyStudentMark($grid, $student, true);
@@ -742,7 +742,7 @@ class RubricMapper
      * @param Rubric $rubric
      * @param SubmissionBox $submissionBox
      */
-    public function save($rubric, $submissionBox)
+    public function save(Rubric $rubric, SubmissionBox $submissionBox)
     {
         // juuust in case
         $rubric->setSubmissionBox($submissionBox);

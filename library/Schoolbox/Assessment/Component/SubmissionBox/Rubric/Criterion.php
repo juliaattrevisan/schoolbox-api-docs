@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\ISoftDeletable;
-use Alaress_Date_Format;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 

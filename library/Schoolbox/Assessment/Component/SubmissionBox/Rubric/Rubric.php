@@ -11,22 +11,61 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric as Core;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use SplObjectStorage;
 
+/**
+ * Composed of domain-level objects. Can be decomposed into ORM mapped-models
+ */
 class Rubric extends Core\Rubric
 {
 
-    /** @var SubmissionBox */
+    /** @var SubmissionBox|null */
     private $box;
+
+    /**
+     * Maps domain object Criterion to ORM Criterion
+     *
+     * @var SplObjectStorage|Core\Criteria\Criterion[]
+     */
+    private $cCache;
+
+    /**
+     * Maps domain object Criterion to ORM Usage
+     *
+     * @var SplObjectStorage|Core\Criteria\Criterion[]
+     */
+    private $uCache;
+
+    /**
+     * Maps domain object Level to ORM Level
+     *
+     * @var SplObjectStorage|Core\Competency\Level[]
+     */
+    private $lCache;
+
+    /**
+     * Maps domain object Descriptor to ORM Descriptor
+     *
+     * @var SplObjectStorage|Core\Descriptor[]
+     */
+    private $dCache;
+
+    /**
+     * Maps domain object Descriptor to ORM Mark
+     *
+     * @var SplObjectStorage|Core\Descriptor[]
+     */
+    private $mCache;
 
 
     /**
      * @param SubmissionBox $submissionBox
      */
-    public function __construct($submissionBox = null)
+    public function __construct(SubmissionBox $submissionBox = null)
     {
         $id = $submissionBox ? $submissionBox->getId() : 0;
 
@@ -43,10 +82,10 @@ class Rubric extends Core\Rubric
 
 
     /**
-     * @param SubmissionBox $box
+     * @param SubmissionBox|null $box
      * @return self
      */
-    public function setSubmissionBox($box)
+    public function setSubmissionBox(SubmissionBox $box = null)
     {
         $this->box = $box;
         // bind my ID to the box's ID
@@ -73,7 +112,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMCriteria()
     {
-        $c = new Collection();
+        $c = CriterionMapper::getInstance()->createCollection();
 
         // cast our object hierarchy into the flattened ORM-style models
         foreach ($this->criteriaGroups as $group) {
@@ -86,15 +125,12 @@ class Rubric extends Core\Rubric
     }
 
 
-    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
-    protected $cCache;
-
     /**
      * @param Core\Criteria\Criterion $criterion
      * @param string                  $groupName
      * @return Criterion
      */
-    protected function createORMCriterion($criterion, $groupName = '')
+    protected function createORMCriterion(Core\Criteria\Criterion $criterion, $groupName = '')
     {
         if (!$this->cCache->contains($criterion)) {
             try {
@@ -124,7 +160,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMUsages()
     {
-        $c = new Collection();
+        $c = UsageMapper::getInstance()->createCollection();
 
         $sequence = 0;
         foreach ($this->criteriaGroups as $group) {
@@ -139,21 +175,18 @@ class Rubric extends Core\Rubric
     }
 
 
-    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
-    protected $uCache;
-
     /**
-     * @param Criterion $criterion
+     * @param Core\Criteria\Criterion $criterion
      * @param int $sequence
      * @return Usage
      */
-    protected function createORMUsage($criterion, $sequence)
+    protected function createORMUsage(Core\Criteria\Criterion $criterion, $sequence)
     {
         if (!$this->uCache->contains($criterion)) {
             $this->uCache->attach($criterion,
                 UsageMapper::getInstance()
                   ->createModel()
-                  ->setCriterion($criterion)
+                  ->setCriterion($this->cCache->offsetGet($criterion))
                   ->setSubmissionBox($this->box)
             );
         }
@@ -169,7 +202,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMLevels()
     {
-        $c = new Collection();
+        $c = LevelMapper::getInstance()->createCollection();
 
         $sequence = 0;
         foreach ($this->levels as $level) {
@@ -180,15 +213,12 @@ class Rubric extends Core\Rubric
     }
 
 
-    /** @var SplObjectStorage|Core\Competency\Level[] */
-    protected $lCache;
-
     /**
      * @param Core\Competency\Level $level
      * @param int              $sequence
      * @return Level
      */
-    protected function createORMLevel($level, $sequence)
+    protected function createORMLevel(Core\Competency\Level $level, $sequence)
     {
         if (!$this->lCache->contains($level)) {
 
@@ -222,7 +252,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMDescriptors()
     {
-        $c = new Collection();
+        $c = DescriptorMapper::getInstance()->createCollection();
 
         foreach ($this->levels as $sequence => $level) {
             foreach ($level->getAllDescriptors() as $descriptor) {
@@ -234,16 +264,13 @@ class Rubric extends Core\Rubric
     }
 
 
-    /** @var SplObjectStorage|Core\Descriptor[] */
-    protected $dCache;
-
     /**
      * @param Core\Descriptor       $descriptor
      * @param Core\Competency\Level $level
      * @param int                   $sequence
      * @return Descriptor
      */
-    protected function createORMDescriptor($descriptor, $level, $sequence)
+    protected function createORMDescriptor(Core\Descriptor $descriptor, Core\Competency\Level $level, $sequence)
     {
         if (!$this->dCache->contains($descriptor)) {
             // models we need
@@ -285,7 +312,7 @@ class Rubric extends Core\Rubric
      */
     public function getAllDescriptors()
     {
-        $c = new Collection();
+        $c = new GenericCollection(Core\Descriptor::class);
 
         foreach ($this->levels as $level) {
             $c = $c->merge($level->getAllDescriptors());
@@ -302,7 +329,7 @@ class Rubric extends Core\Rubric
      */
     public function getORMMarks($student, $timestamp)
     {
-        $c = new Collection();
+        $c = MarkMapper::getInstance()->createCollection();
 
         foreach ($this->getAllDescriptors() as $descr) {
             if ($descr->isSelected()) {
@@ -314,16 +341,13 @@ class Rubric extends Core\Rubric
     }
 
 
-    /** @var SplObjectStorage|Core\Descriptor[] */
-    protected $mCache;
-
     /**
      * @param Core\Descriptor         $descriptor
      * @param Alaress_Date_Format     $timestamp
      * @param User                    $student
      * @return Mark
      */
-    protected function createORMMark($descriptor, $timestamp, $student)
+    protected function createORMMark(Core\Descriptor $descriptor, Alaress_Date_Format $timestamp, User $student)
     {
         if (!$this->mCache->contains($descriptor)) {
             $this->mCache->attach($descriptor,
@@ -343,7 +367,7 @@ class Rubric extends Core\Rubric
     /**
      * Return the Twig representation of the data structure this rubric contains
      *
-     * @param User $sessionUser
+     * @param User $sessionUser|null
      * @return array
      */
     public function toContext(User $sessionUser = null)
@@ -459,8 +483,8 @@ class Rubric extends Core\Rubric
 
 
     /**
-     * @param $percentage
-     * @param $total
+     * @param float $percentage
+     * @param int $total
      * @return string
      */
     protected function calculateHumanReadable($percentage, $total)
