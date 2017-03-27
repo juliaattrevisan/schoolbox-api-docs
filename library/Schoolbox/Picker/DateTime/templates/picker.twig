@@ -83,6 +83,70 @@
     }
 
 </style>
+{#<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />#}
+{#<script type="text/javascript" src="/javascript/components/fullcalendar/dist/fullcalendar.js"></script>#}
+{#<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={SITE_VERSION}"></script>#}
+
+{#<script>#}
+    {#$(document).ready(function() {#}
+
+
+
+
+        {#// page is now ready, initialize the calendar...#}
+
+        {#$('#calendarResponse{{ id }}').fullCalendar({#}
+
+            {#header: {#}
+                {#left: 'today',#}
+                {#center: 'title',#}
+                {#right: ''#}
+            {#},#}
+            {#defaultDate: '2017-03-23',#}
+            {#defaultView: 'agendaDay',#}
+            {#height: 650,#}
+            {#events: [#}
+                {#{#}
+                    {#title: 'All Day Event',#}
+                    {#start: '2017-03-23'#}
+                {#},#}
+                {#{#}
+                    {#title: 'Long Event',#}
+                    {#start: '2017-03-23',#}
+                    {#end: '2017-03-24'#}
+                {#},#}
+                {#{#}
+                    {#id: 999,#}
+                    {#title: 'Repeating Event',#}
+                    {#start: '2017-03-23T16:00:00'#}
+                {#},#}
+                {#{#}
+                    {#id: 999,#}
+                    {#title: 'Repeating Event',#}
+                    {#start: '2017-03-23T16:00:00'#}
+                {#},#}
+                {#{#}
+                    {#title: 'Meeting',#}
+                    {#start: '2017-03-23T10:30:00',#}
+                    {#end: '2017-03-23T12:30:00'#}
+                {#},#}
+                {#{#}
+                    {#title: 'Lunch',#}
+                    {#start: '2017-03-23T12:00:00'#}
+                {#},#}
+                {#{#}
+                    {#title: 'Birthday Party',#}
+                    {#start: '2017-03-23T07:00:00'#}
+                {#}#}
+            {#]#}
+
+
+        {#});#}
+    {#});#}
+
+
+
+{#</script>#}
 {% if type == 'event' or type =='duework' %}
     {% set width = 6 %}
 {% else %}
@@ -128,7 +192,7 @@
                     <div id="timetable{{ id }}">
                         <select name="campus">
                             {% for campus in timetable %}
-                                <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
+                                <option value="{{ campus.campusId }}" data-days="{{ campus.timetableDay }}" >{{ campus.campusName }}</option>
                             {% endfor %}
                         </select>
                         <select name="term">
@@ -138,19 +202,19 @@
                         </select>
                         <select name="cycle">
                             {# Options will be appended here #}
-                        </select>
+                        </select>{{ dump(timetable) }}
                         {# Build all, hide, reveal one later #}
                         {% for campus in timetable %}
                             <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
                                 <th>
-                                    {% for i in 1..timetable[campus.campusId].dayCount %}
+                                    {% for i in 1..timetable[campus.campusId].timetableDay %}
                                 <td class="day-{{ i }}">{{ i }}</td>
                                 {% endfor %}
                                 </th>
                                 {% set k=0 %}
                                 {% for description in timetable[campus.campusId].desc %}
                                     <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k] }}">{{ description }}</td>
-                                        {% for i in 1..timetable[campus.campusId].dayCount %}
+                                        {% for i in 1..timetable[campus.campusId].timetableDay %}
                                             <td><div class="has-period period-{{ i }}-{{ k }}" title="{{ timetable[campus.campusId].start[k] }} - {{ timetable[campus.campusId].end[k] }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
                                         {% endfor %}
                                         {% set k=k+1 %}

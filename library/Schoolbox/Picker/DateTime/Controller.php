@@ -68,7 +68,6 @@ class Controller extends Base
         $displayFormatDate = strlen(Config::get('date_local')) > 0 ? Config::get('date_local'): 'd/m/Y';
         $displayFormatTime = strlen(Config::get('date_time')) > 0 ? Config::get('date_time'): 'h:iK';
 
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@pickerDatetime/picker.twig',
@@ -123,7 +122,11 @@ class Controller extends Base
             $campusInfo['campusId'] = $campus->getId();
             $campusInfo['campusName'] = $campus->getName();
             $campusInfo['campusCode'] = $campus->getExtTimetableCode();
+            $campusInfo['timetableDay'] = $campus->getTimetableDay();
 
+            if(is_null($campusTimetable)) {
+                $campusTimetable = Array();
+            }
             //Return campus and it's timetable in one array
             $timetable[$campus->getId()] = array_merge($campusInfo, $campusTimetable);
         }

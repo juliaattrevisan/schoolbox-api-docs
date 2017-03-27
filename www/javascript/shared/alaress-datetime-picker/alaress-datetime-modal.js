@@ -9,6 +9,8 @@
 // Build datepicker options here... again...
 $.fn.alaressDateTimeModal = function(twigVars) {
 
+
+
     var pickerOptions = {
 
         // Flatpickr related
@@ -139,16 +141,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
 // Timtable picker
 // Build cycles dynamically
-//    function buildCycles(onFirstLoad) {
     function buildCycles() {
 
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
         var termDuration = $('select[name*="term"]').find(':selected').attr('data-duration');
         var optionsHtml = '';
         //Select cycle number on first load
-//        if(onFirstLoad === true) {
         cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate / daysInCycle);
-//        }
         for (i = 1; i <= (termDuration / daysInCycle); i++) {
             var selected = '';
 
@@ -164,7 +163,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function showPeriod() {
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
         var isWeekend = twigVars.timetableDay.isWeekend;
-        // Highlight day if it doen't fall on a weekend
+        // Highlight day if it doesn't fall on a weekend
         if (isWeekend == 0) {
             var period = 0;
             // Get day of the cycle
