@@ -52,6 +52,13 @@ class Document
     {
         $this->setFile($file);
         $this->setAuthenticator(new Authenticator());
+    }
+
+    /**
+     * Upload file to crocodoc
+     */
+    public function upload()
+    {
 
         /** @var Storage $storage */
         $storage     = $this->getFile()->getStorage();
@@ -67,18 +74,10 @@ class Document
             $this->setUrl($destination);
             fclose($fp);
         }
-    }
-
-    /**
-     * Upload file to crocodoc
-     */
-    public function upload()
-    {
-
-        /* Unlink copied file after uploading but only if it exists
-         * it might not, if it's been blown away from storage via gc
+        /* If the storage file didn't exist or it couldn't be opened (for whatever reason)
+         * Then just die, there's nothing else to do
          */
-        if (!file_exists($this->getUrl())) {
+        else {
             return [
                 'result'       => null,
                 'errors'       => 'Missing file',
