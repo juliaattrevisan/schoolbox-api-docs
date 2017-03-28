@@ -439,26 +439,10 @@ class Mapper extends BaseMapper
             // Check tags
 
             if (trim($tags) != '') {
+                $tagsArray = explode(",", trim($tags));
+                $hasAssociatedTags = $this->getPastoralTagsMapper()->associatedWith($record, $tagsArray);
 
-                $tagsArray = explode(",", strtolower(trim($tags)));
-                $tagsList = $this->getPastoralTagsMapper()->findForRecord($record->getId());
-
-                $found = false;
-
-                foreach ($tagsArray as $tagCurrent) {
-                    foreach ($tagsList as $tag) {
-                        if (strtolower($tag->getName()) == $tagCurrent) {
-                            $found = true;
-                            break;
-                        }
-                    }
-
-                    if ($found) {
-                        break;
-                    }
-                }
-
-                if (!$found) {
+                if (!$hasAssociatedTags) {
                     continue;
                 }
             }

@@ -86,6 +86,36 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     }
 
     /**
+     * Find out if $tagName is associated with $pastoral record
+     *
+     * @param PastoralRecord $pastoral
+     * @param array $tagNames
+     * @return bool
+     */
+    public function associatedWith(PastoralRecord $pastoral, $tagNames) {
+        if (count($tagNames)) {
+            $query = "
+                {$this->getSelectString()}
+                INNER JOIN pastoral_record_tag prt ON prt.tag_id = {$this->getTable()}.id
+                WHERE prt.pastoral_id = :pastoralId
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute([
+                'pastoralId' => $pastoral->getId()
+            ]);
+
+            foreach ($statement as $row) {
+                if (in_array($row['name'], $tagNames)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Find a collection of tags associated with $pastoralId
      *
      * @param $pastoralId
