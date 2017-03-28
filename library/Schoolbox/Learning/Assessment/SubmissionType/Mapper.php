@@ -1,6 +1,6 @@
 <?php
 /**
- * Mapper for the SubmissionBox\WorkType model.
+ * Mapper for the SubmissionType model.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -9,16 +9,16 @@
 
 namespace Schoolbox\Learning\Assessment\SubmissionType;
 use Schoolbox;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
+
 
 /**
- * @method WorkType findById($identifierValue)
+ * @method Model findById($identifierValue)
  */
-class WorkTypeMapper extends Schoolbox\Mapper {
+class Mapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('lu_submission_type');
-		$this->hasModel(WorkType::class);
+		$this->hasModel(Model::class);
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',

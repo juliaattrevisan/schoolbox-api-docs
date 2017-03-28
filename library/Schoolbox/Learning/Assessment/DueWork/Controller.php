@@ -14,7 +14,7 @@ use DueWork_ErrorMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
@@ -49,8 +49,8 @@ class Controller extends Assessment\Controller
     /** @var Rubric\RubricMapper */
     private $rubricMapper;
 
-    /** @var WorkTypeMapper */
-    private $workTypeMapper;
+    /** @var SubmissionTypeMapper */
+    private $submissionTypeMapper;
 
     /** @var DueWorkResponseMapper */
     private $dueWorkResponseMapper;
@@ -67,7 +67,7 @@ class Controller extends Assessment\Controller
      * @param Assessment\Breadcrumb\Factory $bakery
      * @param Rubric\RubricMapper           $rubricMapper
      * @param Rubric\ResultMapper           $resultSetMapper
-     * @param WorkTypeMapper                $workTypeMapper
+     * @param SubmissionTypeMapper          $submissionTypeMapper
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
      * @param ParticipantMapper             $participantMapper
      */
@@ -80,14 +80,14 @@ class Controller extends Assessment\Controller
         Assessment\Breadcrumb\Factory $bakery,
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
-        WorkTypeMapper $workTypeMapper,
+        SubmissionTypeMapper $submissionTypeMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
-        $this->workTypeMapper        = $workTypeMapper;
+        $this->submissionTypeMapper  = $submissionTypeMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
         $this->participantMapper     = $participantMapper;
     }
@@ -864,7 +864,7 @@ class Controller extends Assessment\Controller
         $data = [
             'acceptingResponses'=> true,
             'attachzone'      => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
-            'allWorkTypes'    => $this->getWorkTypeMapper()->findAll(),
+            'allWorkTypes'    => $this->getSubmissionTypeMapper()->findAll(),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
@@ -1022,21 +1022,21 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @return WorkTypeMapper
+     * @return SubmissionTypeMapper
      */
-    protected function getWorkTypeMapper()
+    protected function getSubmissionTypeMapper()
     {
-        return $this->workTypeMapper;
+        return $this->submissionTypeMapper;
     }
 
 
     /**
-     * @param WorkTypeMapper $workTypeMapper
+     * @param SubmissionTypeMapper $submissionTypeMapper
      * @return static
      */
-    protected function setWorkTypeMapper($workTypeMapper)
+    protected function setSubmissionTypeMapper($submissionTypeMapper)
     {
-        $this->workTypeMapper = $workTypeMapper;
+        $this->submissionTypeMapper = $submissionTypeMapper;
         return $this;
     }
 

@@ -11,7 +11,7 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
+use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
 use Schoolbox\Assessment\IActivityMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
@@ -25,7 +25,7 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -45,7 +45,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'am');
         $this->joins('category_id', FolderMapper::class, 'id', null, null, 'category', 'category');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->joins('type', WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
+        $this->joins('type', SubmissionTypeMapper::class, 'id', null, null, 'workType', 'work_type');
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('completion_message', self::TYPE_STRING);
@@ -157,7 +157,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      */
     protected function setWorkType(Model $object)
     {
-        $object->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT));
+        $object->setWorkType((new SubmissionType())->setId(SubmissionType::TYPE_ONLINE_ASSESSMENT));
         return true;
     }
 

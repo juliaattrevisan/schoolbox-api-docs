@@ -22,7 +22,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
+use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Role;
@@ -47,7 +47,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     protected $category;
 
     /**
-     * @var WorkType
+     * @var SubmissionType
      */
     protected $work_type;
 
@@ -179,7 +179,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     {
         $this->setAttachments(new Collection());
         $this->setCategory(new FolderModel());
-        $this->setWorkType(new WorkType());
+        $this->setWorkType(new SubmissionType());
         $this->setMarkType(new MarkType());
         $this->setGradeGroup(new GradeLevel\Group\Model());
         $this->setCurriculumNodes(new Collection());
@@ -393,7 +393,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @param  WorkType $type
+     * @param  SubmissionType $type
      * @return $this
      */
     public function setWorkType($type)
@@ -403,7 +403,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @return WorkType
+     * @return SubmissionType
      */
     public function getWorkType()
     {

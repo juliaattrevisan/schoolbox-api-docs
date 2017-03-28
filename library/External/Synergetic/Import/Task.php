@@ -40,7 +40,7 @@ class External_Synergetic_Import_Task {
 	public function import() {
 		$taskMapper = new External_Synergetic_Import_TaskMapper();
 		$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-		$workTypeMapper = new \Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper();
+		$workTypeMapper = new \Schoolbox\Learning\Assessment\SubmissionType\Mapper();
 		$markTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper();
 		$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 		$userMapper = new \Schoolbox\UserMapper();

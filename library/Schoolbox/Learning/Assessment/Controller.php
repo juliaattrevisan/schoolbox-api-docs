@@ -10,8 +10,8 @@ use Alaress_Date_Format;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
+use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -389,11 +389,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      *
      * TODO DI this if you feel like it
      *
-     * @return WorkType[]|Collection
+     * @return SubmissionType[]|Collection
      */
     protected function getAllWorkTypes()
     {
-        return WorkTypeMapper::getInstance()->findAll();
+        return SubmissionTypeMapper::getInstance()->findAll();
     }
 
     /**

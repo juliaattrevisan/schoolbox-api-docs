@@ -84,7 +84,7 @@ class DueWork implements IAssessmentTypeTranslator
 
             // Translate work type
             $model->setWorkType(
-                (new \Schoolbox\Learning\Assessment\SubmissionType\WorkType())
+                (new \Schoolbox\Learning\Assessment\SubmissionType\Model())
                     ->setId($assessment->getWorkType()->getId())
                     ->setName($assessment->getWorkType()->getName())
             );

@@ -9,8 +9,8 @@
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
+use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
@@ -29,7 +29,7 @@ class QuizNotifications extends AbstractNotificationTest
     /** @var Folder\Model */
     protected $folder;
 
-    /** @var  WorkType */
+    /** @var  SubmissionType */
     protected $quizWorkType;
 
     /** @var Collection|User[] */
@@ -93,7 +93,7 @@ class QuizNotifications extends AbstractNotificationTest
         ]);
 
         // erm... "quiz"
-        $this->quizWorkType = WorkTypeMapper::getInstance()->findById(11);
+        $this->quizWorkType = SubmissionTypeMapper::getInstance()->findById(11);
     }
 
 

@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Learning\Assessment\SubmissionType\WorkType as WorkTypeModel;
+use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionTypeModel;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -122,7 +122,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
 
         // Test type
-        $this->assertInstanceOf(WorkTypeModel::class, $dueWorkModel->getWorkType());
+        $this->assertInstanceOf(SubmissionTypeModel::class, $dueWorkModel->getWorkType());
         $this->assertEquals(12, $dueWorkModel->getWorkType()->getId());
         $this->assertEquals('A dumb type', $dueWorkModel->getWorkType()->getName());
 
@@ -293,7 +293,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 ->add($storage2)
                 ->add($storage3)
             )
-            ->setWorkType((new WorkTypeModel())
+            ->setWorkType((new SubmissionTypeModel())
                 ->setId(12)
                 ->setName('A dumb type')
             )

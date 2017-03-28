@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Assessment\SubmissionType;
 use Schoolbox;
 use Schoolbox\Resource;
 
-class WorkType {
+class Model {
 
 	const TYPE_ASSESSMENT_TASK   = 1;
 	const TYPE_ASSIGNMENT        = 2;
