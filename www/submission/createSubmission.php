@@ -10,6 +10,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 
 if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
@@ -118,7 +119,7 @@ $zone
 //
 // Should work types include or not include online assessments?
 // They do for pre-existing items, they don't for new items.
-$work_types  = $workTypeMapper->getAllExcept(WorkType::TYPE_ONLINE_ASSESSMENT);
+$work_types  = $workTypeMapper->getAllExcept(QuizMapper::WORK_TYPE_QUIZ);
 $mark_types  = $mark_mapper->getAll();
 $gradeGroups = $groupMapper->findAllWithGradeLevels();
 

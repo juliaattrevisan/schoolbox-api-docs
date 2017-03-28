@@ -19,13 +19,15 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Factory
 {
+    // This is pretty fragile. Must match value configured in Admin WorkType lists
+    const WORK_TYPE_ASSESSMENT_TASK = 1;
+
     /**
      * @var Gateway
      */
@@ -428,7 +430,7 @@ class Factory
         // Fetch only assessment tasks
         $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
             'id'   => $assessKeys,
-            'type' => WorkType::TYPE_ASSESSMENT_TASK,
+            'type' => self::WORK_TYPE_ASSESSMENT_TASK,
         ]);
         foreach ($assessments as $assess) {
             /** @var SubmissionBox $assess */
@@ -508,7 +510,7 @@ class Factory
             array(
                 'name'     => $assessmentName,
                 'category' => $cohortFolderIds,
-                'type'     => WorkType::TYPE_ASSESSMENT_TASK,
+                'type'     => self::WORK_TYPE_ASSESSMENT_TASK,
             )
         );
         $assessments->add($grade['assessment']);

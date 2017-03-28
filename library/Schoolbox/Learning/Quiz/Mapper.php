@@ -15,7 +15,6 @@ use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Assessment\IActivityMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
-use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -34,6 +33,13 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface
 {
+
+    /**
+     * @const WORK_TYPE_QUIZ
+     * @deprecated 17.0 - too fragile. You cannot reliably imply semantics from the ID. It is user configurable.
+     */
+    const WORK_TYPE_QUIZ = 11;
+
     /**
      * SQL map definition
      */
@@ -157,7 +163,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      */
     protected function setWorkType(Model $object)
     {
-        $object->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT));
+        $object->setWorkType((new WorkType())->setId(self::WORK_TYPE_QUIZ));
         return true;
     }
 

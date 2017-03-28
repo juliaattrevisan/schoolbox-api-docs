@@ -8,7 +8,6 @@
 namespace Custom\Moriah\Cohort\Course;
 
 use Assess\Visibility;
-use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -23,7 +22,6 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\User;
 
 /**
@@ -36,6 +34,9 @@ use Schoolbox\User;
  */
 class Statistics
 {
+    // Pretty fragile. Must match value configured in admin lists for WorkType.
+    const WORK_TYPE_QUIZ = 11;
+
     /**
      * @var Folder
      */
@@ -152,7 +153,7 @@ class Statistics
                 }
 
                 // retrieve ALL the online assessments (not surveys) for this category
-                if (empty($workTypes) || in_array(WorkType::TYPE_ONLINE_ASSESSMENT, $workTypes)) {
+                if (empty($workTypes) || in_array(self::WORK_TYPE_QUIZ, $workTypes)) {
                     $assessCollection = $this->assessMapper->findByColumnList(
                         array(
                             'assess_id'       => $assessIds,
