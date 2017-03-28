@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -25,6 +24,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 
 class Controller extends Assessment\Controller
@@ -40,6 +40,7 @@ class Controller extends Assessment\Controller
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
      * @param MapperProxy                   $assessmentMapper
+     * @param WorkTypeMapper                $workTypeMapper
      * @param Access                        $access
      * @param Transactor                    $transactor
      * @param Assessment\Breadcrumb\Factory $bakery
@@ -49,12 +50,13 @@ class Controller extends Assessment\Controller
         UserMapper $userMapper,
         Error\Mapper $errorMapper,
         MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
         TaskResponseDataSource $taskResponseDataSource
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
 

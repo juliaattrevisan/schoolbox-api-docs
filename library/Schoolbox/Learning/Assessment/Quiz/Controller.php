@@ -26,6 +26,7 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 /**
  * Class Controller
@@ -60,6 +61,7 @@ class Controller extends Assessment\Controller
      * @param UserMapper             $userMapper
      * @param ErrorMapper            $errorMapper
      * @param DataModel\MapperProxy  $assessmentMapper
+     * @param WorkTypeMapper         $workTypeMapper
      * @param Access                 $access
      * @param Transactor             $transactor
      * @param BreadcrumbFactory      $bakery
@@ -71,6 +73,7 @@ class Controller extends Assessment\Controller
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
         DataModel\MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
@@ -78,7 +81,7 @@ class Controller extends Assessment\Controller
         QuizSectionMapper $quizSectionMapper,
         QuizAttemptMapper $quizAttemptMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
         $this->quizMapper = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;

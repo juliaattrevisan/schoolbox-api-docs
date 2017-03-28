@@ -49,9 +49,6 @@ class Controller extends Assessment\Controller
     /** @var Rubric\RubricMapper */
     private $rubricMapper;
 
-    /** @var WorkTypeMapper */
-    private $workTypeMapper;
-
     /** @var DueWorkResponseMapper */
     private $dueWorkResponseMapper;
 
@@ -62,12 +59,12 @@ class Controller extends Assessment\Controller
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
      * @param MapperProxy                   $assessmentMapper
+     * @param WorkTypeMapper                $workTypeMapper
      * @param Access                        $access
      * @param Transactor                    $transactor
      * @param Assessment\Breadcrumb\Factory $bakery
      * @param Rubric\RubricMapper           $rubricMapper
      * @param Rubric\ResultMapper           $resultSetMapper
-     * @param WorkTypeMapper                $workTypeMapper
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
      * @param ParticipantMapper             $participantMapper
      */
@@ -75,19 +72,18 @@ class Controller extends Assessment\Controller
         UserMapper $userMapper,
         Error\Mapper $errorMapper,
         MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
-        WorkTypeMapper $workTypeMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
-        $this->workTypeMapper  = $workTypeMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
         $this->participantMapper     = $participantMapper;
     }
@@ -864,7 +860,6 @@ class Controller extends Assessment\Controller
         $data = [
             'acceptingResponses'=> true,
             'attachzone'      => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
-            'allWorkTypes'    => $this->getWorkTypeMapper()->findAll(),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
@@ -1020,25 +1015,6 @@ class Controller extends Assessment\Controller
         return $this;
     }
 
-
-    /**
-     * @return WorkTypeMapper
-     */
-    protected function getWorkTypeMapper()
-    {
-        return $this->workTypeMapper;
-    }
-
-
-    /**
-     * @param WorkTypeMapper $workTypeMapper
-     * @return static
-     */
-    protected function setWorkTypeMapper($workTypeMapper)
-    {
-        $this->workTypeMapper = $workTypeMapper;
-        return $this;
-    }
 
 
     /**

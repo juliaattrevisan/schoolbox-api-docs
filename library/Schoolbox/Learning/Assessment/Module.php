@@ -346,12 +346,13 @@ class Module extends BaseModule
         $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
             'router' => $injector->lazyGet('router')
         ]);
+        $ac['workTypeMapper']           = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
         $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
         $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
-        $dc['workTypeMapper']           = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
+
         // TODO get this out of DI
         $dc['dueWorkResponseMapper']    = $injector->lazyNew(
             DueWorkResponseMapper::class,

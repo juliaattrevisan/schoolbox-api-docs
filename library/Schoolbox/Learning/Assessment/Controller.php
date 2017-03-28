@@ -10,7 +10,6 @@ use Alaress_Date_Format;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -30,12 +29,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /** @var BreadcrumbFactory */
     protected $bakery;
 
+    /** @var WorkTypeMapper */
+    private $workTypeMapper;
+
     /**
      * Controller constructor.
      *
      * @param UserMapper            $userMapper
      * @param ErrorMapper           $errorMapper
      * @param DataModel\MapperProxy $assessmentMapper
+     * @param WorkTypeMapper        $workTypeMapper
      * @param Access                $access
      * @param Transactor            $transactor
      * @param BreadcrumbFactory     $bakery
@@ -44,12 +47,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
         DataModel\MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor);
-        $this->bakery = $bakery;
+        $this->bakery          = $bakery;
+        $this->workTypeMapper  = $workTypeMapper;
     }
 
     /**
@@ -307,6 +312,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessmentType'        => AssessmentType::objectToString($assessment),
             'visibility'            => $assessment->getMarkVisibility(),
             'availableVisibilities' => $this->getAvailableVisibilities(),
+            'allWorkTypes'          => $this->workTypeMapper->findAll(),
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
@@ -382,18 +388,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getAllMarkTypes(IAssessable $assessable)
     {
         return MarkSchemeFactory::getAvailableMarkTypes($assessable);
-    }
-
-    /**
-     * Gets all work types for due work.
-     *
-     * TODO DI this if you feel like it
-     *
-     * @return WorkType[]|Collection
-     */
-    protected function getAllWorkTypes()
-    {
-        return WorkTypeMapper::getInstance()->findAll();
     }
 
     /**
