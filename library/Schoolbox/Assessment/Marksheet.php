@@ -693,7 +693,7 @@ class Marksheet
                                 'WORK_TITLE' => $item['object']->getName(),
                                 'WORK_ID'    => $item['object']->getId(),
                                 'WORK_PATH'  => '/submission/viewSubmission',
-                                'WORK_TYPE'  => $item['object']->getWorkType()->getName()
+                                'WORK_TYPE'  => $item['object']->getAssessmentModel()->getWorkType()->getName()
                             )
                         );
                     }

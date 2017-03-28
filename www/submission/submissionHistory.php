@@ -269,7 +269,7 @@ $this->setVar(
         'BOX_OWNER' => $userHandler->formatName($user),
         'BOX_OWNER_ID' => $userID,
         'BOX_DESCRIPTION' => Scrub::html($box->getDescription()),
-        'BOX_TYPE' => $workTypeMapper->getNameFromId($box->getWorkType()->getId()),
+        'BOX_TYPE' => $workTypeMapper->getNameFromId($box->getAssessmentModel()->getWorkType()->getId()),
         'BOX_CREATED' => $createdDate->getRelativeTime(),
         'BOX_CREATED_EXACT' => $createdDate->getLong()
     )

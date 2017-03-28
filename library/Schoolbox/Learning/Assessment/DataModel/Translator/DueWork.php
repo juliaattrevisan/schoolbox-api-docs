@@ -48,7 +48,6 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setUseRubric($assessment->getUseRubric())
                 ->setMarkedPerRubricGroup($assessment->getMarkPerCapability())
                 ->setOwner($assessment->getCreator())
-                ->setWorkType($assessment->getWorkType())
                 ->setMarkType(new DueWorkModel\MarkType())
                 ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
             ;
@@ -82,13 +81,6 @@ class DueWork implements IAssessmentTypeTranslator
                         ->setExtension($file->getExtension())
                 );
             }
-
-            // Translate work type
-            $model->setWorkType(
-                (new WorkType())
-                    ->setId($assessment->getWorkType()->getId())
-                    ->setName($assessment->getWorkType()->getName())
-            );
 
             // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
             // TODO figure out rubric result set
@@ -150,11 +142,7 @@ class DueWork implements IAssessmentTypeTranslator
             }
 
             // Convert work type
-            $assessable->setWorkType(
-                (new WorkType())
-                    ->setId($model->getWorkType()->getId())
-                    ->setName($model->getWorkType()->getName())
-            );
+            $assessable->setWorkType($model->getAssessmentModel()->getWorkType());
 
             // Convert mark type
             $assessable->setMarkType(

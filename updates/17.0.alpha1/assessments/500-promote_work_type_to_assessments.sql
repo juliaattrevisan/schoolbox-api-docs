@@ -18,3 +18,7 @@ SET a.work_type_id = sb.type;
 UPDATE assessment a
 JOIN assess qz ON qz.assessment_id = a.id
 SET a.work_type_id = 11;
+
+-- Mark field as deprecated (can be deleted in 17.5)
+ALTER TABLE submission_box
+    CHANGE `type` `type_deprecated` INT(11);

@@ -75,7 +75,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
             'BOX_ID'                => $submissionBox->getId(),
             'BOX_GRADIENT'          => $submissionBox->getGradientIndex(),
             'CAT_ID'                => $submissionBox->getCategory()->getId(),
-            'DUEWORK_TYPE'          => $submissionBox->getWorkType()->getName(),
+            'DUEWORK_TYPE'          => $submissionBox->getAssessmentModel()->getWorkType()->getName(),
             'DUEWORK_DUEDATE'       => $submissionBox->getDueDate()->getLongDateOnly(),
             'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
             'GRADE_VISIBILITY_CODE' => $submissionBox->getMarkVisibility(),

@@ -112,7 +112,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				$workType = $workTypeMapper->findByColumn('name', $this->getTaskKey());
 
 				if ($workType->count()) {
-					$submissionBox->setWorkType($workType->first());
+					$submissionBox->getAssessmentModel()->setWorkType($workType->first());
 				}
 				else {
 					echo "-  Skipping {$edumateTask->getTaskId()} {$edumateTask->getTask()}: work Type not found \n";

@@ -31,13 +31,14 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Alaress_Date_Format;
 use UnderflowException;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 /**
  * Class Mapper
  *
  * @method Model createModel($id=null)
  * @method Model findById($id)
- * @method Model findOneByColumnList($columnList, $order = [])
+ * @method Model findOneByColumnList($columnList, $order = [], $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -57,6 +58,7 @@ class Mapper extends BaseMapper
         $this->uses('close_date', self::TYPE_DATETIME);
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('sequence', self::TYPE_INTEGER);
+        $this->joins('work_type_id', WorkTypeMapper::class, 'id', self::TYPE_MODEL, null, 'workType', 'workType');
         $this->uses('default_open_span', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

@@ -783,7 +783,7 @@ class StudentReportCard
     protected function outputDueWorkRow(SubmissionBox $box, $marks)
     {
         $workTypeMapper = WorkTypeMapper::getInstance();
-        $workType       = $workTypeMapper->findById($box->getWorkType()->getId());
+        $workType       = $workTypeMapper->findById($box->getAssessmentModel()->getWorkType()->getId());
         $urgency        = $box->getGradientIndex();
         $output         = array(
             'WORK_TITLE'   => $box->getName(),

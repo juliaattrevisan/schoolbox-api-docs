@@ -170,7 +170,7 @@ $this->setVar(array(
     'BOX_ID'                      => $submission_box->getId(),
     'SUBMISSION_ID'               => null,
     'BOX_NAME'                    => Scrub::text($submission_box->getName()),
-    'BOX_TYPE'                    => $submission_box->getWorkType()->getName(),
+    'BOX_TYPE'                    => $submission_box->getAssessmentModel()->getWorkType()->getName(),
     'BOX_CREATED'                 => $createdDate->getRelativeTime(),
     'TEXTBOX_BODY'                => $body,
 ));

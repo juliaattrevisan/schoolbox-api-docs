@@ -121,9 +121,9 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
 
         // Test type
-        $this->assertInstanceOf(WorkType::class, $dueWorkModel->getWorkType());
-        $this->assertEquals(12, $dueWorkModel->getWorkType()->getId());
-        $this->assertEquals('A dumb type', $dueWorkModel->getWorkType()->getName());
+        $this->assertInstanceOf(WorkType::class, $dueWorkModel->getAssessmentModel()->getWorkType());
+        $this->assertEquals(12, $dueWorkModel->getAssessmentModel()->getWorkType()->getId());
+        $this->assertEquals('A dumb type', $dueWorkModel->getAssessmentModel()->getWorkType()->getName());
 
         // Test mark scheme
         $this->assertEquals(DueWorkModel\MarkType::TYPE_NONE, $dueWorkModel->getMarkType()->getId());
@@ -288,6 +288,10 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 (new AssessmentModel())
                     ->setAssessmentContext((new Folder())->setId(1))
                     ->setId(33)
+                    ->setWorkType((new WorkType())
+                        ->setId(12)
+                        ->setName('A dumb type')
+                    )
             )
             ->setSkipUnsubmitted(false)
             ->setAcceptOnline(true)
@@ -298,10 +302,6 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 ->add($storage1)
                 ->add($storage2)
                 ->add($storage3)
-            )
-            ->setWorkType((new WorkType())
-                ->setId(12)
-                ->setName('A dumb type')
             )
             ->setMarkType($this->buildMarkType())
         ;

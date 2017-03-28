@@ -87,6 +87,7 @@ class Translator
             ->setDefaultOpenSpan($assessment->getDefaultOpenSpan())
             ->setWeight($assessment->getWeight())
             ->setSequence($assessment->getSequence())
+            ->setWorkType($assessment->getWorkType())
             ->setCreatedAt($assessment->getCreatedAt())
             ->setUpdatedAt($assessment->getUpdatedAt())
             ->setDeletedAt($assessment->getDeletedAt())

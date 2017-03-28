@@ -20,7 +20,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\Participant;
 
 class Model extends AbstractAssessment
@@ -48,14 +47,6 @@ class Model extends AbstractAssessment
      * @var Collection|File[]
      */
     protected $attachedFiles;
-
-    /**
-     * The "type" of the Due Work
-     * (Essay, Homework, etc)
-     *
-     * @var WorkType
-     */
-    private $workType;
 
     /**
      * An enum for accepting submissions online
@@ -471,24 +462,6 @@ class Model extends AbstractAssessment
     public function setRubric(Rubric $rubric = null)
     {
         $this->rubric = $rubric;
-        return $this;
-    }
-
-    /**
-     * @return WorkType
-     */
-    public function getWorkType()
-    {
-        return $this->workType;
-    }
-
-    /**
-     * @param WorkType $workType
-     * @return self
-     */
-    public function setWorkType(WorkType $workType)
-    {
-        $this->workType = $workType;
         return $this;
     }
 

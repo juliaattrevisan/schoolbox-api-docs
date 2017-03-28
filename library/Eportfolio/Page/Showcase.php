@@ -149,7 +149,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                                 'SHOWCASED_WORK_ITEM_ID' => $showcase->getId(),
                                 'SHOWCASED_WORK_ITEM_USER_ID' => $showcase->getUid(),
                                 'SHOWCASED_WORK_BOX_NAME' => $box->getName(),
-                                'SHOWCASED_WORK_BOX_TYPE' => $box->getWorkType()->getName(),
+                                'SHOWCASED_WORK_BOX_TYPE' => $box->getAssessmentModel()->getWorkType()->getName(),
                             )
                         );
 

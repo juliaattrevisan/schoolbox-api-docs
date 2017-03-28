@@ -46,10 +46,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     protected $category;
 
-    /**
-     * @var WorkType
-     */
-    private $workType;
 
     /**
      * @var GradeLevel\Group\Model
@@ -179,7 +175,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     {
         $this->setAttachments(new Collection());
         $this->setCategory(new FolderModel());
-        $this->setWorkType(new WorkType());
         $this->setMarkType(new MarkType());
         $this->setGradeGroup(new GradeLevel\Group\Model());
         $this->setCurriculumNodes(new Collection());
@@ -392,23 +387,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
         return $this->task_instance;
     }
 
-    /**
-     * @param  WorkType $workType
-     * @return $this
-     */
-    public function setWorkType(WorkType $workType)
-    {
-        $this->workType = $workType;
-        return $this;
-    }
-
-    /**
-     * @return WorkType
-     */
-    public function getWorkType()
-    {
-        return $this->workType;
-    }
 
     /**
      * @return Collection|IStorage[]

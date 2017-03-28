@@ -264,11 +264,11 @@ class Activity {
 	}
 
 	public function getType() {
-		return $this->isAssessment() ? $this->getAssessment()->getWorkType()->getId() : $this->getSubmissionBox()->getWorkType()->getId();
+		return $this->isAssessment() ? $this->getAssessment()->getWorkType()->getId() : $this->getSubmissionBox()->getAssessmentModel()->getWorkType()->getId();
 	}
 
 	public function getTypeName() {
-		return $this->isAssessment() ? $this->getAssessment()->getWorkType()->getName() : $this->getSubmissionBox()->getWorkType()->getName();
+		return $this->isAssessment() ? $this->getAssessment()->getWorkType()->getName() : $this->getSubmissionBox()->getAssessmentModel()->getWorkType()->getName();
 	}
 
 	public function getReturnedFileId() {

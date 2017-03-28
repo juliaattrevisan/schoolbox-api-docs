@@ -26,6 +26,7 @@ use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -153,6 +154,14 @@ abstract class AbstractAssessment implements IAssessable
      * @var int
      */
     private $sequence;
+
+    /**
+     * The "type" of the Due Work (Essay, Homework, etc)
+     * NULL is a valid value, and means 'None'
+     *
+     * @var null|WorkType
+     */
+    private $workType;
 
     /**
      * A collection of Curriculum Nodes
@@ -927,6 +936,25 @@ abstract class AbstractAssessment implements IAssessable
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
+     * @return null|WorkType
+     */
+    public function getWorkType()
+    {
+        return $this->workType;
+    }
+
+
+    /**
+     * @param null|WorkType $workType
+     * @return static
+     */
+    public function setWorkType(WorkType $workType = null)
+    {
+        $this->workType = $workType;
         return $this;
     }
 

@@ -195,7 +195,7 @@ class DueWork_Detail
                 'DUEWORK_DESCRIPTION'   => Scrub::text($this->submissionBox->getName()),
                 'DUEWORK_TERM'          => $this->term->getCode(),
                 'CATEGORY_NAME'         => Scrub::text($this->submissionBox->getCategory()->getName()),
-                'DUEWORK_TYPE'          => $this->submissionBox->getWorkType()->getName(),
+                'DUEWORK_TYPE'          => $this->submissionBox->getAssessmentModel()->getWorkType()->getName(),
                 'DUEWORK_MARKTYPE'      => $this->submissionBox->getMarkType()->getName(),
                 'DUEWORK_DUEDATE'       => $closeString,
                 'GRADE_VISIBILITY'      => $this->submissionBox->getMarkVisibilityDescription(),

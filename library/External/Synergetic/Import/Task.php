@@ -113,7 +113,7 @@ class External_Synergetic_Import_Task {
 				$workType = $workTypeMapper->findByColumn('name', $this->getTaskKey());
 
 				if ($workType->count()) {
-					$submissionBox->setWorkType($workType->first());
+					$submissionBox->getAssessmentModel()->setWorkType($workType->first());
 				}
 				else {
 					echo "-  Skipping {$synergeticTask->getTaskId()} {$synergeticTask->getTask()}: work Type not found \n";
