@@ -88,15 +88,15 @@ class Mapper extends BaseMapper
             )
         );
 
-        $this->hasJoin(
-            'tags',
-            array(
-                'mapper' => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
-                'other_key' => 'pastoral_id',
-                'this_key' => 'id',
-                'multiple' => true,
-            )
-        );
+//        $this->hasJoin(
+//            'tags',
+//            array(
+//                'mapper' => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
+//                'other_key' => 'pastoral_id',
+//                'this_key' => 'id',
+//                'multiple' => true,
+//            )
+//        );
 
         $this->hasJoin(
             'comments',
@@ -564,7 +564,7 @@ class Mapper extends BaseMapper
 
         // Don't know if this is right for the one-to-many joins, but it works
 
-        $record->setTagsList($this->getPastoralTagsMapper()->findByColumn("pastoral_id", $record->getId()));
+        $record->setTagsList($this->getPastoralTagsMapper()->findForRecord($record->getId()));
         $record->setCommentList($this->getPastoralCommentMapper()->findByColumn("pastoral_id", $record->getId()));
         $record->setAttachmentList($this->getPastoralAttachmentMapper()->findByColumn("pastoral_id", $record->getId()));
 
