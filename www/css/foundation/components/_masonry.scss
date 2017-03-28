@@ -275,6 +275,10 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-blog;
   color: $icon-color-blog;
 }
+.icon-masonry-Schoolbox_Survey_Component_Eportfolio_Controller:before {
+  @extend .icon-surveys;
+  color: $icon-color-blog;
+}
 .icon-masonry-Component_Eportfolio_FileListController:before {
   @extend .icon-files;
   color: $icon-color-files;
