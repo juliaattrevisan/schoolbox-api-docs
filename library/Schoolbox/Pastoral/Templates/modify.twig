@@ -78,7 +78,20 @@
                      #}
                     var tagName = $(temp[0]).html();
 
-                    selectedTags.push({'tagName':tagName, 'value':value});
+                    {# Find out if this is a tag that never existed
+                     # If that's the case, add it to newTags
+                     #
+                     # Otherwise assume it's an id that exists already
+                     #}
+                    if ($.inArray(tagName, newTagKeys) > -1) {
+                        console.log('found ' + tagName + ' in newTagKeys', newTagKeys);
+                        selectedTags.push({'tagName':tagName, 'value':null});
+                    }
+                    else {
+                        console.log('reusing ' + tagName);
+                        selectedTags.push({'tagName':tagName, 'value':value});
+                    }
+
                 },
                 onItemRemove: function(value) {
                     console.log(value);
