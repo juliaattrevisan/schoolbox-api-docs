@@ -82,7 +82,7 @@ class Document
             return [
                 'result'       => null,
                 'errors'       => 'Missing file',
-                'responseCode' => null,
+                'responseCode' => 500,
             ];
         }
 
