@@ -7,42 +7,58 @@
 
 namespace Schoolbox\Application;
 
-use Alaress_Date_Format;
-use Alaress_Date_Locale_Config;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\Application\Kernel;
 use Alaress\Authorizer\Rule;
+use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Module\Loader as ModuleLoader;
+use Alaress\Redis;
+use Alaress\Twig\Loader\ChainLoader;
+use Alaress\Twig\Method as TwigMethod;
+use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
+use DebugBar\Bridge\Twig\TwigCollector;
+use Alaress\Session\Factory;
+use Alaress\Web\Output;
+use Alaress\Web\Router\RouterFactory;
+use Alaress_Date_Locale_Config;
+use Aura\Di;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Collection;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Error;
+use Schoolbox\Mapper;
+use Schoolbox\MapperFactory;
+use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\Notifactory;
+use Schoolbox\Notif\SilentNotif;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
+use Schoolbox\UserMapper;
+use Twig_Extension_Debug;
+use Twig_Extensions_Extension_Text;
+use Twig_Loader_Filesystem;
+use Twig_SimpleFilter;
+use Twig_SimpleFunction;
+use Alaress_Date_Format;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
-use Alaress\DebugBar\Instance as DebugBar;
-use Alaress\Module\Loader as ModuleLoader;
-use Alaress\Session\Factory;
-use Alaress\Twig\Loader\ChainLoader;
-use Alaress\Twig\Method as TwigMethod;
-use Alaress\Web\Output;
-use Alaress\Web\Router\RouterFactory;
-use Aura\Di;
-use Database;
-use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
-use DebugBar\Bridge\Twig\TwigCollector;
 use External_Class;
 use External_Timetable;
 use External_User;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
-use Schoolbox\Collection;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
-use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
-use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
 use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork as DueWorkTranslator;
 use Schoolbox\Learning\Assessment\DataModel\Translator\Project as ProjectTranslator;
@@ -54,10 +70,8 @@ use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataS
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as FeedbackSubSourceDueWork;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
-use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Response\DataSource as AssessmentResponseDataSource;
 use Schoolbox\Learning\Assessment\Response\SubSource\DueWork as ResponseSubSourceDueWork;
 use Schoolbox\Learning\Assessment\Response\SubSource\Quiz as ResponseSubSourceQuiz;
@@ -66,30 +80,18 @@ use Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy as TaskFeedbackMappe
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Transactor as LearningAssessmentTransactor;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Renderer as LearningRenderer;
 use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
-use Schoolbox\MapperFactory;
-use Schoolbox\Notif\Notifactory;
-use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Role;
 use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
 use Schoolbox\Sync\Log\Mapper as SyncLogMapper;
 use Schoolbox\Sync\Provisioner\Provisioner;
 use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
 use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
-use Schoolbox\UserMapper;
 use Twig_Environment;
-use Twig_Extension_Debug;
-use Twig_Extensions_Extension_Text;
-use Twig_Loader_Filesystem;
-use Twig_SimpleFilter;
-use Twig_SimpleFunction;
 
 abstract class AbstractBootstrap implements BootstrapInterface
 {
@@ -120,6 +122,21 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
         // Config loader
         $di->set('config', $di->lazyNew(ConfigLoader::class));
+
+        $di->set('redis', $di->lazy(function () use ($di) {
+            // Redis connection configuration
+            Redis::getInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+
+            return Redis::getClientInstance();
+        }));
+
+        $di->set('amqp', $di->lazy(function () {
+            return Connector::getInstance();
+        }));
+
+        // install mapper DI
+        // (yes I know this is icky, but it will have to do until mapper construction is set up with DI properly)
+        Mapper::di($di);
 
         // Set correct timezone
         date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
@@ -557,7 +574,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 ExternalConnectorFactory::EXTERNAL_TIMETABLE
             );
         }));
-        
+
         // LTI Provider mapper
         $di->set('providerMapper', $di->lazyNew(LTIProviderMapper::class));
 
