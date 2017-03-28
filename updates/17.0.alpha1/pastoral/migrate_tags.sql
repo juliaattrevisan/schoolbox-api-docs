@@ -1,7 +1,7 @@
 -- Rename corrupted integer tags as what they should be
 UPDATE pastoral_tags AS p1
 INNER JOIN pastoral_tags AS p2 ON p1.id = p2.name
-SET p2.`name` = p1.`name`
+SET p2.`name` = p1.`name`;
 
 -- Move this table somewhere else for now
 -- we will restore records from here
@@ -18,11 +18,14 @@ SELECT
 FROM pastoral_tags_deprecated
 WHERE deleted_at IS NULL
 GROUP BY `name`
-ORDER BY `id`
+ORDER BY `id`;
+
+-- Spawn a relation table for pastoral records and their tags
+CREATE TABLE `pastoral_record_tag`( `pastoral_id` INT(11) NOT NULL, `tag_id` INT(11) NOT NULL );
 
 -- Reassign pastoral tags to their actual records
 INSERT INTO pastoral_record_tag (pastoral_id, tag_id)
 SELECT d.`pastoral_id`, t.`id`
 FROM pastoral_tags_deprecated d
 INNER JOIN pastoral_tag t ON d.name = t.name
-AND t.deleted_at IS NULL
+AND t.deleted_at IS NULL;
