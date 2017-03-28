@@ -637,7 +637,7 @@ class Controller extends Base
     public function postUpdate($record)
     {
         $post = $this->getRequest()->post;
-new \Alaress_Probe($post);die();
+
         // External interface
 
         $pastoralExternal = new \External_Pastoral();
