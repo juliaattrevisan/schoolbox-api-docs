@@ -112,6 +112,17 @@ abstract class Component_FactoryAbstract {
     }
 
     /**
+     * Return a collection of components used in any eportfolio template setup
+     *
+     * @param string $module
+     * @return Component_Instance[]|\Schoolbox\GenericCollection
+     */
+    public function getModuleInstanceList($module)
+    {
+        return Component_InstanceMapper::getInstance()->findByModule($module);
+    }
+
+    /**
      * @param $instanceId
      * @return Component_Instance
      */
