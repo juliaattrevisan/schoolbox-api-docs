@@ -23,7 +23,32 @@
 
         $.fn.alaressEditor();
 
-        $('#tags').selectizeSelector({
+        {#$('#tags').selectizeSelector({#}
+            {#ajax: {#}
+                {#url: '/ajax/tags/pastoral',#}
+                {#type: 'GET',#}
+                {#dataType: 'json'#}
+            {#},#}
+            {#multiple: true,#}
+            {#selectize: {#}
+                {#create: function (input) {#}
+                    {#return {#}
+                        {#id: input,#}
+                        {#name: input#}
+                    {#}#}
+                {#}#}
+            {#},#}
+            {#value: [#}
+                {#{% for tag in record.tagsList %}#}
+                {#{'id':{{ tag.id }},'name':'{{ tag.getName | escape('js') }}'},#}
+                {#{% endfor %}#}
+            {#]#}
+        {#});#}
+
+        var selectedTags = [];
+        var newTagKeys = [];
+
+        $('#mort').selectizeSelector({
             ajax: {
                 url: '/ajax/tags/pastoral',
                 type: 'GET',
@@ -31,14 +56,36 @@
             },
             multiple: true,
             selectize: {
-                create: function (input) {
+                create: function(input) {
+                    console.log(selectedTags, input);
+
                     return {
                         id: input,
                         name: input
                     }
+                },
+                onItemAdd: function(value, item) {
+
+                    {# So we don't affect the selectize ui
+                     #}
+                    var temp = item.clone();
+
+                    {# Remove the little x that deletes an item
+                     #}
+                    $(temp[0]).find('.remove').remove();
+
+                    {# Get the actual tag name and stack it up
+                     #}
+                    var tagName = $(temp[0]).html();
+
+                    selectedTags.push({'tagName':tagName, 'value':value});
+
+                    console.log(selectedTags);
+                },
+                onItemRemove: function(value) {
+                    console.log(value);
                 }
-            },
-            value: [{% for tag in record.tagsList %}'{{ tag.getName | escape('js') }}',{% endfor %}]
+            }
         });
 
         {% if record.getId != '' %}
@@ -108,6 +155,8 @@
         $('[data-role-parent]').prop('disabled', $('#private').prop('checked'));
 
         $('[data-submit]').click(function (event) {
+            console.log(selectedTags);
+            return false;
             form.alaressValidate({
                 ignore: ':disabled',
                 rules: {
@@ -229,7 +278,8 @@
                             Tags
                             <span class="hint has-tip tip-top" data-tooltip
                                   title="Multiple tags can be added to aid filtering and reporting. Try to reuse existing tags by searching first. If necessary you may create new tags.">?</span>
-                            <input id="tags" name="tags" value="{% for tag in record.tagsList %}{{ tag.getName }},{% endfor %}">
+                            {#<input id="tags" name="tags" value="{% for tag in record.tagsList %}{{ tag.getName }},{% endfor %}">#}
+                            <input id="mort" name="tags" />
                         </label>
 
                         <label>
