@@ -45,22 +45,6 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @return int
-     */
-    public function getPastoralId() {
-        return $this->pastoralId;
-    }
-
-    /**
-     * @param int $pastoralId
-     * @return $this
-     */
-    public function setPastoralId($pastoralId) {
-        $this->pastoralId = $pastoralId;
-        return $this;
-    }
-
-    /**
      * @return array
      */
     function jsonSerialize()
