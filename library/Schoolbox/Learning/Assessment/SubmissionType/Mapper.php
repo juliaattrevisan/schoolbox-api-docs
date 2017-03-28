@@ -19,17 +19,8 @@ class Mapper extends Schoolbox\Mapper {
 	protected function mapping () {
 		$this->hasTable('lu_submission_type');
 		$this->hasModel(Model::class);
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'name',
-			'property'   => 'name',
-			'type'       => self::TYPE_STRING,
-		));
+		$this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', self::TYPE_STRING);
 	}
 
 	public function getNameFromId($id) {
