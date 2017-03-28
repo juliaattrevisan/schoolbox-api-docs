@@ -10,6 +10,7 @@
 
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
 
 class External_Edumate_Import_Task extends External_Edumate_Connection {
 
@@ -27,7 +28,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 	public function import() {
 		$taskMapper = new External_Edumate_Import_TaskMapper();
 		$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-		$workTypeMapper = new \Schoolbox\Learning\Assessment\SubmissionType\Mapper();
+		$submissionTypeMapper = SubmissionTypeMapper::getInstance();
 		$markTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper();
 		$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 		$userMapper = new \Schoolbox\UserMapper();
@@ -108,7 +109,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 
 				/* Assign work type
 				 */
-				$workType = $workTypeMapper->findByColumn('name', $this->getTaskKey());
+				$workType = $submissionTypeMapper->findByColumn('name', $this->getTaskKey());
 
 				if ($workType->count()) {
 					$submissionBox->setWorkType($workType->first());

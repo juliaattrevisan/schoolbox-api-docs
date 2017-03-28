@@ -549,7 +549,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  \Schoolbox\Learning\Assessment\SubmissionType\Model $work_type
+    * @param  SubmissionType $work_type
     *
     * @return $this
     */
@@ -560,7 +560,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @return \Schoolbox\Learning\Assessment\SubmissionType\Model
+    * @return SubmissionType
     */
     public function getWorkType()
     {

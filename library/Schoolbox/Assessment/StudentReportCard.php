@@ -27,6 +27,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
+use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
 
 class StudentReportCard
 {
@@ -781,8 +782,8 @@ class StudentReportCard
      */
     protected function outputDueWorkRow(SubmissionBox $box, $marks)
     {
-        $workTypeMapper = new \Schoolbox\Learning\Assessment\SubmissionType\Mapper();
-        $workType       = $workTypeMapper->findById($box->getWorkType()->getId());
+        $submissionTypeMapper = SubmissionTypeMapper::getInstance();
+        $workType       = $submissionTypeMapper->findById($box->getWorkType()->getId());
         $urgency        = $box->getGradientIndex();
         $output         = array(
             'WORK_TITLE'   => $box->getName(),
@@ -825,15 +826,15 @@ class StudentReportCard
      */
     protected function outputOnlineAssessRow(Quiz $oa, $marks, \SitePage $page)
     {
-        $workTypeMapper = new \Schoolbox\Learning\Assessment\SubmissionType\Mapper();
-        $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());
+        $submissionTypeMapper = SubmissionTypeMapper::getInstance();
+        $submissionType       = $submissionTypeMapper->findById($oa->getWorkType()->getId());
         // marks are contained inside a single-element array, pull it out of itself
         $marks                     = $marks[0];
         $urgency                   = $oa->getGradientIndex();
         $output                    = array(
             'WORK_TITLE'   => $oa->getTitle(),
             'WORK_ID'      => $marks ? "{$oa->getId()}/{$marks['section_id']}/{$marks['attempt_id']}" : $oa->getId(),
-            'WORK_TYPE'    => $workType->getName(),
+            'WORK_TYPE'    => $submissionType->getName(),
             'WORK_DATE'    => $oa->getFinish()->getRelativeTime(),
             'WORK_TIME'    => $oa->getFinish()->getDateOnly(),
             'WORK_URGENCY' => $urgency,

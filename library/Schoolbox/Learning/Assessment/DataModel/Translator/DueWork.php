@@ -19,6 +19,7 @@ use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
 
 /**
  * Sub-translator for due work specific fields.
@@ -84,7 +85,7 @@ class DueWork implements IAssessmentTypeTranslator
 
             // Translate work type
             $model->setWorkType(
-                (new \Schoolbox\Learning\Assessment\SubmissionType\Model())
+                (new SubmissionType())
                     ->setId($assessment->getWorkType()->getId())
                     ->setName($assessment->getWorkType()->getName())
             );
