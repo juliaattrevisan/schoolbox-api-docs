@@ -24,12 +24,12 @@ class Model {
 	/**
 	 * @var int
 	 */
-	protected $id;
+	private $id;
 
 	/**
 	 * @var string
 	 */
-	protected $name;
+    private $name;
 
 	/**
 	 * @param int $id
