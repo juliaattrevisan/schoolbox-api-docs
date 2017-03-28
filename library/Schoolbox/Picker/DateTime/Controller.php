@@ -64,7 +64,13 @@ class Controller extends Base
         catch (\Exception $e) {
             var_dump($e->getMessage());
         }
-        $timetableDayNumber = $this->getTimetableDay($dateObject);
+
+        $timetableDayNumber = false;
+        // Don't bother calculating the day, if the timetable is offline, we'll only display the calendar
+        if(is_array($timetable)) {
+            $timetableDayNumber = $this->getTimetableDay($dateObject);
+        }
+
         $displayFormatDate = strlen(Config::get('date_local')) > 0 ? Config::get('date_local'): 'd/m/Y';
         $displayFormatTime = strlen(Config::get('date_time')) > 0 ? Config::get('date_time'): 'h:iK';
 
@@ -78,13 +84,12 @@ class Controller extends Base
                     'value' => $dateObject->getJSDate(),
                     'element' => $element,
                     'type' => $type,
-//                    'enableTime' => $time,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
                     'displayFormatDate' => $this->convertFormat($displayFormatDate),
                     'weekStartDay' => Config::get('calendar_start_day'),
-//                    'databaseFormat' => urldecode($database),
-                    'timetable' => $timetable,
                     'terms' => $terms,
+                    // If the connector is offline, pass FALSE
+                    'timetable' => $timetable,
                     'timetableDay' => $timetableDayNumber
                 ]
             )
@@ -119,16 +124,20 @@ class Controller extends Base
 
         foreach ($user->getCampusCollection() as $campus) {
             $campusTimetable = $timetableHandler->getTimetableDefinition(null, $campus);
-            $campusInfo['campusId'] = $campus->getId();
-            $campusInfo['campusName'] = $campus->getName();
-            $campusInfo['campusCode'] = $campus->getExtTimetableCode();
-            $campusInfo['timetableDay'] = $campus->getTimetableDay();
 
-            if(is_null($campusTimetable)) {
-                $campusTimetable = Array();
+            if($campusTimetable) {
+                $campusInfo['campusId']     = $campus->getId();
+                $campusInfo['campusName']   = $campus->getName();
+                $campusInfo['campusCode']   = $campus->getExtTimetableCode();
+
+                //Return campus and it's timetable in one array
+                $timetable[$campus->getId()] = array_merge($campusInfo, $campusTimetable);
             }
-            //Return campus and it's timetable in one array
-            $timetable[$campus->getId()] = array_merge($campusInfo, $campusTimetable);
+
+            else {
+                $timetable = false;
+            }
+
         }
         return $timetable;
     }

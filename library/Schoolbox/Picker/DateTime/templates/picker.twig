@@ -152,13 +152,15 @@
 {% else %}
     {% set width = 12 %}
 {% endif %}
+
+{% if timetable %}
 <div class="row">
     <dl class="tabs-material center" data-tab role="tablist">
         <dd class="active" role="presentation"><a href="#byDate-{{ id }}">View By Date</a></dd>
-        {# TODO: Cover the case where timetable picker won't be displayed at all #}
         <dd role="presentation"><a href="#byTimetable-{{ id }}">View By Timetable</a></dd>
     </dl>
 </div>
+{% endif %}
 
 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 
@@ -184,6 +186,7 @@
                 <a class="button submit picker-submit" data-reveal-id="stacked-3">Update</a>
             </div>
         </div>
+        {% if timetable %}
         <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
             <div class="row">
                 <div class="small-12 medium-{{ width }} columns">
@@ -192,7 +195,7 @@
                     <div id="timetable{{ id }}">
                         <select name="campus">
                             {% for campus in timetable %}
-                                <option value="{{ campus.campusId }}" data-days="{{ campus.timetableDay }}" >{{ campus.campusName }}</option>
+                                <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
                             {% endfor %}
                         </select>
                         <select name="term">
@@ -207,14 +210,14 @@
                         {% for campus in timetable %}
                             <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
                                 <th>
-                                    {% for i in 1..timetable[campus.campusId].timetableDay %}
+                                    {% for i in 1..timetable[campus.campusId].dayCount %}
                                 <td class="day-{{ i }}">{{ i }}</td>
                                 {% endfor %}
                                 </th>
                                 {% set k=0 %}
                                 {% for description in timetable[campus.campusId].desc %}
                                     <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k] }}">{{ description }}</td>
-                                        {% for i in 1..timetable[campus.campusId].timetableDay %}
+                                        {% for i in 1..timetable[campus.campusId].dayCount %}
                                             <td><div class="has-period period-{{ i }}-{{ k }}" title="{{ timetable[campus.campusId].start[k] }} - {{ timetable[campus.campusId].end[k] }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
                                         {% endfor %}
                                         {% set k=k+1 %}
@@ -238,6 +241,7 @@
                 <a class="button submit timetable-submit" data-timetable-value="{{ value }}">Update</a>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 
@@ -249,14 +253,18 @@
         displayFormat: '{{ displayFormat }}',
         displayFormatDate: '{{ displayFormatDate }}',
         type: '{{ type }}',
-        timetableDay: {
-            daysUntilDate: {{ timetableDay.daysUntilDate }},
-            isWeekend: {{ timetableDay.isWeekend }}
-        },
+        {% if timetableDay %}
+            timetableDay: {
+                daysUntilDate: {{ timetableDay.daysUntilDate }},
+                isWeekend: {{ timetableDay.isWeekend }}
+            },
+        {% endif %}
         routeLookup: {
-            getByTimetableDay: '{{ routeLookup('pickerDatetime.getByTimetableDay') }}',
-            getEventsByTimetableDay: '{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}',
-            getTimetableDate: '{{ routeLookup('pickerDatetime.getTimetableDate') }}',
+            {% if timetable %}
+                getByTimetableDay: '{{ routeLookup('pickerDatetime.getByTimetableDay') }}',
+                getEventsByTimetableDay: '{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}',
+                getTimetableDate: '{{ routeLookup('pickerDatetime.getTimetableDate') }}',
+            {% endif %}
             getDueByDate: '{{ routeLookup('pickerDatetime.getDueByDate') }}',
             getByDate: '{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'
         },

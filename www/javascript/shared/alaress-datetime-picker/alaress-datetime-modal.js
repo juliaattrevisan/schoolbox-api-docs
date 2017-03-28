@@ -139,70 +139,92 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
     }
 
-// Timtable picker
-// Build cycles dynamically
+    // Timetable picker
+    // Build cycles dynamically
     function buildCycles() {
 
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
         var termDuration = $('select[name*="term"]').find(':selected').attr('data-duration');
-        var optionsHtml = '';
-        //Select cycle number on first load
-        cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate / daysInCycle);
-        for (i = 1; i <= (termDuration / daysInCycle); i++) {
-            var selected = '';
 
-            if (cycleSelected == i) {
-                selected = 'selected';
+        // Don't try to divide by zero
+        if ((daysInCycle !== undefined && daysInCycle > 0)  && (termDuration !== undefined && termDuration > 0)) {
+            var optionsHtml = '';
+
+            //Select cycle number on first load
+            cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate / daysInCycle);
+            for (i = 1; i <= (termDuration / daysInCycle); i++) {
+                var selected = '';
+
+                if (cycleSelected == i) {
+                    selected = 'selected';
+                }
+                optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
             }
-            optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
+            $('select[name*="cycle"]').empty().append(optionsHtml);
         }
-        $('select[name*="cycle"]').empty().append(optionsHtml);
+        else {
+            noTimetableData();
+        }
     }
 
-// Highlight day and period
+    // Highlight day and period
     function showPeriod() {
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
-        var isWeekend = twigVars.timetableDay.isWeekend;
-        // Highlight day if it doesn't fall on a weekend
-        if (isWeekend == 0) {
-            var period = 0;
-            // Get day of the cycle
-            var cycleDay = twigVars.timetableDay.daysUntilDate % daysInCycle;
-            if (cycleDay == 0) {
-                cycleDay = daysInCycle;
+        if (daysInCycle !== undefined && daysInCycle > 0) {
+            var isWeekend = twigVars.timetableDay.isWeekend;
+            // Highlight day if it doesn't fall on a weekend
+            if (isWeekend == 0) {
+                var period = 0;
+                // Get day of the cycle
+                var cycleDay = twigVars.timetableDay.daysUntilDate % daysInCycle;
+                if (cycleDay == 0) {
+                    cycleDay = daysInCycle;
+                }
+                $('.day-' + cycleDay).addClass('period-selected');
+
+                $('.period-description').each(function () {
+
+                    var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm');
+                    var e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm');
+                    var t = moment(twigVars.date).format('HHmm');
+                    if ((t >= s) && (t < e)) {
+                        $(this).addClass('period-selected');
+                        period = $(this).attr('data-period-number');
+                    }
+
+                    if ((cycleDay > 0) && (period > 0)) {
+                        $('.period-' + cycleDay + '-' + period).addClass('period-selected');
+                    }
+                })
             }
-            $('.day-' + cycleDay).addClass('period-selected');
-
-            $('.period-description').each(function () {
-
-                var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm');
-                var e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm');
-                var t = moment(twigVars.date).format('HHmm');
-                if ((t >= s) && (t < e)) {
-                    $(this).addClass('period-selected');
-                    period = $(this).attr('data-period-number');
-                }
-
-                if ((cycleDay > 0) && (period > 0)) {
-                    $('.period-' + cycleDay + '-' + period).addClass('period-selected');
-                }
-            })
+        }
+        else {
+            noTimetableData();
         }
     }
 
-// Reveal Timetable
+    // Reveal Timetable
     function revealTimetable() {
         var campus = $('select[name*="campus"]').find(':selected').val();
         $('.timetablePicker' + twigVars.id).css('display', 'none');
         $('#timetable' + twigVars.id + '-' + campus).css('display', 'table');
     }
 
-// Put cycles on load
-    buildCycles(true);
+    function noTimetableData() {
+        var html = '<div data-alert="" class="alert-box alert">Not enough data to build a timetable <br /> for the selected campus and term.<a href="" class="close">×</a></div>';
+
+        $('select[name*="cycle"]').empty().css('display', 'none');
+        $('.timetablePicker'+twigVars.id).empty().css('display', 'none');
+        $('.timetable-submit').css('display', 'none');
+
+        $('#timetable'+twigVars.id).append(html);
+    }
+
+    buildCycles();
     showPeriod();
     revealTimetable();
 
-// Update cycles on Campus or Term change
+    // Update cycles on Campus or Term change
     $('select[name*="campus"]').change(function () {
         buildCycles();
         // Clear selected
@@ -217,7 +239,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     var timetableAppointments = $('#timetableAppointments' + twigVars.id);
 
-// Timetable picker behaviour
+    // Timetable picker behaviour
     $('table.timetablePicker').mouseout(function () {
         $('.period-hover').removeClass('period-hover');
     });
@@ -232,7 +254,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     });
 
-// Loading events on timetable picker click
+    // Loading events on timetable picker click
     var timetableDate = moment().format(convertFormat(twigVars.displayFormat)); //today
     $('.has-period').click(function () {
 
@@ -295,7 +317,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
     });
 
-// Setup calendar
+    // Setup calendar
     var newDate, latestDate;
 
     function renderAllday(instance) {
