@@ -58,7 +58,7 @@ class Mapper extends BaseMapper
         $this->uses('close_date', self::TYPE_DATETIME);
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->joins('work_type_id', WorkTypeMapper::class, 'id', self::TYPE_MODEL, null, 'workType', 'workType');
+        $this->joins('work_type_id', WorkTypeMapper::class, 'id', self::TYPE_MODEL, null, 'workType', 'work_type');
         $this->uses('default_open_span', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -419,7 +419,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('duework', 'd')},
-                {$this->getJoinColumnString('duework.work_type', 'dt')},
+                {$this->getJoinColumnString('work_type', 'wt')},
                 {$this->getJoinColumnString('duework.mark_type', 'mt')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('project', 'p')},
@@ -438,7 +438,7 @@ class Mapper extends BaseMapper
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
-            LEFT JOIN {$this->getJoinSql('duework.work_type', 'd', 'dt')}
+            LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
@@ -557,6 +557,8 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
+            $model->setWorkType($this->hydrateJoin($row, 'work_type', 'wt'));
+
             // Task?
             if ($row['t.id']) {
                 $model->setTask($this->hydrateJoin($row, 'task', 't'));
@@ -567,7 +569,6 @@ class Mapper extends BaseMapper
             if ($row['d.id']) {
                 $model->setDueWork(
                     $this->hydrateJoin($row, 'duework', 'd')
-                        ->setWorkType($this->hydrateJoin($row, 'duework.work_type', 'dt'))
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
                 );
                 $dueWorkIds[] = $row['d.id'];
