@@ -165,10 +165,11 @@ class CommunityPortal implements CommunityPortalInterface
     protected function encryptPassword($plaintext)
     {
         $this->assertKeyAndIvSet();
+
         return base64_encode(
             openssl_encrypt(
-                $plaintext,
-                'AES-128-CBC',
+                mb_convert_encoding($plaintext, 'UCS-2LE'),
+                'AES-256-CBC',
                 $this->key,
                 OPENSSL_RAW_DATA,
                 $this->initializationVector
@@ -189,7 +190,7 @@ class CommunityPortal implements CommunityPortalInterface
         return mb_convert_encoding(
             openssl_decrypt(
                 $encrypted,
-                'AES-128-CBC',
+                'AES-256-CBC',
                 $this->key,
                 OPENSSL_RAW_DATA,
                 $this->initializationVector
