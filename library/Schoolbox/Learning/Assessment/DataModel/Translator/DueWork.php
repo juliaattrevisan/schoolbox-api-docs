@@ -48,7 +48,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setUseRubric($assessment->getUseRubric())
                 ->setMarkedPerRubricGroup($assessment->getMarkPerCapability())
                 ->setOwner($assessment->getCreator())
-                ->setWorkType()
+                ->setWorkType($assessment->getWorkType())
                 ->setMarkType(new DueWorkModel\MarkType())
                 ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
             ;

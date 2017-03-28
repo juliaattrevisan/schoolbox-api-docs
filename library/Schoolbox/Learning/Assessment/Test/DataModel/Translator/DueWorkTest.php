@@ -139,7 +139,8 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             [
                 (new DueWork())
                     ->setContext($context)
-                    ->setMarkScheme(new None()),
+                    ->setMarkScheme(new None())
+                    ->setWorkType(new WorkType()),
                 DueWorkModel\MarkType::TYPE_NONE,
                 null,
                 null,
@@ -147,7 +148,8 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             [
                 (new DueWork())
                     ->setContext($context)
-                    ->setMarkScheme(new Percentage()),
+                    ->setMarkScheme(new Percentage())
+                    ->setWorkType(new WorkType()),
                 DueWorkModel\MarkType::TYPE_PERCENT,
                 null,
                 null,
@@ -155,7 +157,8 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             [
                 (new DueWork())
                     ->setContext($context)
-                    ->setMarkScheme((new TotalMarkWholeNumber(10))),
+                    ->setMarkScheme((new TotalMarkWholeNumber(10)))
+                    ->setWorkType(new WorkType()),
                 DueWorkModel\MarkType::TYPE_TOTAL,
                 10,
                 null,
@@ -169,7 +172,8 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                             ->addGradeLevel(
                                 new DueWorkModel\GradeLevel\Model()
                             )
-                    )),
+                    ))
+                    ->setWorkType(new WorkType()),
                 DueWorkModel\MarkType::TYPE_LETTER,
                 null,
                 7,
@@ -212,21 +216,24 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             [
                 (new DueWork())
                     ->setContext($context)
-                    ->setAcceptsMultiple(),
+                    ->setAcceptsMultiple()
+                    ->setWorkType(new WorkType()),
                  true,
                  true,
             ],
             [
                 (new DueWork())
                     ->setContext($context)
-                    ->setAcceptsSingle(),
+                    ->setAcceptsSingle()
+                    ->setWorkType(new WorkType()),
                 true,
                 false,
             ],
             [
                 (new DueWork())
                     ->setContext($context)
-                    ->setAcceptsNone(),
+                    ->setAcceptsNone()
+                    ->setWorkType(new WorkType()),
                 false,
                 false,
             ],

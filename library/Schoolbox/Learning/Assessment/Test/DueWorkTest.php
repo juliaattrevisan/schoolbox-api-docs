@@ -38,7 +38,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Collection::class, $dueWork->getAllParticipants());
         $this->assertInstanceOf(Collection::class, $dueWork->getAttachedFiles());
-        $this->assertInstanceOf(WorkType::class, $dueWork->getWorkType());
+        $this->assertNull($dueWork->getWorkType());
         $this->assertSame(DueWork::ACCEPT_ONLINE_NONE, $dueWork->getAcceptOnline());
     }
 
