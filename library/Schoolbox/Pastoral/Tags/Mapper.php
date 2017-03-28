@@ -33,11 +33,12 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      */
     protected function mapping()
     {
-        $this->hasTable('pastoral_tags');
+        $this->hasTable('pastoral_tag');
         $this->hasModel(PastoralTagsModel::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('deleted_at');
     }
@@ -61,6 +62,34 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      */
     public function getErrorMapper() {
         return $this->errorMapper;
+    }
+
+    /**
+     * Find a collection of tags associated with $pastoralId
+     *
+     * @param $pastoralId
+     * @return Collection
+     */
+    public function findForRecord($pastoralId)
+    {
+        $query = "
+            {$this->getSelectString()}
+            INNER JOIN pastoral_record_tag prt ON prt.tag_id = {$this->getTable()}.id
+            WHERE prt.pastoral_id = :pastoralId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'pastoralId' => $pastoralId
+        ]);
+
+        $collection = new Collection();
+
+        foreach ($statement as $row) {
+            $collection->add($this->hydrate($row));
+        }
+
+        return $collection;
     }
 
     /**
