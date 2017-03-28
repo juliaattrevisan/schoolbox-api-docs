@@ -63,7 +63,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE); // TODO deprecated, lives on `assessment` table now
 
         $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
-        $this->joins('type', SubmissionBox\WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
+        $this->joins('type', Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');

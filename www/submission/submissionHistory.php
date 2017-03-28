@@ -105,7 +105,7 @@ if ($this->arg[0] == false) {
 
 $boxMapper = new Component\SubmissionBoxMapper();
 $submissionMapper = new Component\SubmissionBox\Submission\SubmissionMapper();
-$work_mapper = new Component\SubmissionBox\WorkTypeMapper();
+$work_mapper = new \Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper();
 $return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $conf = ConfigMapper::getInstance();

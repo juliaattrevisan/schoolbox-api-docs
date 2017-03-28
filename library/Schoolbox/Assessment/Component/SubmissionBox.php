@@ -22,7 +22,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Role;

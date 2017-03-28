@@ -9,7 +9,7 @@ namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
 use Custom\Moriah\Cohort\Course\Statistics as CourseStatistics;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 use Schoolbox\Assessment\Term;

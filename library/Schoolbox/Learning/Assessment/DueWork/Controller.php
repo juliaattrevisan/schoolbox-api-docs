@@ -14,7 +14,7 @@ use DueWork_ErrorMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;

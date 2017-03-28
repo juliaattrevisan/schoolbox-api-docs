@@ -151,7 +151,7 @@ class Statistics
                 }
 
                 // retrieve ALL the online assessments (not surveys) for this category
-                if (empty($workTypes) || in_array(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT, $workTypes)) {
+                if (empty($workTypes) || in_array(\Schoolbox\Learning\Assessment\SubmissionType\WorkType::TYPE_ONLINE_ASSESSMENT, $workTypes)) {
                     $assessCollection = $this->assessMapper->findByColumnList(
                         array(
                             'assess_id'       => $assessIds,

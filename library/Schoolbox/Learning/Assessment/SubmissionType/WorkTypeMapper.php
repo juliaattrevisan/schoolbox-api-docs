@@ -7,8 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox;
+namespace Schoolbox\Learning\Assessment\SubmissionType;
 use Schoolbox;
+use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
 
 /**
  * @method WorkType findById($identifierValue)

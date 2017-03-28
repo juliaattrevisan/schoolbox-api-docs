@@ -781,7 +781,7 @@ class StudentReportCard
      */
     protected function outputDueWorkRow(SubmissionBox $box, $marks)
     {
-        $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+        $workTypeMapper = new \Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper();
         $workType       = $workTypeMapper->findById($box->getWorkType()->getId());
         $urgency        = $box->getGradientIndex();
         $output         = array(
@@ -825,7 +825,7 @@ class StudentReportCard
      */
     protected function outputOnlineAssessRow(Quiz $oa, $marks, \SitePage $page)
     {
-        $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+        $workTypeMapper = new \Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper();
         $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());
         // marks are contained inside a single-element array, pull it out of itself
         $marks                     = $marks[0];

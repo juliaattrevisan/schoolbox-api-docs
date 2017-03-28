@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox;
+namespace Schoolbox\Learning\Assessment\SubmissionType;
 use Schoolbox;
 use Schoolbox\Resource;
 

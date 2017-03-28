@@ -27,7 +27,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 	public function import() {
 		$taskMapper = new External_Edumate_Import_TaskMapper();
 		$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-		$workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+		$workTypeMapper = new \Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper();
 		$markTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper();
 		$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 		$userMapper = new \Schoolbox\UserMapper();

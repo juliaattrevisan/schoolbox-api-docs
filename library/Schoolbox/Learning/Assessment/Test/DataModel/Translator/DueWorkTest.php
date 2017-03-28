@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType as WorkTypeModel;
+use Schoolbox\Learning\Assessment\SubmissionType\WorkType as WorkTypeModel;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;

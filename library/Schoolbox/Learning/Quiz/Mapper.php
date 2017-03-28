@@ -11,7 +11,7 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Learning\Assessment\SubmissionType\WorkType;
 use Schoolbox\Assessment\IActivityMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
@@ -25,7 +25,7 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper;
 use Schoolbox\UserMapper;
 
 /**

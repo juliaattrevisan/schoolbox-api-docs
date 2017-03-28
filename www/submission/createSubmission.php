@@ -96,7 +96,7 @@ if (Config::get('curriculum_tagging_enabled')) {
 
 $mapper      = new SubmissionBoxMapper();
 $cat_mapper  = new FolderMapper();
-$type_mapper = new SubmissionBox\WorkTypeMapper();
+$type_mapper = new \Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper();
 $mark_mapper = new SubmissionBox\MarkTypeMapper();
 $groupMapper = new SubmissionBox\GradeLevel\Group\Mapper();
 $conf_mapper = ConfigMapper::getInstance();
@@ -116,7 +116,7 @@ $zone
 //
 // Should work types include or not include online assessments?
 // They do for pre-existing items, they don't for new items.
-$work_types  = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
+$work_types  = $type_mapper->getAllExcept(\Schoolbox\Learning\Assessment\SubmissionType\WorkType::TYPE_ONLINE_ASSESSMENT);
 $mark_types  = $mark_mapper->getAll();
 $gradeGroups = $groupMapper->findAllWithGradeLevels();
 
@@ -171,7 +171,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         ->setOpenDate(new Alaress_Date_Format(new DateTime('00:00:00')))
         ->setDueDate(new Alaress_Date_Format(new DateTime('+1 day 23:59:59')))
         ->setLateDate(new Alaress_Date_Format(new DateTime('+2 day 23:59:59')))
-        ->setWorkType(new SubmissionBox\WorkType())
+        ->setWorkType(new \Schoolbox\Learning\Assessment\SubmissionType\WorkType())
         ->setMarkType(new SubmissionBox\MarkType())
         ->setMarkVisibility($conf_mapper->get('submission_access'))
         ->setMarkVisibility(Config::get('submission_access'))

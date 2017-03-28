@@ -16,7 +16,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\SubmissionType\WorkTypeMapper;
 use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
