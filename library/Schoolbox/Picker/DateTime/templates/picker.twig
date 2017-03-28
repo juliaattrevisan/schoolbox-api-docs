@@ -202,7 +202,7 @@
                         </select>
                         <select name="cycle">
                             {# Options will be appended here #}
-                        </select>{{ dump(timetable) }}
+                        </select>
                         {# Build all, hide, reveal one later #}
                         {% for campus in timetable %}
                             <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
