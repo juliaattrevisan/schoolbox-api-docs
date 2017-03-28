@@ -652,7 +652,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         } elseif ($site_location == 'scsb') {
             $settings = array(
-                'baseUri'  => 'https://scr-fs02.scr.vic.edu.au/zdrive/',
+                'baseUri'  => 'https://scr-fs02.scr.vic.edu.au/',
                 'userName' => 'SCR\\'.$_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
