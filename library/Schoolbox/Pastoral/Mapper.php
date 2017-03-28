@@ -441,7 +441,7 @@ class Mapper extends BaseMapper
             if (trim($tags) != '') {
 
                 $tagsArray = explode(",", strtolower(trim($tags)));
-                $tagsList = $this->getPastoralTagsMapper()->findByColumn('pastoral_id', $record->getId());
+                $tagsList = $this->getPastoralTagsMapper()->findForRecord($record->getId());
 
                 $found = false;
 
