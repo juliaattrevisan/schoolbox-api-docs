@@ -88,7 +88,7 @@ if (is_numeric($this->arg[0])) {
 
         // first!
         if ($thread->getFirstPost()->getId() == $post->getId()) {
-            $output['THREAD_TITLE'] = $thread->getTitle();
+            $output['THREAD_TITLE'] = Scrub::text($thread->getTitle());
             $this->parse('title_block', 'title');
         }
 
@@ -157,7 +157,7 @@ if (is_numeric($this->arg[0])) {
                 $this->setVar(array(
                         'QUOTE_ID' => $quotePostID,
                         'QUOTE_BODY' => Scrub::html($quote->getBody()),
-                        'QUOTE_AUTHOR' => $quote->getOwner()->formatName(),
+                        'QUOTE_AUTHOR' => Scrub::text($quote->getOwner()->formatName()),
                         'QUOTE_AUTHOR_ID' => $quote->getOwner()->getId()
                     ));
                 $this->parse('quote_block', 'quote');
