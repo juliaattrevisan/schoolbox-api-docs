@@ -21,7 +21,7 @@ class Mapper extends Schoolbox\Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('lu_submission_type');
+        $this->hasTable('lu_work_type');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);

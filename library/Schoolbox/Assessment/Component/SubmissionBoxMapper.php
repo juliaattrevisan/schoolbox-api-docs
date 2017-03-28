@@ -416,7 +416,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			LEFT JOIN folder c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
 			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
-			LEFT JOIN lu_submission_type f ON b.type = f.id
+			LEFT JOIN lu_work_type f ON b.type = f.id
 			WHERE $wherePart
 			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted_at DESC, r.published_at DESC
