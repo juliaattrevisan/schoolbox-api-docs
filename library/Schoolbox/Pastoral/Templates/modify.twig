@@ -57,7 +57,7 @@
             multiple: true,
             selectize: {
                 create: function(input) {
-                    console.log(selectedTags, input);
+                    newTagKeys.push(input);
 
                     return {
                         id: input,
@@ -79,8 +79,6 @@
                     var tagName = $(temp[0]).html();
 
                     selectedTags.push({'tagName':tagName, 'value':value});
-
-                    console.log(selectedTags);
                 },
                 onItemRemove: function(value) {
                     console.log(value);
