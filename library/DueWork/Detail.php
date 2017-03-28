@@ -93,7 +93,7 @@ class DueWork_Detail
             $insertion = array();
 
             // accepts submissions
-            if ($this->getSubmissionType() != self::ACCEPT_NONE) {
+            if ($this->getWorkType() != self::ACCEPT_NONE) {
                 $insertion['user']['instance'] = $user;
                 $submissions = Submission\SubmissionMapper::getInstance()->findByColumnList(
                     array(
@@ -320,7 +320,7 @@ class DueWork_Detail
                             'SUBMISSION_PLAG_SCORE'       => sprintf("%d%%", $plagScan->getScore()),
                             'SUBMISSION_PLAG_CLASS'       => $plagClass,
                             'SUBMISSION_PLAG_HREF'        => base64_encode($plagHref),
-                            'SUBMISSION_EXPANDABLE'       => $this->getSubmissionType() == self::ACCEPT_MULTI
+                            'SUBMISSION_EXPANDABLE'       => $this->getWorkType() == self::ACCEPT_MULTI
                                     ? 'hide expandable'
                                     : '',
                             'SUBMISSION_SELECTED'         => $page->arg[2] == $submission->getId() ? 'highlight' : '',
@@ -517,7 +517,7 @@ class DueWork_Detail
     /**
      * @return int
      */
-    public function getSubmissionType()
+    public function getWorkType()
     {
         if ($this->submissionBox->getAcceptMultiple()) {
             return self::ACCEPT_MULTI;

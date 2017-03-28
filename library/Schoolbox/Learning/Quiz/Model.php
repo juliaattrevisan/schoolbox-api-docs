@@ -24,7 +24,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use \DomainException;
@@ -54,7 +54,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     /**
     * Not strictly required, because it's always WorkType::TYPE_ONLINE_ASSESSMENT.
     *
-    * @var SubmissionType
+    * @var WorkType
     */
     protected $work_type;
 
@@ -549,7 +549,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  SubmissionType $work_type
+    * @param  WorkType $work_type
     *
     * @return $this
     */
@@ -560,7 +560,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @return SubmissionType
+    * @return WorkType
     */
     public function getWorkType()
     {

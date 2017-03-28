@@ -10,7 +10,7 @@
 
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 class External_Synergetic_Import_Task {
 
@@ -41,7 +41,7 @@ class External_Synergetic_Import_Task {
 	public function import() {
 		$taskMapper = new External_Synergetic_Import_TaskMapper();
 		$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-		$submissionTypeMapper = SubmissionTypeMapper::getInstance();
+		$workTypeMapper = WorkTypeMapper::getInstance();
 		$markTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper();
 		$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 		$userMapper = new \Schoolbox\UserMapper();
@@ -110,7 +110,7 @@ class External_Synergetic_Import_Task {
 
 				/* Assign work type
 				 */
-				$workType = $submissionTypeMapper->findByColumn('name', $this->getTaskKey());
+				$workType = $workTypeMapper->findByColumn('name', $this->getTaskKey());
 
 				if ($workType->count()) {
 					$submissionBox->setWorkType($workType->first());

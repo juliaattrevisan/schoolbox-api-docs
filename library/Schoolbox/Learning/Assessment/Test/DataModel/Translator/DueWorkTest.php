@@ -9,12 +9,11 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
 use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
@@ -82,7 +81,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                     ->setStorage($storage3)
                 )
             )
-            ->setWorkType((new DueWorkType())
+            ->setWorkType((new WorkType())
                 ->setId(12)
                 ->setName('A dumb type')
             )
@@ -122,7 +121,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
 
         // Test type
-        $this->assertInstanceOf(SubmissionType::class, $dueWorkModel->getWorkType());
+        $this->assertInstanceOf(WorkType::class, $dueWorkModel->getWorkType());
         $this->assertEquals(12, $dueWorkModel->getWorkType()->getId());
         $this->assertEquals('A dumb type', $dueWorkModel->getWorkType()->getName());
 
@@ -293,7 +292,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 ->add($storage2)
                 ->add($storage3)
             )
-            ->setWorkType((new SubmissionType())
+            ->setWorkType((new WorkType())
                 ->setId(12)
                 ->setName('A dumb type')
             )
@@ -328,7 +327,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('a sound.mp3', $dueWorkModel->getAttachments()[2]->getBasename());
         $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
 
-        $this->assertInstanceOf(DueWorkType::class, $dueWork->getWorkType());
+        $this->assertInstanceOf(WorkType::class, $dueWork->getWorkType());
         $this->assertEquals(12, $dueWork->getWorkType()->getId());
         $this->assertEquals('A dumb type', $dueWork->getWorkType()->getName());
     }

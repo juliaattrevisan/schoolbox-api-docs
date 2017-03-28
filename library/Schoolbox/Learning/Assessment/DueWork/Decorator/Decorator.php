@@ -16,7 +16,7 @@ use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use Schoolbox\Learning\Assessment\DueWork\WorkType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use \Schoolbox\Assessment\Rubric\Factory as RubricFactory;
 use \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric as DueWorkRubric;

@@ -20,6 +20,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\Participant;
 
 class Model extends AbstractAssessment
@@ -54,7 +55,7 @@ class Model extends AbstractAssessment
      *
      * @var WorkType
      */
-    protected $workType;
+    private $workType;
 
     /**
      * An enum for accepting submissions online
@@ -110,7 +111,6 @@ class Model extends AbstractAssessment
         parent::__construct();
 
         $this->setAttachedFiles(new Collection());
-        $this->setWorkType(new WorkType());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         $this->setAttachedFiles(new Collection());
     }
@@ -486,7 +486,7 @@ class Model extends AbstractAssessment
      * @param WorkType $workType
      * @return self
      */
-    public function setWorkType($workType)
+    public function setWorkType(WorkType $workType)
     {
         $this->workType = $workType;
         return $this;

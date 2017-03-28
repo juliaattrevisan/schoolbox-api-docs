@@ -22,7 +22,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use External_Markbook;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 /**
  * Class SubmissionBoxMapper
@@ -64,7 +64,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE); // TODO deprecated, lives on `assessment` table now
 
         $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
-        $this->joins('type', SubmissionTypeMapper::class, 'id', null, null, 'workType', 'work_type');
+        $this->joins('type', WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');

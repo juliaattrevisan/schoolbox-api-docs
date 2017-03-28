@@ -23,7 +23,7 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\User;
 
 /**
@@ -152,7 +152,7 @@ class Statistics
                 }
 
                 // retrieve ALL the online assessments (not surveys) for this category
-                if (empty($workTypes) || in_array(SubmissionType::TYPE_ONLINE_ASSESSMENT, $workTypes)) {
+                if (empty($workTypes) || in_array(WorkType::TYPE_ONLINE_ASSESSMENT, $workTypes)) {
                     $assessCollection = $this->assessMapper->findByColumnList(
                         array(
                             'assess_id'       => $assessIds,

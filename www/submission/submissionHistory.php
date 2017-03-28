@@ -4,7 +4,7 @@
  * redirect to Redirection to 16.5 url
  *
  */
-use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 $url = '/learning/assessments/';
 if ((isset($this->arg[0]) && is_numeric($this->arg[0])) && (isset($this->arg[1]) && is_numeric($this->arg[1]))){
@@ -107,7 +107,7 @@ if ($this->arg[0] == false) {
 
 $boxMapper = new Component\SubmissionBoxMapper();
 $submissionMapper = new Component\SubmissionBox\Submission\SubmissionMapper();
-$submissionTypeMapper = SubmissionTypeMapper::getInstance();
+$workTypeMapper = WorkTypeMapper::getInstance();
 $return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $conf = ConfigMapper::getInstance();
@@ -269,7 +269,7 @@ $this->setVar(
         'BOX_OWNER' => $userHandler->formatName($user),
         'BOX_OWNER_ID' => $userID,
         'BOX_DESCRIPTION' => Scrub::html($box->getDescription()),
-        'BOX_TYPE' => $submissionTypeMapper->getNameFromId($box->getWorkType()->getId()),
+        'BOX_TYPE' => $workTypeMapper->getNameFromId($box->getWorkType()->getId()),
         'BOX_CREATED' => $createdDate->getRelativeTime(),
         'BOX_CREATED_EXACT' => $createdDate->getLong()
     )

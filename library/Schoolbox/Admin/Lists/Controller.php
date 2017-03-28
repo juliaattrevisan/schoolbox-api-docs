@@ -16,7 +16,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
@@ -294,7 +294,7 @@ class Controller extends Base
             ],
             'submission-type'    => [
                 'title'             => 'Submission Types',
-                'mapper'            => SubmissionTypeMapper::class,
+                'mapper'            => WorkTypeMapper::class,
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',

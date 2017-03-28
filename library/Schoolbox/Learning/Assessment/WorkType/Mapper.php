@@ -1,13 +1,11 @@
 <?php
 /**
- * Mapper for the SubmissionType model.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Assessment\SubmissionType;
+namespace Schoolbox\Learning\Assessment\WorkType;
 
 use Schoolbox;
 

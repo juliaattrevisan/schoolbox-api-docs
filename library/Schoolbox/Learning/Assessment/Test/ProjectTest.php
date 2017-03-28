@@ -31,7 +31,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Due
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use \Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
@@ -241,7 +241,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setWorkType((new DueWorkType())
+            ->setWorkType((new WorkType())
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)

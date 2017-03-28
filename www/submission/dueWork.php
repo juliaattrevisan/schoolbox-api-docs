@@ -4,7 +4,7 @@
  * redirect to Redirection to 16.5 url
  *
  */
-use Schoolbox\Learning\Assessment\SubmissionType\Model as SubmissionType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 $url = '/learning/due/';
 if (isset($this->arg[1]) && is_numeric($this->arg[1])) {
@@ -518,7 +518,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
     //
     // box URL depends on whether this is an assessment or submission
     $boxUrl = $taskName;
-    if ($activity->getType() == SubmissionType::TYPE_ONLINE_ASSESSMENT) {
+    if ($activity->getType() == WorkType::TYPE_ONLINE_ASSESSMENT) {
         if ($activity->getEvent() == 'closed') {
             $boxUrl = $activity->getName();
         } else {

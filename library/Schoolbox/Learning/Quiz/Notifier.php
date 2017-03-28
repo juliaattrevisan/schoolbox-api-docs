@@ -15,7 +15,7 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
 use Monolog\Logger;
-use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
@@ -56,7 +56,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /** @var QuizAttemptMapper */
     protected $attemptMapper;
 
-    /** @var SubmissionTypeMapper */
+    /** @var WorkTypeMapper */
     protected $workTypeMapper;
 
     /** @var UserAccessMapper */
@@ -72,7 +72,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $this->categoryMapper = FolderMapper::getInstance();
         $this->attemptMapper = QuizAttemptMapper::getInstance();
-        $this->workTypeMapper = SubmissionTypeMapper::getInstance();
+        $this->workTypeMapper = WorkTypeMapper::getInstance();
         $dependencies['userAccessMapper'] = isset($dependencies['userAccessMapper'])
             ? $dependencies['userAccessMapper']
             : UserAccessMapper::getInstance();

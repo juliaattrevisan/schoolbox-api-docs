@@ -43,7 +43,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
-use Schoolbox\Learning\Assessment\SubmissionType\Mapper as SubmissionTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use UnexpectedValueException;
 
 class Module extends BaseModule
@@ -351,7 +351,7 @@ class Module extends BaseModule
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
         $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
         $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
-        $dc['submissionTypeMapper']     = $this->getMapperFactory()->getLazy(SubmissionTypeMapper::class);
+        $dc['workTypeMapper']           = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
         // TODO get this out of DI
         $dc['dueWorkResponseMapper']    = $injector->lazyNew(
             DueWorkResponseMapper::class,
