@@ -66,15 +66,13 @@ class CommunityPortal implements CommunityPortalInterface
 
         $result = $this->database->query(
             "
-                SELECT    COUNT(*) 
+                SELECT    * 
                 FROM      [dbo].[CommunityLogins] 
                 WHERE     [ID] = {$this->database->smartQuote($communityId)}
             "
         );
 
-        $count = $this->database->getOne($result);
-
-        if ($count > 0) {
+        if ($this->database->countRows($result) > 0) {
 
             // Existing community login record, just update the password
 
@@ -84,9 +82,36 @@ class CommunityPortal implements CommunityPortalInterface
                 WHERE     [ID] = {$this->database->smartQuote($communityId)}
             ";
 
-        } else {
+            $this->database->query($query);
+
+        } else if (\Config::get('synergetic_portal_create_account')) {
 
             // No existing community login record, need to insert one for this to have any chance of doing something
+
+            // This adds the Schools default page permissions to the users
+
+            $query =
+            "
+                INSERT INTO [dbo].[CommunityLoginsPage]
+                (
+                    [ID],
+                    [ConfigSeq],
+                    [EnabledFlag]
+                )
+                SELECT  {$this->database->smartQuote($communityId)},
+                        ConfigSeq,
+                        CASE WHEN DefaultValue = 'TRUE' THEN 1 ELSE 0 END AS Enabled
+                FROM    [dbo].[Config]
+                WHERE   [dbo].[Config].[Key1] = 'CommunityPortal' AND
+                        [dbo].[Config].[Key2] = 'Pages' AND
+                        [dbo].[Config].[Key4] = 'EnabledFlag' AND
+                        [dbo].[Config].[Type] = 'BIT' AND
+                        [dbo].[Config].[Value] = 'True'
+            ";
+
+            $this->database->query($query);
+
+            // This sets the password
 
             $date = Alaress_Date_Format::now()->getDatabase();
 
@@ -100,23 +125,30 @@ class CommunityPortal implements CommunityPortalInterface
                     [LoginType],
                     [SecurityTokenGuid],
                     [SecurityTokenIssueDateTime],
-                    [PasswordHashed],
+                    [PasswordHashed]
                 )
                 VALUES
                 (
                     {$this->database->smartQuote($communityId)},
                     'CP',
                     {$this->database->smartQuote($encryptedPassword)},
-                    {$date},
+                    '{$date}',
                     '',
                     NULL,
                     NULL,
                     ''
                 )
             ";
-        }
 
-        $this->database->query($query);
+            $this->database->query($query);
+
+        } else {
+
+            // There was no community portal password to reset, and automatic creation is disabled- so just return true
+            // and exit out of this happily.
+
+            return true;
+        }
 
         // If one or more rows were affected then this must have done something positive... right?
 
