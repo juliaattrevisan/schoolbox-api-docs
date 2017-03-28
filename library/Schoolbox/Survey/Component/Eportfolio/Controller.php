@@ -9,6 +9,8 @@ namespace Schoolbox\Survey\Component\Eportfolio;
 
 use Component_Eportfolio_ControllerAbstract;
 
+use Schoolbox\Survey\Mapper as SurveyMapper;
+
 class Controller extends Component_Eportfolio_ControllerAbstract
 {
     /**
@@ -35,6 +37,10 @@ class Controller extends Component_Eportfolio_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        // Testing craptastic mapper
+
+        var_dump(SurveyMapper::getInstance()->findAll());
+
         return $this->renderTwigTemplate(
             $templateHandle,
             '@surveyEportfolio/component.twig',
