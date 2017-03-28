@@ -15,7 +15,8 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Pastoral\Tags\Model as PastoralTagsModel;
+use Schoolbox\Pastoral\Tags\Model as PastoralTag;
+use Schoolbox\Pastoral\Model as PastoralRecord;
 
 class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 {
@@ -34,7 +35,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     protected function mapping()
     {
         $this->hasTable('pastoral_tag');
-        $this->hasModel(PastoralTagsModel::class);
+        $this->hasModel(PastoralTag::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME);
@@ -62,6 +63,26 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      */
     public function getErrorMapper() {
         return $this->errorMapper;
+    }
+
+    /**
+     * Assign a tagId to a pastoralId
+     *
+     * @param PastoralRecord $pastoral
+     * @param PastoralTag $tag
+     */
+    public function assignToRecord(PastoralRecord $pastoral, PastoralTag $tag)
+    {
+        $query = "
+            INSERT INTO pastoral_record_tag (pastoral_id, tag_id) 
+            VALUES (:pastoralId, :tagId)
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'pastoralId' => $pastoral->getId(),
+            'tagId' => $tag->getId()
+        ]);
     }
 
     /**
@@ -93,11 +114,29 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     }
 
     /**
+     * Unlink all tags for a particular pastoralId
+     *
+     * @param $pastoralId
+     */
+    public function deleteForRecord($pastoralId)
+    {
+        $query = "
+            DELETE FROM pastoral_record_tag
+            WHERE pastoral_id = :pastoralId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'pastoralId' => $pastoralId
+        ]);
+    }
+
+    /**
      * @param User $user
      * @param string $keyword
      * @param int $offset
      * @param int $limit
-     * @return Collection|PastoralTagsModel[]
+     * @return Collection|PastoralTag[]
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
     {
