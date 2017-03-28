@@ -293,7 +293,7 @@ class Controller extends Base
                 ]
             ],
             'submission-type'    => [
-                'title'             => 'Submission Types',
+                'title'             => 'Work Types',
                 'mapper'            => WorkTypeMapper::class,
                 'fields'            => [
                     'name'          => [
