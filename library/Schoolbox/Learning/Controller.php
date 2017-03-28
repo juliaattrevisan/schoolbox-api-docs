@@ -474,6 +474,10 @@ class Controller extends Base
             ]
         );
 
+        $assessments = $assessments->filter( function(IAssessable $activity) {
+            return $activity->isPublished();
+        });
+
         /* If you're an Instructor/superuser, you can see the graph regardless of
          * the config settings. getFolderAccess() seems to do a lot of stuff,
          * maybe there is a faster or at least, less costly, way of doing this
