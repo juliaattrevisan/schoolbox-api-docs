@@ -57,10 +57,10 @@ abstract class Kernel {
         $this->boot->setIncludePath();
         $this->boot->registerAutoLoading();
         $this->boot->initialiseExternalConnections();
-        //$this->boot->initialiseDebugging();
-        //$this->boot->registerErrorHandling();
-        //$this->boot->registerExceptionHandling();
-        //$this->boot->registerShutdownHandling();
+        $this->boot->initialiseDebugging();
+        $this->boot->registerErrorHandling();
+        $this->boot->registerExceptionHandling();
+        $this->boot->registerShutdownHandling();
         $this->boot->installDependencies();
 
 		return true;
