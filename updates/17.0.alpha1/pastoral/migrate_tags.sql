@@ -19,3 +19,10 @@ FROM pastoral_tags_deprecated
 WHERE deleted_at IS NULL
 GROUP BY `name`
 ORDER BY `id`
+
+-- Reassign pastoral tags to their actual records
+INSERT INTO pastoral_record_tag (pastoral_id, tag_id)
+SELECT d.`pastoral_id`, t.`id`
+FROM pastoral_tags_deprecated d
+INNER JOIN pastoral_tags t ON d.name = t.name
+AND t.deleted_at IS NULL
