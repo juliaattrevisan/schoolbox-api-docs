@@ -8,43 +8,62 @@
  */
 
 namespace Schoolbox\Learning\Assessment\SubmissionType;
+
 use Schoolbox;
 
 
 /**
  * @method Model findById($identifierValue)
  */
-class Mapper extends Schoolbox\Mapper {
+class Mapper extends Schoolbox\Mapper
+{
 
-	protected function mapping () {
-		$this->hasTable('lu_submission_type');
-		$this->hasModel(Model::class);
-		$this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+    /**
+     * @inheritdoc
+     */
+    protected function mapping()
+    {
+        $this->hasTable('lu_submission_type');
+        $this->hasModel(Model::class);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
-	}
+    }
 
-	public function getNameFromId($id) {
-		$query = "SELECT `name` FROM {$this->getTable()} t WHERE t.id=?";
-		$statement = $this->database->prepare($query);
-		$statement->execute(array($id));
-		if ($row = $statement->fetch()) {
-			return $row['name'];
-		}
-		return false;
-	}
 
-	public function getAllExcept($type) {
-		$query = "
-			SELECT {$this->getColumnString('t')}
-			FROM {$this->getTable()} t
-			WHERE t.id != ?
-		";
-		$statement = $this->database->prepare($query);
-		$statement->execute(array($type));
-		$collection = new Schoolbox\Collection(array());
-		foreach ($statement as $row) {
-			$collection->add($this->hydrate($row, 't'));
-		}
-		return $collection;
-	}
+    /**
+     * @param int $id
+     * @return string|bool
+     */
+    public function getNameFromId($id)
+    {
+        $query     = "SELECT `name` FROM {$this->getTable()} t WHERE t.id=?";
+        $statement = $this->database->prepare($query);
+        $statement->execute([$id]);
+        if ($row = $statement->fetch()) {
+            return $row['name'];
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $type
+     * @return Schoolbox\GenericCollection
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function getAllExcept($type)
+    {
+        $query     = "
+            SELECT {$this->getColumnString('t')}
+            FROM {$this->getTable()} t
+            WHERE t.id != ?
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute([$type]);
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            $collection->add($this->hydrate($row, 't'));
+        }
+        return $collection;
+    }
 }
