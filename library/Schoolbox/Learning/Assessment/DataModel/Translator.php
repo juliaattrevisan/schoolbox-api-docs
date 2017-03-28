@@ -177,6 +177,7 @@ class Translator
             ->setMarkScheme($this->markSchemeFactory->spawnMarkSchemeFor($assessable))
             ->setId($dataModel->getAssessmentModel()->getId())
             ->setSequence($dataModel->getAssessmentModel()->getSequence())
+            ->setWorkType($dataModel->getAssessmentModel()->getWorkType())
             ->setTitle($dataModel->getAssessmentModel()->getTitle())
             ->setDescription($dataModel->getAssessmentModel()->getDescription())
             ->setDefaultOpenSpan($dataModel->getAssessmentModel()->getDefaultOpenSpan())

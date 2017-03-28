@@ -24,10 +24,6 @@ trait DueWorkTrait
      */
     protected $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
 
-    /**
-     * @var int
-     */
-    protected $workType;
 
     /**
      * @var int
@@ -84,23 +80,6 @@ trait DueWorkTrait
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getWorkType()
-    {
-        return $this->workType;
-    }
-
-    /**
-     * @param int $workType
-     * @return static
-     */
-    public function setWorkType($workType)
-    {
-        $this->workType = $workType;
-        return $this;
-    }
 
     /**
      * @return int
