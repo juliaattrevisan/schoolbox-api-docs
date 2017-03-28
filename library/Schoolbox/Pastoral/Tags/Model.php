@@ -45,12 +45,17 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * Tags can be spawned inside a selectize
+     *
+     * If it returns a id/name tuple it can't work out when a new tag name
+     * is an id or an actual name
+     *
      * @return array
      */
     function jsonSerialize()
     {
         return [
-            'id'   => $this->getId(),
+            'id'   => $this->getName(),
             'name' => $this->getName(),
         ];
     }
