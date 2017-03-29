@@ -170,5 +170,15 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $this->assertSame(strtolower($users[245]['firstname']), 'caleb');
         $this->assertSame(strtolower($users[245]['lastname']), 'rhodes');
+
+        // ----------------------------------------------------------------------------------------------------------------
+        // Test function call
+        // ----------------------------------------------------------------------------------------------------------------
+
+        $function = $this->schoolbox->executeFunctionCall('testFunction', [
+            'input' => 'Got Milk?'
+        ]);
+
+        $this->assertSame($function->fetchColumn(), 'testFunctionDidThis:Got Milk?');
     }
 }
