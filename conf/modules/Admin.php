@@ -105,9 +105,5 @@ class Admin implements ModuleConfigInterface
         // Video Queue
         $video = new \Schoolbox\Admin\Video\Module($di);
         $video->init('/adminv2/video');
-
-        // Settings
-        $external = new \Schoolbox\Admin\External\Module($di);
-        $external->init('/adminv2/external');
     }
 } 
