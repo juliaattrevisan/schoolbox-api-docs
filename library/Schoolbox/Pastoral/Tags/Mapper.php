@@ -192,6 +192,8 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             return new Collection();
         }
 
+        /* Exclude soft-deleted tags
+         */
         $query = "
             {$this->getSelectString()} 
             WHERE deleted_at IS NULL 
