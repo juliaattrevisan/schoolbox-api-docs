@@ -20,7 +20,7 @@ class Iterator extends Base implements IIterator
      */
     public function rewind()
     {
-        // MySQL does not implement rewinding or scrollable cursors, just cheating and re-executing the statement.
+        // Don't know if DB2 implements rewinding or scrollable cursors, just following MySQL's lead for now.
 
         $this->rowIndex = -1;
         $this->execute();
