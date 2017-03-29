@@ -10,7 +10,7 @@
 
 namespace Alaress\Database\Test\Sqlsrv;
 
-use Alaress\Database\Connector\Mysql\Connector;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
 use Database;
 use PHPUnit_Framework_TestCase;
@@ -78,7 +78,7 @@ class TestConnector extends PHPUnit_Framework_TestCase
 
         $connectorSerialized = serialize($connectorOriginal);
 
-        /** @var Connector $connectorReconstituted */
+        /** @var IConnector $connectorReconstituted */
         $connectorReconstituted = unserialize($connectorSerialized);
 
         $iterator = $connectorReconstituted->executeQueryIterator(

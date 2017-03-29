@@ -6,6 +6,7 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\NotImplementedException;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Calendar\Event\Collection;
@@ -55,9 +56,10 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
         $stack = new Collection();
 
-        try {
-            $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
-        } catch (NotImplementedException $e) {
+        /** @var IIterator $externalEvents */
+        $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
+
+        if ($externalEvents->count() == 0) {
             return $stack;
         }
 

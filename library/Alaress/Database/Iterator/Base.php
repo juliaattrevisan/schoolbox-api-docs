@@ -117,7 +117,7 @@ class Base implements IIterator
     }
 
     /**
-     * @iterator
+     * @inheritdoc
      */
     public function rewind()
     {
@@ -125,6 +125,18 @@ class Base implements IIterator
         // the base implementation will do nothing
 
         return;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function count()
+    {
+        if ($this->statement == null) {
+            return 0;
+        }
+
+        return $this->statement->rowCount();
     }
 
     /**

@@ -9,7 +9,7 @@
 
 namespace Schoolbox\External\Connector\Offline\Base;
 
-use Alaress\Database\NotImplementedException;
+use Alaress\Database\Iterator\Base as Iterator;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 
@@ -20,6 +20,6 @@ class ExternalEvents extends Base implements IExternalEvents
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
-        throw new NotImplementedException();
+        return new Iterator(null, null, null);
     }
 }

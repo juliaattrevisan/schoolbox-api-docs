@@ -9,17 +9,6 @@
 
 namespace Schoolbox\External\Connector\Doublefirst\Base;
 
-use Alaress\Database\NotImplementedException;
-use Schoolbox\External\Connector\IExternalEvents;
-use Schoolbox\External\Connector\Base;
-
-class ExternalEvents extends Base implements IExternalEvents
+class ExternalEvents extends \Schoolbox\External\Connector\Offline\Base\ExternalEvents
 {
-    /**
-     * @inheritdoc
-     */
-    public function getExternalEvents($user, $startDate, $endDate)
-    {
-        throw new NotImplementedException();
-    }
 }

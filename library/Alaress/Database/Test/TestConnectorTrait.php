@@ -10,20 +10,19 @@
 
 namespace Alaress\Database\Test;
 
-use Alaress\Database\Connector\Sqlsrv\Connector as ConnectorSqlsrv;
-use Alaress\Database\Connector\Mysql\Connector as ConnectorMysql;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
 use Database;
 
 trait TestConnectorTrait
 {
-    /** @var ConnectorMysql $schoolbox */
+    /** @var IConnector $schoolbox */
     private $schoolbox;
 
-    /** @var ConnectorSqlsrv $synergetic68 */
+    /** @var IConnector $synergetic68 */
     private $synergetic68;
 
-    /** @var ConnectorSqlsrv $synergetic67 */
+    /** @var IConnector $synergetic67 */
     private $synergetic67;
 
     /**
@@ -39,7 +38,9 @@ trait TestConnectorTrait
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $this->schoolbox = Factory::CreateMysql();
+        $factory = new Factory();
+
+        $this->schoolbox = $factory->createMysql();
         $this->schoolbox->connect(
             '192.168.36.10',
             'schoolbox',
@@ -61,7 +62,8 @@ trait TestConnectorTrait
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $this->synergetic67 = Factory::CreateSqlsrv();
+        $factory = new Factory();
+        $this->synergetic67 = $factory->createSqlsrv();
         $this->synergetic67->connect(
             '172.31.6.236',
             'SynergyOne',
@@ -83,7 +85,9 @@ trait TestConnectorTrait
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $this->synergetic68 = Factory::CreateSqlsrv();
+        $factory = new Factory();
+
+        $this->synergetic68 = $factory->createSqlsrv();
         $this->synergetic68->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',

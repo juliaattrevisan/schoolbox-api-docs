@@ -13,10 +13,11 @@ namespace Alaress\Database\Iterator;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Statement\IStatement;
+use Countable;
 use Iterator as BaseIterator;
 use PDOStatement;
 
-interface IIterator extends BaseIterator
+interface IIterator extends BaseIterator, Countable
 {
     /**
      * Execute iterator
@@ -60,6 +61,13 @@ interface IIterator extends BaseIterator
      * @return void
      */
     public function rewind();
+
+    /**
+     * Return count of elements in the recordset
+     *
+     * @return mixed
+     */
+    public function count();
 
     /**
      * Move to next rowset in result
