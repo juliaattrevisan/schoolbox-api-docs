@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector;
 
 use Alaress\Database\Iterator\IIterator;
+use Alaress\Database\NotImplementedException;
 
 interface IExternalEvents
 {
@@ -20,6 +21,7 @@ interface IExternalEvents
      * @param string $startDate
      * @param string $endDate
      * @return IIterator
+     * @throws NotImplementedException
      */
     public function getExternalEvents($user, $startDate, $endDate);
 }

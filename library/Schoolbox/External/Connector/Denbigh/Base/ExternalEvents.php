@@ -9,6 +9,7 @@
 
 namespace Schoolbox\External\Connector\Denbigh\Base;
 
+use Alaress\Database\NotImplementedException;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 
@@ -19,6 +20,6 @@ class ExternalEvents extends Base implements IExternalEvents
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
-        return false;
+        throw new NotImplementedException();
     }
 }
