@@ -28,7 +28,7 @@ CREATE TABLE `pastoral_record_tag`( `pastoral_id` INT(11) NOT NULL, `tag_id` INT
 ALTER TABLE `pastoral_record_tag` ADD UNIQUE INDEX `pastoral_id_tag_id` (`pastoral_id`, `tag_id`);
 
 -- Reassign pastoral tags to their actual records
-INSERT INTO pastoral_record_tag (pastoral_id, tag_id)
+INSERT IGNORE INTO pastoral_record_tag (pastoral_id, tag_id)
 SELECT d.`pastoral_id`, t.`id`
 FROM pastoral_tags_deprecated d
 INNER JOIN pastoral_tag t ON d.name = t.name
