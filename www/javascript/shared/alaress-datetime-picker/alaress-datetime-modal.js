@@ -140,11 +140,19 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     }
 
     // Timetable picker
+
+    // Timetable dropdown fields
+    var timetable = {
+        campus: $('#byTimetable-' + twigVars.id).find('select[name*="campus"]'),
+        term: $('#byTimetable-' + twigVars.id).find('select[name*="term"]'),
+        cycle: $('#byTimetable-' + twigVars.id).find('select[name*="cycle"]')
+    }
+
     // Build cycles dynamically
     function buildCycles() {
 
-        var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
-        var termDuration = $('select[name*="term"]').find(':selected').attr('data-duration');
+        var daysInCycle = timetable.campus.find(':selected').attr('data-days');
+        var termDuration = timetable.term.find(':selected').attr('data-duration');
 
         // Don't try to divide by zero
         if ((daysInCycle !== undefined && daysInCycle > 0)  && (termDuration !== undefined && termDuration > 0)) {
@@ -160,7 +168,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
                 optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
             }
-            $('select[name*="cycle"]').empty().append(optionsHtml);
+            timetable.cycle.empty().append(optionsHtml);
         }
         else {
             noTimetableData();
@@ -169,7 +177,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     // Highlight day and period
     function showPeriod() {
-        var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
+        var daysInCycle = timetable.campus.find(':selected').attr('data-days');
         if (daysInCycle !== undefined && daysInCycle > 0) {
             var isWeekend = twigVars.timetableDay.isWeekend;
             // Highlight day if it doesn't fall on a weekend
@@ -205,7 +213,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     // Reveal Timetable
     function revealTimetable() {
-        var campus = $('select[name*="campus"]').find(':selected').val();
+        var campus = timetable.campus.find(':selected').val();
         $('.timetablePicker' + twigVars.id).css('display', 'none');
         $('#timetable' + twigVars.id + '-' + campus).css('display', 'table');
     }
@@ -213,7 +221,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function noTimetableData() {
         var html = '<div data-alert="" class="alert-box alert">Not enough data to build a timetable <br /> for the selected campus and term.<a href="" class="close">×</a></div>';
 
-        $('select[name*="cycle"]').empty().css('display', 'none');
+        timetable.cycle.empty().css('display', 'none');
         $('.timetablePicker'+twigVars.id).empty().css('display', 'none');
         $('.timetable-submit').css('display', 'none');
 
@@ -225,7 +233,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     revealTimetable();
 
     // Update cycles on Campus or Term change
-    $('select[name*="campus"]').change(function () {
+    timetable.campus.change(function () {
         buildCycles();
         // Clear selected
         $('.period-selected').removeClass('period-selected');
@@ -233,8 +241,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         revealTimetable();
     });
 
-    $('select[name*="term"]').change(function () {
+    timetable.term.change(function () {
         buildCycles();
+    });
+
+    timetable.cycle.change(function () {
+        $('.period-selected').removeClass('period-selected');
+        $('table').find('[data-selected=1]').attr('data-selected', 0);
     });
 
     var timetableAppointments = $('#timetableAppointments' + twigVars.id);
@@ -269,9 +282,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         $('.description-' + period).addClass('period-selected');
         periodClicked = 'period' + day + '_' + period;
 
-        var campus = $('select[name*="campus"]').val();
-        var term = $('select[name*="term"]').val();
-        var cycle = $('select[name*="cycle"]').val();
+        var campus = timetable.campus.val();
+        var term = timetable.term.val();
+        var cycle = timetable.cycle.val();
 
         if (twigVars.type == 'duework') {
 
@@ -337,6 +350,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     };
 
+    // Accommodating the "start of the week" SB config
     Flatpickr.localize(Flatpickr.l10ns.default);
     Flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
 
