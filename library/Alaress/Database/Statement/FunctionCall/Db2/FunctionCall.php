@@ -16,6 +16,8 @@ class FunctionCall extends Base
 {
     /**
      * @inheritdoc
+     *
+     * TODO: This is the SQLSRV code, need to work out how to execute a function in DB2 and correct the SQL syntax
      */
     public function getSql()
     {
