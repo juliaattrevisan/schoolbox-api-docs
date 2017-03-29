@@ -13,7 +13,7 @@ use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
 use Schoolbox;
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
@@ -145,8 +145,14 @@ class UserMapper extends Mapper
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
             $factory = new ExternalConnectorFactory();
 
-            /** @var CommunityPortalInterface $communityPortal */
-            $communityPortal = $factory->build($this->getConfigLoader(), ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL);
+            $databaseExternal = BREAK_THE_WORLD;
+
+            /** @var ICommunityPortal $communityPortal */
+            $communityPortal = $factory->build(
+                $this->getConfigLoader(),
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
+            );
 
             try {
                 $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
