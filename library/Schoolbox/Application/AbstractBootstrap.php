@@ -10,6 +10,7 @@ namespace Schoolbox\Application;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\Application\Kernel;
 use Alaress\Authorizer\Rule;
+use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
@@ -149,11 +150,22 @@ abstract class AbstractBootstrap implements BootstrapInterface
             )
         );
 
+        // Database connection factory
+        $di->set(
+            'databaseFactory',
+            function() use ($di) {
+                return new SchoolboxDatabaseFactory(
+                    new AlaressDatabaseFactory()
+                );
+            }
+        );
+
         // Schoolbox internal database connection
         $di->set(
             'databaseInternal',
-            function() {
-                $factory = new SchoolboxDatabaseFactory();
+            function() use ($di) {
+                /** @var SchoolboxDatabaseFactory $factory */
+                $factory = $di->get('databaseFactory');
                 return $factory->getInternalDatabase();
             }
         );
@@ -163,11 +175,13 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'databaseExternal',
             $di->lazy(
                 function() use ($di) {
+                    /** @var SchoolboxDatabaseFactory $factory */
+                    $factory = $di->get('databaseFactory');
+
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-
-                    $factory = new SchoolboxDatabaseFactory();
-                    return $factory->getExternalDatabase($config);
+                    
+                    $factory->getExternalDatabase($config);
                 }
             )
         );

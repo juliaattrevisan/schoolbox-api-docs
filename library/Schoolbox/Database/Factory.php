@@ -10,12 +10,26 @@ use Schoolbox\IConfigLoader;
 class Factory
 {
     /**
+     * @var DatabaseFactory $factory
+     */
+    private $factory;
+
+    /**
+     * Factory Constructor
+     *
+     * @param DatabaseFactory $factory
+     */
+    public function __construct($factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
      * Retrieve a connection to Schoolbox database
      */
     public function getInternalDatabase()
     {
-        $factory = new DatabaseFactory();
-        $connectorInternal = $factory->createMysql();
+        $connectorInternal = $this->factory->createMysql();
 
         if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd)) {
             throw new DatabaseException("Unable to connect to Schoolbox database.");
@@ -32,8 +46,6 @@ class Factory
      */
     public function getExternalDatabase($config)
     {
-        $factory = new DatabaseFactory();
-
         switch ($config['external_type']) {
 
             // Microsoft SQL Server
@@ -47,7 +59,7 @@ class Factory
             case 'doublefirst':
             case 'humanedge':
 
-                $connectorExternal = $factory->createSqlsrv();
+                $connectorExternal = $this->factory->createSqlsrv();
                 break;
 
             // MySQL
@@ -55,14 +67,14 @@ class Factory
             case 'schoolbox':
             case 'denbigh':
 
-                $connectorExternal = $factory->createMysql();
+                $connectorExternal = $this->factory->createMysql();
                 break;
 
             // IBM DB2
 
             case 'edumate':
 
-                $connectorExternal = $factory->createDb2();
+                $connectorExternal = $this->factory->createDb2();
                 break;
         };
 
@@ -83,7 +95,7 @@ class Factory
 
         if ($config['external_type'] == 'humanedge') {
 
-            $connectorAplus = $factory->createSqlsrv();
+            $connectorAplus = $this->factory->createSqlsrv();
 
             if (!$connectorAplus->connect(
                 $config['external_humanedge_aplus_db_host'],
