@@ -45,7 +45,7 @@ class Iterator extends Base implements IIterator
                 // $this->execute();
 
                 $iterator = $this->statement->executeIterator();
-                $this->currentRow = $iterator->currentRow;
+                $this->currentRow = $iterator->current();
                 $this->rowIndex = 0;
             }
         }
