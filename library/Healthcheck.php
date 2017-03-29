@@ -11,9 +11,8 @@
  */
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Factory as DatabaseFactory;
 use Alaress\Database\Statement\Base as BaseStatement;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 
 class Healthcheck
 {
@@ -35,69 +34,21 @@ class Healthcheck
     /** @var array This is an array used to hold the output parameters of procedure calls */
     private $outputParameters = [];
 
+    /** @var IConfigLoader  */
+    private $configMapper;
+
     /**
      * Constructor
+     *
+     * @param IConnector $databaseExternal
+     * @param IConfigLoader $configMapper
+     * @throws Exception
      */
-    public function __construct()
+    public function __construct($databaseExternal, $configMapper)
     {
-        $factory = new DatabaseFactory();
-
-        $this->configMapper = ConfigMapper::getInstance();
-        $this->externalType = $this->configMapper->get('external_type');
-
-        // Need to choose appropriate database engine based on external type
-
-        switch ($this->configMapper->get('external_type')) {
-
-            case 'synergetic':
-            case 'tass':
-            case 'schoolbox':
-            case 'schoolpro':
-            case 'maze':
-            case 'pcschools':
-            case 'doublefirst':
-
-                $this->connector = $factory->createSqlsrv();
-                break;
-
-            // This one is a special little potato with two connections
-
-            case 'humanedge':
-
-                $this->connector = $factory->createSqlsrv();
-
-                $this->secondaryConnectors[$this->configMapper->get('external_humanedge_aplus_db_db')] = DatabaseFactory::CreateSqlsrv();
-                $this->secondaryConnectors[$this->configMapper->get('external_humanedge_aplus_db_db')]
-                    ->connect(
-                        $this->configMapper->get('external_humanedge_aplus_db_host'),
-                        $this->configMapper->get('external_humanedge_aplus_db_db'),
-                        $this->configMapper->get('external_humanedge_aplus_db_user'),
-                        $this->configMapper->get('external_humanedge_aplus_db_passwd')
-                    );
-
-                break;
-
-            case 'denbigh':
-
-                $this->connector = $factory->createMysql();
-                break;
-
-            case 'edumate':
-
-                $this->connector = $factory->createDb2();
-                break;
-
-            default:
-
-                throw new Exception("Unknown external database type: " . $this->configMapper->get('external_type'));
-        }
-
-        $this->connector->connect(
-            $this->configMapper->get('external_db_host'),
-            $this->configMapper->get('external_db_db'),
-            $this->configMapper->get('external_db_user'),
-            $this->configMapper->get('external_db_passwd')
-        );
+        $this->connector = $databaseExternal;
+        $this->configMapper = $configMapper;
+        $this->externalType = $configMapper->get('external_type');
     }
 
     /**

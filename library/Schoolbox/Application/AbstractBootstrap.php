@@ -181,7 +181,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
 
-                    $factory->getExternalDatabase($config);
+                    return $factory->getExternalDatabase($config);
                 }
             )
         );
