@@ -190,7 +190,13 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         if (strlen($keyword) === 0) {
             return new Collection();
         }
-        $query = "{$this->getSelectString()} WHERE name LIKE :search";
+
+        $query = "
+            {$this->getSelectString()} 
+            WHERE deleted IS NULL 
+            AND name LIKE :search
+        ";
+
         if ($offset > 0) {
             $query .= ' LIMIT :limit OFFSET :offset';
         } elseif ($limit > 0) {
