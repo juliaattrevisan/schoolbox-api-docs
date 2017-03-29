@@ -30,7 +30,9 @@ class TestConnector extends PHPUnit_Framework_TestCase
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $synergetic67 = Factory::CreateSqlsrv();
+        $factory = new Factory();
+
+        $synergetic67 = $factory->createSqlsrv();
         $result = $synergetic67->connect(
             '172.31.6.236',
             'SynergyOne',
@@ -40,7 +42,7 @@ class TestConnector extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($result, "Failed to connect to Synergetic V67 database");
 
-        $synergetic68 = Factory::CreateSqlsrv();
+        $synergetic68 = $factory->createSqlsrv();
         $result = $synergetic68->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',
@@ -64,7 +66,9 @@ class TestConnector extends PHPUnit_Framework_TestCase
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $connectorOriginal = Factory::CreateSqlsrv();
+        $factory = new Factory();
+
+        $connectorOriginal = $factory->createSqlsrv();
         $connectorOriginal->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',

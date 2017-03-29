@@ -46,7 +46,9 @@ class TestPostProcessor extends PHPUnit_Framework_TestCase
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $synergetic68 = Factory::CreateSqlsrv();
+        $factory = new Factory();
+
+        $synergetic68 = $factory->createSqlsrv();
         $synergetic68->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',

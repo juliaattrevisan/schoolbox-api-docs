@@ -30,7 +30,9 @@ class TestConnector extends PHPUnit_Framework_TestCase
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $schoolbox = Factory::CreateMysql();
+        $factory = new Factory();
+
+        $schoolbox = $factory->createMysql();
         $result = $schoolbox->connect(
             '192.168.36.10',
             'schoolbox',
@@ -54,7 +56,9 @@ class TestConnector extends PHPUnit_Framework_TestCase
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $connectorOriginal = Factory::CreateMysql();
+        $factory = new Factory();
+
+        $connectorOriginal = $factory->createMysql();
         $connectorOriginal->connect(
             '192.168.36.10',
             'schoolbox',

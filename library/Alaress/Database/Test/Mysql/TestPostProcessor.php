@@ -46,7 +46,9 @@ class TestPostProcessor extends PHPUnit_Framework_TestCase
         $database = Database::getInstance();
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
-        $schoolbox = Factory::CreateMysql();
+        $factory = new Factory();
+
+        $schoolbox = $factory->createMysql();
         $schoolbox->connect(
             '192.168.36.10',
             'schoolbox',

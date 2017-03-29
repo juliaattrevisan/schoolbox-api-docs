@@ -141,14 +141,12 @@ abstract class Base implements IConnector
     {
         // We serialize just the settings of the database connection
 
-        $serializedInstance = [
+        return serialize([
             'hostname' => $this->hostname,
             'username' => $this->username,
             'password' => $this->password,
             'database' => $this->database
-        ];
-
-        return json_encode($serializedInstance);
+        ]);
     }
 
     /**
@@ -156,14 +154,14 @@ abstract class Base implements IConnector
      */
     protected function unserialize($serialized)
     {
-        $serialized = json_decode($serialized);
+        $settings = unserialize($serialized);
 
         // We load the settings back into the object
 
-        $this->hostname = $serialized->hostname;
-        $this->username = $serialized->username;
-        $this->password = $serialized->password;
-        $this->database = $serialized->database;
+        $this->hostname = $settings['hostname'];
+        $this->username = $settings['username'];
+        $this->password = $settings['password'];
+        $this->database = $settings['database'];
     }
 
     /**
