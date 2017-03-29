@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
@@ -569,6 +570,17 @@ class Controller extends Base
                         /** @var PastoralTagsModel $tag */
                         $tag = $this->getPastoralTagsMapper()->findOneByColumn('name', $tagCurrent);
                     }
+                    catch (MapperDeletedException $e) {
+
+                        /* Restore this tag to active duty
+                         */
+                        $tag = $e->getDeletedObject();
+
+                        if ($tag->isDeleted()) {
+                            $tag->setDeletedAt(null);
+                            $this->getPastoralTagsMapper()->save($tag);
+                        }
+                    }
                     catch (MapperException $e) {
 
                         /* Tag doesn't exist - spawn it, save it, then assign it
@@ -581,6 +593,7 @@ class Controller extends Base
                     $this->getPastoralTagsMapper()->assignToRecord($record, $tag);
                 }
             }
+
             // Save the audiences
 
             foreach ($post["role"] as $role_id => $checked) {
@@ -729,6 +742,17 @@ class Controller extends Base
 
                     /** @var PastoralTagsModel $tag */
                     $tag = $this->getPastoralTagsMapper()->findOneByColumn('name', $tagCurrent);
+                }
+                catch (MapperDeletedException $e) {
+
+                    /* Restore this tag to active duty
+                     */
+                    $tag = $e->getDeletedObject();
+
+                    if ($tag->isDeleted()) {
+                        $tag->setDeletedAt(null);
+                        $this->getPastoralTagsMapper()->save($tag);
+                    }
                 }
                 catch (MapperException $e) {
 

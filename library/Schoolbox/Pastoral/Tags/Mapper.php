@@ -193,7 +193,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 
         $query = "
             {$this->getSelectString()} 
-            WHERE deleted IS NULL 
+            WHERE deleted_at IS NULL 
             AND name LIKE :search
         ";
 
