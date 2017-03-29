@@ -14,8 +14,9 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Statement\Query\IQuery;
+use Serializable;
 
-abstract class Base implements IConnector
+abstract class Base implements Serializable, IConnector
 {
     // ----------------------------------------------------------------------------------------------------------------
     // This should be overridden in the child classes with the database engine specific broker
@@ -52,6 +53,36 @@ abstract class Base implements IConnector
 
     /** @var string $error Last reported error code */
     protected $errorCode;
+
+    /**
+     * Returns a type specific database broker
+     *
+     * @param IConnector $connector
+     * @return IBroker
+     */
+    abstract protected function newBroker($connector);
+
+    /**
+     * Connect to the database
+     *
+     * @param string $hostname
+     * @param string $database
+     * @param string $username
+     * @param string $password
+     * @param array $options Database connection options
+     * @return bool
+     */
+    public function connect($hostname, $database, $username, $password, $options = [])
+    {
+        $this->options = $options;
+        $this->username = $username;
+        $this->password = $password;
+        $this->hostname = $hostname;
+        $this->database = $database;
+
+        $this->broker = $this->newBroker($this);
+        return $this->broker->connect($options);
+    }
 
     // ----------------------------------------------------------------------------------------------------------------
     // Getters for the immutable properties
@@ -152,7 +183,7 @@ abstract class Base implements IConnector
     /**
      * @inheritdoc
      */
-    protected function unserialize($serialized)
+    public function unserialize($serialized)
     {
         $settings = unserialize($serialized);
 
@@ -162,6 +193,9 @@ abstract class Base implements IConnector
         $this->username = $settings['username'];
         $this->password = $settings['password'];
         $this->database = $settings['database'];
+
+        $this->broker = $this->newBroker($this);
+        $this->broker->connect();
     }
 
     /**
@@ -180,6 +214,20 @@ abstract class Base implements IConnector
     // ----------------------------------------------------------------------------------------------------------------
     // Database statement generators
     // ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareQuery($sql, $parameters = [])
+    {
+        $statement = $this->broker->prepareQuery($sql);
+
+        if (is_array($parameters)) {
+            $statement->bindInputs($parameters);
+        }
+
+        return $statement;
+    }
 
     /**
      * @inheritdoc

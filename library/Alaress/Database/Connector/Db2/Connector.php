@@ -12,66 +12,17 @@ namespace Alaress\Database\Connector\Db2;
 
 use Alaress\Database\Broker\Db2\Broker;
 use Alaress\Database\Connector\Base;
-use Alaress\Database\Connector\IConnector;
-use Serializable;
 
-class Connector extends Base implements Serializable, IConnector
+class Connector extends Base
 {
     /** @var Broker */
     protected $broker;
 
     /**
-     * Connect to the database
-     *
-     * @param string $hostname
-     * @param string $database
-     * @param string $username
-     * @param string $password
-     * @param array $options Database connection options
-     * @return bool
-     */
-    public function connect($hostname, $database, $username, $password, $options = [])
-    {
-        $this->options = $options;
-        $this->username = $username;
-        $this->password = $password;
-        $this->hostname = $hostname;
-        $this->database = $database;
-
-        $this->broker = new Broker($this);
-        return $this->broker->connect($options);
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Type specific deserialize function
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
      * @inheritdoc
      */
-    public function unserialize($serialized)
+    public function newBroker($connector)
     {
-        parent::unserialize($serialized);
-
-        $this->broker = new Broker($this);
-        $this->broker->connect();
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Type specific query preparation function
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function prepareQuery($sql, $parameters = [])
-    {
-        $statement = $this->broker->prepareQuery($sql);
-
-        if (is_array($parameters)) {
-            $statement->bindInputs($parameters);
-        }
-
-        return $statement;
+        return new Broker($connector);
     }
 }
