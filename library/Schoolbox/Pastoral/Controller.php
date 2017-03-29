@@ -581,10 +581,8 @@ class Controller extends Base
                          */
                         $tag = $e->getDeletedObject();
 
-                        if ($tag->isDeleted()) {
-                            $tag->setDeletedAt(null);
-                            $this->getPastoralTagsMapper()->save($tag);
-                        }
+                        $tag->setDeletedAt(null);
+                        $this->getPastoralTagsMapper()->save($tag);
                     }
                     catch (MapperException $e) {
 
@@ -754,10 +752,8 @@ class Controller extends Base
                      */
                     $tag = $e->getDeletedObject();
 
-                    if ($tag->isDeleted()) {
-                        $tag->setDeletedAt(null);
-                        $this->getPastoralTagsMapper()->save($tag);
-                    }
+                    $tag->setDeletedAt(null);
+                    $this->getPastoralTagsMapper()->save($tag);
                 }
                 catch (MapperException $e) {
 
