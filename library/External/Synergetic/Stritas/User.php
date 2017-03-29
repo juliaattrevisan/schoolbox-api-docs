@@ -57,6 +57,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                     vStudents.StudentStudiesCode,
                     AlertMessage,
                     vStudents.StudentBoarder,
+                    vStudents.StudentsComment as Comment,
                     uStudentProgressiveAbsenceCount.AbsenceFullDaysForYear,
                     uStudentProgressiveAbsenceCount.LateStartDaysForYear,
                     uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear

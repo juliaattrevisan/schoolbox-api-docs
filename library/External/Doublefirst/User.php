@@ -389,6 +389,7 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS StudentStudiesCode,
                 UrgentNotes                                         AS AlertMessage,
                 ''                                                  AS StudentBoarder,
+                ''                                                  AS Comment,
                 pca.CustodyAlert                                    AS CustodyAlert,
                 pca.CustodyNotes                                    AS CustodyNotes,
                 pcad.Description                                    AS CustodyResponsiblePerson
