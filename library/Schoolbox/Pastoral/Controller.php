@@ -561,13 +561,26 @@ class Controller extends Base
 
             foreach ($tags as $tagCurrent) {
                 if (trim($tagCurrent) != '') {
-                    $tag = new PastoralTagsModel();
-                    $tag->setName($tagCurrent);
-                    $tag->setPastoralId($record->getId());
-                    $this->getPastoralTagsMapper()->save($tag);
+                    try {
+
+                        /* Assign an existing tag to this pastoral record
+                         */
+
+                        /** @var PastoralTagsModel $tag */
+                        $tag = $this->getPastoralTagsMapper()->findOneByColumn('name', $tagCurrent);
+                    }
+                    catch (MapperException $e) {
+
+                        /* Tag doesn't exist - spawn it, save it, then assign it
+                         */
+                        $tag = new PastoralTagsModel();
+                        $tag->setName($tagCurrent);
+                        $this->getPastoralTagsMapper()->save($tag);
+                    }
+
+                    $this->getPastoralTagsMapper()->assignToRecord($record, $tag);
                 }
             }
-
             // Save the audiences
 
             foreach ($post["role"] as $role_id => $checked) {
