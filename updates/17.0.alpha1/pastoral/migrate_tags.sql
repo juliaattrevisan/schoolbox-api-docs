@@ -23,9 +23,6 @@ ORDER BY `id`;
 -- Spawn a relation table for pastoral records and their tags
 CREATE TABLE `pastoral_record_tag`( `pastoral_id` INT(11) NOT NULL, `tag_id` INT(11) NOT NULL );
 
--- Assign foreign keys
-ALTER TABLE `pastoral_record_tag` ADD CONSTRAINT `fk_pastoral_record_tag_record` FOREIGN KEY (`pastoral_id`) REFERENCES `pastoral`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT `fk_pastoral_record_tag_tag` FOREIGN KEY (`tag_id`) REFERENCES `pastoral_tag`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
 -- Pastoral record/tag relations are unique
 -- You shouldn't have the same tag assigned multiple times to a given record
 ALTER TABLE `pastoral_record_tag` ADD UNIQUE INDEX `pastoral_id_tag_id` (`pastoral_id`, `tag_id`);
@@ -36,3 +33,6 @@ SELECT d.`pastoral_id`, t.`id`
 FROM pastoral_tags_deprecated d
 INNER JOIN pastoral_tag t ON d.name = t.name
 AND t.deleted_at IS NULL;
+
+-- Assign foreign keys
+ALTER TABLE `pastoral_record_tag` ADD CONSTRAINT `fk_pastoral_record_tag_record` FOREIGN KEY (`pastoral_id`) REFERENCES `pastoral`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT `fk_pastoral_record_tag_tag` FOREIGN KEY (`tag_id`) REFERENCES `pastoral_tag`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION;
