@@ -10,36 +10,10 @@
 
 namespace Alaress\Database\Statement\StoredProcedure\Sqlsrv;
 
-use Alaress\Database\Broker\Sqlsrv\Broker;
-use Alaress\Database\Exception as DatabaseException;
-use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Statement\StoredProcedure\Base;
 
-class StoredProcedure extends Base implements IStoredProcedure
+class StoredProcedure extends Base
 {
-    /** @var Broker $broker */
-    protected $broker;
-
-    /** @var string Stored procedure name */
-    private $name;
-
-    /**
-     * Stored procedure constructor
-     *
-     * @param Broker $broker Database wrapper that this object belongs to;
-     * @param string $name Name of stored procedure to execute
-     * @throws DatabaseException
-     */
-    public function __construct($broker, $name)
-    {
-        // Unlike the standard query we do not prepare the statement in the constructor as we need to construct the
-        // query dynamically based on the parameters that are passed. So for now we just store the broker and the
-        // name of the procedure we intend to execute.
-
-        $this->broker = $broker;
-        $this->name = $name;
-    }
-
     /**
      * @inheritdoc
      */

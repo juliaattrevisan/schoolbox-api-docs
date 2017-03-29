@@ -10,11 +10,37 @@
 
 namespace Alaress\Database\Statement\StoredProcedure;
 
+use Alaress\Database\Broker\IBroker;
+use Alaress\Database\Exception as DatabaseException;
+use Alaress\Database\Statement\Query\Base as BaseQuery;
 use PDO;
 use PDOStatement;
-use Alaress\Database\Statement\Query\Base as BaseQuery;
 
-abstract class Base extends BaseQuery implements IStoredProcedure {
+class Base extends BaseQuery implements IStoredProcedure
+{
+    /** @var IBroker $broker */
+    protected $broker;
+
+    /** @var string $name Function name */
+    protected $name;
+
+    /**
+     * Function call constructor
+     *
+     * @param IBroker $broker Database wrapper that this object belongs to;
+     * @param string $name Name of function call to execute
+     * @throws DatabaseException
+     */
+    public function __construct($broker, $name)
+    {
+        parent::__construct($broker, null);
+
+        // Unlike the standard query we do not prepare the statement in the constructor as we need to construct the
+        // query dynamically based on the parameters that are passed. So for now we just store the broker and the
+        // name of the function we intend to execute.
+
+        $this->name = $name;
+    }
 
     /**
      * @inheritdoc

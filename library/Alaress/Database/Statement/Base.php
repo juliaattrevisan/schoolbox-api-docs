@@ -33,6 +33,8 @@ abstract Class Base implements IStatement
     /** @var array $parameters This is an array that contains parameters we intend to bind to the PDO statement */
     protected $parameters = [];
 
+
+
     /**
      * @inheritdoc
      */
