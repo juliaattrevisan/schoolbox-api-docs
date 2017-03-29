@@ -33,12 +33,9 @@ interface IStatement
     /**
      * Get all records from last executed query.
      *
-     * Do not use this on threat of death. This thing is the definition of pure evil, and
-     * you should be iterating instead.
+     * Make sure you really want to use this- it has the potential to be a memory hog. If you're iterating results, use an iterator!
      *
      * @param int $fetchStyle PDO fetch style
-     *
-     * @deprecated
      * @return mixed
      */
     public function fetchAll($fetchStyle = PDO::FETCH_ASSOC);

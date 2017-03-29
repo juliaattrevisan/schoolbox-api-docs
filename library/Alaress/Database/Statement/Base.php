@@ -56,10 +56,8 @@ abstract Class Base implements IStatement
     }
 
     /**
-     * Do not use this on threat of death. This thing is the definition of pure evil, and
-     * you should be iterating instead.
+     * Make sure you really want to use this- it has the potential to be a memory hog. If you're iterating results, use an iterator!
      *
-     * @deprecated
      * @inheritdoc
      */
     public function fetchAll($fetchStyle = PDO::FETCH_ASSOC)
