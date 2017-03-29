@@ -142,6 +142,15 @@
                 error = true;
             }
 
+            {# At least one year has to be selected
+             #}
+            $('#year_error').hide();
+
+            if ($('[data-check-year]:checked').length == 0) {
+                $('#year_error').show();
+                error = true;
+            }
+
             if (!error) {
                 // Create report page GET variables
 
