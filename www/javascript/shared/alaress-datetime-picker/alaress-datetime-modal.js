@@ -80,7 +80,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                     html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
                     html += '<div class="card small-12">';
                     html += '<a href="/search/user/' + data.students[i].id + '">';
-                    html += '<img src="/portrait.php?userId=' + data.students[i].id + '&amp;size=square64">';
+                    html += '<img src="/portrait.php?userId=' + data.students[i].externalId + '&amp;size=square80">';
                     html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
                     html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
                     html += '</a>';
