@@ -76,7 +76,12 @@ class Controller extends Base
      */
     public function getReport()
     {
-        $records = $this->getReportData();
+        try {
+            $records = $this->getReportData();
+        }
+        catch (\InvalidArgumentException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
 
         // Restrict results based on pagination
 

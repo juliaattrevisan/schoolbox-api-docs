@@ -314,13 +314,15 @@ class Mapper extends BaseMapper
         if ($types != '') {
             $criteria[] = "type_id IN ({$types})";
         }
+        else {
+            throw new \InvalidArgumentException('Record type required');
+        }
 
         $array_years = explode(",", $years);
 
         $years_sql = '';
 
         if ($years != '') {
-
             $years_sql .= "";
 
             foreach ($array_years as $year) {
@@ -331,6 +333,9 @@ class Mapper extends BaseMapper
             }
 
             $years_sql = "`s`.year IN ({$years_sql})";
+        }
+        else {
+            throw new \InvalidArgumentException('Year level required');
         }
 
         $criteria[] = $years_sql;
