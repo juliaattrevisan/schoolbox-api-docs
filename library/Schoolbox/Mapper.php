@@ -257,7 +257,6 @@ abstract class Mapper implements IMapper, Serializable
                     'di'          => $di,
                     'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
                 ]),
-                'databaseExternal' => $di->lazyGet('databaseExternal'),
                 'redis'      => $di->lazyGet('redis'),
                 'broker'     => $di->lazyNew(Broker::class, [
                     'instanceId' => INSTANCE_ID,
