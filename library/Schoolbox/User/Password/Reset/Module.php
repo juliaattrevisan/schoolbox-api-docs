@@ -85,7 +85,7 @@ class Module extends BaseModule
                     'passwordService'        => $injector->lazyNew(PasswordService::class),
                     'userMapper'             => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'resetMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'communityPortalFactory' => $injector->get('externalCommunityPortal'),
+                    'communityPortalFactory' => $injector->lazyGet('externalCommunityPortal'),
                     'mailFactory'            => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
                         [
@@ -109,7 +109,9 @@ class Module extends BaseModule
      */
     protected function getMapper()
     {
-        return $this->getMapperFactory()->get(Mapper::class);
+        /** @var Mapper $mapper */
+        $mapper = $this->getMapperFactory()->get(Mapper::class);
+        return $mapper;
     }
 
     /**
@@ -117,7 +119,9 @@ class Module extends BaseModule
      */
     protected function getUserMapper()
     {
-        return $this->getMapperFactory()->get(UserMapper::class);
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+        return $userMapper;
     }
 
 
