@@ -1109,9 +1109,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $task = $this->getDummyTask();
         return [
             [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT],
-            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
-            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
+            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_COMPLETE],
         ];
     }
 
@@ -1120,9 +1120,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $task = $this->getDummyTask();
         return [
             [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT],
-            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
-            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
+            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_COMPLETE],
         ];
     }
 

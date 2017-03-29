@@ -164,6 +164,7 @@ class Project extends AbstractAssessment implements AssessmentContext
      * If a student requires marking on ANY project sub-assessment, the project requires marking (Orange Diamond)
      *
      * @inheritdoc
+     * @throws \DomainException if user is not found in any project sub-assessments
      */
     public function isFeedbackRequired(Participant $participant)
     {

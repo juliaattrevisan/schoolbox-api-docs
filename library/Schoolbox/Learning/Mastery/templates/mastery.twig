@@ -1,5 +1,11 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
+{% set assessments = markbook.assessments %}
+
+{% set classFeedbackRequired = 'mastery-notmarked' %}
+{% set classFailed           = 'mastery-fail' %}
+{% set classMastered         = 'mastery-mastered' %}
+
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
@@ -18,45 +24,20 @@
 <div class="row">
     <div class="small-12 island">
         <div class="context-switch">
-            {% include '@learningMastery/fragments/markbookSelector.twig'
-            with {
-            class: class,
-            terms: terms,
-            currentTerm: currentTerm,
-            previousTerm: previousTerm,
-            nextTerm: nextTerm
+            {% include '@learningMastery/fragments/markbookSelector.twig' with {
+                class:        class,
+                terms:        terms,
+                currentTerm:  currentTerm,
+                previousTerm: previousTerm,
+                nextTerm:     nextTerm
             } %}
         </div>
     </div>
 </div>
 
-<style>
-    .fail {
-        background-color: rgb(247, 206, 204);
-    }
-    .mastered {
-        background-color: rgb(213, 231, 212);
-    }
-    .notmarked {
-        background-color: rgb(255, 242, 205);
-    }
-</style>
-
-{% set assessments = markbook.assessments.sortBy('dueAt', 'asc') %}
-
-{# Need to only show due work and quizzes only. Would be nice to be able to do markbook.assessments.filterBy('typeName', ['quiz', 'dueWork']) instead #)
-{# but 'dueWork' is not a typename #}
-
-{% set empty = true %}
-{% for assessment in assessments %}
-    {% if assessment is quiz or assessment is dueWork %}
-        {% set empty = false %}
-    {% endif %}
-{% endfor %}
-
 <div class="row">
     <div class="small-12 island">
-        {% if not empty %}
+        {% if assessments | length %}
             <div class="scrollable">
                 <table>
                     <thead>
@@ -65,12 +46,10 @@
                         {% for assessment in assessments %}
                             <th>
                                 <div>
-                                    <span>
-                                        <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
-                                        <span class="meta">
-                                            {{ assessment.typeName }}
-                                        </span>
-                                    </span>
+                                <span>
+                                    <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
+                                    <span class="meta">{{ assessment.typeName }}</span>
+                                </span>
                                 </div>
                             </th>
                         {% endfor %}
@@ -97,91 +76,119 @@
                                     </a>
                                 </div>
                             </th>
-                            {% set upcomingFound = false %}
+
+                            {# For each student, treat the first assessment found which requires a response as the 'upcoming' assessment #}
+                            {% set nextUpcomingFound = false %}
 
                             {% for assessment in assessments %}
 
-                                {% set className = '' %}
-                                {% set url = '#' %}
+                                {# Is this assessment the first assessment encountered for this student that requires a response ? #}
+                                {% set isNextUpcoming = false %}
 
+                                {# is student a participant ? #}
                                 {% if assessment.isParticipant(student) %}
 
-                                    {% set humanMark = assessment.getHumanReadableMark(student, true) %}
-                                    {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
-                                    {% set value = assessment.getHumanReadableMark(student, true) | default('–') %}
-                                    {% set participant = assessment.getParticipant(student) %}
+                                    {% set participant      = assessment.getParticipant(student) %}
+                                    {% set humanMark        = assessment.getHumanReadableMark(student, true) %}
+                                    {% set normalisedMark   = assessment.getNormalisedMark(student, true) %}
 
-                                    {% if participant.hasSubmittedResponse %}
-                                        {% set url = routeLookup('learningAssessment.getSummary', {studentId: student.id, assessmentId: assessment.id}) %}
+                                    {% set responseRequired = participant.responseRequired %}
+                                    {% set feedbackRequired = participant.feedbackRequired %}
+                                    {% set reviewComplete   = participant.reviewComplete %}
+
+                                    {# Have we not encountered an assessment that requires a response yet, and this assessment requires a resposne ? #}
+                                    {% if not nextUpcomingFound and responseRequired and not assessment.dueAt.isPast %}
+                                        {% if not (assessment is task and participant.hasMark) %}
+                                            {% set isNextUpcoming = true %}
+                                            {% set nextUpcomingFound = true %}
+                                        {% endif %}
                                     {% endif %}
 
-                                {% else %}
-
-                                    {% set humanMark = null %}
-                                    {% set value = '–' %}
-
-                                {% endif %}
-
-                                {% set isAttempted = normalisedMark is not null %}
-                                {% if assessment is task %}
-                                    {% set mostRecentResponse = participant.findMostRecentResponse %}
-                                    {% set isAwaiting = mostRecentResponse.markedComplete and mostRecentResponse.isSelfAssessed  %}
-                                    {% set isMastered = mostRecentResponse.markedComplete and not mostRecentResponse.isSelfAssessed %}
-                                {% else %}
-                                    {% set mostRecentResponse = null %}
-                                    {% set isAwaiting = participant.isFeedbackRequired %}
-                                    {% set isMastered = normalisedMark >= 70 %}
-                                {% endif %}
-
-                                {% if not isAttempted %}
-
-                                    {# No mark available. Maybe they've done it but not been marked yet? #}
-
-                                    {% if not upcomingFound %}
-
-                                        {# Check if there is one pending #}
-
-                                        {% if participant is not empty %}
-                                            {% if not isAwaiting %}
-                                                {% if assessment.dueAt.isPast %}
-                                                    {# The assessment is past its due date and is not awaiting #}
-
-                                                    {% set value = '<i class="icon-close" title="Past Due Date. No Response">' %}
-                                                {% else %}
-                                                    {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
-                                                    {% set upcomingFound = true %}
-                                                    {% set value = '<i class="icon-eye" title="Next Assessment">' %}
-                                                    {% set url = routeLookupIfAuthorized('learningAssessment.getSummary', { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable }) %}
-                                                {% endif %}
+                                    {# Determine background color #}
+                                    {% if feedbackRequired %}
+                                        {% set colorClass = classFeedbackRequired %}
+                                    {% else %}
+                                        {% if assessment is task %}
+                                            {% set mostRecentResponse = participant.findMostRecentResponse %}
+                                            {% if mostRecentResponse and not mostRecentResponse.isSelfAssessed %}
+                                                {% set colorClass = mostRecentResponse.markedComplete ? classMastered : classFailed %}
+                                            {% else %}
+                                                {% set colorClass = '' %}
+                                            {% endif %}
+                                        {% else %}
+                                            {% if not normalisedMark is null %}
+                                                {% set colorClass = normalisedMark >= 70 ? classMastered : classFailed %}
+                                            {% else %}
+                                                {% set colorClass = '' %}
                                             {% endif %}
                                         {% endif %}
+                                    {% endif %}
 
+                                    {# Determine title #}
+                                    {% if feedbackRequired %}
+                                        {% set title = 'Awaiting Teacher Assessment' %}
+                                    {% elseif isNextUpcoming %}
+                                        {% set title = 'Next Assessment' %}
+                                    {% elseif responseRequired and not assessment is task %}
+                                        {% set title = 'Response Required.' %}
+                                        {% if assessment.dueAt.isPast %}
+                                            {% set title = title ~ ' Past Due Date.' %}
+                                        {% endif %}
                                     {% else %}
-
-                                        {# Otherwise just leave the cell blank and unstyled #}
-
-                                        {% set className = '' %}
-                                        {% set value = '' %}
-
+                                        {% if assessment is task %}
+                                            {% set title = participant.publishedHumanReadableMark %}
+                                        {% else %}
+                                            {% set title = normalisedMark is null ? 'null' : normalisedMark | round ~ ' %' %}
+                                        {% endif %}
                                     {% endif %}
 
-                                {% elseif isMastered %}
-                                    {% set className = 'mastered' %}
+                                    {# Determine text #}
+                                    {% if participant.hasMark %}
+                                        {% set text = humanMark %}
+                                    {% elseif feedbackRequired %}
+                                        {% set text = '<i class="icon-pause">' %}
+                                    {% elseif isNextUpcoming %}
+                                        {% set text = '<i class="icon-eye">' %}
+                                    {% elseif assessment.dueAt.isPast %}
+                                        {% set text = '<i class="icon-close">' %}
+                                    {% else %}
+                                        {% set text = '-' %}
+                                    {% endif %}
+
+                                    {# Determine URL #}
+                                    {% if feedbackRequired or isNextUpcoming %}
+                                        {% if isNextUpcoming or not assessment is dueWork %}
+                                            {% set url = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                                                assessmentId: assessment.id,
+                                                assessment: assessment,
+                                                studentId: student.id,
+                                                student: student
+                                            }) %}
+                                        {% else  %}
+                                            {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {
+                                                assessmentId: assessment.id,
+                                                assessment: assessment,
+                                                studentId: student.id,
+                                                student: student
+                                            }) %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% set url = '' %}
+                                    {% endif %}
+
                                 {% else %}
-                                    {% set className = 'fail' %}
+
+                                    {% set colorClass     = '' %}
+                                    {% set title          = student.fullName ~ ' is not a participant of ' ~ assessment.title %}
+                                    {% set text           = '–' %}
+                                    {% set url            = '' %}
+
                                 {% endif %}
 
-                                {# If student has submitted work but has not received a mark, style the cell appropriately #}
-
-                                {% if participant is not empty %}
-                                    {% if isAwaiting %}
-                                        {% set value='<i class="icon-pause" title="Awaiting Teacher Assessment">' %}
-                                        {% set className = 'notmarked' %}
-                                    {% endif %}
-                                {% endif %}
-
-                                <td class="text-center {{ className }}">
-                                    <a href="{{ url }}" title="{{ normalisedMark | round }}%">{{ value | purify }}</a>
+                                <td class="text-center {{ colorClass }}" title="{{ title }}">
+                                    {% if url %}<a href="{{ url }}">{% endif %}
+                                        {{ text | purify }}
+                                    {% if url %}</a>{% endif %}
                                 </td>
 
                             {% endfor %}

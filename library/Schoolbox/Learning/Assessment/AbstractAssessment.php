@@ -264,7 +264,7 @@ abstract class AbstractAssessment implements IAssessable
 
         /** @var Participant $currentParticipant */
         foreach ($this->getAllParticipants() as $i => $currentParticipant) {
-            if ($currentParticipant->getUser()->getId() == $userId) {
+            if ($currentParticipant->getUser()->getId() === $userId) {
                 $this->participantCache[$userId] = $i;
                 return $currentParticipant;
             }
@@ -279,7 +279,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isPublished(Alaress_Date_Format $now = null)
     {
-        if (is_null($now) || $now->isNull()) {
+        if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -293,7 +293,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isOpen(Alaress_Date_Format $now = null)
     {
-        if (is_null($now) || $now->isNull()) {
+        if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -307,7 +307,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isOverdue(Alaress_Date_Format $now = null)
     {
-        if (is_null($now) || $now->isNull()) {
+        if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -321,7 +321,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isPastClose(Alaress_Date_Format $now = null)
     {
-        if (is_null($now) || $now->isNull()) {
+        if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -339,6 +339,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @param bool $publishedOnly
      * @return string|null
+     * @throws \UnexpectedValueException
      */
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
@@ -382,6 +383,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @param bool $publishedOnly
      * @return float|null
+     * @throws \UnexpectedValueException
      */
     public function getNormalisedMark(User $user, $publishedOnly)
     {
@@ -399,6 +401,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param $publishedOnly
      * @param $normalised
      * @return float|null|string
+     * @throws \UnexpectedValueException
      */
     protected function getMark(User $user, $publishedOnly, $normalised)
     {
@@ -446,28 +449,6 @@ abstract class AbstractAssessment implements IAssessable
         return !$latestSubmittedResponse && !$latestPublishedFeedback;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isFeedbackRequired(Participant $participant)
-    {
-        $this->assertSameAssessment($participant);
-
-        // No responses, or latest response has published feedback already ?
-        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
-        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
-            return false;
-        }
-
-        // One or more responses and no feedback ?
-        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
-        if (!$latestPublishedFeedback) {
-            return true;
-        }
-
-        // Was the latest student response submitted after the latest mark was published?
-        return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
-    }
 
     /**
      * @inheritdoc

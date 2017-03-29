@@ -109,7 +109,7 @@ class Model extends AbstractFeedback
      */
     public function getHumanReadableMark()
     {
-        return Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
+        return Completion::HUMAN_READABLE_COMPLETE;
     }
 
 
