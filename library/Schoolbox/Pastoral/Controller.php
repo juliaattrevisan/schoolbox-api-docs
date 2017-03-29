@@ -446,6 +446,50 @@ class Controller extends Base
     }
 
     /**
+     * Assign tags to a record, spawning them if required, or resurrecting them
+     * if these tags once existed
+     *
+     * @param Model $record
+     * @param $tagCsv
+     */
+    private function assignTagsToRecord(PastoralModel $record, $tagCsv)
+    {
+        $tags = explode(",", $tagCsv);
+
+        foreach ($tags as $tagCurrent) {
+            if (trim($tagCurrent) != '') {
+                try {
+
+                    /* Assign an existing tag to this pastoral record
+                     */
+
+                    /** @var PastoralTagsModel $tag */
+                    $tag = $this->getPastoralTagsMapper()->findOneByColumn('name', $tagCurrent);
+                }
+                catch (MapperDeletedException $e) {
+
+                    /* Restore this tag to active duty
+                     */
+                    $tag = $e->getDeletedObject();
+
+                    $tag->setDeletedAt(null);
+                    $this->getPastoralTagsMapper()->save($tag);
+                }
+                catch (MapperException $e) {
+
+                    /* Tag doesn't exist - spawn it, save it, then assign it
+                     */
+                    $tag = new PastoralTagsModel();
+                    $tag->setName($tagCurrent);
+                    $this->getPastoralTagsMapper()->save($tag);
+                }
+
+                $this->getPastoralTagsMapper()->assignToRecord($record, $tag);
+            }
+        }
+    }
+
+    /**
      * Insert a pastoral care record
      * @throws SchoolboxException
      */
@@ -563,39 +607,7 @@ class Controller extends Base
 
             // Save the tags
 
-            $tags = explode(",", $post["tags"]);
-
-            foreach ($tags as $tagCurrent) {
-                if (trim($tagCurrent) != '') {
-                    try {
-
-                        /* Assign an existing tag to this pastoral record
-                         */
-
-                        /** @var PastoralTagsModel $tag */
-                        $tag = $this->getPastoralTagsMapper()->findOneByColumn('name', $tagCurrent);
-                    }
-                    catch (MapperDeletedException $e) {
-
-                        /* Restore this tag to active duty
-                         */
-                        $tag = $e->getDeletedObject();
-
-                        $tag->setDeletedAt(null);
-                        $this->getPastoralTagsMapper()->save($tag);
-                    }
-                    catch (MapperException $e) {
-
-                        /* Tag doesn't exist - spawn it, save it, then assign it
-                         */
-                        $tag = new PastoralTagsModel();
-                        $tag->setName($tagCurrent);
-                        $this->getPastoralTagsMapper()->save($tag);
-                    }
-
-                    $this->getPastoralTagsMapper()->assignToRecord($record, $tag);
-                }
-            }
+            $this->assignTagsToRecord($record, $post["tags"]);
 
             // Save the audiences
 
@@ -734,39 +746,7 @@ class Controller extends Base
 
         // Save the tags
 
-        $tags = explode(",", $post["tags"]);
-
-        foreach ($tags as $tagCurrent) {
-            if (trim($tagCurrent) != '') {
-                try {
-
-                    /* Assign an existing tag to this pastoral record
-                     */
-
-                    /** @var PastoralTagsModel $tag */
-                    $tag = $this->getPastoralTagsMapper()->findOneByColumn('name', $tagCurrent);
-                }
-                catch (MapperDeletedException $e) {
-
-                    /* Restore this tag to active duty
-                     */
-                    $tag = $e->getDeletedObject();
-
-                    $tag->setDeletedAt(null);
-                    $this->getPastoralTagsMapper()->save($tag);
-                }
-                catch (MapperException $e) {
-
-                    /* Tag doesn't exist - spawn it, save it, then assign it
-                     */
-                    $tag = new PastoralTagsModel();
-                    $tag->setName($tagCurrent);
-                    $this->getPastoralTagsMapper()->save($tag);
-                }
-
-                $this->getPastoralTagsMapper()->assignToRecord($record, $tag);
-            }
-        }
+        $this->assignTagsToRecord($record, $post["tags"]);
 
         // Delete user permissions
 
