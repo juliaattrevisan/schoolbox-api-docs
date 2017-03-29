@@ -74,7 +74,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     public function assignToRecord(PastoralRecord $pastoral, PastoralTag $tag)
     {
         $query = "
-            INSERT INTO pastoral_record_tag (pastoral_id, tag_id) 
+            INSERT IGNORE INTO pastoral_record_tag (pastoral_id, tag_id) 
             VALUES (:pastoralId, :tagId)
         ";
 

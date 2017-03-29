@@ -23,6 +23,10 @@ ORDER BY `id`;
 -- Spawn a relation table for pastoral records and their tags
 CREATE TABLE `pastoral_record_tag`( `pastoral_id` INT(11) NOT NULL, `tag_id` INT(11) NOT NULL );
 
+-- Pastoral record/tag relations are unique
+-- You shouldn't have the same tag assigned multiple times to a given record
+ALTER TABLE `pastoral_record_tag` ADD UNIQUE INDEX `pastoral_id_tag_id` (`pastoral_id`, `tag_id`);
+
 -- Reassign pastoral tags to their actual records
 INSERT INTO pastoral_record_tag (pastoral_id, tag_id)
 SELECT d.`pastoral_id`, t.`id`
