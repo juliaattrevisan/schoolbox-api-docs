@@ -7,7 +7,6 @@
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
-use Alaress\Database\NotImplementedException;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
