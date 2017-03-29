@@ -10,39 +10,46 @@
 
 namespace Alaress\Database;
 
-use Alaress\Database\Connector\Db2\Connector as Db2Connector;
-use Alaress\Database\Connector\Mysql\Connector as MysqlConnector;
-use Alaress\Database\Connector\Sqlsrv\Connector as SqlsrvConnector;
+use Alaress\Database\Broker\Db2\Broker as Db2Broker;
+use Alaress\Database\Broker\Mysql\Broker as MysqlBroker;
+use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
+use Alaress\Database\Connector\Base as Connector;
 
 class Factory
 {
     /**
      * Create a MySQL connector
      *
-     * @return MysqlConnector
+     * @return Connector
      */
     public function createMysql()
     {
-        return new MysqlConnector();
+        return new Connector(
+            new MysqlBroker()
+        );
     }
 
     /**
      * Create an MSSQL connector
      *
-     * @return SqlsrvConnector
+     * @return Connector
      */
     public function createSqlsrv()
     {
-        return new SqlsrvConnector();
+        return new Connector(
+            new SqlsrvBroker()
+        );
     }
 
     /**
      * Create a DB2 connector
      *
-     * @return Db2Connector
+     * @return Connector
      */
     public function createDb2()
     {
-        return new Db2Connector();
+        return new Connector(
+            new Db2Broker()
+        );
     }
 }

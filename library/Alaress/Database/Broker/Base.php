@@ -49,21 +49,21 @@ abstract class Base implements IBroker
     /**
      * Constructor. Sets up the statement cache, and grabs a handle to the connector that holds all
      * of the relevant information we require to connect
-     *
-     * @param IConnector $connector The connector that this broker belongs to
      */
-    public function __construct($connector)
+    public function __construct()
     {
-        // Keep a handle on the connector that this broker belongs to as this is where all of the
-        // connection related settings (hostname, username, password, etc) are stored
-
-        $this->connector = $connector;
-
         // Setup PDO statement cache
 
         $this->statementCache = new Cache(function ($statement, $options) {
             return $this->pdo->prepare($statement, $options);
         });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setConnector($connector) {
+        $this->connector = $connector;
     }
 
     /**

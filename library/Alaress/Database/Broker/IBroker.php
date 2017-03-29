@@ -11,18 +11,25 @@
 namespace Alaress\Database\Broker;
 
 use Alaress\Database\Collector;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
-use PDO;
-use PDOStatement;
-use Alaress\Database\Exception as DatabaseException;
 use DebugBar\DataCollector\PDO as DebugPDO;
+use PDOStatement;
 
 interface IBroker
 {
+    /**
+     * Sets the connector that the broker will use
+     *
+     * @param IConnector $connector
+     */
+    public function setConnector($connector);
+
     /**
      * Create DSN string from connector properties
      *

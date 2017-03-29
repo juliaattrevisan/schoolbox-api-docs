@@ -16,19 +16,10 @@ use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Statement\Query\IQuery;
 use Serializable;
 
-abstract class Base implements Serializable, IConnector
+class Base implements Serializable, IConnector
 {
-    // ----------------------------------------------------------------------------------------------------------------
-    // This should be overridden in the child classes with the database engine specific broker
-    // and only exists here to keep storms type hinting happy
-    // ----------------------------------------------------------------------------------------------------------------
-
     /** @var IBroker */
     protected $broker;
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Common properties
-    // ----------------------------------------------------------------------------------------------------------------
 
     /** @param array */
     protected $options;
@@ -55,12 +46,14 @@ abstract class Base implements Serializable, IConnector
     protected $errorCode;
 
     /**
-     * Returns a type specific database broker
+     * Connector constructor
      *
-     * @param IConnector $connector
-     * @return IBroker
+     * @param IBroker $broker Type specific broker
      */
-    abstract protected function newBroker($connector);
+    public function __construct($broker)
+    {
+        $this->broker = $broker;
+    }
 
     /**
      * Connect to the database
@@ -80,7 +73,7 @@ abstract class Base implements Serializable, IConnector
         $this->hostname = $hostname;
         $this->database = $database;
 
-        $this->broker = $this->newBroker($this);
+        $this->broker->setConnector($this);
         return $this->broker->connect($options);
     }
 
@@ -176,7 +169,8 @@ abstract class Base implements Serializable, IConnector
             'hostname' => $this->hostname,
             'username' => $this->username,
             'password' => $this->password,
-            'database' => $this->database
+            'database' => $this->database,
+            'brokerClass' => get_class($this->broker)
         ]);
     }
 
@@ -194,7 +188,10 @@ abstract class Base implements Serializable, IConnector
         $this->password = $settings['password'];
         $this->database = $settings['database'];
 
-        $this->broker = $this->newBroker($this);
+        // Create the correct broker class
+
+        $this->broker = new $settings['brokerClass'];
+        $this->broker->setConnector($this);
         $this->broker->connect();
     }
 
