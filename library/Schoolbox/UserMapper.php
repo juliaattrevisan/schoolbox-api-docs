@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Database\Factory as AlaressDatabaseFactory;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
@@ -17,6 +18,7 @@ use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
+use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 
 /**
  * Class UserMapper
@@ -143,12 +145,13 @@ class UserMapper extends Mapper
     {
         /** @var User $model */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            $factory = new ExternalConnectorFactory();
+            $schoolboxFactory = new SchoolboxDatabaseFactory(new AlaressDatabaseFactory());
+            $databaseExternal = $schoolboxFactory->getExternalDatabase($this->getConfigLoader());
 
-            $databaseExternal = BREAK_THE_WORLD;
+            $externalFactory = new ExternalConnectorFactory();
 
             /** @var ICommunityPortal $communityPortal */
-            $communityPortal = $factory->build(
+            $communityPortal = $externalFactory->build(
                 $this->getConfigLoader(),
                 $databaseExternal,
                 ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
