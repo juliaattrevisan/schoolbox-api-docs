@@ -162,6 +162,23 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     }
 
     /**
+     * Purge tags that are no longer associated with any
+     * pastoral records - apparently pastoral admins want
+     * tags to vanish once they are no longer in use
+     */
+    public function purgeUnassociated()
+    {
+        $query = "
+            UPDATE {$this->getTable()}
+            SET deleted_at = NOW()
+            WHERE {$this->getTable()}.id NOT IN (SELECT tag_id FROM pastoral_record_tag)
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+    }
+
+    /**
      * @param User $user
      * @param string $keyword
      * @param int $offset

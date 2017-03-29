@@ -637,6 +637,10 @@ class Controller extends Base
             }
         }
 
+        /* Delete any unassociated tags everywhere
+         */
+        $this->getPastoralTagsMapper()->purgeUnassociated();
+
         // Go back to students pastoral record
 
         $this->getResponse()->redirect->afterPost("/pastoral/{$post["student_id"]}");
@@ -932,6 +936,10 @@ class Controller extends Base
             }
         }
 
+        /* Delete any unassociated tags everywhere
+         */
+        $this->getPastoralTagsMapper()->purgeUnassociated();
+
         // Go back to students pastoral record
 
         $this->getResponse()->redirect->afterPost("/pastoral/{$post["student_id"]}");
@@ -954,6 +962,10 @@ class Controller extends Base
         // Delete locally
 
         $this->getPastoralMapper()->delete($record);
+
+        /* Delete any unassociated tags everywhere
+         */
+        $this->getPastoralTagsMapper()->purgeUnassociated();
     }
 
     /**
