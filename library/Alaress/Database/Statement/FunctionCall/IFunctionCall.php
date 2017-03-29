@@ -19,12 +19,12 @@ interface IFunctionCall extends IQuery
      * Bind output parameters. This doesn't bind to the PDO statement, just stores the intention in an array.
      * @param array $outputs
      */
-    function bindOutputs(&$outputs);
+    public function bindOutputs(&$outputs);
 
     /**
      * Bind return parameter. This doesn't bind to the PDO statement, just stores the intention in an array.
      * @param mixed &$parameter Return value parameter
      * @throws DatabaseException
      */
-    function bindReturnValue(&$parameter);
+    public function bindReturnValue(&$parameter);
 }

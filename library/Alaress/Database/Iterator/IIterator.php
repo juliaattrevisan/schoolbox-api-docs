@@ -23,7 +23,7 @@ interface IIterator extends BaseIterator
      *
      * @return bool
      */
-    function execute();
+    public function execute();
 
     /**
      * Return the current element
@@ -31,54 +31,54 @@ interface IIterator extends BaseIterator
      * @return array|bool|object
      * @throws DatabaseException
      */
-    function current();
+    public function current();
 
     /**
      * Move forward to next element
      *
      * @return void Any returned value is ignored.
      */
-    function next();
+    public function next();
 
     /**
      * Return the key of the current element
      *
      * @return mixed scalar on success, or null on failure.
      */
-    function key();
+    public function key();
 
     /**
      * Checks if current position is valid
      *
      * @return boolean The return value will be casted to boolean and then evaluated.
      */
-    function valid();
+    public function valid();
 
     /**
      * Rewind the Iterator to the first element
      *
      * @return void
      */
-    function rewind();
+    public function rewind();
 
     /**
      * Move to next rowset in result
      *
      * @return bool
      */
-    function nextRowset();
+    public function nextRowset();
 
     /**
      * Returns last error message this statement generated
      *
      * @return string
      */
-    function errorInfo();
+    public function errorInfo();
 
     /**
      * Returns last error message this statement generated
      *
      * @return string
      */
-    function errorCode();
+    public function errorCode();
 }

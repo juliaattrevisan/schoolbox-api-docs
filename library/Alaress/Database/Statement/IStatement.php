@@ -20,7 +20,7 @@ interface IStatement
      *
      * @return int
      */
-    function rowCount();
+    public function rowCount();
 
     /**
      * Get single record from last executed query
@@ -28,7 +28,7 @@ interface IStatement
      * @param int $fetchStyle PDO fetch style
      * @return array
      */
-    function fetch($fetchStyle = PDO::FETCH_ASSOC);
+    public function fetch($fetchStyle = PDO::FETCH_ASSOC);
 
     /**
      * Get all records from last executed query.
@@ -41,7 +41,7 @@ interface IStatement
      * @deprecated
      * @return mixed
      */
-    function fetchAll($fetchStyle = PDO::FETCH_ASSOC);
+    public function fetchAll($fetchStyle = PDO::FETCH_ASSOC);
 
     /**
      * Get single column denoted by its index for the next row in the query
@@ -49,7 +49,7 @@ interface IStatement
      * @param int $column
      * @return string
      */
-    function fetchColumn($column = 0);
+    public function fetchColumn($column = 0);
 
     /**
      * Get a single column from every row as an array
@@ -58,7 +58,7 @@ interface IStatement
      * @param null|string $index Optional column name/index to be used as array index
      * @return array
      */
-    function fetchColumnArray($column, $index = null);
+    public function fetchColumnArray($column, $index = null);
 
     /**
      * Returns all query results in an array indexed by a single columns value.
@@ -84,35 +84,35 @@ interface IStatement
      * @param string $index Column name/index to be used as array index
      * @return array
      */
-    function fetchRowArray($index);
+    public function fetchRowArray($index);
 
     /**
      * Returns last error message this statement generated
      *
      * @return string
      */
-    function errorInfo();
+    public function errorInfo();
 
     /**
      * Returns last error message this statement generated
      *
      * @return string
      */
-    function errorCode();
+    public function errorCode();
 
     /**
      * Moves to the next result set in a stored procedure that returns multiple sets of results
      *
      * @return bool
      */
-    function nextRowset();
+    public function nextRowset();
 
     /**
      * This function should manipulate/generate and return the SQL statement to be executed
      *
      * @return string
      */
-    function getSql();
+    public function getSql();
 
     /**
      * Execute query
@@ -120,7 +120,7 @@ interface IStatement
      * @param array|null $values
      * @return bool
      */
-    function execute($values = null);
+    public function execute($values = null);
 
     /**
      * Execute stored procedure and return an iterator
@@ -128,7 +128,7 @@ interface IStatement
      * @param array|null $values
      * @return IIterator|bool
      */
-    function executeIterator($values = null);
+    public function executeIterator($values = null);
 
     /**
      * Returns the data type name as a string for debugging display purposes only, should be no
@@ -138,5 +138,5 @@ interface IStatement
      * @param int $type Override data type
      * @return string
      */
-    static function getDataTypeName($value, $type = null);
+    public static function getDataTypeName($value, $type = null);
 }

@@ -28,7 +28,7 @@ interface IBroker
      *
      * @return string
      */
-    function getDsn();
+    public function getDsn();
 
     /**
      * Connects to the actual database
@@ -37,7 +37,7 @@ interface IBroker
      * @return bool
      * @throws DatabaseException
      */
-    function connect($options = []);
+    public function connect($options = []);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Database query execution
@@ -50,7 +50,7 @@ interface IBroker
      * @param array $options
      * @return PDOStatement
      */
-    function prepare($query, $options = []);
+    public function prepare($query, $options = []);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Database statement generators
@@ -63,7 +63,7 @@ interface IBroker
      * @param PDOStatement $pdoStatement
      * @return IIterator
      */
-    function getIterator($statement, $pdoStatement);
+    public function getIterator($statement, $pdoStatement);
 
     /**
      * Prepare database query
@@ -71,7 +71,7 @@ interface IBroker
      * @param string $query
      * @return IQuery
      */
-    function prepareQuery($query);
+    public function prepareQuery($query);
 
     /**
      * Prepare database function call
@@ -79,7 +79,7 @@ interface IBroker
      * @param string $function Name of the function to execute
      * @return IFunctionCall
      */
-    function prepareFunctionCall($function);
+    public function prepareFunctionCall($function);
 
     /**
      * Prepare database stored procedure
@@ -87,7 +87,7 @@ interface IBroker
      * @param string $procedure Name of the stored procedure to execute
      * @return IStoredProcedure
      */
-    function prepareStoredProcedure($procedure);
+    public function prepareStoredProcedure($procedure);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Database transaction functions
@@ -97,28 +97,28 @@ interface IBroker
      * Begin database transaction
      * @return bool
      */
-    function beginTransaction();
+    public function beginTransaction();
 
     /**
      * Return true/false if in database transaction
      *
      * @return bool
      */
-    function inTransaction();
+    public function inTransaction();
 
     /**
      * Commit database transaction
      *
      * @return bool
      */
-    function commit();
+    public function commit();
 
     /**
      * Rollback transaction
      *
      * @return bool
      */
-    function rollBack();
+    public function rollBack();
 
     /**
      * Return last inserted record ID
@@ -126,7 +126,7 @@ interface IBroker
      * @param string|null $name
      * @return string
      */
-    function lastInsertId($name = null);
+    public function lastInsertId($name = null);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Debugging collector functions
@@ -137,12 +137,12 @@ interface IBroker
      *
      * @return Collector
      */
-    function getCollector();
+    public function getCollector();
 
     /**
      * Installs the PHP debug bar collector into this object.
      */
-    function installCollector();
+    public function installCollector();
 
     // ----------------------------------------------------------------------------------------------------------------
     // Post processor stuff
@@ -154,12 +154,12 @@ interface IBroker
      *
      * @param callable $callable
      */
-    function addPostProcessor($callable);
+    public function addPostProcessor($callable);
 
     /**
      * Return array of post processors
      *
      * @return callable[]
      */
-    function getPostProcessors();
+    public function getPostProcessors();
 }

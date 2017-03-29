@@ -24,7 +24,7 @@ interface IConnector
      * @param array|null $options
      * @return bool
      */
-    function reconnect($options = null);
+    public function reconnect($options = null);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Query preparation functions
@@ -36,7 +36,7 @@ interface IConnector
      * @param string $sql
      * @return bool
      */
-    function execute($sql);
+    public function execute($sql);
 
     /**
      * Prepare database query and return a statement
@@ -45,7 +45,7 @@ interface IConnector
      * @param array $parameters
      * @return IQuery
      */
-    function prepareQuery($query, $parameters = []);
+    public function prepareQuery($query, $parameters = []);
 
     /**
      * Convenience methods that prepares and executes a query with the supplied parameters
@@ -54,7 +54,7 @@ interface IConnector
      * @param null|array $parameters
      * @return IQuery
      */
-    function executeQuery($sql, $parameters = null);
+    public function executeQuery($sql, $parameters = null);
 
     /**
      * Convenience method to prepare and execute a query with the supplied parameters and return a
@@ -64,7 +64,7 @@ interface IConnector
      * @param null|array $parameters
      * @return IIterator
      */
-    function executeQueryIterator($sql, $parameters = null);
+    public function executeQueryIterator($sql, $parameters = null);
 
     /**
      * Prepare database function call
@@ -75,7 +75,7 @@ interface IConnector
      * @param null|array &$return
      * @return IStoredProcedure
      */
-    function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
+    public function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
 
     /**
      * Convenience method to prepare and execute a function call with the supplied parameters
@@ -86,7 +86,7 @@ interface IConnector
      * @param null|array &$return
      * @return IFunctionCall
      */
-    function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
+    public function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
 
     /**
      * Prepare database stored procedure
@@ -97,7 +97,7 @@ interface IConnector
      * @param null|array &$return
      * @return IStoredProcedure
      */
-    function prepareStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null);
+    public function prepareStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null);
 
     /**
      * Convenience method to prepare and execute a stored procedure with the supplied parameters
@@ -108,7 +108,7 @@ interface IConnector
      * @param null|array &$return
      * @return IStoredProcedure
      */
-    function executeStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null);
+    public function executeStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null);
 
     /**
      * Convenience method to prepare and execute a stored procedure with the supplied parameters and
@@ -120,7 +120,7 @@ interface IConnector
      * @param null|array &$return
      * @return IIterator
      */
-    function executeStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null);
+    public function executeStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Getters for immutable properties
@@ -131,56 +131,56 @@ interface IConnector
      *
      * @return string
      */
-    function errorInfo();
+    public function errorInfo();
 
     /**
      * Returns last error code from database connection
      *
      * @return string
      */
-    function errorCode();
+    public function errorCode();
 
     /**
      * Return hostname used for connection
      *
      * @return string
      */
-    function getHostname();
+    public function getHostname();
 
     /**
      * Return port used for connection
      *
      * @return string
      */
-    function getPort();
+    public function getPort();
 
     /**
      * Return username used for connection
      *
      * @return string
      */
-    function getUsername();
+    public function getUsername();
 
     /**
      * Return password used for connection
      *
      * @return string
      */
-    function getPassword();
+    public function getPassword();
 
     /**
      * Return database name used for connection
      *
      * @return string
      */
-    function getDatabase();
+    public function getDatabase();
 
     /**
      * Return database collector for debugging
      *
      * @return Collector
      */
-    function getCollector();
+    public function getCollector();
 
     // ----------------------------------------------------------------------------------------------------------------
     // Post processor stuff
@@ -192,7 +192,7 @@ interface IConnector
      *
      * @param callable $callable
      */
-    function addPostProcessor($callable);
+    public function addPostProcessor($callable);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Lazy temporary clutch to build IN portion of queries, should integrate this things into the
@@ -207,5 +207,5 @@ interface IConnector
      * @param string $prefix
      * @return mixed
      */
-    function prepareInBindings($externalIds, $prefix = 'param');
+    public function prepareInBindings($externalIds, $prefix = 'param');
 }
