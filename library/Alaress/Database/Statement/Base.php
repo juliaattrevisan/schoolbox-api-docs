@@ -33,8 +33,6 @@ abstract Class Base implements IStatement
     /** @var array $parameters This is an array that contains parameters we intend to bind to the PDO statement */
     protected $parameters = [];
 
-
-
     /**
      * @inheritdoc
      */
@@ -64,10 +62,13 @@ abstract Class Base implements IStatement
      */
     public function fetchAll($fetchStyle = PDO::FETCH_ASSOC)
     {
-        $result = $this->statement->fetchAll($fetchStyle);
+        $result = [];
 
-        foreach ($this->broker->getPostProcessors() as $callable) {
-            $result = call_user_func($callable, $result);
+        while ($row = $this->statement->fetch($fetchStyle)) {
+            foreach ($this->broker->getPostProcessors() as $callable) {
+                 $row = call_user_func($callable, $row);
+            }
+            $result[] = $row;
         }
 
         return $result;
