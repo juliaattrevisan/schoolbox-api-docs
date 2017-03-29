@@ -46,8 +46,6 @@ use Twig_SimpleFilter;
 use Twig_SimpleFunction;
 use Alaress_Date_Format;
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Exception as DatabaseException;
-use Alaress\Database\Factory as DatabaseFactory;
 use External_Class;
 use External_Timetable;
 use External_User;
