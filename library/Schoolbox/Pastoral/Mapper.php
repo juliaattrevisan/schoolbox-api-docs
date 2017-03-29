@@ -440,9 +440,11 @@ class Mapper extends BaseMapper
 
             if (trim($tags) != '') {
                 $tagsArray = explode(",", trim($tags));
-                $hasAssociatedTags = $this->getPastoralTagsMapper()->isAssociatedWith($record, $tagsArray);
 
-                if (!$hasAssociatedTags) {
+                /* TODO: Can probably make tags hydrate with pastoral records instead
+                 * but I'll keep doing it this way so the refactor is more familiar
+                 */
+                if (!$this->getPastoralTagsMapper()->isAssociatedWith($record, $tagsArray)) {
                     continue;
                 }
             }
