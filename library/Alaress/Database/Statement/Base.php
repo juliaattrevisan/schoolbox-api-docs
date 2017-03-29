@@ -12,6 +12,7 @@ namespace Alaress\Database\Statement;
 
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
+use Alaress\Database\Exception;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -241,14 +242,14 @@ abstract Class Base implements IStatement
             if (!$iterator->execute()) {
 
                 // Query execution failed
-                return false;
+                throw new Exception("Error executing iterator: " . $iterator->errorInfo());
             }
 
             // If we got to this point we got a valid iterator which had rows
             return $iterator;
 
         } catch (PDOException $e) {
-            return $this->handleException($e);
+            throw new Exception("Exception error executing iterator: " . $e->getMessage());
         }
     }
 

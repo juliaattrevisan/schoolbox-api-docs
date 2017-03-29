@@ -10,6 +10,7 @@
 
 namespace Alaress\Database\Statement;
 
+use Alaress\Database\Exception;
 use Alaress\Database\Iterator\IIterator;
 use PDO;
 
@@ -123,7 +124,8 @@ interface IStatement
      * Execute stored procedure and return an iterator
      *
      * @param array|null $values
-     * @return IIterator|bool
+     * @return IIterator
+     * @throws Exception
      */
     public function executeIterator($values = null);
 
