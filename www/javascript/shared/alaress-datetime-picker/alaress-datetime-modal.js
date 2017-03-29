@@ -20,6 +20,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         allDayExt: getValue($('#' + twigVars.element), 'data-datepicker-alldayext'),
         type: getValue($('#' + twigVars.element), 'data-datepicker-call'), // Ajax call type: events, duework or nothing
         endDay: getValue($('#' + twigVars.element), 'data-datepicker-endofday'), // Should allday change time to 23:59:59
+        endPeriod: getValue($('#' + twigVars.element), 'data-datepicker-endofperiod'), // Should allday change time to 23:59:59
 
     };
 
@@ -54,13 +55,24 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         pickerResponse.html('');
         var html = '';
 
+        // Ajax returned date
+        displayDate = moment(data.date, convertFormat(twigVars.displayFormat)).format(convertFormat('F d, Y'));
+
         if (target == 'timetable') {
             timetable.submit.removeClass('disabled');
             timetable.submit.attr('data-timetable-value', data.date);
-        }
 
-        // Ajax returned date
-        displayDate = moment(data.date, convertFormat(twigVars.displayFormat)).format(convertFormat('F d, Y'));
+            var periodSelected = $('#byTimetable-' + twigVars.id).find('table').find('[data-selected=1]').attr('data-period');
+            var periodStart =  $('#byTimetable-' + twigVars.id).find('[data-period-number=' + periodSelected + ']').attr('data-period-start');
+            var periodEnd =  $('#byTimetable-' + twigVars.id).find('[data-period-number=' + periodSelected + ']').attr('data-period-end');
+
+            $((pickerOptions.endPeriod?'#periodEnd':'#periodStart')+twigVars.id).prop('checked', true);
+
+            $('.timetableDate'+twigVars.id).css('display', 'block');
+            $('.timetableDate'+twigVars.id).find('.displayDate').empty().append(displayDate);
+            $('label[for="periodStart'+twigVars.id+'"]').empty().append(periodStart);
+            $('label[for="periodEnd'+twigVars.id+'"]').empty().append(periodEnd);
+        }
 
         if (template == 'duework') {
 

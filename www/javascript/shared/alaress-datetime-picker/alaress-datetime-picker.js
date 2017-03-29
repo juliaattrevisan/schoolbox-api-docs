@@ -323,12 +323,11 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 $('#byTimetable-'+pickerId).find('.timetable-submit').click(function() {
                     var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
-                    if(options.endPeriod) {
-                        var newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-end'), 'h:mma');
-                    }
-                    else {
-                        var newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-start'), 'h:mma');
-                    }
+
+                    var periodTime = ($('[name*="periodTime'+pickerId+'"]').val());
+alert(periodTime);
+                    var newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-'+periodTime), 'h:mma');
+
                     var newDate = moment($(this).attr('data-timetable-value'), convertFormat(options.displayFormatDate)).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
                     setValue( element, options, false, true, newDate);
 

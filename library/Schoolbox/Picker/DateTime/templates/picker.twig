@@ -81,7 +81,14 @@
     a.picker-submit, a.timetable-submit {
         margin-top: 20px;
     }
-
+    input[type=radio]:not(.plain)+label.input-toggle {
+        width: 4.5em;
+    }
+    span.displayDate {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: #000;
+    }
 </style>
 {#<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />#}
 {#<script type="text/javascript" src="/javascript/components/fullcalendar/dist/fullcalendar.js"></script>#}
@@ -225,6 +232,20 @@
                                 {% endfor %}
                             </table>
                         {% endfor %}
+                        <div class="timetableDate{{ id }}" style="display:none">
+                            <div class="card small-12">
+                                <p class="meta">Selected date</p>
+                                <span class="displayDate"></span>
+                            </div>
+
+                            <div class="card small-12">
+                                <p class="meta">Select start or end time of the period</p>
+                                <input type="radio" name="periodTime{{ id }}" id="periodStart{{ id }}" value="start">
+                                <label class="input-toggle" for="periodStart{{ id }}"></label>
+                                <input type="radio" name="periodTime{{ id }}" id="periodEnd{{ id }}" value="end">
+                                <label class="input-toggle" for="periodEnd{{ id }}"></label>
+                             </div>
+                        </div>
                     </div>
                 </div>
 
