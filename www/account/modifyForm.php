@@ -1,8 +1,10 @@
 <?php
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+
+/** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
+$kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 
 $page = new SitePage();
@@ -55,10 +57,17 @@ if (isset($_POST['current_password'])) {
         $redirect = '/account/modify/success';
         if ($user->getRole()->isParent()) {
 
+            /** @var \Alaress\Database\Connector\IConnector $databaseExternal */
+            $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
+
             $factory = new ExternalConnectorFactory();
 
-            /** @var CommunityPortalInterface $communityPortal */
-            $communityPortal = $factory->build($configMapper, ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL);
+            /** @var ICommunityPortal $communityPortal */
+            $communityPortal = $factory->build(
+                $configMapper,
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
+            );
 
             try {
                 $communityPortal->changePassword($user->getExternalId(), $_POST['new_password']);
