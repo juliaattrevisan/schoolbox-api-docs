@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  */
 
-use Alaress\Database\Connector\Sqlsrv\Connector;
+use Alaress\Database\Connector\Base as Connector;
 use Alaress\Database\Factory as DatabaseFactory;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
