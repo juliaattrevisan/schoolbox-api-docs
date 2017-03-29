@@ -28,7 +28,7 @@ interface IIterator extends BaseIterator
     /**
      * Return the current element
      *
-     * @return array|bool|object
+     * @return array|bool
      * @throws DatabaseException
      */
     public function current();
