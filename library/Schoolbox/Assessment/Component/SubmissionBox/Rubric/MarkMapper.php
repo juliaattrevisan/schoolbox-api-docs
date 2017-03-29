@@ -170,4 +170,39 @@ class MarkMapper extends Mapper
 
         return $statement->rowCount();
     }
+
+
+    /**
+     * Get a list of students who have some form of rubric marked for an assessment
+     *
+     * @param int $assessment_id
+     * @return array
+     */
+    public function findMarkedByAssessment($assessment_id)
+    {
+        $query = "
+            SELECT            rubric_mark.student_id,
+                              COUNT(*)
+            FROM              rubric_mark
+            INNER JOIN        rubric_descriptor ON
+                              rubric_descriptor.id = rubric_mark.descriptor_id
+            INNER JOIN        submission_box ON 
+                              submission_box.id = rubric_descriptor.submission_box_id
+            INNER JOIN        assessment ON 
+                              assessment.id = submission_box.assessment_id
+            WHERE             valid = 1
+                              AND assessment.id = :assessmentId
+            GROUP BY          rubric_mark.student_id
+        ";
+        $stmt = $this->database->prepare($query);
+        $stmt->execute([
+            'assessmentId' => $assessment_id
+        ]);
+        $rowset = $stmt->fetchAll();
+        $rubricMarks = [];
+        foreach ($rowset as $row) {
+            $rubricMarks[$row['student_id']] = true;
+        }
+        return $rubricMarks;
+    }
 }

@@ -140,7 +140,7 @@ class Controller extends Assessment\Controller
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
             'download'    => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks' =>  Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId())
+            'rubricMarks' =>  Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
         ];
 
         $this->getResponse()->content->set(
