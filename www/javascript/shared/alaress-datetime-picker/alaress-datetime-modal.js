@@ -9,8 +9,6 @@
 // Build datepicker options here... again...
 $.fn.alaressDateTimeModal = function(twigVars) {
 
-
-
     var pickerOptions = {
 
         // Flatpickr related
@@ -36,35 +34,38 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         return true;
     }
 
-// Show loader
-
+    // Show loader
     function loadingResponse(target) {
         var pickerResponse = $('#' + target + 'Response' + twigVars.id);
         pickerResponse.html('');
         pickerResponse.append('<img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;">');
-        // Todo: not sure about this
-        $('#byTimetable-' + twigVars.id).find('.timetable-submit').addClass('disabled');
+
+        if (target == 'timetable') {
+            timetable.submit.addClass('disabled');
+        }
     }
 
-// Prepare and append response HTML
-
+    // Prepare and append response HTML
     function appendResponse(data, template, target) {
 
         var pickerResponse = $('#' + target + 'Response' + twigVars.id);
-
-        $('#byTimetable-' + twigVars.id).find('.timetable-submit').removeClass('disabled');
 
         // Clear out any old response display
         pickerResponse.html('');
         var html = '';
 
+        if (target == 'timetable') {
+            timetable.submit.removeClass('disabled');
+            timetable.submit.attr('data-timetable-value', data.date);
+        }
+
         // Ajax returned date
-        timetableDate = moment(data.date, convertFormat(twigVars.displayFormat)).format(convertFormat('F d, Y'));
-        $('.timetable-submit').attr('data-timetable-value', data.date);
+        displayDate = moment(data.date, convertFormat(twigVars.displayFormat)).format(convertFormat('F d, Y'));
+
         if (template == 'duework') {
 
             if (data.students.length == 0) {
-                html += 'Nothing due on ' + timetableDate + '';
+                html += 'Nothing due on ' + displayDate + '';
             }
             else {
 
@@ -72,7 +73,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
                 html += '<div class="row">';
                 html += '<div class="small-12 medium-12 columns">';
-                html += '<h2>Work due on ' + timetableDate + '</h2>';
+                html += '<h2>Work due on ' + displayDate + '</h2>';
                 html += '<ul class="small-12 information-list expandable-card">';
                 for (var i = 0; i < data.students.length; i++) {
                     html += '<li>';
@@ -106,12 +107,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
         else if (template == 'events') {
             if (data.appointments.length == 0) {
-                html += 'No events found for ' + timetableDate;
+                html += 'No events found for ' + displayDate;
             }
             else {
                 html += '<div class="row">';
                 html += '<div class="small-12 medium-12 columns">';
-                html += '<h2>Events on ' + timetableDate + '</h2>';
+                html += '<h2>Events on ' + displayDate + '</h2>';
                 html += '<ul class="small-12 information-list card">';
                 // Populate with appointments for the selected date
                 for (var i = 0; i < data.appointments.length; i++) {
@@ -140,195 +141,198 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     }
 
     // Timetable picker
+    if (twigVars.timetable) {
 
-    // Timetable dropdown fields
-    var timetable = {
-        campus: $('#byTimetable-' + twigVars.id).find('select[name*="campus"]'),
-        term: $('#byTimetable-' + twigVars.id).find('select[name*="term"]'),
-        cycle: $('#byTimetable-' + twigVars.id).find('select[name*="cycle"]')
-    }
+        // Timetable elements
+        var timetable = {
+            campus: $('#byTimetable-' + twigVars.id).find('select[name*="campus"]'),
+            term: $('#byTimetable-' + twigVars.id).find('select[name*="term"]'),
+            cycle: $('#byTimetable-' + twigVars.id).find('select[name*="cycle"]'),
+            submit: $('#byTimetable-' + twigVars.id).find('.timetable-submit')
+        }
 
-    // Build cycles dynamically
-    function buildCycles() {
+        // Build cycles dynamically
+        function buildCycles() {
 
-        var daysInCycle = timetable.campus.find(':selected').attr('data-days');
-        var termDuration = timetable.term.find(':selected').attr('data-duration');
+            var daysInCycle = timetable.campus.find(':selected').attr('data-days');
+            var termDuration = timetable.term.find(':selected').attr('data-duration');
 
-        // Don't try to divide by zero
-        if ((daysInCycle !== undefined && daysInCycle > 0)  && (termDuration !== undefined && termDuration > 0)) {
-            var optionsHtml = '';
+            // Don't try to divide by zero
+            if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
+                var optionsHtml = '';
 
-            //Select cycle number on first load
-            cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate / daysInCycle);
-            for (i = 1; i <= (termDuration / daysInCycle); i++) {
-                var selected = '';
+                //Select cycle number on first load
+                cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate / daysInCycle);
+                for (i = 1; i <= (termDuration / daysInCycle); i++) {
+                    var selected = '';
 
-                if (cycleSelected == i) {
-                    selected = 'selected';
+                    if (cycleSelected == i) {
+                        selected = 'selected';
+                    }
+                    optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
                 }
-                optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
+                timetable.cycle.empty().append(optionsHtml);
             }
-            timetable.cycle.empty().append(optionsHtml);
-        }
-        else {
-            noTimetableData();
-        }
-    }
-
-    // Highlight day and period
-    function showPeriod() {
-        var daysInCycle = timetable.campus.find(':selected').attr('data-days');
-        if (daysInCycle !== undefined && daysInCycle > 0) {
-            var isWeekend = twigVars.timetableDay.isWeekend;
-            // Highlight day if it doesn't fall on a weekend
-            if (isWeekend == 0) {
-                var period = 0;
-                // Get day of the cycle
-                var cycleDay = twigVars.timetableDay.daysUntilDate % daysInCycle;
-                if (cycleDay == 0) {
-                    cycleDay = daysInCycle;
-                }
-                $('.day-' + cycleDay).addClass('period-selected');
-
-                $('.period-description').each(function () {
-
-                    var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm');
-                    var e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm');
-                    var t = moment(twigVars.date).format('HHmm');
-                    if ((t >= s) && (t < e)) {
-                        $(this).addClass('period-selected');
-                        period = $(this).attr('data-period-number');
-                    }
-
-                    if ((cycleDay > 0) && (period > 0)) {
-                        $('.period-' + cycleDay + '-' + period).addClass('period-selected');
-                    }
-                })
+            else {
+                noTimetableData();
             }
         }
-        else {
-            noTimetableData();
+
+        // Highlight day and period
+        function showPeriod() {
+            var daysInCycle = timetable.campus.find(':selected').attr('data-days');
+            if (daysInCycle !== undefined && daysInCycle > 0) {
+                var isWeekend = twigVars.timetableDay.isWeekend;
+                // Highlight day if it doesn't fall on a weekend
+                if (isWeekend == 0) {
+                    var period = 0;
+                    // Get day of the cycle
+                    var cycleDay = twigVars.timetableDay.daysUntilDate % daysInCycle;
+                    if (cycleDay == 0) {
+                        cycleDay = daysInCycle;
+                    }
+                    $('#byTimetable-' + twigVars.id).find('.day-' + cycleDay).addClass('period-selected');
+
+                    $('#byTimetable-' + twigVars.id).find('.period-description').each(function () {
+
+                        var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm');
+                        var e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm');
+                        var t = moment(twigVars.date).format('HHmm');
+                        if ((t >= s) && (t < e)) {
+                            $(this).addClass('period-selected');
+                            period = $(this).attr('data-period-number');
+                        }
+
+                        if ((cycleDay > 0) && (period > 0)) {
+                            $('#byTimetable-' + twigVars.id).find('.period-' + cycleDay + '-' + period).addClass('period-selected');
+                        }
+                    })
+                }
+            }
+            else {
+                noTimetableData();
+            }
         }
-    }
 
-    // Reveal Timetable
-    function revealTimetable() {
-        var campus = timetable.campus.find(':selected').val();
-        $('.timetablePicker' + twigVars.id).css('display', 'none');
-        $('#timetable' + twigVars.id + '-' + campus).css('display', 'table');
-    }
+        // Reveal Timetable
+        function revealTimetable() {
+            var campus = timetable.campus.find(':selected').val();
+            $('.timetablePicker' + twigVars.id).css('display', 'none');
+            $('#timetable' + twigVars.id + '-' + campus).css('display', 'table');
+        }
 
-    function noTimetableData() {
-        var html = '<div data-alert="" class="alert-box alert">Not enough data to build a timetable <br /> for the selected campus and term.<a href="" class="close">×</a></div>';
+        function noTimetableData() {
+            var html = '<div data-alert="" class="alert-box alert">Not enough data to build a timetable <br /> for the selected campus and term.<a href="" class="close">×</a></div>';
 
-        timetable.cycle.empty().css('display', 'none');
-        $('.timetablePicker'+twigVars.id).empty().css('display', 'none');
-        $('.timetable-submit').css('display', 'none');
+            timetable.cycle.empty().css('display', 'none');
+            $('.timetablePicker' + twigVars.id).empty().css('display', 'none');
+            timetable.submit.css('display', 'none');
 
-        $('#timetable'+twigVars.id).append(html);
-    }
+            $('#timetable' + twigVars.id).append(html);
+        }
 
-    buildCycles();
-    showPeriod();
-    revealTimetable();
-
-    // Update cycles on Campus or Term change
-    timetable.campus.change(function () {
         buildCycles();
-        // Clear selected
-        $('.period-selected').removeClass('period-selected');
-        $('table').find('[data-selected=1]').attr('data-selected', 0);
+        showPeriod();
         revealTimetable();
-    });
 
-    timetable.term.change(function () {
-        buildCycles();
-    });
+        // Update cycles on Campus or Term change
+        timetable.campus.change(function () {
+            buildCycles();
+            // Clear selected
+            $('#byTimetable-' + twigVars.id).find('.period-selected').removeClass('period-selected');
+            $('#byTimetable-' + twigVars.id).find('table').find('[data-selected=1]').attr('data-selected', 0);
+            revealTimetable();
+        });
 
-    timetable.cycle.change(function () {
-        $('.period-selected').removeClass('period-selected');
-        $('table').find('[data-selected=1]').attr('data-selected', 0);
-    });
+        timetable.term.change(function () {
+            buildCycles();
+        });
 
-    var timetableAppointments = $('#timetableAppointments' + twigVars.id);
+        timetable.cycle.change(function () {
+            $('#byTimetable-' + twigVars.id).find('.period-selected').removeClass('period-selected');
+            $('#byTimetable-' + twigVars.id).find('table').find('[data-selected=1]').attr('data-selected', 0);
+        });
 
-    // Timetable picker behaviour
-    $('table.timetablePicker').mouseout(function () {
-        $('.period-hover').removeClass('period-hover');
-    });
+        var timetableAppointments = $('#timetableAppointments' + twigVars.id);
 
-    $('.has-period').hover(function () {
+        // Timetable picker behaviour
+        $('table.timetablePicker').mouseout(function () {
+            $('.period-hover').removeClass('period-hover');
+        });
 
-        $('.period-hover').removeClass('period-hover');
-        var day = $(this).attr('data-day');
-        var period = $(this).attr('data-period');
-        $('.day-' + day).addClass('period-hover');
-        $('.description-' + period).addClass('period-hover');
+        $('.has-period').hover(function () {
 
-    });
+            $('.period-hover').removeClass('period-hover');
+            var day = $(this).attr('data-day');
+            var period = $(this).attr('data-period');
+            $('.day-' + day).addClass('period-hover');
+            $('.description-' + period).addClass('period-hover');
 
-    // Loading events on timetable picker click
-    var timetableDate = moment().format(convertFormat(twigVars.displayFormat)); //today
-    $('.has-period').click(function () {
+        });
 
-        var day = $(this).attr('data-day');
-        var period = $(this).attr('data-period');
+        // Loading events on timetable picker click
+        var displayDate = moment().format(convertFormat(twigVars.displayFormat)); //today
+        $('.has-period').click(function () {
 
-        $('.period-selected').removeClass('period-selected');
-        $('table').find('[data-selected=1]').attr('data-selected', 0);
-        $(this).addClass('period-selected');
-        $(this).attr('data-selected', 1);
-        $('.day-' + day).addClass('period-selected');
-        $('.description-' + period).addClass('period-selected');
-        periodClicked = 'period' + day + '_' + period;
+            var day = $(this).attr('data-day');
+            var period = $(this).attr('data-period');
 
-        var campus = timetable.campus.val();
-        var term = timetable.term.val();
-        var cycle = timetable.cycle.val();
+            $('.period-selected').removeClass('period-selected');
+            $('table').find('[data-selected=1]').attr('data-selected', 0);
+            $(this).addClass('period-selected');
+            $(this).attr('data-selected', 1);
+            $('.day-' + day).addClass('period-selected');
+            $('.description-' + period).addClass('period-selected');
+            periodClicked = 'period' + day + '_' + period;
 
-        if (twigVars.type == 'duework') {
+            var campus = timetable.campus.val();
+            var term = timetable.term.val();
+            var cycle = timetable.cycle.val();
 
-            // Can the assessment form have dates and be called outside the class page?
-            var folder = $('*[name = "folderId"]').val();
+            if (twigVars.type == 'duework') {
 
-            loadingResponse('timetable');
+                // Can the assessment form have dates and be called outside the class page?
+                var folder = $('*[name = "folderId"]').val();
 
-            $.get((twigVars.routeLookup.getByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{folder}/g, folder))
-                .done(function (data) {
+                loadingResponse('timetable');
 
-                    appendResponse(data, 'duework', 'timetable');
+                $.get((twigVars.routeLookup.getByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{folder}/g, folder))
+                    .done(function (data) {
 
-                })
-                .fail(function () {
-                    console.log('Failed to retrieve appointments for specified period');
-                });
-        }
-        else if (twigVars.type == 'event') {
-            // Or fetch events
+                        appendResponse(data, 'duework', 'timetable');
 
-            loadingResponse('timetable');
-            $.get((twigVars.routeLookup.getEventsByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
-                .done(function (data) {
+                    })
+                    .fail(function () {
+                        console.log('Failed to retrieve appointments for specified period');
+                    });
+            }
+            else if (twigVars.type == 'event') {
+                // Or fetch events
 
-                    appendResponse(data, 'events', 'timetable');
+                loadingResponse('timetable');
+                $.get((twigVars.routeLookup.getEventsByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                    .done(function (data) {
 
-                })
-                .fail(function () {
-                    console.log('Failed to retrieve appointments for specified period');
-                });
-        }
-        else {
-            // Fetch a timetable day date
-            loadingResponse('timetable');
-            $.get((twigVars.routeLookup.getTimetableDate).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
-                .done(function (data) {
-                    appendResponse(data, '', 'timetable');
-                })
-                .fail(function () {
-                    console.log('Timetable day to date conversion failed');
-                });
-        }
-    });
+                        appendResponse(data, 'events', 'timetable');
+
+                    })
+                    .fail(function () {
+                        console.log('Failed to retrieve appointments for specified period');
+                    });
+            }
+            else {
+                // Fetch a timetable day date
+                loadingResponse('timetable');
+                $.get((twigVars.routeLookup.getTimetableDate).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                    .done(function (data) {
+                        appendResponse(data, '', 'timetable');
+                    })
+                    .fail(function () {
+                        console.log('Timetable day to date conversion failed');
+                    });
+            }
+        });
+    }
 
     // Setup calendar
     var newDate, latestDate;

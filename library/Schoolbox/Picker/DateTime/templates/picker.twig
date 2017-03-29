@@ -253,6 +253,11 @@
         displayFormat: '{{ displayFormat }}',
         displayFormatDate: '{{ displayFormatDate }}',
         type: '{{ type }}',
+        {% if timetable %}
+            timetable: true,
+        {% else %}
+            timetable: false,
+        {% endif %}
         {% if timetableDay %}
             timetableDay: {
                 daysUntilDate: {{ timetableDay.daysUntilDate }},
