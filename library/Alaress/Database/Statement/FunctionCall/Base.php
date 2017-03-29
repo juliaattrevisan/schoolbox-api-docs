@@ -16,7 +16,7 @@ use Alaress\Database\Statement\Query\Base as BaseQuery;
 use PDO;
 use PDOStatement;
 
-abstract class Base extends BaseQuery implements IFunctionCall
+class Base extends BaseQuery implements IFunctionCall
 {
     /** @var IBroker $broker */
     protected $broker;
@@ -33,11 +33,12 @@ abstract class Base extends BaseQuery implements IFunctionCall
      */
     public function __construct($broker, $name)
     {
+        parent::__construct($broker, null);
+
         // Unlike the standard query we do not prepare the statement in the constructor as we need to construct the
         // query dynamically based on the parameters that are passed. So for now we just store the broker and the
         // name of the function we intend to execute.
 
-        $this->broker = $broker;
         $this->name = $name;
     }
 

@@ -10,14 +10,29 @@
 
 namespace Alaress\Database\Statement\Query;
 
+use Alaress\Database\Broker\IBroker;
 use PDO;
 use PDOStatement;
 use Alaress\Database\Statement\Base as BaseStatement;
 
-abstract class Base extends BaseStatement {
-
+class Base extends BaseStatement
+{
     /** @var string $sql */
     protected $sql;
+
+    /** @var IBroker $broker */
+    protected $broker;
+
+    /**
+     * Database statement constructor
+     *
+     * @param IBroker $broker Database broker that this query belongs to
+     * @param string $sql SQL query string to be executed
+     */
+    function __construct($broker, $sql) {
+        $this->broker = $broker;
+        $this->sql = $sql;
+    }
 
     /**
      * @inheritdoc

@@ -14,20 +14,11 @@ use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Db2\Iterator;
 use Alaress\Database\Statement\FunctionCall\Db2\FunctionCall;
-use Alaress\Database\Statement\Query\Db2\Query;
 use Alaress\Database\Statement\StoredProcedure\Db2\StoredProcedure;
 
 class Broker extends Base implements IBroker
 {
     // These return DB2 specific statement objects
-
-    /**
-     * @inheritdoc
-     */
-    public function prepareQuery($query)
-    {
-        return new Query($this, $query);
-    }
 
     /**
      * @inheritdoc

@@ -14,7 +14,6 @@ use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
-use Alaress\Database\Statement\Query\Sqlsrv\Query;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
 use PDO;
 
@@ -55,14 +54,6 @@ class Broker extends Base implements IBroker
     public function getIterator($statement, $pdoStatement)
     {
         return new Iterator($this, $statement, $pdoStatement);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function prepareQuery($query)
-    {
-        return new Query($this, $query);
     }
 
     /**

@@ -14,13 +14,14 @@ namespace Alaress\Database\Broker;
 use Alaress\Cache;
 use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as DatabaseException;
+use Alaress\Database\Statement\Query\Base as Query;
+use Alaress\DebugBar\Instance as DebugBar;
 use DebugBar\DataCollector\DataCollectorInterface;
+use DebugBar\DataCollector\PDO as DebugPDO;
 use PDO;
 use PDOException;
 use PDOStatement;
-use DebugBar\DataCollector\PDO as DebugPDO;
-use Alaress\Database\Exception as DatabaseException;
-use Alaress\DebugBar\Instance as DebugBar;
 
 abstract class Base implements IBroker
 {
@@ -135,6 +136,14 @@ abstract class Base implements IBroker
     public function prepare($query, $options = [])
     {
         return $this->statementCache->get(sha1($query), [$query, $options]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareQuery($query)
+    {
+        return new Query($this, $query);
     }
 
     // ----------------------------------------------------------------------------------------------------------------
