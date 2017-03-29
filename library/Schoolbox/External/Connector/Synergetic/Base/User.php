@@ -9,6 +9,7 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
+use Schoolbox\Collection;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IUser;
 
@@ -19,7 +20,7 @@ class User extends Base implements IUser
      */
     function getPortrait($externalId)
     {
-
+        return false;
     }
 
     /**
@@ -27,7 +28,7 @@ class User extends Base implements IUser
      */
     function getGuardians($externalIds, $hydrateStudents = false)
     {
-
+        return new Collection();
     }
 
     /**
@@ -35,7 +36,7 @@ class User extends Base implements IUser
      */
     function getGuardianDirectory($filter = [])
     {
-
+        return new Collection();
     }
 
     /**
@@ -43,7 +44,7 @@ class User extends Base implements IUser
      */
     function getStudents($externalIds, $hydrateGuardians = false)
     {
-
+        return new Collection();
     }
 
     /**
@@ -51,7 +52,7 @@ class User extends Base implements IUser
      */
     function getStudentsAccessible($externalID)
     {
-
+        return new Collection();
     }
 
     /**
@@ -59,7 +60,7 @@ class User extends Base implements IUser
      */
     function getStaff($externalId)
     {
-
+        return new Collection();
     }
 
     /**
@@ -67,7 +68,7 @@ class User extends Base implements IUser
      */
     function getStaffDirectory($filter = [])
     {
-
+        return new Collection();
     }
 
     /**
@@ -75,7 +76,7 @@ class User extends Base implements IUser
      */
     function getTutors($externalIds)
     {
-
+        return new Collection();
     }
 
     /**
@@ -83,7 +84,7 @@ class User extends Base implements IUser
      */
     function getEmails($externalIds)
     {
-
+        return [];
     }
 
     /**
@@ -91,6 +92,6 @@ class User extends Base implements IUser
      */
     function getCampusInvolvement($externalId)
     {
-
+        return new Collection();
     }
 }
