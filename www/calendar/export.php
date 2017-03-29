@@ -12,6 +12,7 @@
 
 $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
@@ -136,7 +137,9 @@ try {
             break;
 
         case 'external':
-            $api = new Calendar_Api_EventType_Event_External_Default($user, array());
+            /** @var IConnector $databaseExternal */
+            $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
+            $api = new Calendar_Api_EventType_Event_External_Default($user, $databaseExternal, array());
             $filename =  'external';
             break;
 
