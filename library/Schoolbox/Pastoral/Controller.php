@@ -954,6 +954,11 @@ class Controller extends Base
     {
         $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $record->getId());
 
+        /* Remove tag relations
+         */
+        $this->getPastoralTagsMapper()->deleteForRecord($record->getId());
+        $this->getPastoralTagsMapper()->purgeUnassociated();
+
         // Delete on external database
 
         $pastoralExternal = new \External_Pastoral();
@@ -962,10 +967,6 @@ class Controller extends Base
         // Delete locally
 
         $this->getPastoralMapper()->delete($record);
-
-        /* Delete any unassociated tags everywhere
-         */
-        $this->getPastoralTagsMapper()->purgeUnassociated();
     }
 
     /**
