@@ -10,6 +10,21 @@ use Schoolbox\IConfigLoader;
 class Factory
 {
     /**
+     * Retrieve a connection to Schoolbox database
+     */
+    public function getInternalDatabase()
+    {
+        $factory = new DatabaseFactory();
+        $connectorInternal = $factory->createMysql();
+
+        if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd)) {
+            throw new DatabaseException("Unable to connect to Schoolbox database.");
+        }
+
+        return $connectorInternal;
+    }
+
+    /**
      * Retrieve an appropriate external database connection based on the 'external_type' set in Schoolbox configuration
      *
      * @param IConfigLoader $config Schoolbox configuration

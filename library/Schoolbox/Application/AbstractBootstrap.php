@@ -155,14 +155,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set(
             'databaseInternal',
             function() {
-                $factory = new DatabaseFactory();
-                $connectorInternal = $factory->createMysql();
-
-                if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd)) {
-                    throw new DatabaseException("Unable to connect to Schoolbox database.");
-                }
-
-                return $connectorInternal;
+                $factory = new SchoolboxDatabaseFactory();
+                return $factory->getInternalDatabase();
             }
         );
 
