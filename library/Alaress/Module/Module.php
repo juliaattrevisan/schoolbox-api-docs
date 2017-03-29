@@ -507,6 +507,7 @@ class Module {
      * Initializes template paths for this module.
      *
      * @param Twig_Loader_Chain $templateLoader
+     * @throws \Twig_Error_Loader if the directory does not exist
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {}
 
