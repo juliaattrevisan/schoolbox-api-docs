@@ -127,6 +127,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             {$this->getSelectString()}
             INNER JOIN pastoral_record_tag prt ON prt.tag_id = {$this->getTable()}.id
             WHERE prt.pastoral_id = :pastoralId
+            ORDER BY name
         ";
 
         $statement = $this->getDatabase()->prepare($query);
