@@ -13,13 +13,13 @@ namespace Alaress\Database\Broker\Db2;
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Db2\Iterator;
-use Alaress\Database\Statement\FunctionCall\Mysql\FunctionCall;
-use Alaress\Database\Statement\Query\Mysql\Query;
-use Alaress\Database\Statement\StoredProcedure\Mysql\StoredProcedure;
+use Alaress\Database\Statement\FunctionCall\Db2\FunctionCall;
+use Alaress\Database\Statement\Query\Db2\Query;
+use Alaress\Database\Statement\StoredProcedure\Db2\StoredProcedure;
 
 class Broker extends Base implements IBroker
 {
-    // These return MySQL specific statement objects
+    // These return DB2 specific statement objects
 
     /**
      * @inheritdoc
