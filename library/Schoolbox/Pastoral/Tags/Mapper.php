@@ -92,7 +92,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      * @param array $tagNames
      * @return bool
      */
-    public function associatedWith(PastoralRecord $pastoral, $tagNames) {
+    public function isAssociatedWith(PastoralRecord $pastoral, $tagNames) {
         if (count($tagNames)) {
             $query = "
                 {$this->getSelectString()}

@@ -440,7 +440,7 @@ class Mapper extends BaseMapper
 
             if (trim($tags) != '') {
                 $tagsArray = explode(",", trim($tags));
-                $hasAssociatedTags = $this->getPastoralTagsMapper()->associatedWith($record, $tagsArray);
+                $hasAssociatedTags = $this->getPastoralTagsMapper()->isAssociatedWith($record, $tagsArray);
 
                 if (!$hasAssociatedTags) {
                     continue;
