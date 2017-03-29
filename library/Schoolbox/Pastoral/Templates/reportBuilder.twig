@@ -12,7 +12,7 @@
 
         {# Toggle all checkboxes when the 'Select All' box is changed #}
 
-        $('[data-check-all]').change(function (e) {
+        $('[data-check-all-type]').change(function (e) {
             $('[data-check-type]').prop('checked', $(e.target)[0].checked);
         });
 
@@ -22,18 +22,33 @@
 
         {# Whenever a type checkbox is changed disable the 'Select All' box #}
 
+        {# Dynamically decide when all checkboxes are selected while you're ticking boxes
+         #}
         $('[data-check-type]').change(function (e) {
-            $('[data-check-all]').prop('checked', false);
+            if ($('[data-check-type]:checked').length == $('[data-check-type]').length) {
+                $('[data-check-all-type]').prop('checked', true);
+            }
+            else {
+                $('[data-check-all-type]').prop('checked', false);
+            }
         });
 
+        {# Dynamically decide when all checkboxes are selected while you're ticking boxes
+         #}
         $('[data-check-year]').change(function (e) {
-            $('[data-check-all-year]').prop('checked', false);
+            if ($('[data-check-year]:checked').length == $('[data-check-year]').length) {
+                $('[data-check-all-year]').prop('checked', true);
+            }
+            else {
+                $('[data-check-all-year]').prop('checked', false);
+            }
         });
 
-        {# If we are changing report criteria this will tick the 'Select All' box if every type was selected #}
-
+        {# If we are changing report criteria this will tick the 'Select All' box if every type was selected
+         # This occurs upon page load
+         #}
         if ($('[data-check-type]:checked').length == $('[data-check-type]').length) {
-            $('[data-check-all]').prop('checked', true);
+            $('[data-check-all-type]').prop('checked', true);
         }
 
         if ($('[data-check-year]:checked').length == $('[data-check-year]').length) {
@@ -276,7 +291,7 @@
         <section>
             <div class="small-12 columns content">
                 <div class="checklist" data-equalizer-watch="">
-                    <input id="type-all" data-check-all type="checkbox">
+                    <input id="type-all" data-check-all-type type="checkbox">
                     <label for="type-all">Select All</label>
                     {% for type in types %}
                         <input data-check-type id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
