@@ -27,49 +27,6 @@ interface IIterator extends BaseIterator, Countable
     public function execute();
 
     /**
-     * Return the current element
-     *
-     * @return array|bool
-     * @throws DatabaseException
-     */
-    public function current();
-
-    /**
-     * Move forward to next element
-     *
-     * @return void Any returned value is ignored.
-     */
-    public function next();
-
-    /**
-     * Return the key of the current element
-     *
-     * @return mixed scalar on success, or null on failure.
-     */
-    public function key();
-
-    /**
-     * Checks if current position is valid
-     *
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     */
-    public function valid();
-
-    /**
-     * Rewind the Iterator to the first element
-     *
-     * @return void
-     */
-    public function rewind();
-
-    /**
-     * Return count of elements in the recordset
-     *
-     * @return mixed
-     */
-    public function count();
-
-    /**
      * Move to next rowset in result
      *
      * @return bool
