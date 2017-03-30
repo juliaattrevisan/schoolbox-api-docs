@@ -62,7 +62,7 @@
 
 
         $('#season').selectizeSelector({
-            {% if division.season.id %}
+            {% if match.season.id %}
             value: {
                 id: {{ match.season.id }},
                 name: "{{ match.season.name }} - {{ match.season.start.localShort }} to {{ match.season.end.localShort }}"
