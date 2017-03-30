@@ -40,6 +40,7 @@ CREATE TABLE filter_default (
 ) ENGINE=INNODB;
 
 -- User configured filter selections per user
+-- Note that this table is not normalised with filter_option. This is because options may exist implicitly without existing explicitly in DB.
 CREATE TABLE filter_selection (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `user_id` INT(11) UNSIGNED NOT NULL,
@@ -48,12 +49,8 @@ CREATE TABLE filter_selection (
       FOREIGN KEY (`user_id`)
       REFERENCES user(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
-  `filter_option_id` INT(11) NOT NULL,
-    INDEX filter_selection_filter_option_id (`filter_option_id`),
-    CONSTRAINT fk_filter_selection_filter_option_id
-      FOREIGN KEY (`filter_option_id`)
-      REFERENCES filter_option(`id`)
-      ON DELETE CASCADE ON UPDATE CASCADE,
+  `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
+  `key` VARCHAR(255) NOT NULL,
   `selected` BOOL
 ) ENGINE=INNODB;
 

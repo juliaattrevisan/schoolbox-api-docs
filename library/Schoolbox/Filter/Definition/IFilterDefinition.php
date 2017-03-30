@@ -22,6 +22,16 @@ interface IFilterDefinition
 {
 
     /**
+     * Return a rendered filter template
+     *
+     * Intended to be called from twig
+     *
+     * @return string
+     */
+    public function render();
+
+
+    /**
      * @return int
      */
     public function getId();

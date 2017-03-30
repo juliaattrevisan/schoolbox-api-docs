@@ -92,13 +92,7 @@ class TermFilter implements IFilterDefinition
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->filter->getId();
-    }
+
 
 
     public function getTitle()

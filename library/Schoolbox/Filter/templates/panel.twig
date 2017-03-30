@@ -1,0 +1,60 @@
+{#
+A panel that displays various filters.
+
+Usage:
+    contentId string      - the ID of the HTML element where we will replace with AJAX content
+    panel     Filterpanel
+#}
+
+{% set filterPanelId = 'filter_panel' %}
+{% set submitButtonId = 'submit_button' %}
+
+
+<script type="text/javascript">
+    $(function() {
+
+        var $content = $('#{{ contentId }}');
+        var $filterPanel = $('#{{ filterPanelId }}');
+        var $submitButton = $('#{{ submitButtonId }}');
+
+        var $optionCheckboxes = $filterPanel.find('input[type=checkbox]');
+
+
+
+        $submitButton.on('click', function(event){
+            event.preventDefault();
+            $submitButton.attr('disabled', true);
+            $optionCheckboxes.attr('disabled', true);
+
+            var data = $optionCheckboxes.serialize();
+            var href = $submitButton.data('href');
+
+            // TODO display a toast
+            $.post(href, data)
+            .done(function(html){
+                $content.html(html);
+            })
+            .fail(function(data){
+                console.log(data)
+            })
+            .always(function() {
+                $submitButton.attr('disabled', false);
+                $optionCheckboxes.attr('disabled', false);
+            });
+        });
+
+    });
+</script>
+
+
+<h1>A Panel containing various filters</h1>
+
+<div id="{{ filterPanelId }}">
+{% for filter in panel.filters %}
+    {# TODO - Each filter definition is responsible for rendering its own sub-template #}
+    {{ filter.render }}
+{% endfor %}
+</div>
+
+<input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}">
+

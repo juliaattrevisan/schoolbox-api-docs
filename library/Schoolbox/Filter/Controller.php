@@ -17,6 +17,7 @@ use Schoolbox\Filter\Option\Mapper as FilterOptionMapper;
 use Schoolbox\Filter\Option\Defaults\Model as FilterDefaultOption;
 use Schoolbox\Filter\Option\Defaults\Mapper as FilterDefaultMapper;
 use Schoolbox\Role;
+use Schoolbox\Filter\Panel as FilterPanel;
 
 class Controller extends BaseController
 {
