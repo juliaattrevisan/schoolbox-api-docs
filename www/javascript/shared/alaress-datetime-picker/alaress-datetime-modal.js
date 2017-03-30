@@ -184,6 +184,16 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                     optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
                 }
                 timetable.cycle.empty().append(optionsHtml);
+                // Increase space to accommodate a table
+                if (daysInCycle > 7) {
+                    $('#byTimetable-' + twigVars.id).find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-7');
+                    $('#byTimetable-' + twigVars.id).find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-5');
+                }
+                // Back to normal
+                else {
+                    $('#byTimetable-' + twigVars.id).find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-7').addClass('medium-6');
+                    $('#byTimetable-' + twigVars.id).find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-5').addClass('medium-6');
+                }
             }
             else {
                 noTimetableData();
