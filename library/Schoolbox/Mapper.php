@@ -20,6 +20,7 @@ use PDOStatement;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
+use Schoolbox\Column\Model as ModelColumn;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
@@ -889,11 +890,12 @@ abstract class Mapper implements IMapper, Serializable
         $set_method  = $this->getSetMethodName($property);
         $map         = $this->map->getOffset($property);
         $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
-        if ($map['hydrator'] instanceof IColumnType) {
-            $value = $map['hydrator']->hydrate($value, $join_mapper);
+        $hydrator    = $map['hydrator'];
+        if ($hydrator instanceof IColumnType) {
+            $value = $hydrator->hydrate($value, $join_mapper);
             // Attempting to set a model value to NULL will likely break,
             // and won't do anything because it will be NULL on hydrate anyway.
-            if (!isset($value)) {
+            if (!isset($value) && $hydrator instanceof ModelColumn) {
                 return $this;
             }
         }
