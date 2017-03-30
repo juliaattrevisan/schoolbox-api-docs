@@ -19,7 +19,7 @@ use InvalidArgumentException;
  */
 class FlatRouter implements IRouter
 {
-    /** @var array[] */
+    /** @var string[][] */
     private $paths = [];
 
     /** @var bool */
@@ -65,7 +65,7 @@ class FlatRouter implements IRouter
     /**
      * Retrieve all the routes contained in this router
      *
-     * @return array[]
+     * @return string[][]
      */
     public function getAll()
     {
