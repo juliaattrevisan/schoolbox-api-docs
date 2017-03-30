@@ -25,6 +25,33 @@ trait TestConnectorTrait
     /** @var IConnector $synergetic67 */
     private $synergetic67;
 
+    /** @var IConnector $db2Test */
+    private $db2Test;
+
+    /**
+     * Connect to DB2 test database
+     */
+    private function connectDb2Test()
+    {
+        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
+        // it tries to work out if we need to be in debug mode.
+        //
+        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
+
+        $database = Database::getInstance();
+        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
+
+        $factory = new Factory();
+
+        $this->db2Test = $factory->createDb2();
+        $this->db2Test->connect(
+            '172.22.15.133:50000',
+            'SBOX',
+            'damian',
+            '7ek&DPUu'
+        );
+    }
+
     /**
      * Connect to schoolbox database
      */

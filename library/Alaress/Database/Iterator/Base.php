@@ -174,7 +174,7 @@ class Base implements IIterator
      * If we get a PDO exception running a query we don't want to terminate application
      * execution, instead we store the error message/code on the statement and returns false
      *
-     * @param PDOException $e
+     * @param PDOException|DatabaseException $e
      * @return bool
      */
     protected function handleException($e)

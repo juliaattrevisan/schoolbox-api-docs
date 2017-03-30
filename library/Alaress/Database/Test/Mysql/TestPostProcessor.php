@@ -81,5 +81,7 @@ class TestPostProcessor extends PHPUnit_Framework_TestCase
             $this->assertSame(strtolower($row['name']), $expectedResult[$count]);
             $count++;
         }
+
+        $this->assertSame(9, $count);
     }
 }

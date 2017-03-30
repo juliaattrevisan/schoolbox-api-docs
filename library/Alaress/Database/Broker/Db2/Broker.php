@@ -12,13 +12,18 @@ namespace Alaress\Database\Broker\Db2;
 
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
+use Alaress\Database\Exception;
 use Alaress\Database\Iterator\Db2\Iterator;
 use Alaress\Database\Statement\FunctionCall\Db2\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Db2\StoredProcedure;
+use Alaress\Database\Wrapper\Db2\PDO;
 
 class Broker extends Base implements IBroker
 {
     // These return DB2 specific statement objects
+
+    /** @var PDO $pdo The PDO object that does all the real work */
+    protected $pdo;
 
     /**
      * @inheritdoc
@@ -54,6 +59,64 @@ class Broker extends Base implements IBroker
             $portString = "PORT={$this->connector->getPort()};";
         }
 
-        return "\"ibm:DRIVER={IBM DB2 ODBC DRIVER};HOSTNAME={$this->connector->getHostname()};{$portString}DATABASE={$this->connector->getDatabase()};PROTOCOL=TCPIP;";
+        return "DATABASE={$this->connector->getDatabase()};HOSTNAME={$this->connector->getHostname()};{$portString}PROTOCOL=TCPIP;UID={$this->connector->getUsername()};PWD={$this->connector->getPassword()};";
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * DB2 Specific connection function as this uses the hideous PDO wrapper
+     */
+    public function connect($options = [])
+    {
+        // Close any existing connection (this seems a bit flaky- why is there no close function?)
+
+        unset($this->pdo);
+
+        try {
+
+            // Create a new PDO wrapper instance using the DSN string and supplied username/password parameters
+
+            $this->pdo = new PDO($this->getDsn(), null, null);
+
+            // These will only get called if the child class overrides the values- don't *think*
+            // we need these to be parameters as they're really just there to get the database in a
+            // state where our functions operate as expected
+
+
+            foreach ($this->databaseAttributes as $attribute => $value) {
+                $this->pdo->setAttribute($attribute, $value);
+            }
+
+            foreach ($this->postConnectQueries as $sql) {
+                $this->pdo->exec($sql);
+            }
+
+        } catch (Exception $e) {
+
+            // Something went wrong during connection
+
+            throw new Exception("Error connecting to database.\nPDO Wrapper Error: {$e->getMessage()}");
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Disabling for DB2
+     */
+    public function getCollector()
+    {
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Disabling for DB2
+     */
+    public function installCollector()
+    {
     }
 }
