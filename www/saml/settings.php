@@ -20,10 +20,19 @@
 
 require_once __DIR__.'/../../library/Bootstrap.php';
 
+$idp = idp_metadata();
+
 $settings = new OneLogin_Saml_Settings();
 
 // When using Service Provider Initiated SSO (starting at index.php), this URL asks the IdP to authenticate the user.
 $settings->idpSingleSignOnUrl = Config::get('saml_sso_url');
+if ($idp) {
+    foreach ($idp['SingleSignOnService'] as $attribute) {
+        if ($attribute['Binding'] == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" && strlen(trim($attribute['Location'])) > 0) {
+            $settings->idpSingleSignOnUrl = trim($attribute['Location']);
+        }
+    }
+}
 
 // The certificate for the users account in the IdP
 $settings->idpPublicCertificate = preg_replace("/\r/m", "", Config::get('saml_idp_certificate'));
