@@ -132,7 +132,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function persistFiles(Submission $object, Submission $previous = null)
     {
-        $joinMapper = $this->getJoinMapper('file');
+        $joinMapper = $this->getJoinMapper('files');
 
         // Delete files that were attached but aren't now
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
