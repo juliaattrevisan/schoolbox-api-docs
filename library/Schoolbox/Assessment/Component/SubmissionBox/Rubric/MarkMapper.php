@@ -186,8 +186,10 @@ class MarkMapper extends Mapper
             FROM              rubric_mark
             INNER JOIN        rubric_descriptor ON
                               rubric_descriptor.id = rubric_mark.descriptor_id
+            INNER JOIN        rubric_level ON
+                              rubric_level.id = rubric_descriptor.level_id
             INNER JOIN        submission_box ON 
-                              submission_box.id = rubric_descriptor.submission_box_id
+                              submission_box.id = rubric_level.box_id
             INNER JOIN        assessment ON 
                               assessment.id = submission_box.assessment_id
             WHERE             valid = 1
