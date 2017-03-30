@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
@@ -75,7 +76,12 @@ class Controller extends Base
      */
     public function getReport()
     {
-        $records = $this->getReportData();
+        try {
+            $records = $this->getReportData();
+        }
+        catch (\InvalidArgumentException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
 
         // Restrict results based on pagination
 
@@ -440,6 +446,50 @@ class Controller extends Base
     }
 
     /**
+     * Assign tags to a record, spawning them if required, or resurrecting them
+     * if these tags once existed
+     *
+     * @param Model $record
+     * @param $tagCsv
+     */
+    private function assignTagsToRecord(PastoralModel $record, $tagCsv)
+    {
+        $tags = explode(",", $tagCsv);
+
+        foreach ($tags as $tagCurrent) {
+            if (trim($tagCurrent) != '') {
+                try {
+
+                    /* Assign an existing tag to this pastoral record
+                     */
+
+                    /** @var PastoralTagsModel $tag */
+                    $tag = $this->getPastoralTagsMapper()->findOneByColumn('name', $tagCurrent);
+                }
+                catch (MapperDeletedException $e) {
+
+                    /* Restore this tag to active duty
+                     */
+                    $tag = $e->getDeletedObject();
+
+                    $tag->setDeletedAt(null);
+                    $this->getPastoralTagsMapper()->save($tag);
+                }
+                catch (MapperException $e) {
+
+                    /* Tag doesn't exist - spawn it, save it, then assign it
+                     */
+                    $tag = new PastoralTagsModel();
+                    $tag->setName($tagCurrent);
+                    $this->getPastoralTagsMapper()->save($tag);
+                }
+
+                $this->getPastoralTagsMapper()->assignToRecord($record, $tag);
+            }
+        }
+    }
+
+    /**
      * Insert a pastoral care record
      * @throws SchoolboxException
      */
@@ -557,16 +607,7 @@ class Controller extends Base
 
             // Save the tags
 
-            $tags = explode(",", $post["tags"]);
-
-            foreach ($tags as $tagCurrent) {
-                if (trim($tagCurrent) != '') {
-                    $tag = new PastoralTagsModel();
-                    $tag->setName($tagCurrent);
-                    $tag->setPastoralId($record->getId());
-                    $this->getPastoralTagsMapper()->save($tag);
-                }
-            }
+            $this->assignTagsToRecord($record, $post["tags"]);
 
             // Save the audiences
 
@@ -697,21 +738,11 @@ class Controller extends Base
         $this->getPastoralMapper()->save($record);
 
         // Delete old tags
-
-        $this->getPastoralTagsMapper()->deleteByColumn("pastoral_id", $record->getId());
+        $this->getPastoralTagsMapper()->deleteForRecord($record->getId());
 
         // Save the tags
 
-        $tags = explode(",", $post["tags"]);
-
-        foreach ($tags as $tagCurrent) {
-            if (trim($tagCurrent) != '') {
-                $tag = new PastoralTagsModel();
-                $tag->setName($tagCurrent);
-                $tag->setPastoralId($record->getId());
-                $this->getPastoralTagsMapper()->save($tag);
-            }
-        }
+        $this->assignTagsToRecord($record, $post["tags"]);
 
         // Delete user permissions
 
@@ -906,6 +937,10 @@ class Controller extends Base
             }
         }
 
+        /* Delete any unassociated tags everywhere
+         */
+        $this->getPastoralTagsMapper()->purgeUnassociated();
+
         // Go back to students pastoral record
 
         $this->getResponse()->redirect->afterPost("/pastoral/{$post["student_id"]}");
@@ -919,6 +954,11 @@ class Controller extends Base
     public function postDelete($record)
     {
         $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $record->getId());
+
+        /* Remove tag relations
+         */
+        $this->getPastoralTagsMapper()->deleteForRecord($record->getId());
+        $this->getPastoralTagsMapper()->purgeUnassociated();
 
         // Delete on external database
 

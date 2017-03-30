@@ -10,13 +10,17 @@
 namespace Schoolbox\Pastoral\Tags;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class Model implements ISoftDeletable, \JsonSerializable
 {
-
-    /** @var int */
-    protected $id;
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /** @var int */
     protected $pastoralId;
@@ -24,16 +28,13 @@ class Model implements ISoftDeletable, \JsonSerializable
     /** @var string */
     protected $name;
 
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
-
     /**
      * @param string $name
-     * @return self
+     * @return $this
      */
     public function setName($name) {
         $this->name = $name;
-        return $name;
+        return $this;
     }
 
     /**
@@ -44,69 +45,17 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPastoralId() {
-        return $this->pastoralId;
-    }
-
-    /**
-     * @param int $pastoralId
-     * @return self
-     */
-    public function setPastoralId($pastoralId) {
-        $this->pastoralId = $pastoralId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() {
-        return $this->id;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
+     * Tags can be spawned inside a selectize
      *
-     * @return bool
-     */
-    public function isDeleted() {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
-    }
-
-    /**
+     * If it returns a id/name tuple it can't work out when a new tag name
+     * is an id or an actual name
+     *
      * @return array
      */
     function jsonSerialize()
     {
         return [
-            'id'   => $this->getId(),
+            'id'   => $this->getName(),
             'name' => $this->getName(),
         ];
     }

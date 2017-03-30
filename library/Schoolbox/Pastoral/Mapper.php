@@ -88,15 +88,15 @@ class Mapper extends BaseMapper
             )
         );
 
-        $this->hasJoin(
-            'tags',
-            array(
-                'mapper' => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
-                'other_key' => 'pastoral_id',
-                'this_key' => 'id',
-                'multiple' => true,
-            )
-        );
+//        $this->hasJoin(
+//            'tags',
+//            array(
+//                'mapper' => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
+//                'other_key' => 'pastoral_id',
+//                'this_key' => 'id',
+//                'multiple' => true,
+//            )
+//        );
 
         $this->hasJoin(
             'comments',
@@ -314,13 +314,15 @@ class Mapper extends BaseMapper
         if ($types != '') {
             $criteria[] = "type_id IN ({$types})";
         }
+        else {
+            throw new \InvalidArgumentException('Record type required');
+        }
 
         $array_years = explode(",", $years);
 
         $years_sql = '';
 
         if ($years != '') {
-
             $years_sql .= "";
 
             foreach ($array_years as $year) {
@@ -331,6 +333,9 @@ class Mapper extends BaseMapper
             }
 
             $years_sql = "`s`.year IN ({$years_sql})";
+        }
+        else {
+            throw new \InvalidArgumentException('Year level required');
         }
 
         $criteria[] = $years_sql;
@@ -439,26 +444,12 @@ class Mapper extends BaseMapper
             // Check tags
 
             if (trim($tags) != '') {
+                $tagsArray = explode(",", trim($tags));
 
-                $tagsArray = explode(",", strtolower(trim($tags)));
-                $tagsList = $this->getPastoralTagsMapper()->findByColumn('pastoral_id', $record->getId());
-
-                $found = false;
-
-                foreach ($tagsArray as $tagCurrent) {
-                    foreach ($tagsList as $tag) {
-                        if (strtolower($tag->getName()) == $tagCurrent) {
-                            $found = true;
-                            break;
-                        }
-                    }
-
-                    if ($found) {
-                        break;
-                    }
-                }
-
-                if (!$found) {
+                /* TODO: Can probably make tags hydrate with pastoral records instead
+                 * but I'll keep doing it this way so the refactor is more familiar
+                 */
+                if (!$this->getPastoralTagsMapper()->isAssociatedWith($record, $tagsArray)) {
                     continue;
                 }
             }
@@ -564,7 +555,7 @@ class Mapper extends BaseMapper
 
         // Don't know if this is right for the one-to-many joins, but it works
 
-        $record->setTagsList($this->getPastoralTagsMapper()->findByColumn("pastoral_id", $record->getId()));
+        $record->setTagsList($this->getPastoralTagsMapper()->findForRecord($record->getId()));
         $record->setCommentList($this->getPastoralCommentMapper()->findByColumn("pastoral_id", $record->getId()));
         $record->setAttachmentList($this->getPastoralAttachmentMapper()->findByColumn("pastoral_id", $record->getId()));
 

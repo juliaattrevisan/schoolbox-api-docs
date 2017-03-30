@@ -15,7 +15,8 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Pastoral\Tags\Model as PastoralTagsModel;
+use Schoolbox\Pastoral\Tags\Model as PastoralTag;
+use Schoolbox\Pastoral\Model as PastoralRecord;
 
 class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 {
@@ -33,11 +34,12 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      */
     protected function mapping()
     {
-        $this->hasTable('pastoral_tags');
-        $this->hasModel(PastoralTagsModel::class);
+        $this->hasTable('pastoral_tag');
+        $this->hasModel(PastoralTag::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('deleted_at');
     }
@@ -64,18 +66,140 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     }
 
     /**
+     * Assign a tagId to a pastoralId
+     *
+     * @param PastoralRecord $pastoral
+     * @param PastoralTag $tag
+     */
+    public function assignToRecord(PastoralRecord $pastoral, PastoralTag $tag)
+    {
+        $query = "
+            INSERT IGNORE INTO pastoral_record_tag (pastoral_id, tag_id) 
+            VALUES (:pastoralId, :tagId)
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'pastoralId' => $pastoral->getId(),
+            'tagId' => $tag->getId()
+        ]);
+    }
+
+    /**
+     * Find out if $tagName is associated with $pastoral record
+     *
+     * @param PastoralRecord $pastoral
+     * @param array $tagNames
+     * @return bool
+     */
+    public function isAssociatedWith(PastoralRecord $pastoral, $tagNames) {
+        if (count($tagNames)) {
+            $query = "
+                {$this->getSelectString()}
+                INNER JOIN pastoral_record_tag prt ON prt.tag_id = {$this->getTable()}.id
+                WHERE prt.pastoral_id = :pastoralId
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute([
+                'pastoralId' => $pastoral->getId()
+            ]);
+
+            foreach ($statement as $row) {
+                if (in_array($row['name'], $tagNames)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Find a collection of tags associated with $pastoralId
+     *
+     * @param $pastoralId
+     * @return Collection
+     */
+    public function findForRecord($pastoralId)
+    {
+        $query = "
+            {$this->getSelectString()}
+            INNER JOIN pastoral_record_tag prt ON prt.tag_id = {$this->getTable()}.id
+            WHERE prt.pastoral_id = :pastoralId
+            ORDER BY name
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'pastoralId' => $pastoralId
+        ]);
+
+        $collection = new Collection();
+
+        foreach ($statement as $row) {
+            $collection->add($this->hydrate($row));
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Unlink all tags for a particular pastoralId
+     *
+     * @param $pastoralId
+     */
+    public function deleteForRecord($pastoralId)
+    {
+        $query = "
+            DELETE FROM pastoral_record_tag
+            WHERE pastoral_id = :pastoralId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'pastoralId' => $pastoralId
+        ]);
+    }
+
+    /**
+     * Purge tags that are no longer associated with any
+     * pastoral records - apparently pastoral admins want
+     * tags to vanish once they are no longer in use
+     */
+    public function purgeUnassociated()
+    {
+        $query = "
+            UPDATE {$this->getTable()}
+            SET deleted_at = NOW()
+            WHERE {$this->getTable()}.id NOT IN (SELECT tag_id FROM pastoral_record_tag)
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+    }
+
+    /**
      * @param User $user
      * @param string $keyword
      * @param int $offset
      * @param int $limit
-     * @return Collection|PastoralTagsModel[]
+     * @return Collection|PastoralTag[]
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
     {
         if (strlen($keyword) === 0) {
             return new Collection();
         }
-        $query = "{$this->getSelectString()} WHERE name LIKE :search";
+
+        /* Exclude soft-deleted tags
+         */
+        $query = "
+            {$this->getSelectString()} 
+            WHERE deleted_at IS NULL 
+            AND name LIKE :search
+        ";
+
         if ($offset > 0) {
             $query .= ' LIMIT :limit OFFSET :offset';
         } elseif ($limit > 0) {
