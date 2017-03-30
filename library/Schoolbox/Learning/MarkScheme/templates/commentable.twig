@@ -116,8 +116,14 @@
 
             {# Check if this feedback has a crocodoc annotation attached to it #}
             {% set hasCrocodoc = false %}
-            {% if latestFeedback.response.allFiles.count > 0 %}
-                {% for currentFile in latestFeedback.response.allFiles %}
+            {% if (latestFeedback and latestFeedback.response.allFiles.count > 0) or (not latestFeedback and participant.findMostRecentResponse().allFiles.count > 0) %}
+                {% if latestFeedback %}
+                    {% set allFiles = latestFeedback.response.allFiles %}
+                {% else %}
+                    {% set allFiles = participant.findMostRecentResponse().allFiles %}
+                {% endif %}
+
+                {% for currentFile in allFiles %}
                     {% if currentFile.crocodocId %}
                         {% set hasCrocodoc = true %}
                     {% endif %}
