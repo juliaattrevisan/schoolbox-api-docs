@@ -480,6 +480,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
 			LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
 			WHERE u.residential_house_id = :houseId
+			AND u.deleted_at IS NULL
 			ORDER BY LENGTH(u.year), u.year, u.lastname
 		");
 
