@@ -1,6 +1,6 @@
 -- Rename corrupted integer tags to what they should be
 UPDATE pastoral_tags AS p1
-INNER JOIN pastoral_tags AS p2 ON p1.id = p2.name
+INNER JOIN pastoral_tags AS p2 ON p2.name REGEXP '^[0-9]+$' AND p1.id = p2.name
 SET p2.`name` = p1.`name`;
 
 -- Move this table somewhere else for now
