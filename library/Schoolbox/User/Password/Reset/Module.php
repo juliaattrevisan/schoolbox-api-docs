@@ -13,6 +13,7 @@ use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Psr\Log\NullLogger;
 use Schoolbox\External\Connector\CommunityPortalFactory;
 use Schoolbox\Mail;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -93,7 +94,8 @@ class Module extends BaseModule
                             'context' => $injector->lazyNew(
                                 Mail\CoreContext::class,
                                 ['conf' => $injector->lazyGet('config')]
-                            )
+                            ),
+                            'log' => $injector->lazyNew(NullLogger::class),
                         ]
                     ),
                 ]
