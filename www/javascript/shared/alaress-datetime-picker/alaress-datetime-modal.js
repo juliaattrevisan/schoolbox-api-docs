@@ -243,6 +243,15 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $('#timetable' + twigVars.id).append(html);
         }
 
+        function resetTimetable() {
+            $('#byTimetable-' + twigVars.id).find('.period-selected').removeClass('period-selected');
+            $('#byTimetable-' + twigVars.id).find('table').find('[data-selected=1]').attr('data-selected', 0);
+
+            $('.timetableDate'+twigVars.id).css('display', 'none');
+
+            timetable.submit.addClass('disabled');
+        }
+
         buildCycles();
         showPeriod();
         revealTimetable();
@@ -251,18 +260,17 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         timetable.campus.change(function () {
             buildCycles();
             // Clear selected
-            $('#byTimetable-' + twigVars.id).find('.period-selected').removeClass('period-selected');
-            $('#byTimetable-' + twigVars.id).find('table').find('[data-selected=1]').attr('data-selected', 0);
+            resetTimetable();
             revealTimetable();
         });
 
         timetable.term.change(function () {
             buildCycles();
+            resetTimetable();
         });
 
         timetable.cycle.change(function () {
-            $('#byTimetable-' + twigVars.id).find('.period-selected').removeClass('period-selected');
-            $('#byTimetable-' + twigVars.id).find('table').find('[data-selected=1]').attr('data-selected', 0);
+            resetTimetable();
         });
 
         var timetableAppointments = $('#timetableAppointments' + twigVars.id);
