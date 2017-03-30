@@ -107,7 +107,7 @@
         If this is the quick mark screen and there's any files, rubric marks, or crocoodoc annotated doc
         attached to the feedback - tell the user that this feedback also includes those.
         #}
-        {% if not inlineGrader and latestFeedback and (latestFeedback.allFiles.count > 0 or rubricMarks[participant.user.id]) %}
+        {% if not inlineGrader and (latestFeedback.allFiles.count > 0 or rubricMarks[participant.user.id]) %}
 
             {# If we're going to be displaying something here - override the hide on .component-action #}
             {% set actionStyle = '' %}
