@@ -543,13 +543,13 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				luResidentialHouse.name AS name,
 				leave_request.id AS leaveRequestId,
 				SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))) AS absent_morning,
-				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))),0)) AS present_morning,
+				((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))),0)) AS present_morning,
 				SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))) AS absent_day,
-				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))),0)) AS present_day,
+				((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))),0)) AS present_day,
 				SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))) AS absent_night,
-				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))),0)) AS present_night
+				((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))),0)) AS present_night
 			FROM luResidentialHouse
-			LEFT JOIN `user` ON user.residential_house_id = luResidentialHouse.id
+			INNER JOIN `user` ON `user`.residential_house_id = luResidentialHouse.id AND `user`.deleted_at IS NULL
 			LEFT JOIN leave_request ON leave_request.user_id = `user`.id AND leave_request.authorisation_datetime IS NOT NULL AND leave_request.status != :deleted
 			GROUP BY residential_house_id
 			ORDER BY luResidentialHouse.name
