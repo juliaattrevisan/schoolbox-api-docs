@@ -42,6 +42,72 @@ $settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_TRANSIENT;
 $settings->authncontextComparison = Config::get('saml_auth_comparison');
 
 /**
+* Retrieve metadata from the identity provider
+*
+* @return array
+*/
+function idp_metadata() {
+    $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
+    $idp_metadata_url = $url->toString();
+
+    // TODO - Add daily or similar caching
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $idp_metadata_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/'.Cfg::get('site_version'));
+    $idpmetadataraw = curl_exec($ch);
+    curl_close($ch);
+
+    $idpmetadata = simplexml_load_string($idpmetadataraw);
+    $idp['SigningKeys'] = array();
+    $idp['SingleSignOnService'] = array();
+    $idp['SingleLogoutService'] = array();
+    if ($idpmetadata) {
+        $x = 0;
+        foreach ($idpmetadata->IDPSSODescriptor->KeyDescriptor as $key) {
+            foreach ($key->attributes() as $keytype => $keytypevalue) {
+                if ((string)$keytypevalue == "signing") {
+                    $cert = "-----BEGIN CERTIFICATE-----\n";
+                    $cert .= implode("\n",str_split((string)$key->KeyInfo->X509Data->X509Certificate, 64));
+                    $cert .= "\n-----END CERTIFICATE-----";
+                    $output = array();
+                    $status = '1';
+                    exec('echo "' . $cert . '" | openssl x509 -noout -dates', $output, $status);
+                    if ($status == 0) {
+                        $idp['SigningKeys'][$x]['X509Cert'] = $cert;
+                        foreach ($output as $certdate) {
+                            $thiscertdate = explode('=', $certdate);
+                            $idp['SigningKeys'][$x]['Dates'][$thiscertdate[0]] = $thiscertdate[1];
+                        }
+                }
+                $x++;
+                }
+            }
+        }
+
+        $x = 0;
+        foreach ($idpmetadata->IDPSSODescriptor->SingleSignOnService as $SSO) {
+        foreach ($SSO->attributes() as $key => $value) {
+            $idp['SingleSignOnService'][$x][$key] = (string)$value;
+        }
+        $x++;
+        }
+
+        $x = 0;
+        foreach ($idpmetadata->IDPSSODescriptor->SingleLogoutService as $SLO) {
+            foreach ($SLO->attributes() as $key => $value) {
+                $idp['SingleLogoutService'][$x][$key] = (string)$value;
+            }
+            $x++;
+        }
+    } else {
+        return false;
+    }
+    return $idp;
+}
+
+/**
 * Checks an if an IP address is in a CIDR range or matches an individual address
 *
 * @return boolean
