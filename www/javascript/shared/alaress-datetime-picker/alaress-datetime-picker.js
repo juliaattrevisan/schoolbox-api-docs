@@ -324,8 +324,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                 $('#byTimetable-'+pickerId).find('.timetable-submit').click(function() {
                     var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
 
-                    var periodTime = ($('[name*="periodTime'+pickerId+'"]').val());
-alert(periodTime);
+                    var periodTime = ($('[name*="periodTime'+pickerId+'"]:checked').val());
                     var newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-'+periodTime), 'h:mma');
 
                     var newDate = moment($(this).attr('data-timetable-value'), convertFormat(options.displayFormatDate)).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
