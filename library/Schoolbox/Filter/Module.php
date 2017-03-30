@@ -11,6 +11,7 @@ use Alaress\Authorizer\Rule\IsSuperuser;
 use \Alaress\Module\Module as AlaressModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Filter\Definition\IFilter;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
@@ -46,12 +47,23 @@ class Module extends AlaressModule
             }
         };
 
-        $this->register('GET', '', 'getIndex', $isSuper);
-        $this->register('GET', '/{filter:\d+}/options', 'getAdminOptions', $isSuper, $loadFilter);
-        $this->register('GET', '/{filter:\d+}/defaults', 'getAdminDefaults', $isSuper, $loadFilter);
+        $loadDefinition = function (array $params){
+            try {
+                $filterInstance = $this->getFilterMapper()->findById($params['filter']);
+                $definitionClass = $filterInstance->getClass();
 
-        $this->register('POST', '/{filter:\d+}/options/save', 'postSaveOptions', $isSuper, $loadFilter);
-        $this->register('POST', '/{filter:\d+}/defaults/save', 'postSaveDefaults', $isSuper, $loadFilter);
+                return ['definition' => new $definitionClass($filterInstance)];
+            } catch (MapperException $e) {
+                throw new NotFound($e->getMessage());
+            }
+        };
+
+        $this->register('GET', '', 'getIndex', $isSuper);
+        $this->register('GET', '/{filter:\d+}/options', 'getAdminOptions', $isSuper, $loadDefinition);
+        $this->register('GET', '/{filter:\d+}/defaults', 'getAdminDefaults', $isSuper, $loadDefinition);
+
+        $this->register('POST', '/{filter:\d+}/options/save', 'postSaveOptions', $isSuper, $loadDefinition);
+        $this->register('POST', '/{filter:\d+}/defaults/save', 'postSaveDefaults', $isSuper, $loadDefinition);
 
 //        $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
 //        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', null, $preloadCourseSpec);

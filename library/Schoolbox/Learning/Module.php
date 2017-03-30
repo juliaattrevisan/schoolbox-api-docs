@@ -52,7 +52,9 @@ class Module extends BaseModule
                 '/grades/{userId}{/termCode}'             => 'getGrades',                    // student && term && subject
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',          // student && term && subject
             ],
-            'POST' => []
+            'POST' => [
+                '/pending/{userId}'                       => 'postPendingAssessmentsForUser', // viewee
+            ]
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
@@ -74,7 +76,7 @@ class Module extends BaseModule
 
         $this->addRoutePermission(
                 $authorizer,
-                '(?:getPendingAssessmentsForUser)',
+                '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\IsUser('userId')
@@ -105,7 +107,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getPendingAssessmentsForUser|getClasses|getGrades|getGradesYear|getGradesForSubject)',
+            '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser|getClasses|getGrades|getGradesYear|getGradesForSubject)',
             function ($params) {
                 if (array_key_exists('userId', $params)) {
                     try {

@@ -1,0 +1,17 @@
+{#
+    The most basic filter sub-panel template, renders a flat list of checkboxes
+    Usage:
+        selections: FilterSelection[] - A set of filter selections made by the current user.
+#}
+{% block title %}{% endblock %}
+<fieldset class="checklist">
+    {% for selection in selections %}
+        <input
+            id="filter_selection_{{ selection.page }}_{{ selection.key }}"
+            type="checkbox"
+            name="filter_selection[{{ selection.page }}][{{ selection.key }}]"
+            {% if selection.selected %}checked{% endif %}
+        >
+        <label for="filter_selection_{{ selection.page }}_{{ selection.key }}">{{ filter.label(selection.key) }}</label>
+    {% endfor %}
+</fieldset>

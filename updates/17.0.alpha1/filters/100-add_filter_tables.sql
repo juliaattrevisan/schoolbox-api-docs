@@ -21,7 +21,7 @@ CREATE TABLE filter_option (
       ON DELETE CASCADE ON UPDATE CASCADE,
   `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
   `key` VARCHAR(255) NOT NULL,
-  `selectable` BOOL NOT NULL
+  `available` BOOL NOT NULL
 ) ENGINE=INNODB;
 
 

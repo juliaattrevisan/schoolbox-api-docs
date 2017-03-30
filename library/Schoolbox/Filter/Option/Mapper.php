@@ -29,6 +29,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('filter_id', FilterMapper::class, 'id', self::TYPE_MODEL, null, 'filter', 'filter');
         $this->uses('page', self::TYPE_STRING);
         $this->uses('key', self::TYPE_STRING);
-        $this->uses('selectable', self::TYPE_BOOLEAN);
+        $this->uses('available', self::TYPE_BOOLEAN);
     }
 }

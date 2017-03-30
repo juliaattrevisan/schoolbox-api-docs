@@ -1,0 +1,98 @@
+{#
+Displays a list of available filter options.
+Enables an admin to select which options are selected by default for each role type and page.
+
+Usage:
+    filter                 Filter
+    definition             IFilterDefinition
+    pageRoleTypes          string[]            - indexed by page
+    optionsPerPage         FilterOption[][]    - Grouped by option.page, then indexed by option.key. Option.defaults are indexed by roleType
+    roleTypes              string[]            - all known roleTypes
+#}
+
+
+{% set saveButtonId = 'save_button' %}
+
+<script type="text/javascript">
+    $(function() {
+
+        var $saveButton = $('#{{ saveButtonId }}');
+        var $defaultsTables = $('[data-page]');
+
+        $saveButton.on('click', function(event){
+            event.preventDefault();
+            $saveButton.attr('disabled', true);
+
+            var data = $defaultsTables.find('input[type=checkbox]').serialize();
+            var href = $saveButton.data('href');
+
+            // TODO display a toast
+            $.post(href, data)
+                .done(function() {
+                    $saveButton.attr('disabled', false);
+                });
+        });
+
+    });
+</script>
+
+<div class="row">
+    <div class="small-12">
+        {{ renderAdminNavigation(pageCurrent) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        <h1>Role type defaults for {% block title %}{% endblock %} filters</h1>
+        <p>{% block description %}{% endblock %}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        {% for page, pageOptions in optionsPerPage %}
+            <h2>Page: {{ page }}</h2>
+            <table data-page="{{ page }}">
+                <tr>
+                    <th></th>
+                    {% for roleType in roleTypes %}
+                        <th>{{ roleType | capitalize }}</th>
+                    {% endfor %}
+                </tr>
+
+                {% for key, option in pageOptions %}
+                    <tr>
+                        <td>{{ definition.label(key) }}</td>
+                        {% for roleType in roleTypes %}
+                            {% set default = option.defaults[roleType] %}
+
+                            <td>
+                                {% if default %}
+                                    <input
+                                            id="checkbox_{{ option.page }}_{{ option.key }}_{{ roleType }}"
+                                            type="checkbox"
+                                            name="filter_defaults[{{ option.page }}][{{ option.key }}][{{ roleType }}]"
+                                            {% if default.selected %}checked{% endif %}>
+                                    <label for="checkbox_{{ option.page }}_{{ option.key }}_{{ roleType }}" class="checkbox-label"></label>
+                                {% else %}
+                                    <span title="{{ roleType | capitalize }}s do not have access to this page">NA</span>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+
+                    </tr>
+                {% endfor %}
+
+            </table>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <input type="submit" id="{{ saveButtonId }}" value="Save Role Defaults" data-href="{{ routeLookup('filters.postSaveDefaults', { filter: filter.id }) }}">
+        </section>
+    </div>
+</div>

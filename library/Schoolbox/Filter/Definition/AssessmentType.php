@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Definition;
 
-class AssessmentType implements IFilterDefinition
+class AssessmentType implements IFilter
 {
 
 }

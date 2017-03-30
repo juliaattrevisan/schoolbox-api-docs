@@ -1,12 +1,11 @@
 {#
 Displays all possible options for a Filter and enables the admin to configure
-which options should be selectable by users.
+which options should be available to users.
 
 Usage:
-    filter                 Filter
-    definition             IFilterDefinition
-    availableFilterOptions FilterOption[]
-    filterKeys             string[]
+    filter       Filter
+    definition   IFilter
+    options      FilterOption[]
 #}
 
 {% set saveButtonId = 'save_button' %}
@@ -43,14 +42,15 @@ Usage:
 
 <div class="row">
     <div class="small-12">
-        <h1>Available {{ definition.title }} options</h1>
+        <h1>Available {% block title %}{% endblock %} options</h1>
         <p>Select which options should be displayed for this filter.</p>
-        <p>{{ definition.AdminDescription }}</p>
+        <p>{% block description %}{% endblock %}</p>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12">
+        {% block optionsTable %}
         <table id="{{ optionsTableId }}">
             <tr>
                 <th></th>
@@ -58,7 +58,7 @@ Usage:
                     <th>{{ page }}</th>
                 {% endfor %}
             </tr>
-            {% for key, option in availableFilterOptions %}
+            {% for key, option in options %}
             <tr>
                 <td>{{ definition.label(key) }}</td>
                 {% for page in definition.pages %}
@@ -67,14 +67,14 @@ Usage:
                             id="checkbox_{{ key }}_{{ page }}"
                             type="checkbox"
                             name="filter_option[{{ key }}][{{ page }}]"
-                            {% if availableFilterOptions[key][page].selectable %}checked{% endif %}>
+                            {% if options[key][page].available %}checked{% endif %}>
                         <label for="checkbox_{{ key }}_{{ page }}" class="checkbox-label"></label>
                     </td>
                 {% endfor %}
             </tr>
             {% endfor %}
-
         </table>
+        {% endblock %}
     </div>
 </div>
 

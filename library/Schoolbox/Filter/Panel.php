@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\Filter\Definition\IFilterDefinition;
+use Schoolbox\Filter\Definition\IFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter\Model as Filter;
@@ -24,13 +24,16 @@ class Panel
     /** @var User */
     private $user;
 
+    /** @var string */
+    private $page;
+
     /**
      * @var string
      */
     private $route;
 
     /**
-     * @var GenericCollection|IFilterDefinition[]
+     * @var GenericCollection|IFilter[]
      */
     private $filters;
 
@@ -38,23 +41,36 @@ class Panel
 
     /**
      * @param User $user The viewing user.
-     * @param string $route The route to send the f
-     * @param string[] $filterClasses The set of filters to display in this panel instance
-     * @throws \InvalidArgumentException if class not found
+     * @param string $page The page the panel is being rendered into
+     * @param string $route The route to send the filter selections to
+     * @param GenericCollection|IFilter[] $filters The set of filters to display in this panel instance
      */
-    public function __construct(User $user, $route, $filterClasses)
+    public function __construct(User $user, $page, $route, GenericCollection $filters)
     {
         $this->user = $user;
+        $this->page = $page;
         $this->route = $route;
+        $this->filters = $filters;
+    }
 
-        // Validate and load filter definitions
-        $this->filters = new GenericCollection(IFilterDefinition::class);
-        foreach($filterClasses as $filterClass){
-            if(!class_exists($filterClass)){
-                throw new \InvalidArgumentException('Class not found: ' . $filterClass);
-            }
-            $this->filters->add(new $filterClass());
-        }
+    public function getTemplate()
+    {
+        return '@filters/panel.twig';
+    }
+
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    public function getFilters()
+    {
+        return $this->filters;
     }
 
 
@@ -62,10 +78,10 @@ class Panel
      * Loads filter selections for the current user.
      * If none found, fall back to configured user.role.type defaults.
      */
-    public function execute()
+    public function loadUserSelections()
     {
         foreach($this->filters as $filter){
-            $filter->buildFilterDefaults();
+            // Get list of defaults. For each, if user has selection, retain it. If user does not, create one for user with role default value
         }
     }
 

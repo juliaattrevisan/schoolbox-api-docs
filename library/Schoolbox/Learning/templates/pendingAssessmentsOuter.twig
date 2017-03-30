@@ -1,0 +1,14 @@
+{# TODO rename this to better name. 'pendingAssessments.twig' + 'pendingAssessmentsContent.twig' ?
+
+Usage:
+    filterPanel: FilterPanel -
+
+#}
+
+<h1>Pending Assessments</h1>
+
+<div class="row">
+    <div class="small-12 columns island">
+        {% include filterPanel.template with {panel: filterPanel} only %}
+    </div>
+</div>

@@ -8,8 +8,13 @@
 namespace Schoolbox\Filter\Option\Selection;
 
 use Schoolbox\Filter\Option\Mapper as FilterOptionMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -21,8 +26,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('filter_option_id', FilterOptionMapper::class, 'id', self::TYPE_MODEL, null, 'filterOption', 'filterOption');
         $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
+        $this->uses('page', self::TYPE_STRING);
+        $this->uses('key', self::TYPE_STRING);
         $this->uses('selected', self::TYPE_BOOLEAN);
     }
 }

@@ -18,6 +18,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter\Definition\IFilter;
+use Schoolbox\Filter\Definition\TermFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\PendingFactory;
@@ -45,6 +47,9 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use \Alaress_Date_Format;
+use Schoolbox\Filter\Mapper as FilterMapper;
+use Schoolbox\Filter\Panel as FilterPanel;
+use Schoolbox\Filter\Option\Model as FilterOption;
 
 class Controller extends Base
 {
@@ -208,13 +213,10 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee = null)
     {
-        $filterPanel = new
-
         // No User found ?
         if(null === $viewee){
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
-
         // Only display from Staff perspective.
         if(!$viewee->getRole()->isStaff()){
             // Is the Viewee as student or parent?
@@ -229,80 +231,17 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
-        // If currentUser == viewee, use currentUser as it may already have class codes
-        // attached and avoid the need for an external DB call.
-        if($this->getUser()->getId() === $viewee->getId()){
-            $viewee = $this->getUser();
-        }
 
-        $term = $this->termMapper->findForToday();
-        $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
+        $termFilterInstance = FilterMapper::getInstance()->findByColumn('class', TermFilter::class)->first();
+        $termFilter         = new TermFilter($termFilterInstance);
+        $filters            = new GenericCollection(IFilter::class, [$termFilter]);
 
-        // Should we include tasks?
-        $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
+        $route = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
+        $filterPanel = new FilterPanel($this->getUser(), FilterOption::PAGE_PENDING_ASSESSMENTS, $route, $filters);
 
-        $factory = new PendingFactory($viewee, $this->database, $this->externalClass, $term, $toChaseLimit, $includeTasks, $this->folderMapper);
-        $assessments = $factory->getPendingAssessments();
 
-        /**
-         * Indexed by assessment.id
-         *
-         * @var Statistics[]|GenericCollection $assessmentStatistics
-         */
-        $assessmentStatistics = new GenericCollection(Statistics::class);
-
-        /** @var Collection|IAssessable[] $assessmentsToMark */
-        $assessmentsToMark = $this->assessmentMapperProxy->createCollection();
-        foreach($assessments as $assessment){
-            $assessmentStatistics[$assessment->getId()] = new Statistics($assessment);
-            if($assessmentStatistics[$assessment->getId()]->getCountFeedbackRequired()){
-                $assessmentsToMark->add($assessment);
-            }
-        }
-        $assessmentsToMark->sortBy('dueAt', 'asc');
-
-        /** @var IAssessable[] $assessmentsToMark */
-        $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
-
-        foreach($assessments as $assessment){
-            if($assessment->getDueAt()->lt($toChaseLimit) && $assessmentStatistics[$assessment->getId()]->getCountResponseRequired()){
-                $assessmentsToChase->add($assessment);
-            }
-        }
-        $assessmentsToChase->sortBy('dueAt', 'asc');
-
-        $path = $this->request->url->get(PHP_URL_PATH);
-        $partOnePage = $this->request->query->get('p1', 1);
-        $partTwoPage = $this->request->query->get('p2', 1);
-        $url = "$path?p1=$partOnePage&p2=$partTwoPage";
-
-        // Pagination
-        $partOnePaginator = (new UrlPaginator())
-            ->setPaginator((new Paginator())->setTotal(count($assessmentsToMark))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
-            ->setUrl($url)
-            ->setParam('p1');
-        $partTwoPaginator = (new UrlPaginator())->setPaginator(
-            (new Paginator())->setTotal(count($assessmentsToChase))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
-                                                ->setUrl($url)
-                                                ->setParam('p2');
-
-        // Did user request a page that does not exist?
-        if($partOnePage < 0 || ($partOnePaginator->getPageCount() && $partOnePage > $partOnePaginator->getPageCount())){
-            throw new \DomainException("Invalid part one page: $partOnePage");
-        }
-        if($partTwoPage < 0 || ($partTwoPaginator->getPageCount() && $partTwoPage > $partTwoPaginator->getPageCount())){
-            throw new \DomainException("Invalid part two page: $partTwoPage");
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
-            'viewee'             => $viewee,
-            'statistics'         => $assessmentStatistics,
-            'assessmentsToMark'  => $assessmentsToMark,
-            'assessmentsToChase' => $assessmentsToChase,
-            'partOnePaginator'   => $partOnePaginator,
-            'partOnePage'        => $partOnePage,
-            'partTwoPaginator'   => $partTwoPaginator,
-            'partTwoPage'        => $partTwoPage,
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
+            'filterPanel'        => $filterPanel,
         ])->setTab('submission'));
     }
 

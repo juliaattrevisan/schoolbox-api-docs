@@ -8,7 +8,7 @@
 namespace Schoolbox\Filter;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter\Definition\IFilterDefinition;
+use Schoolbox\Filter\Definition\IFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Filter\Option\Model as FilterOption;
@@ -27,7 +27,7 @@ class Model
     /**
      * An instance of the filter-type-specific logic
      *
-     * @var IFilterDefinition
+     * @var IFilter
      */
     private $definition;
 

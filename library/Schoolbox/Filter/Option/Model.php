@@ -14,6 +14,13 @@ use Schoolbox\Role;
 use Schoolbox\Filter\Option\Defaults\Model as FilterDefault;
 use Schoolbox\Filter\Option\Defaults\Mapper as FilterDefaultMapper;
 
+/**
+ * FilterOptions can represent different things.
+ *
+ * They may represent a specific term, such as '2017-2' or a abstract term, eg 'current'.
+ *
+ * It is up to the FilterDefinition to interpret the meaning of the option's key. (ie it may be a model ID, or some abstract concept)
+ */
 class Model
 {
     // Pages with configurable filters
@@ -82,6 +89,24 @@ class Model
         ];
     }
 
+//
+//    /**
+//     * Get the pages this roleType can visit
+//     *
+//     * @param string $roleType
+//     * @return string[]
+//     */
+//    public static function getRoleTypePages($roleType)
+//    {
+//        $pages = [];
+//        foreach(self::getPageRoleTypes() as $page => $roleTypes){
+//            if(in_array($roleType, $roleTypes, true)){
+//                $pages[] = $roleType;
+//            }
+//        }
+//        return $pages;
+//    }
+
     use Id;
 
     /**
@@ -106,7 +131,7 @@ class Model
      * Should this option be selectable in the filter?
      * @var bool
      */
-    private $selectable;
+    private $available;
 
     /**
      * The roleType-specific defaults configured by the admin for this option
@@ -183,19 +208,19 @@ class Model
     /**
      * @return bool
      */
-    public function getSelectable()
+    public function getAvailable()
     {
-        return $this->selectable;
+        return $this->available;
     }
 
 
     /**
-     * @param bool $selectable
+     * @param bool $available
      * @return static
      */
-    public function setSelectable($selectable)
+    public function setAvailable($available)
     {
-        $this->selectable = $selectable;
+        $this->available = $available;
         return $this;
     }
 
