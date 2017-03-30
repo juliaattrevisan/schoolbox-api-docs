@@ -11,6 +11,7 @@ use Alaress\Paginator\Paginator;
 use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Mark;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
@@ -38,9 +39,11 @@ use Schoolbox\Learning\Assessment\Quiz\Model as AssessmentQuiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
 use \Alaress_Date_Format;
 
 class Controller extends Base
@@ -172,6 +175,7 @@ class Controller extends Base
      *
      * @api   GET /learning/pending
      * @level 165
+     * @throws RouteNotFound
      */
     public function getPendingAssessments()
     {
@@ -195,11 +199,17 @@ class Controller extends Base
      * @api   GET /learning/pending/:userId
      * @level 165
      * @param User $viewee The user whose pending assessments we are viewing.
+     * @throws RouteNotFound
+     * @throws ApplicationException
+     * @throws \LogicException
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws ServiceNotFound
      */
     public function getPendingAssessmentsForUser(User $viewee = null)
     {
         // No User found ?
-        if(is_null($viewee)){
+        if(null === $viewee){
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
@@ -219,7 +229,7 @@ class Controller extends Base
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
-        if($this->getUser()->getId() == $viewee->getId()){
+        if($this->getUser()->getId() === $viewee->getId()){
             $viewee = $this->getUser();
         }
 
