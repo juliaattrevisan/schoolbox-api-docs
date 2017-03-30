@@ -146,10 +146,15 @@
 
                     var $actionBar = $li.find('[data-interaction-draft]');
 
-                    $actionBar.slideUp(function () {
-                        $btnPublish.text(config.publishText);
+                    if ($actionBar.find('.component-action-info').length) {
+                        $btnPublish.text(config.publishText).addClass('hide');
                         $btnDrafted.text('');
-                    });
+                    } else {
+                        $actionBar.slideUp(function () {
+                            $btnPublish.text(config.publishText);
+                            $btnDrafted.text('');
+                        });
+                    }
 
                     // Update this participant's status
                     $li.attr('data-status', config.statusReviewed);
@@ -164,6 +169,10 @@
 
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
+
+                    // Store that this has been published in a data var, so that component info can be deleted if needed
+                    // on new feedback creation
+                    $actionBar.attr('data-published', true);
 
                     toast.call($form, 'Feedback published', true, false);
                     config.onPublishCallback();
@@ -195,6 +204,7 @@
 
             var $form = $(this).closest('form');
             $form.find('[data-interaction-draft]').slideDown();
+            $form.find('[data-interaction-draft] [data-draft=publish]').removeClass('hide');
         }
 
         /**
@@ -230,6 +240,12 @@
                 .done(function () {
                     toast.call($form, 'Draft saved', true, true);
                     $form.find('[data-draft="drafted"]').text('Saved as draft');
+
+                    // If this was just published and this is the first change afterwards - removing any info about being linked to a response & having attachments
+                    if ($form.find('[data-published="true"]').length) {
+                        $form.find('[data-feedback-attach-info]').html('');
+                        $form.find('[data-interaction-draft][data-published=true]').removeAttr('data-published');
+                    }
                 })
                 .fail(function (xhr) {
                     toast.call($form, xhr.responseText, false, false);
@@ -255,6 +271,7 @@
 
             if(openActionBar){
                 this.find('[data-interaction-draft]').slideDown();
+                this.find('[data-interaction-draft] [data-draft=publish]').removeClass('hide');
             }
         }
     }

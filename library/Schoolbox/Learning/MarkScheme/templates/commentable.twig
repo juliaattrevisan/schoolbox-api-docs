@@ -14,6 +14,7 @@
     {% set savedStatusText = 'Saved as Draft' %}
 {% else %}
     {% set actionStyle     = 'display:none;' %}
+    {% set publishHide     = 'hide' %}
     {% set publishDisabled = 'disabled="disabled"' %}
 {% endif %}
 
@@ -100,13 +101,81 @@
                 {% include 'sub/attachzone.twig' with {attachzone: feedbackAttachzone} %}
             </div>
         {% endif %}
+
+
+        {#
+        If this is the quick mark screen and there's any files, rubric marks, or crocoodoc annotated doc
+        attached to the feedback - tell the user that this feedback also includes those.
+        #}
+        {% if not inlineGrader and (latestFeedback.allFiles.count > 0 or rubricMarks[participant.user.id]) %}
+
+            {# If we're going to be displaying something here - override the hide on .component-action #}
+            {% set actionStyle = '' %}
+
+            {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
+
+            {# Check if this feedback has a crocodoc annotation attached to it #}
+            {% set hasCrocodoc = false %}
+            {% if (latestFeedback and latestFeedback.response.allFiles.count > 0) or (not latestFeedback and participant.findMostRecentResponse().allFiles.count > 0) %}
+                {% if latestFeedback %}
+                    {% set allFiles = latestFeedback.response.allFiles %}
+                {% else %}
+                    {% set allFiles = participant.findMostRecentResponse().allFiles %}
+                {% endif %}
+
+                {% for currentFile in allFiles %}
+                    {% if currentFile.crocodocId %}
+                        {% set hasCrocodoc = true %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            {# Annotated document/Crocodoc #}
+            {% if hasCrocodoc %}
+                {% set attachedMsg = attachedMsg ~ 'annotated document' %}
+            {% endif %}
+
+            {# Rubric #}
+            {% if rubricMarks[participant.user.id] %}
+                {% if hasCrocodoc and latestFeedback.allFiles.count > 0 %}
+                    {% set attachedMsg = attachedMsg ~ ', ' %}
+                {% elseif hasCrocodoc and latestFeedback.allFiles.count == 0 %}
+                    {% set attachedMsg = attachedMsg ~ ' and ' %}
+                {% endif %}
+                {% set attachedMsg = attachedMsg ~ 'rubric' %}
+            {% endif %}
+
+            {# Files #}
+            {% if latestFeedback.allFiles.count > 0 %}
+
+                {% if hasCrocodoc or rubricMarks[participant.user.id] %}
+                    {% set attachedMsg = attachedMsg ~ ' and ' %}
+                {% endif %}
+
+                {% set attachedMsg = attachedMsg ~ latestFeedback.allFiles.count ~ ' file' %}
+
+                {% if latestFeedback.allFiles.count > 1 %}
+                    {% set attachedMsg = attachedMsg ~ 's' %}
+                {% endif %}
+
+            {% endif %}
+
+            {% set attachedMsg = attachedMsg ~ '</a>.' %}
+
+        {% endif %}
+
         <div class="small-12 column no-pad">
-            <div class="component-action">
+            <div class="component-action" data-interaction-draft="{{ participant.user.id }}" {% if latestFeedback.published %}data-published="true"{% endif %} style="{{ actionStyle }}">
                 <section>
-                    <div style="{{ actionStyle }}" data-interaction-draft="{{ participant.user.id }}">
+
+                    {% if attachedMsg %}
+                        <div class="component-action-info" data-feedback-attach-info>{{ attachedMsg|capitalize|raw }}</div>
+                    {% endif %}
+
+                    <div>
                         {%- spaceless %}
                             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{{ savedStatusText }}</span>
-                            <a class="button" data-draft="publish" {{ publishDisabled }}>Publish</a>
+                            <a class="button {{ publishHide }}" data-draft="publish" {{ publishDisabled }}>Publish</a>
                         {% endspaceless -%}
                     </div>
                 </section>

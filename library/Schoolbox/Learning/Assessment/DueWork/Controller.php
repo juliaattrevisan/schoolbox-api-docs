@@ -19,7 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as File;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -139,7 +139,8 @@ class Controller extends Assessment\Controller
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
-            'download'    => $this->hasDownloadableSubmissionFiles($assessment)
+            'download'    => $this->hasDownloadableSubmissionFiles($assessment),
+            'rubricMarks' =>  Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
         ];
 
         $this->getResponse()->content->set(
@@ -178,7 +179,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var File $submission */
+        /** @var SubmissionFile $submission */
         $allResponses = $participant->getAllResponses();
 
         $twigData = [
@@ -302,7 +303,7 @@ class Controller extends Assessment\Controller
 
                     $files = $response->getAllFiles();
 
-                    /** @var File $file */
+                    /** @var SubmissionFile $file */
                     foreach ($files as $file)
                     {
                         $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
@@ -526,7 +527,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var File $submission */
+        /** @var SubmissionFile $submission */
         $allResponses = $participant->getAllResponses();
 
         /* Work out if we are going to accept responses
@@ -630,7 +631,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var File $submission */
+        /** @var SubmissionFile $submission */
         $allResponses = $participant->getAllResponses();
 
         /* Work out if we are going to accept responses

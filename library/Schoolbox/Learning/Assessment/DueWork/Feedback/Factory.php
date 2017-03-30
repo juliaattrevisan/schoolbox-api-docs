@@ -90,7 +90,7 @@ class Factory
      */
     public function __construct(
         IFeedbackDataSource $dueWorkFeedbackDataSource,
-        Participant $participant, User $currentUser, IFeedback $mostRecentFeedback,
+        Participant $participant, User $currentUser, IFeedback $mostRecentFeedback = null,
         $mark, $comment, $publish, $files,
         DueWorkResponse $response = null
     ) {

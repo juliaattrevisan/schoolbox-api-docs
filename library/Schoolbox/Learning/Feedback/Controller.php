@@ -50,11 +50,11 @@ class Controller extends Base
      */
     public function postParticipantFeedback(Participant $participant)
     {
-        $mostRecentFloatingFeedback = $this->getFloatingFeedback($participant)->first();
+        $mostRecentFeedback = $participant->findMostRecentFeedback();
         $post = $this->getRequest()->post;
 
         try {
-            $this->processFeedback($participant, $mostRecentFloatingFeedback, $post);
+            $this->processFeedback($participant, $mostRecentFeedback, $post);
             $this->processRubric($participant, $post);
         }
         catch (\RangeException $e) {
@@ -179,34 +179,6 @@ class Controller extends Base
         $this->respond('', $data, $code);
     }
 
-    /**
-     * Retrieve the floating feedback for this participant, IN REVERSE CHRONOLOGICAL ORDER
-     *
-     * @param Participant $participant
-     * @return Collection|IFeedback[]
-     */
-    protected function getFloatingFeedback(Participant $participant)
-    {
-        // obtain a reference to the most recent floating feedback
-        // TODO it would be nice to do this via SQL rather than in here, but them's the breaks
-        return $this->getFeedbackDataSource()
-            ->findForAssessment($participant->getAssessable())
-            ->filter(
-                function (IFeedback $feedback) use ($participant)
-                {
-                    if (!empty($feedback->getResponse()->getId())) {
-                        // floating feedback only
-                        return false;
-                    }
-
-                    // filter to current user only
-                    return $participant->getUser()->getId() == $feedback->getReviewee()->getId();
-                }
-            )
-            ->sortBy('updatedAt', 'desc')
-        ;
-
-    }
 
     /**
      * @param string       $template

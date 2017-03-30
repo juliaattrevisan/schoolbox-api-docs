@@ -44,6 +44,7 @@
         border-bottom: 3px solid $body-bg;
         margin: 0;
         text-align: right;
+        min-height: 2.5rem;
     }
     form{
         margin: 0;
@@ -64,6 +65,20 @@
         display: inline-block;
         margin: 0;
         padding: 0.5rem 1rem;
+    }
+    .component-action-info {
+        @extend .meta;
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.5rem 0;
+    }
+}
+
+@media #{$medium-up} {
+    .component-action .component-action-info  {
+        position: absolute;
+        left: 0.75rem;
+        top: 0.75rem;
+        padding: 0;
     }
 }
 
