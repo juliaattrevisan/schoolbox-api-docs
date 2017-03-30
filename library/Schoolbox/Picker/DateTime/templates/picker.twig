@@ -1,95 +1,3 @@
-<style>
-    .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after {
-        bottom: 0;
-    }
-    .flatpickr-calendar.inline {
-        max-height: 370px;
-        border-radius: 0;
-    }
-    .flatpickr-innerContainer{
-        border-bottom: 1px solid #e6e6e6;
-    }
-    .dateIsPicked .flatpickr-innerContainer+.flatpickr-time {
-        border-top: none;
-        border-bottom: 1px solid #e6e6e6;
-    }
-    .flatpickr-time {
-        overflow: visible;
-    }
-    .time-switch {
-        width: 100px;
-        margin: 13px 10px;
-    }
-    .has-time .time-switch {
-        opacity: 0.3;
-    }
-    .all-day .time-switch {
-        opacity: 1;
-    }
-    .flatpickr-month {
-        height: 44px;
-    }
-    .flatpickr-prev-month, .flatpickr-next-month {
-        top: 18px;
-    }
-    .flatpickr-current-month .numInputWrapper {
-        width: 70px;
-    }
-    .submit-calendar {
-        float: right;
-        margin: 5px 10px 1px;
-    }
-    table.timetablePicker {
-        padding: 0;
-        margin: 0;
-        border: 1px solid rgb(230, 230, 230);
-    }
-    table.timetablePicker td {
-        padding: 0;
-        margin: 0;
-        vertical-align: middle;
-        text-align: center;
-    }
-    table.timetablePicker tr {
-    }
-    table.timetablePicker th {
-        width: 36px;
-        height: 36px;
-        border: none;
-    }
-    .has-period {
-        width: 36px;
-        height: 36px;
-        cursor: pointer;
-        border-radius: 150px;
-        border-color: #fff;
-        border-width: 10px;
-        border: 10px solid #fff;
-    }
-    .has-period:hover, td.period-hover {
-        background: rgb(230, 230, 230);
-    }
-    .has-period.period-selected, td.period-selected {
-        background: #569ff7;
-        color: #fff;
-    }
-    table.assessment-list td {
-        border: 0;
-        line-height: 1em;
-        padding: 0.325rem;
-    }
-    a.picker-submit, a.timetable-submit {
-        margin-top: 20px;
-    }
-    input[type=radio]:not(.plain)+label.input-toggle {
-        width: 4.5em;
-    }
-    span.displayDate {
-        font-size: 0.875rem;
-        font-weight: 400;
-        color: #000;
-    }
-</style>
 {#<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />#}
 {#<script type="text/javascript" src="/javascript/components/fullcalendar/dist/fullcalendar.js"></script>#}
 {#<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={SITE_VERSION}"></script>#}
@@ -216,11 +124,12 @@
                         {# Build all, hide, reveal one later #}
                         {% for campus in timetable %}
                             <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
-                                <th>
-                                    {% for i in 1..timetable[campus.campusId].dayCount %}
-                                <td class="day-{{ i }}">{{ i }}</td>
+                                <tr>
+                                    <th>Day</th>
+                                {% for i in 1..timetable[campus.campusId].dayCount %}
+                                    <th class="day-{{ i }}">{{ i }}</th>
                                 {% endfor %}
-                                </th>
+                                </tr>
                                 {% set k=0 %}
                                 {% for description in timetable[campus.campusId].desc %}
                                     <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k] }}">{{ description }}</td>
