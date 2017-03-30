@@ -60,11 +60,9 @@ class SubmissionMapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('box_id', 'b')},
-                {$this->getJoinColumnString('files', 'f')}
+                {$this->getJoinColumnString('box_id', 'b')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('box_id', '', 'b')}
-            LEFT JOIN {$this->getJoinSql('files', '', 'f')}
         ";
     }
 
@@ -76,36 +74,43 @@ class SubmissionMapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Collection|Submission[] $submissions */
-        $submissions = $this->createCollection();
+        /** @var Collection|Submission[] $resultSet */
+        $resultSet = $this->createCollection();
+        $ids       = [];
 
         // Default hydration
-        $submission = null;
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        foreach ($statement as $row) {
+            $result = $this->hydrate($row);
+            $ids[]  = $result->getId();
 
-            // First time we've seen this submission ?
-            if(!$submissions->offsetExists($row[$this->getIdentifierColumn()])){
-                $submission = $this->hydrate($row);
-                // I should never need to know the student's specifics here,
-                // because this object should always be part of a participant's
-                // response or feedback.
+            // I should never need to know the student's specifics here,
+            // because this object should always be part of a participant's
+            // response or feedback.
 
-                // Try to streamline duework+assessment creation too
-                /** @var SubmissionBox $dueWork */
-                $dueWork = $this->createJoinModel('box_id', $row['b.id']);
-                $dueWork->setAssessmentModel($this->createJoinModel('box_id.assessmentModel', $row['b.assessment_id']));
-                $submission->setSubmissionBox($dueWork);
+            // Try to streamline duework+assessment creation too
+            /** @var SubmissionBox $dueWork */
+            $dueWork = $this->createJoinModel('box_id', $row['b.id']);
+            $dueWork->setAssessmentModel($this->createJoinModel('box_id.assessmentModel', $row['b.assessment_id']));
 
-                $submissions->setOffset($submission->getId(), $submission);
-            }
-
-            // Hydrate files
-            if(null !== $row['f.id']){
-                $submission->getFiles()->add($this->hydrateJoin($row, 'files', 'f'));
-            }
+            $resultSet->add(
+                $result
+                    ->setSubmissionBox($dueWork)
+            );
         }
 
-        return $submissions;
+        // Fetch and hydrate files
+        $files = $this->getJoinMapper('files')
+            ->findByColumn('student_submission_id', $ids)
+            ->groupByCallback(function($f) {
+                /** @var SingleFile\Model $f */
+                return $f->getSubmission()->getId();
+            });
+        foreach ($resultSet as $result) {
+            if (isset($files[$result->getId()])) {
+                $result->setFiles($files[$result->getId()]);
+            }
+        }
+        return $resultSet;
     }
 
 
