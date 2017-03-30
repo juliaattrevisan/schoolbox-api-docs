@@ -10,6 +10,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
+use Schoolbox\Filter\Module as FilterModule;
 
 class Admin implements ModuleConfigInterface
 {
@@ -105,5 +106,9 @@ class Admin implements ModuleConfigInterface
         // Video Queue
         $video = new \Schoolbox\Admin\Video\Module($di);
         $video->init('/adminv2/video');
+
+        // Filters
+        $filters = new FilterModule($di);
+        $filters->init('/adminv2/filters');
     }
 } 

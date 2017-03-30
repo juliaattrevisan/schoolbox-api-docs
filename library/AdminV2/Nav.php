@@ -35,6 +35,7 @@ class AdminV2_Nav
         'ups'              => 'User Provisioning System',
         'video'            => 'Media Queue',
         'import'           => 'Import',
+        'filters'          => 'Filters',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')

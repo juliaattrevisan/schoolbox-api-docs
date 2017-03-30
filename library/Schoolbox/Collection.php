@@ -732,7 +732,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      * Groups all results by a field value.
      *
      * @param  string $field The field to search by.
-     * @return static|static[] @see $this->groupByCallback()
+     * @return Collection|static[] @see $this->groupByCallback()
      */
     public function groupBy($field)
     {

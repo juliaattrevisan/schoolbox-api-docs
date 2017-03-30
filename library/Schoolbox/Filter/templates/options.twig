@@ -1,0 +1,87 @@
+{#
+Displays all possible options for a Filter and enables the admin to configure
+which options should be selectable by users.
+
+Usage:
+    filter                 Filter
+    definition             IFilterDefinition
+    availableFilterOptions FilterOption[]
+    filterKeys             string[]
+#}
+
+{% set saveButtonId = 'save_button' %}
+{% set optionsTableId = 'options_table' %}
+
+<script type="text/javascript">
+    $(function() {
+
+        var $saveButton = $('#{{ saveButtonId }}');
+        var $optionsTable = $('#{{ optionsTableId }}');
+
+        $saveButton.on('click', function(event){
+            event.preventDefault();
+            $saveButton.attr('disabled', true);
+
+            var data = $optionsTable.find('input[type=checkbox]').serialize();
+            var href = $saveButton.data('href');
+
+            // TODO display a toast
+            $.post(href, data)
+                .done(function() {
+                    $saveButton.attr('disabled', false);
+                });
+        });
+
+    });
+</script>
+
+<div class="row">
+    <div class="small-12">
+    {{ renderAdminNavigation(pageCurrent) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        <h1>Available {{ definition.title }} options</h1>
+        <p>Select which options should be displayed for this filter.</p>
+        <p>{{ definition.AdminDescription }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        <table id="{{ optionsTableId }}">
+            <tr>
+                <th></th>
+                {% for page in definition.pages %}
+                    <th>{{ page }}</th>
+                {% endfor %}
+            </tr>
+            {% for key, option in availableFilterOptions %}
+            <tr>
+                <td>{{ definition.label(key) }}</td>
+                {% for page in definition.pages %}
+                    <td>
+                        <input
+                            id="checkbox_{{ key }}_{{ page }}"
+                            type="checkbox"
+                            name="filter_option[{{ key }}][{{ page }}]"
+                            {% if availableFilterOptions[key][page].selectable %}checked{% endif %}>
+                        <label for="checkbox_{{ key }}_{{ page }}" class="checkbox-label"></label>
+                    </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <input type="submit" id="{{ saveButtonId }}" value="Save Options" data-href="{{ routeLookup('filters.postSaveOptions', { filter: filter.id }) }}">
+        </section>
+    </div>
+</div>

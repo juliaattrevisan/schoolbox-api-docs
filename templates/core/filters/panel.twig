@@ -1,0 +1,14 @@
+{#
+Displays a filters panel, containing 1 or more filters.
+
+Usage:
+    ajax:     bool     - whether the filters require a server call to get a new data set, or to filter client-side using JS.
+                         For pages where the entire data-set is small and quick to build, it is preferred to send all data
+                         to client and have filters applied by JS. For longer requests (eg 'Pending Assessments' on SB Help),
+                         the server generates the final HTML each time.
+    fillters: Filter[][] - Key value pairs of filter option
+
+#}
+
+<script type="text/javascript" src="/javascript/shared/jquery.filters.js"></script>
+<div></div>
