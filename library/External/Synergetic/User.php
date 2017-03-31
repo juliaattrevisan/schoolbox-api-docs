@@ -702,38 +702,6 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    protected function findFileYearAndSemester($externalUserId = null)
-    {
-        if ($externalUserId) {
-            if (!$this->isExternalIdValid($externalUserId)) {
-                return [];
-            }
-            $statement = $this->getConnector()->prepareProcedure('spsConfigUserDefaultYearSemester');
-            $statement->bindInputs(['ID' => $externalUserId]);
-            $statement->execute();
-
-            if ($row = $statement->fetch()) {
-                return array(
-                    'year' => $row['UserFileYear'],
-                    'semester' => $row['UserFileSemester'],
-                );
-            }
-        }
-        // Get current FileSemester and FileYear
-        $query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1";
-        if ($semester = $this->getConnector()->getRow($query)) {
-            return array(
-                'year' => $semester['FileYear'],
-                'semester' => $semester['FileSemester'],
-            );
-        } else {
-            return array();
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getCurrentSemester($externalUserId = null)
     {
         $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
