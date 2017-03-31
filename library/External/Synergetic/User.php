@@ -138,7 +138,7 @@ class External_Synergetic_User implements External_UserInterface
         // Try and fetch the requested parent
 
         if ($parent = $parentQuery->fetch()) {
-            return $parent;
+            return $this->clearInvalidValues($parent);
         }
 
         // Couldn't find the parent
@@ -183,12 +183,16 @@ class External_Synergetic_User implements External_UserInterface
         // iterator, but that would require refactoring the old sync scripts which is a glorious waste of energy
 
         if (count($synID) > 1) {
-            return $queryParents->fetchAll();
+            return $this->clearInvalidValues(
+                $queryParents->fetchAll()
+            );
         }
 
         // If there are multiple parents requested return the results in an array
 
-        return $queryParents->fetch();
+        return  $this->clearInvalidValues(
+            $queryParents->fetch()
+        );
     }
 
     /**
@@ -359,11 +363,7 @@ class External_Synergetic_User implements External_UserInterface
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
 
-        $student = array_map(function($value) {
-            return trim(str_replace('Not Selected', '', $value));
-        }, $student);
-
-        return $student;
+        return $this->clearInvalidValues($student);
     }
 
     /**
@@ -400,154 +400,176 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
-        $query = "
-            SELECT
-                StudentID,
-                StudentGiven1,
-                StudentSurname,
-                StudentYearLevel,
-                House.Description AS StudentHouse,
-                StudentBoarder,
-                StudentForm,
-                StudentContactID,
-                StudentContactTitle,
-                StudentContactPreferred,
-                StudentContactLegalFullName,
-                StudentContactSurname,
-                StudentContactDefaultEmail,
-                vStudentContactAllAddress.ValidAddressFlag,
-                StudentContactAddress1,
-                StudentContactAddress2,
-                StudentContactAddress3,
-                StudentContactSuburb,
-                StudentContactPostCode,
-                StudentContactState,
-                StudentCountry.Description AS StudentContactCountryCode,
-                StudentContactHomeAddress1,
-                StudentContactHomeAddress2,
-                StudentContactHomeAddress3,
-                StudentContactHomeSuburb,
-                StudentContactHomePostCode,
-                StudentContactHomeState,
-                StudentCountry.Description AS StudentContactHomeCountryCode,
-                StudentContactPhoneActual,
-                StudentContactMobilePhone,
-                StudentContactOccupPhone,
-                StudentContactSpouseID,
-                StudentContactSpouseTitle,
-                StudentContactSpousePreferred,
-                StudentContactSpouseLegalFullName,
-                StudentContactSpouseSurname,
-                StudentContactSpouseMobilePhone,
-                StudentContactSpouseOccupPhone,
-                StudentContactSpouseDefaultEmail,
-                StudentContactType,
-                StudentContactSilentPhoneFlag,
-                Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
-                Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
-                Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-                ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
-                StudentParentsSeparatedFlag
-            FROM dbo.vStudentContactAllAddress
-            LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
-            LEFT JOIN dbo.Addresses ContactAddress ON Contact.AddressID = ContactAddress.AddressID
-            LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-            LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus
-                AND StudentHouse = House.Code
-            LEFT JOIN dbo.luYearLevel Year ON StudentYearLevel = Year.Code
-                AND StudentCampus = Year.Campus
-            LEFT JOIN dbo.luCountry StudentCountry
-                ON StudentContactCountryCode = StudentCountry.Code
-            LEFT JOIN dbo.luCountry StudentHomeCountry
-                ON StudentContactHomeCountryCode = StudentHomeCountry.Code
-            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
-            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'";
-        /* Search for a particular year level
-         */
-        if (strlen($yearlevel)) {
-            if (is_numeric($yearlevel)) {
-                $query .= "
-                AND (StudentYearLevel = '{$this->quote($yearlevel)}'
-                     OR Year.Description = '{$this->quote($yearlevel)}')";
+        // We have to dynamically bind filter parameters here based on the users input
+
+        $filters = '';
+        $bindings = [];
+
+        // Search for a particular year level
+
+        if (!empty($yearLevel)) {
+
+            $bindings['yearDescription'] = $yearLevel;
+
+            if (is_numeric($yearLevel)) {
+
+                $bindings['yearLevel'] = $yearLevel;
+
+                $filters .= " AND (
+                    Year.Description = :yearDescription OR
+                    StudentYearLevel = :yearLevel
+                    )
+                ";
+
             } else {
-                // if year is NOT numeric, don't attempt to compare StudentYearLevel (will bug out)
-                $query .= "
-                AND Year.Description = '{$this->quote($yearlevel)}'";
+
+                // If the year is not numeric, don't attempt to compare to StudentYearLevel
+                // or the query will bug out
+
+                $filters .= " AND Year.Description = :yearDescription";
             }
         }
-        /* Search for a student name
-         */
-        if (strlen($name)) {
+
+        if (!empty($name)) {
 
             $splitNames = explode(' ', $name);
 
+            $count = 1;
+
             foreach ($splitNames as $splitName) {
-                $splitName = $this->quote($splitName);
-                $query .= "
-                    AND (
-                        (StudentSurname LIKE '%{$splitName}%')
-                        OR
-                        (StudentGiven1 LIKE '%{$splitName}%')
-                    )
-                ";
+
+                $keyGiven = "nameGiven{$count}";
+                $bindings[$keyGiven] = "%{$splitName}%";
+
+                $keySurname = "nameSurname{$count}";
+                $bindings[$keySurname] = "%{$splitName}%";
+
+                $filters .= " AND (StudentSurname LIKE :{$keySurname} OR StudentGiven1 LIKE :{$keyGiven})";
+
+                $count++;
             }
         }
-        /* Search for a particular boarding status
-         *
-         * In Synergetic, assume the following:
-         * B: Boarder
-         * D: Day student
-         * HS: Home stay
-         */
-        if ($boardingStatus == '') {
-            /* No restrictions on result set
-             */
-        } elseif ($boardingStatus == 'yes') {
-            $query .= "
-                AND StudentBoarder = 'B'
-            ";
+
+        // Boarder search ('B' = Boarder, 'D' = Day Student, 'HS' = Home Stay)
+
+        if ($boardingStatus == 'yes') {
+            $filters .= " AND StudentBoarder = 'B'";
         } else {
-            $query .= "
-                AND StudentBoarder != 'B'
-            ";
+            $filters .= " AND StudentBoarder != 'B'";
         }
-        /* Search for a particular form
-         */
-        if ($form) {
-            $form = $this->quote($form);
-            $query .= "
-                AND StudentForm = '{$form}'
-            ";
+
+        // Search for a particular form
+
+        if (!empty($form)) {
+            $bindings['form'] = $form;
+            $filters .= " AND StudentForm = :form";
         }
-        $query .= "
-            ORDER BY StudentSurname, StudentID, StudentContactType
+
+        // Now can build the query string
+
+        $query = "
+            SELECT      StudentID,
+                        StudentGiven1,
+                        StudentSurname,
+                        StudentYearLevel,
+                        House.Description AS StudentHouse,
+                        StudentBoarder,
+                        StudentForm,
+                        StudentContactID,
+                        StudentContactTitle,
+                        StudentContactPreferred,
+                        StudentContactLegalFullName,
+                        StudentContactSurname,
+                        StudentContactDefaultEmail,
+                        vStudentContactAllAddress.ValidAddressFlag,
+                        StudentContactAddress1,
+                        StudentContactAddress2,
+                        StudentContactAddress3,
+                        StudentContactSuburb,
+                        StudentContactPostCode,
+                        StudentContactState,
+                        StudentCountry.Description AS StudentContactCountryCode,
+                        StudentContactHomeAddress1,
+                        StudentContactHomeAddress2,
+                        StudentContactHomeAddress3,
+                        StudentContactHomeSuburb,
+                        StudentContactHomePostCode,
+                        StudentContactHomeState,
+                        StudentCountry.Description AS StudentContactHomeCountryCode,
+                        StudentContactPhoneActual,
+                        StudentContactMobilePhone,
+                        StudentContactOccupPhone,
+                        StudentContactSpouseID,
+                        StudentContactSpouseTitle,
+                        StudentContactSpousePreferred,
+                        StudentContactSpouseLegalFullName,
+                        StudentContactSpouseSurname,
+                        StudentContactSpouseMobilePhone,
+                        StudentContactSpouseOccupPhone,
+                        StudentContactSpouseDefaultEmail,
+                        StudentContactType,
+                        StudentContactSilentPhoneFlag,
+                        Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
+                        Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
+                        Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+                        ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
+                        StudentParentsSeparatedFlag
+            FROM        dbo.vStudentContactAllAddress
+            LEFT JOIN   dbo.Community Contact ON StudentContactID = Contact.ID
+            LEFT JOIN   dbo.Addresses ContactAddress ON Contact.AddressID = ContactAddress.AddressID
+            LEFT JOIN   dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+            LEFT JOIN   dbo.luHouse House ON StudentCampus = House.Campus AND
+                        StudentHouse = House.Code
+            LEFT JOIN   dbo.luYearLevel Year ON StudentYearLevel = Year.Code AND
+                        StudentCampus = Year.Campus
+            LEFT JOIN   dbo.luCountry StudentCountry ON StudentContactCountryCode = StudentCountry.Code
+            LEFT JOIN   dbo.luCountry StudentHomeCountry ON StudentContactHomeCountryCode = StudentHomeCountry.Code
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
+                            Semester.FileYear = vStudentContactAllAddress.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            WHERE       StudentContactType IN ('SC1', 'SC2', 'SC3')
+                        {$filters}
+            ORDER BY    StudentSurname, 
+                        StudentID, 
+                        StudentContactType
+                        
         ";
 
-        $contactList = $this->getConnector()->getAll($query) ?: array();
-        foreach ($contactList as &$row) {
-            if ($row['ValidAddressFlag'] == 0 || $row['SilentHomeAddressFlag'] == 1) {
-                $row['StudentContactAddress1'] = '';
-                $row['StudentContactAddress2'] = '';
-                $row['StudentContactAddress3'] = '';
-                $row['StudentContactSuburb'] = '';
-                $row['StudentContactPostCode'] = '';
-                $row['StudentContactState'] = '';
-                $row['StudentContactCountryCode'] = '';
-                $row['StudentContactHomeAddress1'] = '';
-                $row['StudentContactHomeAddress2'] = '';
-                $row['StudentContactHomeAddress3'] = '';
-                $row['StudentContactHomeSuburb'] = '';
-                $row['StudentContactHomePostCode'] = '';
-                $row['StudentContactHomeState'] = '';
-                $row['StudentContactHomeCountryCode'] = '';
+        // Now that we have created the query, time to shove it across to the database with
+        // the appropriate parameters
+
+        $iteratorContacts = $this->getConnector()->executeQueryIterator($query, $bindings);
+
+        $contactList = [];
+
+        foreach ($iteratorContacts as $contact) {
+
+            // Remove invalid and silent contact details
+
+            if ($contact['ValidAddressFlag'] == 0 || $contact['SilentHomeAddressFlag'] == 1) {
+                $contact['StudentContactAddress1'] = '';
+                $contact['StudentContactAddress2'] = '';
+                $contact['StudentContactAddress3'] = '';
+                $contact['StudentContactSuburb'] = '';
+                $contact['StudentContactPostCode'] = '';
+                $contact['StudentContactState'] = '';
+                $contact['StudentContactCountryCode'] = '';
+                $contact['StudentContactHomeAddress1'] = '';
+                $contact['StudentContactHomeAddress2'] = '';
+                $contact['StudentContactHomeAddress3'] = '';
+                $contact['StudentContactHomeSuburb'] = '';
+                $contact['StudentContactHomePostCode'] = '';
+                $contact['StudentContactHomeState'] = '';
+                $contact['StudentContactHomeCountryCode'] = '';
             }
-            $row['StudentContactHomeCountryCode']
-                = $row['StudentContactHomeCountryCode'] == 'Not Selected' ? '' : $row['StudentContactHomeCountryCode'];
-            $row['StudentContactCountryCode']
-                = $row['StudentContactCountryCode'] == 'Not Selected' ? '' : $row['StudentContactCountryCode'];
+
+            $contactList[] = $this->clearInvalidValues($contact);
         }
-        return $contactList;
+
+        // Return the cleaned up list of contacts
+
+        return $this->clearInvalidValues($contactList);
     }
 
     /**
@@ -1104,5 +1126,26 @@ class External_Synergetic_User implements External_UserInterface
             WHERE ActiveFlag = 1
         ";
         return $this->getConnector()->getAll($query);
+    }
+
+    /**
+     * This is a helper function to clear the 'Not Selected' placeholder value that
+     * Synergetic loves to add as an option in every lookup table
+     *
+     * @param array $array
+     * @param string $placeholder
+     * @return array
+     */
+    private function clearInvalidValues($array, $placeholder = 'Not Selected')
+    {
+        // Remove the 'Not Selected' Synergetic placeholder value
+
+        return array_map(function($value) use ($placeholder) {
+            if (is_array($value)) {
+                return $this->clearInvalidValues($value);
+            } else {
+                return trim(str_replace($placeholder, '', $value));
+            }
+        }, $array);
     }
 }
