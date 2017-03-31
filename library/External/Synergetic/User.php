@@ -6,6 +6,7 @@
  */
 
 use Schoolbox\External\DatabaseMSSQLConnectorTrait;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
@@ -153,23 +154,41 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        if (is_array($synID)) {
-            $assignation = " IN ('" . implode("','", array_map([$this->database, 'quote'], $synID)) . "')";
-        } else {
-            $assignation = " =  '" . $this->database->quote($synID) . "'";
+
+        // Coalesce non array inputs into an array just to make this easier
+
+        if (!is_array($synID)) {
+            $synID = [$synID];
         }
-        $query = "
-            SELECT
-                ID, Title,
-                Preferred, Surname,
-                Email, OccupEmail, DefaultEmailCode,
-                DirectoryIncludeFlag
-            FROM dbo.Community
-            WHERE ID $assignation";
-        if (is_array($synID)) {
-            return $this->getConnector()->getAll($query);
+
+        $externalIdBindings = PredicateBuilder::getArrayBindings($synID, 'externalId');
+
+        $query =
+        "
+            SELECT        ID, 
+                          Title,
+                          Preferred, 
+                          Surname,
+                          Email, 
+                          OccupEmail, 
+                          DefaultEmailCode,
+                          DirectoryIncludeFlag
+            FROM          dbo.Community
+            WHERE         ID IN ({$externalIdBindings['placeholders']})
+        ";
+
+        $queryParents = $this->getConnector()->executeQuery($query, $externalIdBindings['bindings']);
+
+        // If multiple parents were requested return the results in an array. This should be replaces with an
+        // iterator, but that would require refactoring the old sync scripts which is a glorious waste of energy
+
+        if (count($synID) > 1) {
+            return $queryParents->fetchAll();
         }
-        return $this->getConnector()->getRow($query);
+
+        // If there are multiple parents requested return the results in an array
+
+        return $queryParents->fetch();
     }
 
     /**
