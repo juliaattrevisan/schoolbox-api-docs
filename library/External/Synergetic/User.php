@@ -256,92 +256,110 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        $currentYear = $this->getCurrentYear();
-        $currentSemester = $this->getCurrentSemester();
-        $query = "SELECT
-                    vStudents.StudentID,
-                    vStudents.StudentGiven1,
-                    vStudents.StudentSurname,
-                    vStudents.StudentBirthDate,
-                    vStudents.StudentTutorName,
-                    vStudents.StudentHeadOfHouse,
-                    House.HeadOfHouseID,
-                    vStudents.StudentFormStaffName,
-                    vStudents.StudentTutorDescription,
-                    luForm.ID AS TeacherFormID,
-                    vStudents.StudentForm,
-                    luTutor.ID AS TeacherTutorID,
-                    vStudents.StudentTutor,
-                    luForm.Description AS FormDescription,
-                    vStudents.StudentHouseDescription,
-                    vStudents.StudentHouse,
-                    vStudents.StudentYearLevel,
-                    vStudents.StudentYearLevelCoordinator,
-                    luYearLevel.YearLevelCoordID,
-                    vStudents.StudentLockerBook,
-                    vStudents.StudentEmergencyName,
-                    vStudents.StudentEmergencyPhone,
-                    vStudents.StudentEmergencyPhoneAlt,
-                    vStudents.StudentEmergency2Name,
-                    vStudents.StudentEmergency2Phone,
-                    vStudents.StudentEmergency2PhoneAlt,
-                    vStudents.StudentEmergency3Name,
-                    vStudents.StudentEmergency3Phone,
-                    vStudents.StudentEmergency3PhoneAlt,
-                    vStudents.StudentMedicalAlert,
-                    vStudents.StudentSpecialNeedsFlag,
-                    vStudents.StudentStudiesCode,
-                    AlertMessage,
-                    vStudents.StudentBoarder,
-                    vStudents.StudentsComment as Comment
-                FROM dbo.vStudents vStudents
-                    LEFT JOIN CommunityAlerts
-                        ON CommunityAlerts.ID = StudentID
-                        AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS DATE))
-                        AND (CommunityAlerts.AlertDateTo IS NULL OR CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE))
-                    LEFT JOIN luForm ON vStudents.StudentForm = luForm.Code
-                    LEFT JOIN luTutor ON vStudents.StudentTutor = luTutor.Code
-                    LEFT JOIN luYearLevel ON vStudents.StudentCampus = luYearLevel.Campus
-                        AND vStudents.StudentYearLevel = luYearLevel.Code
-                    LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
-                WHERE
-                    vStudents.StudentID = '" . $this->database->quote($synID) . "'
-                    AND vStudents.FileSemester='" . $this->database->quote($currentSemester) . "'
-                    AND vStudents.FileYear='" . $this->database->quote($currentYear) . "'
+
+        $query =
+        "
+            SELECT      vStudents.StudentID,
+                        vStudents.StudentGiven1,
+                        vStudents.StudentSurname,
+                        vStudents.StudentBirthDate,
+                        vStudents.StudentTutorName,
+                        vStudents.StudentHeadOfHouse,
+                        House.HeadOfHouseID,
+                        vStudents.StudentFormStaffName,
+                        vStudents.StudentTutorDescription,
+                        luForm.ID AS TeacherFormID,
+                        vStudents.StudentForm,
+                        luTutor.ID AS TeacherTutorID,
+                        vStudents.StudentTutor,
+                        luForm.Description AS FormDescription,
+                        vStudents.StudentHouseDescription,
+                        vStudents.StudentHouse,
+                        vStudents.StudentYearLevel,
+                        vStudents.StudentYearLevelCoordinator,
+                        luYearLevel.YearLevelCoordID,
+                        vStudents.StudentLockerBook,
+                        vStudents.StudentEmergencyName,
+                        vStudents.StudentEmergencyPhone,
+                        vStudents.StudentEmergencyPhoneAlt,
+                        vStudents.StudentEmergency2Name,
+                        vStudents.StudentEmergency2Phone,
+                        vStudents.StudentEmergency2PhoneAlt,
+                        vStudents.StudentEmergency3Name,
+                        vStudents.StudentEmergency3Phone,
+                        vStudents.StudentEmergency3PhoneAlt,
+                        vStudents.StudentMedicalAlert,
+                        vStudents.StudentSpecialNeedsFlag,
+                        vStudents.StudentStudiesCode,
+                        AlertMessage,
+                        vStudents.StudentBoarder,
+                        vStudents.StudentsComment as Comment
+            FROM        dbo.vStudents vStudents
+            LEFT JOIN   CommunityAlerts ON 
+                            CommunityAlerts.ID = StudentID AND 
+                            (
+                                CommunityAlerts.AlertDateFrom IS NULL OR 
+                                CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS DATE)
+                            ) AND 
+                            (
+                                CommunityAlerts.AlertDateTo IS NULL OR 
+                                CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE)
+                            )
+            LEFT JOIN   luForm ON vStudents.StudentForm = luForm.Code
+            LEFT JOIN   luTutor ON vStudents.StudentTutor = luTutor.Code
+            LEFT JOIN   luYearLevel ON 
+                            vStudents.StudentCampus = luYearLevel.Campus AND 
+                            vStudents.StudentYearLevel = luYearLevel.Code
+            LEFT JOIN   luHouse House ON 
+                            StudentCampus = House.Campus AND 
+                            StudentHouse = House.Code
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudents.FileSemester AND
+                            Semester.FileYear = vStudents.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            WHERE       vStudents.StudentID = :externalId
         ";
 
         $student = [];
 
-        foreach ($this->getConnector()->getAll($query) ?: array() as $row) {
+        $iteratorStudents = $this->getConnector()->executeQueryIterator($query, ['externalId' => $synID]);
+
+        foreach ($iteratorStudents as $row) {
+
+            // There might be multiple records, if this is the first one populate the bulk of the details
+
             if (empty($student)) {
-                // fill in student record
+
                 $student = $row;
 
-                if ($student['StudentBirthDate']
-                    && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
-                ) {
-                    $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+                if ($student['StudentBirthDate'] && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
+                    $student['StudentBirthDate'] = strtotime("{$matches[2]} {$matches[1]} {$matches[3]}");
                 } else {
                     $student['StudentBirthDate'] = false;
                 }
-                $student['AlertMessage'] = array($student['AlertMessage']);
+
+                $student['AlertMessage'] = [
+                    $student['AlertMessage']
+                ];
+
             } else {
-                // join subsequent alerts
+
+                // Additional records will only different by their alert message, we just append these to the
+                // existing student record
+
                 $student['AlertMessage'][] = $row['AlertMessage'];
             }
         }
 
-        /* Implode with newlines if you were returned a list of
-         * AlertMessages to join - otherwise do nothing to it
-         */
+        // Implode all of the alert messages down to a single message seperate by line breaks
+
         if (!empty($student) && is_array($student['AlertMessage'])) {
-            $student['AlertMessage'] = implode(
-                "\n",
-                array_unique(array_filter($student['AlertMessage']))
-            );
+            $student['AlertMessage'] = implode("\n", array_unique(array_filter($student['AlertMessage'])));
         }
 
-        $student = array_map(function ($value) {
+        // Remove Synergetic's annoying 'Not Selected' default value for lookups
+
+        $student = array_map(function($value) {
             return trim(str_replace('Not Selected', '', $value));
         }, $student);
 
