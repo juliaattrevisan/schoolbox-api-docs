@@ -196,40 +196,55 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParentEmails($synergyIds)
     {
-        $emailList = array();
-        $id_list = implode(',', array_map([$this->getConnector(), 'smartQuote'], $synergyIds));
-        if (empty($id_list)) {
-            return array();
+        if (!$this->isExternalIdValid($synergyIds)) {
+            return [];
         }
-        $query = "
-            SELECT
-                RelatedID,UseEmail,OccupEmail,Email,DefaultEmail
-            FROM
-                dbo.RelationShips r
-                JOIN dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
-            WHERE
-                r.ID IN ($id_list)";
-        $statement = $this->getConnector()->query($query);
-        while ($row = $statement->fetch()) {
-            switch (strtoupper($row['UseEmail'])) {
-                case 'O': //Use occupation email address
-                    $emailList[$row['RelatedID']] = $row['OccupEmail'];
-                    break;
-                case 'P': //Use personal email address
-                    $emailList[$row['RelatedID']] = $row['Email'];
-                    break;
-                case 'D': //Use default email address
-                    if (trim($row['DefaultEmail']) != '') {
-                        $defaultEmail = explode(';', $row['DefaultEmail']);
-                        foreach ($defaultEmail as $key => $email) {
-                            $emailList[$row['RelatedID'] . '-' . $key] = $email;
-                        }
-                    }
-                    break;
-                default:
-                    break;
+
+        // Coalesce non array inputs into an array just to make this easier
+
+        if (!is_array($synergyIds)) {
+            $synergyIds = [$synergyIds];
+        }
+
+        $externalIdBindings = PredicateBuilder::getArrayBindings($synergyIds, 'externalId');
+
+        $query =
+        "
+            SELECT DISTINCT RelatedID,
+                        CASE 
+                            WHEN UseEmail = 'O' THEN OccupEmail
+                            WHEN UseEmail = 'P' THEN Email
+                            WHEN UseEmail = 'D' THEN DefaultEmail
+                            ELSE ''
+                        END AS Email
+            FROM        dbo.RelationShips r
+            JOIN        dbo.vCommunityAddresses ON RelatedID = vCommunityAddresses.ID
+			WHERE		CASE 
+                            WHEN UseEmail = 'O' THEN OccupEmail
+                            WHEN UseEmail = 'P' THEN Email
+                            WHEN UseEmail = 'D' THEN DefaultEmail
+                            ELSE ''
+                        END <> '' AND
+                        r.ID IN ({$externalIdBindings['placeholders']})
+        ";
+
+        $iteratorParents = $this->getConnector()->executeQueryIterator($query, $externalIdBindings['bindings']);
+
+        $emailList = [];
+
+        foreach ($iteratorParents as $parent) {
+
+            $emailArray = explode(';', $parent['Email']);
+
+            if (count($emailArray) > 0) {
+                foreach ($emailArray as $key => $email) {
+                    $emailList["{$parent['RelatedID']}-{$key}"] = $email;
+                }
+            } else {
+                $emailList[$parent['RelatedID']] = $parent['Email'];
             }
         }
+
         return $emailList;
     }
 
