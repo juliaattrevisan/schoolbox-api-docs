@@ -638,57 +638,65 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
-        $query = "
-            SELECT
-                a.StudentContactID,
-                a.StudentContactTitle,
-                a.StudentContactPreferred,
-                a.StudentContactSurname,
-                a.StudentContactDefaultEmail,
-                a.ValidAddressFlag,
-                a.StudentContactAddress1,
-                a.StudentContactAddress2,
-                a.StudentContactAddress3,
-                a.StudentContactSuburb,
-                a.StudentContactPostCode,
-                a.StudentContactState,
-                a.StudentContactPhoneActual,
-                a.StudentContactMobilePhone,
-                a.StudentContactOccupPhone,
-                a.StudentContactRelation,
-                a.StudentContactSpouseID,
-                a.StudentContactSpouseTitle,
-                a.StudentContactSpousePreferred,
-                a.StudentContactSpouseSurname,
-                a.StudentContactSpouseMobilePhone,
-                a.StudentContactSpouseOccupPhone,
-                a.StudentContactSpouseDefaultEmail,
-                a.StudentContactType,
-                a.StudentContactSpouseRelation,
-                r.UseEmail as StudentContactUseEmail,
-                rs.UseEmail as StudentContactSpouseUseEmail
-                
-            FROM dbo.vStudentContactAllAddress a
-            LEFT JOIN Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
-            LEFT JOIN Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID
-            
-            WHERE
-                StudentID = '$externalUserId'
-                AND StudentContactType IN ('SC1', 'SC2', 'SC3')
-                AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-                AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'";
-        $contactList = $this->getConnector()->getAll($query) ?: array();
-        foreach ($contactList as &$row) {
-            if ($row['ValidAddressFlag'] == 0) {
-                $row['StudentContactAddress1'] = '';
-                $row['StudentContactAddress2'] = '';
-                $row['StudentContactAddress3'] = '';
-                $row['StudentContactSuburb'] = '';
-                $row['StudentContactPostCode'] = '';
-                $row['StudentContactState'] = '';
+
+        $query =
+        "
+            SELECT          a.StudentContactID,
+                            a.StudentContactTitle,
+                            a.StudentContactPreferred,
+                            a.StudentContactSurname,
+                            a.StudentContactDefaultEmail,
+                            a.ValidAddressFlag,
+                            a.StudentContactAddress1,
+                            a.StudentContactAddress2,
+                            a.StudentContactAddress3,
+                            a.StudentContactSuburb,
+                            a.StudentContactPostCode,
+                            a.StudentContactState,
+                            a.StudentContactPhoneActual,
+                            a.StudentContactMobilePhone,
+                            a.StudentContactOccupPhone,
+                            a.StudentContactRelation,
+                            a.StudentContactSpouseID,
+                            a.StudentContactSpouseTitle,
+                            a.StudentContactSpousePreferred,
+                            a.StudentContactSpouseSurname,
+                            a.StudentContactSpouseMobilePhone,
+                            a.StudentContactSpouseOccupPhone,
+                            a.StudentContactSpouseDefaultEmail,
+                            a.StudentContactType,
+                            a.StudentContactSpouseRelation,
+                            r.UseEmail AS StudentContactUseEmail,
+                            rs.UseEmail AS StudentContactSpouseUseEmail                
+            FROM            dbo.vStudentContactAllAddress a
+            LEFT JOIN       Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
+            LEFT JOIN       Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID            
+            JOIN            FileSemesters Semester ON
+                                Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
+                                Semester.FileYear = vStudentContactAllAddress.FileYear AND
+                                Semester.SystemCurrentFlag = 1
+            WHERE           StudentID = :externalId AND
+                            StudentContactType IN ('SC1', 'SC2', 'SC3')
+        ";
+
+        $iteratorContacts = $this->getConnector()->executeQueryIterator($query, ['externalId' => $externalUserId]);
+
+        $contactList = [];
+
+        foreach ($iteratorContacts as $contact) {
+            if ($contact['ValidAddressFlag'] == 0) {
+                $contact['StudentContactAddress1'] = '';
+                $contact['StudentContactAddress2'] = '';
+                $contact['StudentContactAddress3'] = '';
+                $contact['StudentContactSuburb'] = '';
+                $contact['StudentContactPostCode'] = '';
+                $contact['StudentContactState'] = '';
             }
+
+            $contactList[] = $contact;
         }
-        return $contactList;
+
+        return $this->clearInvalidValues($contactList);
     }
 
     /**
