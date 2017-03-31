@@ -276,7 +276,9 @@ class CohortAnalysis
                 $totalWeight += $weight;
             }
 
-            $this->courseGrades[$userId] = $weightedSum / $totalWeight;
+            if(0 !== $totalWeight){
+                $this->courseGrades[$userId] = $weightedSum / $totalWeight;
+            }
         }
     }
 
@@ -602,7 +604,7 @@ class CohortAnalysis
      */
     protected function isExcludedForGrades(IAssessable $assessment)
     {
-        return $assessment instanceof Task || 0 === $assessment->getWeight() || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug();
+        return $assessment instanceof Task || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug();
     }
 
 
