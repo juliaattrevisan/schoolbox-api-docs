@@ -87,6 +87,7 @@ class External_Denbigh2_User implements External_UserInterface
                 'HeadOfHouseID' => '',
                 'StudentHeadOfHouse' => '',
                 'StudentBoarder' => '',
+                'Comment' => '',
                 'StudentForm' => '',
                 'FormDescription' => '',
                 'StudentFormStaffName' => '',

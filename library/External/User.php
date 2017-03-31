@@ -49,7 +49,7 @@ class External_User implements External_UserInterface {
 	 * Used in search
 	 *
 	 * @param Integer $externalUserId
-	 * @return Array
+	 * @return array
 	 */
 	public function getParent ($externalUserId) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
@@ -59,7 +59,7 @@ class External_User implements External_UserInterface {
 	 * No usages found
 	 *
 	 * @param Integer $externalUserId
-	 * @return Array
+	 * @return array
 	 */
 	public function getParentSync ($externalUserId) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
@@ -80,7 +80,7 @@ class External_User implements External_UserInterface {
 	 * Used in search
 	 *
 	 * @param Integer $externalUserId
-	 * @return Array
+	 * @return array
 	 */
 	public function getStudent ($externalUserId) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
@@ -90,13 +90,13 @@ class External_User implements External_UserInterface {
 	 * Used in search
 	 *
 	 * @param Integer $externalUserId
-	 * @return Array
+	 * @return array
 	 */
 	function getStaff ($externalUserId) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
-	/**
+    /**
 	 * Used in report module
 	 *
 	 * @param $yearlevel
@@ -105,7 +105,7 @@ class External_User implements External_UserInterface {
 	 * @param $form
 	 *
 	 * @internal param int $yearLevel
-	 * @return Array
+	 * @return array
 	 */
 	public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
@@ -115,7 +115,7 @@ class External_User implements External_UserInterface {
 	 * Compiles a list of contacts relevant to a student
 	 *
 	 * @param string $externalUserId
-	 * @return Array
+	 * @return array
 	 */
 	function getStudentContactList ($externalUserId) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
@@ -142,7 +142,7 @@ class External_User implements External_UserInterface {
 	 * Retrieves a teacher or student's subject list
 	 *
 	 * @param User $user
-	 * @return Array
+	 * @return array
 	 */
 	function getSubjectList (User $user) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
@@ -152,7 +152,7 @@ class External_User implements External_UserInterface {
 	 * Retrieves a parent's enrolled students
 	 *
 	 * @param Integer $externalUserId
-	 * @return Array
+	 * @return array
 	 */
 	function getEnrolledStudents ($externalUserId) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
@@ -172,7 +172,7 @@ class External_User implements External_UserInterface {
 	 * No usages found
 	 *
 	 * @todo Review usage of method
-	 * @return Array
+	 * @return array
 	 */
 	public function getStudentUserAccountInfo () {
 		return $this->getDatabase()->getStudentUserAccountInfo();
@@ -182,7 +182,7 @@ class External_User implements External_UserInterface {
 	 * No usages found
 	 *
 	 * @todo Review usage of method
-	 * @return Array
+	 * @return array
 	 */
 	public function getParentUserAccountInfo () {
 		return $this->getDatabase()->getParentUserAccountInfo();
@@ -192,7 +192,7 @@ class External_User implements External_UserInterface {
 	 * No usages found
 	 *
 	 * @todo Review usage of method
-	 * @return Array
+	 * @return array
 	 */
 	public function getStaffUserAccountInfo () {
 		return $this->getDatabase()->getStaffUserAccountInfo();

@@ -125,6 +125,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               s.tutor_name AS StudentFormStaffName, s.head_of_house AS StudentHeadOfHouse, s.form_name AS StudentForm,
               s.form_staff_name AS StudentTutor, p.full_name AS StudentEmergencyName,
               p.mobile AS StudentEmergencyPhone,
+              '' AS Comment,
               '' AS StudentStudiesCode
             FROM db2inst1.schoolbox_students s
             LEFT JOIN db2inst1.schoolbox_parent_student ps ON s.student_number = ps.student_number
