@@ -3,7 +3,8 @@
  #
  # Params:
  # * participant: Participant       - The participant object
- # * disabled:    bool              - whether the viewee cannot change the task's marking state
+ # * disabled:    bool              - whether the viewee cannot change the assessment's marking state
+ #                                  - Non-tasks can never be changed this way, thus this will be ignored
  #                                  - For participants, it should be disabled if:
  #                                    * task is not open, or
  #                                    * participant is already marked as teacher-complete, or
@@ -12,6 +13,7 @@
  #}
 
 {% set mostRecentResponse = participant.findMostRecentSubmittedResponse %}
+{% set disabled = disabled or not (participant.assessable is task) %}
 <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
       method="POST"
       class="progress-tick-form"
