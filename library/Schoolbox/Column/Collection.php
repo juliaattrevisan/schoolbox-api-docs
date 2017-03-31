@@ -51,7 +51,7 @@ class Collection implements IColumnType {
 	public function hydrate($value, $mapper = null)
     {
         $collection = $mapper
-            ? new GenericCollection($mapper->getModel())
+            ? $mapper->createCollection()
             : new \Schoolbox\Collection();
 
         /* In the current mapper infrastructure, $value is always a string, never an array - so this code
