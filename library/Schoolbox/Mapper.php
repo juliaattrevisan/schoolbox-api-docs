@@ -2499,11 +2499,23 @@ abstract class Mapper implements IMapper, Serializable
         }
         $this->database->commit();
         foreach ($collection as $i => $model) {
+
             $previous = null;
-            if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
-                $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
-                $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
+
+            if ($id_property) {
+                // this mapper defines a primary key, so providing a diff is possible (if this is an UPDATE)
+                $id = $this->getModelProperty($model, $id_property);
+
+                if ($id) {
+                    $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
+                    $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
+                }
+
+            } else {
+                // this mapper does not define primary key: we cannot supply a diff, but we *can* still call the POSTSAVE hook
+                $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model);
             }
+
             $this->raiseNotification($model, $pdoMethods[$i], $previous);
         }
         return $affectedIDs;
