@@ -16,6 +16,9 @@ use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\IClock;
+use Alaress\Redis\Async\Event\IEvent;
+use Alaress\Redis\Async\Event\Message;
+use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\Scheduler\Cache\ICache;
 use Alaress\Scheduler\Stomp\ResolutionManager;
@@ -32,7 +35,6 @@ use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\External;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Formatter\CompressionException;
 
 /**
@@ -42,7 +44,7 @@ use Schoolbox\Notif\Formatter\CompressionException;
  *
  * @package Schoolbox\Realtime\Schedule
  */
-class Scheduler extends AbstractScheduler implements IConsumer
+class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
     /** @var ResolutionManager */
     private $resolvers;
@@ -116,6 +118,29 @@ class Scheduler extends AbstractScheduler implements IConsumer
         // we need the daemon to crash if there's a database issue
         if ($e instanceof PDOException || $e instanceof External\Exception) {
             throw $e;
+        }
+    }
+
+
+    /**
+     * Handle the given redis event
+     *
+     * @param IEvent $event
+     * @return void
+     */
+    public function handle(IEvent $event)
+    {
+        if (!$event instanceof Message) {
+            // ignore pings
+            return;
+        }
+
+        // comes in the form 'digestd.vagrantx.reload'
+        list (, , $action) = explode('.', $event->getChannel());
+
+        if ($action === 'reload') {
+            // this is the only action we currently know about
+            $this->onHangup();
         }
     }
 
