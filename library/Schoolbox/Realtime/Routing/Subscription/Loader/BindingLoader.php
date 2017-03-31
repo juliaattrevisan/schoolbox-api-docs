@@ -80,4 +80,26 @@ class BindingLoader implements ILoader
         return $this;
     }
 
+
+    /**
+     * @param int $userId
+     * @return string[]
+     */
+    public function getUserSubscriptions($userId)
+    {
+        $userRoutes  = [];
+
+        $bindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
+
+        foreach ($bindings as $prefix => $data) {
+            foreach ($data as $target) {
+                $binding = "*.notify.$prefix.$target";
+                $userRoutes[$binding] = true;
+            }
+        }
+
+        return $userRoutes;
+    }
+
+
 }

@@ -12,13 +12,10 @@ use Alaress\Routing\IRouter;
 use InvalidArgumentException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
-use Redis;
-use Schoolbox\Realtime\Routing\Subscription\Loader\ILoader;
 
 
 /**
  * Class CacheLoader
- * @deprecated
  * @package Schoolbox\Realtime\Routing\Subscription\Loader
  */
 class CacheLoader implements ILoader
@@ -34,11 +31,9 @@ class CacheLoader implements ILoader
     private $data;
 
     /**
-     * @deprecated
-     *
-     * @param Redis|ClientInterface $redis
-     * @param string                $storageKey
-     * @param LoggerInterface       $log
+     * @param ClientInterface $redis
+     * @param string          $storageKey
+     * @param LoggerInterface $log
      * @throws InvalidArgumentException
      */
     public function __construct(ClientInterface $redis, $storageKey, LoggerInterface $log)
@@ -81,4 +76,27 @@ class CacheLoader implements ILoader
 
         return $this;
     }
+
+
+    /**
+     * @param int $userId
+     * @return string[]
+     */
+    public function getUserSubscriptions($userId)
+    {
+        $routes = [];
+
+        $routeTree = json_decode(gzuncompress($this->data), true);
+
+        foreach ($routeTree as $path => $pathData) {
+            foreach ($pathData as $key => $value) {
+                if ($key == $userId) {
+                    $routes[] = $path;
+                }
+            }
+        }
+
+        return $routes;
+    }
+
 }
