@@ -958,94 +958,83 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
+        // Restrict staff categories to provided list
 
-        /* Restrict staff categories to provided list */
-        $staffCategory = explode(',', \$this->config->get('synergetic_staff_dir_restrict'));
-        $scWhere = '';
-        if (is_array($staffCategory) && $staffCategory[0] != '') {
-            $staffCategoryString = implode(',', array_map([$this->getConnector(), 'smartQuote'], $staffCategory));
-            $scWhere = "AND StaffCategory NOT IN ($staffCategoryString)";
+        $staffCategory = explode(',', $this->config->get('synergetic_staff_dir_restrict'));
+
+        $filter = '';
+        $bindings = [];
+
+        if (is_array($staffCategory) && $staffCategory[0] != '')
+        {
+            $count = 1;
+
+            $filterPlaceholder = "";
+
+            foreach ($staffCategory as $category) {
+                if ($filterPlaceholder != '') {
+                    $filterPlaceholder .= ', ';
+                }
+
+                $filterPlaceholder .= ":staffCategory{$count}";
+                $bindings["staffCategory{$count}"] = $category;
+
+                $count++;
+            }
+
+            $filter = " AND StaffCategory NOT IN ($filterPlaceholder)";
         }
 
-        // Check if the custom staff position table exists, and if so use this to override position titles [SB-10813]
+        // Check if the custom staff position table exists, and if so use this to override
+        // position titles [SB-10813]
 
-        $statement = $this->getConnector()->query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'uStaffPosition'");
+        $queryTable = $this->getConnector()->executeQuery(
+            "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'uStaffPosition'"
+        );
 
-        if ($statement->rowCount() > 0) {
-
-            // If the custom table exists, override the 'JobPositionDescription' field
-
-            $query = "
-                SELECT
-                    vStaff.StaffID,
-                    vStaff.SchoolStaffCode,
-                    vStaff.StaffTitle,
-                    vStaff.StaffPreferredName,
-                    vStaff.StaffSurname,
-                    vStaff.StaffOccupPhone,
-                    vStaff.StaffOccupEmail,
-                    vStaff.StaffExtension,
-                    vStaff.StaffCampusDescription,
-                    vStaff.StaffCategory,
-                    vStaff.StaffCategoryType,
-                    vStaff.StaffDefaultMobilePhone,
-                    vStaff.StaffVoiceMail,
-                    StaffDepartmentDescription,
-                    uStaffPosition.JobTitle AS JobPositionDescription,
-                    JobPositions.StaffJobPositionStartDate,
-                    JobPositions.StaffJobPositionEndDate,
-                    Community.OccupDesc AS JobPositionDescriptionAlternate                
-                FROM dbo.vStaff vStaff
-            JOIN dbo.Community ON Community.ID = vStaff.StaffID
-                LEFT JOIN dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-                LEFT JOIN dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID
-                WHERE vStaff.ActiveFlag = 1
-                AND StaffCategoryDescription != 'Staff on leave'
-                $scWhere
-                AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
-                OR    JobPositions.StaffJobPositionStartDate IS NULL )
-                AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
-                OR    JobPositions.StaffJobPositionEndDate IS NULL )
-                ORDER BY vStaff.StaffSurname
-            ";
-
+        if ($queryTable->rowCount() > 0) {
+            $select = 'uStaffPosition.JobTitle AS JobPositionDescription';
+            $join = 'LEFT JOIN dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID';
         } else {
-
-            $query = "
-                SELECT
-                vStaff.StaffID,
-                vStaff.SchoolStaffCode,
-                vStaff.StaffTitle,
-                vStaff.StaffPreferredName,
-                vStaff.StaffSurname,
-                vStaff.StaffOccupPhone,
-                vStaff.StaffOccupEmail,
-                vStaff.StaffExtension,
-                vStaff.StaffCampusDescription,
-                vStaff.StaffCategory,
-                vStaff.StaffCategoryType,
-                vStaff.StaffDefaultMobilePhone,
-                vStaff.StaffVoiceMail,
-                StaffDepartmentDescription,
-                JobPositions.JobPositionDescription,
-                JobPositions.StaffJobPositionStartDate,
-                JobPositions.StaffJobPositionEndDate,
-                Community.OccupDesc AS JobPositionDescriptionAlternate                
-            FROM dbo.vStaff vStaff
-            JOIN dbo.Community ON Community.ID = vStaff.StaffID
-            LEFT JOIN dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-            WHERE vStaff.ActiveFlag = 1
-            AND StaffCategoryDescription != 'Staff on leave'
-            $scWhere
-            AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
-            OR    JobPositions.StaffJobPositionStartDate IS NULL )
-            AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
-            OR    JobPositions.StaffJobPositionEndDate IS NULL )
-            ORDER BY vStaff.StaffSurname
-        ";
+            $select = 'JobPositions.JobPositionDescription';
+            $join = '';
         }
 
-        return $this->getConnector()->getAll($query);
+        // If the custom table exists, override the 'JobPositionDescription' field
+
+        $query = "
+
+            SELECT      vStaff.StaffID,
+                        vStaff.SchoolStaffCode,
+                        vStaff.StaffTitle,
+                        vStaff.StaffPreferredName,
+                        vStaff.StaffSurname,
+                        vStaff.StaffOccupPhone,
+                        vStaff.StaffOccupEmail,
+                        vStaff.StaffExtension,
+                        vStaff.StaffCampusDescription,
+                        vStaff.StaffCategory,
+                        vStaff.StaffCategoryType,
+                        vStaff.StaffDefaultMobilePhone,
+                        vStaff.StaffVoiceMail,
+                        StaffDepartmentDescription,
+                        JobPositions.StaffJobPositionStartDate,
+                        JobPositions.StaffJobPositionEndDate,
+                        Community.OccupDesc AS JobPositionDescriptionAlternate,                
+                        {$select}
+            FROM        dbo.vStaff vStaff
+            JOIN        dbo.Community ON Community.ID = vStaff.StaffID
+            LEFT JOIN   dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
+                        {$join}
+            WHERE       vStaff.ActiveFlag = 1 AND
+                        StaffCategoryDescription != 'Staff on leave' AND
+                        (JobPositions.StaffJobPositionStartDate < GETDATE() OR JobPositions.StaffJobPositionStartDate IS NULL) AND
+                        (JobPositions.StaffJobPositionEndDate > GETDATE() OR JobPositions.StaffJobPositionEndDate IS NULL)
+                        {$filter}
+            ORDER BY    vStaff.StaffSurname
+        ";
+
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
