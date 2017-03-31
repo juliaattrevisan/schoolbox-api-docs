@@ -12,29 +12,24 @@
  #                                  - For teacher, it should be disabled if teacher lacks write+ perm to class folder
  #}
 
-{% set mostRecentResponse = participant.findMostRecentSubmittedResponse %}
-{% set disabled = disabled or not (participant.assessable is task) %}
-<form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
-      method="POST"
-      class="progress-tick-form"
-      data-progress-tick-form="{{ participant.assessable.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
-    {% if not mostRecentResponse.markedComplete %}
+{% if participant.assessable is task %}
+    {% include '@learningAssessment/fragments/task/progressTick.twig' with {
+        participant: participant,
+        disabled: disabled
+    } only %}
+{% elseif participant.assessable is not project %}
+    {% set mostRecentResponse = participant.findMostRecentSubmittedResponse %}
+    {% if participant.responseRequired %}
         <a href="#"
-           disabled
-           class="no-text progress-tick{% if disabled %} disabled{% endif %}"
-           title="Incomplete"
-           data-progress-tick-status="incomplete"></a>
-    {% elseif mostRecentResponse.selfAssessed %}
+           class="no-text progress-tick disabled"
+           title="Response Required"></a>
+    {% elseif participant.feedbackRequired %}
         <a href="#"
-           disabled
-           class="no-text progress-tick pending{% if disabled %} disabled{% endif %}"
-           title="Self-assessed"
-           data-progress-tick-status="selfAssessed"></a>
+           class="no-text progress-tick reviewed disabled"
+           title="Complete"></a>
     {% else %}
         <a href="#"
-           disabled
-           class="no-text progress-tick reviewed{% if disabled %} disabled{% endif %}"
-           title="Completed"
-           data-progress-tick-status="teacherAssessed"></a>
+           class="no-text progress-tick pending disabled"
+           title="Awaiting Feedback"></a>
     {% endif %}
-</form>
+{% endif %}
