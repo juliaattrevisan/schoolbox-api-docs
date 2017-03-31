@@ -832,13 +832,16 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getEmail($id)
+    public function getEmail($externalId)
     {
-        if (!$this->isExternalIdValid($id)) {
+        if (!$this->isExternalIdValid($externalId)) {
             return false;
         }
-        $query = "SELECT Email FROM Community WHERE id = {$this->database->quote($id)}";
-        return $this->getConnector()->getOne($query);
+
+        return $this->getConnector()->executeQuery(
+            "SELECT Email FROM Community WHERE id = :externalId",
+            ['externalId' => $externalId]
+        )->fetch();
     }
 
     /**
