@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Realtime\Routing\Cache;
 
+use Alaress\Async\Synchroniser;
 use Alaress\Routing\FlatRouter;
 use Alaress\Routing\IRouter;
 use Alaress_Byte_Format;
@@ -70,20 +71,20 @@ class RedisCache implements ICache
      */
     public function cacheUser($instanceId, $userId)
     {
-        $this->obtainSemaphoreLock();
-
         try {
             $routeStorageKey = $this->getCacheKey($instanceId);
 
-            $router = $this->bindIndividual($userId, $routeStorageKey);
-            $this->writeCache($router, $routeStorageKey);
+            // ensure this block of code is only ever executed by exactly one process at a time
+            (new Synchroniser($this, $this->redis))->synchronise($userId, function ($userId) use ($routeStorageKey) {
+                // this closure will be called multiple times consecutively if there are concurrent requests
+                $router = $this->bindIndividual($userId, $routeStorageKey);
+                $this->writeCache($router, $routeStorageKey);
+            });
 
-            $this->releaseSemaphore();
             $this->broadcastReload($instanceId);
 
         } catch (UnderflowException $e) {
             $this->log->notice($e->getMessage());
-            $this->releaseSemaphore();
         }
 
     }
@@ -149,25 +150,6 @@ class RedisCache implements ICache
         }
 
         $this->log->debug("$count routes installed from cache");
-    }
-
-
-    /**
-     * @return void
-     */
-    private function obtainSemaphoreLock()
-    {
-        // TODO SEMAPHORE!!!
-        $this->log->error('[TODO] Cache lock obtained');
-    }
-
-    /**
-     * @return void
-     */
-    private function releaseSemaphore()
-    {
-        // TODO release semaphore
-        $this->log->error('[TODO] Cache lock released');
     }
 
 
