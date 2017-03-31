@@ -12,35 +12,57 @@ namespace Schoolbox\LearningAnalytics;
 
 use Alaress\Web\Controller\Base;
 
+use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Collection;
-use Schoolbox\Error;
-use Schoolbox\Learning\Course\DataModel\Implementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
-use Schoolbox\LearningAnalytics\Results\TaskTypes;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType as SubmissionType;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
+use \Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 
 class Controller extends Base
 {
+
     /** @var TermMapper $termMapper */
     private $termMapper;
 
-    public function __construct(TermMapper $termMapper)
+    /** @var FolderMapper */
+    private $folderMapper;
+
+    /** @var SubmissionTypeMapper */
+    private $submissionTypeMapper;
+
+
+    /**
+     * @param TermMapper           $termMapper
+     * @param FolderMapper         $folderMapper
+     * @param SubmissionTypeMapper $submissionTypeMapper
+     */
+    public function __construct(TermMapper $termMapper, FolderMapper $folderMapper, SubmissionTypeMapper $submissionTypeMapper)
     {
-        $this->termMapper = $termMapper;
+        $this->termMapper           = $termMapper;
+        $this->folderMapper         = $folderMapper;
+        $this->submissionTypeMapper = $submissionTypeMapper;
     }
+
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}
      * @level 165
      *
      * @param int $courseSpecId
+     * @throws RouteNotFound
      */
     public function course($courseSpecId)
     {
@@ -48,7 +70,7 @@ class Controller extends Base
         $currentTerm = $this->termMapper->findForToday();
 
         $data = ['courseSpecId' => $courseSpecId, 'termCode' => $currentTerm->getCode()];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTerms', $data));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTerm', $data));
     }
 
 
@@ -56,50 +78,63 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/term/{termCode}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param CourseSpecification             $courseSpecification
+     * @param Collection|UnitImplementation[] $unitImplsInTerm
+     * @param Collection|IAssessable[]        $dueAssessments
+     * @param Term                            $term
+     * @throws ApplicationException
+     * @throws \DomainException
+     * @throws MapperException
      */
-    public function courseWithTerms(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
+    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $dueAssessments, Term $term)
     {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTerms');
+        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'course');
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}
+     * @api   GET /learning/analytics/course/{courseSpecId}/task/{submissionTypeId}
      * @level 165
      *
      * @param int $courseSpecId
-     * @param int $taskTypeId
+     * @param int $submissionTypeId
+     * @throws RouteNotFound
      */
-    public function courseWithTask($courseSpecId, $taskTypeId)
+    public function courseWithSubmissionType($courseSpecId, $submissionTypeId)
     {
         // Redirect to current term
         $currentTerm = $this->termMapper->findForToday();
 
         $data = [
-            'courseSpecId' => $courseSpecId,
-            'taskTypeId'   => $taskTypeId,
-            'termCode'     => $currentTerm->getCode(),
+            'courseSpecId'     => $courseSpecId,
+            'submissionTypeId' => $submissionTypeId,
+            'termCode'         => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTaskAndTerms', $data));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithSubmissionTypeAndTerm', $data));
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}
+     * @api   GET /learning/analytics/course/{courseSpecId}/task/{submissionTypeId}/term/{termCode}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param CourseSpecification             $courseSpecification
+     * @param Collection|UnitImplementation[] $unitImplsInTerm
+     * @param Collection|IAssessable[]        $dueAssessments
+     * @param Term                            $term
+     * @param SubmissionType                  $submissionType
+     * @throws ApplicationException
+     * @throws \DomainException
+     * @throws MapperException
      */
-    public function courseWithTaskAndTerms(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
-    {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'courseWithTaskAndTerms');
+    public function courseWithSubmissionTypeAndTerm(
+        CourseSpecification $courseSpecification,
+        Collection $unitImplsInTerm,
+        Collection $dueAssessments,
+        Term $term,
+        SubmissionType $submissionType
+    ) {
+        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'course', null, $submissionType);
     }
 
 
@@ -109,6 +144,7 @@ class Controller extends Base
      *
      * @param int $courseSpecId
      * @param int $folderId
+     * @throws RouteNotFound
      */
     public function folder($courseSpecId, $folderId)
     {
@@ -120,7 +156,7 @@ class Controller extends Base
             'folderId'     => $folderId,
             'termCode'     => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTerms', $data));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTerm', $data));
     }
 
 
@@ -128,133 +164,125 @@ class Controller extends Base
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/term/{termCode}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Folder                                 $selectedClassFolder
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param Folder                          $classFolder
+     * @param CourseSpecification             $courseSpecification
+     * @param Collection|UnitImplementation[] $unitImplsInTerm
+     * @param Collection|IAssessable[]        $dueAssessments
+     * @param Term                            $term
+     * @throws ApplicationException
+     * @throws \DomainException
+     * @throws MapperException
      */
-    public function folderWithTerms(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
-    {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTerms', $selectedClassFolder);
+    public function folderWithTerm(
+        Folder $classFolder,
+        CourseSpecification $courseSpecification,
+        Collection $unitImplsInTerm,
+        Collection $dueAssessments,
+        Term $term
+    ) {
+        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'folder', $classFolder);
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{submissionTypeId}
      * @level 165
      *
      * @param int $courseSpecId
      * @param int $folderId
-     * @param int $taskTypeId
+     * @param int $submissionTypeId
+     * @throws RouteNotFound
      */
-    public function folderWithTask($courseSpecId, $folderId, $taskTypeId)
+    public function folderWithSubmissionType($courseSpecId, $folderId, $submissionTypeId)
     {
         // Redirect to current term
         $currentTerm = $this->termMapper->findForToday();
 
         $data = [
-            'courseSpecId' => $courseSpecId,
-            'folderId'     => $folderId,
-            'taskTypeId'   => $taskTypeId,
-            'termCode'     => $currentTerm->getCode(),
+            'courseSpecId'     => $courseSpecId,
+            'folderId'         => $folderId,
+            'submissionTypeId' => $submissionTypeId,
+            'termCode'         => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTaskAndTerms', $data));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithSubmissionTypeAndTerm', $data));
     }
 
 
     /**
-     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}
+     * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{submissionTypeId}/term/{termCode}
      * @level 165
      *
-     * @param array                                  $params
-     * @param Folder                                 $selectedClassFolder
-     * @param Specification\Model                    $courseSpecification
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations
-     * @param Term                                   $term
+     * @param Folder                          $classFolder
+     * @param CourseSpecification             $courseSpecification
+     * @param Collection|UnitImplementation[] $unitImplsInTerm
+     * @param Collection|IAssessable[]        $dueAssessments
+     * @param Term                            $term
+     * @param SubmissionType                  $submissionType
+     * @throws ApplicationException
+     * @throws \DomainException
+     * @throws MapperException
      */
-    public function folderWithTaskAndTerms(array $params, Folder $selectedClassFolder, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term)
-    {
-        $this->process($params, $courseSpecification, $unitImplementations, $term, 'folderWithTaskAndTerms', $selectedClassFolder);
+    public function folderWithSubmissionTypeAndTerm(
+        Folder $classFolder,
+        CourseSpecification $courseSpecification,
+        Collection $unitImplsInTerm,
+        Collection $dueAssessments,
+        Term $term,
+        SubmissionType $submissionType
+    ) {
+        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'folder', $classFolder, $submissionType);
     }
 
 
     /**
-     * Generate a set of terms that have data, so we can insert in navigation context selector
+     * Return a collection of Terms that contains 1 or more assessments that:
+     * * are due in that term
+     * * are not a Task, and
+     * * do not have a mark type of 'none'
      *
      * Filter by class if supplied.
      *
      * @param CourseSpecification $courseSpec
-     * @param Folder              $class
+     * @param Folder              $classFolder
      * @return Term[]|GenericCollection
      */
-    protected function getTermsWithResults(CourseSpecification $courseSpec, Folder $class = null)
+    protected function getNavigableTerms(CourseSpecification $courseSpec, Folder $classFolder = null)
     {
-        // Get all courses imported from our courseSpec
-        $courseImplMapper = CourseImplementationMapper::getInstance();
-        $courseImpls = $courseImplMapper->findAllByCourseSpecificationId($courseSpec->getId(), [], true);
-        $courseImplsPerClass = $courseImpls->groupByCallback(function(CourseImplementation $courseImpl){
-            return $courseImpl->getFolder()->getId();
-        });
+        /** @var GenericCollection|Term[] $allTerms */
+        $allTerms       = $this->termMapper->findAll()->indexBy('id');
+        $navigableTerms = $this->termMapper->createCollection();
 
-        /** @var Term[]|GenericCollection $allTerms */
-        $allTerms = $this->termMapper->findAll()->indexBy('id');
-
-        $termsWithResults = $this->filterTermsWithResults($allTerms, $courseImplsPerClass, $class);
-
-        return $termsWithResults->sortByCallback(function(Term $term1, Term $term2){
-            return $term1->compare($term2);
-        });
-    }
-
-    /**
-     * @param Term[]|Collection                               $allTerms
-     * @param CourseImplementation[][]|Collection[]|Collection $courseImplsPerClass
-     * @param Folder|null $class
-     * @return Term[]|GenericCollection $terms
-     */
-    protected function filterTermsWithResults(Collection $allTerms, Collection $courseImplsPerClass, Folder $class = null)
-    {
-        $terms = $this->termMapper->createCollection();
-
-        foreach($courseImplsPerClass as $classFolderId => $courseImpls){
-
-            // Are we filtering for a specific class ? And it doesn't match this set of courseImports?
-            if($class && $class->getId() != $classFolderId){
+        foreach ($courseSpec->getCourseImplementations() as $courseImpl) {
+            // Are we in 'class' (not cohort) context? And courseImpl not for this class ?
+            if ($classFolder && $courseImpl->getFolder()->getId() !== $classFolder->getId()) {
                 continue;
             }
 
-            // Examine all courses imported to this folder
-            /** @var CourseImplementation[] $courseImpls */
-            foreach($courseImpls as $courseImpl){
-                // Examine all unitImpls in the courseImpl
-                foreach($courseImpl->getUnits() as $unitImpl){
-                    // Examine each term that is yet to be confirmed
-                    foreach($allTerms as $term){
-                        // Does this unit start after the term begins?
-                        if($unitImpl->getOpenDate()->compareDateOnly($term->getStart()) >= 0){
-                            // Does the unit end before the term finishes?
-                            if($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->compareDateOnly($term->getActualFinish()) <= 0 ){
-                                // The unit is inside the term.
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                foreach ($unitImpl->getAssessables() as $a) {
 
-                                // Add to our list to display
-                                $terms->setOffset($term->getId(), $term);
+                    // Is Assessment a Task or has MarkType of 'None' ?
+                    if ($a instanceof Task || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
+                        continue;
+                    }
 
-                                // Remove from available so we don't traverse again
-                                $allTerms->offsetUnset($term->getId());
+                    foreach ($allTerms as $t) {
+                        // Is this Assessment due in this Term?
+                        if ($t->getStart()->lte($a->getDueAt()) && ($t->getActualFinish()->isNull() || $t->getActualFinish()->gt($a->getDueAt()))) {
+                            $navigableTerms->setOffset($t->getId(), $t);
 
-                                // Have we selected all terms?
-                                if(!$allTerms->count()){
-                                    // We're done. Bug out.
-                                    return $terms;
-                                }
-                            }
+                            // Remove from available terms to avoid repeated traversals
+                            $allTerms->offsetUnset($t->getId());
+                            break;
                         }
                     }
                 }
             }
         }
-        return $terms;
+
+        return $navigableTerms->sortByCallback(function (Term $term1, Term $term2) {
+            return $term1->compare($term2);
+        });
     }
 
 
@@ -272,71 +300,86 @@ class Controller extends Base
      * Both are processed identically as data is grouped based on task
      * instances' originating task id, not the individual instance id
      *
-     * @param array                                  $params                bag of holding
-     * @param Specification\Model                    $courseSpecification   spec from which all data on this page inherits
-     * @param Collection|Implementation\Unit\Model[] $unitImplementations   units that match the term filter
-     * @param Term                                   $term                  term to filter
-     * @param Folder                                 $selectedClassFolder   if given, the class folder to filter
-     * @param string                                 $routeUsed             pass directly through to twig for route lookups
+     * @param CourseSpecification             $courseSpecification spec from which all data on this page inherits
+     * @param Collection|UnitImplementation[] $unitImplsInTerm     units containing assessments due in current term
+     * @param Collection|IAssessable[]        $dueAssessments      assessments due in current Term
+     * @param Term                            $term                term to filter
+     * @param Folder                          $classFolder         if given, the class folder to filter
+     * @param string                          $routeType           'course'|'folder'
+     * @param null|SubmissionType             $submissionType      if specified, a submission type filter
+     * @throws ApplicationException
+     * @throws \DomainException
+     * @throws MapperException
      */
-    private function process(array $params, Specification\Model $courseSpecification, Collection $unitImplementations, Term $term, $routeUsed, Folder $selectedClassFolder = null)
-    {
-        if ($unitImplementations->count() == 0) {
-            throw Error\Mapper::getInstance()->generateException(Error\Mapper::ERROR_NO_ANALYTICS_DATA);
+    private function process(
+        CourseSpecification $courseSpecification,
+        Collection $unitImplsInTerm,
+        Collection $dueAssessments,
+        Term $term,
+        $routeType,
+        Folder $classFolder = null,
+        SubmissionType $submissionType = null
+    ) {
+        $analysis = new CohortAnalysis($dueAssessments, $classFolder, $submissionType);
+
+        // Get Classes to which this Course has been imported
+        $courseImplementationFolders = $this->folderMapper->createCollection();
+        foreach ($courseSpecification->getCourseImplementations() as $courseImplementation) {
+            $courseFolder = $courseImplementation->getFolder();
+            $courseImplementationFolders->setOffset($courseFolder->getId(), $courseFolder);
         }
 
-        $analysis = new CohortAnalysis($courseSpecification, $unitImplementations, $selectedClassFolder, $term);
+        // Ensure we have folder codes
+        /** @var FolderCodeMapper $codeMapper */
+        $codeMapper = FolderCodeMapper::getInstance();
+        $codeMapper->applyCodesToCategories($courseImplementationFolders);
 
-
-        $metadata = new Metadata($params, $courseSpecification, $unitImplementations, $term, $routeUsed, $selectedClassFolder);
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
          * so just hit the external db once
          */
-        $registry = new Registry($unitImplementations);
+        $registry = new Registry($unitImplsInTerm);
 
-        /**
-         * Results for all the units in each $folder contained in $allFolders
-         * (generated by Registry)
-         */
-        $taskTypes = new TaskTypes($metadata);
+        /** @var Term[]|GenericCollection $navigableTerms */
+        $navigableTerms = $this->getNavigableTerms($courseSpecification, $classFolder);
 
-        /** @var Term[]|GenericCollection $selectableTerms */
-        $selectableTerms = $this->getTermsWithResults($courseSpecification);
+        $data = [
+            'courseSpec'          => $courseSpecification,
+            'classFolder'         => $classFolder,
+            'submissionType'      => $submissionType,
+            'submissionTypes'     => $this->submissionTypeMapper->findAll(),
+            'currentRoute'        => $this->getRouter()->getMatchedRoute()->name,
+            'route'               => $routeType,
+            'classFolders'        => $courseImplementationFolders,
+            'term'                => $term,
+            'terms'               => $navigableTerms,
+            'students'            => $analysis->getParticipatingStudents(),
+            'overallProgress'     => $analysis->getOverallProgress(),
+            'ranking'             => [
+                'top'    => $analysis->getCohortRankings(SORT_DESC),
+                'bottom' => $analysis->getCohortRankings(SORT_ASC),
+            ],
+            'dueAssessments'      => $dueAssessments,
+            'gradableAssessments' => $analysis->getGradableAssessments(false),
+            'results'             => [
+                'assessments' => $analysis->getGradableAssessments(true),
+                'grades'      => $analysis->getAssessmentMarks(true),
+            ],
+            'progress'            => [
+                'allUnits' => $analysis->getProgressByUnit(),
+            ],
+            'rubrics'             => [
+                'allRubrics' => $analysis->getCohortGradesByIndicator($unitImplsInTerm, $registry->getStudents()),
+            ],
+            'effort'              => [
+                'allEffort' => $analysis->getEffort(),
+            ],
+        ];
 
-        /* Twig data
-         */
         $this->getResponse()->content->set([
             'template' => '@learningAnalytics/course.twig',
-            'data'     => [
-                'terms'           => $selectableTerms,
-                'metadata'        => $metadata,
-                'overallProgress' => $analysis->getOverallProgress(),
-                'results' => [
-                    'all' => $analysis->getCohortGradesByActivity($registry),
-                    'activities' => [
-                        'all'   => $analysis->getActivities($registry, $metadata),
-                        'types' => [
-                            'all'      => $taskTypes->getActivityTypes(),
-                            'selected' => $taskTypes->getSelectedActivityTypeFilter(),
-                        ],
-                    ],
-                    'ranking' => [
-                        'top'    => $analysis->getCohortRankings(SORT_DESC),
-                        'bottom' => $analysis->getCohortRankings(SORT_ASC),
-                    ],
-                ],
-                'progress' => [
-                    'allUnits' => $analysis->getProgressByUnit(),
-                ],
-                'rubrics' => [
-                    'allRubrics' => $analysis->getCohortGradesByIndicator($registry, $metadata),
-                ],
-                'effort' => [
-                    'allEffort' => $analysis->getEffort(),
-                ],
-            ]
+            'data'     => $data,
         ]);
     }
 }

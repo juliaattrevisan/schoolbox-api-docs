@@ -7,10 +7,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 
 /**
  * Class DueWork_Rubric_Handler
- * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper
+ * @deprecated
+ * @see RubricMapper
  */
 class DueWork_Rubric_Handler
 {

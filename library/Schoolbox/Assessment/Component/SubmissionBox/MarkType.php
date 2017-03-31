@@ -13,6 +13,7 @@ use Schoolbox;
 
 class MarkType
 {
+    /** @deprecated - Use SLUG_* constants instead */
     const TYPE_PERCENT    = 1;
     const TYPE_LETTER     = 2;
     const TYPE_TOTAL      = 3;
@@ -20,6 +21,14 @@ class MarkType
     const TYPE_RUBRIC     = 5;
     const TYPE_NONE       = 6;
     const TYPE_COMPLETION = 7;
+
+    const SLUG_PERCENT    = 'percent';
+    const SLUG_LETTER     = 'letter';
+    const SLUG_TOTAL      = 'raw';
+    const SLUG_FREE       = 'free';
+    const SLUG_RUBRIC     = 'rubric';
+    const SLUG_NONE       = 'none';
+    const SLUG_COMPLETION = 'completion';
 
     /**
      * @var int

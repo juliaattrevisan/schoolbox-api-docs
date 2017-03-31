@@ -92,7 +92,7 @@ class ClassList
             foreach ($this->user->getSubjectCollection() as $subject) {
                 try {
                     $folder = $this->folderMapper->findByCode($subject['code']);
-                    $folderList->add($folder);
+                    $folderList = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]),'id');
                     $classTypes[$folder->getId()] = $subject['classType'];
                 } catch (MapperException $e) {
                     //not found
@@ -108,6 +108,7 @@ class ClassList
         }
 
         $courseSpecs = $this->getCourseSpecsHavingUnitsInTerm($folderList, $term);
+
 
         $this->applyFolderColours($folderList);
 

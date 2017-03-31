@@ -88,6 +88,15 @@ abstract class AbstractMarkScheme implements IMarkScheme
         return !$this->quantitative;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getPublishedNormalisedMark(Participant $participant)
+    {
+        $feedback = $participant->findMostRecentPublishedFeedback();
+        return $feedback ? $feedback->getNormalisedMark() : null;
+    }
+
 
     /**
      * @inheritdoc

@@ -73,6 +73,13 @@ interface IMarkScheme
      */
     public static function getTitle();
 
+    /**
+     * Return the published normalised mark for the specified participant
+     *
+     * @param Participant $participant
+     * @return int|null
+     */
+    public function getPublishedNormalisedMark(Participant $participant);
 
     /**
      * Return the published human-readable mark for the specified participant

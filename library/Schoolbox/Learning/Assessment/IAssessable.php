@@ -482,7 +482,7 @@ interface IAssessable extends ISoftDeletable
      * other elements in the same set.
      *      -- https://en.wikipedia.org/wiki/Weight_function
      *
-     * @return float
+     * @return int
      */
     public function getWeight();
 
