@@ -250,9 +250,9 @@ class Controller extends BaseController
     }
 
     /**
-     * Download a csv of asessment results for Accellerus
+     * Download a csv of assessment results for Accellerus
      *
-     * @api GET /learning/export/assessment/getCSV
+     * @api GET /learning/export/assessment/csv
      * @level 160
      *
      */
