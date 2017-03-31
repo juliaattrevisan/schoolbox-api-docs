@@ -810,7 +810,7 @@ class External_Synergetic_User implements External_UserInterface
 
             $relationships = ['SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'];
         } else {
-            $relationships = explode(',', $this->config->get('external_synergetic_student_relationships');
+            $relationships = explode(',', $this->config->get('external_synergetic_student_relationships'));
         }
 
         $relationshipBindings = PredicateBuilder::getArrayBindings($relationships, 'relationship');
@@ -821,7 +821,7 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN   dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
             LEFT JOIN   dbo.Community Community ON Relationships.RelatedID = Community.ID
             WHERE       Relationships.ID = :id AND
-                        Constituencies.ConstitCode='@SC' AND
+                        Constituencies.ConstitCode = '@SC' AND
                         Relationships.Relationship IN ({$relationshipBindings['placeholders']})
             ORDER BY    Community.BirthDate
         ";
@@ -881,47 +881,47 @@ class External_Synergetic_User implements External_UserInterface
     public function getParentUserAccountInfo()
     {
         // Get student contact types from config, and wrangle into a query
-        $studentContactTypes =
-            implode(
-                ',',
-                array_map(
-                    [$this->getConnector(), 'smartQuote'],
-                    array_map(
-                        'trim',
-                        explode(',', $this->config->get('external_synergetic_student_contact_types'))
-                    )
-                )
-            );
-        if (strlen($studentContactTypes) === 0) {
-            $studentContactTypes = "'SC1','SC2'";
+
+        if (empty($this->config->get('external_synergetic_student_contact_types')) === 0) {
+
+            // No relationships were found, use the default values we had before introducing this feature
+
+            $studentContactTypes = ['SC1','SC2'];
+        } else {
+            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
         }
 
-        $query = "
-            SELECT DISTINCT
-				cp.NetworkLogin AS StudentContactNetworkLogin,
-				s.StudentContactID,
-				s.StudentContactTitle,
-				s.StudentContactPreferred,
-				s.StudentContactSurname,
-				s.StudentContactDefaultEmail,
-				cs.NetworkLogin AS StudentContactSpouseNetworkLogin,
-				s.StudentContactSpouseID,
-				s.StudentContactSpouseTitle,
-				s.StudentContactSpousePreferred,
-				s.StudentContactSpouseSurname,
-				s.StudentContactSpouseDefaultEmail,
-				s.StudentYearLevel,
-				s.StudentCampus,
-				s.StudentGender
-			FROM dbo.vStudentContactAllAddress s
-			LEFT JOIN dbo.Community cp ON s.StudentContactID = cp.ID
-			LEFT JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
-            WHERE StudentContactType IN ({$studentContactTypes})
-            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
-            ORDER BY StudentContactID
+        $contactTypes = PredicateBuilder::getArrayBindings($studentContactTypes, 'types');
+
+        $query =
+        "
+            SELECT DISTINCT cp.NetworkLogin AS StudentContactNetworkLogin,
+                            s.StudentContactID,
+                            s.StudentContactTitle,
+                            s.StudentContactPreferred,
+                            s.StudentContactSurname,
+                            s.StudentContactDefaultEmail,
+                            cs.NetworkLogin AS StudentContactSpouseNetworkLogin,
+                            s.StudentContactSpouseID,
+                            s.StudentContactSpouseTitle,
+                            s.StudentContactSpousePreferred,
+                            s.StudentContactSpouseSurname,
+                            s.StudentContactSpouseDefaultEmail,
+                            s.StudentYearLevel,
+                            s.StudentCampus,
+                            s.StudentGender
+			FROM            dbo.vStudentContactAllAddress s
+            JOIN            FileSemesters Semester ON
+                                Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
+                                Semester.FileYear = vStudentContactAllAddress.FileYear AND
+                                Semester.SystemCurrentFlag = 1
+			LEFT JOIN       dbo.Community cp ON s.StudentContactID = cp.ID
+			LEFT JOIN       dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+            WHERE           StudentContactType IN ({$contactTypes['placeholders']})
+            ORDER BY        StudentContactID
         ";
-        return $this->getConnector()->getAll($query);
+
+        return $this->getConnector()->executeQuery($query, $contactTypes['bindings'])->fetchAll();
     }
 
     /**
