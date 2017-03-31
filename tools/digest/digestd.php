@@ -2,6 +2,7 @@
 <?php
 
 use Alaress\Date\Clock;
+use Alaress\Redis\Async;
 use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Predis\ClientInterface;
@@ -56,6 +57,9 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Digest', [
 // CREATE DIGEST APP
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
+    $instance = INSTANCE_ID;
+    $topic    = "digestd.$instance.*";
+
     /** @var IConfigLoader $conf */
     $conf = $di->get('config');
 
@@ -66,9 +70,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $roleMapper = $di->get('mapperFactory')->get(RoleMapper::class);
     $userMapper = $di->get('mapperFactory')->get(UserMapper::class);
+    $asyncRedis = new Async\Client($di->get('config')->get('redis_url'), $loop);
     $strat      = new DefaultDispatchStrategy($opts['flags']);
     $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper);
     $factory    = new DigestTriggerFactory($notifier, $clock, $opts['debug-interval']);
 
-    new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);
+    $scheduler  = new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);
+
+    $asyncRedis->psubscribe($topic, $scheduler);
+
+    $log->info("Listening on redis://$topic");
 });
