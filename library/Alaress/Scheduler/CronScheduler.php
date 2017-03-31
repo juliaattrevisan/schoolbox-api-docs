@@ -88,6 +88,7 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
     {
         if (!$event instanceof Message) {
             // ignore pings
+            return;
         }
 
         // comes in the form 'digestd.vagrantx.reload'
