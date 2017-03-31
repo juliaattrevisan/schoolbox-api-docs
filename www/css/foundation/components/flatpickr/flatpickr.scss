@@ -126,18 +126,23 @@ span.displayDate {
     transition: width 0.3s;
 }
 
-.pickerSingle.pickerNarrow {
-    width: 325px;
-}
 
-.pickerSingle.pickerWide {
-    width: 435px;
-}
+@media #{$medium-up} {
 
-.pickerDouble.pickerNarrow {
-    width: 650px;
-}
+    .pickerSingle.pickerNarrow {
+        width: 325px;
+    }
 
-.pickerDouble.pickerWide {
-    width: 750px;
+    .pickerSingle.pickerWide {
+        width: 435px;
+    }
+
+    .pickerDouble.pickerNarrow {
+        width: 650px;
+    }
+
+    .pickerDouble.pickerWide {
+        width: 750px;
+    }
+
 }
