@@ -135,6 +135,11 @@ class Handler implements IConsumer, EventListener
 
                 $userCount = count($userIds);
 
+                if ($userCount === 0) {
+                    $this->log->info("Nobody is subscribed to '$topic', dropping message");
+                    return;
+                }
+
                 if ($userCount > 16) {
                     $suffix = "$userCount users";
                 } else {
