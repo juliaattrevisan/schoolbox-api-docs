@@ -231,15 +231,20 @@ class RedisCache implements ICache
             }
         }
 
-        // overlay this user's bindings to account for any new ones
-        foreach ($userRoutes as $path => $_) {
-            $a = count($router->getAll());
-            $router->add($path, $userId, true);
-            $b = count($router->getAll());
-            if ($b !== $a) {
-                $this->log->info("User $userId + `$path`", [ 'char' => '+' ]);
-                ++$changeCount;
+        // compute the positive diff (ie. new subscriptions)
+        $userDiff = $userRoutes;
+
+        foreach ($allRoutes as $path => $pathData) {
+            if (array_key_exists($userId, $pathData)) {
+                unset($userDiff[$path]);
             }
+        }
+
+        // overlay this user's bindings to account for any new ones
+        foreach ($userDiff as $path => $pathData) {
+            $router->add($path, $userId, true);
+            $this->log->info("User $userId + `$path`", [ 'char' => '+' ]);
+            ++$changeCount;
         }
 
         if ($changeCount === 0) {
