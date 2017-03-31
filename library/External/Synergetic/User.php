@@ -1119,11 +1119,61 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
+     * Retrieve current Synergetic file year and file semester
+     * @param int|null $externalUserId If supplied, will returns the users current year/semester
+     * @return array
+     */
+    protected function findFileYearAndSemester($externalUserId = null)
+    {
+        // If we are supplied a valid user ID use their current file year/semester values
+
+        if ($externalUserId != null) {
+            if ($this->isExternalIdValid($externalUserId)) {
+                $statement = $this->getConnector()->executeStoredProcedure(
+                    'spsConfigUserDefaultYearSemester',
+                    ['ID' => $externalUserId]
+                );
+
+                if ($semester = $statement->fetch()) {
+                    return [
+                        'year'          => $semester['UserFileYear'],
+                        'semester'      => $semester['UserFileSemester']
+                    ];
+                }
+            }
+        }
+
+        // Otherwise, return the current system default values
+
+        $querySemester = $this->getConnector()->executeQuery("SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1"));
+
+        if ($semester = $querySemester->fetch())
+        {
+            return [
+                'year'              => $semester['FileYear'],
+                'semester'          => $semester['FileSemester'],
+            ];
+
+        } else {
+
+            // If everything falls in a heap- return a blank array
+
+            return [];
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function getCurrentSemester($externalUserId = null)
     {
-        die("Remove this");
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+
+        if (!empty($fileYearSemester)) {
+            return $fileYearSemester['semester'];
+        }
+
+        return null;
     }
 
     /**
@@ -1131,6 +1181,12 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getCurrentYear($externalUserId = null)
     {
-        die("Remove this");
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+
+        if (!empty($fileYearSemester)) {
+            return $fileYearSemester['year'];
+        }
+
+        return null;
     }
 }
