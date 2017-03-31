@@ -20,16 +20,10 @@
 {% elseif participant.assessable is not project %}
     {% set mostRecentResponse = participant.findMostRecentSubmittedResponse %}
     {% if participant.responseRequired %}
-        <a href="#"
-           class="no-text progress-tick disabled"
-           title="Response Required"></a>
+        <span class="no-text progress-tick" title="Response Required"></span>
     {% elseif participant.feedbackRequired %}
-        <a href="#"
-           class="no-text progress-tick reviewed disabled"
-           title="Complete"></a>
+        <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
     {% else %}
-        <a href="#"
-           class="no-text progress-tick pending disabled"
-           title="Awaiting Feedback"></a>
+        <span class="no-text progress-tick reviewed" title="Complete"></span>
     {% endif %}
 {% endif %}
