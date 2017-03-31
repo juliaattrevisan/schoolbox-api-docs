@@ -1,3 +1,6 @@
+$pickr-month-height: 40px;
+$pickr-month-padding: 5px;
+
 .alaress-date-picker {
 
     -webkit-transition: width 0.3s; /* Safari */
@@ -41,12 +44,28 @@
     }
 
     .flatpickr-month {
-        height: 44px;
+        height: $pickr-month-height + $pickr-month-padding;
+        margin-bottom: $pickr-month-padding;
     }
 
     .flatpickr-prev-month,
     .flatpickr-next-month {
-        top: 18px;
+        top: $pickr-month-padding;
+        height: $pickr-month-height;
+        line-height: $pickr-month-height + $pickr-month-padding;
+        width: $pickr-month-height;
+    }
+
+    .flatpickr-prev-month {
+        left: 0;
+    }
+
+    .flatpickr-next-month {
+        right: 0;
+    }
+
+    .flatpickr-current-month {
+        top: $pickr-month-padding;
     }
 
     .flatpickr-current-month input.cur-year {
