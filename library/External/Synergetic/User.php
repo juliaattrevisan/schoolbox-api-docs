@@ -577,51 +577,57 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentBoarderContactListExtended()
     {
-        $query = "
-            SELECT
-                StudentID,
-                StudentGiven1,
-                StudentSurname,
-                StudentYearLevel,
-                House.Description AS StudentHouse,
-                StudentContactID,
-                StudentContactTitle,
-                StudentContactPreferred,
-                StudentContactSurname,
-                StudentContactDefaultEmail,
-                StudentContactAddress1,
-                StudentContactAddress2,
-                StudentContactAddress3,
-                StudentContactSuburb,
-                StudentContactPostCode,
-                StudentContactState,
-                StudentContactCountryDesc,
-                StudentContactPhoneActual,
-                StudentContactMobilePhone,
-                StudentContactOccupPhone,
-                StudentContactSpouseID,
-                StudentContactSpouseTitle,
-                StudentContactSpousePreferred,
-                StudentContactSpouseSurname,
-                StudentContactSpouseMobilePhone,
-                StudentContactSpouseOccupPhone,
-                StudentContactSpouseDefaultEmail,
-                StudentContactType,
-                StudentContactSilentPhoneFlag,
-                Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
-                Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
-                Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-                StudentParentsSeparatedFlag
-            FROM dbo.vStudentContactAllAddress
-            LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
-            LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-            LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
-            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
-            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
-            AND StudentBoarder = 'B'
-            ORDER BY StudentSurname, StudentID, StudentContactType";
-        return $this->getConnector()->getAll($query);
+        $query =
+        "
+            SELECT      StudentID,
+                        StudentGiven1,
+                        StudentSurname,
+                        StudentYearLevel,
+                        House.Description AS StudentHouse,
+                        StudentContactID,
+                        StudentContactTitle,
+                        StudentContactPreferred,
+                        StudentContactSurname,
+                        StudentContactDefaultEmail,
+                        StudentContactAddress1,
+                        StudentContactAddress2,
+                        StudentContactAddress3,
+                        StudentContactSuburb,
+                        StudentContactPostCode,
+                        StudentContactState,
+                        StudentContactCountryDesc,
+                        StudentContactPhoneActual,
+                        StudentContactMobilePhone,
+                        StudentContactOccupPhone,
+                        StudentContactSpouseID,
+                        StudentContactSpouseTitle,
+                        StudentContactSpousePreferred,
+                        StudentContactSpouseSurname,
+                        StudentContactSpouseMobilePhone,
+                        StudentContactSpouseOccupPhone,
+                        StudentContactSpouseDefaultEmail,
+                        StudentContactType,
+                        StudentContactSilentPhoneFlag,
+                        Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
+                        Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
+                        Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+                        StudentParentsSeparatedFlag
+            FROM        dbo.vStudentContactAllAddress
+            LEFT JOIN   dbo.Community Contact ON StudentContactID = Contact.ID
+            LEFT JOIN   dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+            LEFT JOIN   dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
+                            Semester.FileYear = vStudentContactAllAddress.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            WHERE       StudentContactType IN ('SC1', 'SC2', 'SC3') AND 
+                        StudentBoarder = 'B'
+            ORDER BY    StudentSurname, 
+                        StudentID, 
+                        StudentContactType
+        ";
+
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
