@@ -21,7 +21,7 @@ use Schoolbox\UserMapper;
 use UnderflowException;
 
 
-class RedisCache implements ICache
+class RedisCache implements ReadableCache, WritableCache
 {
 
     const CACHE_PATTERN  = 'm:%s:routes';

@@ -11,23 +11,8 @@ namespace Schoolbox\Realtime\Routing\Cache;
 use Alaress\Routing\IRouter;
 
 
-interface ICache
+interface ReadableCache
 {
-
-    /**
-     * @param string $instanceId
-     * @param int $userId
-     * @return void
-     */
-    public function cacheUser($instanceId, $userId);
-
-    /**
-     * @param string $instanceId
-     * @return void
-     */
-    public function cacheAllUsers($instanceId);
-
-
     /**
      * @param string  $instanceId
      * @param IRouter $router

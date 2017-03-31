@@ -15,6 +15,12 @@ use Psr\Log\LoggerInterface;
 use Redis;
 use Schoolbox\Realtime\Routing\Subscription\Loader\ILoader;
 
+
+/**
+ * Class CacheLoader
+ * @deprecated
+ * @package Schoolbox\Realtime\Routing\Subscription\Loader
+ */
 class CacheLoader implements ILoader
 {
     /** @var LoggerInterface */
@@ -28,6 +34,8 @@ class CacheLoader implements ILoader
     private $data;
 
     /**
+     * @deprecated
+     *
      * @param Redis|ClientInterface $redis
      * @param string                $storageKey
      * @param LoggerInterface       $log
@@ -39,7 +47,7 @@ class CacheLoader implements ILoader
         $routesCompressed = $redis->get($storageKey);
 
         if (!(is_string($routesCompressed) && strlen($routesCompressed))) {
-            throw new InvalidArgumentException("Invalid data returned from Redis, cannot restore from cache");
+            throw new InvalidArgumentException('Invalid data returned from Redis, cannot restore from cache');
         }
 
         $this->data = $routesCompressed;
@@ -47,16 +55,18 @@ class CacheLoader implements ILoader
     }
 
     /**
+     * @deprecated
+     *
      * @param IRouter $router
      * @throws InvalidArgumentException
      * @return $this
      */
     public function loadSubscriptions(IRouter $router)
     {
-        $this->log->debug("Inflating route tree");
+        $this->log->debug('Inflating route tree');
         $routeTree = json_decode(gzuncompress($this->data), true);
 
-        $this->log->debug("Installing cached routes");
+        $this->log->debug('Reading cached routes');
 
         $count = 0;
 
@@ -67,7 +77,7 @@ class CacheLoader implements ILoader
             }
         }
 
-        $this->log->debug("$count routes installed from cache");
+        $this->log->debug("$count routes read from cache");
 
         return $this;
     }
