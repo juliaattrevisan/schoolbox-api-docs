@@ -1097,7 +1097,6 @@ class External_Synergetic_User implements External_UserInterface
         return $forms;
     }
 
-
     /**
      * This is a helper function to clear the 'Not Selected' placeholder value that
      * Synergetic loves to add as an option in every lookup table
@@ -1117,5 +1116,21 @@ class External_Synergetic_User implements External_UserInterface
                 return trim(str_replace($placeholder, '', $value));
             }
         }, $array);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentSemester($externalUserId = null)
+    {
+        die("Remove this");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentYear($externalUserId = null)
+    {
+        die("Remove this");
     }
 }
