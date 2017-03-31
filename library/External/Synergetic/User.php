@@ -711,70 +711,86 @@ class External_Synergetic_User implements External_UserInterface
         }
 
         if ($user->getRole()->isStudent()) {
-            $sql = "
-                SELECT
-                    StudentClasses.ClassCode,
-                    SubjectClasses.ClassCampus,
-                    SubjectClasses.Description as name,
-                    luFileType.Description as classType
-                FROM StudentClasses
-                INNER JOIN SubjectClasses ON
-                    StudentClasses.FileType = SubjectClasses.FileType AND
-                    StudentClasses.FileYear = SubjectClasses.FileYear AND
-                    StudentClasses.FileSemester = SubjectClasses.FileSemester AND
-                    StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
-                    StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                    StudentClasses.FileSemester = '" . $this->database->quote($this->getCurrentSemester($externalId)) . "' AND
-                    StudentClasses.FileYear = '" . $this->database->quote($this->getCurrentYear($externalId)) . "' AND
-                    StudentClasses.ID = '{$this->database->quote($externalId)}'
-                LEFT JOIN luFileType ON StudentClasses.FileType = luFileType.Code
-                WHERE
-                    StudentClasses.StartDate <= getdate()
-                    AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-                ORDER BY SubjectClasses.FileType ASC, SubjectClasses.Description ASC
+
+            // Retrieve student subjects
+
+            $sql =
+            "
+                SELECT            StudentClasses.ClassCode as code,
+                                  SubjectClasses.ClassCampus as campusCode,
+                                  SubjectClasses.Description as name,
+                                  luFileType.Description as classType
+                FROM              StudentClasses
+                INNER JOIN        SubjectClasses ON
+                                  StudentClasses.FileType = SubjectClasses.FileType AND
+                                  StudentClasses.FileYear = SubjectClasses.FileYear AND
+                                  StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+                                  StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+                                  StudentClasses.ClassCode = SubjectClasses.ClassCode AND
+                                  StudentClasses.ID = :externalId
+                JOIN              FileSemesters Semester ON
+                                      Semester.FileSemester = StudentClasses.FileSemester AND
+                                      Semester.FileYear = StudentClasses.FileYear AND
+                                      Semester.SystemCurrentFlag = 1
+                LEFT JOIN         luFileType ON StudentClasses.FileType = luFileType.Code
+                WHERE             StudentClasses.StartDate <= getdate() AND
+                                  (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+                ORDER BY          SubjectClasses.FileType ASC, 
+                                  SubjectClasses.Description ASC
             ";
+
         } else if ($user->getRole()->isStaff()) {
-            $sql = "
-                SELECT
-                    DISTINCT(c1.ClassCode),
-                    c1.ClassCampus,
-                    c2.description as name,
-                    luFileType.Description as classType
-                FROM SubjectClassStaff c1
-                INNER JOIN SubjectClasses c2 ON
-                    c1.FileType = c2.FileType AND
-                    c1.FileYear = c2.FileYear AND
-                    c1.FileSemester = c2.FileSemester AND
-                    c1.ClassCampus = c2.ClassCampus AND
-                    c1.ClassCode = c2.ClassCode AND
-                    c1.FileSemester = '" . $this->database->quote($this->getCurrentSemester($externalId)) . "' AND
-                    c1.FileYear = '" . $this->database->quote($this->getCurrentYear($externalId)) . "' AND
-                    c1.StaffID = '{$this->database->quote($externalId)}'
-                LEFT JOIN luFileType ON c2.FileType = luFileType.Code
-                ORDER BY luFileType.Description ASC, c2.Description ASC
+
+            // Retrieve staff subjects
+
+            $sql =
+            "
+                SELECT DISTINCT   (c1.ClassCode) AS code,
+                                  c1.ClassCampus as campusCode,
+                                  c2.description as name,
+                                  luFileType.Description as classType
+                FROM              SubjectClassStaff c1
+                INNER JOIN        SubjectClasses c2 ON
+                                        c1.FileType = c2.FileType AND
+                                        c1.FileYear = c2.FileYear AND
+                                        c1.FileSemester = c2.FileSemester AND
+                                        c1.ClassCampus = c2.ClassCampus AND
+                                        c1.ClassCode = c2.ClassCode AND
+                                        c1.StaffID = :externalId
+                JOIN              FileSemesters Semester ON
+                                      Semester.FileSemester = SubjectClasses.FileSemester AND
+                                      Semester.FileYear = SubjectClasses.FileYear AND
+                                      Semester.SystemCurrentFlag = 1
+                LEFT JOIN         luFileType ON c2.FileType = luFileType.Code
+                ORDER BY          luFileType.Description ASC, 
+                                  c2.Description ASC
             ";
+
         } else {
+
+            // If they're neither staff/student- they have no business being here
+
             return [];
         }
 
-        $statement = $this->getConnector()->query($sql);
-        $subjectList = array();
-        while ($subject = $statement->fetch()) {
-            $subjectList[] = array(
-                'code' => $subject['ClassCode'],
-                'name' => $subject['name'],
-                'classType' => $subject['classType'],
-                'campusCode' => $subject['ClassCampus']
-            );
-        }
+        $subjectList = $this->getConnector()->executeQuery($sql, ['externalId' => $externalId])->fetchAll();
+
         if (is_array($subjectList)) {
+
+            // Perform natural sort on subjects so they appear in a more logical order
+            // (unfortunately no current way to do this is MSSQL query without writing
+            // a custom database function or doing a hacky length query)
+
             usort($subjectList, function ($a, $b) {
                 return strnatcmp($a['name'], $b['name']);
             });
+
             return $subjectList;
-        } else {
-            return [];
         }
+
+        // No subjects found
+
+        return [];
     }
 
     /**
