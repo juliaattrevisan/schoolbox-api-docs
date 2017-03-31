@@ -796,49 +796,37 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getEnrolledStudents($synergyID)
+    public function getEnrolledStudents($externalId)
     {
-        if (!$this->isExternalIdValid($synergyID)) {
+        if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
-        //
-        // Valid Relations:
-        // SN/DR:       Son/Daughter
-        // STSN/STDR:   Stepson/Stepdaugter
-        // WD:          Ward
-        // GRASN/GRADR: Grandson/Granddaughter
-        // FOCD:        Foster child
-        // HS/HSS:      Homestay/Homestay Student
 
         // Get student contact types from config, and wrangle into a query
 
-        $studentRelationships =
-            implode(
-                ',',
-                array_map(
-                    [$this->getConnector(), 'smartQuote'],
-                    array_map(
-                        'trim',
-                        explode(',', $this->config->get('external_synergetic_student_relationships'))
-                    )
-                )
-            );
+        if (empty($this->config->get('external_synergetic_student_relationships')) === 0) {
 
-        if (strlen($studentRelationships) === 0) {
-            $studentRelationships = "'SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'";
+            // No relationships were found, use the default values we had before introducing this feature
+
+            $relationships = ['SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'];
+        } else {
+            $relationships = explode(',', $this->config->get('external_synergetic_student_relationships');
         }
 
+        $relationshipBindings = PredicateBuilder::getArrayBindings($relationships, 'relationship');
+
         $query = "
-            SELECT Relationships.RelatedID
-            FROM dbo.Constituencies Constituencies
-            LEFT JOIN dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
-            LEFT JOIN dbo.Community Community ON Relationships.RelatedID = Community.ID
-            WHERE Relationships.ID = '{$this->database->quote($synergyID)}'
-            AND Constituencies.ConstitCode='@SC'
-            AND Relationships.Relationship IN ({$studentRelationships})
-            ORDER BY Community.BirthDate
+            SELECT      Relationships.RelatedID
+            FROM        dbo.Constituencies Constituencies
+            LEFT JOIN   dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
+            LEFT JOIN   dbo.Community Community ON Relationships.RelatedID = Community.ID
+            WHERE       Relationships.ID = :id AND
+                        Constituencies.ConstitCode='@SC' AND
+                        Relationships.Relationship IN ({$relationshipBindings['placeholders']})
+            ORDER BY    Community.BirthDate
         ";
-        return $this->getConnector()->getAll($query);
+
+        return $this->getConnector()->executeQuery($query, $relationshipBindings['bindings'])->fetchAll();
     }
 
     /**
