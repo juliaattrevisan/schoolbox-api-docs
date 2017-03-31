@@ -210,12 +210,8 @@ class Controller extends Base
      * @throws \OutOfRangeException
      * @throws ServiceNotFound
      */
-    public function getPendingAssessmentsForUser(User $viewee = null)
+    public function getPendingAssessmentsForUser(User $viewee)
     {
-        // No User found ?
-        if(null === $viewee){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
         // Only display from Staff perspective.
         if(!$viewee->getRole()->isStaff()){
             // Is the Viewee as student or parent?
@@ -259,11 +255,6 @@ class Controller extends Base
      */
     public function postPendingAssessmentsForUser(User $viewee = null)
     {
-        // No User found ?
-        if(null === $viewee){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
-
         // Only display from Staff perspective.
         if(!$viewee->getRole()->isStaff()){
             // Is the Viewee as student or parent?
