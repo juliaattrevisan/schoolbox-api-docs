@@ -6,63 +6,35 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Realtime\Routing\Cache;
+namespace Schoolbox\Realtime\Routing\Cache\Redis;
 
 use Alaress\Async\Synchroniser;
 use Alaress\Routing\FlatRouter;
-use Alaress\Routing\IRouter;
 use Alaress_Byte_Format;
-use InvalidArgumentException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Realtime\Routing\Subscription;
-use Schoolbox\UserMapper;
 use UnderflowException;
 
 
-class RedisCache implements ReadableCache, WritableCache
+class WriteCache extends ReadCache implements WritableCache
 {
-
-    const CACHE_PATTERN  = 'm:%s:routes';
     const SIGNAL_PATTERN = 'routed.%s.reload';
-
 
     /** @var Subscription\Loader\Factory */
     private $loaderFactory;
 
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var ClientInterface */
-    private $redis;
-
-    /** @var GeneratorInterface */
-    private $generator;
-
-    /** @var UserMapper */
-    private $userMapper;
-
 
     /**
-     * @param Subscription\Loader\Factory $loaderFactory
-     * @param LoggerInterface             $log
      * @param ClientInterface             $redis
-     * @param GeneratorInterface          $generator
-     * @param UserMapper                  $userMapper
+     * @param LoggerInterface             $log
+     * @param Subscription\Loader\Factory $loaderFactory
      */
-    public function __construct(
-        Subscription\Loader\Factory $loaderFactory,
-        LoggerInterface $log,
-        ClientInterface $redis,
-        GeneratorInterface $generator,
-        UserMapper $userMapper
-    ) {
+    public function __construct(ClientInterface $redis, LoggerInterface $log, Subscription\Loader\Factory $loaderFactory)
+    {
+        parent::__construct($redis, $log);
         $this->loaderFactory = $loaderFactory;
-        $this->log           = $log;
-        $this->redis         = $redis;
-        $this->generator     = $generator;
-        $this->userMapper    = $userMapper;
     }
 
 
@@ -100,66 +72,6 @@ class RedisCache implements ReadableCache, WritableCache
         $this->writeCache($router, $this->getCacheKey($instanceId));
 
         $this->broadcastReload($instanceId);
-    }
-
-
-    /**
-     * @param string  $instanceId
-     * @param IRouter $router
-     * @return void
-     */
-    public function readIntoRouter($instanceId, IRouter $router)
-    {
-        try {
-            $this->readFromCache($instanceId, $router);
-        } catch (InvalidArgumentException $e) {
-            $loader = $this->loaderFactory->getNoCache();
-            $loader->loadSubscriptions($router);
-        }
-    }
-
-
-    /**
-     * @param int     $instanceId
-     * @param IRouter $router
-     * @throws InvalidArgumentException
-     * @return void
-     */
-    private function readFromCache($instanceId, IRouter $router)
-    {
-        $routesCompressed = (string)$this->redis->get($this->getCacheKey($instanceId));
-
-        if ($routesCompressed === '') {
-            throw new InvalidArgumentException('Invalid data returned from Redis, cannot restore from cache');
-        }
-
-        $this->log->debug('Inflating route tree');
-
-        /** @var string[][] $routeTree */
-        $routeTree = json_decode(gzuncompress($routesCompressed), true);
-
-        $this->log->debug('Installing cached routes');
-
-        $count = 0;
-
-        foreach ($routeTree as $path => $pathData) {
-            foreach ($pathData as $key => $value) {
-                $router->add($path, $key, $value);
-                ++$count;
-            }
-        }
-
-        $this->log->debug("$count routes installed from cache");
-    }
-
-
-    /**
-     * @param string $instanceId
-     * @return string
-     */
-    private function getCacheKey($instanceId)
-    {
-        return sprintf(self::CACHE_PATTERN, $instanceId);
     }
 
 
@@ -277,19 +189,7 @@ class RedisCache implements ReadableCache, WritableCache
      */
     private function generateRoutesForUser($userId)
     {
-        $userRoutes  = [];
-
-        // use the generator to compute new bindings for the user
-        $userBindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
-
-        foreach ($userBindings as $prefix => $data) {
-            foreach ($data as $target) {
-                $binding = "*.notify.$prefix.$target";
-                $userRoutes[$binding] = true;
-            }
-        }
-
-        return $userRoutes;
+        return $this->loaderFactory->getNoCache()->getUserSubscriptions($userId);
     }
 
 }
