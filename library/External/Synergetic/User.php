@@ -1084,13 +1084,19 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentForms()
     {
-        $query = "
-            SELECT Code, Description
-            FROM dbo.luForm
-            WHERE ActiveFlag = 1
-        ";
-        return $this->getConnector()->getAll($query);
+        $iteratorForms = $this->getConnector()->executeQueryIterator(
+            "SELECT Code, Description FROM dbo.luForm WHERE ActiveFlag = 1"
+        );
+
+        $forms = [];
+
+        foreach ($iteratorForms as $form) {
+            $forms[] = $this->clearInvalidValues($form);
+        }
+
+        return $forms;
     }
+
 
     /**
      * This is a helper function to clear the 'Not Selected' placeholder value that
