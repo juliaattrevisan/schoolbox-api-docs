@@ -9,10 +9,16 @@
 
 namespace Schoolbox\Permission\Access;
 
+use Alaress\Redis;
+use Monolog\Logger;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Queue\Bindings\Generator;
+use Schoolbox\Realtime\Routing\Cache\ICache;
+use Schoolbox\Realtime\Routing\Cache\RedisCache;
+use Schoolbox\Realtime\Routing\Subscription\Loader\Factory;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -31,6 +37,27 @@ use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
  */
 class UserAccessMapper extends Mapper
 {
+    /** @var ICache */
+    private $cache;
+
+    /**
+     * Secondary hook method which occurs after successful construction
+     *
+     * This was made because a subclass of Mapper needed to make a
+     * db call, but that needs to occur after mapping() since it
+     * defines models and tables (unavailable in setup() atm)
+     */
+    protected function postSetup()
+    {
+        /** @var UserMapper $map */
+        $map   = $this->getJoinMapper('user');
+        $redis = Redis::getClientInstance();
+        $gen   = new Generator();
+        $log   = new Logger('');
+
+        $this->cache = new RedisCache(new Factory($redis, $log), $log, $redis, $gen, $map);
+    }
+
 
     /**
      * Cached permissions
@@ -51,7 +78,29 @@ class UserAccessMapper extends Mapper
         $this->uses('service', self::TYPE_INTEGER, null);
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, 'calculateUserSubscription' ]);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);
     }
+
+
+    /**
+     * We don't actually care about *how* the user's access has changed (added, removed, etc), only that it has.
+     * On that basis, the cache will recalculate
+     *
+     * @param UserAccess $model
+     * @throws Mapper\DefinitionException
+     */
+    public function calculateUserSubscription(UserAccess $model)
+    {
+        if ($model->getService() !== UserAccess::SERVICE_HOMEPAGE) {
+            // at present only group changes influence subscriptions, so ignore everything else
+            return;
+        }
+
+        $this->cache->cacheUser(INSTANCE_ID, $model->getUser()->getId());
+    }
+
 
     /**
      * Determine whether $folder has a $user of type 3
