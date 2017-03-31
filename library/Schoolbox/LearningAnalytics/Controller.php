@@ -303,7 +303,7 @@ class Controller extends Base
      * @param Collection|UnitImplementation[] $unitImplsInTerm     units containing assessments due in current term
      * @param Collection|IAssessable[]        $dueAssessments      assessments due in current Term
      * @param Term                            $term                term to filter
-     * @param Folder                          $ClassFolder         if given, the class folder to filter
+     * @param Folder                          $classFolder         if given, the class folder to filter
      * @param string                          $routeType           'course'|'folder'
      * @param null|SubmissionType             $submissionType      if specified, a submission type filter
      * @throws ApplicationException
@@ -316,10 +316,10 @@ class Controller extends Base
         Collection $dueAssessments,
         Term $term,
         $routeType,
-        Folder $ClassFolder = null,
+        Folder $classFolder = null,
         SubmissionType $submissionType = null
     ) {
-        $analysis = new CohortAnalysis($dueAssessments, $ClassFolder, $submissionType);
+        $analysis = new CohortAnalysis($dueAssessments, $classFolder, $submissionType);
 
         // Get Classes to which this Course has been imported
         $courseImplementationFolders = $this->folderMapper->createCollection();
@@ -335,11 +335,11 @@ class Controller extends Base
         $registry = new Registry($unitImplsInTerm);
 
         /** @var Term[]|GenericCollection $navigableTerms */
-        $navigableTerms = $this->getNavigableTerms($courseSpecification, $ClassFolder);
+        $navigableTerms = $this->getNavigableTerms($courseSpecification, $classFolder);
 
         $data = [
             'courseSpec'          => $courseSpecification,
-            'classFolder'         => $ClassFolder,
+            'classFolder'         => $classFolder,
             'submissionType'      => $submissionType,
             'submissionTypes'     => $this->submissionTypeMapper->findAll(),
             'currentRoute'        => $this->getRouter()->getMatchedRoute()->name,
