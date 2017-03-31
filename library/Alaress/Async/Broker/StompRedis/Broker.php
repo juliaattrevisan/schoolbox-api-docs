@@ -117,7 +117,7 @@ abstract class Broker implements IBroker
     /**
      * @return string
      */
-    protected function getQueue()
+    public function getQueue()
     {
         return $this->queue;
     }
