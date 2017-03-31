@@ -9,7 +9,7 @@
 # Standard Disclaimer: If it breaks your world, don't come crying!
 #
 # @author      Damian Sloane <damian.sloane@alaress.com.au>
-# @copyright   2017 Alaress Pty Ltd
+# @copyright   Copyright 2017, Alaress Pty Ltd
 # @link        http://www.alaress.com.au
 
 echo
@@ -28,6 +28,7 @@ echo
 echo "Switching Active PHP Version To 7.1..."
 
 {
+USERPATH=`pwd`
 sudo a2dismod php5
 sudo a2enmod php7.1
 sudo update-alternatives --set php /usr/bin/php7.1
@@ -164,7 +165,8 @@ echo "--------------------------------------------------------------------------
 echo "Installation Completed"
 echo "-------------------------------------------------------------------------------------------"
 echo
+php -i | grep 'PDO drivers'
 echo "Log file available at: ~/php_7.1_pdosqlsrv_install.log"
 echo
-php -i | grep 'PDO drivers'
-echo
+
+eval "cd ${USERPATH}"
