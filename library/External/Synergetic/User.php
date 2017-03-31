@@ -5,13 +5,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\External\DatabaseMSSQLConnectorTrait;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
 {
-    use DatabaseMSSQLConnectorTrait;
+    use External_MssqlConnector;
     use External_Synergetic_ValidateExternalIdTrait;
 
     /**

@@ -8,14 +8,12 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\External;
-
 use Alaress\Database\Connector\Base as Connector;
 use Alaress\Database\Factory as DatabaseFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
-trait DatabaseMSSQLConnectorTrait
+trait External_MssqlConnector
 {
     /** @var Connector $connector */
     protected $connector;
