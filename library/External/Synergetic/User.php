@@ -374,23 +374,25 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        $query = "
-            SELECT
-                SchoolStaffCode,
-                luBuilding.Description AS StaffBuilding,
-                StaffRoom,
-                StaffExtension,
-                StaffMobilePhone,
-                StaffCampusDescription,
-                StaffCategoryDescription,
-                luDepartment.Description AS StaffDepartment,
-                StaffVoiceMail
-             FROM dbo.vStaff vStaff
-             LEFT JOIN dbo.luBuilding ON StaffBuilding = luBuilding.Code
-             LEFT JOIN dbo.luDepartment ON StaffDepartment = luDepartment.Code
-             WHERE vStaff.StaffID = '" . $this->database->quote($synID) . "'";
-        $staff = $this->getConnector()->getRow($query);
-        return $staff;
+
+        $query =
+        "
+            SELECT      SchoolStaffCode,
+                        luBuilding.Description AS StaffBuilding,
+                        StaffRoom,
+                        StaffExtension,
+                        StaffMobilePhone,
+                        StaffCampusDescription,
+                        StaffCategoryDescription,
+                        luDepartment.Description AS StaffDepartment,
+                        StaffVoiceMail
+             FROM       dbo.vStaff vStaff
+             LEFT JOIN  dbo.luBuilding ON StaffBuilding = luBuilding.Code
+             LEFT JOIN  dbo.luDepartment ON StaffDepartment = luDepartment.Code
+             WHERE      vStaff.StaffID = :externalId
+        ";
+
+        return $this->getConnector()->executeQuery($query, ['externalId', $synID])->fetch();
     }
 
     /**
