@@ -15,7 +15,9 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use HouseMapper;
 use HouseResidentialMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
@@ -117,6 +119,8 @@ class Module extends BaseModule
                     'userTitleMapper' => $this->getMapperFactory()->getLazy(UserTitleMapper::class),
                     'userLogMapper' => $this->getMapperFactory()->getLazy(UserLogMapper::class),
                     'cmsLogMapper' => $this->getMapperFactory()->getLazy(CMSLogMapper::class),
+                    'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                    'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
                 ]
             )
         );
