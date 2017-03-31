@@ -204,28 +204,10 @@ class Controller extends Base
      * @level 165
      * @param User $viewee The user whose pending assessments we are viewing.
      * @throws RouteNotFound
-     * @throws ApplicationException
-     * @throws \LogicException
-     * @throws \DomainException
-     * @throws \OutOfRangeException
      * @throws ServiceNotFound
      */
     public function getPendingAssessmentsForUser(User $viewee)
     {
-        // Only display from Staff perspective.
-        if(!$viewee->getRole()->isStaff()){
-            // Is the Viewee as student or parent?
-            if($viewee->getRole()->isStudent() || $viewee->getRole()->isParent()) {
-                // Redirect to 'Due Assessments' page
-                $this->getResponse()->redirect->to($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', [
-                    'studentId' => $viewee->getId(),
-                ]));
-                return;
-            }
-            // Must be a Guest. Block them.
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-        }
-
 
         $termFilterInstance = FilterMapper::getInstance()->findByColumn('class', TermFilter::class)->first();
         $termFilter         = new TermFilter($termFilterInstance);
@@ -246,29 +228,13 @@ class Controller extends Base
      * @api   GET /learning/pending/:userId
      * @level 165
      * @param User $viewee The user whose pending assessments we are viewing.
-     * @throws RouteNotFound
-     * @throws ApplicationException
      * @throws \LogicException
      * @throws \DomainException
      * @throws \OutOfRangeException
      * @throws ServiceNotFound
      */
-    public function postPendingAssessmentsForUser(User $viewee = null)
+    public function postPendingAssessmentsForUser(User $viewee)
     {
-        // Only display from Staff perspective.
-        if(!$viewee->getRole()->isStaff()){
-            // Is the Viewee as student or parent?
-            if($viewee->getRole()->isStudent() || $viewee->getRole()->isParent()) {
-                // Redirect to 'Due Assessments' page
-                $this->getResponse()->redirect->to($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', [
-                    'studentId' => $viewee->getId(),
-                ]));
-                return;
-            }
-            // Must be a Guest. Block them.
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-        }
-
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
         if($this->getUser()->getId() === $viewee->getId()){

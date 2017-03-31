@@ -74,12 +74,16 @@ class Module extends BaseModule
     {
         $this->addRoutePermission($authorizer, '(?:getPendingAssessments|getClasses)', new Rule\IsLoggedIn());
 
+        // Either a SU or staff viewing their own assessments
         $this->addRoutePermission(
                 $authorizer,
                 '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\IsUser('userId')
+                    new Rule\All(
+                        new Rule\IsUser('userId'),
+                        new Rule\HasRole(Role::STAFF)
+                    )
                 )
             );
 
