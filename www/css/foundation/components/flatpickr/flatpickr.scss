@@ -1,148 +1,150 @@
-// Custom styles
-.flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after {
-    bottom: 0;
-}
-
-.flatpickr-calendar.inline {
-    max-height: 370px;
-    border-radius: 0;
-}
-
-.flatpickr-innerContainer {
-    border-bottom: 1px solid #e6e6e6;
-}
-
-.dateIsPicked .flatpickr-innerContainer + .flatpickr-time {
-    border-top: none;
-    border-bottom: 1px solid #e6e6e6;
-}
-
-.flatpickr-time {
-    overflow: visible;
-}
-
-.time-switch {
-    width: 100px;
-    margin: 13px 10px;
-}
-
-.has-time .time-switch {
-    opacity: 0.3;
-}
-
-.all-day .time-switch {
-    opacity: 1;
-}
-
-.flatpickr-month {
-    height: 44px;
-}
-
-.flatpickr-prev-month, .flatpickr-next-month {
-    top: 18px;
-}
-
-.flatpickr-current-month .numInputWrapper {
-    width: 70px;
-}
-
-.submit-calendar {
-    float: right;
-    margin: 5px 10px 1px;
-}
-
-table.timetablePicker {
-    padding: 0;
-    margin: 0;
-    border: 1px solid rgb(230, 230, 230);
-}
-
-table.timetablePicker td {
-    padding: 0;
-    margin: 0;
-    vertical-align: middle;
-    text-align: center;
-}
-
-table.timetablePicker th {
-    width: 36px;
-    height: 36px;
-    border: none;
-    border: 1px solid #ededed;
-    text-align: center;
-    background: #c1e5ff;
-}
-
-.has-period {
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-    border-radius: 150px;
-    border-color: #fff;
-    border: 3px solid #fff;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.has-period:hover, .period-hover, table.timetablePicker th.period-hover {
-    background: #e5f4ff;
-}
-
-.has-period.period-selected {
-    background: #0066b0;
-}
-
-.period-selected, table.timetablePicker th.period-selected {
-    background: #0066b0;
-    color: #fff;
-}
-
-td.period-description {
-    border-right: 1px solid #ededed;
-}
-
-table.assessment-list td {
-    border: 0;
-    line-height: 1em;
-    padding: 0.325rem;
-}
-
-a.picker-submit, a.timetable-submit {
-    margin-top: 20px;
-}
-
-input[type=radio]:not(.plain) + label.input-toggle {
-    width: 4.5em;
-}
-
-span.displayDate {
-    font-size: 0.875rem;
-    font-weight: 400;
-    color: #000;
-}
-
 .alaress-date-picker {
+
     -webkit-transition: width 0.3s; /* Safari */
     transition: width 0.3s;
-}
 
-
-@media #{$medium-up} {
-
-    .pickerSingle.pickerNarrow {
-        width: 325px;
+    .flatpickr-calendar.arrowTop:before,
+    .flatpickr-calendar.arrowTop:after {
+        bottom: 0;
     }
 
-    .pickerSingle.pickerWide {
-        width: 435px;
+    .flatpickr-calendar.inline {
+        max-height: 370px;
+        border-radius: 0;
     }
 
-    .pickerDouble.pickerNarrow {
-        width: 650px;
+    .flatpickr-innerContainer {
+        border-bottom: 1px solid #e6e6e6;
     }
 
-    .pickerDouble.pickerWide {
-        width: 750px;
+    .dateIsPicked .flatpickr-innerContainer + .flatpickr-time {
+        border-top: none;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .flatpickr-time {
+        overflow: visible;
+    }
+
+    .time-switch {
+        width: 100px;
+        margin: 13px 10px;
+    }
+
+    .has-time .time-switch {
+        opacity: 0.3;
+    }
+
+    .all-day .time-switch {
+        opacity: 1;
+    }
+
+    .flatpickr-month {
+        height: 44px;
+    }
+
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        top: 18px;
+    }
+
+    .flatpickr-current-month .numInputWrapper {
+        width: 70px;
+    }
+
+    .submit-calendar {
+        float: right;
+        margin: 5px 10px 1px;
+    }
+
+    table.timetablePicker {
+        padding: 0;
+        margin: 0;
+        border: 1px solid rgb(230, 230, 230);
+    }
+
+    table.timetablePicker td {
+        padding: 0;
+        margin: 0;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    table.timetablePicker th {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border: 1px solid #ededed;
+        text-align: center;
+        background: #c1e5ff;
+    }
+
+    .has-period {
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        border-radius: 150px;
+        border-color: #fff;
+        border: 3px solid #fff;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .has-period:hover, .period-hover,
+    table.timetablePicker th.period-hover {
+        background: #e5f4ff;
+    }
+
+    .has-period.period-selected {
+        background: #0066b0;
+    }
+
+    .period-selected,
+    table.timetablePicker th.period-selected {
+        background: #0066b0;
+        color: #fff;
+    }
+
+    td.period-description {
+        border-right: 1px solid #ededed;
+    }
+
+    table.assessment-list td {
+        border: 0;
+        line-height: 1em;
+        padding: 0.325rem;
+    }
+
+    a.picker-submit,
+    a.timetable-submit {
+        margin-top: 20px;
+    }
+
+    input[type=radio]:not(.plain) + label.input-toggle {
+        width: 4.5em;
+    }
+
+    span.displayDate {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: #000;
+    }
+
+    @media #{$medium-up} {
+
+        &.pickerSingle.pickerNarrow {
+            width: 325px;
+        }
+        &.pickerSingle.pickerWide {
+            width: 435px;
+        }
+        &.pickerDouble.pickerNarrow {
+            width: 650px;
+        }
+        &.pickerDouble.pickerWide {
+            width: 750px;
+        }
+
     }
 
 }
