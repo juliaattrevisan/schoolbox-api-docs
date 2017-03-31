@@ -52,6 +52,7 @@ use \Schoolbox\Resource\Folder\Code\Model as FolderCode;
  * @method Model createModel($idValue = null)
  * @method Collection|Model[] findByColumnList($columnList, $options = []);
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
  */
 class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 {
