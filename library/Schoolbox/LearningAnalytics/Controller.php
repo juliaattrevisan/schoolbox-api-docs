@@ -29,6 +29,7 @@ use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType as SubmissionType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
+use \Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 
 class Controller extends Base
 {
@@ -327,6 +328,12 @@ class Controller extends Base
             $courseFolder = $courseImplementation->getFolder();
             $courseImplementationFolders->setOffset($courseFolder->getId(), $courseFolder);
         }
+
+        // Ensure we have folder codes
+        /** @var FolderCodeMapper $codeMapper */
+        $codeMapper = FolderCodeMapper::getInstance();
+        $codeMapper->applyCodesToCategories($courseImplementationFolders);
+
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
