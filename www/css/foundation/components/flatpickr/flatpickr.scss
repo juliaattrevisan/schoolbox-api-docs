@@ -121,26 +121,23 @@ span.displayDate {
     color: #000;
 }
 
-.pickerSingle.pickerNarrow {
-    width: 325px;
+.alaress-date-picker {
     -webkit-transition: width 0.3s; /* Safari */
     transition: width 0.3s;
+}
+
+.pickerSingle.pickerNarrow {
+    width: 325px;
 }
 
 .pickerSingle.pickerWide {
     width: 435px;
-    -webkit-transition: width 0.3s; /* Safari */
-    transition: width 0.3s;
 }
 
 .pickerDouble.pickerNarrow {
     width: 650px;
-    -webkit-transition: width 0.3s; /* Safari */
-    transition: width 0.3s;
 }
 
 .pickerDouble.pickerWide {
     width: 750px;
-    -webkit-transition: width 0.3s; /* Safari */
-    transition: width 0.3s;
 }
