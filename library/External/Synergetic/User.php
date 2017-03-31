@@ -98,44 +98,51 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
 
-        $query = "
-            SELECT
-                Contact.Title,
-                Contact.Preferred,
-                Contact.Surname,
-                Contact.Email,
-                Contact.OccupEmail,
-                Contact.DefaultEmailCode,
-                Addresses.Phone AS HomePhone,
-                Addresses.SilentPhoneFlag,
-                Contact.SilentMobilePhoneFlag,
-                Contact.MobilePhone,
-                Contact.DirectoryIncludeFlag,
-                Contact.SpouseID,
-                Spouse.Title SpouseTitle,
-                Spouse.Preferred SpousePreferred,
-                Spouse.Surname SpouseSurname,
-                Spouse.Email SpouseEmail,
-                Spouse.OccupEmail SpouseOccupEmail,
-                Spouse.DefaultEmailCode SpouseDefaultEmailCode,
-                Spouse.MobilePhone SpouseMobilePhone,
-                Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
-            FROM
-                dbo.Community Contact
-            LEFT JOIN
-                dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
-            LEFT JOIN
-                dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
-            WHERE
-                Contact.ID = '" . $this->database->quote($synID) . "'";
-        $parent = $this->getConnector()->getRow($query);
-        if ($parent['DefaultEmailCode'] == 'O') {
-            $parent['Email'] = $parent['OccupEmail'];
+        $query =
+        "
+            SELECT      Contact.Title,
+                        Contact.Preferred,
+                        Contact.Surname,
+                        CASE 
+                          WHEN Contact.DefaultEmailCode = 'O' THEN Contact.OccupEmail
+                          ELSE Contact.Email
+                        END AS Email,
+                        Contact.OccupEmail,
+                        Contact.DefaultEmailCode,
+                        Addresses.Phone AS HomePhone,
+                        Addresses.SilentPhoneFlag,
+                        Contact.SilentMobilePhoneFlag,
+                        Contact.MobilePhone,
+                        Contact.DirectoryIncludeFlag,
+                        Contact.SpouseID,
+                        Spouse.Title SpouseTitle,
+                        Spouse.Preferred SpousePreferred,
+                        Spouse.Surname SpouseSurname,
+                        CASE 
+                          WHEN Spouse.DefaultEmailCode = 'O' THEN Spouse.OccupEmail
+                          ELSE Spouse.Email
+                        END AS SpouseEmail,                        
+                        Spouse.OccupEmail SpouseOccupEmail,
+                        Spouse.DefaultEmailCode SpouseDefaultEmailCode,
+                        Spouse.MobilePhone SpouseMobilePhone,
+                        Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
+            FROM        dbo.Community Contact
+            LEFT JOIN   dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
+            LEFT JOIN   dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
+            WHERE       Contact.ID = :externalId
+        ";
+
+        $parentQuery = $this->getConnector()->executeQuery($query, ['externalId' => $synID]);
+
+        // Try and fetch the requested parent
+
+        if ($parent = $parentQuery->fetch()) {
+            return $parent;
         }
-        if ($parent['SpouseDefaultEmailCode'] == 'O') {
-            $parent['SpouseEmail'] = $parent['SpouseOccupEmail'];
-        }
-        return $parent;
+
+        // Couldn't find the parent
+
+        return [];
     }
 
     /**
