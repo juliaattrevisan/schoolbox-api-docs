@@ -929,26 +929,28 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStaffUserAccountInfo()
     {
-        $query = "
-            SELECT
-                vStaff.StaffID,
-                NetworkLogin,
-                ActiveFlag,
-                vStaff.StaffTitle,
-                vStaff.StaffPreferredName,
-                vStaff.StaffSurname,
-                DefaultEmailCode,
-                OccupEmail,
-                Email,
-                vStaff.StaffCampus,
-                StaffCategoryType,
-                StaffCategory,
-                vStaff.StaffDepartment
-            FROM dbo.vStaff vStaff
-            LEFT JOIN Community ON Community.ID = StaffID
-          WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
+        $query =
+            "
+            SELECT      vStaff.StaffID,
+                        NetworkLogin,
+                        ActiveFlag,
+                        vStaff.StaffTitle,
+                        vStaff.StaffPreferredName,
+                        vStaff.StaffSurname,
+                        DefaultEmailCode,
+                        OccupEmail,
+                        Email,
+                        vStaff.StaffCampus,
+                        StaffCategoryType,
+                        StaffCategory,
+                        vStaff.StaffDepartment
+            FROM        dbo.vStaff vStaff
+            LEFT JOIN   Community ON Community.ID = StaffID
+            WHERE       ActiveFlag = 1 AND 
+                        vStaff.StaffRegistrationType != 'STDNT'
         ";
-        return $this->getConnector()->getAll($query);
+
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
