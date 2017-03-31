@@ -20,6 +20,7 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Routing\Cache\RedisCache;
 use Schoolbox\Realtime\Routing\Subscription;
 use Schoolbox\RoleMapper;
@@ -65,7 +66,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
         ->setUserMapper($userMapper)
         ->setGenerator($generator);
 
-    $cache = new RedisCache($loaderFactory, $log, $redis, $generator, $userMapper);
+    $cache = new WriteCache($redis, $log, $loaderFactory);
 
     if ($opts['userId']) {
         $cache->cacheUser($opts['instance'], $opts['userId']);

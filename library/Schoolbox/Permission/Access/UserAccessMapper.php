@@ -16,8 +16,8 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Queue\Bindings\Generator;
-use Schoolbox\Realtime\Routing\Cache\ICache;
-use Schoolbox\Realtime\Routing\Cache\RedisCache;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Realtime\Routing\Subscription\Loader\Factory;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -37,7 +37,7 @@ use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
  */
 class UserAccessMapper extends Mapper
 {
-    /** @var ICache */
+    /** @var WritableCache */
     private $cache;
 
     /**
@@ -55,7 +55,11 @@ class UserAccessMapper extends Mapper
         $gen   = new Generator();
         $log   = new Logger('');
 
-        $this->cache = new RedisCache(new Factory($redis, $log), $log, $redis, $gen, $map);
+        $factory = (new Factory($redis, $log))
+            ->setGenerator($gen)
+            ->setUserMapper($map);
+
+        $this->cache = new WriteCache($redis, $log, $factory);
     }
 
 
