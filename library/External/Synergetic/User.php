@@ -1145,7 +1145,9 @@ class External_Synergetic_User implements External_UserInterface
 
         // Otherwise, return the current system default values
 
-        $querySemester = $this->getConnector()->executeQuery("SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1"));
+        $querySemester = $this->getConnector()->executeQuery(
+            "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1"
+        );
 
         if ($semester = $querySemester->fetch())
         {
