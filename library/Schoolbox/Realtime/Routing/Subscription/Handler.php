@@ -13,13 +13,18 @@ use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Redis\Async\Event\IEvent;
+use Alaress\Redis\Async\Event\Message;
+use Alaress\Redis\Async\EventListener;
 use Alaress\WorkerCrew\Transaction\ITransaction;
 use Alaress\WorkerCrew\TXRX;
 use InvalidArgumentException;
 use OverflowException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Realtime\Routing\Cache\ReadableCache;
 
-class Handler implements IConsumer
+
+class Handler implements IConsumer, EventListener
 {
     const TRANSACTION_CACHE_TIMEOUT = 0.5;
     const TRANSACTION_COUNT_LIMIT   = 80;
@@ -36,19 +41,24 @@ class Handler implements IConsumer
     /** @var TXRX */
     private $txrx;
 
+    /** @var ReadableCache */
+    private $cache;
+
 
     /**
      * @param Resolver        $resolver
      * @param LoggerInterface $log
      * @param TXRX            $txrx
      * @param ITransaction    $transaction
+     * @param ReadableCache   $cache
      */
-    public function __construct(Resolver $resolver, LoggerInterface $log, TXRX $txrx, ITransaction $transaction)
+    public function __construct(Resolver $resolver, LoggerInterface $log, TXRX $txrx, ITransaction $transaction, ReadableCache $cache)
     {
         $this->resolver = $resolver;
         $this->log    = $log;
         $this->txrx   = $txrx;
         $this->transaction = $transaction;
+        $this->cache = $cache;
     }
 
 
@@ -63,7 +73,7 @@ class Handler implements IConsumer
     public function onMessage($instance, IResolver $resolver)
     {
         try {
-            $this->handle($instance);
+            $this->handleMessage($instance);
             $resolver->acknowledge();
             return;
 
@@ -81,10 +91,42 @@ class Handler implements IConsumer
 
 
     /**
+     * Invoked when we receive events via a redis subscription
+     *
+     * @param IEvent $event
+     * @return void
+     */
+    public function handle(IEvent $event)
+    {
+        if (!$event instanceof Message) {
+            // we're not interested in pings
+            return;
+        }
+
+        // events will be delivered on a channel like "routed.vagrantx.rebind"
+        list(, $instanceId, $action) = explode('.', $event->getChannel(), 3);
+
+        $payload = $event->getPayload();
+
+        $suffix = $payload ? ' with payload ' . var_export($payload, true) : '';
+
+        $this->log->info("Received signal to $action $instanceId$suffix", [ 'char' => '>' ]);
+
+        switch ($action) {
+            // so far this is the only action available
+            case 'reload':
+                $this->cache->readIntoRouter($instanceId, $this->resolver->getRouter());
+                break;
+        }
+
+    }
+
+
+    /**
      * @param Instance $instance
      * @throws InvalidArgumentException
      */
-    private function handle(Instance $instance)
+    private function handleMessage(Instance $instance)
     {
         // typically there's only 1, but the possibility of more
         foreach ($instance->getTopics() as $topic) {
