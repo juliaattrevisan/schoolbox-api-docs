@@ -6,41 +6,21 @@ $pickr-month-padding: 5px;
     -webkit-transition: width 0.3s; /* Safari */
     transition: width 0.3s;
 
+    .flatpickr-calendar {
+        max-height: 400px;
+        border-radius: 0;
+        margin: 0 auto;
+        border: 1px solid #e6e6e6;
+        box-shadow: none;
+    }
+
     .flatpickr-calendar.arrowTop:before,
     .flatpickr-calendar.arrowTop:after {
         bottom: 0;
     }
 
-    .flatpickr-calendar.inline {
-        max-height: 370px;
-        border-radius: 0;
-        margin: 0 auto;
-    }
-
     .flatpickr-innerContainer {
         border-bottom: 1px solid #e6e6e6;
-    }
-
-    .dateIsPicked .flatpickr-innerContainer + .flatpickr-time {
-        border-top: none;
-        border-bottom: 1px solid #e6e6e6;
-    }
-
-    .flatpickr-time {
-        overflow: visible;
-    }
-
-    .time-switch {
-        width: 100px;
-        margin: 13px 10px;
-    }
-
-    .has-time .time-switch {
-        opacity: 0.3;
-    }
-
-    .all-day .time-switch {
-        opacity: 1;
     }
 
     .flatpickr-month {
@@ -74,6 +54,60 @@ $pickr-month-padding: 5px;
 
     .flatpickr-current-month .numInputWrapper {
         width: 70px;
+    }
+
+    .flatpickr-day.inRange,
+    .flatpickr-day.prevMonthDay.inRange,
+    .flatpickr-day.nextMonthDay.inRange,
+    .flatpickr-day.today.inRange,
+    .flatpickr-day.prevMonthDay.today.inRange,
+    .flatpickr-day.nextMonthDay.today.inRange,
+    .flatpickr-day:hover,
+    .flatpickr-day.prevMonthDay:hover,
+    .flatpickr-day.nextMonthDay:hover,
+    .flatpickr-day:focus,
+    .flatpickr-day.prevMonthDay:focus,
+    .flatpickr-day.nextMonthDay:focus {
+        background: #e5f4ff;
+        border-color: #e5f4ff;
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:focus,
+    .flatpickr-day.selected:hover,
+    .flatpickr-day.selected.prevMonthDay,
+    .flatpickr-day.selected.nextMonthDay {
+        background: #0066b0;
+        border-color: #0066b0;
+    }
+
+    .dateIsPicked .flatpickr-innerContainer + .flatpickr-time {
+        border-top: none;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .flatpickr-time {
+        overflow: visible;
+        border-top: 0;
+    }
+
+    .flatpickr-time input {
+        border: 0;
+        background: transparent;
+        font-size: 14px;
+    }
+
+    .time-switch {
+        width: 100px;
+        margin: 13px 10px;
+    }
+
+    .has-time .time-switch {
+        opacity: 0.3;
+    }
+
+    .all-day .time-switch {
+        opacity: 1;
     }
 
     .submit-calendar {
