@@ -110,7 +110,7 @@
                 .on('change', ':input', timeoutUpdate)
                 .on('change', '[data-rubric-descriptor]', timeoutUpdate)
                 .on('blur', ':input', doASaveActionNao)
-                .on('addedfile.attachzone', '.attachzone', timeoutUpdate)
+                .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
         }
 
