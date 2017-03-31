@@ -45,10 +45,10 @@ trait TestConnectorTrait
 
         $this->db2Test = $factory->createDb2();
         $this->db2Test->connect(
-            '172.22.15.133:50000',
-            'SBOX',
-            'damian',
-            '7ek&DPUu'
+            'ec2-13-54-248-74.ap-southeast-2.compute.amazonaws.com:50000',
+            'SBOXTEST',
+            'sbox',
+            'tnp879'
         );
     }
 
