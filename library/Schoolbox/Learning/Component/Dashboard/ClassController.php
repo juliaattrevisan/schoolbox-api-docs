@@ -12,30 +12,46 @@ namespace Schoolbox\Learning\Component\Dashboard;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Classes\ClassList;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Timetable_ColourMapper;
 use Schoolbox\User;
 use SitePage;
+use Alaress_Date_Format;
 
 class ClassController extends Component_Dashboard_ControllerAbstract
 {
-    /**
-     * @var Collection|FolderModel
-     */
-    protected $classList;
+    /** @var Term */
+    private $currentTerm;
 
-    /**
-     * @var array
-     */
+    /** @var GenericCollection|Folder[] */
+    private $classList;
 
-    protected $classTypes;
+    /** @var string[] */
+    private $classTypes = [];
 
-    /** @var Collection|Collection[]|Implementation\Model[][] */
-    protected $courseImplementations;
+    /** @var Collection|CourseSpec[][]  */
+    private $courseSpecs;
+
+    /** @var TermMapper */
+    private $termMapper;
+
+    /** @var Timetable_ColourMapper */
+    private $timeTableColourMapper;
+
+    /** @var CourseSpecMapper */
+    private $courseSpecMapper;
+
+    /** @var CourseImplMapper */
+    private $courseImplMapper;
+
 
     /**
      * Injectable constructor
@@ -43,6 +59,7 @@ class ClassController extends Component_Dashboard_ControllerAbstract
      * @param Component_Instance $instance
      * @param User               $user
      * @param SitePage           $sitepage
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         Component_Instance $instance,
@@ -50,7 +67,10 @@ class ClassController extends Component_Dashboard_ControllerAbstract
         SitePage $sitepage
     ) {
         parent::__construct($instance, $user, $sitepage);
-        $this->setClassList(new Collection());
+        $this->timeTableColourMapper = $this->getMapperFactory()->get(Timetable_ColourMapper::class);
+        $this->courseSpecMapper      = $this->getMapperFactory()->get(CourseSpecMapper::class);
+        $this->courseImplMapper      = $this->getMapperFactory()->get(CourseImplMapper::class);
+        $this->termMapper            = $this->getMapperFactory()->get(TermMapper::class);
 
     }
 
@@ -61,35 +81,23 @@ class ClassController extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
-        /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = Timetable_ColourMapper::getInstance()->findAll();
-        $colourIndex = 0;
-
-        $classTypes = array();
-
-        /* Convert external subjects to folders */
-        foreach($this->getUser()->getSubjectCollection() as $subject ) {
-            try {
-                $folder = FolderMapper::getInstance()->findByCode($subject['code']);
-                if (!$folder->getColour()) {
-                    /* Apply colour from list if no colour exists */
-                    $folder->setColour($colourList[$colourIndex]->getHexColour());
-                    $colourIndex = ($colourIndex + 1) % $colourList->count();
-                }
-                $this->getClassList()->add($folder);
-                $classTypes[$folder->getId()] = $subject['classType'];
-            } catch (MapperException $e) {
-                //not found
-            }
+        if ($this->getUser()->getHideTimetable()){
+            return false;
         }
-        $this->setClassTypes($classTypes);
 
-        $this->setCourseImplementations(Implementation\Mapper::getInstance()->findByFolderId($this->getClassList()->getColumnValues('id'))->groupByCallback(
-            function (Implementation\Model $i)
-            {
-                return $i->getFolder()->getId();
-            })
+        $classList = new ClassList(
+            $this->getUser(),
+            $this->getFolderMapper(),
+            $this->timeTableColourMapper,
+            $this->courseSpecMapper,
+            $this->courseImplMapper
         );
+        $gridData = $classList->getClassList($this->termMapper->findForToday(), Alaress_Date_Format::now());
+
+        $this->currentTerm = $gridData['term'];
+        $this->classList   = $gridData['classList'];
+        $this->classTypes  = $gridData['classTypes'];
+        $this->courseSpecs = $gridData['courses'];
 
         return true;
     }
@@ -98,10 +106,11 @@ class ClassController extends Component_Dashboard_ControllerAbstract
      * @param String $templateHandle
      *
      * @return bool
+     * @throws \Exception
      */
     public function renderTemplate($templateHandle)
     {
-        if ($this->getUser()->getHideTimetable() || $this->getClassList()->count() == 0) {
+        if (0 === $this->classList->count()) {
             return false;
         }
 
@@ -111,64 +120,11 @@ class ClassController extends Component_Dashboard_ControllerAbstract
             [
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'componentClass'      => $this->getComponentName(),
-                'currentSemester'     => TermMapper::getInstance()->findForToday(),
-                'classList'           => $this->getClassList(),
-                'classTypes'          => $this->getClassTypes(),
-                'courses'             => $this->getCourseImplementations(),
+                'term'                => $this->currentTerm,
+                'classList'           => $this->classList,
+                'classTypes'          => $this->classTypes,
+                'courses'             => $this->courseSpecs,
             ]
         );
     }
-
-    /**
-     * @return Collection
-     */
-    public function getClassList()
-    {
-        return $this->classList;
-    }
-
-    /**
-     * @return array
-     */
-    public function getClassTypes()
-    {
-        return $this->classTypes;
-    }
-
-    /**
-     * @param Collection $classList
-     */
-    public function setClassList(Collection $classList)
-    {
-        $this->classList = $classList;
-    }
-
-    /**
-     * @param array $classTypes
-     */
-    public function setClassTypes($classTypes)
-    {
-        $this->classTypes = $classTypes;
-    }
-
-
-    /**
-     * @return Collection|Collection[]|Implementation\Model[][]
-     */
-    public function getCourseImplementations()
-    {
-        return $this->courseImplementations;
-    }
-
-
-    /**
-     * @param Collection|Collection[]|Implementation\Model[][] $courseImplementations
-     * @return $this
-     */
-    public function setCourseImplementations(Collection $courseImplementations)
-    {
-        $this->courseImplementations = $courseImplementations;
-        return $this;
-    }
-
 }
