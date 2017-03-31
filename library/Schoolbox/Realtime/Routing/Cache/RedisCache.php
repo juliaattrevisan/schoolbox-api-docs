@@ -207,23 +207,13 @@ class RedisCache implements ICache
         // start by loading from cache
         $this->loaderFactory->get($routeStorageKey)->loadSubscriptions($router);
 
-        // use the generator to compute new bindings for the user
-        $userBindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
-
         // extract the list and reset the router
         $allRoutes = $router->getAll();
         $router = new FlatRouter();
 
         // compile user routes
-        $userRoutes  = [];
+        $userRoutes  = $this->generateRoutesForUser($userId);
         $changeCount = 0;
-
-        foreach ($userBindings as $prefix => $data) {
-            foreach ($data as $target) {
-                $binding = "*.notify.$prefix.$target";
-                $userRoutes[$binding] = true;
-            }
-        }
 
         // remove any bindings no longer applicable to this user
         foreach ($allRoutes as $path => $pathData) {
@@ -271,6 +261,30 @@ class RedisCache implements ICache
         $loader->loadSubscriptions($router);
 
         return $router;
+    }
+
+
+    /**
+     * Essentially just converts generator bindings into a route list
+     *
+     * @param int $userId
+     * @return array
+     */
+    private function generateRoutesForUser($userId)
+    {
+        $userRoutes  = [];
+
+        // use the generator to compute new bindings for the user
+        $userBindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
+
+        foreach ($userBindings as $prefix => $data) {
+            foreach ($data as $target) {
+                $binding = "*.notify.$prefix.$target";
+                $userRoutes[$binding] = true;
+            }
+        }
+
+        return $userRoutes;
     }
 
 }
