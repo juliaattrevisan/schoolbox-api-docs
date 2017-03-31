@@ -1058,18 +1058,18 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType($code)
     {
-        if (strlen($boarderValue) === 0) {
+        if (empty($code)) {
             return '';
         }
-        $query = "
-            SELECT Description
-            FROM   luBoarder
-            WHERE  Code = '{$this->quote($boarderValue)}'
-        ";
-        return $this->getConnector()->getOne($query);
+
+        return $this->getConnector()->executeQuery(
+            "SELECT Description FROM luBoarder WHERE Code = :code",
+            ['code' => $code]
+        )->fetchColumn();
     }
+
 
     /**
      * @inheritdoc
