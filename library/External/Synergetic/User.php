@@ -702,30 +702,6 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getCurrentSemester($externalUserId = null)
-    {
-        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
-        if (!empty($fileYearSemester)) {
-            return $fileYearSemester['semester'];
-        }
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCurrentYear($externalUserId = null)
-    {
-        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
-        if (!empty($fileYearSemester)) {
-            return $fileYearSemester['year'];
-        }
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
