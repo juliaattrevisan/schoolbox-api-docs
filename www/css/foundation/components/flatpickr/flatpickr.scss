@@ -11,6 +11,7 @@
     .flatpickr-calendar.inline {
         max-height: 370px;
         border-radius: 0;
+        margin: 0 auto;
     }
 
     .flatpickr-innerContainer {
@@ -131,6 +132,11 @@
     }
 
     @media #{$medium-up} {
+
+        .flatpickr-calendar.inline {
+            margin-left: 0;
+            margin-right: 0;
+        }
 
         &.pickerSingle.pickerNarrow {
             width: 325px;
