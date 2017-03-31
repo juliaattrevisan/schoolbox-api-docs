@@ -75,7 +75,7 @@ class QueueMapper extends Mapper {
                 if (!empty($results)) {
                     /** @var \Schoolbox\Video\Queue $videoQueue */
                     foreach ($results as $videoQueue) {
-                        if (!empty($videoQueue->getStorage()->getFilename())) {
+                        if ($videoQueue->getStorage() instanceof Storage\Model) {
                             $result[$statusCurrent][] = $videoQueue;
                         }
                     }
@@ -87,7 +87,7 @@ class QueueMapper extends Mapper {
             if (!empty($results)) {
                 /** @var \Schoolbox\Video\Queue $videoQueue */
                 foreach ($results as $videoQueue) {
-                    if (!empty($videoQueue->getStorage()->getFilename())) {
+                    if ($videoQueue->getStorage() instanceof Storage\Model) {
                         $result[] = $videoQueue;
                     }
                 }
