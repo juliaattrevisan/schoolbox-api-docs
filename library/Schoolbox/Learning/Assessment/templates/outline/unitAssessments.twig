@@ -80,7 +80,7 @@
                         {% set participant                 = assessment.getParticipant(USER) %}
                         {% set latestResponse              = participant.findMostRecentSubmittedResposne %}
                         {% set isMarkedByTeacherAsComplete = latestResponse and latestResponse.teacherAssessed and latestResponse.markedComplete %}
-                        {% include '@learningAssessment/task/progressTickForm.twig' with {
+                        {% include '@learningAssessment/fragments/progressTick.twig' with {
                         participant: participant,
                         disabled: not assessment.isOpen or not assessment.isSelfAssessable or isMarkedByTeacherAsComplete
                         } only %}

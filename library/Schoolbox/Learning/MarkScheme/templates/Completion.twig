@@ -1,6 +1,6 @@
 {% set fbUrl %}{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: participant.assessable.id, studentId: participant.user.id }) }}{% endset %}
 
-{% include '@learningAssessment/task/progressTickForm.twig' with {
+{% include '@learningAssessment/fragments/progressTick.twig' with {
     participant: participant,
     disabled: false
 } only %}

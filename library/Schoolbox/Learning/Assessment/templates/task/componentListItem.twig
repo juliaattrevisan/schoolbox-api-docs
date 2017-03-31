@@ -5,7 +5,7 @@
         {% set participant = assessable.getParticipant(USER) %}
         {% set latestResponse = participant.findMostRecentSubmittedResponse %}
 
-        {% include '@learningAssessment/task/progressTickForm.twig' with {
+        {% include '@learningAssessment/fragments/progressTick.twig' with {
             participant: participant,
             disabled: not assessable.isOpen or not assessable.isSelfAssessable or (not latestResponse.selfAssessed and latestResponse.markedComplete )
         } only %}
