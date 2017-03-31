@@ -1,29 +1,27 @@
 <?php
 /**
- * Implementation of Edumate User connector
+ * Implementation of Edumate User Connection
  * For schema information, see http://wiki.schoolbox.com.au/index.php/Interface_Calls
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 use Schoolbox\User;
 
-class External_Edumate_User extends External_Edumate_Connection implements External_UserInterface {
-
+class External_Edumate_User extends External_Edumate_Connection implements External_UserInterface
+{
     /**
-     * Returns information on a parent
-     * @param int $externalUserId
-     * @return bool|array
+     * @inheritdoc
      */
-    public function getParent($externalUserId) {
+    public function getParent($externalUserId)
+    {
         // prepare
 
         $caseSensitiveFields = array('ID', 'Email', 'MobilePhone', 'SpouseID', 'SpouseMobilePhone');
 
-        $stmt = $this->getDatabase()->prepare("
+        $stmt = $this->getConnection()->prepareQuery("
             SELECT carer_number AS ID, full_name, COMBINED_EMAIL_ADDRESS AS Email, mobile AS MobilePhone, spouse_carer_number AS SpouseID, spouse_full_name,
               spouse_mobile AS SpouseMobilePhone
             FROM db2inst1.schoolbox_parents
@@ -37,18 +35,18 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         $parent = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($parent === false) {
+        if ($parent === false) {
             return false;
         }
 
         // manipulate
         // split out [spouse_]full_name fields and try to guess name pieces
         // ** ASSIGNMENT (=) HERE INTENTIONAL, NOT COMPARISON (==)
-        if($selfName = $this->guessNamePartsFromFull($parent['FULL_NAME'])) {
+        if ($selfName = $this->guessNamePartsFromFull($parent['FULL_NAME'])) {
             $parent = array_merge($parent, $selfName);
             unset($parent['FULL_NAME']);
         }
-        if($spouseName = $this->guessNamePartsFromFull($parent['SPOUSE_FULL_NAME'], 'Spouse')) {
+        if ($spouseName = $this->guessNamePartsFromFull($parent['SPOUSE_FULL_NAME'], 'Spouse')) {
             $parent = array_merge($parent, $spouseName);
             unset($parent['SPOUSE_FULL_NAME']);
         }
@@ -57,43 +55,40 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     }
 
     /**
-     * Helper function to convert a fullname field into name parts
-     * @param $fullName
-     * @param string $prefix
-     * @return array|bool
+     * @inheritdoc
      */
-    protected function guessNamePartsFromFull($fullName, $prefix = '') {
+    protected function guessNamePartsFromFull($fullName, $prefix = '')
+    {
         // strip out any consecutive or trailing spaces
         $fullName = trim(preg_replace("/\s\s+/", ' ', $fullName));
 
-        if(!strlen($fullName)) {
+        if (!strlen($fullName)) {
             return false;
         }
 
         $parts = explode(' ', $fullName);
-        switch(count($parts)) {
+        switch (count($parts)) {
             case 2: // one space, take as 'Preferred Surname'
                 return array(
-                    $prefix.'Preferred' => $parts[0],
-                    $prefix.'Surname' => $parts[1],
+                    $prefix . 'Preferred' => $parts[0],
+                    $prefix . 'Surname' => $parts[1],
                 );
             case 3: // 2 spaces, take as 'Title Preferred Surname'
                 return array(
-                    $prefix.'Title' => $parts[0],
-                    $prefix.'Preferred' => $parts[1],
-                    $prefix.'Surname' => $parts[2],
+                    $prefix . 'Title' => $parts[0],
+                    $prefix . 'Preferred' => $parts[1],
+                    $prefix . 'Surname' => $parts[2],
                 );
             default: // anything else, can't work with it, return failure
                 return false;
         }
     }
 
-
     /**
-     * Returns information on a student
-     * @param $externalUserId
+     * @inheritdoc
      */
-    public function getStudent($externalUserId) {
+    public function getStudent($externalUserId)
+    {
         // prepare
 
         /* FIELDS PRESENT IN SYNERGETIC BUT NOT EDUMATE
@@ -115,11 +110,13 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         */
 
         // use this for mapping DB2INDICES to NormalIndices
-        $caseSensitiveFields = array('StudentID', 'StudentGiven1', 'StudentSurname', 'StudentBirthDate',
+        $caseSensitiveFields = array(
+            'StudentID', 'StudentGiven1', 'StudentSurname', 'StudentBirthDate',
             'StudentHouseDescription', 'StudentYearLevel', 'StudentTutor', 'StudentHeadOfHouse', 'StudentForm',
-            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone');
+            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone'
+        );
 
-        $stmt = $this->getDatabase()->prepare("
+        $stmt = $this->getConnection()->prepareQuery("
             SELECT s.student_number AS StudentID, s.firstname AS StudentGiven1, s.surname AS StudentSurname,
               s.birthdate AS StudentBirthDate, s.house AS StudentHouseDescription, s.year_level AS StudentYearLevel,
               s.tutor_name AS StudentFormStaffName, s.head_of_house AS StudentHeadOfHouse, s.form_name AS StudentForm,
@@ -143,7 +140,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // use the first record to plaster the data into an array, or it will be returned false if nonexistent
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if(!$student) {
+        if (!$student) {
             return false;
         }
 
@@ -151,10 +148,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $student['STUDENTYEARLEVEL'] = preg_replace('/[^0-9]/', '', $student['STUDENTYEARLEVEL']) + 0;
 
         // sometimes Edumate will return blank emergency contact on the first record...
-        if(strlen($student['STUDENTEMERGENCYNAME'])) {
+        if (strlen($student['STUDENTEMERGENCYNAME'])) {
             $start = 2;
-        }
-        else {
+        } else {
             $start = 1;
             unset($student['STUDENTEMERGENCYNAME']);
             unset($student['STUDENTEMERGENCYPHONE']);
@@ -162,22 +158,22 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         // parse rows into student - it will be replicated by being joined to parent rows, so need to flatten
         // populate emergency contacts by stacking
-        for($i = $start; $i < 4, $row = $stmt->fetch(PDO::FETCH_ASSOC); ++$i) {
+        for ($i = $start; $i < 4, $row = $stmt->fetch(PDO::FETCH_ASSOC); ++$i) {
 
             // logic to compensate for Edumate returning blank emergency contact
-            if(!strlen($row['STUDENTEMERGENCYNAME'])) {
+            if (!strlen($row['STUDENTEMERGENCYNAME'])) {
                 --$i;
                 continue;
             }
 
-            if($i == 1) {
+            if ($i == 1) {
                 $i = '';
             }
 
-            $student['StudentEmergency'.$i.'Name'] = $row['STUDENTEMERGENCYNAME'];
-            $student['StudentEmergency'.$i.'Phone'] = $row['STUDENTEMERGENCYPHONE'];
+            $student['StudentEmergency' . $i . 'Name'] = $row['STUDENTEMERGENCYNAME'];
+            $student['StudentEmergency' . $i . 'Phone'] = $row['STUDENTEMERGENCYPHONE'];
 
-            if($i == '') {
+            if ($i == '') {
                 $i = 1;
             }
         }
@@ -188,30 +184,23 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return $this->normaliseFields($student, $caseSensitiveFields);
     }
 
-
-    public function getStaff($externalUserId) {
-        // TODO: THERE IS NO VIEW FOR THESE DATA YET
-    }
-
-
-
     /**
-     * Returns a list of contacts for a student
-     * @param string $externalUserId
-     * @return
+     * @inheritdoc
      */
-    public function getStudentContactList($externalUserId) {
-
-        $caseSensitiveFields = array('StudentContactID', 'StudentContactTitle', 'StudentContactPreferred',
+    public function getStudentContactList($externalUserId)
+    {
+        $caseSensitiveFields = array(
+            'StudentContactID', 'StudentContactTitle', 'StudentContactPreferred',
             'StudentContactSurname', 'StudentContactDefaultEmail', 'StudentContactAddress1', 'StudentContactSuburb',
             'StudentContactPostCode', 'StudentContactState', 'StudentContactPhoneActual', 'StudentContactMobilePhone',
             'StudentContactOccupPhone', 'StudentContactSpouseID', 'StudentContactSpouseTitle',
             'StudentContactSpousePreferred', 'StudentContactSpouseSurname', 'StudentContactSpouseMobilePhone',
-            'StudentContactSpouseOccupPhone','StudentContactSpouseDefaultEmail', 'StudentContactType');
+            'StudentContactSpouseOccupPhone', 'StudentContactSpouseDefaultEmail', 'StudentContactType'
+        );
 
-        $stmt = $this->getDatabase()->prepare("
+        $stmt = $this->getConnection()->prepareQuery("
             SELECT p.carer_number AS StudentContactID, full_name, COMBINED_EMAIL_ADDRESS AS StudentContactDefaultEmail,
-              mobile AS StudentContactMobilePhone, p.spouse_carer_number as StudentContactSpouseID, spouse_full_name, spouse_mobile as StudentContactSpouseMobilePhone, COMBINED_EMAIL_ADDRESS AS StudentContactSpouseDefaultEmail
+              mobile AS StudentContactMobilePhone, p.spouse_carer_number AS StudentContactSpouseID, spouse_full_name, spouse_mobile AS StudentContactSpouseMobilePhone, COMBINED_EMAIL_ADDRESS AS StudentContactSpouseDefaultEmail
             FROM db2inst1.schoolbox_parents p
             INNER JOIN db2inst1.schoolbox_parent_student ps ON p.carer_number = ps.carer_number
             WHERE ps.student_number = :id
@@ -222,15 +211,15 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         ));
 
         $parents = array();
-        while($row = $stmt->fetch(DB2::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             // split out [spouse_]full_name fields and try to guess name pieces
             // ** ASSIGNMENT (=) HERE INTENTIONAL, NOT COMPARISON (==)
-            if($selfName = $this->guessNamePartsFromFull($row['FULL_NAME'], 'StudentContact')) {
+            if ($selfName = $this->guessNamePartsFromFull($row['FULL_NAME'], 'StudentContact')) {
                 $row = array_merge($row, $selfName);
                 unset($row['FULL_NAME']);
             }
 
-            if($spouseName = $this->guessNamePartsFromFull($row['SPOUSE_FULL_NAME'], 'StudentContactSpouse')) {
+            if ($spouseName = $this->guessNamePartsFromFull($row['SPOUSE_FULL_NAME'], 'StudentContactSpouse')) {
                 $row = array_merge($row, $spouseName);
                 unset($row['SPOUSE_FULL_NAME']);
             }
@@ -241,13 +230,12 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
     }
 
-
     /**
-     * Returns the current semester/reporting period (used everywhere)
-     * @return bool
+     * @inheritdoc
      */
-    public function getCurrentSemester($externalUserId = null) {
-        $stmt = $this->getDatabase()->prepare("
+    public function getCurrentSemester($externalUserId = null)
+    {
+        $stmt = $this->getConnection()->prepareQuery("
             SELECT report_period
             FROM db2inst1.schoolbox_report_periods
             WHERE start_date < CURRENT_TIMESTAMP
@@ -265,16 +253,16 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return null;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getCurrentYear($externalUserId = null)
     {
         return date('Y');
     }
 
     /**
-     * Returns list of subjects the user is enrolled in
-     *
-     * @param User $user
-     * @return array
+     * @inheritdoc
      */
     public function getSubjectList(User $user)
     {
@@ -286,27 +274,27 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         if ($user->getRole()->isStaff()) {
             $sql = "
-                SELECT c.class_code AS code, class AS name, class_type as classType
+                SELECT c.class_code AS code, class AS name, class_type AS classType
                 FROM db2inst1.schoolbox_teacherclass tc
                 LEFT JOIN db2inst1.schoolbox_classes c ON tc.class_code = c.class_code
                 WHERE tc.staff_number = :id
                 ORDER BY class_type, name
             ";
-        }
-        else if ($user->getRole()->isStudent()) {
-            $sql = "
-                SELECT c.class_code AS code, class AS name, class_type as classType
+        } else {
+            if ($user->getRole()->isStudent()) {
+                $sql = "
+                SELECT c.class_code AS code, class AS name, class_type AS classType
                 FROM db2inst1.schoolbox_studentclass sc
                 LEFT JOIN db2inst1.schoolbox_classes c ON sc.class_code = c.class_code
                 WHERE sc.student_number = :id
                 ORDER BY class_type, name
             ";
-        }
-        else {
-            return [];
+            } else {
+                return [];
+            }
         }
 
-        $stmt = $this->getDatabase()->prepare($sql);
+        $stmt = $this->getConnection()->prepareQuery($sql);
 
         $stmt->execute(array(
             'id' => $externalId
@@ -314,24 +302,24 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         $classes = array();
 
-        while($class = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $classes[$class['CODE']] =  array(  'code'=>$class['CODE'],
-                                                'name'=>$class['NAME'],
-                                                'classType'=>$class['CLASSTYPE']);
+        while ($class = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $classes[$class['CODE']] = array(
+                'code' => $class['CODE'],
+                'name' => $class['NAME'],
+                'classType' => $class['CLASSTYPE']
+            );
         }
 
         return array_values($classes);
     }
 
-
     /**
-     * Returns a list of students related to a parent
-     * @param $externalUserId
-     * @todo note that there is no spouse email field currently available in the edumate views (might be misnamed as `name`)
+     * @inheritdoc
      */
-    public function getEnrolledStudents($externalUserId) {
+    public function getEnrolledStudents($externalUserId)
+    {
         // prepare
-        $stmt = $this->getDatabase()->prepare("
+        $stmt = $this->getConnection()->prepareQuery("
             SELECT student_number
             FROM db2inst1.schoolbox_parent_student
             WHERE carer_number = :id
@@ -344,7 +332,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         // manipulate
         $children = array();
-        while($synId = $stmt->fetchColumn()) {
+        while ($synId = $stmt->fetchColumn()) {
             // ensure a lack of duplicates
             $children[$synId] = array(
                 'RelatedID' => $synId
@@ -354,35 +342,27 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return array_values($children);
     }
 
-
-    public function getEmail($externalUserId) {
-        // TODO implement from schoolbox internal rather than external
-    }
-
     /**
-     * Returns a local path to the user's portrait
-     *
-     * @param Integer $externalUserId
-     * @return Bool|String
+     * @inheritdoc
      */
-    public function getPortrait ($externalUserId) {
+    public function getPortrait($externalUserId)
+    {
 
-        $portraitPath = realpath( Config::get('portrait_dir') ) . "/$externalUserId.jpg";
+        $portraitPath = realpath(Config::get('portrait_dir')) . "/$externalUserId.jpg";
 
-        if ( is_readable($portraitPath) ) {
+        if (is_readable($portraitPath)) {
             return $portraitPath;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-
     /**
-     * Sync Method: Student
+     * @inheritdoc
      */
-    public function getStudentUserAccountInfo() {
-        $stmt = $this->getDatabase()->prepare('
+    public function getStudentUserAccountInfo()
+    {
+        $stmt = $this->getConnection()->prepareQuery('
             SELECT
             STUDENT_NUMBER AS "StudentID",
             USERNAME       AS "NetworkLogin",
@@ -397,14 +377,15 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             FROM db2inst1.schoolbox_students
         ');
         $stmt->execute();
-        return $stmt->fetchAll(DB2::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Sync Method: Parent
+     * @inheritdoc
      */
-    public function getParentUserAccountInfo() {
-	    $stmt = $this->getDatabase()->prepare('
+    public function getParentUserAccountInfo()
+    {
+        $stmt = $this->getConnection()->prepareQuery('
 	        SELECT
 			p.CARER_NUMBER        AS "StudentContactID",
 			NULL                  AS "StudentContactTitle",
@@ -425,15 +406,16 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             	AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
             ORDER BY INTEGER(p.CARER_NUMBER) ASC, INTEGER(s.STUDENT_NUMBER) ASC
         ');
-	    $stmt->execute();
-	    return $stmt->fetchAll(DB2::FETCH_ASSOC);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Sync Method: Staff
+     * @inheritdoc
      */
-    public function getStaffUserAccountInfo() {
-        $stmt = $this->getDatabase()->prepare('
+    public function getStaffUserAccountInfo()
+    {
+        $stmt = $this->getConnection()->prepareQuery('
             SELECT
                 STAFF_NUMBER  AS "StaffID",
                 USERNAME      AS "NetworkLogin",
@@ -451,25 +433,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
              WHERE USERNAME IS NOT NULL
         ');
         $stmt->execute();
-        return $stmt->fetchAll(DB2::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-
     /**
-     * Method not implemented
-     * @deprecated
+     * @inheritdoc
      */
-    public function getParentSync($externalUserId) { }
-
-    /**
-     * Returns a list of email parent email addresseses for students.
-     *
-     * @param array $externalUserIds
-     *
-     * @return array
-     */
-    public function getParentEmails($externalUserIds) {
+    public function getParentEmails($externalUserIds)
+    {
         $emails = array();
         foreach ($externalUserIds as $externalUserId) {
             $userEmails = array();
@@ -478,58 +449,85 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
                 $userEmails[] = $contact['StudentContactSpouseDefaultEmail'];
             }
             foreach ($userEmails as $i => $email) {
-                $emails[$externalUserId.'-'.$i] = $email;
+                $emails[$externalUserId . '-' . $i] = $email;
             }
         }
         return array_filter(array_unique($emails));
     }
 
     /**
-     * Method not implemented
+     * @inheritdoc
      * @deprecated
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) { }
-
-    /**
-     * Method not implemented
-     * @deprecated
-     */
-    public function determineBoarderType($boarderValue) { }
-
-    /**
-     * Method not implemented
-     * @deprecated
-     */
-    public function getHousemasterByHouseId($houseID) { }
-
-    /**
-     * Get contact list for staff directory
-     *
-     * @return array
-     */
-    public function getStaffContactListExtended() {
-        // TODO: Implement getStaffContactListExtended() method.
-        return array();
+    public function getParentSync($externalUserId)
+    {
+        return [];
     }
 
     /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @param int $staffID
-     * @return array|bool
+     * @inheritdoc
+     * @deprecated
+     */
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated
+     */
+    public function determineBoarderType($boarderValue)
+    {
+        return '';
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated
+     */
+    public function getHousemasterByHouseId($houseID)
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStaffContactListExtended()
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getCampusFromTimetable($staffID)
     {
-        return array();
+        return [];
     }
 
     /**
-     * Not yet implemented for this connector
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getStudentForms()
     {
         return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStaff($externalUserId)
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEmail($externalUserId)
+    {
+        return '';
     }
 }
