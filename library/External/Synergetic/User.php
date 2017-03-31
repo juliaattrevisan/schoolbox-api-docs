@@ -849,28 +849,30 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
-        $query = "
-            SELECT
-                vStudents.StudentID,
-                NetworkLogin,
-                vStudents.StudentTitle,
-                vStudents.StudentPreferred,
-                vStudents.StudentSurname,
-                StudentGender,
-                StudentEmail,
-                StudentOccupEmail,
-                vStudents.StudentYearLevel,
-                vStudents.StudentHouse,
-				vStudents.StudentBoarder,
-				vStudents.StudentBoardingHouse,
-                StudentCampus
-            FROM dbo.vStudents vStudents
-            LEFT JOIN Community ON Community.ID = StudentID
-            WHERE
-            FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+        $query =
+            "
+            SELECT      vStudents.StudentID,
+                        NetworkLogin,
+                        vStudents.StudentTitle,
+                        vStudents.StudentPreferred,
+                        vStudents.StudentSurname,
+                        StudentGender,
+                        StudentEmail,
+                        StudentOccupEmail,
+                        vStudents.StudentYearLevel,
+                        vStudents.StudentHouse,
+                        vStudents.StudentBoarder,
+                        vStudents.StudentBoardingHouse,
+                        StudentCampus
+            FROM        dbo.vStudents vStudents
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudents.FileSemester AND
+                            Semester.FileYear = vStudents.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            LEFT JOIN   Community ON Community.ID = StudentID
         ";
-        return $this->getConnector()->getAll($query);
+
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
