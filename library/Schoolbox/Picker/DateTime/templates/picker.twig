@@ -64,10 +64,8 @@
 {#</script>#}
 {% if type == 'event' or type =='duework' %}
     {% set width = 6 %}
-    {% set widthCal = 5 %}
 {% else %}
     {% set width = 12 %}
-    {% set widthCal = 12 %}
 {% endif %}
 
 {% if timetable %}
@@ -84,7 +82,7 @@
 <div class="row" style="padding:0.875rem;">
     <div class="tabs-content">
         <div class="content active" id="byDate-{{ id }}" role="tabpanel" aria-hidden="false">
-            <div class="small-12 medium-{{ widthCal }} columns">
+            <div class="small-12 medium-{{ width }} columns">
 
                 {# Placeholder for calendar ot be rendered in #}
                 <div id="pickerCalendar{{ id }}"></div>
@@ -92,7 +90,7 @@
             </div>
             {# Hide second column if showing just a calendar #}
             {% if width == 6 %}
-                <div class="small-12 medium-{{ 12-widthCal }} columns">
+                <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for appointments to be rendered in #}
                     <div id="calendarResponse{{ id }}"></div>

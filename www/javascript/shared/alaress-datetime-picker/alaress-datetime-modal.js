@@ -152,6 +152,20 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
     }
 
+    function setPickerSize(reset) {
+        var addClass;
+        if (reset || twigVars.timetable === false) {
+            addClass = 'pickerNarrow'
+        }
+        else {
+            var daysInCycle = timetable.campus.find(':selected').attr('data-days');
+            addClass = daysInCycle > 7 ? 'pickerWide' : 'pickerNarrow';
+        }
+        $('#picker'+twigVars.id).removeClass(addClass=='pickerNarrow'?'pickerWide':'pickerNarrow');
+        $('#picker'+twigVars.id).addClass(addClass);
+
+    }
+
     // Timetable picker
     if (twigVars.timetable) {
 
@@ -186,11 +200,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 timetable.cycle.empty().append(optionsHtml);
                 // Increase space to accommodate a table
                 if (daysInCycle > 7) {
+                    setPickerSize(false);
                     $('#byTimetable-' + twigVars.id).find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-7');
                     $('#byTimetable-' + twigVars.id).find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-5');
                 }
                 // Back to normal
                 else {
+                    setPickerSize(true);
                     $('#byTimetable-' + twigVars.id).find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-7').addClass('medium-6');
                     $('#byTimetable-' + twigVars.id).find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-5').addClass('medium-6');
                 }
@@ -478,5 +494,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             latestDate = newDate;
         },
 
+    });
+
+    // Resize modal on changing tabs
+    $('a[href="#byDate-'+twigVars.id+'"]').click(function(){
+       setPickerSize(true);
+    });
+    $('a[href="#byTimetable-'+twigVars.id+'"]').click(function(){
+       setPickerSize(false);
     });
 }

@@ -732,9 +732,23 @@ span.displayDate {
   font-weight: 400;
   color: #000;
 }
-.pickerNarrow {
+.pickerSingle.pickerNarrow {
   width: 325px;
+  -webkit-transition: width 0.3s; /* Safari */
+  transition: width 0.3s;
 }
-.pickerWide {
+.pickerSingle.pickerWide {
+  width: 435px;
+  -webkit-transition: width 0.3s; /* Safari */
+  transition: width 0.3s;
+}
+.pickerDouble.pickerNarrow {
+  width: 650px;
+  -webkit-transition: width 0.3s; /* Safari */
+  transition: width 0.3s;
+}
+.pickerDouble.pickerWide {
   width: 750px;
+  -webkit-transition: width 0.3s; /* Safari */
+  transition: width 0.3s;
 }
