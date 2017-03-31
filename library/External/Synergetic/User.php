@@ -1040,13 +1040,19 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable($externalId)
     {
-        if (!$this->isExternalIdValid($staffID)) {
+        if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
-        $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '{$this->database->quote($staffID)}' AND FileYear = " . date('Y');
-        return $this->getConnector()->getAll($query);
+
+        return $this->getConnector()->executeQuery(
+            "SELECT DISTINCT ClassCampus AS campus FROM timetable WHERE StaffID = :id AND FileYear = :fileYear",
+            [
+                'id' => $externalId,
+                'fileYear' => date('Y')
+            ]
+        )->fetchAll();
     }
 
     /**
