@@ -11,6 +11,7 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 
+/** @method Model createModel($idValue = null) */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -38,7 +39,6 @@ class Mapper extends \Schoolbox\Mapper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /** @var Model $model */
             $model = $this->hydrate($row);
-            $model->loadClass();
             $c->add($model);
         }
 

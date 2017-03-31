@@ -7,11 +7,9 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\Collection;
-use Schoolbox\Filter\Definition\IFilter;
-use Schoolbox\GenericCollection;
+
+
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Filter\Option\Model as FilterOption;
 
 class Model
 {
@@ -23,28 +21,6 @@ class Model
      * @var string
      */
     private $class;
-
-    /**
-     * An instance of the filter-type-specific logic
-     *
-     * @var IFilter
-     */
-    private $definition;
-
-
-    /**
-     * Ensure the filter implementation logic is loaded. Returns false if it was already loaded.
-     * @return bool
-     */
-    public function loadClass()
-    {
-        if (null === $this->definition){
-            $this->definition = new $this->class($this);
-            return true;
-        }
-        return false;
-    }
-
 
 
     /* Getters/Setters

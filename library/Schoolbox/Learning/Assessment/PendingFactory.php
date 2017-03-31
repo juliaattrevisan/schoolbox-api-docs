@@ -8,21 +8,21 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Assessment\Course\Task\Completion;
-use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use \Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -162,9 +162,9 @@ class PendingFactory
     private $teacherCache;
 
     /**
-     * @var Term $term
+     * @var Term\Model[] $terms
      */
-    private $term;
+    private $terms;
 
     /**
      * Which User the Assessments produced by this factory relate to
@@ -223,9 +223,9 @@ class PendingFactory
 
     /**
      * @param User                         $viewee
-     * @param IConnector                   $database
+     * @param IConnector                    $database
      * @param \External_ClassInterface     $externalClass
-     * @param Term                         $term
+     * @param GenericCollection|Term                         \Model[] $terms            Only display assessments that are due in these terms
      * @param \Alaress_Date_Format         $toChaseLimit
      * @param bool                         $includeTasks
      * @param FolderMapper                 $folderMapper
@@ -234,7 +234,7 @@ class PendingFactory
         User $viewee,
         IConnector $database,
         \External_ClassInterface $externalClass,
-        Term $term,
+        GenericCollection $terms,
         \Alaress_Date_Format $toChaseLimit,
         $includeTasks,
         FolderMapper $folderMapper
@@ -244,7 +244,7 @@ class PendingFactory
         $this->database         = $database;
         $this->externalClass    = $externalClass;
         $this->assessmentsCache = new GenericCollection(IAssessable::class);  // TODO SA-2631
-        $this->term             = $term;
+        $this->terms            = $terms;
         $this->toChaseLimit     = $toChaseLimit;
         $this->nullDate         = new \Alaress_Date_NullDate();
         $this->includeTasks     = $includeTasks;
@@ -403,6 +403,44 @@ class PendingFactory
 
 
     /**
+     * Build an assessment dueDate clause to inject into assessment-retrieval query
+     *
+     * @return string
+     */
+    private function buildDueDateClause()
+    {
+        // Generate the dueDate filtering
+        $orParts = [];
+        foreach($this->terms as $term){
+            $andPart = " a.due_date >= '{$term->getStart()->getDatabaseDate()}' ";
+            if(!$term->getActualFinish()->isNull()){
+                $andPart .= " AND a.due_date <= '{$term->getActualFinish()->getDatabaseDate()}' ";
+            }
+            $orParts[] = $andPart;
+        }
+        return '(' . implode(' OR ', $orParts) . ')';
+    }
+
+    /**
+     * Build an assessment type clause to inject into assessment-retrieval query
+     *
+     * @return string[]
+     */
+    private function buildAssessmentTypeClause()
+    {
+        $taskSelect = $this->includeTasks ? ",
+             tk.id                    AS 'tk.id',
+             tk.requires_confirmation AS 'tk.requires_confirmation'
+        " : '';
+        $taskJoin   = $this->includeTasks ? 'LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL' : '';
+        $taskId     = $this->includeTasks ? 'OR tk.id IS NOT NULL' : '';
+
+        return [$taskSelect, $taskJoin, $taskId];
+    }
+
+
+
+    /**
      * Get Assessments associated with Classes taught, or Groups administered, by User.
      *
      * Required Data:
@@ -426,14 +464,13 @@ class PendingFactory
             return;
         }
 
+        $dueDateClause = $this->buildDueDateClause();
+        list($aTypeSelect, $aTypeJoin, $aTypeClause) = $this->buildAssessmentTypeClause();
+
+
         $folderIds = array_keys($this->foldersCache);
 
-        $taskSelect = $this->includeTasks ? ",
-             tk.id                    AS 'tk.id',
-             tk.requires_confirmation AS 'tk.requires_confirmation'
-        " : '';
-        $taskJoin   = $this->includeTasks ? 'LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL' : '';
-        $taskId     = $this->includeTasks ? 'OR tk.id IS NOT NULL' : '';
+
 
         $query1       = "
         SELECT 
@@ -458,18 +495,18 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id'
-                $taskSelect
+                $aTypeSelect
             FROM assessment a 
             LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
-            $taskJoin
+            $aTypeJoin
             
             JOIN assessment_folder af   ON af.assessment_id = a.id 
             JOIN folder f               ON f.id = af.folder_id AND f.deleted_at IS NULL
             
             WHERE f.id IN (" . implode(',', $folderIds) . ")
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $aTypeClause)
+            AND $dueDateClause
         ";
 
         $query2       = "
@@ -495,12 +532,12 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id'
-                $taskSelect
+                $aTypeSelect
            
             FROM assessment a 
             LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
-            $taskJoin
+            $aTypeJoin
             
             JOIN project_assessment pra ON pra.assessment_id = a.id
             JOIN project p              ON pra.project_id = p.id
@@ -509,8 +546,8 @@ class PendingFactory
             JOIN folder pf              ON pf.id = paf.folder_id AND pf.deleted_at IS NULL
             
             WHERE pf.id IN (" . implode(',', $folderIds) . ")
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $aTypeClause)
+            AND $dueDateClause
         ";
 
         $query3       = "
@@ -536,11 +573,11 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id'
-                $taskSelect
+                $aTypeSelect
             FROM assessment a 
             LEFT JOIN assess qz                            ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw                    ON dw.assessment_id = a.id AND dw.deleted = 0
-            $taskJoin
+            $aTypeJoin
             
             JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
             JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id
@@ -552,8 +589,8 @@ class PendingFactory
             JOIN folder csf                                ON csf.id = cs.folder_id AND csf.deleted_at IS NULL
             
             WHERE cif.id IN (" . implode(',', $folderIds) . ")
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $aTypeClause)
+            AND $dueDateClause
         ";
 
         // Assessment in Project in UnitImpl imported on Folder
@@ -580,11 +617,11 @@ class PendingFactory
                 
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id'
-                $taskSelect
+                $aTypeSelect
             FROM assessment a 
             LEFT JOIN assess qz                            ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
             LEFT JOIN submission_box dw                    ON dw.assessment_id = a.id AND dw.deleted = 0
-            $taskJoin
+            $aTypeJoin
             
             JOIN project_assessment pa                     ON pa.assessment_id = a.id
             JOIN project p                                 ON p.id = pa.project_id
@@ -600,8 +637,8 @@ class PendingFactory
             
             WHERE a.deleted_at IS NULL
             AND cif.id IN (" . implode(',', $folderIds) . ")
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
+            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $aTypeClause)
+            AND $dueDateClause
         ";
 
         $this->parseAssessments(

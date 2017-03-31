@@ -10,12 +10,10 @@ namespace Schoolbox\Filter;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use \Alaress\Module\Module as AlaressModule;
 use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Filter\Definition\IFilter;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Role;
 use \Twig_Loader_Chain;
-use Schoolbox\Filter\Mapper as FilterMapper;
 
 
 class Module extends AlaressModule
@@ -34,6 +32,7 @@ class Module extends AlaressModule
      * @inheritdoc
      * @throws NotFound If invalid roleType
      * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
      */
     protected function registerRoutes()
     {
@@ -50,9 +49,12 @@ class Module extends AlaressModule
         $loadDefinition = function (array $params){
             try {
                 $filterInstance = $this->getFilterMapper()->findById($params['filter']);
-                $definitionClass = $filterInstance->getClass();
-
-                return ['definition' => new $definitionClass($filterInstance)];
+                $filterFactoryFactory = new FactoryFactory($this->getMapperFactory());
+                // TODO this is inefficient. We hit the DB to fetch the instace by ID, then re-fetch by class in the factory!
+                $filterFactory = $filterFactoryFactory->buildFilterFactoryFromClass($filterInstance->getClass());
+                return [
+                    'definition' => $filterFactory->buildForAdminPages(),
+                ];
             } catch (MapperException $e) {
                 throw new NotFound($e->getMessage());
             }
@@ -91,11 +93,11 @@ class Module extends AlaressModule
 
 
     /**
-     * @return \Schoolbox\Mapper|FilterMapper
+     * @return \Schoolbox\Mapper|Mapper
      * @throws \InvalidArgumentException
      */
     protected function getFilterMapper()
     {
-        return $this->getMapperFactory()->get(FilterMapper::class);
+        return $this->getMapperFactory()->get(Mapper::class);
     }
 }

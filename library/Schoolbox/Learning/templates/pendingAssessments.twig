@@ -1,6 +1,6 @@
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
-{% import 'sub/breadcrumbs.twig' as bread %}
+
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
@@ -17,10 +17,7 @@
     });
 </script>
 
-{{ bread.crumbs(
-['Learning', routeLookup('learning.getClasses')],
-['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { viewee: viewee })]
-) }}
+
 
 <div class="row">
     <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>

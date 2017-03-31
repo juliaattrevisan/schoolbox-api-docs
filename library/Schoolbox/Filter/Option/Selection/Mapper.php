@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Option\Selection;
 
-use Schoolbox\Filter\Option\Mapper as FilterOptionMapper;
+use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
 
@@ -26,6 +26,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('filter_id', Filter\Mapper::class, 'id', self::TYPE_MODEL, null, 'filter', 'filter');
         $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
         $this->uses('page', self::TYPE_STRING);
         $this->uses('key', self::TYPE_STRING);

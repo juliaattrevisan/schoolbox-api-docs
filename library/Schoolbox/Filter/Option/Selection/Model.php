@@ -9,10 +9,14 @@ namespace Schoolbox\Filter\Option\Selection;
 
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
+use Schoolbox\Filter;
 
 class Model
 {
     use Id;
+
+    /** @var Filter\Model */
+    private $filter;
 
     /** @var User */
     private $user;
@@ -26,6 +30,24 @@ class Model
     /** @var bool */
     private $selected;
 
+    /**
+     * @return Filter\Model
+     */
+    public function getFilter()
+    {
+        return $this->filter;
+    }
+
+
+    /**
+     * @param Filter\Model $filter
+     * @return $this
+     */
+    public function setFilter($filter)
+    {
+        $this->filter = $filter;
+        return $this;
+    }
 
     /**
      * @return User
@@ -105,4 +127,5 @@ class Model
         $this->selected = $selected;
         return $this;
     }
+
 }

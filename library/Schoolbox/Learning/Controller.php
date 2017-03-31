@@ -18,8 +18,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Filter\Definition\IFilter;
-use Schoolbox\Filter\Definition\TermFilter;
+use Schoolbox\Filter\FactoryFactory as FilterFactoryFactory;
+use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\PendingFactory;
@@ -44,11 +44,10 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Application\Exception\Exception as ApplicationException;
 use \Alaress_Date_Format;
-use Schoolbox\Filter\Mapper as FilterMapper;
-use Schoolbox\Filter\Panel as FilterPanel;
-use Schoolbox\Filter\Option\Model as FilterOption;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Option as FilterOption;
+use Schoolbox\Filter\Option\Selection as FilterSelection;
 
 class Controller extends Base
 {
@@ -203,19 +202,21 @@ class Controller extends Base
      * @api   GET /learning/pending/:userId
      * @level 165
      * @param User $viewee The user whose pending assessments we are viewing.
+     * @param FilterFactoryFactory $filterFactoryFactory
      * @throws RouteNotFound
      * @throws ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @todo split pending assessments into own controller
      */
-    public function getPendingAssessmentsForUser(User $viewee)
+    public function getPendingAssessmentsForUser(User $viewee, FilterFactoryFactory $filterFactoryFactory)
     {
+        $termFilterFactory    = $filterFactoryFactory->buildTermFilterFactory();
+        $termFilterDefinition = $termFilterFactory->buildForFilterPanel();
 
-        $termFilterInstance = FilterMapper::getInstance()->findByColumn('class', TermFilter::class)->first();
-        $termFilter         = new TermFilter($termFilterInstance);
-        $filters            = new GenericCollection(IFilter::class, [$termFilter]);
+        $filters            = new GenericCollection(IFilterDefinition::class, [$termFilterDefinition]);
 
         $route = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
-        $filterPanel = new FilterPanel($this->getUser(), FilterOption::PAGE_PENDING_ASSESSMENTS, $route, $filters);
-
+        $filterPanel = new Filter\Panel($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS, $route, $filters);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
             'filterPanel'        => $filterPanel,
@@ -228,26 +229,108 @@ class Controller extends Base
      * @api   GET /learning/pending/:userId
      * @level 165
      * @param User $viewee The user whose pending assessments we are viewing.
+     * @param FilterFactoryFactory $filterFactoryFactory
      * @throws \LogicException
      * @throws \DomainException
      * @throws \OutOfRangeException
      * @throws ServiceNotFound
+     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
-    public function postPendingAssessmentsForUser(User $viewee)
+    public function postPendingAssessmentsForUser(User $viewee, FilterFactoryFactory $filterFactoryFactory)
     {
+        // Save user filter selections
+        /**
+         * Indexed by filter.id, page, then key
+         * @var string[][][] $postFilterSelections
+         */
+        $postFilterSelections = $this->request->post['filter_selection'];
+
+        // Update the user's filter selections
+
+        // Delete user's current selections for this page
+        $filterMapper = Filter\Mapper::getInstance();
+        $filterSelectionMapper = FilterSelection\Mapper::getInstance();
+        $filterSelectionMapper->deleteByColumnList([
+            'user_id' => $this->getUser()->getId(),
+            'page'    => FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
+        ]);
+
+        $selectionsToSave = $filterSelectionMapper->createCollection();
+
+        $termFilterFactory    = $filterFactoryFactory->buildTermFilterFactory();
+        $termFilterDefinition = $termFilterFactory->buildForConvertingKeyToElement();
+
+        // Build the user's selections
+        foreach($postFilterSelections as $filterId => $filterSelections){
+            $filter = $filterMapper->createModel($filterId);
+
+            // TODO make dynamic
+            $definition = $termFilterDefinition;
+
+            foreach($filterSelections as $page => $pageSelections){
+                foreach($pageSelections as $key => $selected){
+
+                    if(true /* TODO check key is valid and sanitise */ ){
+                        $selection = $filterSelectionMapper->createModel();
+                        $selection
+                            ->setFilter($filter)
+                            ->setUser($this->getUser())
+                            ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
+                            ->setKey($key)
+                            ->setSelected((bool)$selected);
+                        $selectionsToSave->add($selection);
+                    }
+
+                }
+            }
+        }
+
+
+        $filterSelectionMapper->save($selectionsToSave);
+
+        /** @var FilterSelection\Model[][] $selectionsPerFilter */
+        $selectionsPerFilter = $selectionsToSave->groupByCallback(function(FilterSelection\Model $selection){
+            return $selection->getFilter()->getId();
+        })->indexByCallback(function(Collection $c){
+            /** @var FilterSelection\Model[] $c */
+            return $c[0]->getFilter()->getId();
+        });
+
+        // Get the terms
+        $availableTerms = $this->termMapper->createCollection();
+        $selectedTerms = $this->termMapper->createCollection();
+        $termSelections = $selectionsPerFilter[$termFilterDefinition->getFilter()->getId()];
+        foreach($termSelections as $termSelection){
+            $term = $termFilterDefinition->getEntityByKey($termSelection->getKey());
+            $availableTerms->add($term);
+            if($termSelection->getSelected()){
+                $selectedTerms->add($term);
+            }
+        }
+
+        // Were none selected ?
+        if(0 === $selectedTerms->count()){
+            $selectedTerms = $availableTerms;
+        }
+
+
+
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
         if($this->getUser()->getId() === $viewee->getId()){
             $viewee = $this->getUser();
         }
 
-        $term = $this->termMapper->findForToday();
+
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
         // Should we include tasks?
         $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
 
-        $factory = new PendingFactory($viewee, $this->database, $this->externalClass, $term, $toChaseLimit, $includeTasks, $this->folderMapper);
+        // TODO -UP TO HERE - assessment TYpes
+
+        $factory = new PendingFactory($viewee, $this->database, $this->externalClass, $selectedTerms, $toChaseLimit, $includeTasks, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
         /**
@@ -300,7 +383,7 @@ class Controller extends Base
             throw new \DomainException("Invalid part two page: $partTwoPage");
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/pendingAssessments.twig', [
             'viewee'             => $viewee,
             'statistics'         => $assessmentStatistics,
             'assessmentsToMark'  => $assessmentsToMark,
@@ -309,7 +392,7 @@ class Controller extends Base
             'partOnePage'        => $partOnePage,
             'partTwoPaginator'   => $partTwoPaginator,
             'partTwoPage'        => $partTwoPage,
-        ])->setTab('submission'));
+        ]));
     }
 
     /**

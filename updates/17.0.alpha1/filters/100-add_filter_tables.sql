@@ -40,9 +40,16 @@ CREATE TABLE filter_default (
 ) ENGINE=INNODB;
 
 -- User configured filter selections per user
--- Note that this table is not normalised with filter_option. This is because options may exist implicitly without existing explicitly in DB.
+-- Note that this table is not normalised with filter_option. This is because we need to be able to save a user's settings before
+-- the admin has configured the availabilities and defaults.
 CREATE TABLE filter_selection (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `filter_id` INT(11) NOT NULL,
+    INDEX filter_selection_filter_id (`filter_id`),
+    CONSTRAINT fk_filter_selection_filter_id
+      FOREIGN KEY (`filter_id`)
+      REFERENCES filter(`id`)
+      ON DELETE CASCADE ON UPDATE CASCADE,
   `user_id` INT(11) UNSIGNED NOT NULL,
     INDEX filter_selection_user_id (`user_id`),
     CONSTRAINT fk_filter_selection_user_id
@@ -55,9 +62,9 @@ CREATE TABLE filter_selection (
 ) ENGINE=INNODB;
 
 -- Add Filters
-INSERT INTO filter (`class`) VALUES
-  ('Schoolbox\\Filter\\Definition\\TermFilter'),
-  ('Schoolbox\\Filter\\Definition\\AssessmentType')
+INSERT INTO filter (id, `class`) VALUES
+  (1, 'Schoolbox\\Filter\\Filters\\Term\\Definition'),
+  (2, 'Schoolbox\\Filter\\Filters\\AssessmentType\\Definition')
 ;
 
 

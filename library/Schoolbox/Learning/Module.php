@@ -14,6 +14,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Filter\FactoryFactory;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -109,6 +110,16 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
+        $this->addRoutePreload(
+            $matcher,
+            '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
+            function ($params) {
+                return [
+                    'filterFactoryFactory' => new FactoryFactory($this->getMapperFactory()),
+                ];
+            }
+        );
+
         $this->addRoutePreload(
             $matcher,
             '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser|getClasses|getGrades|getGradesYear|getGradesForSubject)',

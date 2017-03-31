@@ -5,30 +5,37 @@
  * @link        http://www.alaress.com.au/
  */
 
-
-namespace Schoolbox\Filter\Definition;
+namespace Schoolbox\Filter;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Schoolbox\Filter\Option\Model as FilterOption;
-use Schoolbox\Filter\Option\Selection\Model as FilterSelection;
-use Schoolbox\Filter\Option\Defaults\Model as FilterDefault;
+use Schoolbox\Filter\Option as FilterOption;
+use Schoolbox\Filter\Option\Selection as FilterSelection;
 use Schoolbox\Filter\Model as Filter;
 
 /**
  * All filter definitions must provide an implementation that adheres to this interface.
  *
+ * You should not inject mappers into the filter definitions. They should not do DB calls. The factory should perform
+ * the calls and call the required setters for the definition for it to do its work.
+ *
  * Responsibilities:
- * *
+ * * Rendering possible options, so admin can select which filter options should be available per page
+ * * Rendering default selections, so admin can select which available options should be checked by default per role type and page
+ * * Rendering filter panel fragment, containing available options, checked as per user-specific settings
  */
-interface IFilter
+interface IFilterDefinition
 {
-
     /**
      * @return Filter
      */
     public function getFilter();
+
+    /**
+     * @return string
+     */
+    public function getAdminTemplate();
 
     /**
      * Returns the twig template to render this filters options
@@ -39,7 +46,10 @@ interface IFilter
      */
     public function getOptionsTemplate();
 
-    public function getRoleDefaultsTemplate();
+    /**
+     * @return string
+     */
+    public function getDefaultsTemplate();
 
     /**
      * Returns the twig template to render into the filter panel
@@ -50,8 +60,6 @@ interface IFilter
      */
     public function getPanelTemplate();
 
-
-
     /**
      * Returns a set of data to inject into this filter's template
      *
@@ -61,7 +69,7 @@ interface IFilter
      * @param User $user
      * @return mixed[]
      */
-    public function toContext($page, User $user);
+    public function toPanelContext($page, User $user);
 
 
     /**
@@ -74,7 +82,7 @@ interface IFilter
      *
      * Must ensure inner collections are sorted the same as getPages()
      *
-     * @return FilterOption[][]
+     * @return Collection|GenericCollection[]|FilterOption\Model[][]
      */
     public function getOptions();
 
@@ -83,9 +91,18 @@ interface IFilter
      * Returns sets of options, grouped by option.page, then indexed by option.key.
      * Each Option contains a set of Defaults, indexed by roleType
      *
-     * @return Collection|GenericCollection[]|FilterOption[][]
+     * @return Collection|GenericCollection[]|FilterOption\Model[][]
      */
     public function getOptionDefaults();
+
+
+    /**
+     * Return the model or entity identified by this key
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getEntityByKey($key);
 
 
     /**
@@ -97,34 +114,21 @@ interface IFilter
     public function getPages();
 
 
-
-
-    // ^^ above are confirmed clean  --- VV below are yet to be confirmed //
-
-
-
-
-
-
-
-
-
-
     /**
      * Is the roleType valid for this option? Used for sanitising input
      *
      * @param string $roleType
-     * @param FilterOption $option
+     * @param FilterOption\Model $option
      * @return bool
      */
-    public function isValidRoleType($roleType, FilterOption $option);
-
+    public function isValidRoleType($roleType, FilterOption\Model $option);
 
 
     /**
      * Return the set of possible keys for this filter's options
      *
      * @return string[]
+     * @todo - consider splitting into 1-getOptionKeys() + 2-getSettingKeys()
      */
     public function getKeys();
 

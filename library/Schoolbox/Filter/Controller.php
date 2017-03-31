@@ -9,15 +9,13 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\Filter\Definition\IFilter;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Filter\Model as Filter;
 use Schoolbox\Filter\Option\Model as FilterOption;
 use Schoolbox\Filter\Option\Mapper as FilterOptionMapper;
-use Schoolbox\Filter\Option\Defaults\Model as FilterDefaultOption;
 use Schoolbox\Filter\Option\Defaults\Mapper as FilterDefaultMapper;
 use Schoolbox\Role;
-use Schoolbox\Filter\Panel as FilterPanel;
+
 
 class Controller extends BaseController
 {
@@ -41,10 +39,10 @@ class Controller extends BaseController
      *
      * @api   GET /adminv2/filters/{$filter}/options
      * @level 17.0
-     * @param IFilter $definition
+     * @param IFilterDefinition $definition
      * @throws ServiceNotFound
      */
-    public function getAdminOptions(IFilter $definition)
+    public function getAdminOptions(IFilterDefinition $definition)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getOptionsTemplate(), [
             'filter'           => $definition->getFilter(),
@@ -58,12 +56,12 @@ class Controller extends BaseController
      *
      * @api   GET /adminv2/filters/{$filter}/defaults
      * @level 17.0
-     * @param IFilter $definition
+     * @param IFilterDefinition $definition
      * @throws ServiceNotFound
      */
-    public function getAdminDefaults(IFilter $definition)
+    public function getAdminDefaults(IFilterDefinition $definition)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput($definition->getRoleDefaultsTemplate(), [
+        $this->getResponse()->content->set($this->buildHtmlOutput($definition->getDefaultsTemplate(), [
             'filter'                 => $definition->getFilter(),
             'definition'             => $definition,
             'optionsPerPage'         => $definition->getOptionDefaults(),
@@ -80,11 +78,11 @@ class Controller extends BaseController
     /**
      * Saves which options should be available for each filter on each page
      *
-     * @param IFilter $definition
-     * @var string[][] $_POST['filter_option'] indexed by filterOption.key then page
+     * @param IFilterDefinition $definition
+     * @var string[][]          $_POST['filter_option'] indexed by filterOption.key then page
      * @throws MapperException
      */
-    public function postSaveOptions(IFilter $definition)
+    public function postSaveOptions(IFilterDefinition $definition)
     {
         /** @var string[][] $postFilterOptions */
         $postFilterOptions = $this->getRequest()->post->get('filter_option');
@@ -138,11 +136,11 @@ class Controller extends BaseController
     /**
      * Saves which filter options should be selected by default per role and page
      *
-     * @param IFilter $definition
-     * @var string[][][] $_POST['filter_defaults'] indexed by option.page, option.key, the default.roleType
+     * @param IFilterDefinition $definition
+     * @var string[][][]        $_POST['filter_defaults'] indexed by option.page, option.key, the default.roleType
      * @throws MapperException
      */
-    public function postSaveDefaults(IFilter $definition)
+    public function postSaveDefaults(IFilterDefinition $definition)
     {
         /** @var string[][][] $postFilterDefaults */
         $postFilterDefaults = $this->getRequest()->post->get('filter_defaults');
@@ -209,12 +207,12 @@ class Controller extends BaseController
      * Returns the filter definition, with its possible filterOptions all built
      *
      * @param Model $filter
-     * @return IFilter
+     * @return IFilterDefinition
      */
     protected function getDefinition(Filter $filter)
     {
         $definitionClass = $filter->getClass();
-        /** @var IFilter $definition */
+        /** @var IFilterDefinition $definition */
         $definition = new $definitionClass($filter);
 //        $definition->buildFilterOptions();
         return $definition;
