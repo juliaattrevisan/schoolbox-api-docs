@@ -18,6 +18,8 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function __construct()
     {
+        // This connects to the Synergetic database and stores an ICnnection in `$this->connector` variable
+
         $this->setupDatabase();
     }
 
@@ -671,8 +673,8 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN       Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
             LEFT JOIN       Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID            
             JOIN            FileSemesters Semester ON
-                                Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
-                                Semester.FileYear = vStudentContactAllAddress.FileYear AND
+                                Semester.FileSemester = a.FileSemester AND
+                                Semester.FileYear = a.FileYear AND
                                 Semester.SystemCurrentFlag = 1
             WHERE           StudentID = :externalId AND
                             StudentContactType IN ('SC1', 'SC2', 'SC3')
@@ -911,8 +913,8 @@ class External_Synergetic_User implements External_UserInterface
                             s.StudentGender
 			FROM            dbo.vStudentContactAllAddress s
             JOIN            FileSemesters Semester ON
-                                Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
-                                Semester.FileYear = vStudentContactAllAddress.FileYear AND
+                                Semester.FileSemester = s.FileSemester AND
+                                Semester.FileYear = s.FileYear AND
                                 Semester.SystemCurrentFlag = 1
 			LEFT JOIN       dbo.Community cp ON s.StudentContactID = cp.ID
 			LEFT JOIN       dbo.Community cs ON s.StudentContactSpouseID = cs.ID
