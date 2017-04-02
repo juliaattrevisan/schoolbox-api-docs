@@ -178,6 +178,20 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParentSync($synID)
     {
+        // This hasn't been tested in an actual sync script. But running in isolation it returns this following results.
+        //
+        //    array (size=1)
+        //      0 =>
+        //          array (size=8)
+        //              'ID' => string '224' (length=3)
+        //              'Title' => string 'Mr' (length=2)
+        //              'Preferred' => string 'Tim' (length=3)
+        //              'Surname' => string 'Thomas' (length=6)
+        //              'Email' => string '' (length=0)
+        //              'OccupEmail' => string '' (length=0)
+        //              'DefaultEmailCode' => string '' (length=0)
+        //              'DirectoryIncludeFlag' => string '0' (length=1)
+
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
@@ -227,14 +241,27 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParentEmails($synergyIds)
     {
-        if (!$this->isExternalIdValid($synergyIds)) {
-            return [];
-        }
-
         // Coalesce non array inputs into an array just to make this easier
 
         if (!is_array($synergyIds)) {
             $synergyIds = [$synergyIds];
+        }
+
+        // Make sure all of the ID's supplied were valid
+
+        foreach ($synergyIds as &$id) {
+            if (!$this->isExternalIdValid($id)) {
+
+                // This was not a valid ID, remove it from the array
+
+                unset($id);
+            }
+        }
+
+        // Check if we've got any valid IDs left
+
+        if (count($synergyIds) == 0) {
+            return [];
         }
 
         $externalIdBindings = PredicateBuilder::getArrayBindings($synergyIds, 'externalId');
