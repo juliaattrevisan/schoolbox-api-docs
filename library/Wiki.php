@@ -21,7 +21,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 	 */
 	function getLatestRevision($wikiID)
 	{
-		$query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '$wikiID'";
+		$query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '{$this->db->quote($wikiID)}'";
 
 		$latestRevisionID = $this->db->getRow($query);
 
@@ -39,8 +39,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 	{
 		$query = 'SELECT revisionID
                   FROM ' . $this->_revisionTable . "
-                  WHERE wikiID = '$wikiID'
-                  AND revisionID < '$revisionID'
+                  WHERE wikiID = '{$this->db->quote($wikiID)}'
+                  AND revisionID < '{$this->db->quote($revisionID)}'
                   ORDER BY revisionID DESC";
 
 		$previousRevision = $this->db->getRow($query);
@@ -82,7 +82,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.lastname
 				  FROM " . $this->_revisionTable . " r
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE wikiID = $wikiID
+				  WHERE wikiID = '{$this->db->quote($wikiID)}'
 				  ORDER BY r.created DESC";
 		return $this->db->getAll($query);
 	}
@@ -114,11 +114,11 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 				  FROM wiki w
 				  LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE w.deleted = 'false' AND categoryID = '{$categoryID}'
+				  WHERE w.deleted = 'false' AND categoryID = '{$this->db->quote($categoryID)}'
 				  {$orderBySQL} {$sortDir}";
 
 		if (is_numeric($limit) && ($limit > 0)) {
-			$query .= " LIMIT $limit";
+			$query .= " LIMIT {$this->db->quote($limit)}";
 		}
 
 		return $this->db->getAll($query);
@@ -126,7 +126,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 	function homepageClean($cid)
 	{
-		$query = "DELETE w, r FROM  `" . $this->_table . "` w, " . $this->_revisionTable . " r  WHERE w.wikiID=r.wikiID AND categoryID='$cid'";
+		$query = "DELETE w, r FROM  `" . $this->_table . "` w, " . $this->_revisionTable . " r  WHERE w.wikiID=r.wikiID AND categoryID='{$this->db->quote($cid)}'";
 		$this->db->query($query);
 	}
 
@@ -319,7 +319,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 	public function getWikiByHeading($heading) {
 		$query = "SELECT wiki.wikiID FROM wiki
 					LEFT JOIN wikiRevision ON wiki.latestRevision = wikiRevision.revisionID
-					WHERE heading = \"$heading\"";
+					WHERE heading = \"{$this->db->quote($heading)}\"";
 
 		return $this->db->getRow($query);
 	}
@@ -372,11 +372,11 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 				  LEFT JOIN {$this->_table} w ON w.wikiID = r.wikiID
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE w.deleted = 'false'
-				  AND w.categoryID = '{$categoryID}'
-				  AND w.slug = '{$slug}'";
+				  AND w.categoryID = '{$this->db->quote($categoryID)}'
+				  AND w.slug = '{$this->db->quote($slug)}'";
 
 		if ($revisionID > 0 && is_numeric($revisionID)) {
-			$query .= "AND r.revisionID = '{$revisionID}' ";
+			$query .= "AND r.revisionID = '{$this->db->quote($revisionID)}' ";
 		}
 
 		$query .= "ORDER BY r.created DESC LIMIT 1";
