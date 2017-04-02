@@ -61,10 +61,10 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 				  FROM " . $this->_revisionTable . " r
 				  LEFT JOIN " . $this->_table . " w ON w.wikiID = r.wikiID
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE w.deleted = 'false' AND r.wikiID = $wikiID ";
+				  WHERE w.deleted = 'false' AND r.wikiID = '{$this->db->quote($wikiID)}' ";
 
 		if ($revisionID > 0 && is_numeric($revisionID)) {
-			$query .= "AND r.revisionID = $revisionID ";
+			$query .= "AND r.revisionID = '{$this->db->quote($revisionID)}' ";
 		}
 
 		$query .= "ORDER BY r.created DESC LIMIT 1";
