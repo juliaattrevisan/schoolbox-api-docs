@@ -224,7 +224,14 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
 	{
-		$keyword = $this->db->quote($keyword);
+        /** @var \Schoolbox\User $user */
+        $keyword  = $this->db->quote($keyword);
+        $user     = $_SESSION['user'];
+        $userId   = $this->db->quote($user->getId());
+        $roleId   = $this->db->quote($user->getRole()->getId());
+        $offset   = intval($offset);
+        $limit    = intval($limit);
+        $sort_dir = (strtolower($sort_dir) === 'desc' ? 'desc' : 'asc');
 
 		$query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
@@ -232,15 +239,15 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
                         LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
-                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.gid = '{$roleId}'
                             AND `perms`.type > 0
                         LEFT JOIN `userAccess` ON `wiki`.categoryID = `userAccess`.sid
                             AND `userAccess`.service = 1
-                            AND `userAccess`.uid = {$_SESSION['id']}
+                            AND `userAccess`.uid = '{$userId}'
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
                             AND deleted = 'false'
-                        ORDER BY `$sort_by` $sort_dir
+                        ORDER BY {$this->db->quoteIdentifier($sort_by)} $sort_dir
                         LIMIT $offset, $limit;
             ";
 
@@ -249,11 +256,11 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
                         LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
-                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.gid = '{$roleId}'
                             AND `perms`.type > 0
                         LEFT JOIN `userAccess` ON `wiki`.categoryID = `userAccess`.sid
                             AND `userAccess`.service = 1
-                            AND `userAccess`.uid = {$_SESSION['id']}
+                            AND `userAccess`.uid = '{$userId}'
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
                             AND `deleted` = 'false'
