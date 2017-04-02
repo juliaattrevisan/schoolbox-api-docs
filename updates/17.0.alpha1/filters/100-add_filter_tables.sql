@@ -20,7 +20,7 @@ CREATE TABLE filter_option (
       REFERENCES filter(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
   `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
-  `key` VARCHAR(255) NOT NULL,
+  `abstract_key` VARCHAR(255) NOT NULL,
   `available` BOOL NOT NULL
 ) ENGINE=INNODB;
 

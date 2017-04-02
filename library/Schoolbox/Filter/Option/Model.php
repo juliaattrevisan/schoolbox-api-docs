@@ -125,7 +125,7 @@ class Model
      * It is up to the concrete filter definitions to apply semantics to this value.
      * @var string
      */
-    private $key;
+    private $abstractKey;
 
     /**
      * Should this option be selectable in the filter?
@@ -188,19 +188,19 @@ class Model
     /**
      * @return string
      */
-    public function getKey()
+    public function getAbstractKey()
     {
-        return $this->key;
+        return $this->abstractKey;
     }
 
 
     /**
-     * @param string $key
+     * @param string $abstractKey
      * @return static
      */
-    public function setKey($key)
+    public function setAbstractKey($abstractKey)
     {
-        $this->key = $key;
+        $this->abstractKey = $abstractKey;
         return $this;
     }
 

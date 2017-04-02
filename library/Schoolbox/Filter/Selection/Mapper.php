@@ -29,7 +29,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('filter_id', Filter\Mapper::class, 'id', self::TYPE_MODEL, null, 'filter', 'filter');
         $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
         $this->uses('page', self::TYPE_STRING);
-        $this->uses('key', self::TYPE_STRING);
+        $this->uses('abstract_key', self::TYPE_STRING);
         $this->uses('selected', self::TYPE_BOOLEAN);
     }
 }

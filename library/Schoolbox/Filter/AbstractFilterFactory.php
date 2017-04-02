@@ -53,6 +53,11 @@ abstract class AbstractFilterFactory implements IFilterFactory
         return $this;
     }
 
+    public function getFilterId()
+    {
+        return $this->filter->getId();
+    }
+
 
     /**
      * @param Option\Mapper $filterOptionMapper

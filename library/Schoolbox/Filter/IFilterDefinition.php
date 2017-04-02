@@ -11,8 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter\Option as FilterOption;
-use Schoolbox\Filter\Option\Selection as FilterSelection;
-use Schoolbox\Filter\Model as Filter;
+use Schoolbox\Filter;
 
 /**
  * All filter definitions must provide an implementation that adheres to this interface.
@@ -20,15 +19,17 @@ use Schoolbox\Filter\Model as Filter;
  * You should not inject mappers into the filter definitions. They should not do DB calls. The factory should perform
  * the calls and call the required setters for the definition for it to do its work.
  *
- * Responsibilities:
- * * Rendering possible options, so admin can select which filter options should be available per page
- * * Rendering default selections, so admin can select which available options should be checked by default per role type and page
- * * Rendering filter panel fragment, containing available options, checked as per user-specific settings
+ * 3 Responsibilities
+ * * Rendering available options and default role selections in the admin pages
+ * * Rendering options in a filter panel on a filterable page
+ * * Converting user option selections into entities when generating a filterable page's contents
+ *
+ * Each of these 3 purposes has a corresponding buildFor* method
  */
 interface IFilterDefinition
 {
     /**
-     * @return Filter
+     * @return Filter\Model
      */
     public function getFilter();
 

@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Term;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\GenericCollection;
 
 /**
@@ -57,10 +58,10 @@ class Factory extends AbstractFilterFactory
     /**
      * Build a filter, ready to inject into a filter panel
      *
-     * @param mixed[] $params
+     * @param null|IRunTimeOptions $runTimeOptions
      * @return IFilterDefinition
      */
-    public function buildForFilterPanel(array $params = [])
+    public function buildForFilterPanel(IRunTimeOptions $runTimeOptions = null)
     {
         $definition = new Definition();
         $this->setBaseDependencies($definition);
@@ -75,17 +76,14 @@ class Factory extends AbstractFilterFactory
     }
 
     /**
-     * Build a filter definition that is able to convert keys back to elements (in this case Term models)
+     * Returns a key converter, able to convert between keys (term.id) and the entities they represent (terms)
      *
-     * @return IFilterDefinition
+     * @return KeyConverter
      */
-    public function buildForConvertingKeyToElement()
+    public function buildKeyConverter()
     {
-        $definition = new Definition();
-        $this->setBaseDependencies($definition);
-
-        return $definition
-            ->setTerms($this->getSortedTerms());
+        $terms = $this->getSortedTerms();
+        return new KeyConverter($terms);
     }
 
 

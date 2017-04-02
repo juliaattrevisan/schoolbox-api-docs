@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\AssessmentType;
 
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\IRunTimeOptions;
 
 /**
  * A factory for building TermFilters
@@ -30,10 +31,10 @@ class Factory extends AbstractFilterFactory
     /**
      * Build a filter, ready to inject into a filter panel
      *
-     * @param mixed[] $params - Factory must validate and convert each to calls to setters
+     * @param null|IRunTimeOptions $runTimeOptions
      * @return IFilterDefinition
      */
-    public function buildForFilterPanel(array $params = [])
+    public function buildForFilterPanel(IRunTimeOptions $runTimeOptions = null)
     {
         // TODO: Implement buildForFilterPanel() method.
     }

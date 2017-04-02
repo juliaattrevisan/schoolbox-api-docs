@@ -21,6 +21,8 @@ interface IFilterFactory
     /**
      * Build a filter definition, ready to use in the admin pages
      *
+     * No dynamic options or user-selections relevant.
+     *
      * @return IFilterDefinition
      */
     public function buildForAdminPages();
@@ -28,15 +30,15 @@ interface IFilterFactory
     /**
      * Build a filter, ready to inject into a filter panel
      *
-     * @param mixed[] $params - Factory must validate and convert each to calls to setters
+     * @param null|IRunTimeOptions $runTimeOptions
      * @return IFilterDefinition
      */
-    public function buildForFilterPanel(array $params = []);
+    public function buildForFilterPanel(IRunTimeOptions $runTimeOptions = null);
 
     /**
-     * Build a filter definition that is able to convert keys back to elements
+     * Returns a key converter, able to convert between keys and the entities they represent
      *
-     * @return IFilterDefinition
+     * @return IKeyConverter
      */
-    public function buildForConvertingKeyToElement();
+    public function buildKeyConverter();
 }

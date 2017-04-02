@@ -239,81 +239,78 @@ class Controller extends Base
      */
     public function postPendingAssessmentsForUser(User $viewee, FilterFactoryFactory $filterFactoryFactory)
     {
-        // Save user filter selections
         /**
          * Indexed by filter.id, page, then key
          * @var string[][][] $postFilterSelections
          */
         $postFilterSelections = $this->request->post['filter_selection'];
 
-        // Update the user's filter selections
-
         // Delete user's current selections for this page
-        $filterMapper = Filter\Mapper::getInstance();
         $filterSelectionMapper = FilterSelection\Mapper::getInstance();
         $filterSelectionMapper->deleteByColumnList([
             'user_id' => $this->getUser()->getId(),
             'page'    => FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
         ]);
 
+        // Save User's current selections
+        $filterMapper = Filter\Mapper::getInstance();
         $selectionsToSave = $filterSelectionMapper->createCollection();
 
-        $termFilterFactory    = $filterFactoryFactory->buildTermFilterFactory();
-        $termFilterDefinition = $termFilterFactory->buildForConvertingKeyToElement();
+        // What filters are in use on this page? Get their key converters
+        /** @var GenericCollection|Filter\IKeyConverter[] $keyConverters */
+        $keyConverters = new GenericCollection(Filter\IKeyConverter::class);
 
-        // Build the user's selections
+        // Term Filter
+        $termFilterFactory = $filterFactoryFactory->buildTermFilterFactory();
+        $termKeyConverter  = $termFilterFactory->buildKeyConverter();
+        $keyConverters->offsetSet($termFilterFactory->getFilterId(), $termKeyConverter);
+
+        // TODO add other filters here
+
+        /** @var Collection|GenericCollection[]|FilterSelection\Model[][] $selectionsPerFilter */
+        $selectionsPerFilter = new Collection();
+
         foreach($postFilterSelections as $filterId => $filterSelections){
             $filter = $filterMapper->createModel($filterId);
 
-            // TODO make dynamic
-            $definition = $termFilterDefinition;
+            if(!$selectionsPerFilter->offsetExists($filterId)){
+                $selectionsPerFilter->setOffset($filterId, $filterSelectionMapper->createCollection());
+            }
 
             foreach($filterSelections as $page => $pageSelections){
                 foreach($pageSelections as $key => $selected){
-
-                    if(true /* TODO check key is valid and sanitise */ ){
-                        $selection = $filterSelectionMapper->createModel();
-                        $selection
-                            ->setFilter($filter)
-                            ->setUser($this->getUser())
-                            ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
-                            ->setKey($key)
-                            ->setSelected((bool)$selected);
-                        $selectionsToSave->add($selection);
-                    }
-
+                    $selection = $filterSelectionMapper->createModel();
+                    $key = $keyConverters[$filter->getId()]->sanitiseKey($key);
+                    $selection
+                        ->setFilter($filter)
+                        ->setUser($this->getUser())
+                        ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
+                        ->setKey($key)
+                        ->setSelected((bool)$selected);
+                    $selectionsToSave->add($selection);
+                    $selectionsPerFilter->offsetSet($key, $selection);
                 }
             }
         }
-
-
         $filterSelectionMapper->save($selectionsToSave);
 
-        /** @var FilterSelection\Model[][] $selectionsPerFilter */
-        $selectionsPerFilter = $selectionsToSave->groupByCallback(function(FilterSelection\Model $selection){
-            return $selection->getFilter()->getId();
-        })->indexByCallback(function(Collection $c){
-            /** @var FilterSelection\Model[] $c */
-            return $c[0]->getFilter()->getId();
-        });
 
         // Get the terms
         $availableTerms = $this->termMapper->createCollection();
         $selectedTerms = $this->termMapper->createCollection();
-        $termSelections = $selectionsPerFilter[$termFilterDefinition->getFilter()->getId()];
+        $termSelections = $selectionsPerFilter[$termFilterFactory->getFilterId()];
         foreach($termSelections as $termSelection){
-            $term = $termFilterDefinition->getEntityByKey($termSelection->getKey());
+            $term = $termKeyConverter->getItem($termSelection->getKey());
             $availableTerms->add($term);
             if($termSelection->getSelected()){
                 $selectedTerms->add($term);
             }
         }
 
-        // Were none selected ?
+        // Were no terms selected ?
         if(0 === $selectedTerms->count()){
             $selectedTerms = $availableTerms;
         }
-
 
 
         // If currentUser == viewee, use currentUser as it may already have class codes

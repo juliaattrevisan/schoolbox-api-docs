@@ -193,10 +193,10 @@ class Definition extends AbstractFilterDefinition
                     }
                     $option
                         ->setFilter($this->getFilter())
-                        ->setKey($customKey)
+                        ->setAbstractKey($customKey)
                         ->setPage($page)
                         ->setAvailable($isAvailable);
-                    $pageOptions->setOffset($option->getKey(), $option);
+                    $pageOptions->setOffset($option->getAbstractKey(), $option);
                 }
             }
 
@@ -207,19 +207,19 @@ class Definition extends AbstractFilterDefinition
                     $option = $this->getFilterOptionMapper()->createModel();
                     $option
                         ->setFilter($this->getFilter())
-                        ->setKey($term->getId())
+                        ->setAbstractKey($term->getId())
                         ->setPage($page)
                         ->setAvailable(false);
-                    $pageOptions->setOffset($option->getKey(), $option);
+                    $pageOptions->setOffset($option->getAbstractKey(), $option);
                 }
             }
 
             // Discard any options that refer to Terms that no longer exist (eg if deleted)
             foreach($pageOptions as $filterOption){
                 // Does the filter refer to a specific Term instance?
-                $isForSpecificTerm = !in_array($filterOption->getKey(), $this->getCustomKeys(), true);
-                if($isForSpecificTerm && !$this->terms->offsetExists($filterOption->getKey())){
-                    $pageOptions->offsetUnset($filterOption->getKey());
+                $isForSpecificTerm = !in_array($filterOption->getAbstractKey(), $this->getCustomKeys(), true);
+                if($isForSpecificTerm && !$this->terms->offsetExists($filterOption->getAbstractKey())){
+                    $pageOptions->offsetUnset($filterOption->getAbstractKey());
                 }
             }
 
@@ -255,13 +255,13 @@ class Definition extends AbstractFilterDefinition
     protected function sortFilterOptions(GenericCollection $options)
     {
         return $options->sortByCallback(function(FilterOption\Model $left, FilterOption\Model $right){
-            $leftKey = $left->getKey();
-            $rightKey = $right->getKey();
+            $leftKey = $left->getAbstractKey();
+            $rightKey = $right->getAbstractKey();
             if(self::KEY_ALL === $leftKey){
                 return -1;
             }
             if(self::KEY_FUTURE === $leftKey){
-                return self::KEY_ALL === $right->getKey() ? +1 : -1;
+                return self::KEY_ALL === $right->getAbstractKey() ? +1 : -1;
             }
             if(self::KEY_CURRENT === $leftKey){
                 return in_array($rightKey, [self::KEY_ALL, self::KEY_FUTURE], true)  ? +1 : -1;
@@ -275,7 +275,7 @@ class Definition extends AbstractFilterDefinition
             if(self::KEY_FUTURE === $rightKey || self::KEY_PAST === $rightKey){
                 return +1;
             }
-            return $this->terms[$right->getKey()]->compare($this->terms[$leftKey]);
+            return $this->terms[$right->getAbstractKey()]->compare($this->terms[$leftKey]);
         });
     }
 

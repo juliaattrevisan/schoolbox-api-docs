@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\WorkType;
 
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\Filter\Model as Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -55,12 +56,23 @@ class Factory extends AbstractFilterFactory
     /**
      * Build a filter, ready to inject into a filter panel
      *
-     * @param mixed[] $params - Factory must validate and convert each to calls to setters TODO Fa
+     * @param null|IRunTimeOptions $runTimeOptions
      * @return IFilterDefinition
      */
-    public function buildForFilterPanel(array $params = [])
+    public function buildForFilterPanel(IRunTimeOptions $runTimeOptions = null)
     {
         return (new Definition($this->getFilter()))
             ->setWorkTypes($this->getWorkTypes());
+    }
+
+
+    /**
+     * Build a filter definition that is able to convert keys back to elements
+     *
+     * @return IFilterDefinition
+     */
+    public function buildKeyConverter()
+    {
+        // TODO: Implement buildForConvertingKeyToElement() method.
     }
 }
