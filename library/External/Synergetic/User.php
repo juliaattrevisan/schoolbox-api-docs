@@ -37,7 +37,7 @@ class External_Synergetic_User implements External_UserInterface
         // Get path on Schoolbox server to cached photos. These stupidly have a .JPG extension regardless of what
         // they really are- so don't pay much attention that the type
 
-        $photoPath = realpath($this->config->get('portrait_dir')) . "/{$externalUserId}/.jpg";
+        $photoPath = realpath($this->config->get('portrait_dir')) . "/{$externalUserId}.jpg";
 
         // Check if the configuration options have SIS photo imporing disabled
 
@@ -52,6 +52,8 @@ class External_Synergetic_User implements External_UserInterface
             }
         }
 
+        // Do a query to get the photos modification date in the SIS. We don't pull the actual photo at this time
+
         $queryPhoto = $this->getConnector()->executeQuery(
             "SELECT vPhotos.ModifiedDate FROM dbo.vPhotos vPhotos WHERE vPhotos.ID = :externalId",
             ['externalId' => $externalUserId]
@@ -61,15 +63,39 @@ class External_Synergetic_User implements External_UserInterface
 
         if ($photo = $queryPhoto->fetch()) {
 
-            // Check
+            // Check we can read the file
 
             if (is_readable($photoPath)) {
-                $cacheExpired = filemtime($photoPath) < strtotime($photo['ModifiedDate']);
+
+                // If the file is empty, or does not contain a valid image we want to replace it regardless of its date
+
+                if (filesize($photoPath) == 0 || !exif_imagetype($photoPath)) {
+
+                    $downloadImage = true;
+
+                } else {
+
+                    // File on disk was a valid image- check the modification date to see if we want to redownload
+
+                    $downloadImage = filemtime($photoPath) < strtotime($photo['ModifiedDate']);
+                }
             } else {
-                $cacheExpired = true;
+
+                // File was not readable
+
+                $downloadImage = true;
             }
 
-            if ($cacheExpired) {
+            if ($downloadImage) {
+
+                // Do a query to retrieve the actual photo from the database
+
+                $queryPhoto = $this->getConnector()->executeQuery(
+                    "SELECT vPhotos.Photo FROM dbo.vPhotos vPhotos WHERE vPhotos.ID = :externalId",
+                    ['externalId' => $externalUserId]
+                );
+
+                $photo = $queryPhoto->fetch();
 
                 // The cache has expired, overwrite it with the one from the SIS
 
