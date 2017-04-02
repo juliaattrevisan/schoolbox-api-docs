@@ -1088,7 +1088,7 @@ class External_Synergetic_User implements External_UserInterface
             ORDER BY    vStaff.StaffSurname
         ";
 
-        return $this->getConnector()->executeQuery($query)->fetchAll();
+        return $this->getConnector()->executeQuery($query, $bindings)->fetchAll();
     }
 
     /**
