@@ -446,7 +446,7 @@ class External_Synergetic_User implements External_UserInterface
              WHERE      vStaff.StaffID = :externalId
         ";
 
-        return $this->getConnector()->executeQuery($query, ['externalId', $synID])->fetch();
+        return $this->getConnector()->executeQuery($query, ['externalId' => $synID])->fetch();
     }
 
     /**
