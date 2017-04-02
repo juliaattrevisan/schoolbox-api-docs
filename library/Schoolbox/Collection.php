@@ -885,4 +885,22 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         }
         return $clone;
     }
+
+
+    /**
+     * Creates a shallow clone of this collection.
+     *
+     * Enables preservation of indexing and sort order, but non-duplication of items.
+     *
+     * @return static
+     */
+    public function shallowClone()
+    {
+        $newCollection = $this->emptyClone();
+        foreach($this->stack as $idx => $item){
+            $newCollection->stack[$idx] = $item;
+        }
+        return $newCollection;
+    }
+
 }
