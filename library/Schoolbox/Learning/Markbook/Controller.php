@@ -163,7 +163,8 @@ class Controller extends Base
         try {
             $pendingLabel = $this->dueWorkErrorMapper->findDefaultForNewSubmissions()->getDisplayAs();
         } catch (MapperException $e) {
-            $pendingLabel = 'Pending';
+            // Let Twig figure it out
+            $pendingLabel = null;
         }
 
         // And output

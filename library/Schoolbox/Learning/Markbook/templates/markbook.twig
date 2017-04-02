@@ -167,7 +167,7 @@
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
                                     {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
-                                        ? pendingLabel
+                                        ? (pendingLabel ?: "Pending")
                                         : assessment.getHumanReadableMark(student, true) | default('–')
                                     %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"
