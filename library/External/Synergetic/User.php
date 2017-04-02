@@ -1096,12 +1096,26 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getCampusFromTimetable($externalId)
     {
+        // Was unable to hit this in testing, but running in isolation returned
+        //
+        //    /vagrant/library/External/Synergetic/User.php:440:
+        //    array (size=1)
+        //      0 =>
+        //          array (size=1)
+        //              'campus' => string 'S' (length=1)
+
         if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
 
         return $this->getConnector()->executeQuery(
-            "SELECT DISTINCT ClassCampus AS campus FROM timetable WHERE StaffID = :id AND FileYear = :fileYear",
+            "
+                SELECT DISTINCT     ClassCampus AS campus 
+                FROM                timetable 
+                WHERE               StaffID = :id AND 
+                                    FileYear = :fileYear AND
+                                    ClassCampus <> ''
+            ",
             [
                 'id' => $externalId,
                 'fileYear' => date('Y')
