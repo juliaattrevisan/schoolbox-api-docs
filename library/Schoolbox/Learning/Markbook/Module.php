@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use DueWork_ErrorMapper;
 
 class Module extends BaseModule
 {
@@ -76,6 +77,7 @@ class Module extends BaseModule
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
                 'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
                 'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
             ])
         );
     }
