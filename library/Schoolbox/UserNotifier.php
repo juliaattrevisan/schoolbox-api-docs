@@ -66,6 +66,7 @@ class UserNotifier extends AbstractModuleNotifier
 
 
     /**
+     * @deprecated
      * Manual trigger for when a user is created.
      *
      * This and manualTriggerUpdated() are intended for use by handlers, so that
@@ -94,6 +95,7 @@ class UserNotifier extends AbstractModuleNotifier
 
 
     /**
+     * @deprecated
      * Manual trigger for when a user is updated.
      *
      * @param int  $userId      The ID of the user who was updated
