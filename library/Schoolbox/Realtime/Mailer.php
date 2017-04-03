@@ -31,17 +31,22 @@ class Mailer
     /** @var UserMapper */
     private $userMapper;
 
+    /** @var bool */
+    private $useReplyTo;
+
 
     /**
      * @param TwigEmailFactory $emailFactory
      * @param LoggerInterface  $log
      * @param UserMapper       $userMapper
+     * @param bool             $includeReplyToHeaders
      */
-    public function __construct(TwigEmailFactory $emailFactory, LoggerInterface $log, UserMapper $userMapper)
+    public function __construct(TwigEmailFactory $emailFactory, LoggerInterface $log, UserMapper $userMapper, $includeReplyToHeaders)
     {
         $this->emailFactory = $emailFactory;
         $this->log          = $log;
-        $this->userMapper = $userMapper;
+        $this->userMapper   = $userMapper;
+        $this->useReplyTo   = $includeReplyToHeaders;
     }
 
 
@@ -86,7 +91,7 @@ class Mailer
         $email->setContext($context)->setTo($address);
 
         // we can only include the reply-to header if there is but one email
-        if ($decorator->count() === 1) {
+        if ($this->useReplyTo && $decorator->count() === 1) {
             $email->setReplyTo($this->getEmailAddresses(
                 $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getEffectorIds())->getAll()
             ));

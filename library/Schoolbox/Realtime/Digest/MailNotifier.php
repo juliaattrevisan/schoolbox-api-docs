@@ -52,7 +52,9 @@ class MailNotifier extends WorkNotifier
 
         $this->factory    = $factory;
         $this->userMapper = $userMapper;
-        $this->mailer     = new Mailer(new TwigEmailFactory(new CoreContext($this->conf), $this->log()), $this->log(), $userMapper);
+
+        // set up a mailer (we forcibly exclude reply-to headers from digest emails)
+        $this->mailer = new Mailer(new TwigEmailFactory(new CoreContext($this->conf), $this->log()), $this->log(), $userMapper, false);
     }
 
 
