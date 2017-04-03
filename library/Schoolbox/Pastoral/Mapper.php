@@ -294,16 +294,16 @@ class Mapper extends BaseMapper
 
         if ($before_date != '') {
             $before_date = \Alaress_Date_Format::newLocal($before_date . " 12:00AM");
-            $criteria[] = "created_at <= '" . $before_date->toIso8601String() . "'";
+            $criteria[] = "created_at <= '" . $before_date->getDatabase() . "'";
         }
 
         if ($after_date != '') {
             $after_date = \Alaress_Date_Format::newLocal($after_date . " 11:59PM");
-            $criteria[] = "created_at >= '" . $after_date->toIso8601String() . "'";
+            $criteria[] = "created_at >= '" . $after_date->getDatabase() . "'";
         }
 
         if ($severity != '') {
-            $criteria[] = "sv.order >= {$severity}";
+            $criteria[] = "sv.order >= '{$severity}'";
         }
         if ($students != '') {
             $criteria[] = "student_id IN ({$students})";
@@ -333,22 +333,17 @@ class Mapper extends BaseMapper
             }
 
             $years_sql = "`s`.year IN ({$years_sql})";
+            $criteria[] = $years_sql;
         }
         else {
             throw new \InvalidArgumentException('Year level required');
         }
 
-        $criteria[] = $years_sql;
 
-        $criteria_sql = "";
+        $criteria_sql = 'WHERE 1=1';
 
         foreach ($criteria as $criterion) {
-            if ($criteria_sql != "") {
-                $criteria_sql .= " AND ";
-            } else {
-                $criteria_sql = "WHERE ";
-            }
-            $criteria_sql .= $criterion;
+            $criteria_sql .= ' AND '.$criterion;
         }
 
         $order_sql = "";
@@ -393,9 +388,9 @@ class Mapper extends BaseMapper
 
             $involved_sql = "
                 AND (
-                    (SELECT COUNT(*) FROM pastoral_access WHERE role_id = {$role_id} AND pastoral_id = `r`.id) > 0 OR
-                    (SELECT COUNT(*) FROM pastoral_access WHERE user_id = {$user_id} AND pastoral_id = `r`.id) > 0 OR
-                    `r`.owner_id = {$user_id}
+                    (SELECT COUNT(*) FROM pastoral_access WHERE role_id = '{$role_id}' AND pastoral_id = `r`.id) > 0 OR
+                    (SELECT COUNT(*) FROM pastoral_access WHERE user_id = '{$user_id}' AND pastoral_id = `r`.id) > 0 OR
+                    `r`.owner_id = '{$user_id}'
                 )
             ";
 
@@ -421,8 +416,10 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             {$criteria_sql}
             {$involved_sql}
-            ORDER BY {$order_sql}
         ";
+        if($order_sql) {
+            $query .= "ORDER BY {$order_sql}";
+        }
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
