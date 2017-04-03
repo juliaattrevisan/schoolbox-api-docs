@@ -16,6 +16,9 @@ class Factory
     private $factory;
 
     /**
+     * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
+     *
+     * @deprecated
      * @return IConnector
      */
     protected static $connectorExternal;
@@ -23,6 +26,9 @@ class Factory
     /**
      * Retrieves static instance of external database connection
      *
+     * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
+     *
+     * @deprecated
      * @return IConnector
      */
     public static function getInstanceExternal() {
