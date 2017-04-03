@@ -25,6 +25,10 @@ use Schoolbox\UserMapper;
  * @version     SVN: $Id$
  */
 
+/**
+ * Shut UP, storm!
+ * @var array $fields
+ */
 $fields = [ 'porcelain', 'mem', 'truemem', 'pid', 'debug-interval:' ];
 
 $opts = getopt('v', $fields);
