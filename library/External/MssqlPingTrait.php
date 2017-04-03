@@ -16,6 +16,6 @@ trait External_MssqlPingTrait
      */
     public function isResponsive()
     {
-        return MSSQL::getInstance()->connect();
+        return MSSQL::getInstance()->isResponsive();
     }
 }

@@ -8,10 +8,10 @@
  */
 
 use Alaress\Database\Connector\Base as Connector;
-use Alaress\Database\Factory as DatabaseFactory;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -20,7 +20,7 @@ use Schoolbox\IConfigLoader;
  */
 class MSSQL
 {
-    /** @var Connector */
+    /** @var Connector $connector */
     protected $connector;
 
     /** @var IConfigLoader $config */
@@ -80,36 +80,22 @@ class MSSQL
      */
     function __construct($db = false, $optionalConfig = false)
     {
-        $factory = new DatabaseFactory();
-        $this->connector = $factory->createSqlsrv();
+        $this->connector = $this->connector = DatabaseFactory::getInstanceExternal();
         $this->config = ConfigMapper::getInstance();
-
-        if (is_array($optionalConfig)) {
-            $this->host = $optionalConfig['host'];
-            $this->user = $optionalConfig['user'];
-            $this->passwd = $optionalConfig['passwd'];
-            $this->db = $optionalConfig['db'];
-        } else {
-            $this->host = $this->config->get('external_db_host');
-            $this->user = $this->config->get('external_db_user');
-            $this->passwd = $this->config->get('external_db_passwd');
-            $this->db = $db ? $db : $this->config->get('external_db_db');
-        }
-
-        $this->connect();
     }
 
     /**
-     * Connect to database
+     * Ping function just attempts to reconnect to the database
+     *
      * @deprecated
      */
-    function connect()
+    function isResponsive()
     {
         return $this->connector->connect(
-            $this->host,
-            $this->db,
-            $this->user,
-            $this->passwd
+            $this->config->get('external_db_host'),
+            $this->config->get('external_db_db'),
+            $this->config->get('external_db_user'),
+            $this->config->get('external_db_passwd')
         );
     }
 

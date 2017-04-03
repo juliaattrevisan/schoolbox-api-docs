@@ -5,6 +5,7 @@ namespace Schoolbox\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
 class Factory
@@ -13,6 +14,32 @@ class Factory
      * @var DatabaseFactory $factory
      */
     private $factory;
+
+    /**
+     * @return IConnector
+     */
+    protected static $connectorExternal;
+
+    /**
+     * Retrieves static instance of external database connection
+     *
+     * @return IConnector
+     */
+    public static function getInstanceExternal() {
+        if (!isset(self::$connectorExternal)) {
+            $factory = new DatabaseFactory();
+            self::$connectorExternal = $factory->createSqlsrv();
+            $config = ConfigMapper::getInstance();
+
+            self::$connectorExternal->connect(
+                $config->get('external_db_host'),
+                $config->get('external_db_db'),
+                $config->get('external_db_user'),
+                $config->get('external_db_passwd')
+            );
+        }
+        return self::$connectorExternal;
+    }
 
     /**
      * Factory Constructor

@@ -19,6 +19,18 @@ use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 interface IConnector
 {
     /**
+     * Connect to database
+     *
+     * @param $hostname
+     * @param $database
+     * @param $username
+     * @param $password
+     * @param array $options
+     * @return bool
+     */
+    public function connect($hostname, $database, $username, $password, $options = []);
+
+    /**
      * Reconnect to the database (optionally- with new options)
      *
      * @param array|null $options

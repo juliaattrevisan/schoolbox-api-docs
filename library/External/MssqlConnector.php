@@ -8,14 +8,14 @@
  * @link        http://www.alaress.com.au/
  */
 
-use Alaress\Database\Connector\Base as Connector;
-use Alaress\Database\Factory as DatabaseFactory;
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
 trait External_MssqlConnector
 {
-    /** @var Connector $connector */
+    /** @var IConnector $connector */
     protected $connector;
 
     /** @var IConfigLoader $config */
@@ -26,20 +26,12 @@ trait External_MssqlConnector
      */
     protected function setupDatabase()
     {
-        $factory = new DatabaseFactory();
-        $this->connector = $factory->createSqlsrv();
+        $this->connector = DatabaseFactory::getInstanceExternal();
         $this->config = ConfigMapper::getInstance();
-
-        $this->connector->connect(
-            $this->config->get('external_db_host'),
-            $this->config->get('external_db_db'),
-            $this->config->get('external_db_user'),
-            $this->config->get('external_db_passwd')
-        );
     }
 
     /**
-     * @return Connector
+     * @return IConnector
      */
     protected function getConnector() {
         return $this->connector;
