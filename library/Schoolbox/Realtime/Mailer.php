@@ -10,9 +10,11 @@ namespace Schoolbox\Realtime;
 
 use Alaress\Async\Queue\QueueInterface;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Swift_RfcComplianceException;
 use Swift_SwiftException;
 use Twig_Error_Runtime;
@@ -27,21 +29,31 @@ class Mailer
     /** @var LoggerInterface */
     private $log;
 
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var bool */
+    private $useReplyTo;
+
 
     /**
      * @param TwigEmailFactory $emailFactory
      * @param LoggerInterface  $log
+     * @param UserMapper       $userMapper
+     * @param bool             $includeReplyToHeaders
      */
-    public function __construct(TwigEmailFactory $emailFactory, LoggerInterface $log)
+    public function __construct(TwigEmailFactory $emailFactory, LoggerInterface $log, UserMapper $userMapper, $includeReplyToHeaders)
     {
         $this->emailFactory = $emailFactory;
         $this->log          = $log;
+        $this->userMapper   = $userMapper;
+        $this->useReplyTo   = $includeReplyToHeaders;
     }
 
 
     /**
      * @param QueueInterface $list
-     * @param User           $user
+     * @param User           $recipient
      * @param string         $template
      * @param string         $subject
      * @param int            $sortDir
@@ -49,13 +61,16 @@ class Mailer
      * @throws UnderflowException
      * @return bool
      */
-    public function sendListContents(QueueInterface $list, User $user, $template, $subject = '', $sortDir = SORT_ASC)
+    public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC)
     {
-        $emailAddress = trim($user->getEmail());
+        $address = trim($recipient->getEmail());
 
-        if (empty($emailAddress)) {
-            throw new Swift_RfcComplianceException("Empty address for user {$user->getId()}");
+        if (empty($address)) {
+            throw new Swift_RfcComplianceException("Empty address for user {$recipient->getId()}");
         }
+
+        // format rfc2822
+        $address = sprintf('"%s" <%s>', $recipient->formatName(), $address);
 
         $decorator = new Decorator();
 
@@ -70,17 +85,26 @@ class Mailer
             $subject = $decorator->renderTitleAsPlaintext($decorator->getNotifications(1)[0]);
         }
 
-        $this->log->debug(sprintf('Compiling %d notification%s for user %s', $decorator->count(), $decorator->count() === 1 ? '' : 's', $user->getUsername()));
+        $this->log->debug(sprintf('Compiling %d notification%s for user %s', $decorator->count(), $decorator->count() === 1 ? '' : 's', $recipient->getUsername()));
 
         $context = $decorator->renderAsTwigContext($this->emailFactory->getCoreContext(), 0, $sortDir);
-        $context['recipient'] = $user->getFirstname();
-
-        // explicitly an rfc822 email spec, so it sets, not adds
-        $address = sprintf('%s <%s>', $user->formatName(), $emailAddress);
+        $context['recipient'] = $recipient->getFirstname();
 
         // build the email object
         $email = $this->emailFactory->build($template, $subject);
         $email->setContext($context)->setTo($address);
+
+        // we can only include the reply-to header if there is but one email
+        if ($this->useReplyTo && $decorator->count() === 1) {
+            try {
+                $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getEffectorIds());
+                // do NOT format rcf2822, because swift mailer
+                $email->setReplyTo($this->getReplyTo($effectors));
+
+            } catch (Swift_RfcComplianceException $e) {
+                $this->log->warning('Error applying reply-to: ' . $e->getMessage());
+            }
+        }
 
         try {
             // away she goes
@@ -112,4 +136,22 @@ class Mailer
         return false;
     }
 
+
+    /**
+     * @param Collection|User[] $effectors
+     * @return string[]
+     */
+    private function getReplyTo(Collection $effectors)
+    {
+        $replyTo = [];
+
+        foreach ($effectors as $effector) {
+            $replyAddr = trim($effector->getEmail());
+            if ($replyAddr) {
+                $replyTo[$replyAddr] = $effector->formatName();
+            }
+        }
+
+        return $replyTo;
+    }
 }

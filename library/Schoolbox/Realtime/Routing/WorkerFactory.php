@@ -85,8 +85,8 @@ class WorkerFactory
         // factory for configuring instant emails
         $twigFactory = new TwigEmailFactory(new CoreContext($this->conf), $this->log);
 
-        // responsible for draining a list into an email and sending it
-        $mailer = new Mailer($twigFactory, $this->log);
+        // responsible for draining a list into an email and sending it (only include reply-to headers if config allows)
+        $mailer = new Mailer($twigFactory, $this->log, $this->userMapper, $this->conf->get('mail_replyto_enabled'));
 
         // build a list factory
         $listFactory = new MessageList\PublicationFactory($instanceId, $this->client, $cloudManager, $this->userMapper, $mailer);

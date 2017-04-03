@@ -198,7 +198,11 @@ abstract class RedisQueue implements QueueInterface
      */
     private function inflate($data)
     {
-        return unserialize(gzuncompress($data));
+        $unserial = unserialize(gzuncompress($data));
+        if (!$unserial instanceof Instance) {
+            throw new InvalidArgumentException('Could not inflate and unserialize payload');
+        }
+        return $unserial;
     }
 
 
