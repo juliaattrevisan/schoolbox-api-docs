@@ -192,7 +192,8 @@ $pickr-month-padding: 5px;
     }
 
     input[type=radio]:not(.plain) + label.input-toggle {
-        width: 4.5em;
+        width: auto;
+        padding: 0.75rem;
     }
 
     span.displayDate {
