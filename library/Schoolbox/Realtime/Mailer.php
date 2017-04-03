@@ -41,7 +41,7 @@ class Mailer
 
     /**
      * @param QueueInterface $list
-     * @param User           $user
+     * @param User           $recipient
      * @param string         $template
      * @param string         $subject
      * @param int            $sortDir
@@ -49,12 +49,12 @@ class Mailer
      * @throws UnderflowException
      * @return bool
      */
-    public function sendListContents(QueueInterface $list, User $user, $template, $subject = '', $sortDir = SORT_ASC)
+    public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC)
     {
-        $emailAddress = trim($user->getEmail());
+        $emailAddress = trim($recipient->getEmail());
 
         if (empty($emailAddress)) {
-            throw new Swift_RfcComplianceException("Empty address for user {$user->getId()}");
+            throw new Swift_RfcComplianceException("Empty address for user {$recipient->getId()}");
         }
 
         $decorator = new Decorator();
@@ -70,13 +70,13 @@ class Mailer
             $subject = $decorator->renderTitleAsPlaintext($decorator->getNotifications(1)[0]);
         }
 
-        $this->log->debug(sprintf('Compiling %d notification%s for user %s', $decorator->count(), $decorator->count() === 1 ? '' : 's', $user->getUsername()));
+        $this->log->debug(sprintf('Compiling %d notification%s for user %s', $decorator->count(), $decorator->count() === 1 ? '' : 's', $recipient->getUsername()));
 
         $context = $decorator->renderAsTwigContext($this->emailFactory->getCoreContext(), 0, $sortDir);
-        $context['recipient'] = $user->getFirstname();
+        $context['recipient'] = $recipient->getFirstname();
 
         // explicitly an rfc822 email spec, so it sets, not adds
-        $address = sprintf('%s <%s>', $user->formatName(), $emailAddress);
+        $address = sprintf('%s <%s>', $recipient->formatName(), $emailAddress);
 
         // build the email object
         $email = $this->emailFactory->build($template, $subject);
