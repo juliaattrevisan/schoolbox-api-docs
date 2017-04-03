@@ -874,13 +874,19 @@ class External_Synergetic_User implements External_UserInterface
             FROM        dbo.Constituencies Constituencies
             LEFT JOIN   dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
             LEFT JOIN   dbo.Community Community ON Relationships.RelatedID = Community.ID
-            WHERE       Relationships.ID = :id AND
+            WHERE       Relationships.ID = :externalId AND
                         Constituencies.ConstitCode = '@SC' AND
                         Relationships.Relationship IN ({$relationshipBindings['placeholders']})
             ORDER BY    Community.BirthDate
         ";
 
-        return $this->getConnector()->executeQuery($query, $relationshipBindings['bindings'])->fetchAll();
+        return $this->getConnector()->executeQuery(
+            $query,
+            array_merge(
+                $relationshipBindings['bindings'],
+                ['externalId' => $externalId]
+            )
+        )->fetchAll();
     }
 
     /**
