@@ -9,11 +9,12 @@
 
 namespace Schoolbox\External\Connector;
 
-use Schoolbox\Collection;
+use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Tutor;
 use Schoolbox\External\Normalise\User\Student;
+use Schoolbox\GenericCollection;
 
 interface IUser
 {
@@ -31,7 +32,7 @@ interface IUser
      *
      * @param int|string|int[]|string[] $externalIds The external SIS IDs of the guardians to retrieve
      * @param bool $hydrateStudents If set, any students linked to the guardian records will also be retrieved and hydrated
-     * @return Collection|Guardian
+     * @return GenericCollection|Guardian[]
      */
     function getGuardians($externalIds, $hydrateStudents = false);
 
@@ -40,7 +41,7 @@ interface IUser
      * collection of students with hydrated guardian records
      *
      * @param array $filter
-     * @return Collection Collection of hydrated student records
+     * @return GenericCollection|Student[]
      */
     function getGuardianDirectory($filter = []);
 
@@ -49,7 +50,7 @@ interface IUser
      *
      * @param int|string|int[]|string[] $externalIds The external SIS IDs of the students to retrieve
      * @param bool $hydrateGuardians If set, any guardians linked to the student records will also be retrieved and hydrated
-     * @return bool|Student|Collection
+     * @return GenericCollection|Student[]
      */
     function getStudents($externalIds, $hydrateGuardians = false);
 
@@ -58,7 +59,7 @@ interface IUser
      * the specified person
      *
      * @param int|string $externalId This is the external ID of the guardian
-     * @return Collection Collection of hydrated student records
+     * @return GenericCollection|Student[]
      */
     function getStudentsAccessible($externalId);
 
@@ -66,7 +67,7 @@ interface IUser
      * Retrieve staff records from the SIS
      *
      * @param int|string|int[]|string[] $externalIds The external SIS ID of the staff member/members to retrieve
-     * @return bool|Staff|Collection
+     * @return GenericCollection|Staff[]
      */
     function getStaff($externalIds);
 
@@ -74,7 +75,7 @@ interface IUser
      * Retrieve all information required to render the staff directory
      *
      * @param array $filter
-     * @return Collection
+     * @return GenericCollection|Staff[]
      */
     function getStaffDirectory($filter = []);
 
@@ -82,7 +83,7 @@ interface IUser
      * Retrieve one or more tutor records from the SIS
      *
      * @param int|string|int[]|string[] $externalIds The external SIS ID of the tutors
-     * @return bool|Tutor|Collection
+     * @return GenericCollection|Tutor[]
      */
     function getTutors($externalIds);
 
@@ -106,7 +107,7 @@ interface IUser
      * timetabled classes
      *
      * @param int|string|int[]|string[] $externalIds Array or string containing the external ID of one or more users
-     * @return Collection
+     * @return GenericCollection|Campus[]
      */
     function getCampusInvolvement($externalIds);
 }

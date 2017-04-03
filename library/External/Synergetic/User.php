@@ -1192,6 +1192,8 @@ class External_Synergetic_User implements External_UserInterface
         }, $array);
     }
 
+    // TODO: These functions seem to be used prolifically to fill in SQL clauses- in these cases should be using appropriate SQL joins.
+
     /**
      * Retrieve current Synergetic file year and file semester
      * @param int|null $externalUserId If supplied, will returns the users current year/semester
