@@ -51,9 +51,9 @@ class Mailer
      */
     public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC)
     {
-        $emailAddress = trim($recipient->getEmail());
+        $address = $this->getEmailAddress($recipient);
 
-        if (empty($emailAddress)) {
+        if (empty($address)) {
             throw new Swift_RfcComplianceException("Empty address for user {$recipient->getId()}");
         }
 
@@ -74,9 +74,6 @@ class Mailer
 
         $context = $decorator->renderAsTwigContext($this->emailFactory->getCoreContext(), 0, $sortDir);
         $context['recipient'] = $recipient->getFirstname();
-
-        // explicitly an rfc822 email spec, so it sets, not adds
-        $address = sprintf('%s <%s>', $recipient->formatName(), $emailAddress);
 
         // build the email object
         $email = $this->emailFactory->build($template, $subject);
@@ -110,6 +107,38 @@ class Mailer
         }
 
         return false;
+    }
+
+
+    /**
+     * Extract email addresses for all given users
+     *
+     * @param User[] $users
+     * @return string[]
+     */
+    private function getEmailAddresses(array $users)
+    {
+        return array_filter(
+            array_map([ $this, 'getEmailAddress' ], $users)
+        );
+
+    }
+
+
+    /**
+     * @param User $user
+     * @return string
+     */
+    private function getEmailAddress(User $user)
+    {
+        $address = trim($user->getEmail());
+
+        if ($address) {
+            // explicitly an rfc822 email spec
+            return sprintf('%s <%s>', $user->formatName(), $address);
+        }
+
+        return '';
     }
 
 }
