@@ -15,7 +15,6 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Survey\Section\Mapper as SurveySectionMapper;
 
 class Mapper extends BaseMapper
 {
@@ -51,5 +50,41 @@ class Mapper extends BaseMapper
         }
 
         return $this->hydrateList($results);
+    }
+
+    /**
+     * Retrieve the data required for the ePortfolio matrix component
+     */
+    public function getMatrix() {
+        $sql =
+        "
+            SELECT      survey.assess_id AS survey_id,
+                        survey.title AS survey_title,
+                        section.title as section_title,
+                        question.question as question,
+                        answer.answer as answer,
+                        response.response
+            FROM        assess survey
+            JOIN        assess_section section ON section.assess_id = survey.assess_id
+            JOIN        assess_question question ON question.section_id = section.section_id
+            JOIN        assess_attempt attempt ON
+                            attempt.assess_id = survey.assess_id AND
+                            attempt.user_id = :user_id AND
+                            attempt.attempt_id = (
+                                SELECT    attempt_id
+                                FROM      assess_attempt last_attempt
+                                WHERE     last_attempt.assess_id = survey.assess_id
+                                ORDER BY  last_attempt.attempt_id DESC
+                                LIMIT 1
+                            )
+            JOIN        assess_response response ON
+                            response.attempt_id = attempt.attempt_id AND
+                            response.section_id = section.section_id AND
+                            response.question_id = question.question_id
+            JOIN        assess_answer answer ON answer.question_id = question.question_id                            
+            WHERE       survey.assess_id = :assess_id
+            ORDER BY    section.sequence,
+                        question.sequence
+        ";
     }
 }
