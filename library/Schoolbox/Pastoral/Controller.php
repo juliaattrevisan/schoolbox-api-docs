@@ -290,6 +290,17 @@ class Controller extends Base
             return $this->getAuthorizer()->isPathAuthorizedForUser('pastoral.getRecord', ['record'=>$record, 'access'=>$record->getAccessList(), 'studentId'=>$record->getStudent()->getId()], $this->getUser());
         });
 
+        //Age
+        $age = '';
+        if($studentExternal['StudentBirthDate']) {
+            try {
+                $birthday = new \Alaress_Date_Format($studentExternal['StudentBirthDate'], \Alaress_Date_Format::TIMESTAMP);
+                $age = $birthday->getDateTimeObject()->age;
+            } catch (RuntimeException $e) {
+                //noop
+            }
+        }
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/index.twig',
@@ -297,7 +308,7 @@ class Controller extends Base
                     'session' => $_SESSION,
                     'records' => $records,
                     'student' => $student,
-                    'studentAge' => $this->calculateAge($studentExternal['StudentBirthDate']),
+                    'studentAge' => $age,
                     'studentContacts' => $studentContacts,
                     'role' => $this->getUser()->getRole()->getType(),
                     'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
@@ -999,35 +1010,6 @@ class Controller extends Base
         }
 
         return $zone->getTwigContext();
-    }
-
-    /**
-     * Calculate age of student
-     *
-     * @param int $timestamp
-     * @param int $now
-     * @return int
-     */
-    private function calculateAge($timestamp = 0, $now = 0)
-    {
-
-        if ($now == 0) {
-            $now = time();
-        }
-
-        $yearDiff = date("Y", $now) - date("Y", $timestamp);
-        $monthDiff = date("m", $now) - date("m", $timestamp);
-        $dayDiff = date("d", $now) - date("d", $timestamp);
-
-        if ($monthDiff < 0) {
-            $yearDiff--;
-        } elseif (($monthDiff == 0) && ($dayDiff < 0)) {
-            $yearDiff--;
-        }
-
-        $result = intval($yearDiff);
-
-        return $result;
     }
 
     /**

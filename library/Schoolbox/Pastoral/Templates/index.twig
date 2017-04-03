@@ -104,8 +104,9 @@
                         <div class="small-12 medium-8 large-10 columns">
                             <dl class="profile">
                                 <dt class="no-margin small-6 medium-4">Age</dt>
+                                {% if studentAge is not empty %}
                                 <dd class="no-margin small-6 medium-8">{{ studentAge }} Years Old</dd>
-
+                                {% endif %}
                                 <dt class="no-margin small-6 medium-4 {% if student.StudentYearLevel == '' and student.FormDescription == '' %}hide{% endif %}">
                                     Year Level
                                 </dt>
