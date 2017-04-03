@@ -2016,6 +2016,7 @@ abstract class Mapper implements IMapper, Serializable
                     $prefix     = $this->database->quoteIdentifier($parts[0]);
                     $columnName = $this->database->quoteIdentifier($parts[1]);
                 }
+
                 $order_option = strtoupper($order_option);
                 if (in_array($order_option, array('ASC', 'DESC'))) {
                     $order_parts[] = "$prefix.$columnName $order_option";

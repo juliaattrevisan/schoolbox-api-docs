@@ -11,8 +11,6 @@
 
 namespace Schoolbox\Survey\Section;
 
-use PDO;
-use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 

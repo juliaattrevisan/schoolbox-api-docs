@@ -15,6 +15,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Survey\Section\Mapper as SurveySectionMapper;
 
 class Mapper extends BaseMapper
 {
@@ -29,6 +30,7 @@ class Mapper extends BaseMapper
         $this->uses('availability', self::TYPE_STRING);
         $this->uses('title', self::TYPE_STRING);
         $this->joins('category_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
+        $this->joinsReverse('assess_id', SurveySectionMapper::class, 'assess_id', null, null, 'sections', 'sections');
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('deleted_at');

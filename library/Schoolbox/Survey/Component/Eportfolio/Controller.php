@@ -48,13 +48,21 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
 
         if (!empty($surveyId)) {
-            $survey = SurveyMapper::getInstance()->findById($surveyId);
-            $attempts = SurveyAttemptMapper::getInstance()->findByColumnList([
-                'user_id' => $studentId,
-                'assess_id' => $surveyId
-            ]);
 
-            var_dump($attempts);
+            // Retrieve the survey
+
+            $survey = SurveyMapper::getInstance()->findById($surveyId);
+
+            var_dump($survey);
+
+            // Get the most recent attempt
+
+            $attempt = SurveyAttemptMapper::getInstance()->findOneByColumnList([
+                    'user_id' => $studentId,
+                    'assess_id' => $surveyId
+                ], ['start' => 'desc']
+            );
+
         } else {
             $survey = null;
             $responses = null;

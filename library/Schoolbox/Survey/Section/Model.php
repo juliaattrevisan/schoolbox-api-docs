@@ -11,12 +11,12 @@
 
 namespace Schoolbox\Survey\Section;
 
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Survey\Model as Survey;
 
 class Model
 {
-    /** @var int */
-    protected $id;
+    use Id;
 
     /** @var int */
     protected $sequence;
@@ -26,24 +26,6 @@ class Model
 
     /** @var Survey $survey */
     protected $survey;
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @param int $sequence

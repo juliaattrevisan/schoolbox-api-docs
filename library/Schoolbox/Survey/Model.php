@@ -11,6 +11,7 @@
 
 namespace Schoolbox\Survey;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -30,6 +31,11 @@ class Model
 
     /** @var Folder $folder */
     protected $folder;
+
+    /**
+     * @var Collection
+     */
+    protected $sections;
 
     /**
      * @param string $availability
@@ -83,5 +89,23 @@ class Model
     public function getFolder()
     {
         return $this->folder;
+    }
+
+    /**
+     * @param Collection $sections
+     * @return self
+     */
+    public function setSections($sections)
+    {
+        $this->sections = $sections;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getSections()
+    {
+        return $this->sections;
     }
 }
