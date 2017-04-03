@@ -291,7 +291,7 @@ abstract class AbstractTreeBuilder
      * @param array $aAttributes
      * @return array
      */
-    protected function generateFolderArray(IFolder $folder, $type, $name = null, Color $colour = null, IStorage $coverImage, array $liAttributes = null, array $aAttributes = null)
+    protected function generateFolderArray(IFolder $folder, $type, $name = null, Color $colour = null, IStorage $coverImage = null, array $liAttributes = null, array $aAttributes = null)
     {
         return $this->generateNodeArray(
             $folder->getId(),

@@ -555,7 +555,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
                 /** @var \Schoolbox\Resource\Folder\Code\Model $code */
                 $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getFolder()->getId()) {
+                if ($code->getFolder() instanceof Model) {
                     $category->addCode($code);
                 }
                 $collection->add($category);
@@ -841,12 +841,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $category->setGroup($group);
 
                 $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
-                if($courseSpec->getId()){
+                if($courseSpec){
                     $category->setCourseSpecification($courseSpec);
                 }
 
                 $unitSpec = $unitSpecMapper->hydrate($row, 'us');
-                if($unitSpec->getId()){
+                if($unitSpec){
                     $category->setUnitSpecification($unitSpec);
                 }
             }
@@ -854,7 +854,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Hydrate class codes (avoiding duplicates) and cache
             $code = $code_mapper->hydrate($row, 'cc');
 
-            if ($code->getFolder()->getId()) {
+            if ($code->getFolder() instanceof Model) {
                 $addedClassCodes[$testId][$code->getCode()] = $code;
             }
 
@@ -865,7 +865,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             /** @var Node\Mapper $joinMapper */
             $joinMapper = $this->getJoinMapper('curriculum_node_for_category');
             $curriculumNode = $joinMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-            if ($curriculumNode->getId()) {
+            if ($curriculumNode) {
                 $addedCurriculumNodes[$testId][$curriculumNode->getId()] = $curriculumNode;
             }
         }

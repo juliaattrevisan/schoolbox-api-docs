@@ -868,9 +868,11 @@ class Mapper extends BaseMapper
                 continue;
             }
             if ($submodel instanceof SubmissionBox || $submodel instanceof ProjectModel) {
-                $submodel->setGradeGroup(
-                    $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
-                );
+                if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
+                    $submodel->setGradeGroup(
+                        $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
+                    );
+                }
             }
         }
 

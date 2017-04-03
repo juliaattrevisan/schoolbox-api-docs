@@ -278,7 +278,7 @@ class PageMapper extends Schoolbox\Mapper {
 			/* If a permission was parsed from this $row, hydrate
 			 * put the permission with its parent page
 			 */
-			if (is_numeric($permissionItem->getId())) {
+			if ($permissionItem instanceof Permission) {
 				$collection->getOffset($permissionItem->getPageId())->getPermissions()->add($permissionItem);
 			}
 		}

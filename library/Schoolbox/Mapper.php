@@ -20,6 +20,7 @@ use PDOStatement;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
+use Schoolbox\Column\Model as ModelColumn;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
@@ -431,6 +432,11 @@ abstract class Mapper implements IMapper, Serializable
 
             if (array_key_exists($key, $row) && $this->localBodyCacheBypass == false) {
                 $id = $row[$key];
+
+                // If the identifier is null, just return scalar NULL.
+                if (null === $id) {
+                    return null;
+                }
                 $model = $mapper->createModel($id);
             } else {
                 $model = $mapper->createModel();
@@ -444,7 +450,6 @@ abstract class Mapper implements IMapper, Serializable
                     if (!(isset($map['join']) && isset($mapper->joins[$map['join']]['multi']))) {
                         throw new Exception("Column must be declared if no multijoin set for it: " . json_encode($map));
                     }
-
                 } else {
                     $columnName = $map['column'];
 
@@ -885,8 +890,14 @@ abstract class Mapper implements IMapper, Serializable
         $set_method  = $this->getSetMethodName($property);
         $map         = $this->map->getOffset($property);
         $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
-        if ($map['hydrator'] instanceof IColumnType) {
-            $value = $map['hydrator']->hydrate($value, $join_mapper);
+        $hydrator    = $map['hydrator'];
+        if ($hydrator instanceof IColumnType) {
+            $value = $hydrator->hydrate($value, $join_mapper);
+            // Attempting to set a model value to NULL will likely break,
+            // and won't do anything because it will be NULL on hydrate anyway.
+            if (!isset($value) && $hydrator instanceof ModelColumn) {
+                return $this;
+            }
         }
         $model->$set_method($value);
         return $this;
@@ -984,24 +995,42 @@ abstract class Mapper implements IMapper, Serializable
         return $this->hasMap($map);
     }
 
-
     /**
      * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
      *
-     * @param string      $foreignKey
+     * Use this when a parent object has 0|1 relationship to a child object, where
+     * the join is defined on the child's table.
+     *
+     * @param string      $foreignKey      The foreign key on the other table
      * @param string      $foreignMapper
-     * @param string      $localColumn
-     * @param IColumnType $hydrator
-     * @param int         $options
      * @param string      $property
      * @param string      $name
      * @return bool
      */
-    protected function joinsReverse($foreignKey, $foreignMapper, $localColumn = 'id', $hydrator = null, $options = null, $property = null, $name = null)
+    protected function joinsReverseSingle($foreignKey, $foreignMapper, $property = null, $name = null)
     {
-        // enforce reverse joining
-        $options = $options | self::COLUMN_JOIN_REVERSE;
-        return $this->joins($localColumn, $foreignMapper, $foreignKey, $hydrator, $options, $property, $name);
+        $localColumn = $this->getIdentifierColumn();
+        $options = self::COLUMN_JOIN_REVERSE;
+        return $this->joins($localColumn, $foreignMapper, $foreignKey, self::TYPE_MODEL, $options, $property, $name);
+    }
+
+    /**
+     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE | self::COLUMN_JOIN_MULTI)
+     *
+     * Use this when a parent object has a Collection of 0:N children objects associated with it, where
+     * the join is defined on the children's table.
+     *
+     * @param string      $foreignKey      The foreign key on the other table
+     * @param string      $foreignMapper
+     * @param string      $property
+     * @param string      $name
+     * @return bool
+     */
+    protected function joinsReverseMulti($foreignKey, $foreignMapper, $property = null, $name = null)
+    {
+        $localColumn = $this->getIdentifierColumn();
+        $options = self::COLUMN_JOIN_REVERSE | self::COLUMN_JOIN_MULTI;
+        return $this->joins($localColumn, $foreignMapper, $foreignKey, self::TYPE_COLLECTION, $options, $property, $name);
     }
 
 
@@ -2706,7 +2735,10 @@ abstract class Mapper implements IMapper, Serializable
     {
         $modelList = $this->createCollection();
         foreach ($rowList as $row) {
-            $modelList->add($this->hydrate($row, $alias, $callback));
+            $model = $this->hydrate($row, $alias, $callback);
+            if($model){
+                $modelList->add($model);
+            }
         }
         return $modelList;
     }
@@ -2974,7 +3006,7 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty($this->model)) {
             // no model is defined; explode
-            throw new Exception("Model is undefined, cannot instantiate.");
+            throw new Exception('Model is undefined, cannot instantiate.');
         }
 
         if (!class_exists($this->model)) {
@@ -2982,7 +3014,16 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // create a new, blank model
-        return new $this->model;
+        $model = new $this->model;
+
+        // Ensure any model Collections are instantiated
+        foreach ($this->map as $map){
+            if($map['hydrator'] instanceof Column\Collection){
+                $this->setModelProperty($model, $map['property'], null);
+            }
+        }
+
+        return $model;
     }
 
     /**

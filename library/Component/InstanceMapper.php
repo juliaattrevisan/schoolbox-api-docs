@@ -196,72 +196,60 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         $statement = $this->database->prepare($sql);
         $statement->execute($fields);
 
-        $rowset = $statement->fetchAll();
-
-        //
         // Hydrate a whole bunch of stuff here.
-        $instanceCollection         = $this->hydrateList($rowset, 'ci');
-        $definitionCollection       = Component_DefinitionMapper::getInstance()->hydrateList($rowset, 'cd');
-        $configInstanceCollection   = Component_ConfigMapper::getInstance()->hydrateList($rowset, 'cci');
-        $configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->hydrateList($rowset, 'ccd');
+        $instanceCollection         = $this->createCollection();
+        $definitionCollection       = Component_DefinitionMapper::getInstance()->createCollection();
+        $configInstanceCollection   = Component_ConfigMapper::getInstance()->createCollection();
+        $configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->createCollection();
 
-        $finalCollection = $this->createCollection();
+        // hydrate rows
+        /** @var Component_Instance         $instance */
+        /** @var Component_Definition       $definition */
+        /** @var Component_Config           $configInstance */
+        /** @var Component_ConfigDefinition $configDef */
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $instanceId   = $row['ci.id'];
+            $definitionId = $row['cd.id'];
+            $configId     = $row['cci.id'];
+            $configDefId  = $row['ccd.id'];
 
-        // map the definitions into their instances
-        foreach ($instanceCollection as $i => $instance) {
-            /**
-            * @var $instance   Component_Instance
-            * @var $definition Component_Definition
-            * @var $config     Component_Config
-            * @var $config_def Component_ConfigDefinition
-            */
-            $definition = $definitionCollection->getOffset($i);
-            $config_def = $configDefinitionCollection->getOffset($i);
-
-            // if this component has already been processed, just add the config and move on
-            $instance_id = $instance->getId();
-            if (isset($finalCollection[$instance_id])) {
-                /* @var $finalCollection[$instance_id] Component_Instance */
-                $finalCollection[$instance_id]->getConfig()->setOffset($config_def->getId(), $config_def);
-                continue;
+            // Component Definition
+            if ($definitionId && !$definitionCollection->offsetExists($definitionId)) {
+                $definitionCollection->setOffset($definitionId, Component_DefinitionMapper::getInstance()->hydrate($row, 'cd'));
             }
+            $definition = $definitionCollection->getOffset($definitionId);
 
-            // 1:1 :: instance:definition
-            $instance->setDefinition($definition);
+            // Component Instance
+            if ($instanceId && !$instanceCollection->offsetExists($instanceId)) {
+                $instanceCollection->setOffset($instanceId, $this->hydrate($row, 'ci'));
+
+                // 1:1 :: instance:definition
+                $instanceCollection->getOffset($instanceId)->setDefinition($definition);
+            }
+            $instance = $instanceCollection->getOffset($instanceId);
+
+
+            if ($configDefId && !$configDefinitionCollection->offsetExists($configDefId)) {
+                $configDefinitionCollection->setOffset($configDefId, Component_ConfigDefinitionMapper::getInstance()->hydrate($row, 'ccd'));
+            }
+            $configDef = $configDefinitionCollection->getOffset($configDefId);
+
+            if ($configId && !$configInstanceCollection->offsetExists($configId)) {
+                $configInstanceCollection->setOffset($configId, Component_ConfigMapper::getInstance()->hydrate($row, 'cci'));
+            }
+            $configInstance = $configInstanceCollection->getOffset($configId);
 
             // n:1 :: configDefinitions:instance
-            $instance->getConfig()->setOffset($config_def->getId(), $config_def);
-
-            $finalCollection[$instance_id] = $instance;
-        }
-
-        // overwrite default configurations
-
-        /* Apparently Component Config Instances can be orphaned from their parent Component
-         * and will die magnificently if this orphanage isn't checked
-         *
-         * I'm not sure why or how this occurs (could be from bad prior data or misconfigured componentry...?)
-         * but this check should prevent attempts to override a component's config when the component itself
-         * doesn't actually exist in $finalCollection
-         */
-        foreach ($configInstanceCollection as $confInstance) {
-
-            /* @var $confInstance Component_Config */
-            if (($confInstance->getId() != null) && isset($finalCollection[$confInstance->getInstanceId()])) {
-                // Clone config instead.
-                // Because the select cache stores references to each retrieved object,
-                // each component of the same type's config objects are the same object.
-                // Setting the config value directly affects the config value for this key
-                // for ALL components of this type!
-                /** @var Component_Config $newConfig */
-                $newConfig = clone $finalCollection[$confInstance->getInstanceId()]->getConfig()
-                                                                                   ->getOffset($confInstance->getConfigDefinitionId());
-                $finalCollection[$confInstance->getInstanceId()]->getConfig()
-                                                                ->setOffset($confInstance->getConfigDefinitionId(), $newConfig->setValue($confInstance->getValue()));
+            if($configDef){
+                $config = clone $configDef;
+                if($configInstance){
+                    $config->setValue($configInstance->getValue());
+                }
+                $instance->getConfig()->setOffset($config->getId(), $config);
             }
         }
 
-        return $finalCollection;
+        return $instanceCollection;
     }
 
 

@@ -24,6 +24,10 @@ class Model implements IColumnType {
     public function __construct()
     {
         $this->cache = new Cache(function (Mapper $mapper, $value) {
+            if (null === $value){
+                return null;
+            }
+
             $model = $mapper->createModel();
 
             // Figure out the identifier property to set on the model.
@@ -76,7 +80,7 @@ class Model implements IColumnType {
 	 * @param mixed  $value
 	 * @param Mapper $mapper
 	 *
-	 * @return object
+	 * @return object|null
 	 */
     public function hydrate($value, $mapper = null)
     {

@@ -56,13 +56,6 @@ class Submission implements IStorage
      */
     private $submittedAt;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->setFiles(new Collection());
-    }
 
     /**
      * @return boolean

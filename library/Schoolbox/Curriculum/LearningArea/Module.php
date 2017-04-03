@@ -16,7 +16,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -59,7 +58,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->params[Controller::class]['mapper']
-            = $this->getMapperFactory()->getLazy(UserMapper::class);
+            = $this->getMapperFactory()->getLazy(Mapper::class);
         $injector->params[Controller::class]['sourceMapper']
             = $this->getMapperFactory()->getLazy(Source\Mapper::class);
         $injector->set(
