@@ -294,10 +294,13 @@ class Controller extends Base
         $age = '';
         if($studentExternal['StudentBirthDate']) {
             try {
-                $birthday = new \Alaress_Date_Format($studentExternal['StudentBirthDate'], \Alaress_Date_Format::TIMESTAMP);
-                $age = $birthday->getDateTimeObject()->age;
-            } catch (RuntimeException $e) {
-                //noop
+                $birthday = new \Alaress_Date_Format('', \Alaress_Date_Format::TIMESTAMP);
+                $age = $birthday->diffInYears(\Alaress_Date_Format::now());
+            } catch (\InvalidArgumentException $e) {
+                // noop
+            } catch (\RuntimeException $e) {
+                // Not even sure how this can throw a RuntimeException.
+                // Anyway: noop
             }
         }
 
