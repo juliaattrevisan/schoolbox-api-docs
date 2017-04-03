@@ -78,8 +78,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             if (data.students.length == 0) {
                 html += 'Nothing due on ' + displayDate + '';
+                pickerResponse.addClass('meta');
             }
             else {
+
+                pickerResponse.removeClass('meta');
 
                 // Populate with results for the selected date
 
@@ -120,8 +123,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         else if (template == 'events') {
             if (data.appointments.length == 0) {
                 html += 'No events found for ' + displayDate;
+                pickerResponse.addClass('meta');
             }
             else {
+                pickerResponse.removeClass('meta');
+
                 html += '<div class="row">';
                 html += '<div class="small-12 medium-12 columns">';
                 html += '<h2>Events on ' + displayDate + '</h2>';
