@@ -91,7 +91,6 @@ class CommunityPortal implements ICommunityPortal
 
             // This adds the Schools default page permissions to the users
 
-            /** @noinspection SqlInsertValues */
             $query =
             "
                 INSERT INTO dbo.CommunityLoginsPage
@@ -100,7 +99,7 @@ class CommunityPortal implements ICommunityPortal
                     ConfigSeq,
                     EnabledFlag
                 )
-                SELECT  :externalId
+                SELECT  :externalId,
                         ConfigSeq,
                         CASE WHEN DefaultValue = 'TRUE' THEN 1 ELSE 0 END AS Enabled
                 FROM    dbo.config
