@@ -25,6 +25,7 @@ use Alaress_Date_Locale_Config;
 use Aura\Di;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
+use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -541,12 +542,33 @@ abstract class AbstractBootstrap implements BootstrapInterface
             /** @var array|IConnector $databaseExternal */
             $databaseExternal = $di->get('databaseExternal');
 
+            // Create the external connection to community portal
+
             $factory = new ExternalConnectorFactory();
-            return $factory->build(
+
+            /** @var ICommunityPortal $communityPortal */
+            $communityPortal = $factory->build(
                 $config,
                 $databaseExternal,
                 ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
             );
+
+            // Load in the key and initialization vector that are required before it can be used
+
+            $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
+
+            if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
+                $config = json_decode(file_get_contents($webServicesKeyFile), true);
+
+                $communityPortal->setSecrets(
+                    base64_decode($config['key']),
+                    base64_decode($config['iv'])
+                );
+            } else {
+                trigger_error('Cannot read community portal key - password will not be changed', E_USER_WARNING);
+            }
+
+            return $communityPortal;
         }));
 
         // Register external NDS object services

@@ -19,4 +19,12 @@ interface ICommunityPortal
      * @return bool
      */
     function changePassword($communityId, $newPassword);
+
+    /**
+     * Sets the secret key and initialization vector required for encryption/decryption
+     *
+     * @param $key
+     * @param $initializationVector
+     */
+    function setSecrets($key, $initializationVector);
 }

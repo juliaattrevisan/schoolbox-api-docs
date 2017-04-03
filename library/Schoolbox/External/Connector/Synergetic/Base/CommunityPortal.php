@@ -16,7 +16,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\ICommunityPortal;
 use UnexpectedValueException;
 
-class CommunityPortal extends Base implements ICommunityPortal
+class CommunityPortal implements ICommunityPortal
 {
     /** @var IConnector $databaseExternal */
     private $databaseExternal;
@@ -33,12 +33,19 @@ class CommunityPortal extends Base implements ICommunityPortal
     /**
      * @inheritdoc
      */
-    public function __construct($databaseExternal, $key, $initializationVector)
+    public function __construct($config, $databaseExternal)
+    {
+        $this->allowCreateUser = $config['synergetic_portal_create_account'];
+        $this->databaseExternal = $databaseExternal;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSecrets($key, $initializationVector)
     {
         $this->key = $key;
         $this->initializationVector = $initializationVector;
-        $this->allowCreateUser = $allowCreateUser;
-        $this->databaseExternal = $databaseExternal;
     }
 
     /**
@@ -55,25 +62,29 @@ class CommunityPortal extends Base implements ICommunityPortal
 
         // Check to see if they have an existing record in the 'CommunityLogins' table
 
-        $result = $this->database->query(
+        $query = $this->databaseExternal->executeQuery(
             "
                 SELECT    * 
-                FROM      [dbo].[CommunityLogins] 
-                WHERE     [ID] = {$this->database->smartQuote($communityId)}
-            "
+                FROM      dbo.communityLogins 
+                WHERE     ID = :externalId
+            ", 
+            ['externalId' => $communityId]
         );
 
-        if ($this->database->countRows($result) > 0) {
+        if ($query->rowCount() > 0) {
 
             // Existing community login record, just update the password
 
             $query = "
-                UPDATE    [dbo].[CommunityLogins]
-                SET       [Password] = {$this->database->smartQuote($encryptedPassword)}
-                WHERE     [ID] = {$this->database->smartQuote($communityId)}
+                UPDATE    dbo.communityLogins
+                SET       password = :password
+                WHERE     ID = :externalId
             ";
 
-            $this->database->query($query);
+            $rowsAffected = $this->databaseExternal->executeQuery($query, [
+                'password' => $encryptedPassword,
+                'externalId' => $communityId
+            ])->rowCount();
 
         } elseif ($this->allowCreateUser) {
 
@@ -83,47 +94,47 @@ class CommunityPortal extends Base implements ICommunityPortal
 
             $query =
             "
-                INSERT INTO [dbo].[CommunityLoginsPage]
+                INSERT INTO dbo.CommunityLoginsPage
                 (
-                    [ID],
-                    [ConfigSeq],
-                    [EnabledFlag]
+                    ID,
+                    ConfigSeq,
+                    EnabledFlag
                 )
-                SELECT  {$this->database->smartQuote($communityId)},
+                SELECT  :externalId
                         ConfigSeq,
                         CASE WHEN DefaultValue = 'TRUE' THEN 1 ELSE 0 END AS Enabled
-                FROM    [dbo].[Config]
-                WHERE   [dbo].[Config].[Key1] = 'CommunityPortal' AND
-                        [dbo].[Config].[Key2] = 'Pages' AND
-                        [dbo].[Config].[Key4] = 'EnabledFlag' AND
-                        [dbo].[Config].[Type] = 'BIT' AND
-                        [dbo].[Config].[Value] = 'True'
+                FROM    dbo.config
+                WHERE   dbo.config.Key1 = 'CommunityPortal' AND
+                        dbo.config.Key2 = 'Pages' AND
+                        dbo.config.Key4 = 'EnabledFlag' AND
+                        dbo.config.Type = 'BIT' AND
+                        dbo.config.Value = 'True'
             ";
 
-            $this->database->query($query);
+            $this->databaseExternal->executeQuery($query, [
+                'externalId' => $communityId
+            ]);
 
             // This sets the password
 
-            $date = Alaress_Date_Format::now()->getDatabase();
-
             $query = "
-                INSERT INTO [dbo].[CommunityLogins]
+                INSERT INTO dbo.communityLogins
                 (
-                    [ID],
-                    [Type],
-                    [Password],
-                    [LastLoginDate],
-                    [LoginType],
-                    [SecurityTokenGuid],
-                    [SecurityTokenIssueDateTime],
-                    [PasswordHashed]
+                    ID,
+                    Type,
+                    password,
+                    LastLoginDate,
+                    LoginType,
+                    SecurityTokenGuid,
+                    SecurityTokenIssueDateTime,
+                    PasswordHashed
                 )
                 VALUES
                 (
-                    {$this->database->smartQuote($communityId)},
+                    :externalId,
                     'CP',
-                    {$this->database->smartQuote($encryptedPassword)},
-                    '{$date}',
+                    :password,
+                    NOW(),
                     '',
                     NULL,
                     NULL,
@@ -131,7 +142,10 @@ class CommunityPortal extends Base implements ICommunityPortal
                 )
             ";
 
-            $this->database->query($query);
+            $rowsAffected = $this->databaseExternal->executeQuery($query, [
+                'externalId' => $communityId,
+                'password' => $encryptedPassword
+            ])->rowCount();
 
         } else {
 
@@ -143,7 +157,7 @@ class CommunityPortal extends Base implements ICommunityPortal
 
         // If one or more rows were affected then this must have done something positive... right?
 
-        return intval($this->database->getOne('SELECT @@ROWCOUNT')) > 0;
+        return $rowsAffected > 0;
     }
 
     /**
