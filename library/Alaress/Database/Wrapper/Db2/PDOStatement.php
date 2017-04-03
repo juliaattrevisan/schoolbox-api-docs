@@ -52,13 +52,13 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function execute(array $input_parameters = null)
      */
-    public function execute($bound_input_params = null)
+    public function execute(array $input_params = null)
     {
-        if (is_array($bound_input_params) && count($bound_input_params) > 0) {
+        if (is_array($input_params) && count($input_params) > 0) {
 
             // Use the supplied parameters rather than the ones previously bound
 
-            $parameters = $bound_input_params;
+            $parameters = $input_params;
 
         } else {
 
@@ -208,7 +208,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function fetchAll($fetch_style = null, $fetch_argument = null, array $ctor_args = array())
      */
-    public function fetchAll($how = null, $class_name = null, $ctor_args = null)
+    public function fetchAll($how = null, $class_name = null, array $ctor_args = null)
     {
         $result = [];
 
@@ -293,7 +293,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function fetchObject($class_name = "stdClass", array $ctor_args = array())
      */
-    public function fetchObject($class_name = null, $ctor_args = null)
+    public function fetchObject($class_name = null, array $ctor_args = null)
     {
         throw new Exception("Object fetching not supported by DB2 wrapper.");
     }

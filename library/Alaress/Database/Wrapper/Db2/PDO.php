@@ -72,7 +72,7 @@ class PDO extends BasePDO
      *
      * @return bool|PDOStatement
      */
-    public function prepare($statement, $options = null)
+    public function prepare($statement, array $options = null)
     {
         $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $statement);
         return $this->lastStatement;
