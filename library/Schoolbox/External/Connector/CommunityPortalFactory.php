@@ -20,12 +20,12 @@ class CommunityPortalFactory
     public function build()
     {
         // TODO inject config
-        $connector          = ucwords(\Config::get('external_type'));
+        $connector               = ucwords(\Config::get('external_type'));
         $synergeticPasswordReset = \Config::get('synergetic_password_reset');
-        $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
+        $webServicesKeyFile      = '/etc/schoolbox-synergetic/config.json';
 
         // Synergetic only
-        if ($connector == 'Synergetic' && $synergeticPasswordReset) {
+        if ($connector === 'Synergetic' && $synergeticPasswordReset) {
             $key = false;
             $iv  = false;
             if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
@@ -36,7 +36,7 @@ class CommunityPortalFactory
                 // can't read file, that's a warning at least.
                 trigger_error('Cannot read community portal key - password will not be changed', E_USER_WARNING);
             }
-            return new Synergetic\Base\CommunityPortal($key, $iv);
+            return new Synergetic\Base\CommunityPortal($key, $iv, \Config::get('synergetic_portal_create_account'));
         }
         return new Offline\Base\CommunityPortal();
     }

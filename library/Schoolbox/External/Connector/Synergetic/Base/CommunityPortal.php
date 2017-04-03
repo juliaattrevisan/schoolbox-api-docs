@@ -29,16 +29,23 @@ class CommunityPortal implements CommunityPortalInterface
     private $initializationVector;
 
     /**
+     * @var bool
+     */
+    private $allowCreateUser;
+
+    /**
      * Constructor
      *
      * @param string $key
      * @param string $initializationVector
+     * @param bool   $allowCreateUser      Can this object create new users in the community portal?
      */
-    public function __construct($key, $initializationVector)
+    public function __construct($key, $initializationVector, $allowCreateUser)
     {
         $this->key = $key;
         $this->initializationVector = $initializationVector;
         $this->database = MSSQL::getInstance();
+        $this->allowCreateUser = $allowCreateUser;
 
         if (DebugBar::isEnabled()) {
             $this->database->installCollector();
@@ -84,7 +91,7 @@ class CommunityPortal implements CommunityPortalInterface
 
             $this->database->query($query);
 
-        } else if (\Config::get('synergetic_portal_create_account')) {
+        } elseif ($this->allowCreateUser) {
 
             // No existing community login record, need to insert one for this to have any chance of doing something
 
