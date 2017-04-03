@@ -294,7 +294,7 @@ class Controller extends Base
         $age = '';
         if($studentExternal['StudentBirthDate']) {
             try {
-                $birthday = new \Alaress_Date_Format('', \Alaress_Date_Format::TIMESTAMP);
+                $birthday = new \Alaress_Date_Format($studentExternal['StudentBirthDate'], \Alaress_Date_Format::TIMESTAMP);
                 $age = $birthday->diffInYears(\Alaress_Date_Format::now());
             } catch (\InvalidArgumentException $e) {
                 // noop
