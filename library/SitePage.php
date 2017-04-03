@@ -443,8 +443,8 @@ class SitePage extends Page
 
         $this->setBlock($this->responsive ? TEMPLATE_body : 'bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
 
-        if ($_SESSION['id']) {
-
+        if ($_SESSION['id'] && $_SESSION['user'] instanceof User)
+        {
             // quasi-localisation
             $this->localise();
 
@@ -578,7 +578,8 @@ class SitePage extends Page
             $this->goLoginPage();
         }
 
-        if (!isset($_SESSION['id']) || //If session does not exist
+        if (!isset($_SESSION['id']) || //If session does not exist ||
+            !$_SESSION['user'] instanceof User ||
             (($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
             ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
