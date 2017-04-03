@@ -21,4 +21,11 @@ class CommunityPortal extends Base implements ICommunityPortal
     {
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSecrets($key, $initializationVector)
+    {
+    }
 }
