@@ -70,7 +70,7 @@ class Sync implements SyncInterface
             FROM student AS s
             LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
             WHERE s.cmpy_code = {$this->database->smartQuote($this->companyCode)}
-            AND   s.dol IS NULL
+            AND   (s.dol IS NULL OR s.dol > getdate())
         ";
         return new Iterator\Student(
             $this->database->getIterator($query)->addMap([$this->database, 'trimRow'])
