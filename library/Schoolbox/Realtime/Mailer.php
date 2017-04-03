@@ -152,8 +152,8 @@ class Mailer
         $address = trim($user->getEmail());
 
         if ($address) {
-            // explicitly an rfc822 email spec
-            return sprintf('%s <%s>', $user->formatName(), $address);
+            // explicitly an rfc2822 email spec, on the off-chance it's there, strip DQUOT from formatted name
+            return sprintf('"%s" <%s>', str_replace('"', '', $user->formatName()), $address);
         }
 
         return '';
