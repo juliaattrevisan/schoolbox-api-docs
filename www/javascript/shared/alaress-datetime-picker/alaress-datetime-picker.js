@@ -28,42 +28,43 @@ convertFormat = function (format) {
             i: 'mm',
             s: 'ss',
             O: 'ZZ',
-            P: 'Z',
+            P: 'Z'
         },
 
-        formatEx = /[dDjJlNKSwWFmMnoYyaAgGhHisOP]/g;
-        var that = this;
-        // Just return the converted format
-        return format.replace(formatEx, function (format) {
-            return formatMap[format];
-        });
+        formatEx = /[dDjJlNKSwWFmMnoYyaAgGhHisOP]/g,
+        that = this;
+
+    // Just return the converted format
+    return format.replace(formatEx, function (format) {
+        return formatMap[format];
+    });
 };
 
 //Use global counter in case multiple alaressDateTimePicker() have been called from one page
 
 var pickerCounter = 0;
 countPickers = function () {
-    pickerCounter ++;
+    pickerCounter++;
     return pickerCounter;
 };
 
-function getValue(input, attribute){
+function getValue(input, attribute) {
     var value = input.attr(attribute);
     // There is no such attribute, return false
-    if(value === undefined){
+    if (value === undefined) {
         return false;
     }
     // The attribute is there and has a value, return it
-    else if(value.length > 0 ) {
+    else if (value.length > 0) {
         return value;
     }
     // The attribute is there, but no value is set, return true
     else {
         return true;
     }
-};
+}
 
-function getOptions (element) {
+function getOptions(element) {
 
     // Build datepicker options form the element data attributes
     var elementOptions = {
@@ -78,23 +79,22 @@ function getOptions (element) {
         // allDateTime: 'start', //Set time to start or end of the day: start, finish
         type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
         endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
-        endPeriod: getValue(element, 'data-datepicker-endofperiod'),// It will use end of the period to set time through timetable picker
-
+        endPeriod: getValue(element, 'data-datepicker-endofperiod')// It will use end of the period to set time through timetable picker
     };
     return elementOptions;
 }
 
-function getPickerFormats (allDayState, options) {
+function getPickerFormats(allDayState, options) {
     // Getting element date/datetime format settings
     var from, to;
     // Format is always date or datetime
-    if (options.altFormat !== false ){
+    if (options.altFormat !== false) {
         if (options.altFormat == 'date') {
             from = options.displayFormatDate;
             to = options.displayFormatDate;
         }
         else if (options.altFormat == 'datetime') {
-            from  = options.displayFormat;
+            from = options.displayFormat;
             to = options.displayFormat;
         }
     }
@@ -130,87 +130,90 @@ function getPickerFormats (allDayState, options) {
     return formats;
 }
 
-function getLinkedElements (element, options) {
+function getLinkedElements(element, options) {
     // Get all linked inputs, e.g. startDate, endDate
-    var elements = $('[data-datepicker-alldayext = '+ options.allDayExt +']');
+    var elements = $('[data-datepicker-alldayext = ' + options.allDayExt + ']');
     var linkedElements = [];
-    elements.each( function() {
-       if($(this)[0] !== element[0]) {
-           linkedElements.push($(this));
-       }
+    elements.each(function () {
+        if ($(this)[0] !== element[0]) {
+            linkedElements.push($(this));
+        }
     });
     return linkedElements;
 }
 
-function setValue ( element, options, state, trigger, date ) {
+function setValue(element, options, state, trigger, date) {
 
     // Get their pickerIds
     var pId = element.attr('data-datepicker-id');
 
     // Get the format
     var pickerFormats = getPickerFormats(state, options);
+    var value;
 
-    if(date !== undefined) {
-        var value = date;
+    if (date !== undefined) {
+        value = date;
     }
-    else if(window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
-        var value = window.pickerInstance[pId].input.value;
+    else if (window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
+        value = window.pickerInstance[pId].input.value;
     }
     else if (element.val() !== undefined && element.val()) {
-        var value = element.val();
+        value = element.val();
     }
     else {
-        var value = moment();
+        value = moment();
     }
+
     // All Day is on
-    if(state === true) {
-        if(options.endDay) {
-            var v = moment(value, convertFormat(pickerFormats.convertFrom)).endOf('day').format(convertFormat(pickerFormats.convertTo));
+    var v;
+    if (state === true) {
+        if (options.endDay) {
+            v = moment(value, convertFormat(pickerFormats.convertFrom)).endOf('day').format(convertFormat(pickerFormats.convertTo));
         }
         else {
-            var v = moment(value, convertFormat(pickerFormats.convertFrom)).startOf('day').format(convertFormat(pickerFormats.convertTo));
+            v = moment(value, convertFormat(pickerFormats.convertFrom)).startOf('day').format(convertFormat(pickerFormats.convertTo));
         }
-        if(window.pickerInstance[pId] !== undefined) {
+        if (window.pickerInstance[pId] !== undefined) {
             window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
         }
         element.val(v);
     }
     else {
-        var v = moment(value, convertFormat(pickerFormats.convertFrom)).format(convertFormat(pickerFormats.convertTo));
-        if(window.pickerInstance[pId] !== undefined) {
+        v = moment(value, convertFormat(pickerFormats.convertFrom)).format(convertFormat(pickerFormats.convertTo));
+        if (window.pickerInstance[pId] !== undefined) {
             window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
         }
         element.val(v);
     }
-    if(trigger === true) {
+    if (trigger === true) {
         element.trigger('change');
     }
-    if(options.allDayExt !== false) {
-        $('#'+options.allDayExt).val(state?1:0);
+    if (options.allDayExt !== false) {
+        $('#' + options.allDayExt).val(state ? 1 : 0);
     }
 
 }
 
-function checkAllday( state, pickerId ) {
+function checkAllday(state, pickerId) {
 
-    var timeDiv = $('#pickerCalendar'+pickerId).closest('#picker'+pickerId).find('.flatpickr-time');
+    var timeDiv = $('#pickerCalendar' + pickerId).closest('#picker' + pickerId).find('.flatpickr-time');
 
     // All Day is on
-    if(state === true) {
+    if (state === true) {
         timeDiv.css('display', 'none');
-        $('#hideTime'+pickerId).prop('checked', true);
+        $('#hideTime' + pickerId).prop('checked', true);
 
     }
     else {
         timeDiv.css('display', 'block');
-        $('#hideTime'+pickerId).prop('checked', false);
+        $('#hideTime' + pickerId).prop('checked', false);
     }
 
-};
+}
 
 // Extend jQuery with our datepicker function
 
-$.fn.alaressDateTimePicker = function(optionsOverride) {
+$.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
 
@@ -235,22 +238,24 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
     // Create click event to open the modal for the element
 
-    element.change(function() {
-        if(window.pickerInstance[pickerId] !== undefined) {
+    element.change(function () {
+        if (window.pickerInstance[pickerId] !== undefined) {
             window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
         }
     });
 
-    element.click(function() {
+    element.click(function () {
+
+        var originalValue;
 
         if (element.val().length > 0) {
-            var originalValue = element.val();
+            originalValue = element.val();
         }
         // if no value has been passed, use today
         else {
-            var originalValue = moment().format(convertFormat(options.displayFormat));
+            originalValue = moment().format(convertFormat(options.displayFormat));
         }
-        if (options.allDayExt !== false && $('#'+options.allDayExt).val() == 1) {
+        if (options.allDayExt !== false && $('#' + options.allDayExt).val() == 1) {
             originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat));
         }
 
@@ -265,7 +270,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
             //Check if the form is inside another modal
             var reveal = element.parents('*[data-reveal]');
-            if (reveal.length > 0){
+            if (reveal.length > 0) {
                 picker.data('reveal', reveal.attr('id'));
             }
 
@@ -291,7 +296,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                 $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
                     // Open back the parent modal, if any
                     if ((picker.data('reveal').length > 0)) {
-                        $('#'+picker.data('reveal')).foundation('reveal', 'open');
+                        $('#' + picker.data('reveal')).foundation('reveal', 'open');
                     }
                 });
                 // Update picker status
@@ -302,18 +307,18 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                 // Initialise tabs
                 picker.foundation('reflow', 'tab');
 
-                $('#byDate-'+pickerId).find('.picker-submit').click(function() {
-                    if ($('#hideTime'+pickerId).is(':checked')) {
-                        setValue( element, options, true, true );
+                $('#byDate-' + pickerId).find('.picker-submit').click(function () {
+                    if ($('#hideTime' + pickerId).is(':checked')) {
+                        setValue(element, options, true, true);
                     }
                     else {
-                        setValue( element, options, false, true );
+                        setValue(element, options, false, true);
                     }
 
                     if (options.allDayExt !== false) {
-                        var linkedElements = getLinkedElements( element, options );
-                        linkedElements.forEach(function(item) {
-                            setValue(item, getOptions(item), $('#hideTime'+pickerId).is(':checked'), false);
+                        var linkedElements = getLinkedElements(element, options);
+                        linkedElements.forEach(function (item) {
+                            setValue(item, getOptions(item), $('#hideTime' + pickerId).is(':checked'), false);
                         });
                     }
 
@@ -321,18 +326,18 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 });
 
-                $('#byTimetable-'+pickerId).find('.timetable-submit').click(function() {
-                    var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
+                $('#byTimetable-' + pickerId).find('.timetable-submit').click(function () {
 
-                    var periodTime = ($('[name*="periodTime'+pickerId+'"]:checked').val());
-                    var newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-'+periodTime), 'h:mma');
+                    var periodSelected = $('table').find('[data-selected=1]').attr('data-period'),
+                        periodTime = ($('[name*="periodTime' + pickerId + '"]:checked').val()),
+                        newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma'),
+                        newDate = moment($(this).attr('data-timetable-value'), convertFormat(options.displayFormatDate)).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
 
-                    var newDate = moment($(this).attr('data-timetable-value'), convertFormat(options.displayFormatDate)).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
-                    setValue( element, options, false, true, newDate);
+                    setValue(element, options, false, true, newDate);
 
                     if (options.allDayExt !== false) {
-                        var linkedElements = getLinkedElements( element, options );
-                        linkedElements.forEach(function(item) {
+                        var linkedElements = getLinkedElements(element, options);
+                        linkedElements.forEach(function (item) {
                             setValue(item, getOptions(item), false, false);
                         });
                     }

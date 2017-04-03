@@ -7,20 +7,20 @@
 // Picker settings
 
 // Build datepicker options here... again...
-$.fn.alaressDateTimeModal = function(twigVars) {
+$.fn.alaressDateTimeModal = function (twigVars) {
 
-    var pickerOptions = {
-
+    var $picker = $('#' + twigVars.element),
+        pickerOptions = {
         // Flatpickr related
-        enableTime: getValue($('#' + twigVars.element), 'data-datepicker-time'),
+        enableTime: getValue($picker, 'data-datepicker-time'),
 
         // All the rest
-        altFormat: getValue($('#' + twigVars.element), 'data-datepicker-format'), // false|date|datetime
-        allDay: getValue($('#' + twigVars.element), 'data-datepicker-allday'), // Show All Day switch
-        allDayExt: getValue($('#' + twigVars.element), 'data-datepicker-alldayext'),
-        type: getValue($('#' + twigVars.element), 'data-datepicker-call'), // Ajax call type: events, duework or nothing
-        endDay: getValue($('#' + twigVars.element), 'data-datepicker-endofday'), // Should allday change time to 23:59:59
-        endPeriod: getValue($('#' + twigVars.element), 'data-datepicker-endofperiod'), // Should allday change time to 23:59:59
+        altFormat: getValue($picker, 'data-datepicker-format'), // false|date|datetime
+        allDay: getValue($picker, 'data-datepicker-allday'), // Show All Day switch
+        allDayExt: getValue($picker, 'data-datepicker-alldayext'),
+        type: getValue($picker, 'data-datepicker-call'), // Ajax call type: events, duework or nothing
+        endDay: getValue($picker, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
+        endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
 
     };
 
@@ -62,16 +62,19 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             timetable.submit.removeClass('disabled');
             timetable.submit.attr('data-timetable-value', data.date);
 
-            var periodSelected = $('#byTimetable-' + twigVars.id).find('table').find('[data-selected=1]').attr('data-period');
-            var periodStart =  $('#byTimetable-' + twigVars.id).find('[data-period-number=' + periodSelected + ']').attr('data-period-start');
-            var periodEnd =  $('#byTimetable-' + twigVars.id).find('[data-period-number=' + periodSelected + ']').attr('data-period-end');
+            var $byTimetable = $('#byTimetable-' + twigVars.id),
+                periodSelected = $byTimetable.find('table').find('[data-selected=1]').attr('data-period'),
+                periodStart = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-start'),
+                periodEnd = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-end');
 
-            $((pickerOptions.endPeriod?'#periodEnd':'#periodStart')+twigVars.id).prop('checked', true);
+            $((pickerOptions.endPeriod ? '#periodEnd' : '#periodStart') + twigVars.id).prop('checked', true);
 
-            $('.timetableDate'+twigVars.id).css('display', 'block');
-            $('.timetableDate'+twigVars.id).find('.displayDate').empty().append(displayDate);
-            $('label[for="periodStart'+twigVars.id+'"]').empty().append(periodStart);
-            $('label[for="periodEnd'+twigVars.id+'"]').empty().append(periodEnd);
+            $('.timetableDate' + twigVars.id)
+                .css('display', 'block')
+                .find('.displayDate').empty().append(displayDate);
+
+            $('label[for="periodStart' + twigVars.id + '"]').empty().append(periodStart);
+            $('label[for="periodEnd' + twigVars.id + '"]').empty().append(periodEnd);
         }
 
         if (template == 'duework') {
@@ -160,6 +163,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     function setPickerSize(reset) {
         var addClass;
+
         if (reset || twigVars.timetable === false) {
             addClass = 'pickerNarrow'
         }
@@ -167,8 +171,10 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             var daysInCycle = timetable.campus.find(':selected').attr('data-days');
             addClass = daysInCycle > 7 ? 'pickerWide' : 'pickerNarrow';
         }
-        $('#picker'+twigVars.id).removeClass(addClass=='pickerNarrow'?'pickerWide':'pickerNarrow');
-        $('#picker'+twigVars.id).addClass(addClass);
+
+        $('#picker' + twigVars.id)
+            .removeClass(addClass == 'pickerNarrow' ? 'pickerWide' : 'pickerNarrow')
+            .addClass(addClass);
 
     }
 
@@ -176,26 +182,27 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     if (twigVars.timetable) {
 
         // Timetable elements
-        var timetable = {
-            campus: $('#byTimetable-' + twigVars.id).find('select[name*="campus"]'),
-            term: $('#byTimetable-' + twigVars.id).find('select[name*="term"]'),
-            cycle: $('#byTimetable-' + twigVars.id).find('select[name*="cycle"]'),
-            submit: $('#byTimetable-' + twigVars.id).find('.timetable-submit')
-        }
+        var $byTimetable = $('#byTimetable-' + twigVars.id),
+            timetable = {
+                campus: $byTimetable.find('select[name*="campus"]'),
+                term: $byTimetable.find('select[name*="term"]'),
+                cycle: $byTimetable.find('select[name*="cycle"]'),
+                submit: $byTimetable.find('.timetable-submit')
+            };
 
         // Build cycles dynamically
         function buildCycles() {
 
-            var daysInCycle = timetable.campus.find(':selected').attr('data-days');
-            var termDuration = timetable.term.find(':selected').attr('data-duration');
+            var daysInCycle = timetable.campus.find(':selected').attr('data-days'),
+                termDuration = timetable.term.find(':selected').attr('data-duration');
 
             // Don't try to divide by zero
             if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
                 var optionsHtml = '';
 
                 //Select cycle number on first load
-                cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate / daysInCycle);
-                for (i = 1; i <= (termDuration / daysInCycle); i++) {
+                var cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate / daysInCycle);
+                for (var i = 1; i <= (termDuration / daysInCycle); i++) {
                     var selected = '';
 
                     if (cycleSelected == i) {
@@ -204,17 +211,19 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                     optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
                 }
                 timetable.cycle.empty().append(optionsHtml);
+
                 // Increase space to accommodate a table
+                var $byTimetable = $('#byTimetable-' + twigVars.id);
                 if (daysInCycle > 7) {
                     setPickerSize(false);
-                    $('#byTimetable-' + twigVars.id).find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-7');
-                    $('#byTimetable-' + twigVars.id).find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-5');
+                    $byTimetable.find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-7');
+                    $byTimetable.find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-5');
                 }
                 // Back to normal
                 else {
                     setPickerSize(true);
-                    $('#byTimetable-' + twigVars.id).find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-7').addClass('medium-6');
-                    $('#byTimetable-' + twigVars.id).find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-5').addClass('medium-6');
+                    $byTimetable.find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-7').addClass('medium-6');
+                    $byTimetable.find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-5').addClass('medium-6');
                 }
             }
             else {
@@ -235,13 +244,15 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                     if (cycleDay == 0) {
                         cycleDay = daysInCycle;
                     }
-                    $('#byTimetable-' + twigVars.id).find('.day-' + cycleDay).addClass('period-selected');
 
-                    $('#byTimetable-' + twigVars.id).find('.period-description').each(function () {
+                    var $byTimetable = $('#byTimetable-' + twigVars.id);
+                    $byTimetable.find('.day-' + cycleDay).addClass('period-selected');
+                    $byTimetable.find('.period-description').each(function () {
 
-                        var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm');
-                        var e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm');
-                        var t = moment(twigVars.date).format('HHmm');
+                        var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm'),
+                            e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm'),
+                            t = moment(twigVars.date).format('HHmm');
+
                         if ((t >= s) && (t < e)) {
                             $(this).addClass('period-selected');
                             period = $(this).attr('data-period-number');
@@ -250,7 +261,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                         if ((cycleDay > 0) && (period > 0)) {
                             $('#byTimetable-' + twigVars.id).find('.period-' + cycleDay + '-' + period).addClass('period-selected');
                         }
-                    })
+                    });
                 }
             }
             else {
@@ -276,10 +287,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
 
         function resetTimetable() {
-            $('#byTimetable-' + twigVars.id).find('.period-selected').removeClass('period-selected');
-            $('#byTimetable-' + twigVars.id).find('table').find('[data-selected=1]').attr('data-selected', 0);
+            var timetable = $('#byTimetable-' + twigVars.id);
 
-            $('.timetableDate'+twigVars.id).css('display', 'none');
+            timetable.find('.period-selected').removeClass('period-selected');
+            timetable.find('table').find('[data-selected=1]').attr('data-selected', 0);
+
+            $('.timetableDate' + twigVars.id).css('display', 'none');
 
             timetable.submit.addClass('disabled');
         }
@@ -337,9 +350,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $('.description-' + period).addClass('period-selected');
             periodClicked = 'period' + day + '_' + period;
 
-            var campus = timetable.campus.val();
-            var term = timetable.term.val();
-            var cycle = timetable.cycle.val();
+            var campus = timetable.campus.val(),
+                term = timetable.term.val(),
+                cycle = timetable.cycle.val();
 
             if (twigVars.type == 'duework') {
 
@@ -404,7 +417,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         timeDiv.after(html);
 
-    };
+    }
 
     // Accommodating the "start of the week" SB config
     Flatpickr.localize(Flatpickr.l10ns.default);
@@ -453,8 +466,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             // Put the display date onto the calendar div so we can capture it when the modal is closed
             var dateSplit = dateStr.split(' ');
-            $('#pickerCalendar' + twigVars.id).attr('data-date', dateSplit[0]);
-            $('#pickerCalendar' + twigVars.id).attr('data-time', dateSplit[1]);
+            $('#pickerCalendar' + twigVars.id)
+                .attr('data-date', dateSplit[0])
+                .attr('data-time', dateSplit[1]);
 
             // Check if selected date has changed and don't send an ajax on time change
             var selectedObj = new Date(selectedDates);
@@ -498,15 +512,15 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
             }
             latestDate = newDate;
-        },
+        }
 
     });
 
     // Resize modal on changing tabs
-    $('a[href="#byDate-'+twigVars.id+'"]').click(function(){
-       setPickerSize(true);
+    $('a[href="#byDate-' + twigVars.id + '"]').click(function () {
+        setPickerSize(true);
     });
-    $('a[href="#byTimetable-'+twigVars.id+'"]').click(function(){
-       setPickerSize(false);
+    $('a[href="#byTimetable-' + twigVars.id + '"]').click(function () {
+        setPickerSize(false);
     });
-}
+};
