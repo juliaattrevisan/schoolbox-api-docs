@@ -86,7 +86,7 @@ class WorkerFactory
         $twigFactory = new TwigEmailFactory(new CoreContext($this->conf), $this->log);
 
         // responsible for draining a list into an email and sending it
-        $mailer = new Mailer($twigFactory, $this->log);
+        $mailer = new Mailer($twigFactory, $this->log, $this->userMapper);
 
         // build a list factory
         $listFactory = new MessageList\PublicationFactory($instanceId, $this->client, $cloudManager, $this->userMapper, $mailer);

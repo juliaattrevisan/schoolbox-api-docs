@@ -33,17 +33,26 @@ class MailNotifier extends WorkNotifier
     /** @var Mailer */
     private $mailer;
 
+    /** @var UserMapper */
+    private $userMapper;
 
     /**
      * @param IListFactory    $factory
+     * @param UserMapper      $userMapper
      * @param IConfigLoader   $configLoader
      * @param LoggerInterface $log
      */
-    public function __construct(IListFactory $factory, IConfigLoader $configLoader = null, LoggerInterface $log = null)
-    {
+    public function __construct(
+        IListFactory $factory,
+        UserMapper $userMapper,
+        IConfigLoader $configLoader = null,
+        LoggerInterface $log = null
+    ) {
         parent::__construct($configLoader, $log);
-        $this->factory = $factory;
-        $this->mailer  = new Mailer(new TwigEmailFactory(new CoreContext($this->conf), $this->log()), $this->log());
+
+        $this->factory    = $factory;
+        $this->userMapper = $userMapper;
+        $this->mailer     = new Mailer(new TwigEmailFactory(new CoreContext($this->conf), $this->log()), $this->log(), $userMapper);
     }
 
 
@@ -57,7 +66,7 @@ class MailNotifier extends WorkNotifier
     {
 		// get a list of users
         /** @var Collection|User[] $users */
-		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
+		$users = $this->userMapper->findByColumn('group_id', $role->getId());
 
 		$this->log()->notice("Preparing to digest {$role->getName()}: {$users->count()} users");
 
@@ -83,7 +92,7 @@ class MailNotifier extends WorkNotifier
             }
 		}
 
-        unset($user, $users);
+        unset($users);
 
 		// return the number of emails successfully sent
 		$this->log()->info("Finished digesting {$role->getName()}: $result emails sent");
@@ -105,7 +114,7 @@ class MailNotifier extends WorkNotifier
      */
     public function unserialize($serialized)
     {
-        $this->__construct(unserialize($serialized));
+        $this->__construct(unserialize($serialized), UserMapper::getInstance());
     }
 
 }

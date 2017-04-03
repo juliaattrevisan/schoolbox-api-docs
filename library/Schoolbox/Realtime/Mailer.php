@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Swift_RfcComplianceException;
 use Swift_SwiftException;
 use Twig_Error_Runtime;
@@ -27,15 +28,20 @@ class Mailer
     /** @var LoggerInterface */
     private $log;
 
+    /** @var UserMapper */
+    private $userMapper;
+
 
     /**
      * @param TwigEmailFactory $emailFactory
      * @param LoggerInterface  $log
+     * @param UserMapper       $userMapper
      */
-    public function __construct(TwigEmailFactory $emailFactory, LoggerInterface $log)
+    public function __construct(TwigEmailFactory $emailFactory, LoggerInterface $log, UserMapper $userMapper)
     {
         $this->emailFactory = $emailFactory;
         $this->log          = $log;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -78,6 +84,13 @@ class Mailer
         // build the email object
         $email = $this->emailFactory->build($template, $subject);
         $email->setContext($context)->setTo($address);
+
+        // we can only include the reply-to header if there is but one email
+        if ($decorator->count() === 1) {
+            $email->setReplyTo($this->getEmailAddresses(
+                $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getEffectorIds())->getAll()
+            ));
+        }
 
         try {
             // away she goes

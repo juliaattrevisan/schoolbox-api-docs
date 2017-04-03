@@ -13,6 +13,7 @@ use Schoolbox\Realtime\Digest\DigestScheduler;
 use Schoolbox\Realtime\Digest\MailNotifier;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
+use Schoolbox\UserMapper;
 
 
 /**
@@ -60,8 +61,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $clock = new Clock();
 
     $roleMapper = $di->get('mapperFactory')->get(RoleMapper::class);
+    $userMapper = $di->get('mapperFactory')->get(UserMapper::class);
     $strat      = new DefaultDispatchStrategy($opts['flags']);
-    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis));
+    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper);
     $factory    = new DigestTriggerFactory($notifier, $clock, $opts['debug-interval']);
 
     new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);
