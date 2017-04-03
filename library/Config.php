@@ -107,29 +107,29 @@ class Config extends DeprecatedModel {
         }
 
         public static function getAllOfType($orderBy = '', $type = '') {
-                self::getInstance();
+            $db = self::getInstance()->db;
 
-                $query = "
-                        SELECT *, `lu_config_field`.`field`, `lu_config_type`.`type`
-                        FROM `config`
-                        INNER JOIN `lu_config_field` ON `config`.`field_id` = `lu_config_field`.`id`
-                        INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
-                        WHERE 1=1 ";
+            $query = "
+                    SELECT *, `lu_config_field`.`field`, `lu_config_type`.`type`
+                    FROM `config`
+                    INNER JOIN `lu_config_field` ON `config`.`field_id` = `lu_config_field`.`id`
+                    INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
+                    WHERE 1=1 ";
 
-                if (!empty($type)) {
-                        $query .= "AND `lu_config_type`.`type` = '$type' ";
-                }
+            if (!empty($type)) {
+                $query .= "AND `lu_config_type`.`type` = '{$db->quote($type)}' ";
+            }
 
-                /* filter out references to leave module if not enabled */
-                if (!self::get('boarder_leave_enabled')) {
-                        $query .= "AND `config`.`type_id` != '".self::TYPE_BOARD."'";
-                }
+            /* filter out references to leave module if not enabled */
+            if (!self::get('boarder_leave_enabled')) {
+                $query .= "AND `config`.`type_id` != '{$db->quote(self::TYPE_BOARD)}'";
+            }
 
-                if (!empty($orderBy)) {
-                        $query .= "ORDER BY `$orderBy`";
-                }
+            if (!empty($orderBy)) {
+                $query .= "ORDER BY {$db->quoteIdentifier($orderBy)}";
+            }
 
-                return DeprecatedDatabase::getInstance()->getAll($query);
+            return $db->getAll($query);
         }
 
         public function updateArray($configList) {

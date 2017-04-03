@@ -21,7 +21,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 	 */
 	function getLatestRevision($wikiID)
 	{
-		$query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '$wikiID'";
+		$query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '{$this->db->quote($wikiID)}'";
 
 		$latestRevisionID = $this->db->getRow($query);
 
@@ -39,8 +39,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 	{
 		$query = 'SELECT revisionID
                   FROM ' . $this->_revisionTable . "
-                  WHERE wikiID = '$wikiID'
-                  AND revisionID < '$revisionID'
+                  WHERE wikiID = '{$this->db->quote($wikiID)}'
+                  AND revisionID < '{$this->db->quote($revisionID)}'
                   ORDER BY revisionID DESC";
 
 		$previousRevision = $this->db->getRow($query);
@@ -61,10 +61,10 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 				  FROM " . $this->_revisionTable . " r
 				  LEFT JOIN " . $this->_table . " w ON w.wikiID = r.wikiID
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE w.deleted = 'false' AND r.wikiID = $wikiID ";
+				  WHERE w.deleted = 'false' AND r.wikiID = '{$this->db->quote($wikiID)}' ";
 
 		if ($revisionID > 0 && is_numeric($revisionID)) {
-			$query .= "AND r.revisionID = $revisionID ";
+			$query .= "AND r.revisionID = '{$this->db->quote($revisionID)}' ";
 		}
 
 		$query .= "ORDER BY r.created DESC LIMIT 1";
@@ -82,7 +82,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.lastname
 				  FROM " . $this->_revisionTable . " r
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE wikiID = $wikiID
+				  WHERE wikiID = '{$this->db->quote($wikiID)}'
 				  ORDER BY r.created DESC";
 		return $this->db->getAll($query);
 	}
@@ -114,11 +114,11 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 				  FROM wiki w
 				  LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE w.deleted = 'false' AND categoryID = '{$categoryID}'
+				  WHERE w.deleted = 'false' AND categoryID = '{$this->db->quote($categoryID)}'
 				  {$orderBySQL} {$sortDir}";
 
 		if (is_numeric($limit) && ($limit > 0)) {
-			$query .= " LIMIT $limit";
+			$query .= " LIMIT {$this->db->quote($limit)}";
 		}
 
 		return $this->db->getAll($query);
@@ -126,7 +126,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 	function homepageClean($cid)
 	{
-		$query = "DELETE w, r FROM  `" . $this->_table . "` w, " . $this->_revisionTable . " r  WHERE w.wikiID=r.wikiID AND categoryID='$cid'";
+		$query = "DELETE w, r FROM  `" . $this->_table . "` w, " . $this->_revisionTable . " r  WHERE w.wikiID=r.wikiID AND categoryID='{$this->db->quote($cid)}'";
 		$this->db->query($query);
 	}
 
@@ -224,7 +224,14 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
 	{
-		$keyword = $this->db->quote($keyword);
+        /** @var \Schoolbox\User $user */
+        $keyword  = $this->db->quote($keyword);
+        $user     = $_SESSION['user'];
+        $userId   = $this->db->quote($user->getId());
+        $roleId   = $this->db->quote($user->getRole()->getId());
+        $offset   = intval($offset);
+        $limit    = intval($limit);
+        $sort_dir = (strtolower($sort_dir) === 'desc' ? 'desc' : 'asc');
 
 		$query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
@@ -232,15 +239,15 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
                         LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
-                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.gid = '{$roleId}'
                             AND `perms`.type > 0
                         LEFT JOIN `userAccess` ON `wiki`.categoryID = `userAccess`.sid
                             AND `userAccess`.service = 1
-                            AND `userAccess`.uid = {$_SESSION['id']}
+                            AND `userAccess`.uid = '{$userId}'
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
                             AND deleted = 'false'
-                        ORDER BY `$sort_by` $sort_dir
+                        ORDER BY {$this->db->quoteIdentifier($sort_by)} $sort_dir
                         LIMIT $offset, $limit;
             ";
 
@@ -249,11 +256,11 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
                         LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
-                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.gid = '{$roleId}'
                             AND `perms`.type > 0
                         LEFT JOIN `userAccess` ON `wiki`.categoryID = `userAccess`.sid
                             AND `userAccess`.service = 1
-                            AND `userAccess`.uid = {$_SESSION['id']}
+                            AND `userAccess`.uid = '{$userId}'
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
                             AND `deleted` = 'false'
@@ -319,7 +326,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 	public function getWikiByHeading($heading) {
 		$query = "SELECT wiki.wikiID FROM wiki
 					LEFT JOIN wikiRevision ON wiki.latestRevision = wikiRevision.revisionID
-					WHERE heading = \"$heading\"";
+					WHERE heading = \"{$this->db->quote($heading)}\"";
 
 		return $this->db->getRow($query);
 	}
@@ -372,11 +379,11 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 				  LEFT JOIN {$this->_table} w ON w.wikiID = r.wikiID
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE w.deleted = 'false'
-				  AND w.categoryID = '{$categoryID}'
-				  AND w.slug = '{$slug}'";
+				  AND w.categoryID = '{$this->db->quote($categoryID)}'
+				  AND w.slug = '{$this->db->quote($slug)}'";
 
 		if ($revisionID > 0 && is_numeric($revisionID)) {
-			$query .= "AND r.revisionID = '{$revisionID}' ";
+			$query .= "AND r.revisionID = '{$this->db->quote($revisionID)}' ";
 		}
 
 		$query .= "ORDER BY r.created DESC LIMIT 1";
