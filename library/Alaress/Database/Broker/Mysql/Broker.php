@@ -15,7 +15,7 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Mysql\Iterator;
 use Alaress\Database\Statement\FunctionCall\Mysql\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Mysql\StoredProcedure;
-use Sabre\DAVACL\PrincipalBackend\PDO;
+use PDO;
 
 class Broker extends Base implements IBroker
 {
