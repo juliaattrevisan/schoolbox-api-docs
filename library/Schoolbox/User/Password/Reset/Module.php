@@ -86,7 +86,10 @@ class Module extends BaseModule
                     'passwordService'        => $injector->lazyNew(PasswordService::class),
                     'userMapper'             => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'resetMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'communityPortalFactory' => $injector->lazyNew(CommunityPortalFactory::class),
+                    'communityPortalFactory' => $injector->lazyNew(
+                        CommunityPortalFactory::class,
+                        ['config' => $injector->lazyGet('config')]
+                    ),
                     'mailFactory'            => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
                         [

@@ -54,7 +54,7 @@ if (isset($_POST['current_password'])) {
         // I shouldn't have to send all those damn password change mails anymore either
         $redirect = '/account/modify/success';
         if ($user->getRole()->isParent()) {
-            $communityPortalFactory = new \Schoolbox\External\Connector\CommunityPortalFactory();
+            $communityPortalFactory = new \Schoolbox\External\Connector\CommunityPortalFactory(ConfigMapper::getInstance());
             $communityPortal        = $communityPortalFactory->build();
             try {
                 $communityPortal->changePassword($user->getExternalId(), $_POST['new_password']);

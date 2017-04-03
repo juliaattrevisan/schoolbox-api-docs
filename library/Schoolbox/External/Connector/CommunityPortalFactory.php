@@ -9,8 +9,25 @@
 
 namespace Schoolbox\External\Connector;
 
+use Schoolbox\IConfigLoader;
+
 class CommunityPortalFactory
 {
+    /**
+     * @var IConfigLoader
+     */
+    protected $config;
+
+    /**
+     * Constructor
+     *
+     * @param IConfigLoader $config
+     */
+    public function __construct(IConfigLoader $config)
+    {
+        $this->config = $config;
+    }
+
     /**
      * Choose which variant to spawn
      *
@@ -19,9 +36,8 @@ class CommunityPortalFactory
      */
     public function build()
     {
-        // TODO inject config
-        $connector               = ucwords(\Config::get('external_type'));
-        $synergeticPasswordReset = \Config::get('synergetic_password_reset');
+        $connector               = ucwords($this->config->get('external_type'));
+        $synergeticPasswordReset = $this->config->get('synergetic_password_reset');
         $webServicesKeyFile      = '/etc/schoolbox-synergetic/config.json';
 
         // Synergetic only
@@ -36,7 +52,7 @@ class CommunityPortalFactory
                 // can't read file, that's a warning at least.
                 trigger_error('Cannot read community portal key - password will not be changed', E_USER_WARNING);
             }
-            return new Synergetic\Base\CommunityPortal($key, $iv, \Config::get('synergetic_portal_create_account'));
+            return new Synergetic\Base\CommunityPortal($key, $iv, $this->config->get('synergetic_portal_create_account'));
         }
         return new Offline\Base\CommunityPortal();
     }
