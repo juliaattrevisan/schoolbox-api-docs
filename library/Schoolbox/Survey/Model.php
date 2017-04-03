@@ -32,10 +32,11 @@ class Model
     /** @var Folder $folder */
     protected $folder;
 
-    /**
-     * @var Collection
-     */
+    /** @var Collection $sections */
     protected $sections;
+
+    /** @var Collection $attempts */
+    protected $attempts;
 
     /**
      * @param string $availability
@@ -108,4 +109,22 @@ class Model
     {
         return $this->sections;
     }
+
+    /**
+     * @param Collection $attempts
+     * @return self
+     */
+    public function setAttempts($attempts)
+    {
+        $this->attempts = $attempts;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAttempts()
+    {
+        return $this->attempts;
+    }    
 }

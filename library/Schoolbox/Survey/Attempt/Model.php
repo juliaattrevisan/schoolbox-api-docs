@@ -12,6 +12,7 @@
 namespace Schoolbox\Survey\Attempt;
 
 use Alaress_Date_Format;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Survey\Model as Survey;
 use Schoolbox\User;
@@ -32,6 +33,9 @@ class Model
     /** @var User $user */
     protected $user;
 
+    /** @var Collection */
+    protected $responses;
+    
     /**
      * @param Alaress_Date_Format $start
      * @return self
@@ -139,4 +143,23 @@ class Model
     {
         return $this->user;
     }
+
+    /**
+     * @param Collection $responses
+     * @return self
+     */
+    public function setResponses($responses)
+    {
+        $this->responses = $responses;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getResponses()
+    {
+        return $this->responses;
+    }
+
 }

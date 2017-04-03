@@ -11,6 +11,7 @@
 
 namespace Schoolbox\Survey\Section;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Survey\Model as Survey;
 
@@ -27,6 +28,9 @@ class Model
     /** @var Survey $survey */
     protected $survey;
 
+    /** @var Collection $questions */
+    protected $questions;
+    
     /**
      * @param int $sequence
      * @return self
@@ -80,4 +84,22 @@ class Model
     {
         return $this->survey;
     }
+
+    /**
+     * @param Collection $questions
+     * @return self
+     */
+    public function setQuestions($questions)
+    {
+        $this->questions = $questions;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getQuestions()
+    {
+        return $this->questions;
+    }    
 }

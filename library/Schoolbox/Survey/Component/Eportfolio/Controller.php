@@ -10,7 +10,14 @@ namespace Schoolbox\Survey\Component\Eportfolio;
 use Component_Eportfolio_ControllerAbstract;
 
 use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
+use Schoolbox\Survey\Attempt\Model as Attempt;
 use Schoolbox\Survey\Mapper as SurveyMapper;
+use Schoolbox\Survey\Model as Survey;
+use Schoolbox\Survey\Question\Mapper as SurveyQuestionMapper;
+use Schoolbox\Survey\Response\Mapper as SurveyResponseMapper;
+use Schoolbox\Survey\Response\Model as Response;
+use Schoolbox\Survey\Section\Mapper as SurveySectionMapper;
+use Schoolbox\Survey\Section\Model as Section;
 
 class Controller extends Component_Eportfolio_ControllerAbstract
 {
@@ -51,17 +58,44 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
             // Retrieve the survey
 
+            /** @var Survey $survey */
             $survey = SurveyMapper::getInstance()->findById($surveyId);
 
-            var_dump($survey);
+            // Retrieve all attempts for the survey
 
-            // Get the most recent attempt
+            $survey->setAttempts(SurveyAttemptMapper::getInstance()->findByColumnList([
+                'user_id' => $studentId,
+                'assess_id' => $surveyId
+            ], ['start' => 'desc']
+            ));
 
-            $attempt = SurveyAttemptMapper::getInstance()->findOneByColumnList([
-                    'user_id' => $studentId,
-                    'assess_id' => $surveyId
-                ], ['start' => 'desc']
-            );
+            // Retrieve the responses for each of these attempts
+
+            /** @var Attempt $attempt */
+            foreach ($survey->getAttempts() as $attempt) {
+                $attempt->setResponses(SurveyResponseMapper::getInstance()->findByColumn('attempt_id', $attempt->getId()));
+            }
+
+            // Retrieve all of the surveys sections in sequence order
+
+            $survey->setSections(SurveySectionMapper::getInstance()->findByColumn('assess_id', $survey->getId(), [
+                'order' => [
+                    'sequence' => 'ASC'
+                ]
+            ]));
+
+            // For each section get its questions in sequence order
+
+            /** @var Section $section */
+            foreach ($survey->getSections() as $section) {
+                $section->setQuestions(SurveyQuestionMapper::getInstance()->findByColumn('section_id', $section->getId(), [
+                    'order' => [
+                        'sequence' => 'ASC'
+                    ]
+                ]));
+            }
+
+            new \Alaress_Probe($survey);
 
         } else {
             $survey = null;
