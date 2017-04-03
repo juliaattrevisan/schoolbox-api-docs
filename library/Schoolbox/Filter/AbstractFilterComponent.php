@@ -7,7 +7,9 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use Schoolbox\Filter\Selection;
 
 /**
  * Common logic for Filter Components
@@ -26,12 +28,27 @@ abstract class AbstractFilterComponent implements IFilterComponent
     /** @var string */
     private $page;
 
+    /** @var GenericCollection|Selection\Model[] */
+    private $savedSelections;
 
-    public function __construct(IFilterDefinition $definition, User $user, $page)
+    /** @var Selection\Mapper */
+    private $filterSelectionMapper;
+
+
+    /**
+     * @param IFilterDefinition $definition
+     * @param User              $user
+     * @param string            $page
+     * @param GenericCollection $savedSelections Existing selections for this filter, user and page
+     * @param Selection\Mapper  $filterSelectionMapper
+     */
+    public function __construct(IFilterDefinition $definition, User $user, $page, GenericCollection $savedSelections, Selection\Mapper $filterSelectionMapper)
     {
-        $this->definition = $definition;
-        $this->user       = $user;
-        $this->page       = $page;
+        $this->definition            = $definition;
+        $this->user                  = $user;
+        $this->page                  = $page;
+        $this->savedSelections       = $savedSelections;
+        $this->filterSelectionMapper = $filterSelectionMapper;
     }
 
 
@@ -53,7 +70,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
     /**
      * @return IFilterDefinition
      */
-    protected function getDefinition()
+    public function getDefinition()
     {
         return $this->definition;
     }
@@ -74,5 +91,23 @@ abstract class AbstractFilterComponent implements IFilterComponent
     protected function getPage()
     {
         return $this->page;
+    }
+
+
+    /**
+     * @return Selection\Model[]|GenericCollection
+     */
+    protected function getSavedSelections()
+    {
+        return $this->savedSelections;
+    }
+
+
+    /**
+     * @return Selection\Mapper
+     */
+    protected function getFilterSelectionMapper()
+    {
+        return $this->filterSelectionMapper;
     }
 }

@@ -55,16 +55,6 @@ class Definition extends AbstractFilterDefinition
     private $previousTerm;
 
     /**
-     * All abstract keys possible for this filter, sorted as they should appear in lists
-     *
-     * This contains 'all', 'past', term.ids etc.
-     *
-     * @var string[]
-     */
-    private $abstractKeys;
-
-
-    /**
      * @param Filter\Model         $filter
      * @param FilterOption\Mapper  $filterOptionMapper
      * @param FilterDefault\Mapper $filterDefaultMapper
@@ -97,17 +87,6 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * @param GenericCollection $terms
-     * @return static
-     */
-    public function setTerms(GenericCollection $terms)
-    {
-        $this->terms = $terms->shallowClone()->sortBy('start', 'DESC')->indexBy('id');
-        return $this;
-    }
-
-
-    /**
      * @return Term\Model[]|GenericCollection
      */
     public function getTerms()
@@ -117,33 +96,11 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * @param Term\Model $currentTerm
-     * @return static
-     */
-    public function setCurrentTerm(Term\Model $currentTerm = null)
-    {
-        $this->currentTerm = $currentTerm;
-        return $this;
-    }
-
-
-    /**
      * @return Term\Model
      */
     public function getCurrentTerm()
     {
         return $this->currentTerm;
-    }
-
-
-    /**
-     * @param Term\Model $previousTerm
-     * @return static
-     */
-    public function setPreviousTerm(Term\Model $previousTerm = null)
-    {
-        $this->previousTerm = $previousTerm;
-        return $this;
     }
 
 
@@ -429,46 +386,27 @@ class Definition extends AbstractFilterDefinition
      */
     public function getAbstractKeys()
     {
-        return $this->abstractKeys;
+        return array_merge(self::$customKeys, $this->terms->keys());
     }
 
 
-    /**
-     * @param string $key
-     * @return mixed|Term\Model
-     */
-    public function getEntityByKey($key)
-    {
-        return $this->terms[$key];
-    }
 
 
-    public function isValidRoleType($roleType, FilterOption\Model $option)
-    {
-        $validRoles = FilterOption\Model::getRoleTypesForPage($option->getPage());
-        return in_array($roleType, $validRoles, true);
-    }
-
-
-    /**
-     * @param string $key
-     * @return string
-     */
     public function getLabel($key)
     {
-        if (self::KEY_ALL === $key) {
+        if (Definition::KEY_ALL === $key) {
             return 'All Terms';
         }
-        if (self::KEY_FUTURE === $key) {
+        if (Definition::KEY_FUTURE === $key) {
             return 'Future Terms';
         }
-        if (self::KEY_CURRENT === $key) {
+        if (Definition::KEY_CURRENT === $key) {
             return $this->currentTerm ? "Current ({$this->currentTerm->getCode()})" : '';
         }
-        if (self::KEY_PREVIOUS === $key) {
+        if (Definition::KEY_PREVIOUS === $key) {
             return $this->previousTerm ? "Previous ({$this->previousTerm->getCode()})" : '';
         }
-        if (self::KEY_PAST === $key) {
+        if (Definition::KEY_PAST === $key) {
             return 'Past Terms';
         }
         return $this->terms[$key]->getCode();

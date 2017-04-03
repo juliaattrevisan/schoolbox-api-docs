@@ -134,18 +134,6 @@ class Definition extends AbstractFilterDefinition
     }
 
 
-    /**
-     * Is the roleType valid for this option? Used for sanitising input
-     *
-     * @param string       $roleType
-     * @param FilterOption $option
-     * @return bool
-     */
-    public function isValidRoleType($roleType, FilterOption $option)
-    {
-        // TODO: Implement isValidRoleType() method.
-        return true;
-    }
 
 
     /**

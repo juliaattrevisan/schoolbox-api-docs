@@ -33,8 +33,6 @@ interface IFilterComponent
      *
      * Intended to be called in twig includes
      *
-     * @param string $page
-     * @param User $user
      * @return \Schoolbox\Filter\Selection\Model[]
      */
     public function toContext();

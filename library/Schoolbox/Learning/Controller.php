@@ -48,7 +48,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use \Alaress_Date_Format;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option as FilterOption;
-use Schoolbox\Filter\Option\Selection as FilterSelection;
+use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 
 class Controller extends Base
@@ -277,17 +277,19 @@ class Controller extends Base
 
         // TODO add other filters here
 
-        /** @var Collection|GenericCollection[]|\Schoolbox\Filter\Selection\Model[][] $selectionsPerFilter */
+        /** @var Collection|GenericCollection[]|FilterSelection\Model[][] $selectionsPerFilter */
         $selectionsPerFilter = new Collection();
 
-        foreach ($postFilterSelections as $filterId => $filterSelections) {
+        foreach ($postFilterSelections as $filterId => $postFilterSelections) {
             $filter = $keyConverters[$filterId]->getFilter();
 
             if (!$selectionsPerFilter->offsetExists($filterId)) {
                 $selectionsPerFilter->setOffset($filterId, $filterSelectionMapper->createCollection());
             }
+            $filterSelections = $selectionsPerFilter[$filterId];
 
-            foreach ($filterSelections as $key => $selected) {
+            /**  @var FilterSelection\Model[] $filterSelections */
+            foreach ($postFilterSelections as $key => $selected) {
                 $selection = $filterSelectionMapper->createModel();
                 $key       = $keyConverters[$filter->getId()]->sanitiseKey($key);
                 $selection
@@ -297,7 +299,7 @@ class Controller extends Base
                     ->setKey($key)
                     ->setSelected((bool)$selected);
                 $selectionsToSave->add($selection);
-                $selectionsPerFilter->offsetSet($key, $selection);
+                $filterSelections->offsetSet($key, $selection);
             }
 
         }
@@ -308,6 +310,7 @@ class Controller extends Base
         $availableTerms = $this->termMapper->createCollection();
         $selectedTerms  = $this->termMapper->createCollection();
         $termSelections = $selectionsPerFilter[$termKeyConverter->getFilter()->getId()];
+        /** @var FilterSelection\Model[] $termSelections */
         foreach ($termSelections as $termSelection) {
             $term = $termKeyConverter->getItem($termSelection->getKey());
             $availableTerms->add($term);

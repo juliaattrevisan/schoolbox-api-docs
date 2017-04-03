@@ -29,7 +29,7 @@ interface IFilterFactory
     public function buildDefinition(Filter\Model $filter);
 
     /**
-     * Build a filter, ready to inject into a filter panel
+     * Build a filter component, ready to inject into a filter panel
      *
      * @param User $user
      * @param string $page

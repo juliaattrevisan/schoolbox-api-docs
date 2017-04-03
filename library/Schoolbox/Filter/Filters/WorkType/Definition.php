@@ -79,15 +79,6 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    public function isValidRoleType($roleType, FilterOption $option)
-    {
-        // TODO: Implement  method.
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getAbstractKeys()
     {
         // TODO: Implement  method.

@@ -38,7 +38,7 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * Given a key (such as returned from a user's filter panel selections), return the corresponding item
+     * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *
      * @param string $key
      * @return mixed|Term\Model
@@ -54,7 +54,7 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * For a given element, return its key
+     * Return a concrete key for the specified element
      *
      * @param Term\Model $element
      * @return string

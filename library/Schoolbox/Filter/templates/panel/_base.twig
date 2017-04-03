@@ -1,6 +1,7 @@
 {#
     The most basic filter sub-panel template, renders a flat list of checkboxes
     Usage:
+        component:  IFilterComponent
         selections: FilterSelection[] - A set of filter selections made by the current user.
 #}
 {% block title %}{% endblock %}
@@ -14,6 +15,6 @@
             value="1"
             {% if selection.selected %}checked{% endif %}
         >
-        <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}">{{ filter.label(selection.key) }}</label>
+        <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}">{{ definition.label(selection.key) }}</label>
     {% endfor %}
 </fieldset>

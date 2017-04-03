@@ -33,12 +33,17 @@ interface IFilterDefinition
     public function getFilter();
 
     /**
+     * Get a fragment to insert in the admin's filter summary screen
+     *
+     * Called from twig.
+     *
      * @return string
+     * @todo - is this required? Or should we just have a simple table with links to availableOptions|RoleDefaults pages
      */
     public function getAdminTemplate();
 
     /**
-     * Returns the twig template to render this filters options
+     * Returns the twig template to render this filter's available options
      *
      * Intended to be called in Controller
      *
@@ -47,6 +52,10 @@ interface IFilterDefinition
     public function getOptionsTemplate();
 
     /**
+     * Returns the twig template to render this filters roleType default selections
+     *
+     * Intended to be called in Controller
+     *
      * @return string
      */
     public function getDefaultsTemplate();
@@ -77,16 +86,7 @@ interface IFilterDefinition
 
 
     /**
-     * Return the model or entity identified by this key
-     *
-     * @param string $key
-     * @return mixed
-     */
-    public function getEntityByKey($key);
-
-
-    /**
-     * Return the set of pages where this filter is available
+     * Return an ordered list of pages where this filter is available
      *
      * @see FilterOption::PAGE_* constants
      * @return string[]
@@ -95,25 +95,21 @@ interface IFilterDefinition
 
 
     /**
-     * Is the roleType valid for this option? Used for sanitising input
-     *
-     * @param string $roleType
-     * @param FilterOption\Model $option
-     * @return bool
-     */
-    public function isValidRoleType($roleType, FilterOption\Model $option);
-
-
-    /**
      * Return the set of possible abstract keys for this filter's options
      *
      * @return string[]
-     * @todo - consider splitting into 1-getOptionKeys() + 2-getSettingKeys()
      */
     public function getAbstractKeys();
 
 
-
-
-
+    /**
+     * Convert an abstract key into a label suitable for rendering in admin pages
+     *
+     * eg: 'all' => 'All'
+     *     '1'   => 'Something that represents #1'
+     *     '2'   => '2016-1 (current)'
+     * @param string $key
+     * @return string
+     */
+    public function getLabel($key);
 }

@@ -138,22 +138,13 @@ class Controller extends BaseController
      * @param IFilterDefinition $definition
      * @param Option\Mapper $optionMapper
      * @param Defaults\Mapper $defaultMapper
-     * @var string[][][]        $_POST['filter_defaults'] indexed by option.page, option.key, the default.roleType
+     * @var string[][][]        $_POST['filter_defaults'] indexed by option.page, option.key, default.roleType
      * @throws MapperException
      */
     public function postSaveDefaults(IFilterDefinition $definition, Option\Mapper $optionMapper, Defaults\Mapper $defaultMapper)
     {
         /** @var string[][][] $postFilterDefaults */
         $postFilterDefaults = $this->getRequest()->post->get('filter_defaults');
-
-
-        // Get all existing defaults
-//        $existingOptions = $filterOptionMapper->findByColumn('filter_id', $definition->getFilter()->getId());
-//        $existingDefaults = $filterDefaultMapper->findByColumn('filter_option_id', $existingOptions->getColumnValues('id'))->groupBy('page');
-//        foreach($existingDefaults as $page => $existingPageDefaults){
-//            $existingPageDefaults->groupBy('key');
-//        }
-
 
         // Upgrade implicitly selectable options to explicitly selectable
         $optionsToSave = $optionMapper->createCollection();
@@ -166,34 +157,12 @@ class Controller extends BaseController
             foreach ($pageOptions as $key => $options) {
                 $optionsToSave->add($options);
                 foreach ($options->getDefaults() as $roleType => $default) {
-                    // Was this default selected?
                     $defaultsToSave->add($default);
+                    // Was this default selected?
                     $default->setSelected(isset($postFilterDefaults[$page][$key][$roleType]));
                 }
             }
         }
-//
-//            foreach($pageDefaults as $key => $keyDefaults){
-//                /** @var FilterOption $option */
-//                $option = $optionsPerPageAndKey[$page][$key];
-//                // Does this option exist in DB yet?
-//                if(null === $option->getId()){
-//                    $optionsToSave->add($option);
-//                }
-//
-//                foreach($keyDefaults as $roleType => $on){
-//                    // Sanitise role type
-//                    if($definition->isValidRoleType($roleType, $option)){
-//                        $default = $filterDefaultMapper->createModel();
-//                        $default
-//                            ->setFilterOption($option)
-//                            ->setRoleType($roleType)
-//                            ->setSelected(true);
-//                        $defaultsToSave->add($default);
-//                    }
-//                }
-//            }
-//        }
 
         $optionMapper->save($optionsToSave);
         $defaultMapper->save($defaultsToSave);

@@ -9,36 +9,14 @@ namespace Schoolbox\Filter\Filters\Term;
 
 use Schoolbox\Filter\AbstractFilterComponent;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Selection;
 
 /**
  * @method Definition getDefinition()
  */
 class Component extends AbstractFilterComponent
 {
-    /** @var GenericCollection|Selection\Model[] */
-    private $savedSelections;
-
-    /** @var Selection\Mapper */
-    private $filterSelectionMapper;
-
-    /**
-     * @param Definition             $definition
-     * @param User $user
-     * @param string $page
-     * @param GenericCollection      $savedSelections Existing selections for this filter, user and page
-     * @param Selection\Mapper $filterSelectionMapper
-     */
-    public function __construct(Definition $definition, User $user, $page, GenericCollection $savedSelections, Selection\Mapper $filterSelectionMapper)
-    {
-        parent::__construct($definition, $user, $page);
-        $this->savedSelections       = $savedSelections;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-    }
-
 
     /**
      * @return string
@@ -60,29 +38,29 @@ class Component extends AbstractFilterComponent
         /** @var GenericCollection|Option\Model[] $optionDefaults */
         $optionDefaults = $this->getDefinition()->getOptionDefaults($this->getPage())->getOffset($this->getPage());
 
-        $availableSelections = $this->filterSelectionMapper->createCollection();
+        $availableSelections = $this->getFilterSelectionMapper()->createCollection();
 
         // Is this term available?
 
-        foreach($this->getDefinition()->getTerms() as $term){
+        foreach ($this->getDefinition()->getTerms() as $term) {
             $termFinish = $term->getActualFinish();
-            $available = false;
-            if($optionDefaults->offsetExists(Definition::KEY_ALL)){
+            $available  = false;
+            if ($optionDefaults->offsetExists(Definition::KEY_ALL)) {
                 $available = true;
-            } elseif ($optionDefaults->offsetExists(Definition::KEY_FUTURE) && $term->getStart()->isFuture()){
+            } elseif ($optionDefaults->offsetExists(Definition::KEY_FUTURE) && $term->getStart()->isFuture()) {
                 $available = true;
-            } elseif ($optionDefaults->offsetExists(Definition::KEY_CURRENT) && $this->getDefinition()->getCurrentTerm() && $this->getDefinition()->getCurrentTerm()->getId() === $term->getId()){
+            } elseif ($optionDefaults->offsetExists(Definition::KEY_CURRENT) && $this->getDefinition()->getCurrentTerm() && $this->getDefinition()->getCurrentTerm()->getId() === $term->getId()) {
                 $available = true;
-            } elseif ($optionDefaults->offsetExists(Definition::KEY_PREVIOUS) && $this->getDefinition()->getPreviousTerm() && $this->getDefinition()->getPreviousTerm()->getId() === $term->getId()){
+            } elseif ($optionDefaults->offsetExists(Definition::KEY_PREVIOUS) && $this->getDefinition()->getPreviousTerm() && $this->getDefinition()->getPreviousTerm()->getId() === $term->getId()) {
                 $available = true;
-            } elseif (!$termFinish->isNull() && $optionDefaults->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()){
+            } elseif (!$termFinish->isNull() && $optionDefaults->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()) {
                 $available = true;
-            } elseif ($optionDefaults->offsetExists($term->getId())){
+            } elseif ($optionDefaults->offsetExists($term->getId())) {
                 $available = true;
             }
 
-            if($available){
-                $selection = $this->filterSelectionMapper->createModel();
+            if ($available) {
+                $selection = $this->getFilterSelectionMapper()->createModel();
                 $selection
                     ->setFilter($this->getDefinition()->getFilter())
                     ->setUser($this->getUser())
@@ -94,43 +72,43 @@ class Component extends AbstractFilterComponent
         }
 
         $defaultsPerKey = $this->getDefinition()->getFilterDefaultMapper()->createCollection();
-        foreach($optionDefaults as $key => $option){
-            foreach($option->getDefaults() as $roleType => $default){
+        foreach ($optionDefaults as $key => $option) {
+            foreach ($option->getDefaults() as $roleType => $default) {
                 $defaultsPerKey[$key] = $default;
             }
         }
 
 
         // Overlay role-specific settings
-        foreach($availableSelections as $selection){
+        foreach ($availableSelections as $selection) {
 
-            $term = $this->getDefinition()->getTerms()[$selection->getKey()];
+            $term       = $this->getDefinition()->getTerms()[$selection->getKey()];
             $termStart  = $term->getStart();
             $termFinish = $term->getActualFinish();
 
-            foreach($defaultsPerKey as $key => $default){
-                if(!$default->isSelected()){
+            foreach ($defaultsPerKey as $key => $default) {
+                if (!$default->isSelected()) {
                     continue;
                 }
-                if(Definition::KEY_ALL === $key){
+                if (Definition::KEY_ALL === $key) {
                     $selection->setSelected(true);
-                } elseif(Definition::KEY_FUTURE === $key && $termStart->isFuture()){
+                } elseif (Definition::KEY_FUTURE === $key && $termStart->isFuture()) {
                     $selection->setSelected(true);
-                } elseif(Definition::KEY_PAST === $key && !$termFinish->isNull() && $termFinish->isPast()){
+                } elseif (Definition::KEY_PAST === $key && !$termFinish->isNull() && $termFinish->isPast()) {
                     $selection->setSelected(true);
-                } elseif(Definition::KEY_CURRENT === $key && $this->getDefinition()->getCurrentTerm() && $term->getId() === $this->getDefinition()->getCurrentTerm()->getId()){
+                } elseif (Definition::KEY_CURRENT === $key && $this->getDefinition()->getCurrentTerm() && $term->getId() === $this->getDefinition()->getCurrentTerm()->getId()) {
                     $selection->setSelected(true);
-                } elseif(Definition::KEY_PREVIOUS === $key && $this->getDefinition()->getPreviousTerm() && $term->getId() === $this->getDefinition()->getPreviousTerm()->getId()){
+                } elseif (Definition::KEY_PREVIOUS === $key && $this->getDefinition()->getPreviousTerm() && $term->getId() === $this->getDefinition()->getPreviousTerm()->getId()) {
                     $selection->setSelected(true);
-                } elseif((string)$key === (string)$term->getId()){
+                } elseif ((string)$key === (string)$term->getId()) {
                     $selection->setSelected(true);
                 }
             }
         }
 
         // Overlay user-specific settings
-        foreach($availableSelections as $key => $savedSelection){
-            if($this->savedSelections->offsetExists($key)){
+        foreach ($availableSelections as $key => $savedSelection) {
+            if ($this->getSavedSelections()->offsetExists($key)) {
                 $availableSelections[$key]
                     ->setId($savedSelection->getId())
                     ->setSelected($savedSelection->getSelected());
@@ -148,6 +126,7 @@ class Component extends AbstractFilterComponent
     public function toContext()
     {
         return [
+            'definition' => $this->getDefinition(),
             'selections' => $this->getAvailableSelections(),
         ];
     }

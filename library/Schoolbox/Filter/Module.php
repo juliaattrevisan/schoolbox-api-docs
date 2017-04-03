@@ -14,6 +14,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Twig_Loader_Chain;
+use Schoolbox\Filter\Option\Defaults;
 
 
 class Module extends AlaressModule
@@ -53,13 +54,13 @@ class Module extends AlaressModule
 
         $optionDependencies = function (array $params) use ($loadDefinition){
             return array_merge([
-                'optionMapper' => $this->getMapperFactory()->getLazy(Option\Mapper::class)
+                'optionMapper' => $this->getMapperFactory()->get(Option\Mapper::class)
             ], $loadDefinition($params));
         };
 
         $defaultDependencies = function (array $params) use ($optionDependencies){
             return array_merge([
-                'defaultMapper' => $this->getMapperFactory()->getLazy(Option\Mapper::class)
+                'defaultMapper' => $this->getMapperFactory()->get(Defaults\Mapper::class)
             ], $optionDependencies($params));
         };
 

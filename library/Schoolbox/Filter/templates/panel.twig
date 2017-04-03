@@ -48,8 +48,8 @@ Usage:
 <h1>A Panel containing various filters</h1>
 
 <div id="{{ filterPanelId }}" style="background-color: rgba(200,100,150,0.5)">
-{% for filter in panel.filters %}
-    {% include filter.template with filter.toContext() %}
+{% for component in panel.filterComponents %}
+    {% include component.template with component.toContext() %}
 {% endfor %}
 </div>
 

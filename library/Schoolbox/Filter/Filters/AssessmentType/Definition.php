@@ -122,14 +122,7 @@ class Definition extends AbstractFilterDefinition
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function isValidRoleType($roleType, FilterOption $option)
-    {
-        // TODO: Implement isValidRoleType() method.
-        return true;
-    }
+
 
 
     /**

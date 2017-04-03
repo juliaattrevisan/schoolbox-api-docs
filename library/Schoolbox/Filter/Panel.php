@@ -8,7 +8,6 @@
 namespace Schoolbox\Filter;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
 
 /**
  * A filter panel holds one or more filters.
@@ -19,49 +18,31 @@ use Schoolbox\User;
  */
 class Panel
 {
-    /** @var User */
-    private $user;
-
-    /** @var string */
-    private $page;
-
     /**
      * @var string
      */
     private $route;
 
     /**
-     * @var GenericCollection|IFilterDefinition[]
+     * @var GenericCollection|IFilterComponent[]
      */
-    private $filters;
+    private $filterComponents;
 
 
 
     /**
      * @param string                                $route   The route to send the filter selections to
-     * @param GenericCollection|IFilterDefinition[] $filters The set of filters to display in this panel instance
+     * @param GenericCollection|IFilterComponent[] $filterComponents The set of filters to display in this panel instance
      */
-    public function __construct($route, GenericCollection $filters)
+    public function __construct($route, GenericCollection $filterComponents)
     {
-        $this->user = $user;
-        $this->page = $page;
         $this->route = $route;
-        $this->filters = $filters;
+        $this->filterComponents = $filterComponents;
     }
 
     public function getTemplate()
     {
         return '@filters/panel.twig';
-    }
-
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    public function getPage()
-    {
-        return $this->page;
     }
 
     public function getRoute()
@@ -70,8 +51,8 @@ class Panel
     }
 
 
-    public function getFilters()
+    public function getFilterComponents()
     {
-        return $this->filters;
+        return $this->filterComponents;
     }
 }
