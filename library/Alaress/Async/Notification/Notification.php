@@ -229,4 +229,19 @@ class Notification {
 		return $this->params;
 	}
 
+
+    /**
+     * @return int[]
+     */
+	public function getEffectorIds()
+    {
+        return array_filter(
+            array_map(function (Instance $instance) {
+                return isset($instance->getContext()['user'])
+                    ? $instance->getContext()['user']
+                    : null;
+            }, $this->instances)
+        );
+    }
+
 } 
