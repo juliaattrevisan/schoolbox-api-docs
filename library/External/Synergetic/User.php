@@ -509,7 +509,7 @@ class External_Synergetic_User implements External_UserInterface
         if ($boardingStatus == 'yes') {
             $filters .= " AND StudentBoarder = 'B'";
         } else {
-            $filters .= " AND StudentBoarder != 'B'";
+            $filters .= " AND StudentBoarder <> 'B'";
         }
 
         // Search for a particular form
@@ -1007,7 +1007,7 @@ class External_Synergetic_User implements External_UserInterface
             FROM        dbo.vStaff vStaff
             LEFT JOIN   Community ON Community.ID = StaffID
             WHERE       ActiveFlag = 1 AND 
-                        vStaff.StaffRegistrationType != 'STDNT'
+                        vStaff.StaffRegistrationType <> 'STDNT'
         ";
 
         return $this->getConnector()->executeQuery($query)->fetchAll();
@@ -1087,7 +1087,7 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN   dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
                         {$join}
             WHERE       vStaff.ActiveFlag = 1 AND
-                        StaffCategoryDescription != 'Staff on leave' AND
+                        StaffCategoryDescription <> 'Staff on leave' AND
                         (JobPositions.StaffJobPositionStartDate < GETDATE() OR JobPositions.StaffJobPositionStartDate IS NULL) AND
                         (JobPositions.StaffJobPositionEndDate > GETDATE() OR JobPositions.StaffJobPositionEndDate IS NULL)
                         {$filter}
