@@ -9,11 +9,10 @@ namespace Schoolbox\Filter\Filters\Term;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Option\Defaults as FilterDefault;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Assessment\Term;
 
 
@@ -35,16 +34,13 @@ class Definition extends AbstractFilterDefinition
     const KEY_PREVIOUS = 'previous';   // one before current term
     const KEY_PAST     = 'past';       // All terms in past
 
-    public function getCustomKeys()
-    {
-        return [
-            self::KEY_ALL,
-            self::KEY_FUTURE,
-            self::KEY_CURRENT,
-            self::KEY_PREVIOUS,
-            self::KEY_PAST,
-        ];
-    }
+    private static $customKeys = [
+        self::KEY_ALL,
+        self::KEY_FUTURE,
+        self::KEY_CURRENT,
+        self::KEY_PREVIOUS,
+        self::KEY_PAST,
+    ];
 
     /**
      * @var GenericCollection|Term\Model[]
@@ -67,6 +63,35 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
+     * @param Filter\Model         $filter
+     * @param FilterOption\Mapper  $filterOptionMapper
+     * @param FilterDefault\Mapper $filterDefaultMapper
+     * @param GenericCollection    $terms
+     * @param Term\Model|null      $currentTerm
+     * @param Term\Model|null      $previousTerm
+     */
+    public function __construct(
+        Filter\Model $filter,
+        FilterOption\Mapper $filterOptionMapper,
+        FilterDefault\Mapper $filterDefaultMapper,
+        GenericCollection $terms,
+        Term\Model $currentTerm = null,
+        Term\Model $previousTerm = null
+    ) {
+        parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
+    }
+
+
+    /**
+     * @return string[]
+     */
+    public function getCustomKeys()
+    {
+        return self::$customKeys;
+    }
+
+
+    /**
      * @param GenericCollection $terms
      * @return static
      */
@@ -74,6 +99,15 @@ class Definition extends AbstractFilterDefinition
     {
         $this->terms = $terms->shallowClone()->sortBy('start', 'DESC')->indexBy('id');
         return $this;
+    }
+
+
+    /**
+     * @return Term\Model[]|GenericCollection
+     */
+    public function getTerms()
+    {
+        return $this->terms;
     }
 
     /**
@@ -87,6 +121,15 @@ class Definition extends AbstractFilterDefinition
     }
 
     /**
+     * @return Term\Model
+     */
+    public function getCurrentTerm()
+    {
+        return $this->currentTerm;
+    }
+
+
+    /**
      * @param Term\Model $previousTerm
      * @return static
      */
@@ -96,15 +139,12 @@ class Definition extends AbstractFilterDefinition
         return $this;
     }
 
-
     /**
-     * @param string[] $abstractKeys
-     * @return static
+     * @return Term\Model
      */
-    public function setAbstractKeys(array $abstractKeys)
+    public function getPreviousTerm()
     {
-        $this->abstractKeys = $abstractKeys;
-        return $this;
+        return $this->previousTerm;
     }
 
 
@@ -361,122 +401,6 @@ class Definition extends AbstractFilterDefinition
     }
 
 
-    /**
-     * @param User $user
-     * @param null|string $page
-     * @return \Schoolbox\Filter\Selection\Model[]|GenericCollection
-     */
-    protected function getAvailableSelections(User $user, $page = null)
-    {
-        // Get default options for role
-        /** @var GenericCollection|FilterOption\Model[] $optionDefaults */
-        $optionDefaults = $this->getOptionDefaults($page)->getOffset($page);
-
-
-        $availableSelections = $this->getFilterSelectionMapper()->createCollection();
-
-        // Is this term available?
-
-        foreach($this->terms as $term){
-            $termFinish = $term->getActualFinish();
-            $available = false;
-            if($optionDefaults->offsetExists(self::KEY_ALL)){
-                $available = true;
-            } elseif ($optionDefaults->offsetExists(self::KEY_FUTURE) && $term->getStart()->isFuture()){
-                $available = true;
-            } elseif ($this->currentTerm && $optionDefaults->offsetExists(self::KEY_CURRENT) && $this->currentTerm->getId() === $term->getId()){
-                $available = true;
-            } elseif ($this->previousTerm && $optionDefaults->offsetExists(self::KEY_PREVIOUS) && $this->previousTerm->getId() === $term->getId()){
-                $available = true;
-            } elseif (!$termFinish->isNull() && $optionDefaults->offsetExists(self::KEY_PAST) && $term->getActualFinish()->isPast()){
-                $available = true;
-            } elseif ($optionDefaults->offsetExists($term->getId())){
-                $available = true;
-            }
-
-            if($available){
-                $selection = $this->getFilterSelectionMapper()->createModel();
-                $selection
-                    ->setFilter($this->getFilter())
-                    ->setUser($user)
-                    ->setPage($page)
-                    ->setKey((string)$term->getId())
-                    ->setSelected(false);
-                $availableSelections[$selection->getKey()] = $selection;
-            }
-        }
-
-        $defaultsPerKey = $this->getFilterDefaultMapper()->createCollection();
-        foreach($optionDefaults as $key => $option){
-            foreach($option->getDefaults() as $roleType => $default){
-                $defaultsPerKey[$key] = $default;
-            }
-        }
-
-
-        // Overlay role-specific settings
-        foreach($availableSelections as $selection){
-
-            $term = $this->terms[$selection->getKey()];
-            $termStart  = $term->getStart();
-            $termFinish = $term->getActualFinish();
-
-            foreach($defaultsPerKey as $key => $default){
-                if(!$default->isSelected()){
-                    continue;
-                }
-                if(self::KEY_ALL === $key){
-                    $selection->setSelected(true);
-                } elseif(self::KEY_FUTURE === $key && $termStart->isFuture()){
-                    $selection->setSelected(true);
-                } elseif(self::KEY_PAST === $key && !$termFinish->isNull() && $termFinish->isPast()){
-                    $selection->setSelected(true);
-                } elseif(self::KEY_CURRENT === $key && $this->currentTerm && $term->getId() === $this->currentTerm->getId()){
-                    $selection->setSelected(true);
-                } elseif(self::KEY_PREVIOUS === $key && $this->previousTerm && $term->getId() === $this->previousTerm->getId()){
-                    $selection->setSelected(true);
-                } elseif((string)$key === (string)$term->getId()){
-                    $selection->setSelected(true);
-                }
-            }
-        }
-
-
-        // Overlay user-specific selections
-        /** @var GenericCollection|\Schoolbox\Filter\Selection\Model[] $savedSelections */
-        $savedSelections = $this->getFilterSelectionMapper()->findByColumnList([
-            'user_id' => $user->getId(),
-            'page' => $page,
-        ])->indexBy('key');
-
-        foreach($savedSelections as $key => $savedSelection){
-            if($savedSelections->offsetExists($key)){
-                $availableSelections[$key]
-                    ->setId($savedSelection->getId())
-                    ->setSelected($savedSelection->getSelected());
-            }
-        }
-
-        return $availableSelections;
-    }
-
-
-    /**
-     * Returns a set of data to inject into this filter's template
-     *
-     * Intended to be called in twig includes
-     *
-     * @param string $page
-     * @param User $user
-     * @return \Schoolbox\Filter\Selection\Model[]
-     * @throws MapperException
-     */
-    public function toPanelContext($page, User $user)
-    {
-        return [
-            'selections' => $this->getAvailableSelections($user, $page),
-        ];
-    }
 
 
 

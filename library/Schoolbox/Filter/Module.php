@@ -53,7 +53,7 @@ class Module extends AlaressModule
                 // TODO this is inefficient. We hit the DB to fetch the instace by ID, then re-fetch by class in the factory!
                 $filterFactory = $filterFactoryFactory->buildFilterFactoryFromClass($filterInstance->getClass());
                 return [
-                    'definition' => $filterFactory->buildForAdminPages(),
+                    'definition' => $filterFactory->buildDefinition(),
                 ];
             } catch (MapperException $e) {
                 throw new NotFound($e->getMessage());

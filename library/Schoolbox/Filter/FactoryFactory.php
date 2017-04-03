@@ -10,7 +10,7 @@ namespace Schoolbox\Filter;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Option\Selection;
+use Schoolbox\Filter\Selection;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
 use Schoolbox\Filter\Filters\ClassGroup as ClassGroupFilter;
@@ -42,78 +42,54 @@ class FactoryFactory
     }
 
 
-    /**
-     * Sets the common dependencies required for all filter factories
-     *
-     * @param AbstractFilterFactory $filterFactory
-     * @param string                $class
-     * @throws \InvalidArgumentException
-     */
-    private function setBaseDependencies(AbstractFilterFactory $filterFactory, $class)
-    {
-        $filterModel = $this->mapperFactory->get(Filter\Mapper::class)->findByColumn('class', $class)->first();
-        /** @var Option\Mapper $filterOptionMapper */
-        $filterOptionMapper = $this->mapperFactory->get(Option\Mapper::class);
-        /** @var Defaults\Mapper $filterDefaultMapper */
-        $filterDefaultMapper = $this->mapperFactory->get(Defaults\Mapper::class);
-        /** @var \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper */
-        $filterSelectionMapper = $this->mapperFactory->get(\Schoolbox\Filter\Selection\Mapper::class);
+//    /**
+//     * @param string $filterDefinitionClass
+//     * @return IFilterFactory
+//     * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
+//     */
+//    public function buildFilterFactoryFromClass($filterDefinitionClass)
+//    {
+//        if (!class_exists($filterDefinitionClass)) {
+//            throw new \InvalidArgumentException('No filter definition found for class: ' . $filterDefinitionClass);
+//        }
+//
+//        // Registry of as filters definitions. Ensures static analysis identifies usages.
+//        switch ($filterDefinitionClass) {
+//            case AssessmentTypeFilter\Definition::class:
+//                return $this->buildAssessmentTypeFilterFactory();
+//            case ClassGroupFilter\Definition::class:
+//                return $this->buildClassGroupFilterFactory();
+//            case TermFilter\Definition::class:
+//                return $this->buildTermFilterFactory();
+//            case WorkTypeFilter\Definition::class:
+//                return $this->buildWorkTypeFilterFactory();
+//        }
+//        throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
+//    }
 
-        $filterFactory->setFilter($filterModel);
-        $filterFactory->setFilterOptionMapper($filterOptionMapper);
-        $filterFactory->setFilterDefaultMapper($filterDefaultMapper);
-        $filterFactory->setFilterSelectionMapper($filterSelectionMapper);
-    }
-
-
-    /**
-     * @param string $filterDefinitionClass
-     * @return IFilterFactory
-     * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
-     */
-    public function buildFilterFactoryFromClass($filterDefinitionClass)
-    {
-        if (!class_exists($filterDefinitionClass)) {
-            throw new \InvalidArgumentException('No filter definition found for class: ' . $filterDefinitionClass);
-        }
-
-        // Registry of as filters definitions. Ensures static analysis identifies usages.
-        switch ($filterDefinitionClass) {
-            case AssessmentTypeFilter\Definition::class:
-                return $this->buildAssessmentTypeFilterFactory();
-            case ClassGroupFilter\Definition::class:
-                return $this->buildClassGroupFilterFactory();
-            case TermFilter\Definition::class:
-                return $this->buildTermFilterFactory();
-            case WorkTypeFilter\Definition::class:
-                return $this->buildWorkTypeFilterFactory();
-        }
-        throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
-    }
-
-
-    /**
-     * @return AssessmentTypeFilter\Factory
-     * @throws \InvalidArgumentException
-     */
-    public function buildAssessmentTypeFilterFactory()
-    {
-        $factory = new AssessmentTypeFilter\Factory();
-        $this->setBaseDependencies($factory, AssessmentTypeFilter\Definition::class);
-        return $factory;
-    }
-
-
-    /**
-     * @return ClassGroupFilter\Factory
-     * @throws \InvalidArgumentException
-     */
-    public function buildClassGroupFilterFactory()
-    {
-        $factory = new ClassGroupFilter\Factory();
-        $this->setBaseDependencies($factory, ClassGroupFilter\Definition::class);
-        return $factory;
-    }
+//
+//    /**
+//     * @return AssessmentTypeFilter\Factory
+//     * @throws \InvalidArgumentException
+//     */
+//    public function buildAssessmentTypeFilterFactory()
+//    {
+//        $factory = new AssessmentTypeFilter\Factory();
+//        $this->setBaseDependencies($factory, AssessmentTypeFilter\Definition::class);
+//        return $factory;
+//    }
+//
+//
+//    /**
+//     * @return ClassGroupFilter\Factory
+//     * @throws \InvalidArgumentException
+//     */
+//    public function buildClassGroupFilterFactory()
+//    {
+//        $factory = new ClassGroupFilter\Factory();
+//        $this->setBaseDependencies($factory, ClassGroupFilter\Definition::class);
+//        return $factory;
+//    }
 
 
     /**
@@ -124,22 +100,65 @@ class FactoryFactory
     {
         /** @var Term\Mapper $termMapper */
         $termMapper = $this->mapperFactory->get(Term\Mapper::class);
-        $factory    = new TermFilter\Factory($termMapper);
-        $this->setBaseDependencies($factory, TermFilter\Definition::class);
-        return $factory;
+        return new TermFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper(),
+            $termMapper
+        );
     }
 
 
+//
+//
+//    /**
+//     * @return WorkTypeFilter\Factory
+//     * @throws \InvalidArgumentException
+//     */
+//    public function buildWorkTypeFilterFactory()
+//    {
+//        /** @var WorkType\Mapper $workTypeMapper */
+//        $workTypeMapper = $this->mapperFactory->get(WorkType\Mapper::class);
+//        $factory        = new WorkTypeFilter\Factory($workTypeMapper);
+//        $this->setBaseDependencies($factory, WorkTypeFilter\Definition::class);
+//        return $factory;
+//    }
+
+
     /**
-     * @return WorkTypeFilter\Factory
+     * @return \Schoolbox\Mapper|Filter\Mapper
      * @throws \InvalidArgumentException
      */
-    public function buildWorkTypeFilterFactory()
+    private function getFilterMapper()
     {
-        /** @var WorkType\Mapper $workTypeMapper */
-        $workTypeMapper = $this->mapperFactory->get(WorkType\Mapper::class);
-        $factory        = new WorkTypeFilter\Factory($workTypeMapper);
-        $this->setBaseDependencies($factory, WorkTypeFilter\Definition::class);
-        return $factory;
+        return $this->mapperFactory->get(Filter\Mapper::class);
+    }
+
+    /**
+     * @return \Schoolbox\Mapper|Option\Mapper
+     * @throws \InvalidArgumentException
+     */
+    private function getFilterOptionMapper()
+    {
+        return $this->mapperFactory->get(Option\Mapper::class);
+    }
+
+    /**
+     * @return \Schoolbox\Mapper|Defaults\Mapper
+     * @throws \InvalidArgumentException
+     */
+    private function getFilterDefaultsMapper()
+    {
+        return $this->mapperFactory->get(Defaults\Mapper::class);
+    }
+
+    /**
+     * @return \Schoolbox\Mapper|Selection\Mapper
+     * @throws \InvalidArgumentException
+     */
+    private function getFilterSelectionMapper()
+    {
+        return $this->mapperFactory->get(Selection\Mapper::class);
     }
 }

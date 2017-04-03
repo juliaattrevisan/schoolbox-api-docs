@@ -48,6 +48,7 @@ use \Alaress_Date_Format;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Option\Selection as FilterSelection;
+use Schoolbox\Mapper;
 
 class Controller extends Base
 {
@@ -206,12 +207,14 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException
+     * @throws Mapper\Exception
      * @todo split pending assessments into own controller
      */
     public function getPendingAssessmentsForUser(User $viewee, FilterFactoryFactory $filterFactoryFactory)
     {
+        // Move this to module
         $termFilterFactory    = $filterFactoryFactory->buildTermFilterFactory();
-        $termFilterDefinition = $termFilterFactory->buildForFilterPanel();
+        $termFilterDefinition = $termFilterFactory->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
 
         $filters            = new GenericCollection(IFilterDefinition::class, [$termFilterDefinition]);
 

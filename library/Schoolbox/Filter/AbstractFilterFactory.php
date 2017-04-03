@@ -10,14 +10,14 @@ namespace Schoolbox\Filter;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Option\Selection;
+use Schoolbox\Filter\Selection;
 
 
 abstract class AbstractFilterFactory implements IFilterFactory
 {
 
-    /** @var Filter\Model */
-    private $filter;
+    /** @var Filter\Mapper */
+    private $filterMapper;
 
     /** @var Option\Mapper */
     private $filterOptionMapper;
@@ -25,81 +25,29 @@ abstract class AbstractFilterFactory implements IFilterFactory
     /** @var Defaults\Mapper */
     private $filterDefaultMapper;
 
-    /** @var \Schoolbox\Filter\Selection\Mapper */
+    /** @var Selection\Mapper */
     private $filterSelectionMapper;
 
 
-    /**
-     * Injects the common dependencies shared by all definition filters
-     * @param AbstractFilterDefinition $definition
-     */
-    protected function setBaseDependencies(AbstractFilterDefinition $definition)
-    {
-        $definition
-            ->setFilter($this->filter)
-            ->setFilterOptionMapper($this->filterOptionMapper)
-            ->setFilterDefaultMapper($this->filterDefaultMapper)
-            ->setFilterSelectionMapper($this->filterSelectionMapper);
+    public function __construct(
+        Filter\Mapper $filterMapper,
+        Option\Mapper $optionMapper,
+        Defaults\Mapper $defaultMapper,
+        Selection\Mapper $selectionMapper
+    ) {
+        $this->filterMapper          = $filterMapper;
+        $this->filterOptionMapper    = $optionMapper;
+        $this->filterDefaultMapper   = $defaultMapper;
+        $this->filterSelectionMapper = $selectionMapper;
     }
-
 
     /**
-     * @param Filter\Model $filter
-     * @return $this
+     * @return Filter\Mapper
      */
-    public function setFilter(Filter\Model $filter)
+    protected function getFilterMapper()
     {
-        $this->filter = $filter;
-        return $this;
+        return $this->filterMapper;
     }
-
-    public function getFilterId()
-    {
-        return $this->filter->getId();
-    }
-
-
-    /**
-     * @param Option\Mapper $filterOptionMapper
-     * @return $this
-     */
-    public function setFilterOptionMapper(Option\Mapper $filterOptionMapper)
-    {
-        $this->filterOptionMapper = $filterOptionMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param Defaults\Mapper $filterDefaultMapper
-     * @return $this
-     */
-    public function setFilterDefaultMapper(Defaults\Mapper $filterDefaultMapper)
-    {
-        $this->filterDefaultMapper = $filterDefaultMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper
-     * @return $this
-     */
-    public function setFilterSelectionMapper(\Schoolbox\Filter\Selection\Mapper $filterSelectionMapper)
-    {
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return Filter\Model
-     */
-    protected function getFilter()
-    {
-        return $this->filter;
-    }
-
 
     /**
      * @return Option\Mapper

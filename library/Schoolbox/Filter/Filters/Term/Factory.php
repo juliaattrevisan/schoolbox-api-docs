@@ -9,12 +9,17 @@ namespace Schoolbox\Filter\Filters\Term;
 
 use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\AbstractFilterFactory;
-use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\GenericCollection;
+use Schoolbox\User;
+use Schoolbox\Mapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Option;
+use Schoolbox\Filter\Option\Defaults;
+use Schoolbox\Filter\Selection;
 
 /**
- * A factory for building TermFilters
+ * A factory for building TermFilter objects
  */
 class Factory extends AbstractFilterFactory
 {
@@ -26,54 +31,60 @@ class Factory extends AbstractFilterFactory
 
 
     /**
-     * @param Term\Mapper $termMapper
+     * @param Filter\Mapper    $filterMapper
+     * @param Option\Mapper    $optionMapper
+     * @param Defaults\Mapper  $defaultMapper
+     * @param Selection\Mapper $selectionMapper
+     * @param Term\Mapper      $termMapper
      */
-    public function __construct(Term\Mapper $termMapper)
-    {
+    public function __construct(
+        Filter\Mapper $filterMapper,
+        Option\Mapper $optionMapper,
+        Defaults\Mapper $defaultMapper,
+        Selection\Mapper $selectionMapper,
+        Term\Mapper $termMapper
+    ) {
+        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
         $this->termMapper = $termMapper;
     }
 
 
     /**
-     * Build a filter definition, ready to use in the admin pages
-     *
-     * @return IFilterDefinition
+     * @inheritdoc
      */
-    public function buildForAdminPages()
+    public function buildDefinition(Filter\Model $filter)
     {
-        $definition = new Definition();
-        $this->setBaseDependencies($definition);
-
         $sortedTerms = $this->getSortedTerms();
 
-        $definition
-            ->setTerms($sortedTerms)
-            ->setAbstractKeys($this->getKeys($sortedTerms))
-            ->setCurrentTerm($this->getCurrentTerm($sortedTerms))
-            ->setPreviousTerm($this->getPreviousTerm($sortedTerms));
-        return $definition;
+        return new Definition(
+            $filter,
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultMapper(),
+            $sortedTerms,
+            $this->getCurrentTerm($sortedTerms),
+            $this->getPreviousTerm($sortedTerms)
+        );
     }
 
 
     /**
-     * Build a filter, ready to inject into a filter panel
-     *
-     * @param null|IRunTimeOptions $runTimeOptions
-     * @return IFilterDefinition
+     * @inheritdoc
+     * @throws Mapper\Exception
      */
-    public function buildForFilterPanel(IRunTimeOptions $runTimeOptions = null)
+    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
     {
-        $definition = new Definition();
-        $this->setBaseDependencies($definition);
+        $filter     = $this->getFilterMapper()->findForClass(Definition::class);
+        $definition = $this->buildDefinition($filter);
 
-        $terms = $this->getSortedTerms();
+        // Get user's existing selections for this page
+        $savedSelections = $this->getFilterSelectionMapper()->findByColumnList([
+            'user_id' => $user->getId(),
+            'page'    => $page,
+        ])->indexBy('key');
 
-        return $definition
-            ->setTerms($terms)
-            ->setAbstractKeys($this->getKeys($terms))
-            ->setCurrentTerm($this->getCurrentTerm($terms))
-            ->setPreviousTerm($this->getPreviousTerm($terms));
+        return new Component($definition, $user, $page, $savedSelections, $this->getFilterSelectionMapper());
     }
+
 
     /**
      * Returns a key converter, able to convert between keys (term.id) and the entities they represent (terms)
@@ -95,22 +106,6 @@ class Factory extends AbstractFilterFactory
         /** @var GenericCollection|Term\Model[] $terms */
         $terms = $this->termMapper->findAll(['order' => ['start' => 'DESC']])->indexBy('id');
         return $terms;
-    }
-
-
-    /**
-     * @param GenericCollection|Term\Model[] $terms
-     * @return string[]
-     */
-    private function getKeys(GenericCollection $terms)
-    {
-        return array_merge([
-            Definition::KEY_ALL,
-            Definition::KEY_FUTURE,
-            Definition::KEY_CURRENT,
-            Definition::KEY_PREVIOUS,
-            Definition::KEY_PAST,
-        ], $terms->getColumnValues('id'));
     }
 
 

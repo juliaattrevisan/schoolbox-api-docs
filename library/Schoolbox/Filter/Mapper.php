@@ -28,6 +28,16 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * @param string $class
+     * @return Model
+     */
+    public function findForClass($class)
+    {
+        return $this->findByColumn('class', $class)->first();
+    }
+
+
+    /**
      * @param PDOStatement $statement
      * @return GenericCollection|Model[]
      * @throws MapperException

@@ -7,14 +7,14 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\User;
+use Schoolbox\Filter;
 
 
 /**
- * Each instance of this factory knows how to build a specific filter definition.
+ * Responsible for building concrete implementation of the filter interfaces.
  *
- * Once build, the definition should be able to perform its intended end use without fetching any more data.
- *
- * It is up to the factory to fetch all data and inject it into the filter definition.
+ * All DB access should happen in factory, with results injected into objects being built.
  */
 interface IFilterFactory
 {
@@ -23,17 +23,20 @@ interface IFilterFactory
      *
      * No dynamic options or user-selections relevant.
      *
+     * @param Filter\Model $filter
      * @return IFilterDefinition
      */
-    public function buildForAdminPages();
+    public function buildDefinition(Filter\Model $filter);
 
     /**
      * Build a filter, ready to inject into a filter panel
      *
+     * @param User $user
+     * @param string $page
      * @param null|IRunTimeOptions $runTimeOptions
      * @return IFilterDefinition
      */
-    public function buildForFilterPanel(IRunTimeOptions $runTimeOptions = null);
+    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null);
 
     /**
      * Returns a key converter, able to convert between concrete keys and the entities they represent

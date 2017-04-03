@@ -45,7 +45,7 @@ class Factory extends AbstractFilterFactory
      *
      * @return IFilterDefinition
      */
-    public function buildForAdminPages()
+    public function buildDefinition()
     {
         return (new Definition($this->getFilter()))
             ->setWorkTypes($this->getWorkTypes());
@@ -58,7 +58,7 @@ class Factory extends AbstractFilterFactory
      * @param null|IRunTimeOptions $runTimeOptions
      * @return IFilterDefinition
      */
-    public function buildForFilterPanel(IRunTimeOptions $runTimeOptions = null)
+    public function buildComponent(IRunTimeOptions $runTimeOptions = null)
     {
         return (new Definition($this->getFilter()))
             ->setWorkTypes($this->getWorkTypes());
