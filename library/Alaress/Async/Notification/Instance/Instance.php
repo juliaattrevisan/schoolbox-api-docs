@@ -395,6 +395,9 @@ class Instance implements JsonSerializable
         foreach ($this->meta as $m) {
             $list[] = $m;
         }
+        foreach ($this->context as $c) {
+            $list[] = $c;
+        }
         return sha1(json_encode($list));
     }
 
