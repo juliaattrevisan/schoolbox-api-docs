@@ -11,7 +11,7 @@
 namespace Alaress\Database;
 
 use Alaress\Database\Broker\IBroker;
-use Alaress\Database\Statement\IStatement;
+use Alaress\Database\Statement\Base as BaseStatement;
 use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
@@ -19,7 +19,7 @@ use DebugBar\DataCollector\Renderable;
 class Collector extends DataCollector implements Renderable, AssetProvider
 {
     /** @var string $widget_name */
-    protected $widget_name = 'Database';
+    protected $widget_name = "Alaress/Database - ";
 
     /** @var IBroker $broker */
     protected $broker;
@@ -35,20 +35,21 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     public function __construct($broker)
     {
         $this->broker = $broker;
+        $this->widget_name .= str_replace(".","",$broker->getHostname());
     }
 
     /**
      * Runs query, and logs its results.
      *
-     * @param IStatement $statement
+     * @param BaseStatement $statement
      * @return bool
      */
     public function execute($statement)
     {
         $start = microtime(true);
-        $result = $statement->execute();
+        $result = $statement->getPDOStatement()->execute();
 
-        $statement = [
+        $statementSummary = [
             'sql' => $statement->getSql(),
             'prepared_stmt' => $statement->getSql(),
             'params' => [],
@@ -61,12 +62,13 @@ class Collector extends DataCollector implements Renderable, AssetProvider
         $duration = microtime(true) - $start;
         $memory = memory_get_peak_usage(true);
 
-        $statement['duration'] = $duration;
-        $statement['duration_str'] = $this->formatDuration($duration);
-        $statement['memory'] = $memory;
-        $statement['memory_str'] = $this->formatBytes($memory);
+        $statementSummary['connection'] = "{$this->broker->getHostname()}:{$this->broker->getDatabase()}";
+        $statementSummary['duration'] = $duration;
+        $statementSummary['duration_str'] = $this->formatDuration($duration);
+        $statementSummary['memory'] = $memory;
+        $statementSummary['memory_str'] = $this->formatBytes($memory);
 
-        $this->statements[] = $statement;
+        $this->statements[] = $statementSummary;
 
         return $result;
     }

@@ -13,6 +13,7 @@ namespace Alaress\Database\Statement;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception;
+use DebugBar\DataCollector\PDO\PDOCollector;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -207,6 +208,16 @@ abstract Class Base implements IStatement
 
         $this->bindStatement();
         return true;
+    }
+
+    /**
+     * This returns the underlying PDO statement. This is used by the debugging collector.
+     *
+     * @return PDOStatement
+     */
+    public function getPDOStatement()
+    {
+        return $this->statement;
     }
 
     /**

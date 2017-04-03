@@ -202,8 +202,7 @@ abstract class Base implements IBroker
      */
     public function getCollector()
     {
-        $this->pdo = new DebugPDO\TraceablePDO($this->pdo);
-        return new DebugPDO\PDOCollector($this->pdo);
+        return $this->collector;
     }
 
     /**
@@ -214,6 +213,20 @@ abstract class Base implements IBroker
         if (!($this->collector instanceof Collector)) {
             $this->collector = new Collector($this);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHostname() {
+        return $this->connector->getHostname();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDatabase() {
+        return $this->connector->getDatabase();
     }
 
     // ----------------------------------------------------------------------------------------------------------------

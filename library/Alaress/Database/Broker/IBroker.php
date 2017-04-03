@@ -38,6 +38,20 @@ interface IBroker
     public function getDsn();
 
     /**
+     * Retrieve the hostname from connector
+     *
+     * @return string
+     */
+    public function getHostname();
+
+    /**
+     * Retrieve the database name from the connector
+     *
+     * @return string
+     */
+    public function getDatabase();
+
+    /**
      * Connects to the actual database
      *
      * @param array $options Optional array of connection parameters (currently only 'debug')
