@@ -4,6 +4,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Learning;
 
 use Alaress\Database\Connector\IConnector;
@@ -52,6 +53,7 @@ use Schoolbox\Mapper;
 
 class Controller extends Base
 {
+
     // Enable pagination of both part1 and part2 of the screen, with this many items per page.
     const COUNT_ASSESSMENTS_PER_PAGE = 100;
 
@@ -121,19 +123,20 @@ class Controller extends Base
      */
     private $database;
 
+
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param FolderMapper $folderMapper
-     * @param TermMapper $termMapper
-     * @param GradeGroup $defaultGradeGroup
-     * @param ShowcaseMapper $showcaseMapper
-     * @param RubricMapper $rubricMapper
-     * @param QuizMapper $quizMapper
-     * @param QuizAttemptMapper $quizAttemptMapper
-     * @param Timetable_ColourMapper $timetableColourMapper
+     * @param ErrorMapper                $errorMapper
+     * @param AssessmentMapperProxy      $assessmentMapperProxy
+     * @param FolderMapper               $folderMapper
+     * @param TermMapper                 $termMapper
+     * @param GradeGroup                 $defaultGradeGroup
+     * @param ShowcaseMapper             $showcaseMapper
+     * @param RubricMapper               $rubricMapper
+     * @param QuizMapper                 $quizMapper
+     * @param QuizAttemptMapper          $quizAttemptMapper
+     * @param Timetable_ColourMapper     $timetableColourMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param CourseSpecificationMapper $courseSpecificationMapper
      * @param \External_ClassInterface $externalClass
@@ -174,6 +177,7 @@ class Controller extends Base
         $this->access                     = $access;
     }
 
+
     /**
      * Redirects to current user
      *
@@ -197,18 +201,19 @@ class Controller extends Base
         ]));
     }
 
+
     /**
      * Displays a blank page with collapsed filter panel
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User $viewee The user whose pending assessments we are viewing.
+     * @param User                 $viewee The user whose pending assessments we are viewing.
      * @param FilterFactoryFactory $filterFactoryFactory
      * @throws RouteNotFound
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws Mapper\Exception
-     * @todo split pending assessments into own controller
+     * @todo  split pending assessments into own controller
      */
     public function getPendingAssessmentsForUser(User $viewee, FilterFactoryFactory $filterFactoryFactory)
     {
@@ -216,23 +221,25 @@ class Controller extends Base
         $termFilterFactory    = $filterFactoryFactory->buildTermFilterFactory();
         $termFilterDefinition = $termFilterFactory->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
 
-        $filters            = new GenericCollection(IFilterDefinition::class, [$termFilterDefinition]);
+        $filters = new GenericCollection(Filter\IFilterComponent::class, [$termFilterDefinition]);
 
-        $route = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
-        $filterPanel = new Filter\Panel($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS, $route, $filters);
+        $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
+        $filterPanel = new Filter\Panel($route, $filters);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
-            'filterPanel'        => $filterPanel,
+            'filterPanel' => $filterPanel,
         ])->setTab('submission'));
     }
+
 
     /**
      * Displays a list of Assessments that require marking, and Assessments currently unsubmitted
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User $viewee The user whose pending assessments we are viewing.
+     * @param User                 $viewee The user whose pending assessments we are viewing.
      * @param FilterFactoryFactory $filterFactoryFactory
+     * @var  string[][]            $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
      * @throws \LogicException
      * @throws \DomainException
      * @throws \OutOfRangeException
@@ -243,8 +250,9 @@ class Controller extends Base
     public function postPendingAssessmentsForUser(User $viewee, FilterFactoryFactory $filterFactoryFactory)
     {
         /**
-         * Indexed by filter.id, page, then key
-         * @var string[][][] $postFilterSelections
+         * Indexed by filter.id, then concrete key
+         *
+         * @var string[][] $postFilterSelections
          */
         $postFilterSelections = $this->request->post['filter_selection'];
 
@@ -256,7 +264,6 @@ class Controller extends Base
         ]);
 
         // Save User's current selections
-        $filterMapper = Filter\Mapper::getInstance();
         $selectionsToSave = $filterSelectionMapper->createCollection();
 
         // What filters are in use on this page? Get their key converters
@@ -266,59 +273,58 @@ class Controller extends Base
         // Term Filter
         $termFilterFactory = $filterFactoryFactory->buildTermFilterFactory();
         $termKeyConverter  = $termFilterFactory->buildKeyConverter();
-        $keyConverters->offsetSet($termFilterFactory->getFilterId(), $termKeyConverter);
+        $keyConverters->offsetSet($termKeyConverter->getFilter()->getId(), $termKeyConverter);
 
         // TODO add other filters here
 
         /** @var Collection|GenericCollection[]|\Schoolbox\Filter\Selection\Model[][] $selectionsPerFilter */
         $selectionsPerFilter = new Collection();
 
-        foreach($postFilterSelections as $filterId => $filterSelections){
-            $filter = $filterMapper->createModel($filterId);
+        foreach ($postFilterSelections as $filterId => $filterSelections) {
+            $filter = $keyConverters[$filterId]->getFilter();
 
-            if(!$selectionsPerFilter->offsetExists($filterId)){
+            if (!$selectionsPerFilter->offsetExists($filterId)) {
                 $selectionsPerFilter->setOffset($filterId, $filterSelectionMapper->createCollection());
             }
 
-            foreach($filterSelections as $page => $pageSelections){
-                foreach($pageSelections as $key => $selected){
-                    $selection = $filterSelectionMapper->createModel();
-                    $key = $keyConverters[$filter->getId()]->sanitiseKey($key);
-                    $selection
-                        ->setFilter($filter)
-                        ->setUser($this->getUser())
-                        ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
-                        ->setKey($key)
-                        ->setSelected((bool)$selected);
-                    $selectionsToSave->add($selection);
-                    $selectionsPerFilter->offsetSet($key, $selection);
-                }
+            foreach ($filterSelections as $key => $selected) {
+                $selection = $filterSelectionMapper->createModel();
+                $key       = $keyConverters[$filter->getId()]->sanitiseKey($key);
+                $selection
+                    ->setFilter($filter)
+                    ->setUser($this->getUser())
+                    ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
+                    ->setKey($key)
+                    ->setSelected((bool)$selected);
+                $selectionsToSave->add($selection);
+                $selectionsPerFilter->offsetSet($key, $selection);
             }
+
         }
         $filterSelectionMapper->save($selectionsToSave);
 
 
         // Get the terms
         $availableTerms = $this->termMapper->createCollection();
-        $selectedTerms = $this->termMapper->createCollection();
-        $termSelections = $selectionsPerFilter[$termFilterFactory->getFilterId()];
-        foreach($termSelections as $termSelection){
+        $selectedTerms  = $this->termMapper->createCollection();
+        $termSelections = $selectionsPerFilter[$termKeyConverter->getFilter()->getId()];
+        foreach ($termSelections as $termSelection) {
             $term = $termKeyConverter->getItem($termSelection->getKey());
             $availableTerms->add($term);
-            if($termSelection->getSelected()){
+            if ($termSelection->getSelected()) {
                 $selectedTerms->add($term);
             }
         }
 
         // Were no terms selected ?
-        if(0 === $selectedTerms->count()){
+        if (0 === $selectedTerms->count()) {
             $selectedTerms = $availableTerms;
         }
 
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
-        if($this->getUser()->getId() === $viewee->getId()){
+        if ($this->getUser()->getId() === $viewee->getId()) {
             $viewee = $this->getUser();
         }
 
@@ -330,7 +336,7 @@ class Controller extends Base
 
         // TODO -UP TO HERE - assessment TYpes
 
-        $factory = new PendingFactory($viewee, $this->database, $this->externalClass, $selectedTerms, $toChaseLimit, $includeTasks, $this->folderMapper);
+        $factory     = new PendingFactory($viewee, $this->database, $this->externalClass, $selectedTerms, $toChaseLimit, $includeTasks, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
         /**
@@ -342,9 +348,9 @@ class Controller extends Base
 
         /** @var Collection|IAssessable[] $assessmentsToMark */
         $assessmentsToMark = $this->assessmentMapperProxy->createCollection();
-        foreach($assessments as $assessment){
+        foreach ($assessments as $assessment) {
             $assessmentStatistics[$assessment->getId()] = new Statistics($assessment);
-            if($assessmentStatistics[$assessment->getId()]->getCountFeedbackRequired()){
+            if ($assessmentStatistics[$assessment->getId()]->getCountFeedbackRequired()) {
                 $assessmentsToMark->add($assessment);
             }
         }
@@ -353,17 +359,17 @@ class Controller extends Base
         /** @var IAssessable[] $assessmentsToMark */
         $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
 
-        foreach($assessments as $assessment){
-            if($assessment->getDueAt()->lt($toChaseLimit) && $assessmentStatistics[$assessment->getId()]->getCountResponseRequired()){
+        foreach ($assessments as $assessment) {
+            if ($assessment->getDueAt()->lt($toChaseLimit) && $assessmentStatistics[$assessment->getId()]->getCountResponseRequired()) {
                 $assessmentsToChase->add($assessment);
             }
         }
         $assessmentsToChase->sortBy('dueAt', 'asc');
 
-        $path = $this->request->url->get(PHP_URL_PATH);
+        $path        = $this->request->url->get(PHP_URL_PATH);
         $partOnePage = $this->request->query->get('p1', 1);
         $partTwoPage = $this->request->query->get('p2', 1);
-        $url = "$path?p1=$partOnePage&p2=$partTwoPage";
+        $url         = "$path?p1=$partOnePage&p2=$partTwoPage";
 
         // Pagination
         $partOnePaginator = (new UrlPaginator())
@@ -372,14 +378,14 @@ class Controller extends Base
             ->setParam('p1');
         $partTwoPaginator = (new UrlPaginator())->setPaginator(
             (new Paginator())->setTotal(count($assessmentsToChase))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
-            ->setUrl($url)
-            ->setParam('p2');
+                                                ->setUrl($url)
+                                                ->setParam('p2');
 
         // Did user request a page that does not exist?
-        if($partOnePage < 0 || ($partOnePaginator->getPageCount() && $partOnePage > $partOnePaginator->getPageCount())){
+        if ($partOnePage < 0 || ($partOnePaginator->getPageCount() && $partOnePage > $partOnePaginator->getPageCount())) {
             throw new \DomainException("Invalid part one page: $partOnePage");
         }
-        if($partTwoPage < 0 || ($partTwoPaginator->getPageCount() && $partTwoPage > $partTwoPaginator->getPageCount())){
+        if ($partTwoPage < 0 || ($partTwoPaginator->getPageCount() && $partTwoPage > $partTwoPaginator->getPageCount())) {
             throw new \DomainException("Invalid part two page: $partTwoPage");
         }
 
@@ -395,13 +401,14 @@ class Controller extends Base
         ]));
     }
 
+
     /**
      * Displays a list of classes for the current logged in user
      *
      * If the term includes now (ie is current) then we use current enrollment.
      * Else term is historical, so we display classes where a student has submitted responses or received feedback
      *
-     * @api GET /learning/classes{/term}
+     * @api   GET /learning/classes{/term}
      * @level 165
      *
      * @param Term $term
@@ -417,7 +424,7 @@ class Controller extends Base
         $hideClasses   = $isTermCurrent && $hideTimetable;
 
         // Are we not showing classes ?
-        if($hideClasses){
+        if ($hideClasses) {
             $gridData = [
                 'term'       => $term,
                 'classList'  => $this->folderMapper->createCollection(),
@@ -432,7 +439,7 @@ class Controller extends Base
                 $this->courseSpecificationMapper,
                 $this->courseImplementationMapper
             );
-            $gridData = $classList->getClassList($term, $now);
+            $gridData  = $classList->getClassList($term, $now);
         }
 
 
@@ -446,14 +453,13 @@ class Controller extends Base
     }
 
 
-
     /**
      * Displays a list of grades/results for the specified user and term for all subjects
      *
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
      * @param User $viewee
-     * @param Term $term
+     * @param  Term $term
      * @throws ServiceNotFound If unable to find mail handler service
      * @throws DefinitionException
      * @throws MapperException
@@ -502,13 +508,14 @@ class Controller extends Base
         ])->setTab('grade'));
     }
 
+
     /**
      * Displays a list of grades for the specified user, term and subject
      *
      * @api   GET /learning/grades/{userId}/{termCode}/{subjectId}
      * @level 165
-     * @param User $viewee
-     * @param Term $term
+     * @param User   $viewee
+     * @param Term   $term
      * @param Folder $subject
      * @throws DefinitionException
      * @throws MapperException
@@ -530,7 +537,7 @@ class Controller extends Base
         );
 
         /** @var GenericCollection|IAssessable[] $assessments */
-        $assessments = $assessments->filter( function(IAssessable $activity) {
+        $assessments = $assessments->filter(function (IAssessable $activity) {
             return $activity->isPublished();
         });
 
@@ -547,7 +554,7 @@ class Controller extends Base
         $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Let markbook calculate the statistics
-        $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
+        $markbook   = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
         $statistics = $markbook->getAssessmentStatistics();
 
         // Get the data for the graph
@@ -562,13 +569,12 @@ class Controller extends Base
 
             // If this is a quiz we need to find out if the student has made any attempts so we can display a link to view them
 
-            if ($assessment instanceof AssessmentQuiz)
-            {
+            if ($assessment instanceof AssessmentQuiz) {
                 try {
-                    $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
+                    $quiz     = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
                     $attempts = $this->quizAttemptMapper->findByColumnList([
-                        'assess_id' =>$quiz->getId(),
-                        'user_id' => $viewee->getId(),
+                        'assess_id' => $quiz->getId(),
+                        'user_id'   => $viewee->getId(),
                     ]);
 
                     if ($attempts->count() > 0) {
@@ -590,16 +596,16 @@ class Controller extends Base
 
                 if (!empty($feedback->getHumanReadableMark()) || !empty($feedback->getComment())) {
                     $graphInfo[] = [
-                        'displayMark' => $feedback->getHumanReadableMark(),
+                        'displayMark'  => $feedback->getHumanReadableMark(),
                         'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
-                        'info' => null === $feedback->getComment() ? '' : $feedback->getComment(),
+                        'info'         => null === $feedback->getComment() ? '' : $feedback->getComment(),
                     ];
                 } else {
                     $graphInfo[] = [];
                 }
             } else {
                 $graphScatter[] = '';
-                $graphInfo[] = [];
+                $graphInfo[]    = [];
             }
 
             $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()->isQuantitative();
@@ -608,34 +614,34 @@ class Controller extends Base
                 $graphData[] = [
                     // Minimum
                     [
-                        'info' => null,
-                        'uid' => null,
+                        'info'  => null,
+                        'uid'   => null,
                         'value' => $statistics[$assessment->getId()]['minNormalized'],
                     ],
                     // 1st Quartile
                     [
-                        'info' => null,
-                        'uid' => null,
+                        'info'  => null,
+                        'uid'   => null,
                         // TODO: Find the real way to calculate the 1st/3rd quartiles
                         'value' => $statistics[$assessment->getId()]['meanNormalized'] - $statistics[$assessment->getId()]['sdNormalized'],
                     ],
                     // Median
                     [
-                        'info' => null,
-                        'uid' => null,
+                        'info'  => null,
+                        'uid'   => null,
                         'value' => $statistics[$assessment->getId()]['meanNormalized'],
                     ],
                     // 3rd Quartile
                     [
-                        'info' => null,
-                        'uid' => null,
+                        'info'  => null,
+                        'uid'   => null,
                         // TODO: Find the real way to calculate the 1st/3rd quartiles
                         'value' => $statistics[$assessment->getId()]['meanNormalized'] + $statistics[$assessment->getId()]['sdNormalized'],
                     ],
                     // Maximum
                     [
-                        'info' => null,
-                        'uid' => null,
+                        'info'  => null,
+                        'uid'   => null,
                         'value' => $statistics[$assessment->getId()]['maxNormalized'],
                     ],
                 ];
@@ -655,7 +661,7 @@ class Controller extends Base
 
         // Squeeze it on out
 
-        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER['REQUEST_URI']);
+        $returnUrlSuffix = '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
             'student'            => $viewee,
@@ -708,6 +714,7 @@ class Controller extends Base
         return $this->errorMapper;
     }
 
+
     /**
      * @param ErrorMapper $errorMapper
      * @return static
@@ -718,6 +725,7 @@ class Controller extends Base
         return $this;
     }
 
+
     /**
      * @return AssessmentMapperProxy
      */
@@ -725,6 +733,7 @@ class Controller extends Base
     {
         return $this->assessmentMapperProxy;
     }
+
 
     /**
      * @param AssessmentMapperProxy $assessmentMapperProxy
@@ -736,6 +745,7 @@ class Controller extends Base
         return $this;
     }
 
+
     /**
      * @return TermMapper
      */
@@ -743,6 +753,7 @@ class Controller extends Base
     {
         return $this->termMapper;
     }
+
 
     /**
      * @param TermMapper $termMapper
@@ -754,6 +765,7 @@ class Controller extends Base
         return $this;
     }
 
+
     /**
      * @return FolderMapper
      */
@@ -761,6 +773,7 @@ class Controller extends Base
     {
         return $this->folderMapper;
     }
+
 
     /**
      * @param FolderMapper $folderMapper
@@ -772,6 +785,7 @@ class Controller extends Base
         return $this;
     }
 
+
     /**
      * @return GradeGroup
      */
@@ -779,6 +793,7 @@ class Controller extends Base
     {
         return $this->defaultGradeGroup;
     }
+
 
     /**
      * @param GradeGroup $defaultGradeGroup
@@ -789,6 +804,7 @@ class Controller extends Base
         $this->defaultGradeGroup = $defaultGradeGroup;
         return $this;
     }
+
 
     /**
      * @return ShowcaseMapper
@@ -829,6 +845,7 @@ class Controller extends Base
         return $this;
     }
 
+
     /**
      * @return Timetable_ColourMapper
      */
@@ -836,6 +853,7 @@ class Controller extends Base
     {
         return $this->timetableColourMapper;
     }
+
 
     /**
      * @param Timetable_ColourMapper $timetableColourMapper
@@ -846,6 +864,7 @@ class Controller extends Base
         $this->timetableColourMapper = $timetableColourMapper;
         return $this;
     }
+
 
     /**
      * @return Access

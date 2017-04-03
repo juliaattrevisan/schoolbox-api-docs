@@ -38,34 +38,39 @@ class Module extends AlaressModule
     {
         $isSuper = new IsSuperuser();
 
-        $loadFilter = function (array $params){
-            try {
-                return ['filter' => $this->getFilterMapper()->findById($params['filter'])];
-            } catch (MapperException $e) {
-                throw new NotFound($e->getMessage());
-            }
-        };
-
         $loadDefinition = function (array $params){
             try {
                 $filterInstance = $this->getFilterMapper()->findById($params['filter']);
                 $filterFactoryFactory = new FactoryFactory($this->getMapperFactory());
-                // TODO this is inefficient. We hit the DB to fetch the instace by ID, then re-fetch by class in the factory!
-                $filterFactory = $filterFactoryFactory->buildFilterFactoryFromClass($filterInstance->getClass());
+                $filterFactory = $filterFactoryFactory->buildFilterFactoryForFilter($filterInstance->getClass());
                 return [
-                    'definition' => $filterFactory->buildDefinition(),
+                    'definition' => $filterFactory->buildDefinition($filterInstance),
                 ];
             } catch (MapperException $e) {
                 throw new NotFound($e->getMessage());
             }
         };
 
+        $optionDependencies = function (array $params) use ($loadDefinition){
+            return array_merge([
+                'optionMapper' => $this->getMapperFactory()->getLazy(Option\Mapper::class)
+            ], $loadDefinition($params));
+        };
+
+        $defaultDependencies = function (array $params) use ($optionDependencies){
+            return array_merge([
+                'defaultMapper' => $this->getMapperFactory()->getLazy(Option\Mapper::class)
+            ], $optionDependencies($params));
+        };
+
+
+
         $this->register('GET', '', 'getIndex', $isSuper);
         $this->register('GET', '/{filter:\d+}/options', 'getAdminOptions', $isSuper, $loadDefinition);
         $this->register('GET', '/{filter:\d+}/defaults', 'getAdminDefaults', $isSuper, $loadDefinition);
 
-        $this->register('POST', '/{filter:\d+}/options/save', 'postSaveOptions', $isSuper, $loadDefinition);
-        $this->register('POST', '/{filter:\d+}/defaults/save', 'postSaveDefaults', $isSuper, $loadDefinition);
+        $this->register('POST', '/{filter:\d+}/options/save', 'postSaveOptions', $isSuper, $optionDependencies);
+        $this->register('POST', '/{filter:\d+}/defaults/save', 'postSaveDefaults', $isSuper, $defaultDependencies);
 
 //        $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
 //        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', null, $preloadCourseSpec);

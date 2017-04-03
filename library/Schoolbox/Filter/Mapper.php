@@ -11,7 +11,10 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 
-/** @method Model createModel($idValue = null) */
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**

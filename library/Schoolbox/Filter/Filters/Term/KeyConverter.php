@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Term;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Filter;
 
 
 /**
@@ -24,10 +25,13 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
+     * @param Filter\Model $filter
      * @param GenericCollection|Term\Model[] $terms
      */
-    public function __construct(GenericCollection $terms)
+    public function __construct(Filter\Model $filter, GenericCollection $terms)
     {
+        parent::__construct($filter);
+
         // Ensure invoker cannot mutate our collection's sorting or indexing after construction
         $this->terms = $terms->shallowClone()->indexBy('id');
     }

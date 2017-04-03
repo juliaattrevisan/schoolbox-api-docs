@@ -49,7 +49,7 @@ Usage:
 
 <div id="{{ filterPanelId }}" style="background-color: rgba(200,100,150,0.5)">
 {% for filter in panel.filters %}
-    {% include filter.panelTemplate with filter.toPanelContext(panel.page, panel.user) %}
+    {% include filter.template with filter.toContext() %}
 {% endfor %}
 </div>
 

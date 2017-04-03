@@ -38,12 +38,10 @@ class Panel
 
 
     /**
-     * @param User                                  $user    The viewing user.
-     * @param string                                $page    The page the panel is being rendered into
      * @param string                                $route   The route to send the filter selections to
      * @param GenericCollection|IFilterDefinition[] $filters The set of filters to display in this panel instance
      */
-    public function __construct(User $user, $page, $route, GenericCollection $filters)
+    public function __construct($route, GenericCollection $filters)
     {
         $this->user = $user;
         $this->page = $page;

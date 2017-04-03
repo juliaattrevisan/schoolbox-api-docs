@@ -10,10 +10,8 @@ namespace Schoolbox\Filter;
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Filter\Model as Filter;
-use Schoolbox\Filter\Option\Model as FilterOption;
-use Schoolbox\Filter\Option\Mapper as FilterOptionMapper;
-use Schoolbox\Filter\Option\Defaults\Mapper as FilterDefaultMapper;
+use Schoolbox\Filter\Option;
+use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Role;
 
 
@@ -29,6 +27,7 @@ class Controller extends BaseController
      */
     public function getIndex()
     {
+        // TODO
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/admin.twig', [
 
         ]));
@@ -79,30 +78,30 @@ class Controller extends BaseController
      * Saves which options should be available for each filter on each page
      *
      * @param IFilterDefinition $definition
+     * @param Option\Mapper $optionMapper
      * @var string[][]          $_POST['filter_option'] indexed by filterOption.key then page
      * @throws MapperException
      */
-    public function postSaveOptions(IFilterDefinition $definition)
+    public function postSaveOptions(IFilterDefinition $definition, Option\Mapper $optionMapper)
     {
         /** @var string[][] $postFilterOptions */
         $postFilterOptions = $this->getRequest()->post->get('filter_option');
-        $filterOptionMapper = FilterOptionMapper::getInstance();
 
 
         // Delete any existing options that belong to invalid pages or abstract keys
-        $optionsToDelete = $filterOptionMapper->createCollection();
-        $existingOptions = $filterOptionMapper->findByColumn('filter_id', $definition->getFilter()->getId());
+        $optionsToDelete = $optionMapper->createCollection();
+        $existingOptions = $optionMapper->findByColumn('filter_id', $definition->getFilter()->getId());
 
         foreach($existingOptions as $option){
             if(!in_array($option->getPage(), $definition->getPages(), true) || !in_array($option->getKey(), $definition->getAbstractKeys(), true)){
                 $optionsToDelete->add($option);
             }
         }
-        $filterOptionMapper->delete($optionsToDelete);
+        $optionMapper->delete($optionsToDelete);
 
 
         // Save selections. We *do* save unchecked items. These are explicitly set to not-selected
-        $optionsToSave   = $filterOptionMapper->createCollection();
+        $optionsToSave   = $optionMapper->createCollection();
         $existingOptionsByKeyThenPage = $existingOptions->groupBy('key');
         foreach($existingOptionsByKeyThenPage as $key => $pageFilterOptions){
             $pageFilterOptions->indexBy('page');
@@ -116,7 +115,7 @@ class Controller extends BaseController
                 $filterOption = $existingOptionsByKeyThenPage[$key][$page];
 
                 if(!$filterOption){
-                    $filterOption = $filterOptionMapper->createModel();
+                    $filterOption = $optionMapper->createModel();
                     $filterOption
                         ->setFilter($definition->getFilter())
                         ->setPage($page)
@@ -127,7 +126,7 @@ class Controller extends BaseController
                 $optionsToSave->add($filterOption);
             }
         }
-        $filterOptionMapper->save($optionsToSave);
+        $optionMapper->save($optionsToSave);
 
         $this->getResponse()->content->set($this->buildJsonOutput(['status' => 'OK']));
     }
@@ -137,16 +136,15 @@ class Controller extends BaseController
      * Saves which filter options should be selected by default per role and page
      *
      * @param IFilterDefinition $definition
+     * @param Option\Mapper $optionMapper
+     * @param Defaults\Mapper $defaultMapper
      * @var string[][][]        $_POST['filter_defaults'] indexed by option.page, option.key, the default.roleType
      * @throws MapperException
      */
-    public function postSaveDefaults(IFilterDefinition $definition)
+    public function postSaveDefaults(IFilterDefinition $definition, Option\Mapper $optionMapper, Defaults\Mapper $defaultMapper)
     {
         /** @var string[][][] $postFilterDefaults */
         $postFilterDefaults = $this->getRequest()->post->get('filter_defaults');
-        $filterOptionMapper = FilterOptionMapper::getInstance();
-        $filterDefaultMapper = FilterDefaultMapper::getInstance();
-
 
 
         // Get all existing defaults
@@ -158,13 +156,13 @@ class Controller extends BaseController
 
 
         // Upgrade implicitly selectable options to explicitly selectable
-        $optionsToSave = $filterOptionMapper->createCollection();
-        $defaultsToSave = $filterDefaultMapper->createCollection();
+        $optionsToSave = $optionMapper->createCollection();
+        $defaultsToSave = $defaultMapper->createCollection();
 
         $optionsPerPageAndKey = $definition->getOptionDefaults();
 
         foreach($optionsPerPageAndKey as $page => $pageOptions) {
-            /** @var FilterOption[] $pageOptions */
+            /** @var Option\Model[] $pageOptions */
             foreach ($pageOptions as $key => $options) {
                 $optionsToSave->add($options);
                 foreach ($options->getDefaults() as $roleType => $default) {
@@ -197,26 +195,9 @@ class Controller extends BaseController
 //            }
 //        }
 
-        $filterOptionMapper->save($optionsToSave);
-        $filterDefaultMapper->save($defaultsToSave);
+        $optionMapper->save($optionsToSave);
+        $defaultMapper->save($defaultsToSave);
 
         $this->getResponse()->content->set($this->buildJsonOutput(['status' => 'OK']));
     }
-
-    /**
-     * Returns the filter definition, with its possible filterOptions all built
-     *
-     * @param Model $filter
-     * @return IFilterDefinition
-     */
-    protected function getDefinition(Filter $filter)
-    {
-        $definitionClass = $filter->getClass();
-        /** @var IFilterDefinition $definition */
-        $definition = new $definitionClass($filter);
-//        $definition->buildFilterOptions();
-        return $definition;
-    }
-
-
 }

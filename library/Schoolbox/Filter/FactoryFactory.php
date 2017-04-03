@@ -42,30 +42,30 @@ class FactoryFactory
     }
 
 
-//    /**
-//     * @param string $filterDefinitionClass
-//     * @return IFilterFactory
-//     * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
-//     */
-//    public function buildFilterFactoryFromClass($filterDefinitionClass)
-//    {
-//        if (!class_exists($filterDefinitionClass)) {
-//            throw new \InvalidArgumentException('No filter definition found for class: ' . $filterDefinitionClass);
-//        }
-//
-//        // Registry of as filters definitions. Ensures static analysis identifies usages.
-//        switch ($filterDefinitionClass) {
+    /**
+     * @param string $filterDefinitionClass
+     * @return IFilterFactory
+     * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
+     */
+    public function buildFilterFactoryForFilter($filterDefinitionClass)
+    {
+        if (!class_exists($filterDefinitionClass)) {
+            throw new \InvalidArgumentException('No filter definition found for class: ' . $filterDefinitionClass);
+        }
+
+        // Registry of as filters definitions. Ensures static analysis identifies usages.
+        switch ($filterDefinitionClass) {
 //            case AssessmentTypeFilter\Definition::class:
 //                return $this->buildAssessmentTypeFilterFactory();
 //            case ClassGroupFilter\Definition::class:
 //                return $this->buildClassGroupFilterFactory();
-//            case TermFilter\Definition::class:
-//                return $this->buildTermFilterFactory();
+            case TermFilter\Definition::class:
+                return $this->buildTermFilterFactory();
 //            case WorkTypeFilter\Definition::class:
 //                return $this->buildWorkTypeFilterFactory();
-//        }
-//        throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
-//    }
+        }
+        throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
+    }
 
 //
 //    /**

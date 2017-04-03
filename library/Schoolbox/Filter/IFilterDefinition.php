@@ -9,7 +9,6 @@ namespace Schoolbox\Filter;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter;
 
@@ -51,26 +50,6 @@ interface IFilterDefinition
      * @return string
      */
     public function getDefaultsTemplate();
-
-    /**
-     * Returns the twig template to render into the filter panel
-     *
-     * Intended to be called in twig includes
-     *
-     * @return string
-     */
-    public function getPanelTemplate();
-
-    /**
-     * Returns a set of data to inject into this filter's template
-     *
-     * Intended to be called in twig includes
-     *
-     * @param string $page
-     * @param User $user
-     * @return mixed[]
-     */
-    public function toPanelContext($page, User $user);
 
 
     /**

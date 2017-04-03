@@ -15,6 +15,11 @@ interface IKeyConverter
 {
 
     /**
+     * @return Model
+     */
+    public function getFilter();
+
+    /**
      * Given a key (such as returned from a user's filter panel selections), return the corresponding item
      *
      * @param string $key

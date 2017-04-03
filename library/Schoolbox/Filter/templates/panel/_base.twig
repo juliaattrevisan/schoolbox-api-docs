@@ -6,14 +6,14 @@
 {% block title %}{% endblock %}
 <fieldset class="checklist">
     {% for selection in selections %}
-        <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.page }}][{{ selection.key }}]" value="0">
+        <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">
         <input
-            id="filter_selection_{{ selection.filter.id }}_{{ selection.page }}_{{ selection.key }}"
+            id="filter_selection_{{ selection.filter.id }}_{{ selection.key }}"
             type="checkbox"
-            name="filter_selection[{{ selection.filter.id }}][{{ selection.page }}][{{ selection.key }}]"
+            name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
             value="1"
             {% if selection.selected %}checked{% endif %}
         >
-        <label for="filter_selection_{{ selection.filter.id }}_{{ selection.page }}_{{ selection.key }}">{{ filter.label(selection.key) }}</label>
+        <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}">{{ filter.label(selection.key) }}</label>
     {% endfor %}
 </fieldset>

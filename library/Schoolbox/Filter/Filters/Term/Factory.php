@@ -89,12 +89,14 @@ class Factory extends AbstractFilterFactory
     /**
      * Returns a key converter, able to convert between keys (term.id) and the entities they represent (terms)
      *
+     * @param
      * @return KeyConverter
      */
     public function buildKeyConverter()
     {
+        $filter = $this->getFilterMapper()->findForClass(Definition::class);
         $terms = $this->getSortedTerms();
-        return new KeyConverter($terms);
+        return new KeyConverter($filter, $terms);
     }
 
 
