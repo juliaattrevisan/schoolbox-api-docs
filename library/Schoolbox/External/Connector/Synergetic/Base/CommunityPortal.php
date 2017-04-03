@@ -11,7 +11,6 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use Alaress_Date_Format;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\ICommunityPortal;
 use UnexpectedValueException;
@@ -92,6 +91,7 @@ class CommunityPortal implements ICommunityPortal
 
             // This adds the Schools default page permissions to the users
 
+            /** @noinspection SqlInsertValues */
             $query =
             "
                 INSERT INTO dbo.CommunityLoginsPage
