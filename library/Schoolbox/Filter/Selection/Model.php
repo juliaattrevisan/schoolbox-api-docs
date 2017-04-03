@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Option\Selection;
+namespace Schoolbox\Filter\Selection;
 
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
@@ -24,7 +24,10 @@ class Model
     /** @var string */
     private $page;
 
-    /** @var string */
+    /**
+     * A concrete key, eg '1', '3' that matches 1 entity
+     * @var string
+     */
     private $key;
 
     /** @var bool */

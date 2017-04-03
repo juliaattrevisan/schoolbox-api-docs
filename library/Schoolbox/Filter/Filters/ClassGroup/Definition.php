@@ -102,16 +102,7 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Get all available filter options, grouped by option.key, then indexed by option.page
-     *
-     * Options may be pulled from:
-     * * DB,
-     * * Hard-coded, or
-     * * Both
-     *
-     * Must ensure inner collections are sorted the same as getPages()
-     *
-     * @return Collection|GenericCollection[]|FilterOption[][]
+     * @inheritdoc
      */
     public function getOptions()
     {
@@ -121,10 +112,7 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Returns sets of options, grouped by option.page, then indexed by option.key.
-     * Each Option contains a set of Defaults, indexed by roleType
-     *
-     * @return Collection|GenericCollection[]|FilterOption[][]
+     * @inheritdoc
      */
     public function getOptionDefaults()
     {
@@ -161,13 +149,11 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Return the set of possible keys for this filter's options
-     *
-     * @return string[]
+     * @inheritdoc
      */
-    public function getKeys()
+    public function getAbstractKeys()
     {
-        // TODO: Implement getKeys() method.
+        // TODO: Implement getAbstractKeys() method.
         return [];
     }
 

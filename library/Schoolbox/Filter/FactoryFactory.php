@@ -56,8 +56,8 @@ class FactoryFactory
         $filterOptionMapper = $this->mapperFactory->get(Option\Mapper::class);
         /** @var Defaults\Mapper $filterDefaultMapper */
         $filterDefaultMapper = $this->mapperFactory->get(Defaults\Mapper::class);
-        /** @var Selection\Mapper $filterSelectionMapper */
-        $filterSelectionMapper = $this->mapperFactory->get(Selection\Mapper::class);
+        /** @var \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper */
+        $filterSelectionMapper = $this->mapperFactory->get(\Schoolbox\Filter\Selection\Mapper::class);
 
         $filterFactory->setFilter($filterModel);
         $filterFactory->setFilterOptionMapper($filterOptionMapper);

@@ -19,7 +19,7 @@ use Schoolbox\Filter\Option\Defaults\Mapper as FilterDefaultMapper;
  *
  * They may represent a specific term, such as '2017-2' or a abstract term, eg 'current'.
  *
- * It is up to the FilterDefinition to interpret the meaning of the option's key. (ie it may be a model ID, or some abstract concept)
+ * It is up to the FilterDefinition to interpret the meaning of the option's abstractKey. (ie it may be a model ID, or some abstract concept)
  */
 class Model
 {
@@ -121,11 +121,13 @@ class Model
     private $page;
 
     /**
-     * The key may be an ID of a model, eg a Term, or some other dynamic identifier, eg 'current' term.
+     * An abstract key. Eg 'all', 'future', '1', '3', etc which may represent 1 or more concrete keys.
+     *
      * It is up to the concrete filter definitions to apply semantics to this value.
+     * 
      * @var string
      */
-    private $abstractKey;
+    private $key;
 
     /**
      * Should this option be selectable in the filter?
@@ -188,19 +190,19 @@ class Model
     /**
      * @return string
      */
-    public function getAbstractKey()
+    public function getKey()
     {
-        return $this->abstractKey;
+        return $this->key;
     }
 
 
     /**
-     * @param string $abstractKey
+     * @param string $key
      * @return static
      */
-    public function setAbstractKey($abstractKey)
+    public function setKey($key)
     {
-        $this->abstractKey = $abstractKey;
+        $this->key = $key;
         return $this;
     }
 

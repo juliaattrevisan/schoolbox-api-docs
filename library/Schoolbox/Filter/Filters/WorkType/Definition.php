@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\WorkType;
 
-use Schoolbox\Collection;
+
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter\Option\Model as FilterOption;
 use Schoolbox\GenericCollection;
@@ -32,7 +32,7 @@ class Definition extends AbstractFilterDefinition
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getTemplateFile()
     {
@@ -41,82 +41,55 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Returns a set of data to inject into this filter's template
-     *
-     * Intended to be called in twig includes
-     *
-     * @param string $page
-     * @param User   $user
-     * @return mixed[]
+     * @inheritdoc
      */
     public function toPanelContext($page, User $user)
     {
-        // TODO: Implement toPanelContext() method.
+        // TODO: Implement method.
     }
 
 
     /**
-     * Get all available filter options, grouped by option.key, then indexed by option.page
-     *
-     * Options may be pulled from:
-     * * DB,
-     * * Hard-coded, or
-     * * Both
-     *
-     * Must ensure inner collections are sorted the same as getPages()
-     *
-     * @return Collection|GenericCollection[]|FilterOption[][]
+     * @inheritdoc
      */
     public function getOptions()
     {
-        // TODO: Implement getOptions() method.
+        // TODO: Implement  method.
     }
 
 
     /**
-     * Returns sets of options, grouped by option.page, then indexed by option.key.
-     * Each Option contains a set of Defaults, indexed by roleType
-     *
-     * @return Collection|GenericCollection[]|FilterOption[][]
+     * @inheritdoc
      */
     public function getOptionDefaults()
     {
-        // TODO: Implement getOptionDefaults() method.
+        // TODO: Implement method.
     }
 
 
     /**
-     * Return the set of pages where this filter is available
-     *
-     * @see FilterOption::PAGE_* constants
-     * @return string[]
+     * @inheritdoc
      */
     public function getPages()
     {
-        // TODO: Implement getPages() method.
+        // TODO: Implement method.
     }
 
 
     /**
-     * Is the roleType valid for this option? Used for sanitising input
-     *
-     * @param string       $roleType
-     * @param FilterOption $option
-     * @return bool
+     * @inheritdoc
      */
     public function isValidRoleType($roleType, FilterOption $option)
     {
-        // TODO: Implement isValidRoleType() method.
+        // TODO: Implement  method.
     }
 
 
     /**
-     * Return the set of possible keys for this filter's options
-     *
-     * @return string[]
+     * @inheritdoc
      */
-    public function getKeys()
+    public function getAbstractKeys()
     {
-        // TODO: Implement getKeys() method.
+        // TODO: Implement  method.
     }
 }

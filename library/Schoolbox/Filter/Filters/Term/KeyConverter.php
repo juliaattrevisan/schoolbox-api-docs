@@ -12,7 +12,7 @@ use Schoolbox\Assessment\Term;
 
 
 /**
- * Converts between termFilter keys and Term models
+ * Converts between termFilter concrete keys and Term models
  */
 class KeyConverter extends AbstractKeyConverter
 {

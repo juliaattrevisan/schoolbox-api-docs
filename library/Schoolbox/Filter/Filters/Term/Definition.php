@@ -11,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter\Option\Defaults as FilterDefault;
 use Schoolbox\Filter\Option as FilterOption;
-use Schoolbox\Filter\Option\Selection as FilterSelection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -59,12 +58,12 @@ class Definition extends AbstractFilterDefinition
     private $previousTerm;
 
     /**
-     * All possible keys possible for this filter, sorted as they should appear in lists
+     * All abstract keys possible for this filter, sorted as they should appear in lists
      *
      * This contains 'all', 'past', term.ids etc.
      * @var string[]
      */
-    private $keys;
+    private $abstractKeys;
 
 
     /**
@@ -73,7 +72,7 @@ class Definition extends AbstractFilterDefinition
      */
     public function setTerms(GenericCollection $terms)
     {
-        $this->terms = $terms->sortBy('start', 'DESC')->indexBy('id');
+        $this->terms = $terms->shallowClone()->sortBy('start', 'DESC')->indexBy('id');
         return $this;
     }
 
@@ -99,12 +98,12 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * @param string[] $keys
+     * @param string[] $abstractKeys
      * @return static
      */
-    public function setKeys(array $keys)
+    public function setAbstractKeys(array $abstractKeys)
     {
-        $this->keys = $keys;
+        $this->abstractKeys = $abstractKeys;
         return $this;
     }
 
@@ -169,12 +168,12 @@ class Definition extends AbstractFilterDefinition
             $pageOptions->indexBy('key');
 
             // Ensure it contains 'all', 'current', etc
-            foreach($this->getCustomKeys() as $customKey){
-                if(!$pageOptions->offsetExists($customKey)){
+            foreach($this->getCustomKeys() as $customAbstractKey){
+                if(!$pageOptions->offsetExists($customAbstractKey)){
                     $option = $this->getFilterOptionMapper()->createModel();
 
                     $isAvailable = false;
-                    switch($customKey){
+                    switch($customAbstractKey){
                         case self::KEY_ALL:
                             $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
                             break;
@@ -193,10 +192,10 @@ class Definition extends AbstractFilterDefinition
                     }
                     $option
                         ->setFilter($this->getFilter())
-                        ->setAbstractKey($customKey)
+                        ->setKey($customAbstractKey)
                         ->setPage($page)
                         ->setAvailable($isAvailable);
-                    $pageOptions->setOffset($option->getAbstractKey(), $option);
+                    $pageOptions->setOffset($option->getKey(), $option);
                 }
             }
 
@@ -207,19 +206,19 @@ class Definition extends AbstractFilterDefinition
                     $option = $this->getFilterOptionMapper()->createModel();
                     $option
                         ->setFilter($this->getFilter())
-                        ->setAbstractKey($term->getId())
+                        ->setKey($term->getId())
                         ->setPage($page)
                         ->setAvailable(false);
-                    $pageOptions->setOffset($option->getAbstractKey(), $option);
+                    $pageOptions->setOffset($option->getKey(), $option);
                 }
             }
 
             // Discard any options that refer to Terms that no longer exist (eg if deleted)
             foreach($pageOptions as $filterOption){
                 // Does the filter refer to a specific Term instance?
-                $isForSpecificTerm = !in_array($filterOption->getAbstractKey(), $this->getCustomKeys(), true);
-                if($isForSpecificTerm && !$this->terms->offsetExists($filterOption->getAbstractKey())){
-                    $pageOptions->offsetUnset($filterOption->getAbstractKey());
+                $isForSpecificTerm = !in_array($filterOption->getKey(), $this->getCustomKeys(), true);
+                if($isForSpecificTerm && !$this->terms->offsetExists($filterOption->getKey())){
+                    $pageOptions->offsetUnset($filterOption->getKey());
                 }
             }
 
@@ -227,7 +226,7 @@ class Definition extends AbstractFilterDefinition
             $this->sortFilterOptions($pageOptions)->indexBy('key');
         }
 
-        // Convert to ordered by key
+        // Convert to ordered by abstract key
         $optionsPerKey = new Collection();
 
         // Ensure page order is same as getPages()
@@ -237,11 +236,11 @@ class Definition extends AbstractFilterDefinition
             }
 
             $pageOptions = $optionsPerPage[$page];
-            foreach($pageOptions as $key => $filterOption){
-                if(!$optionsPerKey->offsetExists($key)){
-                    $optionsPerKey->setOffset($key, $this->getFilterOptionMapper()->createCollection());
+            foreach($pageOptions as $abstractKey => $filterOption){
+                if(!$optionsPerKey->offsetExists($abstractKey)){
+                    $optionsPerKey->setOffset($abstractKey, $this->getFilterOptionMapper()->createCollection());
                 }
-                $optionsPerKey[$key][$page] = $filterOption;
+                $optionsPerKey[$abstractKey][$page] = $filterOption;
             }
         }
         return $optionsPerKey;
@@ -255,13 +254,13 @@ class Definition extends AbstractFilterDefinition
     protected function sortFilterOptions(GenericCollection $options)
     {
         return $options->sortByCallback(function(FilterOption\Model $left, FilterOption\Model $right){
-            $leftKey = $left->getAbstractKey();
-            $rightKey = $right->getAbstractKey();
+            $leftKey = $left->getKey();
+            $rightKey = $right->getKey();
             if(self::KEY_ALL === $leftKey){
                 return -1;
             }
             if(self::KEY_FUTURE === $leftKey){
-                return self::KEY_ALL === $right->getAbstractKey() ? +1 : -1;
+                return self::KEY_ALL === $right->getKey() ? +1 : -1;
             }
             if(self::KEY_CURRENT === $leftKey){
                 return in_array($rightKey, [self::KEY_ALL, self::KEY_FUTURE], true)  ? +1 : -1;
@@ -275,7 +274,7 @@ class Definition extends AbstractFilterDefinition
             if(self::KEY_FUTURE === $rightKey || self::KEY_PAST === $rightKey){
                 return +1;
             }
-            return $this->terms[$right->getAbstractKey()]->compare($this->terms[$leftKey]);
+            return $this->terms[$right->getKey()]->compare($this->terms[$leftKey]);
         });
     }
 
@@ -365,7 +364,7 @@ class Definition extends AbstractFilterDefinition
     /**
      * @param User $user
      * @param null|string $page
-     * @return FilterSelection\Model[]|GenericCollection
+     * @return \Schoolbox\Filter\Selection\Model[]|GenericCollection
      */
     protected function getAvailableSelections(User $user, $page = null)
     {
@@ -444,7 +443,7 @@ class Definition extends AbstractFilterDefinition
 
 
         // Overlay user-specific selections
-        /** @var GenericCollection|FilterSelection\Model[] $savedSelections */
+        /** @var GenericCollection|\Schoolbox\Filter\Selection\Model[] $savedSelections */
         $savedSelections = $this->getFilterSelectionMapper()->findByColumnList([
             'user_id' => $user->getId(),
             'page' => $page,
@@ -469,7 +468,7 @@ class Definition extends AbstractFilterDefinition
      *
      * @param string $page
      * @param User $user
-     * @return FilterSelection\Model[]
+     * @return \Schoolbox\Filter\Selection\Model[]
      * @throws MapperException
      */
     public function toPanelContext($page, User $user)
@@ -500,9 +499,9 @@ class Definition extends AbstractFilterDefinition
      *
      * @return string[]
      */
-    public function getKeys()
+    public function getAbstractKeys()
     {
-        return $this->keys;
+        return $this->abstractKeys;
     }
 
 

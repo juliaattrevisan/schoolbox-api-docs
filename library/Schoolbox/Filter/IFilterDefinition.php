@@ -126,12 +126,12 @@ interface IFilterDefinition
 
 
     /**
-     * Return the set of possible keys for this filter's options
+     * Return the set of possible abstract keys for this filter's options
      *
      * @return string[]
      * @todo - consider splitting into 1-getOptionKeys() + 2-getSettingKeys()
      */
-    public function getKeys();
+    public function getAbstractKeys();
 
 
 

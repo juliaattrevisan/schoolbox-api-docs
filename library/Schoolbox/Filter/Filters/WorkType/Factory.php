@@ -10,7 +10,6 @@ namespace Schoolbox\Filter\Filters\WorkType;
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\Filter\IRunTimeOptions;
-use Schoolbox\Filter\Model as Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 

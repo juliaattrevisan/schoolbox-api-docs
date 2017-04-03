@@ -123,11 +123,7 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Is the roleType valid for this option? Used for sanitising input
-     *
-     * @param string       $roleType
-     * @param FilterOption $option
-     * @return bool
+     * @inheritdoc
      */
     public function isValidRoleType($roleType, FilterOption $option)
     {
@@ -137,11 +133,9 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Return the set of possible keys for this filter's options
-     *
-     * @return string[]
+     * @inheritdoc
      */
-    public function getKeys()
+    public function getAbstractKeys()
     {
         // TODO: Implement getKeys() method.
         return [];

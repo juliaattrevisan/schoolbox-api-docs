@@ -36,7 +36,7 @@ interface IFilterFactory
     public function buildForFilterPanel(IRunTimeOptions $runTimeOptions = null);
 
     /**
-     * Returns a key converter, able to convert between keys and the entities they represent
+     * Returns a key converter, able to convert between concrete keys and the entities they represent
      *
      * @return IKeyConverter
      */

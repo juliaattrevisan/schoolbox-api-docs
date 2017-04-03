@@ -89,12 +89,12 @@ class Controller extends BaseController
         $filterOptionMapper = FilterOptionMapper::getInstance();
 
 
-        // Delete any existing options that belong to invalid pages or keys
+        // Delete any existing options that belong to invalid pages or abstract keys
         $optionsToDelete = $filterOptionMapper->createCollection();
         $existingOptions = $filterOptionMapper->findByColumn('filter_id', $definition->getFilter()->getId());
 
         foreach($existingOptions as $option){
-            if(!in_array($option->getPage(), $definition->getPages(), true) || !in_array($option->getAbstractKey(), $definition->getKeys(), true)){
+            if(!in_array($option->getPage(), $definition->getPages(), true) || !in_array($option->getKey(), $definition->getAbstractKeys(), true)){
                 $optionsToDelete->add($option);
             }
         }
@@ -109,7 +109,7 @@ class Controller extends BaseController
         }
 
         // Examine all possible options
-        foreach($definition->getKeys() as $key){
+        foreach($definition->getAbstractKeys() as $key){
             foreach($definition->getPages() as $page){
 
                 // Does this option exist ?
@@ -120,7 +120,7 @@ class Controller extends BaseController
                     $filterOption
                         ->setFilter($definition->getFilter())
                         ->setPage($page)
-                        ->setAbstractKey($key);
+                        ->setKey($key);
                 }
                 // Did user check this option?
                 $filterOption->setAvailable(isset($postFilterOptions[$key][$page]));

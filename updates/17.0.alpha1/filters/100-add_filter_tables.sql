@@ -20,7 +20,7 @@ CREATE TABLE filter_option (
       REFERENCES filter(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
   `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
-  `abstract_key` VARCHAR(255) NOT NULL,
+  `key` VARCHAR(255) NOT NULL COMMENT 'An abstract key - eg \'all\', \'future\', etc',
   `available` BOOL NOT NULL
 ) ENGINE=INNODB;
 
@@ -57,7 +57,7 @@ CREATE TABLE filter_selection (
       REFERENCES user(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
   `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
-  `key` VARCHAR(255) NOT NULL,
+  `key` VARCHAR(255) NOT NULL COMMENT 'A concrete key - eg a Model ID',
   `selected` BOOL
 ) ENGINE=INNODB;
 

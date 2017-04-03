@@ -48,7 +48,7 @@ class Factory extends AbstractFilterFactory
 
         $definition
             ->setTerms($sortedTerms)
-            ->setKeys($this->getKeys($sortedTerms))
+            ->setAbstractKeys($this->getKeys($sortedTerms))
             ->setCurrentTerm($this->getCurrentTerm($sortedTerms))
             ->setPreviousTerm($this->getPreviousTerm($sortedTerms));
         return $definition;
@@ -70,7 +70,7 @@ class Factory extends AbstractFilterFactory
 
         return $definition
             ->setTerms($terms)
-            ->setKeys($this->getKeys($terms))
+            ->setAbstractKeys($this->getKeys($terms))
             ->setCurrentTerm($this->getCurrentTerm($terms))
             ->setPreviousTerm($this->getPreviousTerm($terms));
     }

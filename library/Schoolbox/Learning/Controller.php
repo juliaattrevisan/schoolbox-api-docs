@@ -246,7 +246,7 @@ class Controller extends Base
         $postFilterSelections = $this->request->post['filter_selection'];
 
         // Delete user's current selections for this page
-        $filterSelectionMapper = FilterSelection\Mapper::getInstance();
+        $filterSelectionMapper = Filter\Selection\Mapper::getInstance();
         $filterSelectionMapper->deleteByColumnList([
             'user_id' => $this->getUser()->getId(),
             'page'    => FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
@@ -267,7 +267,7 @@ class Controller extends Base
 
         // TODO add other filters here
 
-        /** @var Collection|GenericCollection[]|FilterSelection\Model[][] $selectionsPerFilter */
+        /** @var Collection|GenericCollection[]|\Schoolbox\Filter\Selection\Model[][] $selectionsPerFilter */
         $selectionsPerFilter = new Collection();
 
         foreach($postFilterSelections as $filterId => $filterSelections){

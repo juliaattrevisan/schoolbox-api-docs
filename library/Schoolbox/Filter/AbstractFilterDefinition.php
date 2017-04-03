@@ -28,7 +28,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
     /** @var Defaults\Mapper */
     private $filterDefaultMapper;
 
-    /** @var Selection\Mapper */
+    /** @var \Schoolbox\Filter\Selection\Mapper */
     private $filterSelectionMapper;
 
 
@@ -141,7 +141,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
 
     /**
-     * @return Selection\Mapper
+     * @return \Schoolbox\Filter\Selection\Mapper
      */
     protected function getFilterSelectionMapper()
     {
@@ -150,10 +150,10 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
 
     /**
-     * @param Selection\Mapper $filterSelectionMapper
+     * @param \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper
      * @return $this
      */
-    public function setFilterSelectionMapper(Selection\Mapper $filterSelectionMapper)
+    public function setFilterSelectionMapper(\Schoolbox\Filter\Selection\Mapper $filterSelectionMapper)
     {
         $this->filterSelectionMapper = $filterSelectionMapper;
         return $this;
