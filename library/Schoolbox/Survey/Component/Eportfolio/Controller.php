@@ -9,6 +9,7 @@ namespace Schoolbox\Survey\Component\Eportfolio;
 
 use Component_Eportfolio_ControllerAbstract;
 
+use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 
 class Controller extends Component_Eportfolio_ControllerAbstract
@@ -37,9 +38,27 @@ class Controller extends Component_Eportfolio_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Testing craptastic mapper
+        // Get the ID of the student whose ePortfolio we are viewing
 
-        var_dump(SurveyMapper::getInstance()->findAll());
+        // Retrieve the survey ID from the component configuration
+
+        $surveyId = $this->getConfig('survey');
+
+        $studentId = $this->getContext()->getUserId();
+
+
+        if (!empty($surveyId)) {
+            $survey = SurveyMapper::getInstance()->findById($surveyId);
+            $attempts = SurveyAttemptMapper::getInstance()->findByColumnList([
+                'user_id' => $studentId,
+                'assess_id' => $surveyId
+            ]);
+
+            var_dump($attempts);
+        } else {
+            $survey = null;
+            $responses = null;
+        }
 
         return $this->renderTwigTemplate(
             $templateHandle,
@@ -47,7 +66,8 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             [
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
-                'compact'               => $this->getConfig('compactMode','value')
+                'config'                => $this->getConfig(),
+                'survey'                => $survey
             ]
         );
     }

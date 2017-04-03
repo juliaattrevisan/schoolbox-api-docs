@@ -11,36 +11,25 @@
 
 namespace Schoolbox\Survey;
 
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Model
 {
-    /** @var int */
-    protected $id;
+    use Id;
+    use CreatedAtDate;
+    use DeletedAtDate;
 
     /** @var string */
     protected $availability;
 
+    /** @var string */
+    protected $title;
+
     /** @var Folder $folder */
     protected $folder;
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @param string $availability
@@ -58,6 +47,24 @@ class Model
     public function getAvailability()
     {
         return $this->availability;
+    }
+
+    /**
+     * @param string $title
+     * @return self
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     /**

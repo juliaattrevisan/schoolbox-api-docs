@@ -1,1 +1,14 @@
-This is a component, yippee!
+{# Make sure a survey has been selected in the components configuration #}
+
+{% if config.survey is empty %}
+
+    {# No survey seledted #}
+
+    <div class="empty-state">
+        <i class="icon-surveys"></i>
+        <p>This component has not yet been setup.</p>
+    </div>
+
+{% else %}
+
+{% endif %}
