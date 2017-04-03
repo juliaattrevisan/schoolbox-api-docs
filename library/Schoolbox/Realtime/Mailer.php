@@ -10,6 +10,7 @@ namespace Schoolbox\Realtime;
 
 use Alaress\Async\Queue\QueueInterface;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
@@ -62,11 +63,14 @@ class Mailer
      */
     public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC)
     {
-        $address = $this->getEmailAddress($recipient);
+        $address = trim($recipient->getEmail());
 
         if (empty($address)) {
             throw new Swift_RfcComplianceException("Empty address for user {$recipient->getId()}");
         }
+
+        // format rfc2822
+        $address = sprintf('"%s" <%s>', $recipient->formatName(), $address);
 
         $decorator = new Decorator();
 
@@ -92,9 +96,14 @@ class Mailer
 
         // we can only include the reply-to header if there is but one email
         if ($this->useReplyTo && $decorator->count() === 1) {
-            $email->setReplyTo($this->getEmailAddresses(
-                $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getEffectorIds())->getAll()
-            ));
+            try {
+                $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getEffectorIds());
+                // do NOT format rcf2822, because swift mailer
+                $email->setReplyTo($this->getReplyTo($effectors));
+
+            } catch (Swift_RfcComplianceException $e) {
+                $this->log->warning('Error applying reply-to: ' . $e->getMessage());
+            }
         }
 
         try {
@@ -129,34 +138,20 @@ class Mailer
 
 
     /**
-     * Extract email addresses for all given users
-     *
-     * @param User[] $users
+     * @param Collection|User[] $effectors
      * @return string[]
      */
-    private function getEmailAddresses(array $users)
+    private function getReplyTo(Collection $effectors)
     {
-        return array_filter(
-            array_map([ $this, 'getEmailAddress' ], $users)
-        );
+        $replyTo = [];
 
-    }
-
-
-    /**
-     * @param User $user
-     * @return string
-     */
-    private function getEmailAddress(User $user)
-    {
-        $address = trim($user->getEmail());
-
-        if ($address) {
-            // explicitly an rfc2822 email spec, on the off-chance it's there, strip DQUOT from formatted name
-            return sprintf('"%s" <%s>', str_replace('"', '', $user->formatName()), $address);
+        foreach ($effectors as $effector) {
+            $replyAddr = trim($effector->getEmail());
+            if ($replyAddr) {
+                $replyTo[$replyAddr] = $effector->formatName();
+            }
         }
 
-        return '';
+        return $replyTo;
     }
-
 }
