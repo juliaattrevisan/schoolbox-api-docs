@@ -16,7 +16,7 @@ if ($_SESSION['user']->isSuperuser()) {
     $allRows = array_keys($_POST);
 
     // Messaging behavior may be affected by changing configuration.
-    $rerouterSettings = ['messaging_enabled'];
+    $rerouterSettings = [ 'messaging_enabled', 'mail_replyto_enabled' ];
     $reloadRerouter   = false;
 
     /* Accumulate a set of data from the relevant data columns
