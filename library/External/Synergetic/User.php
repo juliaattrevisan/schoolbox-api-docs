@@ -812,8 +812,8 @@ class External_Synergetic_User implements External_UserInterface
                                         c1.ClassCode = c2.ClassCode AND
                                         c1.StaffID = :externalId
                 JOIN              FileSemesters Semester ON
-                                      Semester.FileSemester = SubjectClasses.FileSemester AND
-                                      Semester.FileYear = SubjectClasses.FileYear AND
+                                      Semester.FileSemester = c2.FileSemester AND
+                                      Semester.FileYear = c2.FileYear AND
                                       Semester.SystemCurrentFlag = 1
                 LEFT JOIN         luFileType ON c2.FileType = luFileType.Code
                 ORDER BY          luFileType.Description ASC, 
