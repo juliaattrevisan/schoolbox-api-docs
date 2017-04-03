@@ -52,18 +52,17 @@ class Component_Config_Textbox extends Component_Config_Abstract
              * It's possible to create a text box without any heading so for the select box-
              * check heading and if that's a no-go then use the first part of the content
              */
-            $textBoxHeading = Scrub::text($currentTextbox->getHeading());
-            $textBoxBody = Scrub::html2text($currentTextbox->getBody());
+            $textBoxHeading = $currentTextbox->getHeading();
 
             if (strlen($textBoxHeading)) {
                 $selectText = $textBoxHeading;
             } else {
-                $selectText = substr($textBoxBody, 0, 75) . '...';
+                $selectText = substr(Scrub::html2text($currentTextbox->getBody()), 0, 75) . '...';
             }
 
             $page->setVar([
-                'COMPONENT_CONFIG_BOXSELECT_NAME'       => $selectText,
-                'COMPONENT_CONFIG_BOXSELECT_VALUE' 	    => $currentTextbox->getId(),
+                'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text($selectText),
+                'COMPONENT_CONFIG_BOXSELECT_VALUE'      => Scrub::text($currentTextbox->getId()),
                 'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => $currentTextbox->getId() == $configValue ? 'selected="selected"' : '',
             ]);
 
