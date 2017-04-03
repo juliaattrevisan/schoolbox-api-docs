@@ -11,6 +11,7 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
+use Alaress_Date_Format;
 use Alaress\DebugBar\Instance as DebugBar;
 use MSSQL;
 use Schoolbox\External\Connector\CommunityPortalInterface;
@@ -18,36 +19,34 @@ use UnexpectedValueException;
 
 class CommunityPortal implements CommunityPortalInterface
 {
-    /**
-     * @var MSSQL
-     */
+    /** @var MSSQL $database */
     private $database;
 
-    /**
-     * The password encryption key. This must be secret and not stored in code.
-     *
-     * @var string
-     */
+    /** @var string $key The password encryption key. This must be secret and not stored in code. */
     private $key;
 
-    /**
-     * The hard-coded IV for the password. This does not need to be secret.
-     *
-     * @var string
-     */
+    /** @var string $initializationVector The hard-coded IV for the password. This does not need to be secret. */
     private $initializationVector;
+
+    /**
+     * @var bool
+     */
+    private $allowCreateUser;
 
     /**
      * Constructor
      *
      * @param string $key
      * @param string $initializationVector
+     * @param bool   $allowCreateUser      Can this object create new users in the community portal?
      */
-    public function __construct($key, $initializationVector)
+    public function __construct($key, $initializationVector, $allowCreateUser)
     {
-        $this->key                  = $key;
+        $this->key = $key;
         $this->initializationVector = $initializationVector;
-        $this->database             = MSSQL::getInstance();
+        $this->database = MSSQL::getInstance();
+        $this->allowCreateUser = $allowCreateUser;
+
         if (DebugBar::isEnabled()) {
             $this->database->installCollector();
             /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
@@ -61,46 +60,125 @@ class CommunityPortal implements CommunityPortalInterface
     /**
      * Updates the community portal password for this user.
      *
-     * @param  string $communityId
-     * @param  string $newPassword
+     * @param string $communityId
+     * @param string $newPassword
      * @return bool
      * @throws UnexpectedValueException if either key or IV was not set
      */
     public function changePassword($communityId, $newPassword)
     {
         $encryptedPassword = $this->encryptPassword($newPassword);
-        $query = "
-            UPDATE CommunityLogins
-            SET    Password = {$this->database->smartQuote($encryptedPassword)}
-            WHERE  ID = {$this->database->smartQuote($communityId)}
-        ";
-        $this->database->query($query);
+
+        // Check to see if they have an existing record in the 'CommunityLogins' table
+
+        $result = $this->database->query(
+            "
+                SELECT    * 
+                FROM      [dbo].[CommunityLogins] 
+                WHERE     [ID] = {$this->database->smartQuote($communityId)}
+            "
+        );
+
+        if ($this->database->countRows($result) > 0) {
+
+            // Existing community login record, just update the password
+
+            $query = "
+                UPDATE    [dbo].[CommunityLogins]
+                SET       [Password] = {$this->database->smartQuote($encryptedPassword)}
+                WHERE     [ID] = {$this->database->smartQuote($communityId)}
+            ";
+
+            $this->database->query($query);
+
+        } elseif ($this->allowCreateUser) {
+
+            // No existing community login record, need to insert one for this to have any chance of doing something
+
+            // This adds the Schools default page permissions to the users
+
+            $query =
+            "
+                INSERT INTO [dbo].[CommunityLoginsPage]
+                (
+                    [ID],
+                    [ConfigSeq],
+                    [EnabledFlag]
+                )
+                SELECT  {$this->database->smartQuote($communityId)},
+                        ConfigSeq,
+                        CASE WHEN DefaultValue = 'TRUE' THEN 1 ELSE 0 END AS Enabled
+                FROM    [dbo].[Config]
+                WHERE   [dbo].[Config].[Key1] = 'CommunityPortal' AND
+                        [dbo].[Config].[Key2] = 'Pages' AND
+                        [dbo].[Config].[Key4] = 'EnabledFlag' AND
+                        [dbo].[Config].[Type] = 'BIT' AND
+                        [dbo].[Config].[Value] = 'True'
+            ";
+
+            $this->database->query($query);
+
+            // This sets the password
+
+            $date = Alaress_Date_Format::now()->getDatabase();
+
+            $query = "
+                INSERT INTO [dbo].[CommunityLogins]
+                (
+                    [ID],
+                    [Type],
+                    [Password],
+                    [LastLoginDate],
+                    [LoginType],
+                    [SecurityTokenGuid],
+                    [SecurityTokenIssueDateTime],
+                    [PasswordHashed]
+                )
+                VALUES
+                (
+                    {$this->database->smartQuote($communityId)},
+                    'CP',
+                    {$this->database->smartQuote($encryptedPassword)},
+                    '{$date}',
+                    '',
+                    NULL,
+                    NULL,
+                    ''
+                )
+            ";
+
+            $this->database->query($query);
+
+        } else {
+
+            // There was no community portal password to reset, and automatic creation is disabled- so just return true
+            // and exit out of this happily.
+
+            return true;
+        }
+
+        // If one or more rows were affected then this must have done something positive... right?
+
         return intval($this->database->getOne('SELECT @@ROWCOUNT')) > 0;
     }
 
     /**
      * Encrypts this plaintext password.
      *
-     * @param  string $plaintext
+     * @param string $plaintext
      * @return string
      * @throws UnexpectedValueException if either key or IV was not set
      */
     protected function encryptPassword($plaintext)
     {
         $this->assertKeyAndIvSet();
-        // Pad converted text to a block with chr(bytes to pad)
-        // @see https://php.net/manual/en/function.mcrypt-encrypt.php#47973
-        $blockSize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-        // Because this is the encoding their DB uses
-        $convText  = mb_convert_encoding($plaintext, 'UCS-2LE');
-        $padding   = $blockSize - (strlen($convText) % $blockSize);
-        $convText  .= str_repeat(chr($padding), $padding);
+
         return base64_encode(
-            mcrypt_encrypt(
-                MCRYPT_RIJNDAEL_128,
+            openssl_encrypt(
+                mb_convert_encoding($plaintext, 'UCS-2LE'),
+                'AES-256-CBC',
                 $this->key,
-                $convText,
-                MCRYPT_MODE_CBC,
+                OPENSSL_RAW_DATA,
                 $this->initializationVector
             )
         );
@@ -117,11 +195,11 @@ class CommunityPortal implements CommunityPortalInterface
     {
         $this->assertKeyAndIvSet();
         return mb_convert_encoding(
-            mcrypt_decrypt(
-                MCRYPT_RIJNDAEL_128,
+            openssl_decrypt(
+                $encrypted,
+                'AES-256-CBC',
                 $this->key,
-                base64_decode($encrypted),
-                MCRYPT_MODE_CBC,
+                OPENSSL_RAW_DATA,
                 $this->initializationVector
             ),
             'UTF-8'

@@ -144,7 +144,7 @@ class UserMapper extends Mapper
     {
         /** @var User $model */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            $communityPortalFactory = new CommunityPortalFactory();
+            $communityPortalFactory = new CommunityPortalFactory($this->getConfigLoader());
             $communityPortal = $communityPortalFactory->build();
             try {
                 $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
