@@ -18,7 +18,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function __construct()
     {
-        // This connects to the Synergetic database and stores an ICnnection in `$this->connector` variable
+        // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
 
         $this->setupDatabase();
     }

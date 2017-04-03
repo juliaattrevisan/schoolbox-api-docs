@@ -78,7 +78,6 @@ abstract class Base implements IBroker
         // Set any database connection options that we want to allow
 
         $options = [
-            PDO::ATTR_PERSISTENT => isset($options['debug']) ? $options['debug'] : false,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ];
 

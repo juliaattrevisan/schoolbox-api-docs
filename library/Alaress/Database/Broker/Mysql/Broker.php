@@ -15,6 +15,7 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Mysql\Iterator;
 use Alaress\Database\Statement\FunctionCall\Mysql\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Mysql\StoredProcedure;
+use Sabre\DAVACL\PrincipalBackend\PDO;
 
 class Broker extends Base implements IBroker
 {
@@ -55,5 +56,19 @@ class Broker extends Base implements IBroker
         }
 
         return "mysql:host={$this->connector->getHostname()};{$portString}dbname={$this->connector->getDatabase()}";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function connect($options = [])
+    {
+        // Enable persistent connection if not in debug mode
+
+        /** @noinspection PhpUndefinedClassConstantInspection */
+
+        $this->databaseAttributes = [PDO::ATTR_PERSISTENT => isset($options['debug']) ? $options['debug'] : false];
+
+        return parent::connect($options);
     }
 }
