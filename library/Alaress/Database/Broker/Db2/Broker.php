@@ -17,6 +17,8 @@ use Alaress\Database\Iterator\Db2\Iterator;
 use Alaress\Database\Statement\FunctionCall\Db2\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Db2\StoredProcedure;
 use Alaress\Database\Wrapper\Db2\PDO;
+use Alaress\DebugBar\Instance as DebugBar;
+use DebugBar\DataCollector\DataCollectorInterface;
 
 class Broker extends Base implements IBroker
 {
@@ -92,6 +94,17 @@ class Broker extends Base implements IBroker
                 $this->pdo->exec($sql);
             }
 
+            if (DebugBar::isEnabled()) {
+                $this->installCollector();
+
+                /** @var DataCollectorInterface $collector */
+                $collector = $this->getCollector();
+
+                if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
+                    DebugBar::getInstance()->addCollector($collector);
+                }
+            }
+
         } catch (Exception $e) {
 
             // Something went wrong during connection
@@ -100,23 +113,5 @@ class Broker extends Base implements IBroker
         }
 
         return true;
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * Disabling for DB2
-     */
-    public function getCollector()
-    {
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * Disabling for DB2
-     */
-    public function installCollector()
-    {
     }
 }

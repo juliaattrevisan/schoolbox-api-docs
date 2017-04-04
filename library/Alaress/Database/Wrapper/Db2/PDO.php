@@ -72,7 +72,7 @@ class PDO extends BasePDO
      *
      * @return bool|PDOStatement
      */
-    public function prepare($statement, array $options = null)
+    public function prepare($statement, $options = null)
     {
         $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $statement);
         return $this->lastStatement;
@@ -123,7 +123,7 @@ class PDO extends BasePDO
      */
     public function exec($statement)
     {
-        $resource = db2_prepare($this->getConnectionWithCheck(), $statement);
+        $resource = db2_prepare($this->getConnectionWithCheck(), $statement, ['cursor' => DB2_SCROLLABLE]);
 
         if (!$resource) {
             return false;
@@ -146,9 +146,9 @@ class PDO extends BasePDO
      * @inheritdoc
      * @return bool|PDOStatement
      */
-    public function query($statement, $mode = BasePDO::ATTR_DEFAULT_FETCH_MODE, $arg3 = null, array $ctorargs = [])
+    public function query($statement, $mode = BasePDO::ATTR_DEFAULT_FETCH_MODE, $arg3 = null, $ctorargs = [])
     {
-        $resource = db2_prepare($this->getConnectionWithCheck(), $statement);
+        $resource = db2_prepare($this->getConnectionWithCheck(), $statement, ['cursor' => DB2_SCROLLABLE]);
 
         if (!$resource) {
             return false;

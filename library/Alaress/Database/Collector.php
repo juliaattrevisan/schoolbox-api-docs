@@ -62,7 +62,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
         $duration = microtime(true) - $start;
         $memory = memory_get_peak_usage(true);
 
-        $statementSummary['connection'] = "{$this->broker->getHostname()}:{$this->broker->getDatabase()}";
+        $statementSummary['connection'] = $this->broker->getDatabase();
         $statementSummary['duration'] = $duration;
         $statementSummary['duration_str'] = $this->formatDuration($duration);
         $statementSummary['memory'] = $memory;

@@ -13,6 +13,7 @@ namespace Alaress\Database\Statement;
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\IIterator;
 use PDO;
+use PDOStatement;
 
 interface IStatement
 {

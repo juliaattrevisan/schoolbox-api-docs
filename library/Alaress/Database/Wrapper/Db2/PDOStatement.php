@@ -52,7 +52,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function execute(array $input_parameters = null)
      */
-    public function execute(array $input_params = null)
+    public function execute($input_params = null)
     {
         if (is_array($input_params) && count($input_params) > 0) {
 
@@ -75,7 +75,7 @@ class PDOStatement extends BasePDOStatement
 
         // Create the prepared statement from the SQL with anonymous placeholders
 
-        $this->statement = db2_prepare($this->connection, $sql);
+        $this->statement = db2_prepare($this->connection, $sql, ['cursor' => DB2_SCROLLABLE]);
 
         // The commented code below *should* work for binding both input and output parameters as far as I can tell-
         // but I am receiving "Describe Param Failed" on my test database. Disabling this for now, which limits us
@@ -208,7 +208,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function fetchAll($fetch_style = null, $fetch_argument = null, array $ctor_args = array())
      */
-    public function fetchAll($how = null, $class_name = null, array $ctor_args = null)
+    public function fetchAll($how = null, $class_name = null, $ctor_args = null)
     {
         $result = [];
 
@@ -293,7 +293,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function fetchObject($class_name = "stdClass", array $ctor_args = array())
      */
-    public function fetchObject($class_name = null, array $ctor_args = null)
+    public function fetchObject($class_name = null, $ctor_args = null)
     {
         throw new Exception("Object fetching not supported by DB2 wrapper.");
     }
