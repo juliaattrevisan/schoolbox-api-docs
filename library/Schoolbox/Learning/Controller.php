@@ -273,9 +273,12 @@ class Controller extends Base
         $keyConverters = $filterFactoryFactory->createKeyConverterCollection();
 
         // Term Filter
-        $termFilterFactory = $filterFactoryFactory->buildTermFilterFactory();
-        $termKeyConverter  = $termFilterFactory->buildKeyConverter();
+        $termKeyConverter  = $filterFactoryFactory->buildTermFilterFactory()->buildKeyConverter();
         $keyConverters->offsetSet($termKeyConverter->getFilter()->getId(), $termKeyConverter);
+
+        // AssessmentType Filter
+        $assessmentTypeKeyConverter = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildKeyConverter();
+        $keyConverters->offsetSet($assessmentTypeKeyConverter->getFilter()->getId(), $assessmentTypeKeyConverter);
 
         // TODO add other filters here
 
@@ -319,10 +322,26 @@ class Controller extends Base
                 $selectedTerms->add($term);
             }
         }
-
         // Were no terms selected ?
         if (0 === $selectedTerms->count()) {
             $selectedTerms = $availableTerms;
+        }
+
+        // Get the AssessmentTypes selected by the user
+        $availableAssessmentTypes = [];
+        $selectedAssessmentTypes  = [];
+        $assessmentTypeSelections = $selectionsPerFilter[$assessmentTypeKeyConverter->getFilter()->getId()];
+        /** @var FilterSelection\Model[] $assessmentTypeSelections */
+        foreach ($assessmentTypeSelections as $assessmentTypeSelection) {
+            $assessmentType = $assessmentTypeKeyConverter->getItem($assessmentTypeSelection->getKey());
+            $availableAssessmentTypes[] = $assessmentType;
+            if ($assessmentTypeSelection->getSelected()) {
+                $selectedAssessmentTypes[] = $assessmentType;
+            }
+        }
+        // Were no assessmentTypes selected ?
+        if (0 === count($selectedAssessmentTypes)) {
+            $selectedAssessmentTypes = $availableAssessmentTypes;
         }
 
 
@@ -340,7 +359,7 @@ class Controller extends Base
 
         // TODO -UP TO HERE - assessment TYpes
 
-        $factory     = new PendingFactory($viewee, $this->database, $this->externalClass, $selectedTerms, $toChaseLimit, $includeTasks, $this->folderMapper);
+        $factory     = new PendingFactory($viewee, $this->database, $this->externalClass, $selectedTerms, $toChaseLimit, $selectedAssessmentTypes, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();
 
         /**
