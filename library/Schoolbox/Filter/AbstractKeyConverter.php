@@ -32,14 +32,4 @@ abstract class AbstractKeyConverter implements IKeyConverter
         return $this->filter;
     }
 
-
-    /**
-     * Sanitises a concrete key before insertion in filter_selection table
-     * @param string $key
-     * @return string
-     */
-    public function sanitiseKey($key)
-    {
-        return (string)(int)$key;
-    }
 }

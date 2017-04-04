@@ -40,4 +40,18 @@ class KeyConverter extends AbstractKeyConverter
     {
         return $element;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function sanitiseKey($key)
+    {
+        $validKeys = [
+            Definition::KEY_TASK,
+            Definition::KEY_DUE_WORK,
+            Definition::KEY_QUIZ,
+            Definition::KEY_PROJECT,
+        ];
+        return in_array($key, $validKeys, true) ? $key : '';
+    }
 }

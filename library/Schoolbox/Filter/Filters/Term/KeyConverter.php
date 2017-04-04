@@ -63,4 +63,13 @@ class KeyConverter extends AbstractKeyConverter
     {
         return (string)$element->getId();
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function sanitiseKey($key)
+    {
+        return (string)(int)$key;
+    }
 }

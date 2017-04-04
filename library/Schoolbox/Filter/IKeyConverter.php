@@ -40,6 +40,7 @@ interface IKeyConverter
      * Sanitises a key before insertion in filter_selection table
      * @param string $key
      * @return string
+     * @todo should this throw an exception if the key is invalid ? Or just return an empty string?
      */
     public function sanitiseKey($key);
 }
