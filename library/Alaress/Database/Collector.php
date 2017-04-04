@@ -11,7 +11,7 @@
 namespace Alaress\Database;
 
 use Alaress\Database\Broker\IBroker;
-use Alaress\Database\Statement\Base as BaseStatement;
+use Alaress\Database\Statement\IStatement;
 use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
@@ -41,7 +41,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * Runs query, and logs its results.
      *
-     * @param BaseStatement $statement
+     * @param IStatement $statement
      * @return bool
      */
     public function execute($statement)

@@ -113,6 +113,13 @@ interface IStatement
     public function getSql();
 
     /**
+     * This returns the underlying PDO statement. This is used by the debugging collector.
+     *
+     * @return PDOStatement
+     */
+    public function getPDOStatement();
+
+    /**
      * Execute query
      *
      * @param array|null $values
