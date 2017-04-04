@@ -29,7 +29,7 @@
 
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
             <div class="actions-small-1">
-                {% if readOnly == false %}
+                {% if canWrite %}
                     <div class="grip compact"></div>
                 {% endif %}
                 <div class="list-item">
@@ -37,10 +37,10 @@
                         {##
                         #  Special case for projects, to take teachers to status page rather than summary
                         #}
-                        {% if readOnly == false and assessment is project %}
+                        {% if canWrite and assessment is project %}
                             {% set href = routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) %}
                         {% else %}
-                            {% if assessable.isParticipant(USER) %}
+                            {% if isParticipant or canWrite %}
                                 {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
                             {%  else %}
                                 {% set href = routeLookup('learningAssessment.getPreview', {assessmentId: assessment.id}) %}
@@ -58,7 +58,7 @@
                          # Teacher: sees completion stats
                          # Others: see due date
                          #}
-                        {% if readOnly == false %}
+                        {% if canWrite %}
                             {% if assessment is not project %}
                                 <p class="meta">
                                     <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
@@ -78,7 +78,7 @@
                      # Teacher: sees nav
                      # Participant: sees complete task button (if of course it's a task that's self-assessable)
                      #}
-                    {% if readOnly == false %}
+                    {% if canWrite %}
                         <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
                     {% elseif isParticipant and assessment is task %}
                         {% set participant                 = assessment.getParticipant(USER) %}
@@ -90,7 +90,7 @@
                         } only %}
                     {% endif %}
                 </nav>
-                {% if readOnly == false  %}
+                {% if canWrite  %}
                     <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
                         <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
 

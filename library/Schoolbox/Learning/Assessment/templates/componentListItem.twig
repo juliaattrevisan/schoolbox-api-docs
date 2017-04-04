@@ -11,7 +11,7 @@
 <li id="component-assessment-{{ assessable.id }}" class="actions-small-1" data-assessment="{{ assessable.id }}" data-assessment-title="{{  assessable.title }}">
     <div class="list-item">
         <div class="card small-12">
-            {% if assessable.isParticipant(USER) %}
+            {% if assessable.isParticipant(USER) or canWrite %}
                 {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id, studentId: USER.id}) %}
             {%  else %}
                 {% set href = routeLookup('learningAssessment.getPreview', {assessmentId: assessable.id}) %}
