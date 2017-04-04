@@ -22,6 +22,9 @@ class Iterator extends Base implements IIterator
      */
     public function rewind()
     {
+        // Have disabled rewinding due to performance issues with cursors being enabled
+
+        /**
         // Only waste our time rewinding if we're not already at the start of the results
 
         if ($this->rowIndex > 0) {
@@ -49,5 +52,6 @@ class Iterator extends Base implements IIterator
                 $this->rowIndex = 0;
             }
         }
+        */
     }
 }

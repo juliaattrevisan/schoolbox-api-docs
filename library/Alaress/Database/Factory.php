@@ -10,6 +10,7 @@
 
 namespace Alaress\Database;
 
+use Alaress\Database\Broker\Dblib\Broker as DblibBroker;
 use Alaress\Database\Broker\Db2\Broker as Db2Broker;
 use Alaress\Database\Broker\Mysql\Broker as MysqlBroker;
 use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
@@ -26,6 +27,18 @@ class Factory
     {
         return new Connector(
             new MysqlBroker()
+        );
+    }
+
+    /**
+     * Create a DBLIB connector
+     *
+     * @return Connector
+     */
+    public function createDblib()
+    {
+        return new Connector(
+            new DblibBroker()
         );
     }
 

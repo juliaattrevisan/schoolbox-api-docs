@@ -49,8 +49,24 @@ class Collector extends DataCollector implements Renderable, AssetProvider
         $start = microtime(true);
         $result = $statement->getPDOStatement()->execute();
 
+        $backtrace = debug_backtrace();
+
+        $sql = '';
+        $prefix = 'Alaress\Database';
+
+        // Used this trying to find where queries came from
+
+        foreach ($backtrace as $trace) {
+            if (substr($trace['class'], 0, strlen($prefix)) != $prefix) {
+                $sql .= "Statment Class: " . get_class($statement) . "\nLine {$trace['line']}: {$trace['file']}::{$trace['function']}()\n\n";
+                break;
+            }
+        }
+
+        $sql .= $statement->getSql();
+
         $statementSummary = [
-            'sql' => $statement->getSql(),
+            'sql' => $sql,
             'prepared_stmt' => $statement->getSql(),
             'params' => [],
             'is_success' => $result,

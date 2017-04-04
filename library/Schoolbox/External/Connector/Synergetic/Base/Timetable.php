@@ -106,9 +106,12 @@ class Timetable extends Base implements ITimetable
                                     StudentClasses.FileSemester = SubjectClasses.FileSemester AND
                                     StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
                                     StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                                    StudentClasses.FileSemester = :fileSemester1 AND
-                                    StudentClasses.FileYear = :fileYear1 AND
                                     StudentClasses.ID IN ({$externalIdBindings1['sql']})
+                JOIN            FileSemesters Semester ON
+                                Semester.FileSemester = StudentClasses.FileSemester AND
+                                Semester.FileYear = StudentClasses.FileYear AND
+                                Semester.SystemCurrentFlag = 1
+                                    
                 LEFT JOIN       luFileType ON StudentClasses.FileType = luFileType.Code
                 WHERE           StudentClasses.StartDate <= getdate() AND
                                 (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
@@ -129,9 +132,11 @@ class Timetable extends Base implements ITimetable
                                     c1.FileSemester = c2.FileSemester AND
                                     c1.ClassCampus = c2.ClassCampus AND
                                     c1.ClassCode = c2.ClassCode AND
-                                    c1.FileSemester = :fileSemester2 AND
-                                    c1.FileYear = :fileYear2 AND 
                                     c1.StaffID IN ({$externalIdBindings2['sql']})
+                JOIN            FileSemesters Semester ON
+                                Semester.FileSemester = c1.FileSemester AND
+                                Semester.FileYear = c1.FileYear AND
+                                Semester.SystemCurrentFlag = 1
                 LEFT JOIN       luFileType ON c2.FileType = luFileType.Code
                 ORDER BY        luFileType.Description ASC, 
                                 c2.Description ASC
@@ -139,13 +144,7 @@ class Timetable extends Base implements ITimetable
             array_merge
             (
                 $externalIdBindings1['bindings'],
-                $externalIdBindings2['bindings'],
-                [
-                    'fileYear1' => $this->getCurrentYear(),
-                    'fileSemester1' => $this->getCurrentSemester(),
-                    'fileYear2' => $this->getCurrentYear(),
-                    'fileSemester2' => $this->getCurrentSemester()
-                ]
+                $externalIdBindings2['bindings']
             )
         );
 

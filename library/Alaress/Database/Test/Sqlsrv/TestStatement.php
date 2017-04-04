@@ -97,6 +97,9 @@ class TestStatement extends PHPUnit_Framework_TestCase
             $this->assertSame(strtolower($row['Surname']), 'rhodes');
         }
 
+        // Have disabled rewinding due to performance issues with cursors being enabled, so this test will fail
+
+        /*
         $count2 = 0;
         foreach ($iterator as $row) {
             $count2++;
@@ -106,6 +109,7 @@ class TestStatement extends PHPUnit_Framework_TestCase
         // Test both iterations returned same number of results
 
         $this->assertSame($count1, $count2);
+        */
 
         // ----------------------------------------------------------------------------------------------------------------
         // fetchColumn

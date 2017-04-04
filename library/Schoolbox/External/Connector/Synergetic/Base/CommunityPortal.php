@@ -70,7 +70,7 @@ class CommunityPortal implements ICommunityPortal
             ['externalId' => $communityId]
         );
 
-        if ($query->rowCount() > 0) {
+        if ($query->fetch()) {
 
             // Existing community login record, just update the password
 
@@ -80,10 +80,10 @@ class CommunityPortal implements ICommunityPortal
                 WHERE     ID = :externalId
             ";
 
-            $rowsAffected = $this->databaseExternal->executeQuery($query, [
+            $result = $this->databaseExternal->executeQuery($query, [
                 'password' => $encryptedPassword,
                 'externalId' => $communityId
-            ])->rowCount();
+            ]);
 
         } elseif ($this->allowCreateUser) {
 
@@ -141,10 +141,10 @@ class CommunityPortal implements ICommunityPortal
                 )
             ";
 
-            $rowsAffected = $this->databaseExternal->executeQuery($query, [
+            $result = $this->databaseExternal->executeQuery($query, [
                 'externalId' => $communityId,
                 'password' => $encryptedPassword
-            ])->rowCount();
+            ]);
 
         } else {
 
@@ -154,9 +154,7 @@ class CommunityPortal implements ICommunityPortal
             return true;
         }
 
-        // If one or more rows were affected then this must have done something positive... right?
-
-        return $rowsAffected > 0;
+        return $result;
     }
 
     /**

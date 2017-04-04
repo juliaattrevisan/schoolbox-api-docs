@@ -83,6 +83,6 @@ class Broker extends Base implements IBroker
             $portString = ",{$this->connector->getPort()};";
         }
 
-        return "sqlsrv:Server={$this->connector->getHostname()};{$portString}Database={$this->connector->getDatabase()}";
+        return "sqlsrv:Server={$this->connector->getHostname()};{$portString}Database={$this->connector->getDatabase()};MultipleActiveResultSets=0;";
     }
 }

@@ -413,26 +413,27 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $iterator = $statement->executeIterator();
 
-        if ($statement->rowCount() > 0) {
-            foreach ($iterator as $spRow) {
-                if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
-                    $periodList[] = array(
-                        'Room' => $spRow['Room'],
-                        'Description' => $spRow['ClassDescription'],
-                        'PeriodNumber' => $spRow['Period'],
-                        'ClassCampus' => $spRow['ClassCampus'],
-                        'ClassCode' => $spRow['ClassCode'],
-                        'SubstituteFlag' => $spRow['SubstituteFlag'],
-                        'SubstitutedFlag' => $spRow['SubstitutedFlag'],
-                        'AttendanceMarked' => $spRow['IsMarkedFlag'],
-                        'AttendanceEnabled' => $spRow['AttendanceEntryEnabledFlag'],
+        $count = 0;
 
-                    );
+        foreach ($iterator as $spRow) {
+            if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
+                $periodList[] = array(
+                    'Room' => $spRow['Room'],
+                    'Description' => $spRow['ClassDescription'],
+                    'PeriodNumber' => $spRow['Period'],
+                    'ClassCampus' => $spRow['ClassCampus'],
+                    'ClassCode' => $spRow['ClassCode'],
+                    'SubstituteFlag' => $spRow['SubstituteFlag'],
+                    'SubstitutedFlag' => $spRow['SubstitutedFlag'],
+                    'AttendanceMarked' => $spRow['IsMarkedFlag'],
+                    'AttendanceEnabled' => $spRow['AttendanceEntryEnabledFlag'],
 
-                }
+                );
             }
+            $count++;
         }
-        else {
+
+        if ($count == 0) {
             // Fall back to getDayTimetable()
             return $this->getDayTimetable(
                 $externalUserId,

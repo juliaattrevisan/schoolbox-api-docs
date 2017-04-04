@@ -190,7 +190,7 @@ abstract Class Base implements IStatement
     {
         if (empty($this->statement)) {
             try {
-                $this->statement = $this->broker->prepare($this->getSql(), [PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL]);
+                $this->statement = $this->broker->prepare($this->getSql());
             } catch (PDOException $e) {
                 $this->handleException($e);
                 return false;

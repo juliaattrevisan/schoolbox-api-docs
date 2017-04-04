@@ -34,7 +34,10 @@ class Factory
     public static function getInstanceExternal() {
         if (!isset(self::$connectorExternal)) {
             $factory = new DatabaseFactory();
+
             self::$connectorExternal = $factory->createSqlsrv();
+            // self::$connectorExternal = $factory->createDblib();
+
             $config = ConfigMapper::getInstance();
 
             self::$connectorExternal->connect(
@@ -44,6 +47,7 @@ class Factory
                 $config->get('external_db_passwd')
             );
         }
+
         return self::$connectorExternal;
     }
 
@@ -93,6 +97,7 @@ class Factory
             case 'humanedge':
 
                 $connectorExternal = $this->factory->createSqlsrv();
+                // $connectorExternal = $this->factory->createDblib();
                 break;
 
             // MySQL

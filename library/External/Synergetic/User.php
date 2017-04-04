@@ -1052,7 +1052,7 @@ class External_Synergetic_User implements External_UserInterface
             "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'uStaffPosition'"
         );
 
-        if ($queryTable->rowCount() > 0) {
+        if ($queryTable->fetch()) {
             $select = 'uStaffPosition.JobTitle AS JobPositionDescription';
             $join = 'LEFT JOIN dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID';
         } else {
@@ -1192,6 +1192,20 @@ class External_Synergetic_User implements External_UserInterface
         }, $array);
     }
 
+    // TODO: These calls don't seem to be getting cached according to the debug console, so caching them here.
+
+    /**
+     * Cache of users file year/semester
+     * @var array
+     */
+    private static $fileYearSemesterUser = [];
+
+    /**
+     * Cache of system file year/semester
+     * @var array
+     */
+    private static $fileYearSemesterDefault;
+
     // TODO: These functions seem to be used prolifically to fill in SQL clauses- in these cases should be using appropriate SQL joins.
 
     /**
@@ -1204,6 +1218,11 @@ class External_Synergetic_User implements External_UserInterface
         // If we are supplied a valid user ID use their current file year/semester values
 
         if ($externalUserId != null) {
+
+            if (isset(self::$fileYearSemesterUser[$externalUserId])) {
+                return self::$fileYearSemesterUser[$externalUserId];
+            }
+
             if ($this->isExternalIdValid($externalUserId)) {
                 $statement = $this->getConnector()->executeStoredProcedure(
                     'spsConfigUserDefaultYearSemester',
@@ -1211,33 +1230,40 @@ class External_Synergetic_User implements External_UserInterface
                 );
 
                 if ($semester = $statement->fetch()) {
-                    return [
-                        'year'          => $semester['UserFileYear'],
-                        'semester'      => $semester['UserFileSemester']
+                    self::$fileYearSemesterUser[$externalUserId] = [
+                        'year' => $semester['UserFileYear'],
+                        'semester' => $semester['UserFileSemester']
                     ];
+
+                    return self::$fileYearSemesterUser[$externalUserId];
                 }
             }
         }
 
         // Otherwise, return the current system default values
 
-        $querySemester = $this->getConnector()->executeQuery(
-            "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1"
-        );
+        if (!isset(self::$fileYearSemesterDefault)) {
 
-        if ($semester = $querySemester->fetch())
-        {
-            return [
-                'year'              => $semester['FileYear'],
-                'semester'          => $semester['FileSemester'],
-            ];
+            $querySemester = $this->getConnector()->executeQuery(
+                "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1"
+            );
 
-        } else {
+            if ($semester = $querySemester->fetch()) {
+                self::$fileYearSemesterDefault = [
+                    'year' => $semester['FileYear'],
+                    'semester' => $semester['FileSemester'],
+                ];
 
-            // If everything falls in a heap- return a blank array
+            } else {
 
-            return [];
+                // If everything falls in a heap- return a blank array
+
+                return [];
+            }
+
         }
+
+        return self::$fileYearSemesterDefault;
     }
 
     /**
