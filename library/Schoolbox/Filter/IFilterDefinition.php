@@ -77,12 +77,15 @@ interface IFilterDefinition
 
 
     /**
-     * Returns sets of options, grouped by option.page, then indexed by option.key.
+     * Returns sets of available options, grouped by option.page, then indexed by option.key.
      * Each Option contains a set of Defaults, indexed by roleType
      *
+     * @param null|string $pageFilter If supplied, get defaults just for this page
+     * @param null|string $roleTypeFilter If supplied, get defaults just for this roleType
      * @return Collection|GenericCollection[]|FilterOption\Model[][]
+     * @todo consider renaming to 'getAvailableOptions()'
      */
-    public function getOptionDefaults();
+    public function getOptionDefaults($pageFilter = null, $roleTypeFilter = null);
 
 
     /**

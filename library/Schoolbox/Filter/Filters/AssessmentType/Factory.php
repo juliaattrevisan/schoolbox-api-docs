@@ -7,35 +7,160 @@
 
 namespace Schoolbox\Filter\Filters\AssessmentType;
 
+use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\AbstractFilterFactory;
-use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\Filter\IRunTimeOptions;
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
+use Schoolbox\Mapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Option;
+use Schoolbox\Filter\Option\Defaults;
+use Schoolbox\Filter\Selection;
 
 /**
- * A factory for building TermFilters
+ * A factory for building AssessmentTypeFilter objects
  */
 class Factory extends AbstractFilterFactory
 {
 
     /**
-     * Build a filter definition, ready to use in the admin pages
-     *
-     * @return IFilterDefinition
+     * @var Term\Mapper
      */
-    public function buildDefinition()
-    {
-        // TODO: Implement buildForAdminPages() method.
+    private $termMapper;
+
+
+    /**
+     * @param Filter\Mapper    $filterMapper
+     * @param Option\Mapper    $optionMapper
+     * @param Defaults\Mapper  $defaultMapper
+     * @param Selection\Mapper $selectionMapper
+     * @param Term\Mapper      $termMapper
+     */
+    public function __construct(
+        Filter\Mapper $filterMapper,
+        Option\Mapper $optionMapper,
+        Defaults\Mapper $defaultMapper,
+        Selection\Mapper $selectionMapper,
+        Term\Mapper $termMapper
+    ) {
+        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        $this->termMapper = $termMapper;
     }
 
 
     /**
-     * Build a filter, ready to inject into a filter panel
-     *
-     * @param null|IRunTimeOptions $runTimeOptions
-     * @return IFilterDefinition
+     * @inheritdoc
      */
-    public function buildComponent(IRunTimeOptions $runTimeOptions = null)
+    public function buildDefinition(Filter\Model $filter)
     {
-        // TODO: Implement buildForFilterPanel() method.
+        $sortedTerms = $this->getSortedTerms();
+
+        return new Definition(
+            $filter,
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultMapper(),
+            $sortedTerms,
+            $this->getCurrentTerm($sortedTerms),
+            $this->getPreviousTerm($sortedTerms)
+        );
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws Mapper\Exception
+     */
+    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
+    {
+        $filter     = $this->getFilterMapper()->findForClass(Definition::class);
+        $definition = $this->buildDefinition($filter);
+
+        // Get user's existing selections for this page
+        $savedSelections = $this->getFilterSelectionMapper()->findByColumnList([
+            'user_id' => $user->getId(),
+            'page'    => $page,
+        ])->indexBy('key');
+
+        return new Component($definition, $user, $page, $savedSelections, $this->getFilterSelectionMapper());
+    }
+
+
+    /**
+     * Returns a key converter, able to convert between keys (term.id) and the entities they represent (terms)
+     *
+     * @param
+     * @return KeyConverter
+     */
+    public function buildKeyConverter()
+    {
+        $filter = $this->getFilterMapper()->findForClass(Definition::class);
+        $terms = $this->getSortedTerms();
+        return new KeyConverter($filter, $terms);
+    }
+
+
+    /**
+     * @return GenericCollection|Term\Model[]
+     */
+    private function getSortedTerms()
+    {
+        /** @var GenericCollection|Term\Model[] $terms */
+        $terms = $this->termMapper->findAll(['order' => ['start' => 'DESC']])->indexBy('id');
+        return $terms;
+    }
+
+
+    /**
+     * @param GenericCollection|Term\Model[] $terms
+     * @return Term\Model|null
+     */
+    private function getCurrentTerm(GenericCollection $terms)
+    {
+        $now = \Alaress_Date_Format::now();
+        foreach ($terms as $term) {
+            if ($term->contains($now)) {
+                return $term;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Gets the term before the current one. If we are not currently in a term, returns the most recent term.
+     *
+     * Returns null if there are no previous terms at all.
+     *
+     * @param GenericCollection|Term\Model[] $terms
+     * @return null|Term\Model
+     */
+    private function getPreviousTerm(GenericCollection $terms)
+    {
+        /** @var GenericCollection|Term\Model[] $sortedTerms */
+        $currentTerm = $this->getCurrentTerm($terms);
+
+        if (!$currentTerm) {
+            // Get the most recent term that finished in the past
+            foreach ($terms as $term) {
+                $termFinish = $term->getActualFinish();
+                if (!$termFinish->isNull() && $termFinish->isPast()) {
+                    return $term;
+                }
+            }
+            return null;
+        }
+
+        // Loop a single index back past the current term
+        $currentFound = false;
+        foreach ($terms as $term) {
+            if ($currentFound) {
+                return $term;
+            }
+            if ($term->getId() === $currentTerm->getId()) {
+                $currentFound = true;
+            }
+        }
+        return null;
     }
 }

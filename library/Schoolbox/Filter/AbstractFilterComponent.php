@@ -10,6 +10,8 @@ namespace Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter\Selection;
+use Schoolbox\Mapper;
+use Schoolbox\Filter\Option;
 
 /**
  * Common logic for Filter Components
@@ -65,6 +67,101 @@ abstract class AbstractFilterComponent implements IFilterComponent
      * @return string
      */
     protected abstract function getTemplateFile();
+
+    /**
+     * @return \Schoolbox\Filter\Selection\Model[]|GenericCollection
+     * @throws Mapper\Exception
+     * @todo break this into smaller private methods
+     * @todo move common bits into abstract parent
+     */
+    protected function getSelections()
+    {
+        // Get option defaults for current user's roleType
+        $page     = $this->getPage();
+        $roleType = $this->getUser()->getRole()->getType();
+
+        /** @var GenericCollection|Option\Model[] $optionDefaults */
+        $optionDefaults = $this->getDefinition()->getOptionDefaults($page, $roleType)[$page];
+
+        $availableSelections = $this->buildDefaultSelections($optionDefaults);
+        $this->overlayUserSelections($availableSelections);
+
+        return $availableSelections;
+    }
+
+
+    /**
+     * Generate a list of available options, selected as per role defaults.
+     *
+     * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
+     *
+     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
+     * @return GenericCollection|Selection\Model[]
+     */
+    protected function buildDefaultSelections(GenericCollection $optionDefaults)
+    {
+        // IMPORTANT:
+        // This base implementation represents the case when there is a 1:1 between option.key and selection.key
+        // This is the case for, eg, WorkType, AssessmentType, etc.
+        // It is NOT the case when a single option.key represents more than 1 selection.key, eg terms 'ALL' can match 2015, 2016 etc
+        // In the latter case, you MUST override this method (see TermFilter for an example)
+
+        $availableSelections = $this->getFilterSelectionMapper()->createCollection();
+
+        foreach ($optionDefaults as $option) {
+
+            $selection = $this->getFilterSelectionMapper()->createModel();
+            $selection
+                ->setFilter($this->getDefinition()->getFilter())
+                ->setUser($this->getUser())
+                ->setPage($this->getPage())
+                ->setKey($option->getKey())
+                ->setSelected($option->getDefaults()[$this->getUser()->getRole()->getType()]->getSelected());
+            $availableSelections[$selection->getKey()] = $selection;
+        }
+        return $availableSelections;
+    }
+
+
+
+    /**
+     * Final step in deciding which options should be selected in a filter panel.
+     *
+     * Overlays the specific user's previously saved settings
+     *
+     * @param GenericCollection|Selection\Model[] $availableSelections
+     * @return GenericCollection|Selection\Model[]
+     */
+    protected function overlayUserSelections(GenericCollection $availableSelections)
+    {
+        // Overlay user-specific selection settings
+        $savedSelections = $this->getSavedSelections();
+        foreach ($availableSelections as $key => $availableSelection) {
+            if ($savedSelections->offsetExists($key)) {
+                $availableSelection
+                    ->setId($savedSelections[$key]->getId())
+                    ->setSelected($savedSelections[$key]->getSelected());
+            }
+        }
+
+        return $availableSelections;
+    }
+
+    /**
+     * @inheritdoc
+     * @throws Mapper\Exception
+     */
+    public function toContext()
+    {
+        return [
+            'definition' => $this->getDefinition(),
+            'selections' => $this->getSelections(),
+        ];
+    }
+
+
+    /* Getters
+     */
 
 
     /**

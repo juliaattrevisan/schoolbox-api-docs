@@ -14,6 +14,7 @@ use Schoolbox\Filter\Option\Defaults as FilterDefault;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Mapper;
 
 
 /**
@@ -34,14 +35,6 @@ class Definition extends AbstractFilterDefinition
     const KEY_CURRENT = 'current';    // current term
     const KEY_PREVIOUS = 'previous';   // one before current term
     const KEY_PAST = 'past';       // All terms in past
-
-    private static $customKeys = [
-        self::KEY_ALL,
-        self::KEY_FUTURE,
-        self::KEY_CURRENT,
-        self::KEY_PREVIOUS,
-        self::KEY_PAST,
-    ];
 
     /**
      * @var GenericCollection|Term\Model[]
@@ -78,38 +71,29 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * @return string[]
+     * @inheritdoc
      */
-    public function getCustomKeys()
+    protected function getCustomKeys()
     {
-        return self::$customKeys;
+        return [
+            self::KEY_ALL,
+            self::KEY_FUTURE,
+            self::KEY_CURRENT,
+            self::KEY_PREVIOUS,
+            self::KEY_PAST,
+        ];
     }
 
-
     /**
-     * @return Term\Model[]|GenericCollection
+     * @inheritdoc
      */
-    public function getTerms()
+    public function getPages()
     {
-        return $this->terms;
-    }
-
-
-    /**
-     * @return Term\Model
-     */
-    public function getCurrentTerm()
-    {
-        return $this->currentTerm;
-    }
-
-
-    /**
-     * @return Term\Model
-     */
-    public function getPreviousTerm()
-    {
-        return $this->previousTerm;
+        return [
+            FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
+            FilterOption\Model::PAGE_GRADES,
+            FilterOption\Model::PAGE_MARK_BOOK,
+        ];
     }
 
 
@@ -122,133 +106,76 @@ class Definition extends AbstractFilterDefinition
     }
 
 
+
     /**
-     * Options include 'all', 'future', 'current', 'previous', 'past' and all terms in the system.
+     * If the admin has not configured this option, should it be available in filter panels?
      *
-     * Grouped by option.key, then indexed by option.page
-     *
-     * @param null|string $pageFilter If supplied, get options just for this page, otherwise get options for all available pages
-     * @return Collection|GenericCollection[]|FilterOption\Model[][]
+     * @param string $customAbstractKey
+     * @param string $page
+     * @return bool
      */
-    public function getOptions($pageFilter = null)
+    protected function getInitialAvailability($customAbstractKey, $page)
     {
-        $validPages = $this->getPages();
-
-        // Did we supply a page, and the page is not in the valid pages?
-        if ($pageFilter && !in_array($pageFilter, $validPages, true)) {
-            return new Collection();
+        $isAvailable = false;
+        switch ($customAbstractKey) {
+            case self::KEY_ALL:
+                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
+                break;
+            case self::KEY_FUTURE:
+                $isAvailable = false;
+                break;
+            case self::KEY_CURRENT:
+                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
+                break;
+            case self::KEY_PREVIOUS:
+                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
+                break;
+            case self::KEY_PAST:
+                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
+                break;
         }
-
-        // Get existing DB values, discarding any that belong to invalid pages
-        /** @var Collection|GenericCollection[]|FilterOption\Model[][] $optionsPerPage */
-        $optionsPerPage = $this->getFilterOptionMapper()->findByColumnList([
-            'filter_id' => $this->getFilter()->getId(),
-        ])->filter(function (FilterOption\Model $option) use ($pageFilter, $validPages) {
-
-            // Are we filtering for page?
-            if ($pageFilter && $option->getPage() !== $pageFilter) {
-                return false;
-            }
-
-            return in_array($option->getPage(), $validPages, true);
-        })->groupBy('page');
+        return $isAvailable;
+    }
 
 
-        // Ensure we have a set of options per valid page
-        foreach ($validPages as $page) {
-
-            // Are we filtering by page?
-            if ($pageFilter && $pageFilter !== $page) {
-                continue;
-            }
-
-            if (!$optionsPerPage->offsetExists($page)) {
-                $optionsPerPage->setOffset($page, $this->getFilterOptionMapper()->createCollection());
-            }
-        }
-
-        // Ensure all possible options present in graph
-        /** @var GenericCollection|FilterOption\Model[] $pageOptions */
-        foreach ($optionsPerPage as $page => $pageOptions) {
-            $pageOptions->indexBy('key');
-
-            // Ensure it contains 'all', 'current', etc
-            foreach ($this->getCustomKeys() as $customAbstractKey) {
-                if (!$pageOptions->offsetExists($customAbstractKey)) {
-                    $option = $this->getFilterOptionMapper()->createModel();
-
-                    $isAvailable = false;
-                    switch ($customAbstractKey) {
-                        case self::KEY_ALL:
-                            $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
-                            break;
-                        case self::KEY_FUTURE:
-                            $isAvailable = false;
-                            break;
-                        case self::KEY_CURRENT:
-                            $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
-                            break;
-                        case self::KEY_PREVIOUS:
-                            $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
-                            break;
-                        case self::KEY_PAST:
-                            $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
-                            break;
-                    }
-                    $option
-                        ->setFilter($this->getFilter())
-                        ->setKey($customAbstractKey)
-                        ->setPage($page)
-                        ->setAvailable($isAvailable);
-                    $pageOptions->setOffset($option->getKey(), $option);
-                }
-            }
-
-
-            // Ensure it contains all Term instances
-            foreach ($this->terms as $term) {
-                if (!$pageOptions->offsetExists($term->getId())) {
-                    $option = $this->getFilterOptionMapper()->createModel();
-                    $option
-                        ->setFilter($this->getFilter())
-                        ->setKey($term->getId())
-                        ->setPage($page)
-                        ->setAvailable(false);
-                    $pageOptions->setOffset($option->getKey(), $option);
-                }
-            }
-
-            // Discard any options that refer to Terms that no longer exist (eg if deleted)
-            foreach ($pageOptions as $filterOption) {
-                // Does the filter refer to a specific Term instance?
-                $isForSpecificTerm = !in_array($filterOption->getKey(), $this->getCustomKeys(), true);
-                if ($isForSpecificTerm && !$this->terms->offsetExists($filterOption->getKey())) {
-                    $pageOptions->offsetUnset($filterOption->getKey());
-                }
-            }
-
-            // Order the options. 'All', then 'Current', then 'Previous', then from most recent term back
-            $this->sortFilterOptions($pageOptions)->indexBy('key');
-        }
-
-        // Convert to ordered by abstract key
-        $optionsPerKey = new Collection();
-
-        // Ensure page order is same as getPages()
-        foreach ($validPages as $page) {
-            if ($pageFilter && $pageFilter !== $page) {
-                continue;
-            }
-
-            $pageOptions = $optionsPerPage[$page];
-            foreach ($pageOptions as $abstractKey => $filterOption) {
-                if (!$optionsPerKey->offsetExists($abstractKey)) {
-                    $optionsPerKey->setOffset($abstractKey, $this->getFilterOptionMapper()->createCollection());
-                }
-                $optionsPerKey[$abstractKey][$page] = $filterOption;
+    /**
+     * @param GenericCollection|FilterOption\Model[] $pageOptions
+     * @param string $page
+     * @return GenericCollection|FilterOption\Model[]
+     */
+    protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
+    {
+        // Ensure it contains all Term instances
+        foreach ($this->terms as $term) {
+            if (!$pageOptions->offsetExists($term->getId())) {
+                $option = $this->getFilterOptionMapper()->createModel();
+                $key = (string)$term->getId();
+                $option
+                    ->setFilter($this->getFilter())
+                    ->setKey($key)
+                    ->setPage($page)
+                    ->setAvailable($this->getInitialAvailability($key, $page));
+                $pageOptions->setOffset($option->getKey(), $option);
             }
         }
-        return $optionsPerKey;
+        return $pageOptions;
+    }
+
+    /**
+     * @param GenericCollection|FilterOption\Model[] $pageOptions
+     * @return GenericCollection|FilterOption\Model[]
+     */
+    protected function unsetInvalidOptions(GenericCollection $pageOptions)
+    {
+        // Discard any options that refer to Terms that no longer exist (eg if deleted)
+        foreach ($pageOptions as $filterOption) {
+            // Does the filter refer to a specific Term instance?
+            $isForSpecificTerm = !in_array($filterOption->getKey(), $this->getCustomKeys(), true);
+            if ($isForSpecificTerm && !$this->terms->offsetExists($filterOption->getKey())) {
+                $pageOptions->offsetUnset($filterOption->getKey());
+            }
+        }
+        return $pageOptions;
     }
 
 
@@ -285,15 +212,13 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Returns sets of options, grouped by option.page, then indexed by option.key.
-     * Each Option contains a set of Defaults, indexed by roleType
-     *
-     * @param null|string $pageFilter If supplied, get options just for this page, otherwise get options for all available pages
-     * @return Collection|GenericCollection[]|FilterOption\Model[][]
+     * @inheritdoc
+     * @throws Mapper\Exception
+     * @todo move common logic into abstract base
      */
-    public function getOptionDefaults($pageFilter = null)
+    public function getOptionDefaults($pageFilter = null, $roleTypeFilter = null)
     {
-        $optionsPerKey = $this->getOptions();
+        $optionsPerKey = $this->getOptions($pageFilter);
 
         // Get the ones which are available (regardless of whether they exist yet in DB)
         $availableOptions = $this->getFilterOptionMapper()->createCollection();
@@ -313,11 +238,14 @@ class Definition extends AbstractFilterDefinition
         })->indexBy('id');
 
         // Load existing defaults for existing options, and group by option
-        $defaultsPerExistingOption = $this->getFilterDefaultMapper()
-                                          ->findByColumn('filter_option_id', $existingOptions->keys())
-                                          ->groupByCallback(function (FilterDefault\Model $default) {
-                                              return $default->getFilterOption()->getId();
-                                          });
+        $columnList = ['filter_option_id' => $existingOptions->keys()];
+        if($roleTypeFilter){
+            $columnList['role_type'] = $roleTypeFilter;
+        }
+        $existingDefaults = $this->getFilterDefaultMapper()->findByColumnList($columnList);
+        $defaultsPerExistingOption = $existingDefaults->groupByCallback(function (FilterDefault\Model $default) {
+            return $default->getFilterOption()->getId();
+        });
 
         // Add defaults to the options, and index defaults by roleType
         foreach ($defaultsPerExistingOption as $optionId => $defaults) {
@@ -348,6 +276,10 @@ class Definition extends AbstractFilterDefinition
                 $defaults = $option->getDefaults();
                 // Does it contain a Default for all relevant roleTypes?
                 foreach (FilterOption\Model::getRoleTypesForPage($page) as $roleType) {
+                    // Are we filtering results ?
+                    if($roleTypeFilter && $roleTypeFilter !== $roleType){
+                        continue;
+                    }
                     if (!$defaults->offsetExists($roleType)) {
                         $default = $this->getFilterDefaultMapper()->createModel();
                         $default
@@ -365,28 +297,13 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Return the set of pages where this filter is displayed
-     *
-     * @return string[]
-     */
-    public function getPages()
-    {
-        return [
-            FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
-            FilterOption\Model::PAGE_GRADES,
-            FilterOption\Model::PAGE_MARK_BOOK,
-        ];
-    }
-
-
-    /**
      * Return the set of possible keys for this filter's options
      *
      * @return string[]
      */
     public function getAbstractKeys()
     {
-        return array_merge(self::$customKeys, $this->terms->keys());
+        return array_merge($this->getCustomKeys(), $this->terms->keys());
     }
 
 
@@ -410,6 +327,35 @@ class Definition extends AbstractFilterDefinition
             return 'Past Terms';
         }
         return $this->terms[$key]->getCode();
+    }
+
+    /* Getters
+     */
+
+    /**
+     * @return Term\Model[]|GenericCollection
+     */
+    public function getTerms()
+    {
+        return $this->terms;
+    }
+
+
+    /**
+     * @return Term\Model
+     */
+    public function getCurrentTerm()
+    {
+        return $this->currentTerm;
+    }
+
+
+    /**
+     * @return Term\Model
+     */
+    public function getPreviousTerm()
+    {
+        return $this->previousTerm;
     }
 
 }
