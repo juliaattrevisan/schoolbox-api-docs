@@ -61,7 +61,7 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    public function getOptionDefaults()
+    public function getAvailableOptions()
     {
         // TODO: Implement method.
     }

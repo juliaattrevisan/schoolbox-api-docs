@@ -62,7 +62,7 @@ interface IFilterDefinition
 
 
     /**
-     * Get all available filter options, grouped by option.key, then indexed by option.page
+     * Get all possible filter options, grouped by option.key, then indexed by option.page
      *
      * Options may be pulled from:
      * * DB,
@@ -85,7 +85,7 @@ interface IFilterDefinition
      * @return Collection|GenericCollection[]|FilterOption\Model[][]
      * @todo consider renaming to 'getAvailableOptions()'
      */
-    public function getOptionDefaults($pageFilter = null, $roleTypeFilter = null);
+    public function getAvailableOptions($pageFilter = null, $roleTypeFilter = null);
 
 
     /**

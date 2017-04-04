@@ -80,10 +80,10 @@ abstract class AbstractFilterComponent implements IFilterComponent
         $page     = $this->getPage();
         $roleType = $this->getUser()->getRole()->getType();
 
-        /** @var GenericCollection|Option\Model[] $optionDefaults */
-        $optionDefaults = $this->getDefinition()->getOptionDefaults($page, $roleType)[$page];
+        /** @var GenericCollection|Option\Model[] $availableOptions */
+        $availableOptions = $this->getDefinition()->getAvailableOptions($page, $roleType)[$page];
 
-        $availableSelections = $this->buildDefaultSelections($optionDefaults);
+        $availableSelections = $this->buildDefaultSelections($availableOptions);
         $this->overlayUserSelections($availableSelections);
 
         return $availableSelections;

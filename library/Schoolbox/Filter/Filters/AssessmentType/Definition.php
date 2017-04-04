@@ -181,7 +181,7 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    public function getOptionDefaults($pageFilter = null, $roleTypeFilter = null)
+    public function getAvailableOptions($pageFilter = null, $roleTypeFilter = null)
     {
         $optionsPerKey = $this->getOptions();
 

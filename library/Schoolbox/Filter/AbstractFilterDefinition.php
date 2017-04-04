@@ -12,6 +12,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper;
 
 /**
  * Provides common filter definition behaviour
@@ -154,6 +155,106 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
     abstract protected function unsetInvalidOptions(GenericCollection $pageOptions);
 
 
+    /**
+     * @inheritdoc
+     * @throws Mapper\Exception
+     */
+    public function getAvailableOptions($pageFilter = null, $roleTypeFilter = null)
+    {
+        // Get all possible options, filtering by page.
+        $optionsPerKey = $this->getOptions($pageFilter);
+
+        // Get the options which are available (regardless of whether they exist yet in DB)
+        $availableOptions = $this->getFilterOptionMapper()->createCollection();
+        foreach ($optionsPerKey as $key => $keyOptions) {
+            /** @var Option\Model[] $keyOptions */
+            foreach ($keyOptions as $page => $option) {
+                if ($option->getAvailable()) {
+                    $availableOptions->add($option);
+                }
+            }
+        }
+
+        // Find any options that already exist in the DB
+        /** @var Option\Model[]|GenericCollection $existingOptions */
+        $existingOptions = $availableOptions->filter(function (Option\Model $option) {
+            return null !== $option->getId();
+        })->indexBy('id');
+
+        // Load existing defaults for existing options, and group by option
+        $columnList = ['filter_option_id' => $existingOptions->keys()];
+        if($roleTypeFilter){
+            $columnList['role_type'] = $roleTypeFilter;
+        }
+        $existingDefaults = $this->getFilterDefaultMapper()->findByColumnList($columnList);
+        $defaultsPerExistingOption = $existingDefaults->groupByCallback(function (Defaults\Model $default) {
+            return $default->getFilterOption()->getId();
+        });
+
+        // Add defaults to the options, and index defaults by roleType
+        foreach ($defaultsPerExistingOption as $optionId => $defaults) {
+            $existingOptions[$optionId]->setDefaults($defaults->indexBy('roleType'));
+        }
+
+        // Group the options by page, then index by key
+        /** @var Collection|GenericCollection[]|Option\Model[][] $optionsPerPage */
+        $optionsPerPage = $availableOptions->groupBy('page');
+        foreach ($optionsPerPage as $page => $options) {
+            $options->indexBy('key');
+        }
+
+        // Ensure the pages are sorted as defined by the filter definition
+        $sortedOptionsPerPage = new Collection();
+        foreach ($this->getPages() as $page) {
+            if ($pageFilter && $pageFilter !== $page) {
+                continue;
+            }
+            $sortedOptionsPerPage[$page] = $optionsPerPage[$page];
+        }
+
+        // Ensure all defaults are present in our model graph
+        foreach ($sortedOptionsPerPage as $page => $options) {
+            /** @var GenericCollection|Option\Model[] $options */
+            foreach ($options as $key => $option) {
+                $defaults = $option->getDefaults();
+                // Does it contain a Default for all relevant roleTypes?
+                foreach (Option\Model::getRoleTypesForPage($page) as $roleType) {
+                    // Are we filtering results ?
+                    if($roleTypeFilter && $roleTypeFilter !== $roleType){
+                        continue;
+                    }
+                    if (!$defaults->offsetExists($roleType)) {
+                        $default = $this->getFilterDefaultMapper()->createModel();
+                        $default
+                            ->setFilterOption($option)
+                            ->setRoleType($roleType)
+                            ->setSelected($this->getInitialSelectedState($key, $page, $roleType));
+                        $defaults[$roleType] = $default;
+                    }
+                }
+            }
+        }
+
+        return $sortedOptionsPerPage;
+    }
+
+
+    /**
+     * If not yet configured by the admin, should this filter option be selected by default
+     *
+     * @param string $key
+     * @param string $page
+     * @param string $roleType
+     * @return bool
+     * @todo how get rid of grey squiggles? No base implementation? Promote to interface?
+     */
+    protected function getInitialSelectedState($key, $page, $roleType)
+    {
+        // Default to never setting available option to be pre-selected
+        return false;
+    }
+
+
 
     /**
      * @return string
@@ -187,7 +288,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      * @param string $customAbstractKey
      * @param string $page
      * @return bool
-     * @todo figure out how to get rid of grey squiggles. Put on interface? yuk!
+     * @todo how get rid of grey squiggles? No base implementation? Promote to interface?
      */
     protected function getInitialAvailability($customAbstractKey, $page)
     {

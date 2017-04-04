@@ -63,7 +63,7 @@ class Controller extends BaseController
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getDefaultsTemplate(), [
             'filter'                 => $definition->getFilter(),
             'definition'             => $definition,
-            'optionsPerPage'         => $definition->getOptionDefaults(),
+            'optionsPerPage'         => $definition->getAvailableOptions(),
             'roleTypes'              => [
                 Role::STAFF,
                 Role::PARENT,
@@ -150,7 +150,7 @@ class Controller extends BaseController
         $optionsToSave = $optionMapper->createCollection();
         $defaultsToSave = $defaultMapper->createCollection();
 
-        $optionsPerPageAndKey = $definition->getOptionDefaults();
+        $optionsPerPageAndKey = $definition->getAvailableOptions();
 
         foreach($optionsPerPageAndKey as $page => $pageOptions) {
             /** @var Option\Model[] $pageOptions */

@@ -139,6 +139,15 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
+     * @inheritdoc
+     */
+    protected function getInitialSelectedState($key, $page, $roleType)
+    {
+        return self::KEY_CURRENT === $key && FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
+    }
+
+
+    /**
      * @param GenericCollection|FilterOption\Model[] $pageOptions
      * @param string $page
      * @return GenericCollection|FilterOption\Model[]
@@ -211,89 +220,7 @@ class Definition extends AbstractFilterDefinition
     }
 
 
-    /**
-     * @inheritdoc
-     * @throws Mapper\Exception
-     * @todo move common logic into abstract base
-     */
-    public function getOptionDefaults($pageFilter = null, $roleTypeFilter = null)
-    {
-        $optionsPerKey = $this->getOptions($pageFilter);
 
-        // Get the ones which are available (regardless of whether they exist yet in DB)
-        $availableOptions = $this->getFilterOptionMapper()->createCollection();
-        foreach ($optionsPerKey as $key => $keyOptions) {
-            /** @var FilterOption\Model[] $keyOptions */
-            foreach ($keyOptions as $page => $option) {
-                if ($option->getAvailable()) {
-                    $availableOptions->add($option);
-                }
-            }
-        }
-
-        // Find any options that already exist in the DB
-        /** @var FilterOption\Model[]|GenericCollection $existingOptions */
-        $existingOptions = $availableOptions->filter(function (FilterOption\Model $option) {
-            return null !== $option->getId();
-        })->indexBy('id');
-
-        // Load existing defaults for existing options, and group by option
-        $columnList = ['filter_option_id' => $existingOptions->keys()];
-        if($roleTypeFilter){
-            $columnList['role_type'] = $roleTypeFilter;
-        }
-        $existingDefaults = $this->getFilterDefaultMapper()->findByColumnList($columnList);
-        $defaultsPerExistingOption = $existingDefaults->groupByCallback(function (FilterDefault\Model $default) {
-            return $default->getFilterOption()->getId();
-        });
-
-        // Add defaults to the options, and index defaults by roleType
-        foreach ($defaultsPerExistingOption as $optionId => $defaults) {
-            $existingOptions[$optionId]->setDefaults($defaults->indexBy('roleType'));
-        }
-
-        // Group the options by page, then index by key
-
-        /** @var Collection|GenericCollection[]|FilterOption\Model[][] $optionsPerPage */
-        $optionsPerPage = $availableOptions->groupBy('page');
-        foreach ($optionsPerPage as $page => $options) {
-            $options->indexBy('key');
-        }
-
-        // Ensure the pages are sorted
-        $sortedOptionsPerPage = new Collection();
-        foreach ($this->getPages() as $page) {
-            if ($pageFilter && $pageFilter !== $page) {
-                continue;
-            }
-            $sortedOptionsPerPage[$page] = $optionsPerPage[$page];
-        }
-
-        // Ensure all defaults are available for configuration
-        foreach ($sortedOptionsPerPage as $page => $options) {
-            /** @var GenericCollection|FilterOption\Model[] $options */
-            foreach ($options as $key => $option) {
-                $defaults = $option->getDefaults();
-                // Does it contain a Default for all relevant roleTypes?
-                foreach (FilterOption\Model::getRoleTypesForPage($page) as $roleType) {
-                    // Are we filtering results ?
-                    if($roleTypeFilter && $roleTypeFilter !== $roleType){
-                        continue;
-                    }
-                    if (!$defaults->offsetExists($roleType)) {
-                        $default = $this->getFilterDefaultMapper()->createModel();
-                        $default
-                            ->setFilterOption($option)
-                            ->setRoleType($roleType)
-                            ->setSelected(self::KEY_CURRENT === $key && FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page);
-                        $defaults[$roleType] = $default;
-                    }
-                }
-            }
-        }
-
-        return $sortedOptionsPerPage;
-    }
 
 
     /**

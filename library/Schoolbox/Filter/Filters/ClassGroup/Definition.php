@@ -114,7 +114,7 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    public function getOptionDefaults()
+    public function getAvailableOptions()
     {
         // TODO consider all/none ?
         return new Collection();
