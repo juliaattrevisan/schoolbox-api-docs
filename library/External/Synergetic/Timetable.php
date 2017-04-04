@@ -105,7 +105,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $currentDay = null;
 
         $outputs['CurrentDay'] = [
-            'value' => null,
+            'value' => &$currentDay,
             'type' => PDO::PARAM_INT,
             'length' => 4
         ];
@@ -113,7 +113,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $statement->bindOutputs($outputs);
         $statement->execute();
 
-        if ($statement->nextRowset()) {
+        if (isset($currentDay)) {
             return $currentDay;
         }
 
