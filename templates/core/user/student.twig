@@ -7,6 +7,7 @@
 {# medical: if allowed in config, and user is staff or parent of this child #}
 {% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
 {% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaff %}
+{% set showComments = config.synergetic_student_comment and isStaff %}
 {# details: su, staff, self or parent #}
 {% set showDetails = isStaff or isSelf or isParentOfStudent %}
 {# emails: students may view other student's emails #}
@@ -62,7 +63,7 @@
                         {% endblock medicalAlert %}
 
                         {% block synergeticComments %}
-                            {% if externalUser.Comment is not empty %}
+                            {% if externalUser.Comment is not empty and showComments %}
                                 <div class="alert-box highlight icon-info no-margin">
                                     {{ externalUser.Comment }}
                                 </div>
