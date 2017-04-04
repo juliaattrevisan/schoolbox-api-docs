@@ -59,7 +59,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $asyncRedis = new Async\Client($di->get('config')->get('redis_url'), $loop);
 
     /** @var Database $db */
-    $db = $di->get('database');
+    $db = $di->get('databaseInternal');
 
     /** @var IConfigLoader $conf */
     $conf = $di->get('config');

@@ -165,7 +165,7 @@ class Module extends BaseModule
             'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
             'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
             'externalClass'              => $this->getInjector()->get('externalClass'),
-            'database'                   => $this->getInjector()->get('database'),
+            'database'                   => $this->getInjector()->get('databaseInternal'),
         ];
     }
 

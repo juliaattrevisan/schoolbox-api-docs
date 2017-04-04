@@ -18,6 +18,6 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel('Assessment CSV');
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
-    $exporter = new Exporter($di->get('database'));
+    $exporter = new Exporter($di->get('databaseInternal'));
     $exporter->generate(STDOUT);
 });
