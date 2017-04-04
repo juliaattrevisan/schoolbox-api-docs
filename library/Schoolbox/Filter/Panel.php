@@ -10,14 +10,15 @@ namespace Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 
 /**
- * A filter panel holds one or more filters.
+ * A filter panel holds one or more filter components
  *
- * Each filter renders a sub-panel, containing:
+ * Each filter component renders a sub-panel, containing:
  * * a title for the filter
- * * filter options able to be selected by the user
+ * * concrete filter options able to be selected by the user
  */
 class Panel
 {
+
     /**
      * @var string
      */
@@ -26,24 +27,25 @@ class Panel
     /**
      * @var GenericCollection|IFilterComponent[]
      */
-    private $filterComponents;
-
+    private $components;
 
 
     /**
-     * @param string                                $route   The route to send the filter selections to
-     * @param GenericCollection|IFilterComponent[] $filterComponents The set of filters to display in this panel instance
+     * @param string                               $route      The route to send the filter selections to
+     * @param GenericCollection|IFilterComponent[] $components The set of filters to display in this panel instance
      */
-    public function __construct($route, GenericCollection $filterComponents)
+    public function __construct($route, GenericCollection $components)
     {
-        $this->route = $route;
-        $this->filterComponents = $filterComponents;
+        $this->route      = $route;
+        $this->components = $components;
     }
+
 
     public function getTemplate()
     {
         return '@filters/panel.twig';
     }
+
 
     public function getRoute()
     {
@@ -51,8 +53,12 @@ class Panel
     }
 
 
-    public function getFilterComponents()
+    /**
+     *
+     * @return IFilterComponent[]|GenericCollection
+     */
+    public function getComponents()
     {
-        return $this->filterComponents;
+        return $this->components;
     }
 }

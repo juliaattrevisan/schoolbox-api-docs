@@ -221,10 +221,10 @@ class Controller extends Base
 
         // TODO add other filters
 
-        $filters =  $filterFactoryFactory->createFilterComponentCollection([$termFilterComponent]);
+        $filterComponents =  $filterFactoryFactory->createFilterComponentCollection([$termFilterComponent]);
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
-        $filterPanel = new Filter\Panel($route, $filters);
+        $filterPanel = new Filter\Panel($route, $filterComponents);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
             'filterPanel' => $filterPanel,

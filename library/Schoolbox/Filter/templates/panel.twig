@@ -48,7 +48,7 @@ Usage:
 <h1>A Panel containing various filters</h1>
 
 <div id="{{ filterPanelId }}" style="background-color: rgba(200,100,150,0.5)">
-{% for component in panel.filterComponents %}
+{% for component in panel.components %}
     {% include component.template with component.toContext() %}
 {% endfor %}
 </div>

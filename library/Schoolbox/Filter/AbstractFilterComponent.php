@@ -83,7 +83,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
         /** @var GenericCollection|Option\Model[] $availableOptions */
         $availableOptions = $this->getDefinition()->getAvailableOptions($page, $roleType)[$page];
 
-        $availableSelections = $this->buildDefaultSelections($availableOptions);
+        $availableSelections = $this->getDefaultSelections($availableOptions);
         $this->overlayUserSelections($availableSelections);
 
         return $availableSelections;
@@ -98,7 +98,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
      * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
      * @return GenericCollection|Selection\Model[]
      */
-    protected function buildDefaultSelections(GenericCollection $optionDefaults)
+    protected function getDefaultSelections(GenericCollection $optionDefaults)
     {
         // IMPORTANT:
         // This base implementation represents the case when there is a 1:1 between option.key and selection.key

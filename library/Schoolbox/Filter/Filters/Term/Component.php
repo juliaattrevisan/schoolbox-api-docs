@@ -34,7 +34,7 @@ class Component extends AbstractFilterComponent
      * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
      * @return GenericCollection|Selection\Model[]
      */
-    protected function buildDefaultSelections(GenericCollection $optionDefaults)
+    protected function getDefaultSelections(GenericCollection $optionDefaults)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType = $this->getUser()->getRole()->getType();
