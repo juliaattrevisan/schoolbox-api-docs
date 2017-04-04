@@ -215,13 +215,16 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
-        // Add Term Filter
-        $termFilterFactory    = $filterFactoryFactory->buildTermFilterFactory();
-        $termFilterComponent  = $termFilterFactory->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+        // Build Filter Panel Components
+        $termFilterComponent  = $filterFactoryFactory->buildTermFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+        $assessmentTypeComponent = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
 
         // TODO add other filters
 
-        $filterComponents =  $filterFactoryFactory->createFilterComponentCollection([$termFilterComponent]);
+        $filterComponents =  $filterFactoryFactory->createFilterComponentCollection([
+            $termFilterComponent,
+            $assessmentTypeComponent,
+        ]);
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
         $filterPanel = new Filter\Panel($route, $filterComponents);

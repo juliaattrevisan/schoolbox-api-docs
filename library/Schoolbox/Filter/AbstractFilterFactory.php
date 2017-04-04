@@ -11,6 +11,9 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper;
+use Schoolbox\User;
 
 
 abstract class AbstractFilterFactory implements IFilterFactory
@@ -39,6 +42,22 @@ abstract class AbstractFilterFactory implements IFilterFactory
         $this->filterOptionMapper    = $optionMapper;
         $this->filterDefaultMapper   = $defaultMapper;
         $this->filterSelectionMapper = $selectionMapper;
+    }
+
+    /**
+     * Get user's existing selections for this page
+     *
+     * @param User $user
+     * @param string  $page
+     * @return GenericCollection|Selection\Model[]
+     * @throws Mapper\Exception
+     */
+    protected function getSavedSelections(User $user, $page)
+    {
+        return $this->getFilterSelectionMapper()->findByColumnList([
+            'user_id' => $user->getId(),
+            'page'    => $page,
+        ])->indexBy('key');
     }
 
     /**

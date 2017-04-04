@@ -242,33 +242,31 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
     /**
      * If not yet configured by the admin, should this filter option be selected by default
      *
+     * By default, return false (never setting available option to be pre-selected)
+     *
      * @param string $key
      * @param string $page
      * @param string $roleType
      * @return bool
      * @todo how get rid of grey squiggles? No base implementation? Promote to interface?
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
-    {
-        // Default to never setting available option to be pre-selected
-        return false;
-    }
+    abstract protected function getInitialSelectedState($key, $page, $roleType);
 
 
 
     /**
      * @return string
      */
-    protected abstract function getTemplateFile();
+    abstract protected function getTemplateFile();
 
 
     /**
-     * Return the hard-codes list of custom keys for this filter.
+     * Return the ordered, hard-codes list of custom keys for this filter.
      * These may represent abstract concepts, eg 'all', 'past' etc, or concrete items, like '1' => Project, '2' => Quiz
      *
      * @return string[]
      */
-    protected abstract function getCustomKeys();
+    abstract protected function getCustomKeys();
 
 
     /**
@@ -277,23 +275,19 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      * @param GenericCollection|Option\Model[] $options
      * @return GenericCollection
      */
-    protected abstract function sortFilterOptions(GenericCollection $options);
+    abstract protected function sortFilterOptions(GenericCollection $options);
 
 
     /**
      * If the admin has not configured this option, should it be available in filter panels?
      *
-     * By default, all possible options will be available on all pages.
+     * By default, all possible options will be available on all pages. (ie just return true)
      *
      * @param string $customAbstractKey
      * @param string $page
      * @return bool
-     * @todo how get rid of grey squiggles? No base implementation? Promote to interface?
      */
-    protected function getInitialAvailability($customAbstractKey, $page)
-    {
-        return true;
-    }
+    abstract protected function getInitialAvailability($customAbstractKey, $page);
 
 
     /**

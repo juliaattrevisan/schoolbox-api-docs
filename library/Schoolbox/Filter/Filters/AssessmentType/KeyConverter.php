@@ -7,9 +7,7 @@
 namespace Schoolbox\Filter\Filters\AssessmentType;
 
 use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Filter;
 
 
 /**
@@ -17,25 +15,6 @@ use Schoolbox\Filter;
  */
 class KeyConverter extends AbstractKeyConverter
 {
-
-    /**
-     * @var GenericCollection|Term\Model[]
-     */
-    private $terms;
-
-
-    /**
-     * @param Filter\Model $filter
-     * @param GenericCollection|Term\Model[] $terms
-     */
-    public function __construct(Filter\Model $filter, GenericCollection $terms)
-    {
-        parent::__construct($filter);
-
-        // Ensure invoker cannot mutate our collection's sorting or indexing after construction
-        $this->terms = $terms->shallowClone()->indexBy('id');
-    }
-
 
     /**
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
@@ -46,21 +25,19 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getItem($key)
     {
-        if(!$this->terms->offsetExists($key)){
-            throw new \InvalidArgumentException("No term found for key:  $key");
-        }
-        return $this->terms[$key];
+        // Simply returns the key, representing an AssessmentType
+        return $key;
     }
 
 
     /**
      * Return a concrete key for the specified element
      *
-     * @param Term\Model $element
+     * @param string $element
      * @return string
      */
     public function getKey($element)
     {
-        return (string)$element->getId();
+        return $element;
     }
 }

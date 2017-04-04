@@ -66,7 +66,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
     /**
      * @return string
      */
-    protected abstract function getTemplateFile();
+    abstract protected function getTemplateFile();
 
     /**
      * @return \Schoolbox\Filter\Selection\Model[]|GenericCollection

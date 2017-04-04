@@ -57,8 +57,8 @@ class FactoryFactory
 
         // Registry of as filters definitions. Ensures static analysis identifies usages.
         switch ($filterDefinitionClass) {
-//            case AssessmentTypeFilter\Definition::class:
-//                return $this->buildAssessmentTypeFilterFactory();
+            case AssessmentTypeFilter\Definition::class:
+                return $this->buildAssessmentTypeFilterFactory();
 //            case ClassGroupFilter\Definition::class:
 //                return $this->buildClassGroupFilterFactory();
             case TermFilter\Definition::class:
@@ -87,18 +87,21 @@ class FactoryFactory
         return new GenericCollection(IKeyConverter::class, $contents);
     }
 
-//
-//    /**
-//     * @return AssessmentTypeFilter\Factory
-//     * @throws \InvalidArgumentException
-//     */
-//    public function buildAssessmentTypeFilterFactory()
-//    {
-//        $factory = new AssessmentTypeFilter\Factory();
-//        $this->setBaseDependencies($factory, AssessmentTypeFilter\Definition::class);
-//        return $factory;
-//    }
-//
+
+    /**
+     * @return AssessmentTypeFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    public function buildAssessmentTypeFilterFactory()
+    {
+        return new AssessmentTypeFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper()
+        );
+    }
+
 //
 //    /**
 //     * @return ClassGroupFilter\Factory

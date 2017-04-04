@@ -7,14 +7,12 @@
 
 namespace Schoolbox\Filter\Filters\Term;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option\Defaults as FilterDefault;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Mapper;
 
 
 /**
@@ -238,19 +236,19 @@ class Definition extends AbstractFilterDefinition
 
     public function getLabel($key)
     {
-        if (Definition::KEY_ALL === $key) {
+        if (self::KEY_ALL === $key) {
             return 'All Terms';
         }
-        if (Definition::KEY_FUTURE === $key) {
+        if (self::KEY_FUTURE === $key) {
             return 'Future Terms';
         }
-        if (Definition::KEY_CURRENT === $key) {
+        if (self::KEY_CURRENT === $key) {
             return $this->currentTerm ? "Current ({$this->currentTerm->getCode()})" : '';
         }
-        if (Definition::KEY_PREVIOUS === $key) {
+        if (self::KEY_PREVIOUS === $key) {
             return $this->previousTerm ? "Previous ({$this->previousTerm->getCode()})" : '';
         }
-        if (Definition::KEY_PAST === $key) {
+        if (self::KEY_PAST === $key) {
             return 'Past Terms';
         }
         return $this->terms[$key]->getCode();
