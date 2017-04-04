@@ -2482,62 +2482,12 @@ abstract class Mapper implements IMapper, Serializable
                         }
                         $affectedIDs[] = $this->getModelProperty($model, $id_property);
                     }
-                    // also update n:n relation tables if they exist
-                    foreach ($this->getMap() as $map) {
-                        if (empty($map['join'])
-                            || empty($this->joins[$map['join']]['multi'])
-                            || (isset($this->joins[$map['join']]['multi']['read_only']) && $this->joins[$map['join']]['multi']['read_only'])
-                        ) {
-                            // not interested
-                            continue;
-                        }
-                        $joinSchema = $this->joins[$map['join']];
-                        $joinMulti  = $joinSchema['multi'];
-                        $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
-                        // step 1: delete existing relations in join table
-                        $deleteRelationStatement = $this->database->prepare("
-                            DELETE FROM `{$joinMulti['via_table']}`
-                            WHERE `{$joinMulti['this_key']}` = :this_key
-                        ");
-                        $deleteRelationStatement->bindValue(':this_key', $thisKey);
-                        if (!$deleteRelationStatement->execute()) {
-                            $this->database->rollBack();
-                            return false;
-                        }
-                        // step 2: insert new relations in join table
-                        $insertRelationStatement = $this->database->prepare("
-                            INSERT IGNORE INTO `{$joinMulti['via_table']}`
-                                (`{$joinMulti['this_key']}`,`{$joinMulti['other_key']}`)
-                            VALUES
-                                (:this_key, :other_key)
-                        ");
-                        // should dehydrate to an array
-                        $propertyValue = (array)$this->getModelProperty($model, $map['property']);
-                        // iterate the values given and insert into join table
-                        $otherMapper       = $this->getJoinMapper($map['join']);
-                        $otherModelExample = $otherMapper->createModel();
-                        foreach ($propertyValue as $value) {
-                            // Is $otherKey a model? If so I need its identifier.
-                            if ($value instanceof $otherModelExample) {
-                                $otherKey = $otherMapper->getModelProperty(
-                                    $value,
-                                    $this->getIdentifierProperty()
-                                );
-                            } else {
-                                $otherKey = $value;
-                            }
-                            $success = $insertRelationStatement->execute(
-                                array(
-                                    'this_key'  => $thisKey,
-                                    'other_key' => $otherKey
-                                )
-                            );
-                            if (!$success) {
-                                $this->database->rollBack();
-                                return false;
-                            }
-                        }
+
+                    if (!$this->savePolyJoins($model)) {
+                        $this->database->rollBack();
+                        return false;
                     }
+
                 } else {
                     $this->database->rollBack();
                     return false;
@@ -2549,16 +2499,122 @@ abstract class Mapper implements IMapper, Serializable
         }
         $this->database->commit();
         foreach ($collection as $i => $model) {
+
             $previous = null;
-            if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
-                $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
-                $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
+
+            if ($id_property) {
+                // this mapper defines a primary key, so providing a diff is possible (if this is an UPDATE)
+                $id = $this->getModelProperty($model, $id_property);
+
+                if ($id) {
+                    $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
+                    $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
+                }
+
+            } else {
+                // this mapper does not define primary key: we cannot supply a diff, but we *can* still call the POSTSAVE hook
+                $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model);
             }
+
             $this->raiseNotification($model, $pdoMethods[$i], $previous);
         }
         return $affectedIDs;
     }
 
+
+    /**
+     * Update any n:n relations that exist
+     *
+     * @param object $model
+     * @throws PDOException
+     * @return bool
+     */
+    private function savePolyJoins($model)
+    {
+        $deletePattern = 'DELETE FROM `%s` WHERE `%s` = :this_key';
+        $insertPattern = 'INSERT IGNORE INTO `%s` (`%s`, `%s`) VALUES (:this_key, :other_key)';
+
+        try {
+            foreach ($this->getMap() as $map) {
+                if (!$this->polyJoinExists($map)) {
+                    // not interested
+                    continue;
+                }
+
+                $joinSchema = $this->joins[$map['join']];
+                $joinMulti  = $joinSchema['multi'];
+                $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
+
+                $viaTable   = $joinMulti['via_table'];
+                $viaLocal   = $joinMulti['this_key'];
+                $viaForeign = $joinMulti['other_key'];
+
+                // step 1: delete existing relations in join table
+                $deleteRelationStatement = $this->database->prepare(sprintf($deletePattern, $viaTable, $viaLocal));
+
+                $deleteRelationStatement->bindValue(':this_key', $thisKey);
+
+                if (!$deleteRelationStatement->execute()) {
+                    return false;
+                }
+
+                // step 2: insert new relations in join table
+                $insertRelationStatement = $this->database->prepare(sprintf($insertPattern, $viaTable, $viaLocal, $viaForeign));
+
+                // should dehydrate to an array
+                $propertyValue = (array)$this->getModelProperty($model, $map['property']);
+
+                // iterate the values given and insert into join table
+                $otherMapper       = $this->getJoinMapper($map['join']);
+                $otherModelExample = $otherMapper->createModel();
+
+                foreach ($propertyValue as $value) {
+
+                    $otherKey = $value;
+
+                    // Is $otherKey a model? If so I need its identifier.
+                    if ($value instanceof $otherModelExample) {
+                        $otherKey = $otherMapper->getModelProperty($value, $this->getIdentifierProperty());
+                    }
+
+                    $success = $insertRelationStatement->execute([
+                        'this_key'  => $thisKey,
+                        'other_key' => $otherKey
+                    ]);
+
+                    if (!$success) {
+                        return false;
+                    }
+                }
+            }
+        } catch (InvalidArgumentException $e) {
+            // in all exceptional cases except PDOException, we return false
+            return false;
+        } catch (Exception $e) {
+            return false;
+        } catch (Mapper\DefinitionException $e) {
+            return false;
+        }
+
+        // even if we did nothing, nothing is still a success
+        return true;
+    }
+
+
+    /**
+     * Does this specific mapping have a n:n join?
+     *
+     * @param array $map
+     * @return bool
+     */
+    private function polyJoinExists(array $map)
+    {
+        return !(
+            empty($map['join'])
+            || empty($this->joins[$map['join']]['multi'])
+            || (isset($this->joins[$map['join']]['multi']['read_only']) && $this->joins[$map['join']]['multi']['read_only'])
+        );
+    }
 
     /**
      * Setup method. Implementing classes to define their SQL map here.

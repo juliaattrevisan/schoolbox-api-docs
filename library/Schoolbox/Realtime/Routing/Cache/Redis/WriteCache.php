@@ -1,0 +1,195 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Realtime\Routing\Cache\Redis;
+
+use Alaress\Async\Synchroniser;
+use Alaress\Routing\FlatRouter;
+use Alaress_Byte_Format;
+use Predis\ClientInterface;
+use Psr\Log\LoggerInterface;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
+use Schoolbox\Realtime\Routing\Subscription;
+use UnderflowException;
+
+
+class WriteCache extends ReadCache implements WritableCache
+{
+    const SIGNAL_PATTERN = 'routed.%s.reload';
+
+    /** @var Subscription\Loader\Factory */
+    private $loaderFactory;
+
+
+    /**
+     * @param ClientInterface             $redis
+     * @param LoggerInterface             $log
+     * @param Subscription\Loader\Factory $loaderFactory
+     */
+    public function __construct(ClientInterface $redis, LoggerInterface $log, Subscription\Loader\Factory $loaderFactory)
+    {
+        parent::__construct($redis, $log);
+        $this->loaderFactory = $loaderFactory;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function cacheUser($instanceId, $userId)
+    {
+        try {
+            $routeStorageKey = $this->getCacheKey($instanceId);
+
+            // ensure this block of code is only ever executed by exactly one process at a time
+            (new Synchroniser($this, $this->redis))->synchronise($userId, function ($userId) use ($routeStorageKey) {
+                // this closure will be called multiple times consecutively if there are concurrent requests
+                $router = $this->bindIndividual($userId, $routeStorageKey);
+                $this->writeCache($router, $routeStorageKey);
+            });
+
+            $this->broadcastReload($instanceId);
+
+        } catch (UnderflowException $e) {
+            $this->log->notice($e->getMessage());
+        }
+
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws UnderflowException
+     */
+    public function cacheAllUsers($instanceId)
+    {
+        $router = $this->bindEveryone($this->loaderFactory->getNoCache(), new FlatRouter());
+        $this->writeCache($router, $this->getCacheKey($instanceId));
+
+        $this->broadcastReload($instanceId);
+    }
+
+
+    /**
+     * @param string $instanceId
+     */
+    private function broadcastReload($instanceId)
+    {
+        $reloadChannel = sprintf(self::SIGNAL_PATTERN, $instanceId);
+
+        $this->log->info("Broadcasting `$reloadChannel`", [ 'char' => '>' ]);
+
+        $this->redis->publish($reloadChannel, '');
+    }
+
+
+    /**
+     * @param FlatRouter $router
+     * @param string     $routeStorageKey
+     */
+    private function writeCache(FlatRouter $router, $routeStorageKey)
+    {
+        $json = json_encode($router->getAll());
+        $gz = gzcompress($json, 9);
+
+        $this->log->info(sprintf('Compressing route tree: %s => %s', Alaress_Byte_Format::bytesToString(strlen($json)), Alaress_Byte_Format::bytesToString(strlen($gz))));
+
+        $this->redis->set($routeStorageKey, $gz);
+
+        $this->log->info("Route tree stored in `$routeStorageKey`", [ 'char' => '+' ]);
+    }
+
+
+    /**
+     * @param int    $userId
+     * @param string $routeStorageKey
+     * @throws UnderflowException
+     * @return FlatRouter
+     */
+    private function bindIndividual($userId, $routeStorageKey)
+    {
+        $this->log->info("Calculating bindings for user $userId");
+        $router = new FlatRouter();
+
+        // start by loading from cache
+        $this->loaderFactory->get($routeStorageKey)->loadSubscriptions($router);
+
+        // extract the list and reset the router
+        $allRoutes = $router->getAll();
+        $router = new FlatRouter();
+
+        // compile user routes
+        $userRoutes  = $this->generateRoutesForUser($userId);
+        $changeCount = 0;
+
+        // remove any bindings no longer applicable to this user
+        foreach ($allRoutes as $path => $pathData) {
+            if (isset($pathData[$userId]) && empty($userRoutes[$path])) {
+                $this->log->info("User $userId - `$path`", [ 'char' => '-' ]);
+                unset ($allRoutes[$path][$userId]);
+                ++$changeCount;
+            }
+        }
+
+        // reinsert all remaining routes
+        foreach ($allRoutes as $path => $pathData) {
+            foreach ($pathData as $key => $value) {
+                $router->add($path, $key, $value);
+            }
+        }
+
+        // compute the positive diff (ie. new subscriptions)
+        $userDiff = $userRoutes;
+
+        foreach ($allRoutes as $path => $pathData) {
+            if (array_key_exists($userId, $pathData)) {
+                unset($userDiff[$path]);
+            }
+        }
+
+        // overlay this user's bindings to account for any new ones
+        foreach ($userDiff as $path => $pathData) {
+            $router->add($path, $userId, true);
+            $this->log->info("User $userId + `$path`", [ 'char' => '+' ]);
+            ++$changeCount;
+        }
+
+        if ($changeCount === 0) {
+            throw new UnderflowException("No changes made to bindings for user $userId");
+        }
+
+        return $router;
+    }
+
+
+    /**
+     * @param Subscription\Loader\ILoader $loader
+     * @param FlatRouter                  $router
+     * @return FlatRouter
+     */
+    private function bindEveryone(Subscription\Loader\ILoader $loader, FlatRouter $router)
+    {
+        // this will calculate and load all subscriptions into the router
+        $loader->loadSubscriptions($router);
+
+        return $router;
+    }
+
+
+    /**
+     * Essentially just converts generator bindings into a route list
+     *
+     * @param int $userId
+     * @return array
+     */
+    private function generateRoutesForUser($userId)
+    {
+        return $this->loaderFactory->getNoCache()->getUserSubscriptions($userId);
+    }
+
+}

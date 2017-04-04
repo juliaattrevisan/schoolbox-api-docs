@@ -24,4 +24,12 @@ interface ILoader
      * @return $this
      */
     public function loadSubscriptions(IRouter $router);
+
+
+    /**
+     * @param int $userId
+     * @return string[]
+     */
+    public function getUserSubscriptions($userId);
+
 }

@@ -42,7 +42,9 @@ if (Cfg::get('external_sync_data') == 1) {
     } else {
         $sync->execute();
 
-        // TODO implement REDIS publish
+
+
+        \Alaress\Redis::getClientInstance()->publish('routed.'.INSTANCE_ID.'.reload', '');
     }
 
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Redis\Async;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\Clock;
@@ -80,6 +81,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var React\Stomp\Client $stomp */
     $stomp = $di->get('stomp');
 
+    $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);
 
     try {
         /** @var AMQPInterface $amqp */
@@ -101,12 +103,16 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
 
         // due to the async nature of STOMP, only register the consumer once the connection is actually established
-        $stomp->connect()->then(function () use ($scheduleBroker, $scheduler, $log) {
+        $stomp->connect()->then(function () use ($scheduleBroker, $scheduler, $log, $asyncRedis) {
             $log->info('Connected to STOMP', [ 'char' => '+' ]);
 
             $scheduleBroker->registerConsumer($scheduler);
-
             $log->debug('Consuming amqp://' . Schedule\Broker::QUEUE);
+
+            $topic = 'scheduled.'.INSTANCE_ID.'.*';
+
+            $asyncRedis->psubscribe($topic, $scheduler);
+            $log->info("Listening on redis://$topic");
         });
 
     } catch (ConnectionException $e) {

@@ -95,22 +95,6 @@ class UserAccessNotifier extends AbstractModuleNotifier
     }
 
 
-    /**
-     * @param string $label
-     * @return array
-     */
-    public function retrieveCallbacks($label)
-    {
-        $callbacks = parent::retrieveCallbacks($label);
-        // append system one too
-        $method = 'notifySystem' . ucfirst($label);
-        if (method_exists($this, $method)) {
-            $callbacks[] = [$this, $method];
-        }
-        return $callbacks;
-    }
-
-
     /* ASYNC METHODS */
 
     /**
@@ -389,74 +373,6 @@ class UserAccessNotifier extends AbstractModuleNotifier
     public function notifyParentApproved($userAccess, $user, $diff = null)
     {
         return $this->notifyApproved($userAccess, $user, $diff);
-    }
-
-
-    /**
-     * Tells the scheduler commander that the user in $userAccess needs to be
-     * rebound.
-     *
-     * @param UserAccess $userAccess
-     */
-    protected function adviseRerouterCommander($userAccess)
-    {
-        // TODO implement REDIS publish
-    }
-
-
-    /**
-     * System notifiers intentionally don't return a Messenger - instead, they
-     * tell the scheduler commander to rebind the user whose access was changed.
-     *
-     * @param UserAccess $userAccess
-     * @param User       $user
-     * @param array      $diff
-     */
-    public function notifySystemJoined($userAccess, $user, $diff = null)
-    {
-        $this->adviseRerouterCommander($userAccess);
-    }
-
-
-    /**
-     * System notifiers intentionally don't return a Messenger - instead, they
-     * tell the scheduler commander to rebind the user whose access was changed.
-     *
-     * @param UserAccess $userAccess
-     * @param User       $user
-     * @param array      $diff
-     */
-    public function notifySystemLeft($userAccess, $user, $diff = null)
-    {
-        $this->adviseRerouterCommander($userAccess);
-    }
-
-
-    /**
-     * System notifiers intentionally don't return a Messenger - instead, they
-     * tell the scheduler commander to rebind the user whose access was changed.
-     *
-     * @param UserAccess $userAccess
-     * @param User       $user
-     * @param array      $diff
-     */
-    public function notifySystemApproved($userAccess, $user, $diff = null)
-    {
-        $this->adviseRerouterCommander($userAccess);
-    }
-
-
-    /**
-     * System notifiers intentionally don't return a Messenger - instead, they
-     * tell the scheduler commander to rebind the user whose access was changed.
-     *
-     * @param UserAccess $userAccess
-     * @param User       $user
-     * @param array      $diff
-     */
-    public function notifySystemRejected($userAccess, $user, $diff = null)
-    {
-        $this->adviseRerouterCommander($userAccess);
     }
 
 }

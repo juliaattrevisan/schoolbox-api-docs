@@ -92,4 +92,13 @@ class Resolver
         }
     }
 
+
+    /**
+     * @return IRouter
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
 }

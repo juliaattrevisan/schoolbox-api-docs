@@ -11,6 +11,9 @@ namespace Alaress\Scheduler;
 
 
 use Alaress\Date\IClock;
+use Alaress\Redis\Async\Event\IEvent;
+use Alaress\Redis\Async\Event\Message;
+use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
@@ -24,7 +27,7 @@ use RuntimeException;
  *
  * @package Alaress\Scheduler
  */
-abstract class CronScheduler extends AbstractScheduler
+abstract class CronScheduler extends AbstractScheduler implements EventListener
 {
 
     /** @var TriggerInterface[] */
@@ -72,6 +75,29 @@ abstract class CronScheduler extends AbstractScheduler
     public function onReload() {
         $this->dropCache();
         $this->reload();
+    }
+
+
+    /**
+     * Handle the given redis event
+     *
+     * @param IEvent $event
+     * @return void
+     */
+    public function handle(IEvent $event)
+    {
+        if (!$event instanceof Message) {
+            // ignore pings
+            return;
+        }
+
+        // comes in the form 'digestd.vagrantx.reload'
+        list (, , $action) = explode('.', $event->getChannel());
+
+        if ($action === 'reload') {
+            // this is the only action we currently know about
+            $this->onReload();
+        }
     }
 
 

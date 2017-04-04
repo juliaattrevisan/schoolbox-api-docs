@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Alaress\Redis\Async;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
@@ -18,6 +19,7 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
+use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Routing\DispatchResponder;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\RouteTXRX;
@@ -54,31 +56,37 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         /** @var AMQPInterface $amqp */
         $amqp = $di->get('amqp');
 
-        $routeBroker   = new Schoolbox\Realtime\Routing\Broker(INSTANCE_ID, $amqp, $redis, $client);
-        $loaderFactory = new Subscription\Loader\Factory($redis, $log);
-        $dispatcher    = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($opts['flags']));
+        // also listen for signals
+        $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);
+        $dispatcher  = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($opts['flags']));
+
+        $cache = new Routing\Cache\Redis\ReadCache($redis, $log);
 
         // ensure endpoints exist
         foreach ($instances as $instance) {
             // this holds and traverses all our subscription data
             $router = new Router(new SubscriptionDictionary('.'));
+            $routeBroker = new Routing\Broker($instance, $amqp, $redis, $client);
 
-            $q = "$instance.route";
+            $q = $routeBroker->getQueue();
+            $t = "routed.$instance.*";
 
             $amqp->declareQueue($q);
 
-            $loaderFactory->get("m:{$instance}:routes")->loadSubscriptions($router);
+            $cache->readIntoRouter($instance, $router);
 
             $transaction = new DispatchTransaction($loop, $dispatcher, DispatchStrategy::TASK_ROUTE,
                 Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
                 Subscription\Handler::TRANSACTION_COUNT_LIMIT
             );
 
-            $handler = new Subscription\Handler(new Subscription\Resolver($router), $log, $txrx, $transaction);
+            $handler = new Subscription\Handler(new Subscription\Resolver($router), $log, $txrx, $transaction, $cache);
 
             $routeBroker->registerConsumer($handler);
+            $log->info("Consuming amqp://$q");
 
-            $log->debug("Consuming amqp://$q");
+            $asyncRedis->psubscribe($t, $handler);
+            $log->info("Listening on redis://$t");
         }
     });
 });
