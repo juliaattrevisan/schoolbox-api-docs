@@ -9,44 +9,17 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use MSSQL;
-use Schoolbox\External\Connector\ExternalEventsInterface;
-use \Alaress_Date_Format;
+use Alaress_Date_Format;
+use Schoolbox\External\Connector\IExternalEvents;
+use Schoolbox\External\Connector\Base;
 
-/**
- * Class ExternalEvents
- *
- * @package Schoolbox\External\Connector\Synergetic\Base
- */
-class ExternalEvents implements ExternalEventsInterface
+class ExternalEvents extends Base implements IExternalEvents
 {
     /**
-     * @var MSSQL
-     */
-    private $database;
-
-
-    /**
-     * Constructor
-     *
-     */
-    public function __construct()
-    {
-        $this->database = MSSQL::getInstance();
-    }
-
-
-    /**
-     * Getting events for a user (a teacher or a student) for a specific time interval
-     *
-     * @param  object $user
-     * @param  string $startDate
-     * @param  string $endDate
-     * @return array|bool
+     * @inheritdoc
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
-
         $start = new Alaress_Date_Format($startDate, 'U');
         $finish = new Alaress_Date_Format($endDate, 'U');
 
@@ -106,6 +79,6 @@ class ExternalEvents implements ExternalEventsInterface
               {$where}
               ORDER BY ss.StaffScheduleSeq ASC";
 
-        return $this->database->getAll($query);
+        return $this->databaseExternal->executeQueryIterator($query);
     }
  }

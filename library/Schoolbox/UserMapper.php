@@ -9,14 +9,16 @@
 
 namespace Schoolbox;
 
+use Alaress\Database\Factory as AlaressDatabaseFactory;
 use HouseMapper;
 use HouseResidentialMapper;
-use Alaress\Cache;
 use PDOStatement;
 use Schoolbox;
-use Schoolbox\External\Connector\CommunityPortalFactory;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\External\Connector\ICommunityPortal;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
+use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 
 /**
  * Class UserMapper
@@ -45,7 +47,6 @@ class UserMapper extends Mapper
      */
     protected function mapping()
     {
-
         $this->hasTable('user');
         $this->hasModel(User::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
@@ -144,8 +145,18 @@ class UserMapper extends Mapper
     {
         /** @var User $model */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            $communityPortalFactory = new CommunityPortalFactory($this->getConfigLoader());
-            $communityPortal = $communityPortalFactory->build();
+            $schoolboxFactory = new SchoolboxDatabaseFactory(new AlaressDatabaseFactory());
+            $databaseExternal = $schoolboxFactory->getExternalDatabase($this->getConfigLoader());
+
+            $externalFactory = new ExternalConnectorFactory();
+
+            /** @var ICommunityPortal $communityPortal */
+            $communityPortal = $externalFactory->build(
+                $this->getConfigLoader(),
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
+            );
+
             try {
                 $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
             } catch (\UnexpectedValueException $e) {
@@ -292,7 +303,10 @@ class UserMapper extends Mapper
      */
     protected function findAccessList(User $user)
     {
-        return $this->getJoinMapper('userAccess')->findAllForUser($user);
+        /** @var UserAccessMapper $userAccessMapper */
+        $userAccessMapper = $this->getJoinMapper('userAccess');
+
+        return $userAccessMapper->findAllForUser($user);
     }
 
     /**
@@ -378,7 +392,11 @@ class UserMapper extends Mapper
 
         foreach ($statement as $row) {
             $user = $this->hydrate($row, 'u');
-            $user->setRole($roleMapper->hydrate($row, 'g'));
+
+            /** @var Role $role */
+            $role = $roleMapper->hydrate($row, 'g');
+
+            $user->setRole($role);
 
             $collection->add($user);
         }
@@ -421,17 +439,15 @@ class UserMapper extends Mapper
      * Retrieves all users who have the given level of access (or higher) to the
      * requested service.
      *
-     * @param  int $service The service level. A UserAccess::SERVICE_*
-     *                                constant.
-     * @param  int $accessLevel The access level. A UserAccess::ACCESS_*
-     *                                constant.
-     * @param  int $serviceIdentifier If provided, the campus or homepage that
-     *                                $service is for.
+     * @param int $service The service level. A UserAccess::SERVICE_* constant
+     * @param int $accessLevel The access level. A UserAccess::ACCESS_* constant
+     * @param int $serviceIdentifier If provided, the campus or homepage that $service is for
+     * @param array $order Sort order array
      * @param int $limit If provided, limit the amount of users to query
      * @return Collection|User[] A list of users who have this level of access
      *                           to the given service.
      */
-    public function findByAccess($service, $accessLevel, $serviceIdentifier = null, $order = Array(), $limit = null)
+    public function findByAccess($service, $accessLevel, $serviceIdentifier = null, $order = [], $limit = null)
     {
         $query = "
             SELECT DISTINCT {$this->getColumnString('u')}, {$this->getJoinColumnString('role', 'r')}
@@ -471,7 +487,10 @@ class UserMapper extends Mapper
 
         foreach ($statement as $row) {
             $user = $this->hydrate($row, 'u');
+
+            /** @var Role $role */
             $role = $this->hydrateJoin($row, 'role', 'r');
+
             $user->setRole($role);
             $users->add($user);
         }

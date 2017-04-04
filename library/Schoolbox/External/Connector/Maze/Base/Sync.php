@@ -9,25 +9,12 @@
 
 namespace Schoolbox\External\Connector\Maze\Base;
 
-use MSSQL;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\Base;
+use Schoolbox\External\Connector\ISync;
 use Schoolbox\Sync\Iterator;
 
-class Sync implements SyncInterface
+class Sync extends Base implements ISync
 {
-    /**
-     * @var MSSQL
-     */
-    protected $database;
-
-    /**
-     * Sync constructor
-     */
-    public function __construct()
-    {
-        $this->database = MSSQL::getInstance();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -53,7 +40,9 @@ class Sync implements SyncInterface
             FROM ST
             WHERE STATUS != 'LEFT'
         ";
-        return new Iterator\Student($this->database->getIterator($query));
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -108,7 +97,10 @@ class Sync implements SyncInterface
 
             ORDER BY student_contact_id ASC
         ";
-        return new Iterator\Guardian($this->database->getIterator($query));
+
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -140,6 +132,9 @@ class Sync implements SyncInterface
             WHERE FINISH IS NULL
             AND STAFF_TYPE != 'L'
         ";
-        return new Iterator\Staff($this->database->getIterator($query));
+
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }

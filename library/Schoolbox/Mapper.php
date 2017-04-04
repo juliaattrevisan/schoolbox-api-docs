@@ -243,12 +243,14 @@ abstract class Mapper implements IMapper, Serializable
         self::$columnFactory = new ColumnFactory();
 
         // only functional in development
+
         self::$perfmon = (INSTANCE_ID === 'vagrantx' && self::isWithinWebRequest())
             ? new DevMonitor(DebugBar::getInstance())
             : new LiveMonitor()
         ;
 
         try {
+
             self::$prop = $di->newInstance(Propagator::class, [
                 'splitter'   => $di->lazyNew(Splitter::class, [
                     'conf'        => $di->lazyGet('config'),
@@ -264,7 +266,9 @@ abstract class Mapper implements IMapper, Serializable
                 ]),
                 'instanceId' => INSTANCE_ID,
             ]);
+
         } catch (Di\Exception\ServiceNotFound $e) {
+
             // in PHPUnit land, we do not have external services.
             // this catch is merely to accommodate that case, it should not be
             // relied upon in development

@@ -11,16 +11,14 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use Alaress_Date_Format;
-use Alaress\DebugBar\Instance as DebugBar;
-use MSSQL;
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\External\Connector\ICommunityPortal;
 use UnexpectedValueException;
 
-class CommunityPortal implements CommunityPortalInterface
+class CommunityPortal implements ICommunityPortal
 {
-    /** @var MSSQL $database */
-    private $database;
+    /** @var IConnector $databaseExternal */
+    private $databaseExternal;
 
     /** @var string $key The password encryption key. This must be secret and not stored in code. */
     private $key;
@@ -28,33 +26,25 @@ class CommunityPortal implements CommunityPortalInterface
     /** @var string $initializationVector The hard-coded IV for the password. This does not need to be secret. */
     private $initializationVector;
 
-    /**
-     * @var bool
-     */
+    /** @var bool $allowCreateUser */
     private $allowCreateUser;
 
     /**
-     * Constructor
-     *
-     * @param string $key
-     * @param string $initializationVector
-     * @param bool   $allowCreateUser      Can this object create new users in the community portal?
+     * @inheritdoc
      */
-    public function __construct($key, $initializationVector, $allowCreateUser)
+    public function __construct($config, $databaseExternal)
+    {
+        $this->allowCreateUser = $config['synergetic_portal_create_account'];
+        $this->databaseExternal = $databaseExternal;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSecrets($key, $initializationVector)
     {
         $this->key = $key;
         $this->initializationVector = $initializationVector;
-        $this->database = MSSQL::getInstance();
-        $this->allowCreateUser = $allowCreateUser;
-
-        if (DebugBar::isEnabled()) {
-            $this->database->installCollector();
-            /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
-            $collector = $this->database->getCollector();
-            if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
-                DebugBar::getInstance()->addCollector($collector);
-            }
-        }
     }
 
     /**
@@ -71,25 +61,29 @@ class CommunityPortal implements CommunityPortalInterface
 
         // Check to see if they have an existing record in the 'CommunityLogins' table
 
-        $result = $this->database->query(
+        $query = $this->databaseExternal->executeQuery(
             "
                 SELECT    * 
-                FROM      [dbo].[CommunityLogins] 
-                WHERE     [ID] = {$this->database->smartQuote($communityId)}
-            "
+                FROM      dbo.communityLogins 
+                WHERE     ID = :externalId
+            ", 
+            ['externalId' => $communityId]
         );
 
-        if ($this->database->countRows($result) > 0) {
+        if ($query->fetch()) {
 
             // Existing community login record, just update the password
 
             $query = "
-                UPDATE    [dbo].[CommunityLogins]
-                SET       [Password] = {$this->database->smartQuote($encryptedPassword)}
-                WHERE     [ID] = {$this->database->smartQuote($communityId)}
+                UPDATE    dbo.communityLogins
+                SET       password = :password
+                WHERE     ID = :externalId
             ";
 
-            $this->database->query($query);
+            $result = $this->databaseExternal->executeQuery($query, [
+                'password' => $encryptedPassword,
+                'externalId' => $communityId
+            ]);
 
         } elseif ($this->allowCreateUser) {
 
@@ -99,47 +93,47 @@ class CommunityPortal implements CommunityPortalInterface
 
             $query =
             "
-                INSERT INTO [dbo].[CommunityLoginsPage]
+                INSERT INTO dbo.CommunityLoginsPage
                 (
-                    [ID],
-                    [ConfigSeq],
-                    [EnabledFlag]
+                    ID,
+                    ConfigSeq,
+                    EnabledFlag
                 )
-                SELECT  {$this->database->smartQuote($communityId)},
+                SELECT  :externalId,
                         ConfigSeq,
                         CASE WHEN DefaultValue = 'TRUE' THEN 1 ELSE 0 END AS Enabled
-                FROM    [dbo].[Config]
-                WHERE   [dbo].[Config].[Key1] = 'CommunityPortal' AND
-                        [dbo].[Config].[Key2] = 'Pages' AND
-                        [dbo].[Config].[Key4] = 'EnabledFlag' AND
-                        [dbo].[Config].[Type] = 'BIT' AND
-                        [dbo].[Config].[Value] = 'True'
+                FROM    dbo.config
+                WHERE   dbo.config.Key1 = 'CommunityPortal' AND
+                        dbo.config.Key2 = 'Pages' AND
+                        dbo.config.Key4 = 'EnabledFlag' AND
+                        dbo.config.Type = 'BIT' AND
+                        dbo.config.Value = 'True'
             ";
 
-            $this->database->query($query);
+            $this->databaseExternal->executeQuery($query, [
+                'externalId' => $communityId
+            ]);
 
             // This sets the password
 
-            $date = Alaress_Date_Format::now()->getDatabase();
-
             $query = "
-                INSERT INTO [dbo].[CommunityLogins]
+                INSERT INTO dbo.communityLogins
                 (
-                    [ID],
-                    [Type],
-                    [Password],
-                    [LastLoginDate],
-                    [LoginType],
-                    [SecurityTokenGuid],
-                    [SecurityTokenIssueDateTime],
-                    [PasswordHashed]
+                    ID,
+                    Type,
+                    password,
+                    LastLoginDate,
+                    LoginType,
+                    SecurityTokenGuid,
+                    SecurityTokenIssueDateTime,
+                    PasswordHashed
                 )
                 VALUES
                 (
-                    {$this->database->smartQuote($communityId)},
+                    :externalId,
                     'CP',
-                    {$this->database->smartQuote($encryptedPassword)},
-                    '{$date}',
+                    :password,
+                    NOW(),
                     '',
                     NULL,
                     NULL,
@@ -147,7 +141,10 @@ class CommunityPortal implements CommunityPortalInterface
                 )
             ";
 
-            $this->database->query($query);
+            $result = $this->databaseExternal->executeQuery($query, [
+                'externalId' => $communityId,
+                'password' => $encryptedPassword
+            ]);
 
         } else {
 
@@ -157,9 +154,7 @@ class CommunityPortal implements CommunityPortalInterface
             return true;
         }
 
-        // If one or more rows were affected then this must have done something positive... right?
-
-        return intval($this->database->getOne('SELECT @@ROWCOUNT')) > 0;
+        return $result;
     }
 
     /**
@@ -216,6 +211,7 @@ class CommunityPortal implements CommunityPortalInterface
         if (empty($this->key)) {
             throw new UnexpectedValueException('Key was not set in constructor');
         }
+
         if (empty($this->initializationVector)) {
             throw new UnexpectedValueException('Initialization vector was not set in constructor');
         }

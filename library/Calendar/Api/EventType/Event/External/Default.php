@@ -5,10 +5,13 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\External\Connector\ExternalEventsFactory;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Iterator\IIterator;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Calendar\EventType;
 
@@ -29,13 +32,14 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     /**
      * Constructor
      *
-     * @param $user
+     * @param User $user
+     * @param IConnector $databaseExternal
      * @param $config
      */
-    public function __construct($user, $config) {
+    public function __construct($user, $databaseExternal, $config) {
         $this->setUser($user);
-        $factory = new ExternalEventsFactory();
-        $this->externalEvents = $factory->build();
+        $factory = new ExternalConnectorFactory();
+        $this->externalEvents = $factory->build($config, $databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 
@@ -49,75 +53,81 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function getEvents($startTimestamp, $endTimestamp) {
 
-        $stack          = new Collection();
+        $stack = new Collection();
+
+        /** @var IIterator $externalEvents */
         $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
 
-        if($externalEvents) {
-            // Figure out event type
-            try {
-                /** @var Calendar_Api_Config_Record $config */
-                $config        = $this->loadConnectorConfiguration();
-                $decodedConfig = $config->decodeConfig();
-                $eventType     = $decodedConfig->getLuEventType();
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $eventType = 1;
-            }
-
-            $eventColor = null;
-            try {
-                /** @var EventType $eventTypeObject */
-                $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
-                $eventColor      = $eventTypeObject->getColor();
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // noop
-            }
-
-            foreach ($externalEvents as $externalEvent) {
-
-                $event = new Event();
-                $event->setEventId($externalEvent['id']);
-                $event->setType($eventType);
-                $event->setTitle($externalEvent['title']);
-                $event->setIsEditable(false);
-                $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
-                $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
-                // Publish date is not available in Synergetic Staff Scheduler, but may be available elsewhere
-                $event->setPublishDate(empty($externalEvent['publish']) ? '' : new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
-
-                //Where is the best place to format this? TODO
-                $eventDetail = '';
-                if(strlen(strip_tags($externalEvent['comment'])) > 0) {
-                    $eventDetail .= strip_tags($externalEvent['comment']);
-                }
-                if(strlen($externalEvent['team']) > 0) {
-                    $eventDetail .= '<br />Team: '.$externalEvent['team'];
-                }
-                if(strlen($eventDetail) > 0) {
-                    $event->setDetail('<p>'.$eventDetail.'</p>');
-                }
-                $event->setLocation(strlen($externalEvent['location']) > 0 ? $externalEvent['location'] : $externalEvent['room']);
-
-                $event->setEventType('external');
-                $event->setAllday(false);
-
-                $owner = UserMapper::getInstance()->findByExternalId($externalEvent['owner']);
-                $event->setAuthorId($externalEvent['owner']);
-                $event->setAuthorName($owner->formatName());
-
-                $event->setColour($eventColor);
-
-                $event->setConnectorId($this->getConnectorId());
-
-                $stack->add($event);
-            }
+        if ($externalEvents->count() == 0) {
+            return $stack;
         }
+
+        // Figure out event type
+        try {
+            /** @var Calendar_Api_Config_Record $config */
+            $config        = $this->loadConnectorConfiguration();
+            $decodedConfig = $config->decodeConfig();
+            $eventType     = $decodedConfig->getLuEventType();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $eventType = 1;
+        }
+
+        $eventColor = null;
+        try {
+            /** @var EventType $eventTypeObject */
+            $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
+            $eventColor      = $eventTypeObject->getColor();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
+        }
+
+        foreach ($externalEvents as $externalEvent) {
+
+            $event = new Event();
+            $event->setEventId($externalEvent['id']);
+            $event->setType($eventType);
+            $event->setTitle($externalEvent['title']);
+            $event->setIsEditable(false);
+            $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
+            $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+            // Publish date is not available in Synergetic Staff Scheduler, but may be available elsewhere
+            $event->setPublishDate(empty($externalEvent['publish']) ? '' : new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+
+            //Where is the best place to format this? TODO
+            $eventDetail = '';
+            if(strlen(strip_tags($externalEvent['comment'])) > 0) {
+                $eventDetail .= strip_tags($externalEvent['comment']);
+            }
+            if(strlen($externalEvent['team']) > 0) {
+                $eventDetail .= '<br />Team: '.$externalEvent['team'];
+            }
+            if(strlen($eventDetail) > 0) {
+                $event->setDetail('<p>'.$eventDetail.'</p>');
+            }
+            $event->setLocation(strlen($externalEvent['location']) > 0 ? $externalEvent['location'] : $externalEvent['room']);
+
+            $event->setEventType('external');
+            $event->setAllday(false);
+
+            $owner = UserMapper::getInstance()->findByExternalId($externalEvent['owner']);
+            $event->setAuthorId($externalEvent['owner']);
+            $event->setAuthorName($owner->formatName());
+
+            $event->setColour($eventColor);
+
+            $event->setConnectorId($this->getConnectorId());
+
+            $stack->add($event);
+        }
+
         return $stack;
 
     }
 
     /**
      * Making the abstract class happy
-     *
+     * @param int $eventId
+     * @return string
      */
     public function getEvent($eventId) {
         return '';

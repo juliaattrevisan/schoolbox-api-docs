@@ -10,7 +10,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\External\Normalise\User;
@@ -1372,6 +1371,7 @@ class Adapter  implements \External_UserInterface {
      * @return Collection
      */
     public function getSubjectList(\Schoolbox\User $user) {
+
         $collection = new Collection();
 
         $allResults = $this->getHandler()->getSubjectList($user);

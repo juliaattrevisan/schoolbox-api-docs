@@ -9,33 +9,18 @@
 
 namespace Schoolbox\External\Connector\Edumate\Base;
 
-use DB2;
-use External_Edumate_Connection;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\Base;
+use Schoolbox\External\Connector\ISync;
 use Schoolbox\Sync\Iterator;
 
-class Sync implements SyncInterface
+class Sync extends Base implements ISync
 {
-    /**
-     * @var DB2
-     */
-    protected $database;
-
-    /**
-     * Sync constructor
-     */
-    public function __construct()
-    {
-        $connection     = new External_Edumate_Connection();
-        $this->database = $connection->getDatabase();
-    }
-
     /**
      * {@inheritdoc}
      */
     public function findAllStudents()
     {
-        $stmt = $this->database->prepare('
+        $query = '
             SELECT
             STUDENT_NUMBER AS "student_id",
             USERNAME       AS "network_login",
@@ -52,9 +37,11 @@ class Sync implements SyncInterface
             NULL           AS "student_boarding_house",
             NULL           AS "student_campus"
             FROM db2inst1.schoolbox_students
-        ');
-        $stmt->execute();
-        return new Iterator\Student(new ResultIterator($stmt));
+        ';
+
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -62,7 +49,7 @@ class Sync implements SyncInterface
      */
     public function findAllParents()
     {
-        $stmt = $this->database->prepare('
+        $query = '
             SELECT
                 p.USERNAME               AS "student_contact_network_login",
                 p.CARER_NUMBER           AS "student_contact_id",
@@ -112,9 +99,11 @@ class Sync implements SyncInterface
             INNER JOIN db2inst1.schoolbox_students
                 AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
             WHERE p.SPOUSE_CARER_NUMBER IS NOT NULL
-        ');
-        $stmt->execute();
-        return new Iterator\Guardian(new ResultIterator($stmt));
+        ';
+
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -122,8 +111,7 @@ class Sync implements SyncInterface
      */
     public function findAllStaff()
     {
-        /** @var \DB2Statement $stmt */
-        $stmt = $this->database->prepare('
+        $query = '
             SELECT
                 STAFF_NUMBER  AS "staff_id",
                 USERNAME      AS "network_login",
@@ -146,8 +134,10 @@ class Sync implements SyncInterface
                 
             FROM db2inst1.schoolbox_staff
             WHERE USERNAME IS NOT NULL
-        ');
-        $stmt->execute();
-        return new Iterator\Staff(new ResultIterator($stmt));
+        ';
+
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }

@@ -27,7 +27,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 
         // use defaults to connect to Synergetic for passwords
         $link = MSSQL::getInstance();
-        $link->query("
+        $statement = $link->query("
             SELECT vCommunityAddresses.id AS SynergyID,
                    CommunityAttributes.AttributeCode AS CommunityAttribute,
                    CommunityAttributes.AttributeValue AS CommunityPortalPassword,
@@ -39,7 +39,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
         );
 
         // collate the results, indexed by synID
-        while($user = $link->getNextArray()) {
+        while($user = $statement->fetch()) {
             $this->parentPSync[$user['SynergyID']] = $user;
         }
 	}

@@ -310,9 +310,9 @@ class External_Doublefirst_User implements External_UserInterface
             AND               cei.EmailID <> ''
         ";
 
-        $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
-        while ($row = $this->getDatabase()->getNextArray()) {
+        while ($row = $statement->fetch()) {
             if (!isset($emailList[$row['RelatedID']])) {
                 $emailList[$row['RelatedID']] = $row['DefaultEmail'];
             }
@@ -915,10 +915,10 @@ class External_Doublefirst_User implements External_UserInterface
             return [];
         }
 
-        $this->getDatabase()->query($sql);
+        $statement = $this->getDatabase()->query($sql);
         $subjectList = array();
 
-        while ($subject = $this->getDatabase()->getNextArray()) {
+        while ($subject = $statement->fetch()) {
             $subjectList[] = array(
                 'code' => $subject['ClassCode'],
                 'name' => $subject['name'],

@@ -1,0 +1,157 @@
+<?php
+
+/**
+ * Collector for calls to a database connector
+ *
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Alaress\Database;
+
+use Alaress\Database\Broker\IBroker;
+use Alaress\Database\Statement\IStatement;
+use DebugBar\DataCollector\AssetProvider;
+use DebugBar\DataCollector\DataCollector;
+use DebugBar\DataCollector\Renderable;
+
+class Collector extends DataCollector implements Renderable, AssetProvider
+{
+    /** @var string $widget_name */
+    protected $widget_name = "Alaress/Database - ";
+
+    /** @var IBroker $broker */
+    protected $broker;
+
+    /** @var array $statements List of statements run */
+    protected $statements = array();
+
+    /**
+     * Constructor
+     *
+     * @param IBroker $broker
+     */
+    public function __construct($broker)
+    {
+        $this->broker = $broker;
+        $this->widget_name .= str_replace(".","",$broker->getHostname());
+    }
+
+    /**
+     * Runs query, and logs its results.
+     *
+     * @param IStatement $statement
+     * @return bool
+     */
+    public function execute($statement)
+    {
+        $start = microtime(true);
+        $result = $statement->getPDOStatement()->execute();
+
+        $backtrace = debug_backtrace();
+
+        $sql = '';
+        $prefix = 'Alaress\Database';
+
+        // Used this trying to find where queries came from
+
+        foreach ($backtrace as $trace) {
+            if (substr($trace['class'], 0, strlen($prefix)) != $prefix) {
+                $sql .= "Statment Class: " . get_class($statement) . "\nLine {$trace['line']}: {$trace['file']}::{$trace['function']}()\n\n";
+                break;
+            }
+        }
+
+        $sql .= $statement->getSql();
+
+        $statementSummary = [
+            'sql' => $sql,
+            'prepared_stmt' => $statement->getSql(),
+            'params' => [],
+            'is_success' => $result,
+            'row_count' => $statement->rowCount(),
+            'error_code' => $statement->errorCode(),
+            'error_message' => $statement->errorInfo()
+        ];
+
+        $duration = microtime(true) - $start;
+        $memory = memory_get_peak_usage(true);
+
+        $statementSummary['connection'] = $this->broker->getDatabase();
+        $statementSummary['duration'] = $duration;
+        $statementSummary['duration_str'] = $this->formatDuration($duration);
+        $statementSummary['memory'] = $memory;
+        $statementSummary['memory_str'] = $this->formatBytes($memory);
+
+        $this->statements[] = $statementSummary;
+
+        return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function collect()
+    {
+        $result = array(
+            'nb_statements' => count($this->statements),
+            'nb_failed_statements' => 0,
+            'accumulated_duration' => 0,
+            'peak_memory_usage' => 0,
+            'statements' => $this->statements
+        );
+
+        foreach ($this->statements as $statement) {
+            if (!$statement['is_success']) {
+                $result['nb_failed_statements']++;
+            }
+            $result['accumulated_duration'] += $statement['duration'];
+            if ($statement['memory'] > $result['peak_memory_usage']) {
+                $result['peak_memory_usage'] = $statement['memory'];
+            }
+        }
+
+        $result['accumulated_duration_str'] = $this->formatDuration($result['accumulated_duration']);
+        $result['peak_memory_usage_str'] = $this->formatBytes($result['peak_memory_usage']);
+
+        return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+        return $this->widget_name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getWidgets()
+    {
+        return array(
+            $this->widget_name => array(
+                "widget" => "PhpDebugBar.Widgets.SQLQueriesWidget",
+                "map" => $this->widget_name,
+                "default" => "[]"
+            ),
+            $this->widget_name . ":badge" => array(
+                "map" => $this->widget_name . ".nb_statements",
+                "default" => 0
+            )
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAssets()
+    {
+        return [
+            'css' => 'widgets/sqlqueries/widget.css',
+            'js' => 'widgets/sqlqueries/widget.js',
+        ];
+    }
+}

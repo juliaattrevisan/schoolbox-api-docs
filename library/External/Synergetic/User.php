@@ -1,756 +1,760 @@
 <?php
-/************************************************************
- *                                                           *
- *         Copyright (c) 2013 Alaress Pty Ltd                *
- *                                                           *
- *    This file provides access to synergetic user info      *
- *                                                           *
- ************************************************************/
+/**
+ * @author    The Whole Company <support@alaress.com.au>
+ * @copyright Copyright 2011-2017 (Hopefully RIP after that), Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
-use Alaress\DebugBar\Instance as DebugBar;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
 {
+    use External_MssqlConnector;
     use External_Synergetic_ValidateExternalIdTrait;
-
-    /**
-     * @var MSSQL
-     */
-    private $database;
-    private $groupHandler;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
-        $this->setGroup(new Group());
+        // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
+
+        $this->setupDatabase();
     }
 
     /**
-     * Update a particular custom attribute for a specific user
-     *
-     * @param $synergyId
-     * @param $attributeId
-     * @param $newValue
-     */
-    public function updateCustomAttribute($synergyId, $attributeId, $newValue)
-    {
-        if (!$this->isExternalIdValid($synergyId)) {
-            return;
-        }
-        /* First check if there is an Attribute $attributeId for the current person
-         * If there is, update it's fields accordingly; otherwise ignore it
-         *
-         * The alternative is to create it, but where does AttributeCreatedBy come from?
-         * Plus, you need to insert it into the lookup table luCommunityAttributes.
-         * That may not be ideal.
-         *
-         * @pc = Current Parent (this query checks if the current $synergyId is also
-         * an current parent)
-         */
-        $query  = "
-            SELECT COUNT(*) AS num
-            FROM dbo.vCommunityAddresses
-            LEFT JOIN dbo.CommunityAttributes
-              ON dbo.CommunityAttributes.ID = vCommunityAddresses.id
-            WHERE ConstitCodes LIKE '%@pc%'
-            AND CommunityAttributes.AttributeCode = '{$attributeId}'
-            AND vCommunityAddresses.id = '{$synergyId}'
-        ";
-        $result = $this->getDatabase()->getRow($query);
-        if ((int)$result['num']) {
-            $query = "
-                UPDATE dbo.CommunityAttributes
-                SET AttributeValue = \"$newValue\"
-                WHERE ID = '{$synergyId}'
-                AND AttributeCode = '{$attributeId}'
-            ";
-            $this->getDatabase()->query($query);
-        }
-// Deliberately disabled
-//		else {
-//			$query = "
-//				INSERT INTO dbo.CommunityAttributes (ID, AttributeCode, AttributeValue, AttributeCreatedDate, AttributeModifiedDate)
-//				VALUES ('{$synergyId}', '{$attributeId}', '{$newValue}', NOW(), NOW())
-//			";
-//
-//			$this->getDatabase()->query($query);
-//		}
-    }
-
-    /**
-     * Retrieves the user's Synergetic image
-     *
-     * @param Integer $externalUserId
-     *
-     * @return Bool|String
+     * @inheritdoc
      */
     public function getPortrait($externalUserId)
     {
+        // Make sure a valid external ID was passed
+
         if (!$this->isExternalIdValid($externalUserId)) {
             return false;
         }
 
-        $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+        // Get path on Schoolbox server to cached photos. These stupidly have a .JPG extension regardless of what
+        // they really are- so don't pay much attention that the type
 
-        if (Config::get('photo_sis_import') == 0) {
-            if (file_exists($photoPath))
+        $photoPath = realpath($this->config->get('portrait_dir')) . "/{$externalUserId}.jpg";
+
+        // Check if the configuration options have SIS photo imporing disabled
+
+        if ($this->config->get('photo_sis_import') == 0) {
+
+            // Not allowed to import photos. If one exists locally we can use it, otherwise we will just fail
+
+            if (file_exists($photoPath)) {
                 return $photoPath;
-            else
+            } else {
                 return false;
+            }
         }
-        
-        $query = "
-            SELECT vPhotos.ModifiedDate
-            FROM dbo.vPhotos vPhotos
-            WHERE vPhotos.ID = '" . $this->getDatabase()->quote($externalUserId) . "'
-        ";
 
-        if ($photo = $this->getDatabase()->getRow($query)) {
-            //TODO: delete photos on rollover
-            /* If the cached file doesn't exist, or the synergetic image is more recent than our
-                      * last known cached version, regenerate cached version.
-                      *
-                      * Separate the queries out, fetching the photo data only if it's newer than the cached
-                      * version, or if the cache version doesn't already exist.
-                      */
-            $cacheTime    = @filemtime($photoPath);
-            $modifiedTime = strtotime($photo['ModifiedDate']);
+        // Do a query to get the photos modification date in the SIS. We don't pull the actual photo at this time
 
-            if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-                $query = "
-                    SELECT vPhotos.Photo, vPhotos.PhotoType
-                    FROM dbo.vPhotos vPhotos
-                    WHERE vPhotos.ID = '" . $this->getDatabase()->quote($externalUserId) . "'
-                ";
-                $photo = $this->getDatabase()->getRow($query);
-                /* Save the image
-                          */
+        $queryPhoto = $this->getConnector()->executeQuery(
+            "SELECT vPhotos.ModifiedDate FROM dbo.vPhotos vPhotos WHERE vPhotos.ID = :externalId",
+            ['externalId' => $externalUserId]
+        );
+
+        // Check if we found a photo in the SIS
+
+        if ($photo = $queryPhoto->fetch()) {
+
+            // Check we can read the file
+
+            if (is_readable($photoPath)) {
+
+                // If the file is empty, or does not contain a valid image we want to replace it regardless of its date
+
+                if (filesize($photoPath) == 0 || !exif_imagetype($photoPath)) {
+
+                    $downloadImage = true;
+
+                } else {
+
+                    // File on disk was a valid image- check the modification date to see if we want to redownload
+
+                    $downloadImage = filemtime($photoPath) < strtotime($photo['ModifiedDate']);
+                }
+            } else {
+
+                // File was not readable
+
+                $downloadImage = true;
+            }
+
+            if ($downloadImage) {
+
+                // Do a query to retrieve the actual photo from the database
+
+                $queryPhoto = $this->getConnector()->executeQuery(
+                    "SELECT vPhotos.Photo FROM dbo.vPhotos vPhotos WHERE vPhotos.ID = :externalId",
+                    ['externalId' => $externalUserId]
+                );
+
+                $photo = $queryPhoto->fetch();
+
+                // The cache has expired, overwrite it with the one from the SIS
+
                 $photoHandle = fopen($photoPath, "w");
-                fwrite($photoHandle, $photo['Photo']);
+                fwrite($photoHandle, hex2bin($photo['Photo']));
                 fclose($photoHandle);
             }
+
             return $photoPath;
+        }
+
+        // There was no photo in the SIS, so we don't want to display the cached image either- delete it from
+        // disk so it doesn't magically appear later after they'd specifically deleted it from Synergetic
+
+        if (file_exists($photoPath)) {
+            unlink($photoPath);
         }
 
         return false;
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the Synergetic of the Contact, not the Student.
-     *
-     * @param $synID
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getParent($synID)
     {
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        $query  = "
-            SELECT
-                Contact.Title,
-                Contact.Preferred,
-                Contact.Surname,
-                Contact.Email,
-                Contact.OccupEmail,
-                Contact.DefaultEmailCode,
-                Addresses.Phone AS HomePhone,
-                Addresses.SilentPhoneFlag,
-                Contact.SilentMobilePhoneFlag,
-                Contact.MobilePhone,
-                Contact.DirectoryIncludeFlag,
-                Contact.SpouseID,
-                Spouse.Title SpouseTitle,
-                Spouse.Preferred SpousePreferred,
-                Spouse.Surname SpouseSurname,
-                Spouse.Email SpouseEmail,
-                Spouse.OccupEmail SpouseOccupEmail,
-                Spouse.DefaultEmailCode SpouseDefaultEmailCode,
-                Spouse.MobilePhone SpouseMobilePhone,
-                Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
-            FROM
-                dbo.Community Contact
-            LEFT JOIN
-                dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
-            LEFT JOIN
-                dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
-            WHERE
-                Contact.ID = '" . $this->database->quote($synID) . "'";
-        $parent = $this->getDatabase()->getRow($query);
-        if ($parent['DefaultEmailCode'] == 'O') {
-            $parent['Email'] = $parent['OccupEmail'];
+
+        $query =
+        "
+            SELECT      Contact.Title,
+                        Contact.Preferred,
+                        Contact.Surname,
+                        CASE 
+                          WHEN Contact.DefaultEmailCode = 'O' THEN Contact.OccupEmail
+                          ELSE Contact.Email
+                        END AS Email,
+                        Contact.OccupEmail,
+                        Contact.DefaultEmailCode,
+                        Addresses.Phone AS HomePhone,
+                        Addresses.SilentPhoneFlag,
+                        Contact.SilentMobilePhoneFlag,
+                        Contact.MobilePhone,
+                        Contact.DirectoryIncludeFlag,
+                        Contact.SpouseID,
+                        Spouse.Title SpouseTitle,
+                        Spouse.Preferred SpousePreferred,
+                        Spouse.Surname SpouseSurname,
+                        CASE 
+                          WHEN Spouse.DefaultEmailCode = 'O' THEN Spouse.OccupEmail
+                          ELSE Spouse.Email
+                        END AS SpouseEmail,                        
+                        Spouse.OccupEmail SpouseOccupEmail,
+                        Spouse.DefaultEmailCode SpouseDefaultEmailCode,
+                        Spouse.MobilePhone SpouseMobilePhone,
+                        Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
+            FROM        dbo.Community Contact
+            LEFT JOIN   dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
+            LEFT JOIN   dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
+            WHERE       Contact.ID = :externalId
+        ";
+
+        $parentQuery = $this->getConnector()->executeQuery($query, ['externalId' => $synID]);
+
+        // Try and fetch the requested parent
+
+        if ($parent = $parentQuery->fetch()) {
+            return $this->clearInvalidValues($parent);
         }
-        if ($parent['SpouseDefaultEmailCode'] == 'O') {
-            $parent['SpouseEmail'] = $parent['SpouseOccupEmail'];
-        }
-        return $parent;
+
+        // Couldn't find the parent
+
+        return [];
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the Synergetic of the Contact, not the Student. Anyone who is
-     * not supposed to be having their details publicised (via the
-     * DirectoryIncludeFlag) are not included in the result set.
-     * Accept array of Synergy IDs, or just an int
-     *
-     * @param $synID
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getParentSync($synID)
     {
+        // This hasn't been tested in an actual sync script. But running in isolation it returns this following results.
+        //
+        //    array (size=1)
+        //      0 =>
+        //          array (size=8)
+        //              'ID' => string '224' (length=3)
+        //              'Title' => string 'Mr' (length=2)
+        //              'Preferred' => string 'Tim' (length=3)
+        //              'Surname' => string 'Thomas' (length=6)
+        //              'Email' => string '' (length=0)
+        //              'OccupEmail' => string '' (length=0)
+        //              'DefaultEmailCode' => string '' (length=0)
+        //              'DirectoryIncludeFlag' => string '0' (length=1)
+
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        if (is_array($synID)) {
-            $assignation = " IN ('" . implode("','", array_map([$this->database, 'quote'], $synID)) . "')";
-        } else {
-            $assignation = " =  '" . $this->database->quote($synID) . "'";
+
+        // Coalesce non array inputs into an array just to make this easier
+
+        if (!is_array($synID)) {
+            $synID = [$synID];
         }
-        $query = "
-            SELECT
-                ID, Title,
-                Preferred, Surname,
-                Email, OccupEmail, DefaultEmailCode,
-                DirectoryIncludeFlag
-            FROM dbo.Community
-            WHERE ID $assignation";
-        if (is_array($synID)) {
-            return $this->getDatabase()->getAll($query);
+
+        $externalIdBindings = PredicateBuilder::getArrayBindings($synID, 'externalId');
+
+        $query =
+        "
+            SELECT        ID, 
+                          Title,
+                          Preferred, 
+                          Surname,
+                          Email, 
+                          OccupEmail, 
+                          DefaultEmailCode,
+                          DirectoryIncludeFlag
+            FROM          dbo.Community
+            WHERE         ID IN ({$externalIdBindings['placeholders']})
+        ";
+
+        $queryParents = $this->getConnector()->executeQuery($query, $externalIdBindings['bindings']);
+
+        // If multiple parents were requested return the results in an array. This should be replaces with an
+        // iterator, but that would require refactoring the old sync scripts which is a glorious waste of energy
+
+        if (count($synID) > 1) {
+            return $this->clearInvalidValues(
+                $queryParents->fetchAll()
+            );
         }
-        return $this->getDatabase()->getRow($query);
+
+        // If there are multiple parents requested return the results in an array
+
+        return  $this->clearInvalidValues(
+            $queryParents->fetch()
+        );
     }
 
     /**
-     * Get all the parents emails for a class, or group of students
-     *
-     * @param array $synergyIds
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getParentEmails($synergyIds)
     {
-        $emailList = array();
-        $id_list   = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds));
-        if (empty($id_list)) {
-            return array();
+        // Coalesce non array inputs into an array just to make this easier
+
+        if (!is_array($synergyIds)) {
+            $synergyIds = [$synergyIds];
         }
-        $query = "
-            SELECT
-                RelatedID,UseEmail,OccupEmail,Email,DefaultEmail
-            FROM
-                dbo.RelationShips r
-                JOIN dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
-            WHERE
-                r.ID IN ($id_list)";
-        $this->getDatabase()->query($query);
-        while ($row = $this->getDatabase()->getNextArray()) {
-            switch (strtoupper($row['UseEmail'])) {
-                case 'O': //Use occupation email address
-                    $emailList[$row['RelatedID']] = $row['OccupEmail'];
-                    break;
-                case 'P': //Use personal email address
-                    $emailList[$row['RelatedID']] = $row['Email'];
-                    break;
-                case 'D': //Use default email address
-                    if(trim($row['DefaultEmail']) != '') {
-                        $defaultEmail = explode(';',$row['DefaultEmail']);
-                        foreach($defaultEmail as $key=>$email){
-                            $emailList[$row['RelatedID'].'-'.$key] = $email;
-                        }
-                    }
-                    break;
-                default:
-                    break;
+
+        // Make sure all of the ID's supplied were valid
+
+        foreach ($synergyIds as &$id) {
+            if (!$this->isExternalIdValid($id)) {
+
+                // This was not a valid ID, remove it from the array
+
+                unset($id);
             }
         }
+
+        // Check if we've got any valid IDs left
+
+        if (count($synergyIds) == 0) {
+            return [];
+        }
+
+        $externalIdBindings = PredicateBuilder::getArrayBindings($synergyIds, 'externalId');
+
+        $query =
+        "
+            SELECT DISTINCT RelatedID,
+                        CASE 
+                            WHEN UseEmail = 'O' THEN OccupEmail
+                            WHEN UseEmail = 'P' THEN Email
+                            WHEN UseEmail = 'D' THEN DefaultEmail
+                            ELSE ''
+                        END AS Email
+            FROM        dbo.RelationShips r
+            JOIN        dbo.vCommunityAddresses ON RelatedID = vCommunityAddresses.ID
+			WHERE		CASE 
+                            WHEN UseEmail = 'O' THEN OccupEmail
+                            WHEN UseEmail = 'P' THEN Email
+                            WHEN UseEmail = 'D' THEN DefaultEmail
+                            ELSE ''
+                        END <> '' AND
+                        r.ID IN ({$externalIdBindings['placeholders']})
+        ";
+
+        $iteratorParents = $this->getConnector()->executeQueryIterator($query, $externalIdBindings['bindings']);
+
+        $emailList = [];
+
+        foreach ($iteratorParents as $parent) {
+
+            $emailArray = explode(';', $parent['Email']);
+
+            if (count($emailArray) > 0) {
+                foreach ($emailArray as $key => $email) {
+                    $emailList["{$parent['RelatedID']}-{$key}"] = $email;
+                }
+            } else {
+                $emailList[$parent['RelatedID']] = $parent['Email'];
+            }
+        }
+
         return $emailList;
     }
 
     /**
-     * Get a guy's info from Synergetic
-     *
-     * @param  $synID
-     *
-     * @return array|bool
+     * @inheritdoc
      */
     public function getStudent($synID)
     {
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        $currentYear     = $this->getCurrentYear();
-        $currentSemester = $this->getCurrentSemester();
-        $query   = "SELECT
-                    vStudents.StudentID,
-                    vStudents.StudentGiven1,
-                    vStudents.StudentSurname,
-                    vStudents.StudentBirthDate,
-                    vStudents.StudentTutorName,
-                    vStudents.StudentHeadOfHouse,
-                    House.HeadOfHouseID,
-                    vStudents.StudentFormStaffName,
-                    vStudents.StudentTutorDescription,
-                    luForm.ID as TeacherFormID,
-                    vStudents.StudentForm,
-                    luTutor.ID as TeacherTutorID,
-                    vStudents.StudentTutor,
-                    luForm.Description as FormDescription,
-                    vStudents.StudentHouseDescription,
-                    vStudents.StudentHouse,
-                    vStudents.StudentYearLevel,
-                    vStudents.StudentYearLevelCoordinator,
-                    luYearLevel.YearLevelCoordID,
-                    vStudents.StudentLockerBook,
-                    vStudents.StudentEmergencyName,
-                    vStudents.StudentEmergencyPhone,
-                    vStudents.StudentEmergencyPhoneAlt,
-                    vStudents.StudentEmergency2Name,
-                    vStudents.StudentEmergency2Phone,
-                    vStudents.StudentEmergency2PhoneAlt,
-                    vStudents.StudentEmergency3Name,
-                    vStudents.StudentEmergency3Phone,
-                    vStudents.StudentEmergency3PhoneAlt,
-                    vStudents.StudentMedicalAlert,
-                    vStudents.StudentSpecialNeedsFlag,
-                    vStudents.StudentStudiesCode,
-                    AlertMessage,
-                    vStudents.StudentBoarder,
-                    vStudents.StudentsComment as Comment
-                FROM dbo.vStudents vStudents
-                    LEFT JOIN CommunityAlerts
-                        ON CommunityAlerts.ID = StudentID
-                        AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS date))
-                        AND (CommunityAlerts.AlertDateTo IS NULL OR CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS date))
-                    LEFT JOIN luForm ON vStudents.StudentForm = luForm.Code
-                    LEFT JOIN luTutor ON vStudents.StudentTutor = luTutor.Code
-                    LEFT JOIN luYearLevel ON vStudents.StudentCampus = luYearLevel.Campus
-                        AND vStudents.StudentYearLevel = luYearLevel.Code
-                    LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
-                WHERE
-                    vStudents.StudentID = '" . $this->database->quote($synID) . "'
-                    AND vStudents.FileSemester='" . $this->database->quote($currentSemester) . "'
-                    AND vStudents.FileYear='" . $this->database->quote($currentYear) . "'
+
+        $query =
+        "
+            SELECT      vStudents.StudentID,
+                        vStudents.StudentGiven1,
+                        vStudents.StudentSurname,
+                        vStudents.StudentBirthDate,
+                        vStudents.StudentTutorName,
+                        vStudents.StudentHeadOfHouse,
+                        House.HeadOfHouseID,
+                        vStudents.StudentFormStaffName,
+                        vStudents.StudentTutorDescription,
+                        luForm.ID AS TeacherFormID,
+                        vStudents.StudentForm,
+                        luTutor.ID AS TeacherTutorID,
+                        vStudents.StudentTutor,
+                        luForm.Description AS FormDescription,
+                        vStudents.StudentHouseDescription,
+                        vStudents.StudentHouse,
+                        vStudents.StudentYearLevel,
+                        vStudents.StudentYearLevelCoordinator,
+                        luYearLevel.YearLevelCoordID,
+                        vStudents.StudentLockerBook,
+                        vStudents.StudentEmergencyName,
+                        vStudents.StudentEmergencyPhone,
+                        vStudents.StudentEmergencyPhoneAlt,
+                        vStudents.StudentEmergency2Name,
+                        vStudents.StudentEmergency2Phone,
+                        vStudents.StudentEmergency2PhoneAlt,
+                        vStudents.StudentEmergency3Name,
+                        vStudents.StudentEmergency3Phone,
+                        vStudents.StudentEmergency3PhoneAlt,
+                        vStudents.StudentMedicalAlert,
+                        vStudents.StudentSpecialNeedsFlag,
+                        vStudents.StudentStudiesCode,
+                        AlertMessage,
+                        vStudents.StudentBoarder,
+                        vStudents.StudentsComment as Comment
+            FROM        dbo.vStudents vStudents
+            LEFT JOIN   CommunityAlerts ON 
+                            CommunityAlerts.ID = StudentID AND 
+                            (
+                                CommunityAlerts.AlertDateFrom IS NULL OR 
+                                CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS DATE)
+                            ) AND 
+                            (
+                                CommunityAlerts.AlertDateTo IS NULL OR 
+                                CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE)
+                            )
+            LEFT JOIN   luForm ON vStudents.StudentForm = luForm.Code
+            LEFT JOIN   luTutor ON vStudents.StudentTutor = luTutor.Code
+            LEFT JOIN   luYearLevel ON 
+                            vStudents.StudentCampus = luYearLevel.Campus AND 
+                            vStudents.StudentYearLevel = luYearLevel.Code
+            LEFT JOIN   luHouse House ON 
+                            StudentCampus = House.Campus AND 
+                            StudentHouse = House.Code
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudents.FileSemester AND
+                            Semester.FileYear = vStudents.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            WHERE       vStudents.StudentID = :externalId
         ";
 
-		$student = [];
+        $student = [];
 
-        foreach ($this->getDatabase()->getAll($query) ?: array() as $row) {
+        $iteratorStudents = $this->getConnector()->executeQueryIterator($query, ['externalId' => $synID]);
+
+        foreach ($iteratorStudents as $row) {
+
+            // There might be multiple records, if this is the first one populate the bulk of the details
+
             if (empty($student)) {
-                // fill in student record
+
                 $student = $row;
 
-                if ($student['StudentBirthDate']
-                    && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
-                ) {
-                    $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+                if ($student['StudentBirthDate'] && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
+                    $student['StudentBirthDate'] = strtotime("{$matches[2]} {$matches[1]} {$matches[3]}");
                 } else {
                     $student['StudentBirthDate'] = false;
                 }
-                $student['AlertMessage'] = array($student['AlertMessage']);
+
+                $student['AlertMessage'] = [
+                    $student['AlertMessage']
+                ];
+
             } else {
-                // join subsequent alerts
+
+                // Additional records will only different by their alert message, we just append these to the
+                // existing student record
+
                 $student['AlertMessage'][] = $row['AlertMessage'];
             }
         }
 
-        /* Implode with newlines if you were returned a list of
-         * AlertMessages to join - otherwise do nothing to it
-         */
-		if (!empty($student) && is_array($student['AlertMessage'])) {
-			$student['AlertMessage'] = implode(
-				"\n",
-				array_unique(array_filter($student['AlertMessage']))
-			);
-		}
+        // Implode all of the alert messages down to a single message seperate by line breaks
 
-        $student = array_map(function($value) {
-            return trim(str_replace('Not Selected', '', $value));
-        }, $student);
+        if (!empty($student) && is_array($student['AlertMessage'])) {
+            $student['AlertMessage'] = implode("\n", array_unique(array_filter($student['AlertMessage'])));
+        }
 
-        return $student;
+        // Remove Synergetic's annoying 'Not Selected' default value for lookups
+
+        return $this->clearInvalidValues($student);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getStaff($synID)
     {
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        $query = "
-            SELECT
-                SchoolStaffCode,
-                luBuilding.Description AS StaffBuilding,
-                StaffRoom,
-                StaffExtension,
-                StaffMobilePhone,
-                StaffCampusDescription,
-                StaffCategoryDescription,
-                luDepartment.Description AS StaffDepartment,
-                StaffVoiceMail
-             FROM dbo.vStaff vStaff
-             LEFT JOIN dbo.luBuilding ON StaffBuilding = luBuilding.Code
-             LEFT JOIN dbo.luDepartment ON StaffDepartment = luDepartment.Code
-             WHERE vStaff.StaffID = '" . $this->database->quote($synID) . "'";
-        $staff = $this->getDatabase()->getRow($query);
-        return $staff;
+
+        $query =
+        "
+            SELECT      SchoolStaffCode,
+                        luBuilding.Description AS StaffBuilding,
+                        StaffRoom,
+                        StaffExtension,
+                        StaffMobilePhone,
+                        StaffCampusDescription,
+                        StaffCategoryDescription,
+                        luDepartment.Description AS StaffDepartment,
+                        StaffVoiceMail
+             FROM       dbo.vStaff vStaff
+             LEFT JOIN  dbo.luBuilding ON StaffBuilding = luBuilding.Code
+             LEFT JOIN  dbo.luDepartment ON StaffDepartment = luDepartment.Code
+             WHERE      vStaff.StaffID = :externalId
+        ";
+
+        return $this->getConnector()->executeQuery($query, ['externalId' => $synID])->fetch();
     }
 
     /**
-     * Gets a list of Contacts for all Students in a particular year level. The
-     * year level is stored in Synergetic.
-     *
-     * Used in reporting.
-     *
-     * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
-     * so I changed it to use CountryCode instead.
-     *
-     * @param $yearlevel
-     * @param $name
-     * @param $boardingStatus
-     * @param $form
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
-        $query = "
-            SELECT
-                StudentID,
-                StudentGiven1,
-                StudentSurname,
-                StudentYearLevel,
-                House.Description AS StudentHouse,
-                StudentBoarder,
-                StudentForm,
-                StudentContactID,
-                StudentContactTitle,
-                StudentContactPreferred,
-                StudentContactLegalFullName,
-                StudentContactSurname,
-                StudentContactDefaultEmail,
-                vStudentContactAllAddress.ValidAddressFlag,
-                StudentContactAddress1,
-                StudentContactAddress2,
-                StudentContactAddress3,
-                StudentContactSuburb,
-                StudentContactPostCode,
-                StudentContactState,
-                StudentCountry.Description AS StudentContactCountryCode,
-                StudentContactHomeAddress1,
-                StudentContactHomeAddress2,
-                StudentContactHomeAddress3,
-                StudentContactHomeSuburb,
-                StudentContactHomePostCode,
-                StudentContactHomeState,
-                StudentCountry.Description AS StudentContactHomeCountryCode,
-                StudentContactPhoneActual,
-                StudentContactMobilePhone,
-                StudentContactOccupPhone,
-                StudentContactSpouseID,
-                StudentContactSpouseTitle,
-                StudentContactSpousePreferred,
-                StudentContactSpouseLegalFullName,
-                StudentContactSpouseSurname,
-                StudentContactSpouseMobilePhone,
-                StudentContactSpouseOccupPhone,
-                StudentContactSpouseDefaultEmail,
-                StudentContactType,
-                StudentContactSilentPhoneFlag,
-                Contact.SilentMobilePhoneFlag as StudentContactSilentMobilePhoneFlag,
-                Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
-                Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-                ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
-                StudentParentsSeparatedFlag
-            FROM dbo.vStudentContactAllAddress
-            LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
-            LEFT JOIN dbo.Addresses ContactAddress ON Contact.AddressID = ContactAddress.AddressID
-            LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-            LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus
-                AND StudentHouse = House.Code
-            LEFT JOIN dbo.luYearLevel Year ON StudentYearLevel = Year.Code
-                AND StudentCampus = Year.Campus
-            LEFT JOIN dbo.luCountry StudentCountry
-                ON StudentContactCountryCode = StudentCountry.Code
-            LEFT JOIN dbo.luCountry StudentHomeCountry
-                ON StudentContactHomeCountryCode = StudentHomeCountry.Code
-            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
-            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
-        ;
-        /* Search for a particular year level
-         */
-        if (strlen($yearlevel)) {
-            if (is_numeric($yearlevel)) {
-                $query .= "
-                AND (StudentYearLevel = '{$this->getDatabase()->quote($yearlevel)}'
-                     OR Year.Description = '{$this->getDatabase()->quote($yearlevel)}')";
+        // We have to dynamically bind filter parameters here based on the users input
+
+        $filters = '';
+        $bindings = [];
+
+        // Search for a particular year level
+
+        if (!empty($yearLevel)) {
+
+            $bindings['yearDescription'] = $yearLevel;
+
+            if (is_numeric($yearLevel)) {
+
+                $bindings['yearLevel'] = $yearLevel;
+
+                $filters .= " AND (
+                    Year.Description = :yearDescription OR
+                    StudentYearLevel = :yearLevel
+                    )
+                ";
+
             } else {
-                // if year is NOT numeric, don't attempt to compare StudentYearLevel (will bug out)
-                $query .= "
-                AND Year.Description = '{$this->getDatabase()->quote($yearlevel)}'";
+
+                // If the year is not numeric, don't attempt to compare to StudentYearLevel
+                // or the query will bug out
+
+                $filters .= " AND Year.Description = :yearDescription";
             }
         }
-        /* Search for a student name
-         */
-        if (strlen($name)) {
+
+        if (!empty($name)) {
 
             $splitNames = explode(' ', $name);
 
+            $count = 1;
+
             foreach ($splitNames as $splitName) {
-                $splitName = $this->getDatabase()->quote($splitName);
-                $query .= "
-                    AND (
-                        (StudentSurname LIKE '%{$splitName}%')
-                        OR
-                        (StudentGiven1 LIKE '%{$splitName}%')
-                    )
-                ";
+
+                $keyGiven = "nameGiven{$count}";
+                $bindings[$keyGiven] = "%{$splitName}%";
+
+                $keySurname = "nameSurname{$count}";
+                $bindings[$keySurname] = "%{$splitName}%";
+
+                $filters .= " AND (StudentSurname LIKE :{$keySurname} OR StudentGiven1 LIKE :{$keyGiven})";
+
+                $count++;
             }
         }
-        /* Search for a particular boarding status
-         *
-         * In Synergetic, assume the following:
-         * B: Boarder
-         * D: Day student
-         * HS: Home stay
-         */
-        if ($boardingStatus == '') {
-            /* No restrictions on result set
-             */
-        } elseif ($boardingStatus == 'yes') {
-            $query .= "
-                AND StudentBoarder = 'B'
-            ";
+
+        // Boarder search ('B' = Boarder, 'D' = Day Student, 'HS' = Home Stay)
+
+        if ($boardingStatus == 'yes') {
+            $filters .= " AND StudentBoarder = 'B'";
         } else {
-            $query .= "
-                AND StudentBoarder != 'B'
-            ";
+            $filters .= " AND StudentBoarder <> 'B'";
         }
-        /* Search for a particular form
-         */
-        if ($form) {
-            $form = $this->getDatabase()->quote($form);
-            $query .= "
-                AND StudentForm = '{$form}'
-            ";
+
+        // Search for a particular form
+
+        if (!empty($form)) {
+            $bindings['form'] = $form;
+            $filters .= " AND StudentForm = :form";
         }
-        $query .= "
-            ORDER BY StudentSurname, StudentID, StudentContactType
+
+        // Now can build the query string
+
+        $query = "
+            SELECT      StudentID,
+                        StudentGiven1,
+                        StudentSurname,
+                        StudentYearLevel,
+                        House.Description AS StudentHouse,
+                        StudentBoarder,
+                        StudentForm,
+                        StudentContactID,
+                        StudentContactTitle,
+                        StudentContactPreferred,
+                        StudentContactLegalFullName,
+                        StudentContactSurname,
+                        StudentContactDefaultEmail,
+                        vStudentContactAllAddress.ValidAddressFlag,
+                        StudentContactAddress1,
+                        StudentContactAddress2,
+                        StudentContactAddress3,
+                        StudentContactSuburb,
+                        StudentContactPostCode,
+                        StudentContactState,
+                        StudentCountry.Description AS StudentContactCountryCode,
+                        StudentContactHomeAddress1,
+                        StudentContactHomeAddress2,
+                        StudentContactHomeAddress3,
+                        StudentContactHomeSuburb,
+                        StudentContactHomePostCode,
+                        StudentContactHomeState,
+                        StudentCountry.Description AS StudentContactHomeCountryCode,
+                        StudentContactPhoneActual,
+                        StudentContactMobilePhone,
+                        StudentContactOccupPhone,
+                        StudentContactSpouseID,
+                        StudentContactSpouseTitle,
+                        StudentContactSpousePreferred,
+                        StudentContactSpouseLegalFullName,
+                        StudentContactSpouseSurname,
+                        StudentContactSpouseMobilePhone,
+                        StudentContactSpouseOccupPhone,
+                        StudentContactSpouseDefaultEmail,
+                        StudentContactType,
+                        StudentContactSilentPhoneFlag,
+                        Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
+                        Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
+                        Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+                        ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
+                        StudentParentsSeparatedFlag
+            FROM        dbo.vStudentContactAllAddress
+            LEFT JOIN   dbo.Community Contact ON StudentContactID = Contact.ID
+            LEFT JOIN   dbo.Addresses ContactAddress ON Contact.AddressID = ContactAddress.AddressID
+            LEFT JOIN   dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+            LEFT JOIN   dbo.luHouse House ON StudentCampus = House.Campus AND
+                        StudentHouse = House.Code
+            LEFT JOIN   dbo.luYearLevel Year ON StudentYearLevel = Year.Code AND
+                        StudentCampus = Year.Campus
+            LEFT JOIN   dbo.luCountry StudentCountry ON StudentContactCountryCode = StudentCountry.Code
+            LEFT JOIN   dbo.luCountry StudentHomeCountry ON StudentContactHomeCountryCode = StudentHomeCountry.Code
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
+                            Semester.FileYear = vStudentContactAllAddress.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            WHERE       StudentContactType IN ('SC1', 'SC2', 'SC3')
+                        {$filters}
+            ORDER BY    StudentSurname, 
+                        StudentID, 
+                        StudentContactType
+                        
         ";
 
-        $contactList = $this->getDatabase()->getAll($query) ?: array();
-        foreach ($contactList as &$row) {
-            if ($row['ValidAddressFlag'] == 0 || $row['SilentHomeAddressFlag'] == 1) {
-                $row['StudentContactAddress1']        = '';
-                $row['StudentContactAddress2']        = '';
-                $row['StudentContactAddress3']        = '';
-                $row['StudentContactSuburb']          = '';
-                $row['StudentContactPostCode']        = '';
-                $row['StudentContactState']           = '';
-                $row['StudentContactCountryCode']     = '';
-                $row['StudentContactHomeAddress1']    = '';
-                $row['StudentContactHomeAddress2']    = '';
-                $row['StudentContactHomeAddress3']    = '';
-                $row['StudentContactHomeSuburb']      = '';
-                $row['StudentContactHomePostCode']    = '';
-                $row['StudentContactHomeState']       = '';
-                $row['StudentContactHomeCountryCode'] = '';
+        // Now that we have created the query, time to shove it across to the database with
+        // the appropriate parameters
+
+        $iteratorContacts = $this->getConnector()->executeQueryIterator($query, $bindings);
+
+        $contactList = [];
+
+        foreach ($iteratorContacts as $contact) {
+
+            // Remove invalid and silent contact details
+
+            if ($contact['ValidAddressFlag'] == 0 || $contact['SilentHomeAddressFlag'] == 1) {
+                $contact['StudentContactAddress1'] = '';
+                $contact['StudentContactAddress2'] = '';
+                $contact['StudentContactAddress3'] = '';
+                $contact['StudentContactSuburb'] = '';
+                $contact['StudentContactPostCode'] = '';
+                $contact['StudentContactState'] = '';
+                $contact['StudentContactCountryCode'] = '';
+                $contact['StudentContactHomeAddress1'] = '';
+                $contact['StudentContactHomeAddress2'] = '';
+                $contact['StudentContactHomeAddress3'] = '';
+                $contact['StudentContactHomeSuburb'] = '';
+                $contact['StudentContactHomePostCode'] = '';
+                $contact['StudentContactHomeState'] = '';
+                $contact['StudentContactHomeCountryCode'] = '';
             }
-            $row['StudentContactHomeCountryCode']
-                = $row['StudentContactHomeCountryCode'] == 'Not Selected' ? '' : $row['StudentContactHomeCountryCode'];
-            $row['StudentContactCountryCode']
-                = $row['StudentContactCountryCode'] == 'Not Selected' ? '' : $row['StudentContactCountryCode'];
+
+            $contactList[] = $this->clearInvalidValues($contact);
         }
-        return $contactList;
+
+        // Return the cleaned up list of contacts
+
+        return $this->clearInvalidValues($contactList);
     }
 
     /**
-     * Gets a list of Contacts for all Student Boarders.
-     *
-     * Used in reporting.
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getStudentBoarderContactListExtended()
     {
-        $query = "
-            SELECT
-                StudentID,
-                StudentGiven1,
-                StudentSurname,
-                StudentYearLevel,
-                House.Description AS StudentHouse,
-                StudentContactID,
-                StudentContactTitle,
-                StudentContactPreferred,
-                StudentContactSurname,
-                StudentContactDefaultEmail,
-                StudentContactAddress1,
-                StudentContactAddress2,
-                StudentContactAddress3,
-                StudentContactSuburb,
-                StudentContactPostCode,
-                StudentContactState,
-                StudentContactCountryDesc,
-                StudentContactPhoneActual,
-                StudentContactMobilePhone,
-                StudentContactOccupPhone,
-                StudentContactSpouseID,
-                StudentContactSpouseTitle,
-                StudentContactSpousePreferred,
-                StudentContactSpouseSurname,
-                StudentContactSpouseMobilePhone,
-                StudentContactSpouseOccupPhone,
-                StudentContactSpouseDefaultEmail,
-                StudentContactType,
-                StudentContactSilentPhoneFlag,
-                Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
-                Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
-                Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-                StudentParentsSeparatedFlag
-            FROM dbo.vStudentContactAllAddress
-            LEFT JOIN dbo.Community Contact ON StudentContactID = Contact.ID
-            LEFT JOIN dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-            LEFT JOIN dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
-            WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
-            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
-            AND StudentBoarder = 'B'
-            ORDER BY StudentSurname, StudentID, StudentContactType";
-        return $this->getDatabase()->getAll($query);
+        $query =
+        "
+            SELECT      StudentID,
+                        StudentGiven1,
+                        StudentSurname,
+                        StudentYearLevel,
+                        House.Description AS StudentHouse,
+                        StudentContactID,
+                        StudentContactTitle,
+                        StudentContactPreferred,
+                        StudentContactSurname,
+                        StudentContactDefaultEmail,
+                        StudentContactAddress1,
+                        StudentContactAddress2,
+                        StudentContactAddress3,
+                        StudentContactSuburb,
+                        StudentContactPostCode,
+                        StudentContactState,
+                        StudentContactCountryDesc,
+                        StudentContactPhoneActual,
+                        StudentContactMobilePhone,
+                        StudentContactOccupPhone,
+                        StudentContactSpouseID,
+                        StudentContactSpouseTitle,
+                        StudentContactSpousePreferred,
+                        StudentContactSpouseSurname,
+                        StudentContactSpouseMobilePhone,
+                        StudentContactSpouseOccupPhone,
+                        StudentContactSpouseDefaultEmail,
+                        StudentContactType,
+                        StudentContactSilentPhoneFlag,
+                        Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
+                        Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
+                        Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+                        StudentParentsSeparatedFlag
+            FROM        dbo.vStudentContactAllAddress
+            LEFT JOIN   dbo.Community Contact ON StudentContactID = Contact.ID
+            LEFT JOIN   dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+            LEFT JOIN   dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
+                            Semester.FileYear = vStudentContactAllAddress.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            WHERE       StudentContactType IN ('SC1', 'SC2', 'SC3') AND 
+                        StudentBoarder = 'B'
+            ORDER BY    StudentSurname, 
+                        StudentID, 
+                        StudentContactType
+        ";
+
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
-     * Get a list of student contacts (parents) and their contact information
-     *
-     * @param string $externalUserId
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getStudentContactList($externalUserId)
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
-        $query       = "
-            SELECT
-                a.StudentContactID,
-                a.StudentContactTitle,
-                a.StudentContactPreferred,
-                a.StudentContactSurname,
-                a.StudentContactDefaultEmail,
-                a.ValidAddressFlag,
-                a.StudentContactAddress1,
-                a.StudentContactAddress2,
-                a.StudentContactAddress3,
-                a.StudentContactSuburb,
-                a.StudentContactPostCode,
-                a.StudentContactState,
-                a.StudentContactPhoneActual,
-                a.StudentContactMobilePhone,
-                a.StudentContactOccupPhone,
-                a.StudentContactRelation,
-                a.StudentContactSpouseID,
-                a.StudentContactSpouseTitle,
-                a.StudentContactSpousePreferred,
-                a.StudentContactSpouseSurname,
-                a.StudentContactSpouseMobilePhone,
-                a.StudentContactSpouseOccupPhone,
-                a.StudentContactSpouseDefaultEmail,
-                a.StudentContactType,
-                a.StudentContactSpouseRelation,
-                r.UseEmail as StudentContactUseEmail,
-                rs.UseEmail as StudentContactSpouseUseEmail
-                
-            FROM dbo.vStudentContactAllAddress a
-            LEFT JOIN Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
-            LEFT JOIN Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID
-            
-            WHERE
-                StudentID = '$externalUserId'
-                AND StudentContactType IN ('SC1', 'SC2', 'SC3')
-                AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-                AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
-        ;
-        $contactList = $this->getDatabase()->getAll($query) ?: array();
-        foreach ($contactList as &$row) {
-            if ($row['ValidAddressFlag'] == 0) {
-                $row['StudentContactAddress1'] = '';
-                $row['StudentContactAddress2'] = '';
-                $row['StudentContactAddress3'] = '';
-                $row['StudentContactSuburb']   = '';
-                $row['StudentContactPostCode'] = '';
-                $row['StudentContactState']    = '';
-            }
-        }
-        return $contactList;
-    }
 
-    protected function findFileYearAndSemester($externalUserId = null)
-    {
-        if ($externalUserId) {
-            if (!$this->isExternalIdValid($externalUserId)) {
-                return [];
-            }
-            $result = $this->getDatabase()->executeProcedure(
-                'spsConfigUserDefaultYearSemester',
-                array(
-                    array('@ID', $externalUserId, SQLINT4, false, false, -1),
-                )
-            );
-            if ($result['success']
-                && isset($result['result'][0]['UserFileSemester'])
-                && $result['result'][0]['UserFileSemester']
-                && isset($result['result'][0]['UserFileYear'])
-                && $result['result'][0]['UserFileSemester']
-            ) {
-                return array(
-                    'year'     => $result['result'][0]['UserFileYear'],
-                    'semester' => $result['result'][0]['UserFileSemester'],
-                );
-            }
-        }
-        // Get current FileSemester and FileYear
-        $query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1";
-        if ($semester = $this->getDatabase()->getRow($query)) {
-            return array(
-                'year'     => $semester['FileYear'],
-                'semester' => $semester['FileSemester'],
-            );
-        } else {
-            return array();
-        }
-    }
+        $query =
+        "
+            SELECT          a.StudentContactID,
+                            a.StudentContactTitle,
+                            a.StudentContactPreferred,
+                            a.StudentContactSurname,
+                            a.StudentContactDefaultEmail,
+                            a.ValidAddressFlag,
+                            a.StudentContactAddress1,
+                            a.StudentContactAddress2,
+                            a.StudentContactAddress3,
+                            a.StudentContactSuburb,
+                            a.StudentContactPostCode,
+                            a.StudentContactState,
+                            a.StudentContactPhoneActual,
+                            a.StudentContactMobilePhone,
+                            a.StudentContactOccupPhone,
+                            a.StudentContactRelation,
+                            a.StudentContactSpouseID,
+                            a.StudentContactSpouseTitle,
+                            a.StudentContactSpousePreferred,
+                            a.StudentContactSpouseSurname,
+                            a.StudentContactSpouseMobilePhone,
+                            a.StudentContactSpouseOccupPhone,
+                            a.StudentContactSpouseDefaultEmail,
+                            a.StudentContactType,
+                            a.StudentContactSpouseRelation,
+                            r.UseEmail AS StudentContactUseEmail,
+                            rs.UseEmail AS StudentContactSpouseUseEmail                
+            FROM            dbo.vStudentContactAllAddress a
+            LEFT JOIN       Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
+            LEFT JOIN       Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID            
+            JOIN            FileSemesters Semester ON
+                                Semester.FileSemester = a.FileSemester AND
+                                Semester.FileYear = a.FileYear AND
+                                Semester.SystemCurrentFlag = 1
+            WHERE           StudentID = :externalId AND
+                            StudentContactType IN ('SC1', 'SC2', 'SC3')
+        ";
 
-    public function getCurrentSemester($externalUserId = null)
-    {
-        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
-        if (!empty($fileYearSemester)) {
-            return $fileYearSemester['semester'];
-        }
-        return null;
-    }
+        $iteratorContacts = $this->getConnector()->executeQueryIterator($query, ['externalId' => $externalUserId]);
 
-    public function getCurrentYear($externalUserId = null)
-    {
-        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
-        if (!empty($fileYearSemester)) {
-            return $fileYearSemester['year'];
+        $contactList = [];
+
+        foreach ($iteratorContacts as $contact) {
+            if ($contact['ValidAddressFlag'] == 0) {
+                $contact['StudentContactAddress1'] = '';
+                $contact['StudentContactAddress2'] = '';
+                $contact['StudentContactAddress3'] = '';
+                $contact['StudentContactSuburb'] = '';
+                $contact['StudentContactPostCode'] = '';
+                $contact['StudentContactState'] = '';
+            }
+
+            $contactList[] = $contact;
         }
-        return null;
+
+        return $this->clearInvalidValues($contactList);
     }
 
     /**
-     * Get a list of subjects and their types
-     *
-     * @param User $user
-     * @return array
+     * @inheritdoc
      */
     public function getSubjectList(User $user)
     {
@@ -761,436 +765,532 @@ class External_Synergetic_User implements External_UserInterface
         }
 
         if ($user->getRole()->isStudent()) {
-            $sql = "
-                SELECT
-                    StudentClasses.ClassCode,
-                    SubjectClasses.ClassCampus,
-                    SubjectClasses.Description as name,
-                    luFileType.Description as classType
-                FROM StudentClasses
-                INNER JOIN SubjectClasses ON
-                    StudentClasses.FileType = SubjectClasses.FileType AND
-                    StudentClasses.FileYear = SubjectClasses.FileYear AND
-                    StudentClasses.FileSemester = SubjectClasses.FileSemester AND
-                    StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
-                    StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                    StudentClasses.FileSemester = '" . $this->database->quote($this->getCurrentSemester($externalId)) . "' AND
-                    StudentClasses.FileYear = '" . $this->database->quote($this->getCurrentYear($externalId)) . "' AND
-                    StudentClasses.ID = '{$this->database->quote($externalId)}'
-                LEFT JOIN luFileType ON StudentClasses.FileType = luFileType.Code
-                WHERE
-                    StudentClasses.StartDate <= getdate()
-                    AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-                ORDER BY SubjectClasses.FileType ASC, SubjectClasses.Description ASC
+
+            // Retrieve student subjects
+
+            $sql =
+            "
+                SELECT            StudentClasses.ClassCode as code,
+                                  SubjectClasses.ClassCampus as campusCode,
+                                  SubjectClasses.Description as name,
+                                  luFileType.Description as classType
+                FROM              StudentClasses
+                INNER JOIN        SubjectClasses ON
+                                  StudentClasses.FileType = SubjectClasses.FileType AND
+                                  StudentClasses.FileYear = SubjectClasses.FileYear AND
+                                  StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+                                  StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+                                  StudentClasses.ClassCode = SubjectClasses.ClassCode AND
+                                  StudentClasses.ID = :externalId
+                JOIN              FileSemesters Semester ON
+                                      Semester.FileSemester = StudentClasses.FileSemester AND
+                                      Semester.FileYear = StudentClasses.FileYear AND
+                                      Semester.SystemCurrentFlag = 1
+                LEFT JOIN         luFileType ON StudentClasses.FileType = luFileType.Code
+                WHERE             StudentClasses.StartDate <= getdate() AND
+                                  (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+                ORDER BY          SubjectClasses.FileType ASC, 
+                                  SubjectClasses.Description ASC
             ";
+
         } else if ($user->getRole()->isStaff()) {
-            $sql = "
-                SELECT
-                    DISTINCT(c1.ClassCode),
-                    c1.ClassCampus,
-                    c2.description as name,
-                    luFileType.Description as classType
-                FROM SubjectClassStaff c1
-                INNER JOIN SubjectClasses c2 ON
-                    c1.FileType = c2.FileType AND
-                    c1.FileYear = c2.FileYear AND
-                    c1.FileSemester = c2.FileSemester AND
-                    c1.ClassCampus = c2.ClassCampus AND
-                    c1.ClassCode = c2.ClassCode AND
-                    c1.FileSemester = '" . $this->database->quote($this->getCurrentSemester($externalId)) . "' AND
-                    c1.FileYear = '" . $this->database->quote($this->getCurrentYear($externalId)) . "' AND
-                    c1.StaffID = '{$this->database->quote($externalId)}'
-                LEFT JOIN luFileType ON c2.FileType = luFileType.Code
-                ORDER BY luFileType.Description ASC, c2.Description ASC
+
+            // Retrieve staff subjects
+
+            $sql =
+            "
+                SELECT DISTINCT   (c1.ClassCode) AS code,
+                                  c1.ClassCampus as campusCode,
+                                  c2.description as name,
+                                  luFileType.Description as classType
+                FROM              SubjectClassStaff c1
+                INNER JOIN        SubjectClasses c2 ON
+                                        c1.FileType = c2.FileType AND
+                                        c1.FileYear = c2.FileYear AND
+                                        c1.FileSemester = c2.FileSemester AND
+                                        c1.ClassCampus = c2.ClassCampus AND
+                                        c1.ClassCode = c2.ClassCode AND
+                                        c1.StaffID = :externalId
+                JOIN              FileSemesters Semester ON
+                                      Semester.FileSemester = c2.FileSemester AND
+                                      Semester.FileYear = c2.FileYear AND
+                                      Semester.SystemCurrentFlag = 1
+                LEFT JOIN         luFileType ON c2.FileType = luFileType.Code
+                ORDER BY          luFileType.Description ASC, 
+                                  c2.Description ASC
             ";
+
         } else {
+
+            // If they're neither staff/student- they have no business being here
+
             return [];
         }
 
-        $this->getDatabase()->query($sql);
-        $subjectList = array();
-        while ($subject = $this->getDatabase()->getNextArray()) {
-            $subjectList[] = array(
-                'code'       => $subject['ClassCode'],
-                'name'       => $subject['name'],
-                'classType'  => $subject['classType'],
-                'campusCode' => $subject['ClassCampus']
-            );
-        }
+        $subjectList = $this->getConnector()->executeQuery($sql, ['externalId' => $externalId])->fetchAll();
+
         if (is_array($subjectList)) {
-            usort($subjectList, function($a, $b) {
-                return strnatcmp($a['name'],$b['name']);
+
+            // Perform natural sort on subjects so they appear in a more logical order
+            // (unfortunately no current way to do this is MSSQL query without writing
+            // a custom database function or doing a hacky length query)
+
+            usort($subjectList, function ($a, $b) {
+                return strnatcmp($a['name'], $b['name']);
             });
+
             return $subjectList;
-        } else {
-            return [];
         }
+
+        // No subjects found
+
+        return [];
     }
 
     /**
-     * Get the students belonging to you
-     *
-     * @param $synergyID
-     *
-     * @return array|bool
+     * @inheritdoc
      */
-    public function getEnrolledStudents($synergyID)
+    public function getEnrolledStudents($externalId)
     {
-        if (!$this->isExternalIdValid($synergyID)) {
+        if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
-        //
-        // Valid Relations:
-        // SN/DR:       Son/Daughter
-        // STSN/STDR:   Stepson/Stepdaugter
-        // WD:          Ward
-        // GRASN/GRADR: Grandson/Granddaughter
-        // FOCD:        Foster child
-        // HS/HSS:      Homestay/Homestay Student
 
         // Get student contact types from config, and wrangle into a query
 
-        $studentRelationships =
-            implode(
-                ',',
-                array_map(
-                    [$this->getDatabase(), 'smartQuote'],
-                    array_map(
-                        'trim',
-                        explode(',', Config::get('external_synergetic_student_relationships'))
-                    )
-                )
-            );
+        if (empty($this->config->get('external_synergetic_student_relationships')) === 0) {
 
-        if (strlen($studentRelationships) === 0) {
-            $studentRelationships = "'SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'";
+            // No relationships were found, use the default values we had before introducing this feature
+
+            $relationships = ['SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'];
+        } else {
+            $relationships = explode(',', $this->config->get('external_synergetic_student_relationships'));
         }
+
+        $relationshipBindings = PredicateBuilder::getArrayBindings($relationships, 'relationship');
 
         $query = "
-            SELECT Relationships.RelatedID
-            FROM dbo.Constituencies Constituencies
-            LEFT JOIN dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
-            LEFT JOIN dbo.Community Community ON Relationships.RelatedID = Community.ID
-            WHERE Relationships.ID = '{$this->database->quote($synergyID)}'
-            AND Constituencies.ConstitCode='@SC'
-            AND Relationships.Relationship IN ({$studentRelationships})
-            ORDER BY Community.BirthDate
+            SELECT      Relationships.RelatedID
+            FROM        dbo.Constituencies Constituencies
+            LEFT JOIN   dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
+            LEFT JOIN   dbo.Community Community ON Relationships.RelatedID = Community.ID
+            WHERE       Relationships.ID = :externalId AND
+                        Constituencies.ConstitCode = '@SC' AND
+                        Relationships.Relationship IN ({$relationshipBindings['placeholders']})
+            ORDER BY    Community.BirthDate
         ";
-        return $this->getDatabase()->getAll($query);
-    }
 
-    public function getEmail($id)
-    {
-        if (!$this->isExternalIdValid($id)) {
-            return false;
-        }
-        $query = "SELECT Email FROM Community WHERE id = {$this->database->quote($id)}";
-        return $this->getDatabase()->getOne($query);
+        return $this->getConnector()->executeQuery(
+            $query,
+            array_merge(
+                $relationshipBindings['bindings'],
+                ['externalId' => $externalId]
+            )
+        )->fetchAll();
     }
 
     /**
-     * Gets all Students' account info from Synergetic
-     *
-     * @return array|bool
+     * @inheritdoc
+     */
+    public function getEmail($externalId)
+    {
+        if (!$this->isExternalIdValid($externalId)) {
+            return false;
+        }
+
+        return $this->getConnector()->executeQuery(
+            "SELECT Email FROM Community WHERE id = :externalId",
+            ['externalId' => $externalId]
+        )->fetch();
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getStudentUserAccountInfo()
     {
-        $query = "
-            SELECT
-                vStudents.StudentID,
-                NetworkLogin,
-                vStudents.StudentTitle,
-                vStudents.StudentPreferred,
-                vStudents.StudentSurname,
-                StudentGender,
-                StudentEmail,
-                StudentOccupEmail,
-                vStudents.StudentYearLevel,
-                vStudents.StudentHouse,
-				vStudents.StudentBoarder,
-				vStudents.StudentBoardingHouse,
-                StudentCampus
-            FROM dbo.vStudents vStudents
-            LEFT JOIN Community ON Community.ID = StudentID
-            WHERE
-            FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+        $query =
+            "
+            SELECT      vStudents.StudentID,
+                        NetworkLogin,
+                        vStudents.StudentTitle,
+                        vStudents.StudentPreferred,
+                        vStudents.StudentSurname,
+                        StudentGender,
+                        StudentEmail,
+                        StudentOccupEmail,
+                        vStudents.StudentYearLevel,
+                        vStudents.StudentHouse,
+                        vStudents.StudentBoarder,
+                        vStudents.StudentBoardingHouse,
+                        StudentCampus
+            FROM        dbo.vStudents vStudents
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudents.FileSemester AND
+                            Semester.FileYear = vStudents.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            LEFT JOIN   Community ON Community.ID = StudentID
         ";
-        return $this->getDatabase()->getAll($query);
+
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
-     * Gets all Parents' account info from Synergetic
-     * Used for Bialik sync
-     *
-     * @return array|bool
+     * @inheritdoc
      */
     public function getParentUserAccountInfo()
     {
         // Get student contact types from config, and wrangle into a query
-        $studentContactTypes =
-            implode(
-                ',',
-                array_map(
-                    [$this->getDatabase(), 'smartQuote'],
-                    array_map(
-                        'trim',
-                        explode(',', Config::get('external_synergetic_student_contact_types'))
-                    )
-                )
-            );
-        if (strlen($studentContactTypes) === 0) {
-            $studentContactTypes = "'SC1','SC2'";
+
+        if (empty($this->config->get('external_synergetic_student_contact_types')) === 0) {
+
+            // No relationships were found, use the default values we had before introducing this feature
+
+            $studentContactTypes = ['SC1','SC2'];
+        } else {
+            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
         }
 
-        $query = "
-            SELECT DISTINCT
-				cp.NetworkLogin AS StudentContactNetworkLogin,
-				s.StudentContactID,
-				s.StudentContactTitle,
-				s.StudentContactPreferred,
-				s.StudentContactSurname,
-				s.StudentContactDefaultEmail,
-				cs.NetworkLogin AS StudentContactSpouseNetworkLogin,
-				s.StudentContactSpouseID,
-				s.StudentContactSpouseTitle,
-				s.StudentContactSpousePreferred,
-				s.StudentContactSpouseSurname,
-				s.StudentContactSpouseDefaultEmail,
-				s.StudentYearLevel,
-				s.StudentCampus,
-				s.StudentGender
-			FROM dbo.vStudentContactAllAddress s
-			LEFT JOIN dbo.Community cp ON s.StudentContactID = cp.ID
-			LEFT JOIN dbo.Community cs ON s.StudentContactSpouseID = cs.ID
-            WHERE StudentContactType IN ({$studentContactTypes})
-            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
-            ORDER BY StudentContactID
+        $contactTypes = PredicateBuilder::getArrayBindings($studentContactTypes, 'types');
+
+        $query =
+        "
+            SELECT DISTINCT cp.NetworkLogin AS StudentContactNetworkLogin,
+                            s.StudentContactID,
+                            s.StudentContactTitle,
+                            s.StudentContactPreferred,
+                            s.StudentContactSurname,
+                            s.StudentContactDefaultEmail,
+                            cs.NetworkLogin AS StudentContactSpouseNetworkLogin,
+                            s.StudentContactSpouseID,
+                            s.StudentContactSpouseTitle,
+                            s.StudentContactSpousePreferred,
+                            s.StudentContactSpouseSurname,
+                            s.StudentContactSpouseDefaultEmail,
+                            s.StudentYearLevel,
+                            s.StudentCampus,
+                            s.StudentGender
+			FROM            dbo.vStudentContactAllAddress s
+            JOIN            FileSemesters Semester ON
+                                Semester.FileSemester = s.FileSemester AND
+                                Semester.FileYear = s.FileYear AND
+                                Semester.SystemCurrentFlag = 1
+			LEFT JOIN       dbo.Community cp ON s.StudentContactID = cp.ID
+			LEFT JOIN       dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+            WHERE           StudentContactType IN ({$contactTypes['placeholders']})
+            ORDER BY        StudentContactID
         ";
-        return $this->getDatabase()->getAll($query);
+
+        return $this->getConnector()->executeQuery($query, $contactTypes['bindings'])->fetchAll();
     }
 
     /**
-     * Gets all active Staff's account info from Synergetic
-     *
-     * @return array|bool
+     * @inheritdoc
      */
     public function getStaffUserAccountInfo()
     {
-        $query = "
-            SELECT
-                vStaff.StaffID,
-                NetworkLogin,
-                ActiveFlag,
-                vStaff.StaffTitle,
-                vStaff.StaffPreferredName,
-                vStaff.StaffSurname,
-                DefaultEmailCode,
-                OccupEmail,
-                Email,
-                vStaff.StaffCampus,
-                StaffCategoryType,
-                StaffCategory,
-                vStaff.StaffDepartment
-            FROM dbo.vStaff vStaff
-            LEFT JOIN Community ON Community.ID = StaffID
-          WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
+        $query =
+            "
+            SELECT      vStaff.StaffID,
+                        NetworkLogin,
+                        ActiveFlag,
+                        vStaff.StaffTitle,
+                        vStaff.StaffPreferredName,
+                        vStaff.StaffSurname,
+                        DefaultEmailCode,
+                        OccupEmail,
+                        Email,
+                        vStaff.StaffCampus,
+                        StaffCategoryType,
+                        StaffCategory,
+                        vStaff.StaffDepartment
+            FROM        dbo.vStaff vStaff
+            LEFT JOIN   Community ON Community.ID = StaffID
+            WHERE       ActiveFlag = 1 AND 
+                        vStaff.StaffRegistrationType <> 'STDNT'
         ";
-        return $this->getDatabase()->getAll($query);
+
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
-     * Contact list for staff directory
-     * Exclude people who aren't active.
-     * Exclude people who are on leave (category description for this is 'Staff on leave')
-     * TODO: Make exclusion on category configurable, currently excluding
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getStaffContactListExtended()
     {
+        // Restrict staff categories to provided list
 
-        /* Restrict staff categories to provided list */
-        $staffCategory = explode(',',\Config::get('synergetic_staff_dir_restrict'));
-        $scWhere = '';
-        if(is_array($staffCategory) && $staffCategory[0] != '') {
-            $staffCategoryString = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $staffCategory));
-            $scWhere = "AND StaffCategory NOT IN ($staffCategoryString)";
+        $staffCategory = explode(',', $this->config->get('synergetic_staff_dir_restrict'));
+
+        $filter = '';
+        $bindings = [];
+
+        if (is_array($staffCategory) && $staffCategory[0] != '')
+        {
+            $count = 1;
+
+            $filterPlaceholder = "";
+
+            foreach ($staffCategory as $category) {
+                if ($filterPlaceholder != '') {
+                    $filterPlaceholder .= ', ';
+                }
+
+                $filterPlaceholder .= ":staffCategory{$count}";
+                $bindings["staffCategory{$count}"] = $category;
+
+                $count++;
+            }
+
+            $filter = " AND StaffCategory NOT IN ($filterPlaceholder)";
         }
 
-        // Check if the custom staff position table exists, and if so use this to override position titles [SB-10813]
+        // Check if the custom staff position table exists, and if so use this to override
+        // position titles [SB-10813]
 
-        $statement = $this->getDatabase()->query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'uStaffPosition'");
+        $queryTable = $this->getConnector()->executeQuery(
+            "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'uStaffPosition'"
+        );
 
-        if ($this->getDatabase()->countRows($statement) > 0) {
-
-            // If the custom table exists, override the 'JobPositionDescription' field
-
-            $query = "
-                SELECT
-                    vStaff.StaffID,
-                    vStaff.SchoolStaffCode,
-                    vStaff.StaffTitle,
-                    vStaff.StaffPreferredName,
-                    vStaff.StaffSurname,
-                    vStaff.StaffOccupPhone,
-                    vStaff.StaffOccupEmail,
-                    vStaff.StaffExtension,
-                    vStaff.StaffCampusDescription,
-                    vStaff.StaffCategory,
-                    vStaff.StaffCategoryType,
-                    vStaff.StaffDefaultMobilePhone,
-                    vStaff.StaffVoiceMail,
-                    StaffDepartmentDescription,
-                    uStaffPosition.JobTitle AS JobPositionDescription,
-                    JobPositions.StaffJobPositionStartDate,
-                    JobPositions.StaffJobPositionEndDate,
-                    Community.OccupDesc AS JobPositionDescriptionAlternate                
-                FROM dbo.vStaff vStaff
-            JOIN dbo.Community ON Community.ID = vStaff.StaffID
-                LEFT JOIN dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-                LEFT JOIN dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID
-                WHERE vStaff.ActiveFlag = 1
-                AND StaffCategoryDescription != 'Staff on leave'
-                $scWhere
-                AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
-                OR    JobPositions.StaffJobPositionStartDate IS NULL )
-                AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
-                OR    JobPositions.StaffJobPositionEndDate IS NULL )
-                ORDER BY vStaff.StaffSurname
-            ";
-
+        if ($queryTable->fetch()) {
+            $select = 'uStaffPosition.JobTitle AS JobPositionDescription';
+            $join = 'LEFT JOIN dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID';
         } else {
-
-            $query = "
-                SELECT
-                vStaff.StaffID,
-                vStaff.SchoolStaffCode,
-                vStaff.StaffTitle,
-                vStaff.StaffPreferredName,
-                vStaff.StaffSurname,
-                vStaff.StaffOccupPhone,
-                vStaff.StaffOccupEmail,
-                vStaff.StaffExtension,
-                vStaff.StaffCampusDescription,
-                vStaff.StaffCategory,
-                vStaff.StaffCategoryType,
-                vStaff.StaffDefaultMobilePhone,
-                vStaff.StaffVoiceMail,
-                StaffDepartmentDescription,
-                JobPositions.JobPositionDescription,
-                JobPositions.StaffJobPositionStartDate,
-                JobPositions.StaffJobPositionEndDate,
-                Community.OccupDesc AS JobPositionDescriptionAlternate                
-            FROM dbo.vStaff vStaff
-            JOIN dbo.Community ON Community.ID = vStaff.StaffID
-            LEFT JOIN dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-            WHERE vStaff.ActiveFlag = 1
-            AND StaffCategoryDescription != 'Staff on leave'
-            $scWhere
-            AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
-            OR    JobPositions.StaffJobPositionStartDate IS NULL )
-            AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
-            OR    JobPositions.StaffJobPositionEndDate IS NULL )
-            ORDER BY vStaff.StaffSurname
-        ";
+            $select = 'JobPositions.JobPositionDescription';
+            $join = '';
         }
 
-        return $this->getDatabase()->getAll($query);
+        // If the custom table exists, override the 'JobPositionDescription' field
+
+        $query = "
+
+            SELECT      vStaff.StaffID,
+                        vStaff.SchoolStaffCode,
+                        vStaff.StaffTitle,
+                        vStaff.StaffPreferredName,
+                        vStaff.StaffSurname,
+                        vStaff.StaffOccupPhone,
+                        vStaff.StaffOccupEmail,
+                        vStaff.StaffExtension,
+                        vStaff.StaffCampusDescription,
+                        vStaff.StaffCategory,
+                        vStaff.StaffCategoryType,
+                        vStaff.StaffDefaultMobilePhone,
+                        vStaff.StaffVoiceMail,
+                        StaffDepartmentDescription,
+                        JobPositions.StaffJobPositionStartDate,
+                        JobPositions.StaffJobPositionEndDate,
+                        Community.OccupDesc AS JobPositionDescriptionAlternate,                
+                        {$select}
+            FROM        dbo.vStaff vStaff
+            JOIN        dbo.Community ON Community.ID = vStaff.StaffID
+            LEFT JOIN   dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
+                        {$join}
+            WHERE       vStaff.ActiveFlag = 1 AND
+                        StaffCategoryDescription <> 'Staff on leave' AND
+                        (JobPositions.StaffJobPositionStartDate < GETDATE() OR JobPositions.StaffJobPositionStartDate IS NULL) AND
+                        (JobPositions.StaffJobPositionEndDate > GETDATE() OR JobPositions.StaffJobPositionEndDate IS NULL)
+                        {$filter}
+            ORDER BY    vStaff.StaffSurname
+        ";
+
+        return $this->getConnector()->executeQuery($query, $bindings)->fetchAll();
     }
 
-
     /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @param int $staffID
-     * @return array|bool
+     * @inheritdoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable($externalId)
     {
-        if (!$this->isExternalIdValid($staffID)) {
+        // Was unable to hit this in testing, but running in isolation returned
+        //
+        //    /vagrant/library/External/Synergetic/User.php:440:
+        //    array (size=1)
+        //      0 =>
+        //          array (size=1)
+        //              'campus' => string 'S' (length=1)
+
+        if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
-        $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '{$this->database->quote($staffID)}' AND FileYear = ".date('Y');
-        return $this->getDatabase()->getAll($query);
+
+        return $this->getConnector()->executeQuery(
+            "
+                SELECT DISTINCT     ClassCampus AS campus 
+                FROM                timetable 
+                WHERE               StaffID = :id AND 
+                                    FileYear = :fileYear AND
+                                    ClassCampus <> ''
+            ",
+            [
+                'id' => $externalId,
+                'fileYear' => date('Y')
+            ]
+        )->fetchAll();
     }
 
     /**
-     * Determine the boarder type based on a value
-     * Returns a human-readable string
-     *
-     * @param $boarderValue
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType($code)
     {
-        if (strlen($boarderValue) === 0) {
+        if (empty($code)) {
             return '';
         }
-        $query = "
-            SELECT Description
-            FROM   luBoarder
-            WHERE  Code = '{$this->getDatabase()->quote($boarderValue)}'
-        ";
-        return $this->getDatabase()->getOne($query);
+
+        return $this->getConnector()->executeQuery(
+            "SELECT Description FROM luBoarder WHERE Code = :code",
+            ['code' => $code]
+        )->fetchColumn();
     }
 
+
+    /**
+     * @inheritdoc
+     */
     public function getHousemasterByHouseId($houseID)
     {
         return false;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getStudentForms()
     {
-        $query = "
-            SELECT Code, Description
-            FROM dbo.luForm
-            WHERE ActiveFlag = 1
-        ";
-        return $this->getDatabase()->getAll($query);
+        $iteratorForms = $this->getConnector()->executeQueryIterator(
+            "SELECT Code, Description FROM dbo.luForm WHERE ActiveFlag = 1"
+        );
+
+        $forms = [];
+
+        foreach ($iteratorForms as $form) {
+            $forms[] = $this->clearInvalidValues($form);
+        }
+
+        return $forms;
     }
 
-    /* Getters/Setters
-      */
-
     /**
-     * Set database
+     * This is a helper function to clear the 'Not Selected' placeholder value that
+     * Synergetic loves to add as an option in every lookup table
      *
-     * @param $database
+     * @param array $array
+     * @param string $placeholder
+     * @return array
      */
-    private function setDatabase($database)
+    private function clearInvalidValues($array, $placeholder = 'Not Selected')
     {
-        $this->database = $database;
+        // Remove the 'Not Selected' Synergetic placeholder value
+
+        return array_map(function($value) use ($placeholder) {
+            if (is_array($value)) {
+                return $this->clearInvalidValues($value);
+            } else {
+                return trim(str_replace($placeholder, '', $value));
+            }
+        }, $array);
+    }
+
+    // TODO: These calls don't seem to be getting cached according to the debug console, so caching them here.
+
+    /**
+     * Cache of users file year/semester
+     * @var array
+     */
+    private static $fileYearSemesterUser = [];
+
+    /**
+     * Cache of system file year/semester
+     * @var array
+     */
+    private static $fileYearSemesterDefault;
+
+    // TODO: These functions seem to be used prolifically to fill in SQL clauses- in these cases should be using appropriate SQL joins.
+
+    /**
+     * Retrieve current Synergetic file year and file semester
+     * @param int|null $externalUserId If supplied, will returns the users current year/semester
+     * @return array
+     */
+    protected function findFileYearAndSemester($externalUserId = null)
+    {
+        // If we are supplied a valid user ID use their current file year/semester values
+
+        if ($externalUserId != null) {
+
+            if (isset(self::$fileYearSemesterUser[$externalUserId])) {
+                return self::$fileYearSemesterUser[$externalUserId];
+            }
+
+            if ($this->isExternalIdValid($externalUserId)) {
+                $statement = $this->getConnector()->executeStoredProcedure(
+                    'spsConfigUserDefaultYearSemester',
+                    ['ID' => $externalUserId]
+                );
+
+                if ($semester = $statement->fetch()) {
+                    self::$fileYearSemesterUser[$externalUserId] = [
+                        'year' => $semester['UserFileYear'],
+                        'semester' => $semester['UserFileSemester']
+                    ];
+
+                    return self::$fileYearSemesterUser[$externalUserId];
+                }
+            }
+        }
+
+        // Otherwise, return the current system default values
+
+        if (!isset(self::$fileYearSemesterDefault)) {
+
+            $querySemester = $this->getConnector()->executeQuery(
+                "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1"
+            );
+
+            if ($semester = $querySemester->fetch()) {
+                self::$fileYearSemesterDefault = [
+                    'year' => $semester['FileYear'],
+                    'semester' => $semester['FileSemester'],
+                ];
+
+            } else {
+
+                // If everything falls in a heap- return a blank array
+
+                return [];
+            }
+
+        }
+
+        return self::$fileYearSemesterDefault;
     }
 
     /**
-     * Get database
-     *
-     * @return MSSQL
+     * @inheritdoc
      */
-    protected function getDatabase()
+    public function getCurrentSemester($externalUserId = null)
     {
-        return $this->database;
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+
+        if (!empty($fileYearSemester)) {
+            return $fileYearSemester['semester'];
+        }
+
+        return null;
     }
 
     /**
-     * @param Group $groupHandler
+     * @inheritdoc
      */
-    public function setGroup($groupHandler)
+    public function getCurrentYear($externalUserId = null)
     {
-        $this->groupHandler = $groupHandler;
-    }
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
 
-    /**
-     * @return Group
-     */
-    public function getGroup()
-    {
-        return $this->groupHandler;
+        if (!empty($fileYearSemester)) {
+            return $fileYearSemester['year'];
+        }
+
+        return null;
     }
 }

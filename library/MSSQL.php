@@ -1,582 +1,263 @@
 <?php
-/************************************************************
- *                                                           *
- * 		Copyright (c) 2013 Alaress Pty Ltd				*
- *                                                           *
- *	This file provides abstraction of the  MSSQL database.	*
- *	This used for Synergetic connections. 	 				*
- *	It also includes error handling and a debug mode.		*
- *                                                           *
- ************************************************************/
+/**
+ * This class is now deprecated. Use a DI injected \Alaress\Database\IConnector class instead.
+ *
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ */
 
-use Alaress\DebugBar\DataCollector\MssqlDatabaseCollector;
-use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Database\Connector\Base as Connector;
+use Alaress\Database\Statement\IStatement;
+use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\IConfigLoader;
 
-class MSSQL {
+/**
+ * @deprecated
+ * Class MSSQL
+ */
+class MSSQL
+{
+    /** @var Connector $connector */
+    protected $connector;
 
-	/**
-	 * @var MssqlDatabaseCollector
-	 */
-	protected $collector = null;
-
-	/**
-	 * The database connection resource
-	 * @var resource
-	 */
-	protected $dbf = null;
-
-	/**
-	 * Database host address
-	 * @var string
-	 */
-	protected $host = null;
-
-	/**
-	 * Database user
-	 * @var string
-	 */
-	protected $user = null;
-
-	/**
-	 * Database password
-	 * @var string
-	 */
-	protected $passwd = null;
-
-	/**
-	 * Database name
-	 * @var string
-	 */
-	protected $db = null;
-
-	/**
-	 * Most recent result resource
-	 * @var resource
-	 */
-	protected $result = null;
-
-	/**
-	 * Static instance of this class
-	 *
-	 * @var self
-	 */
-	protected static $instance = null;
+    /** @var IConfigLoader $config */
+    protected $config;
 
     /**
-     * A key-value lookup for each connection - it contains the last database
-     * that that host/user/password combination queried.
-     *
-     * @var array
+     * Database host address
+     * @var string
      */
-    protected static $lastDatabase = [];
-
-	/**
-	 * @param bool $db
-	 * @param bool $optionalConfig
-	 */
-	function __construct($db = false, $optionalConfig = false) {
-
-		/* Blasphemy (heresy unavoidable)
-		 * Hijack these settings for alternative config
-		 */
-		if (is_array($optionalConfig)) {
-			$this->host = $optionalConfig['host'];
-			$this->user = $optionalConfig['user'];
-			$this->passwd = $optionalConfig['passwd'];
-			$this->db = $optionalConfig['db'];
-		}
-		else {
-			$this->host = Cfg::get('external_db_host');
-			$this->user = Cfg::get('external_db_user');
-			$this->passwd = Cfg::get('external_db_passwd');
-			$this->debug = 0;
-			$this->db = $db?$db:Cfg::get('external_db_db');
-		}
-	}
-
-	/**
-	 * Gets static instance of this class (with default settings). Should be
-	 * alright as this never gets called
-	 *
-	 * @return self
-	 */
-	public static function getInstance() {
-		if (!self::$instance) {
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
-
-	/**
-	 * Connect to database
-	 *
-	 * @throws Schoolbox\External\Exception
-	 */
-	function connect() {
-		if (!isset($this->dbf)) {
-			// mssql.charset not already set? set it to UTF-8 here.
-			if (strlen(ini_get('mssql.charset')) === 0) {
-				ini_set('mssql.charset', 'UTF-8');
-			}
-			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd);
-		}
-
-		if ($this->dbf == false) {
-			throw new \Schoolbox\External\Exception("Schoolbox was unable to connect to your schools external database.\nIf this problem persists, please contact your system administrator.");
-		} else {
-			if (!$this->changeDb($this->db)) {
-				throw new \Schoolbox\External\Exception("Schoolbox was unable to connect to your schools external database.\nThe server was online, however the database could not be accessed. If this problem persists, please contact your system administrator.");
-			} else {
-				/* Set Default NULL ON, due to stored procs requiring this */
-				mssql_query('SET ANSI_NULL_DFLT_ON ON', $this->dbf);
-				mssql_query('SET CONCAT_NULL_YIELDS_NULL ON', $this->dbf);
-			}
-		}
-
-		if (DebugBar::isEnabled()) {
-			$this->installCollector();
-			/** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
-			$collector = $this->getCollector();
-			if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
-				DebugBar::getInstance()->addCollector($collector);
-			}
-		}
-
-	}
+    protected $host = null;
 
     /**
-     * Determines a unique identifier for this host/user/password combination.
+     * Database user
+     * @var string
+     */
+    protected $user = null;
+
+    /**
+     * Database password
+     * @var string
+     */
+    protected $passwd = null;
+
+    /**
+     * Database name
+     * @var string
+     */
+    protected $db = null;
+
+    /**
+     * Static instance of this class
      *
+     * @deprecated
+     * @var self
+     */
+    protected static $instance = null;
+
+    /**
+     * Gets static instance of this class (with default settings). Should be
+     * alright as this never gets called
+     *
+     * @deprecated
+     * @return self
+     */
+    public static function getInstance()
+    {
+        if (!self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * @deprecated
+     * @param bool $db
+     * @param bool $optionalConfig
+     */
+    function __construct($db = false, $optionalConfig = false)
+    {
+        $this->connector = $this->connector = DatabaseFactory::getInstanceExternal();
+        $this->config = ConfigMapper::getInstance();
+    }
+
+    /**
+     * Ping function just attempts to reconnect to the database
+     *
+     * @deprecated
+     */
+    function isResponsive()
+    {
+        return $this->connector->connect(
+            $this->config->get('external_db_host'),
+            $this->config->get('external_db_db'),
+            $this->config->get('external_db_user'),
+            $this->config->get('external_db_passwd')
+        );
+    }
+
+    /**
+     * Executes a query, returns the statement
+     *
+     * @deprecated
+     * @param string $sql_q
+     * @return bool|IStatement
+     */
+    function query($sql_q)
+    {
+        $result = $this->connector->prepareQuery($sql_q);
+        $result->execute();
+        return $result;
+    }
+
+    /**
+     * Runs a stored procedure
+     *
+     * @deprecated
+     * @param string $name The name of the stored procedure.
+     * @return IStoredProcedure
+     */
+    public function prepareProcedure($name)
+    {
+        return $this->connector->prepareStoredProcedure($name);
+    }
+
+    /**
+     * Gets the first result returned by the query. Returns an associative array of row,
+     * false if none exists
+     *
+     * @deprecated
+     * @param string $sql_q
+     * @return array|bool
+     */
+    function getRow($sql_q)
+    {
+        $query = $this->connector->executeQuery($sql_q);
+        return $query->fetch();
+    }
+
+    /**
+     * Gets the first value of the first result returned by the query. Returns an associative
+     * array of row, false if none exists
+     *
+     * @deprecated
+     * @param string $sql_q
+     * @return array|bool
+     */
+    function getOne($sql_q)
+    {
+        $query = $this->connector->executeQuery($sql_q);
+        return $query->fetchColumn();
+    }
+
+    /**
+     * Gets an 3 dimensional associative array of all rows returned by query,
+     * returns false if no rows
+     *
+     * @deprecated
+     * @param string $sql_q
+     * @return array|bool
+     */
+    function getAll($sql_q)
+    {
+        $query = $this->connector->executeQuery($sql_q);
+        return $query->fetchAll();
+    }
+
+    /**
+     * Gets an iterator over a query.
+     *
+     * @deprecated
+     * @param string $sql_q
+     * @return MssqlResultIterator
+     */
+    public function getIterator($sql_q)
+    {
+        return $this->connector->executeQueryIterator($sql_q);
+    }
+
+    /**
+     * Calls trimRow() on all rows from a rowset (returned by $this->fetchAll())
+     * @see $this->trimRow()
+     *
+     * @deprecated
+     * @param  array $rowset
+     * @return array
+     */
+    public function trimAll($rowset)
+    {
+        if (is_array($rowset)) {
+            return array_map(array($this, 'trimRow'), $rowset);
+        }
+        return $rowset;
+    }
+
+    /**
+     * Trims all field values in a single row (returned by $this->fetchRow())
+     *
+     * Needed by TASS because most of its fields are CHAR instead of VARCHAR.
+     *
+     * @deprecated
+     * @param  array $row
+     * @return array
+     */
+    public function trimRow($row)
+    {
+        if (is_array($row)) {
+            return array_map(array($this, 'trimField'), $row);
+        }
+        return $row;
+    }
+
+    /**
+     * Trims a single field value.
+     *
+     * @deprecated
+     * @param  mixed $fieldValue
+     * @return mixed Trimmed value if $fieldValue was set, null otherwise.
+     */
+    public function trimField($fieldValue)
+    {
+        return isset($fieldValue) ? trim($fieldValue) : null;
+    }
+
+    /**
+     * Escapes a value for safe usage in a query. The only escape needed is a
+     * single apostrophe for two ("'" => "''")
+     *
+     * @deprecated
+     * @param string $value The string to escape.
      * @return string
      */
-    protected function getConnectionHash()
+    public function quote($value)
     {
-        return hash('sha256', serialize([$this->host, $this->user, $this->passwd]));
+        return str_replace("'", "''", $value);
     }
 
     /**
-     * Changes to a different database, only if this host/user/password isn't
-     * already connected to it.
+     * Escapes a value for safe usage in a query, and wraps in quotes so that
+     * it can be interposed directly into a string.
      *
-     * @param $db
+     * @deprecated
+     * @param string $value The string to escape.
+     * @return string
      */
-    protected function changeDatabaseIfRequired($db)
+    public function smartQuote($value)
     {
-        $hash = $this->getConnectionHash();
-        if (isset(self::$lastDatabase[$hash]) && self::$lastDatabase[$hash] != $db) {
-            $this->changeDB($db);
-        }
+        return "'" . $this->quote($value) . "'";
     }
 
-	/**
-	 * Change to a different DB on server
-	 * @param string $db
-	 * @return bool
-	 */
-	function changeDB($db) {
-		if(@mssql_select_db($db, $this->dbf))
-		{
-			$this->db = $db;
-			// Store that this connection is connected to this database
-			self::$lastDatabase[$this->getConnectionHash()] = $db;
-			return true;
-
-		}
-		else
-			return false;
-	}
-
-	/**
-	 * Installs the PHP debug bar collector into this object.
-	 */
-	public function installCollector() {
-		if (!($this->collector instanceof MssqlDatabaseCollector)) {
-			$this->collector = new MssqlDatabaseCollector($this->dbf);
-		}
-	}
-
-	/**
-	 * @return MssqlDatabaseCollector
-	 */
-	public function getCollector() {
-		return $this->collector;
-	}
-
-	/**
-	 * @param string $sql_q
-	 * @return bool|resource
-	 */
-	function query($sql_q)
-	{
-		if (!$this->isConnected()) {
-			$this->connect();
-		}
-
-		$this->changeDatabaseIfRequired($this->db);
-
-		// SB-6907: Cathedral's SQL server won't accept long query strings, so
-		// strip any leading space from each line of the query.
-		// (I can't guarantee that this won't change the meaning of any query,
-		//  but 1. we never insert into any MSSQL DB, and 2. we never query on
-		//  any value with a line break, so this should be fine.
-		$sql_q = preg_replace('/^\\s+/m', '', $sql_q);
-		if($this->dbf) {
-			if ($this->collector instanceof MssqlDatabaseCollector) {
-				$this->result = $this->collector->query($sql_q);
-			}
-			else {
-				$this->result = mssql_query($sql_q, $this->dbf);
-
-				if ($this->result == false) {
-					if ($this->debug) {
-						trigger_error(sprintf('MSSQL Query: "%s" triggered error: "%s"', $sql_q, mssql_get_last_message()), E_USER_WARNING);
-					}
-					else {
-						error(21, 'Error in Microsoft SQL query<br /><br /><p>'.mssql_get_last_message().'</p>' );
-					}
-				}
-			}
-
-			return $this->result;
-		}
-		else
-			return false;
-	}
-
-	/**
-	 * Runs a stored procedure
-	 *
-	 * @param string  $name   The name of the stored procedure.
-	 * @param array[] $params A list of parameters to bind {@see mssql_bind}
-	 *                        Each array in this list should contain parameters
-	 *                        to mssql_bind in order, minus the first (the stored
-	 *                        procedure resource is created by this method)
-	 * @param bool    $multipleResultSets
-	 *                        Does this procedure return multiple result sets?
-	 *                        (Yes, it is possible for a stored proc to do this!)
-	 *
-	 * @return array success: Did the procedure run successfully?
-	 *               output:  output vars from the procedure
-	 *               result:  if the procedure returned a result set, the results
-	 *                        from the procedure.
-	 *                        If $multipleResultSets is on, then each set is a
-	 *                        separate array in this key.
-	 */
-	public function executeProcedure($name, $params, $multipleResultSets = false)
-	{
-		if (!$this->isConnected()) {
-			$this->connect();
-		}
-		$this->changeDatabaseIfRequired($this->db);
-
-		$bound_outputs = array();
-		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
-
-		// Run procedure, fetching the result set if there is one
-		$success = true;
-		$return  = array();
-		try {
-			$result  = mssql_execute($proc);
-			$message = mssql_get_last_message();
-
-			if (is_resource($result)) {
-				if ($multipleResultSets) {
-					$resultSetNo = 0;
-					do {
-						$return[$resultSetNo] = [];
-						while ($row = mssql_fetch_assoc($result)) {
-							$return[$resultSetNo][] = $row;
-						}
-						$resultSetNo++;
-					} while (mssql_next_result($result));
-				} else {
-					while ($row = mssql_fetch_assoc($result)) {
-						$return[] = $row;
-					}
-					/* This fixes issue where output params were not available after resultset was returned */
-					mssql_next_result($result);
-				}
-			}
-			elseif ($result === false) {
-				// Did the procedure error out? Return nothing instead.
-				$success       = false;
-				$bound_outputs = array();
-			}
-		}
-		catch (ErrorException $e) {
-			$success       = false;
-			$bound_outputs = array();
-			$message       = $e->getMessage();
-		}
-		mssql_free_statement($proc);
-
-		return array(
-			'success' => $success,
-			'output'  => $bound_outputs,
-			'result'  => $return,
-			'message' => $message,
-		);
-	}
-
-	/**
-	 * Gets the first result returned by the query
-	 * Returns an associative array of row, false if none exists
-	 *
-	 * @param string $sql_q
-	 *
-	 * @return array|bool
-	 */
-	function getRow($sql_q)
-	{
-		$result = $this->query($sql_q);
-		return $this->getNextArray($result);
-	}
-
-	/**
-	 * Gets the first value of the first result returned by the query
-	 * Returns an associative array of row, false if none exists
-	 *
-	 * @param string $sql_q
-	 *
-	 * @return array|bool
-	 */
-	function getOne($sql_q)
-	{
-		$result = $this->query($sql_q);
-		$row    = mssql_fetch_row($result);
-		if (!is_array($row)) {
-			return false;
-		}
-		return $row[0];
-	}
-
-	/**
-	 * Gets an 3 dimensional associative array of all rows returned by query,
-	 * returns false if no rows
-	 *
-	 * @deprecated Use getIterator() instead if possible.
-	 *
-	 * @param string $sql_q
-	 * @return array|bool
-	 */
-	function getAll($sql_q)
-	{
-		$result = $this->query($sql_q);
-		$table = array();
-		$results = false;
-		//loop through all records and insert into array table
-		while ($line = $this->getNextArray($result)) {
-			$table[] = $line;
-			$results = true;
-		}
-		if($results)
-			return $table;
-		else
-			return false;
-	}
-
-	/**
-	 * Gets an iterator over a query.
-	 *
-	 * @param string $sql_q
-	 * @return MssqlResultIterator
-	 */
-	public function getIterator($sql_q)
-	{
-		return new MssqlResultIterator($this->query($sql_q));
-	}
-
-	/**
-	 * Gets an iterator over a stored procedure.
-	 *
-	 * This currently only works with stored procs that return a result set
-	 * directly - any result text or output variables will be ignored.
-	 *
-	 * @see $this->executeProcedure()
-	 *
-	 * @return MssqlResultIterator
-	 */
-	public function getProcedureIterator($name, $params)
-	{
-		// Bound outputs will be ignored
-		$bound_outputs = [];
-		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
-		return new MssqlResultIterator(mssql_execute($proc));
-	}
-
-	/**
-	 * Returns the next result from a query result resource
-	 * Can be optionally passed a result resource otherwise it uses current result resource
-	 *
-	 * @param int  $result The resource to use, or 0 to use $this->result
-	 *
-	 * @return array|bool
-	 */
-	function getNextArray($result = 0)
-	{
-		if ($result === true) {
-			// mssql_query returns true for an empty result set :/
-			return false;
-		} elseif (is_resource($result)) {
-			$return_array = mssql_fetch_assoc($result);
-		} elseif ($result == 0 && is_resource($this->result)) {
-			$return_array = mssql_fetch_assoc($this->result);
-		} else {
-			return false;
-		}
-
-		if (is_array($return_array)) {
-			$return_array = array_map(array($this, 'convertEncoding'), $return_array);
-		}
-
-		return $return_array;
-	}
-
-	/**
-	 * Calls trimRow() on all rows from a rowset (returned by $this->fetchAll())
-	 * @see $this->trimRow()
-	 *
-	 * @param  array $rowset
-	 * @return array
-	 */
-	public function trimAll($rowset) {
-		if(is_array($rowset)) {
-			return array_map(array($this, 'trimRow'), $rowset);
-		}
-		return $rowset;
-	}
-
-	/**
-	 * Trims all field values in a single row (returned by $this->fetchRow())
-	 *
-	 * Needed by TASS because most of its fields are CHAR instead of VARCHAR.
-	 *
-	 * @param  array $row
-	 * @return array
-	 */
-	public function trimRow($row) {
-		if(is_array($row)) {
-			return array_map(array($this, 'trimField'), $row);
-		}
-		return $row;
-	}
-
-	/**
-	 * Trims a single field value.
-	 *
-	 * @param  mixed $fieldValue
-	 * @return mixed Trimmed value if $fieldValue was set, null otherwise.
-	 */
-	public function trimField($fieldValue) {
-		return isset($fieldValue) ? trim($fieldValue) : null;
-	}
-
-	/**
-	 * Returns the number of rows returned by the query
-	 *
-	 * @param int $result
-	 *
-	 * @return bool|int
-	 */
-	function countRows($result = 0)
-	{
-		if($result)
-			$return_count = mssql_num_rows($result);
-		else if($this->result)
-			$return_count = mssql_num_rows($this->result);
-		else
-			return false;
-		return $return_count;
-	}
-
-	/**
-	 * Used to converts $value's encoding to UTF-8, based on whatever this
-	 * connection's encoding was (ISO-8859-1 if not specified).
-	 *
-	 * Now does nothing, because mssql.encoding handles charset conversion
-	 * properly and transparently.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @param $value
-	 *
-	 * @return string
-	 */
-	protected function convertEncoding($value)
-	{
-		return $value;
-//		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
-	}
-
-	/**
-	 * Escapes a value for safe usage in a query. The only escape needed is a
-	 * single apostrophe for two ("'" => "''")
-	 *
-	 * @param string $value The string to escape.
-	 *
-	 * @return string
-	 */
-	public function quote($value) {
-		return str_replace("'", "''", $value);
-	}
-
-	/**
-	 * Escapes a value for safe usage in a query, and wraps in quotes so that
-	 * it can be interposed directly into a string.
-	 *
-	 * @param string $value The string to escape.
-	 *
-	 * @return string
-	 */
-	public function smartQuote($value)
-	{
-		return "'".$this->quote($value)."'";
-	}
-
-	/**
-	 * Check whether a db resource was spawned
-	 *
-	 * @return bool
-	 */
-	public function isConnected() {
-		if ($this->dbf !== null && $this->dbf != false) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param string $name
-	 * @param array  $params
-	 * @param array  &$bound_outputs
-	 *
-	 * @return resource
-	 */
-	protected function buildProcedure($name, $params, &$bound_outputs)
-	{
-		$proc         = mssql_init($name, $this->dbf);
-		$bound_inputs = array();
-
-		// Bind each parameter to the procedure
-		foreach ($params as $param) {
-			list($param_name, $var, $type, $is_output, $is_null, $maxlen) = $param;
-			if (!$is_output) {
-				$is_output = false;
-			}
-			if (!$is_null) {
-				$is_null = false;
-			}
-			if (!$maxlen) {
-				$maxlen = -1;
-			}
-			if ($is_output) {
-				mssql_bind($proc, $param_name, $bound_outputs[$param_name], $type, true, $is_null, $maxlen);
-			} else {
-				$bound_inputs[$param_name] = $var;
-				mssql_bind($proc, $param_name, $bound_inputs[$param_name], $type, false, $is_null, $maxlen);
-			}
-		}
-		return $proc;
-	}
+    /**
+     * Return last error from connector
+     *
+     * @deprecated
+     * @return string
+     */
+    public function getError()
+    {
+        return $this->connector->errorInfo();
+    }
 }

@@ -392,6 +392,40 @@ class PredicateBuilder
         return '(' . implode(',', self::getPlaceholders($input, $prefix)) . ')';
     }
 
+    /**
+     * Gets an array of binding for placeholders- usually used for creating a
+     * list of placeholders for an IN condition.
+     *
+     * @param array  $input
+     * @param string $prefix If not supplied, ? will be used as the placeholder
+     *                       for all values.
+     *
+     * @return array Something like:
+     *
+     *      [
+     *          'placeholders' => ":id_0, :id_1, :id_2",
+     *          'bindings' => [
+     *              'id_0' => 123,
+     *              'id_1' => 234,
+     *              'id_3' => 345
+     *          ]
+     *      ]
+     */
+    public static function getArrayBindings($input, $prefix = null)
+    {
+        $return = [];
+        $return['placeholders'] = implode(",", self::getPlaceholders($input, $prefix));
+        $return['bindings'] = [];
+
+        $i = 0;
+        foreach ($input as $key => $value) {
+            $return['bindings'][isset($prefix) ? (':' . $prefix . '_' . self::escapePlaceholder($key)) : $i] = $value;
+            $i++;
+        }
+
+        return $return;
+    }
+
 
     /**
      * The non-concatenated version of getArrayPlaceholders()

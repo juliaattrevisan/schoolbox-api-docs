@@ -209,15 +209,18 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         } elseif ($user->getRole()->isStaff()) {
             $teacherExternalId = $user->getExternalId();
         }
-        $params = [
-            ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
-            ['@TIMEPERIOD', $timePeriod, SQLVARCHAR, false, false, -1],
-            ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
-            ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
-//            ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
-        ];
-        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params, true);
-        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $response['result'];
+
+        $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+        $statement->bindInputs([
+            ['name' => 'DATE', 'value' => date('Ymd')],
+            ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
+            ['name' => 'STUDKEY', 'value' => $studentExternalId],
+            ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+        ]);
+
+        $statement->execute();
+        $row = $statement->fetch();
+        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
 
         // The $homeClasses definition is mostly included within dayPeriods
         $timetable = [];
@@ -294,15 +297,18 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         } elseif ($user->getRole()->isStaff()) {
             $teacherExternalId = $user->getExternalId();
         }
-        $params = [
-            ['@DATE', $date->getUsingFormat('Ymd'), SQLVARCHAR, false, false, -1],
-            ['@TIMEPERIOD', $timePeriod, SQLVARCHAR, false, false, -1],
-            ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
-            ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
-//            ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
-        ];
-        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params, true);
-        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $response['result'];
+
+        $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+        $statement->bindInputs([
+            ['name' => 'DATE', 'value' => $date->getUsingFormat('Ymd')],
+            ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
+            ['name' => 'STUDKEY', 'value' => $studentExternalId],
+            ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+        ]);
+
+        $statement->execute();
+        $row = $statement->fetch();
+        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
 
         // The $homeClasses definition is mostly included within dayPeriods
         $timetable = [];
@@ -412,15 +418,18 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         } elseif ($user->getRole()->isStaff()) {
             $teacherExternalId = $user->getExternalId();
         }
-        $params = [
-            ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
-            ['@TIMEPERIOD', $timePeriod, SQLVARCHAR, false, false, -1],
-            ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
-            ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
-//            ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
-        ];
-        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params, true);
-        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $response['result'];
+
+        $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+        $statement->bindInputs([
+            ['name' => 'DATE', 'value' => date('Ymd')],
+            ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
+            ['name' => 'STUDKEY', 'value' => $studentExternalId],
+            ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+        ]);
+
+        $statement->execute();
+        $row = $statement->fetch();
+        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
 
         $term = array_shift($terms);
 
