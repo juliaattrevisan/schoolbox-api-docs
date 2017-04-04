@@ -77,7 +77,7 @@ if ($_SESSION['user']->isSuperuser()) {
 
     // Reload message router
     if ($reloadRerouter) {
-        // TODO implement REDIS publish
+        \Alaress\Redis::getClientInstance()->publish('routed.'.INSTANCE_ID.'.reload', '');
     }
 
     $page->backToTheFuture(1);
