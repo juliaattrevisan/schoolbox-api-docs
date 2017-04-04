@@ -19,8 +19,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Filter\FactoryFactory as FilterFactoryFactory;
-use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\PendingFactory;
@@ -208,20 +206,22 @@ class Controller extends Base
      * @api   GET /learning/pending/:userId
      * @level 165
      * @param User                 $viewee The user whose pending assessments we are viewing.
-     * @param FilterFactoryFactory $filterFactoryFactory
+     * @param Filter\FactoryFactory $filterFactoryFactory
      * @throws RouteNotFound
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws Mapper\Exception
      * @todo  split pending assessments into own controller
      */
-    public function getPendingAssessmentsForUser(User $viewee, FilterFactoryFactory $filterFactoryFactory)
+    public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
-        // Move this to module
+        // Add Term Filter
         $termFilterFactory    = $filterFactoryFactory->buildTermFilterFactory();
-        $termFilterComponent = $termFilterFactory->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+        $termFilterComponent  = $termFilterFactory->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
 
-        $filters = new GenericCollection(Filter\IFilterComponent::class, [$termFilterComponent]);
+        // TODO add other filters
+
+        $filters =  $filterFactoryFactory->createFilterComponentCollection([$termFilterComponent]);
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
         $filterPanel = new Filter\Panel($route, $filters);
@@ -238,7 +238,7 @@ class Controller extends Base
      * @api   GET /learning/pending/:userId
      * @level 165
      * @param User                 $viewee The user whose pending assessments we are viewing.
-     * @param FilterFactoryFactory $filterFactoryFactory
+     * @param Filter\FactoryFactory $filterFactoryFactory
      * @var  string[][]            $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
      * @throws \LogicException
      * @throws \DomainException
@@ -247,7 +247,7 @@ class Controller extends Base
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
-    public function postPendingAssessmentsForUser(User $viewee, FilterFactoryFactory $filterFactoryFactory)
+    public function postPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
         /**
          * Indexed by filter.id, then concrete key
@@ -267,8 +267,7 @@ class Controller extends Base
         $selectionsToSave = $filterSelectionMapper->createCollection();
 
         // What filters are in use on this page? Get their key converters
-        /** @var GenericCollection|Filter\IKeyConverter[] $keyConverters */
-        $keyConverters = new GenericCollection(Filter\IKeyConverter::class);
+        $keyConverters = $filterFactoryFactory->createKeyConverterCollection();
 
         // Term Filter
         $termFilterFactory = $filterFactoryFactory->buildTermFilterFactory();
@@ -277,31 +276,30 @@ class Controller extends Base
 
         // TODO add other filters here
 
-        /** @var Collection|GenericCollection[]|FilterSelection\Model[][] $selectionsPerFilter */
+        /**
+         * Parse the post data to build a graph of all user selections, grouped by filter.id
+         * @var Collection|GenericCollection[]|FilterSelection\Model[][] $selectionsPerFilter
+         */
         $selectionsPerFilter = new Collection();
 
         foreach ($postFilterSelections as $filterId => $postFilterSelection) {
-            $filter = $keyConverters[$filterId]->getFilter();
+            $keyConverter = $keyConverters[$filterId];
+            $filter = $keyConverter->getFilter();
 
-            if (!$selectionsPerFilter->offsetExists($filterId)) {
-                $selectionsPerFilter->setOffset($filterId, $filterSelectionMapper->createCollection());
-            }
-            $filterSelections = $selectionsPerFilter[$filterId];
+            $filterSelections = $filterSelectionMapper->createCollection();
+            $selectionsPerFilter->setOffset($filterId, $filterSelections);
 
-            /**  @var FilterSelection\Model[] $filterSelections */
             foreach ($postFilterSelection as $key => $selected) {
                 $selection = $filterSelectionMapper->createModel();
-                $key       = $keyConverters[$filter->getId()]->sanitiseKey($key);
                 $selection
                     ->setFilter($filter)
                     ->setUser($this->getUser())
                     ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
-                    ->setKey($key)
+                    ->setKey($keyConverter->sanitiseKey($key))
                     ->setSelected((bool)$selected);
                 $selectionsToSave->add($selection);
                 $filterSelections->offsetSet($key, $selection);
             }
-
         }
         $filterSelectionMapper->save($selectionsToSave);
 

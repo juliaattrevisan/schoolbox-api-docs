@@ -16,6 +16,7 @@ use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
 use Schoolbox\Filter\Filters\ClassGroup as ClassGroupFilter;
 use Schoolbox\Filter\Filters\Term as TermFilter;
 use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
+use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Learning\Assessment\WorkType;
 
@@ -41,8 +42,9 @@ class FactoryFactory
         $this->mapperFactory = $mapperFactory;
     }
 
-
     /**
+     * A registry of filter factories. Registered by filter definition class name.
+     *
      * @param string $filterDefinitionClass
      * @return IFilterFactory
      * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
@@ -65,6 +67,24 @@ class FactoryFactory
 //                return $this->buildWorkTypeFilterFactory();
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
+    }
+
+    /**
+     * @param null|IFilterComponent[] $contents
+     * @return GenericCollection|IFilterComponent[]
+     */
+    public function createFilterComponentCollection(array $contents = [])
+    {
+        return new GenericCollection(IFilterComponent::class, $contents);
+    }
+
+    /**
+     * @param null|IKeyConverter[] $contents
+     * @return GenericCollection|IKeyConverter[]
+     */
+    public function createKeyConverterCollection(array $contents = [])
+    {
+        return new GenericCollection(IKeyConverter::class, $contents);
     }
 
 //
