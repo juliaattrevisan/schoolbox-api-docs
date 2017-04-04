@@ -106,12 +106,13 @@ class Component extends AbstractFilterComponent
             }
         }
 
-        // Overlay user-specific settings
-        foreach ($availableSelections as $key => $savedSelection) {
-            if ($this->getSavedSelections()->offsetExists($key)) {
-                $availableSelections[$key]
-                    ->setId($savedSelection->getId())
-                    ->setSelected($savedSelection->getSelected());
+        // Overlay user-specific selection settings
+        $savedSelections = $this->getSavedSelections();
+        foreach ($availableSelections as $key => $availableSelection) {
+            if ($savedSelections->offsetExists($key)) {
+                $availableSelection
+                    ->setId($savedSelections[$key]->getId())
+                    ->setSelected($savedSelections[$key]->getSelected());
             }
         }
 

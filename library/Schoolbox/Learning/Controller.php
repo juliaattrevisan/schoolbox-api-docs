@@ -219,9 +219,9 @@ class Controller extends Base
     {
         // Move this to module
         $termFilterFactory    = $filterFactoryFactory->buildTermFilterFactory();
-        $termFilterDefinition = $termFilterFactory->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+        $termFilterComponent = $termFilterFactory->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
 
-        $filters = new GenericCollection(Filter\IFilterComponent::class, [$termFilterDefinition]);
+        $filters = new GenericCollection(Filter\IFilterComponent::class, [$termFilterComponent]);
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
         $filterPanel = new Filter\Panel($route, $filters);
@@ -280,7 +280,7 @@ class Controller extends Base
         /** @var Collection|GenericCollection[]|FilterSelection\Model[][] $selectionsPerFilter */
         $selectionsPerFilter = new Collection();
 
-        foreach ($postFilterSelections as $filterId => $postFilterSelections) {
+        foreach ($postFilterSelections as $filterId => $postFilterSelection) {
             $filter = $keyConverters[$filterId]->getFilter();
 
             if (!$selectionsPerFilter->offsetExists($filterId)) {
@@ -289,7 +289,7 @@ class Controller extends Base
             $filterSelections = $selectionsPerFilter[$filterId];
 
             /**  @var FilterSelection\Model[] $filterSelections */
-            foreach ($postFilterSelections as $key => $selected) {
+            foreach ($postFilterSelection as $key => $selected) {
                 $selection = $filterSelectionMapper->createModel();
                 $key       = $keyConverters[$filter->getId()]->sanitiseKey($key);
                 $selection
