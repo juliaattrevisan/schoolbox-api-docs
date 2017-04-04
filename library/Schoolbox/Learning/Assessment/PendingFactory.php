@@ -447,7 +447,7 @@ class PendingFactory
         }
 
         // Quiz
-        if (in_array(AssessmentType::TYPE_TASK, $this->assessmentTypes, true)) {
+        if (in_array(AssessmentType::TYPE_QUIZ, $this->assessmentTypes, true)) {
             $selectClause .= ",
                  qz.assess_id AS 'qz.id'
             ";
@@ -458,7 +458,7 @@ class PendingFactory
         }
 
         // DueWork
-        if (in_array(AssessmentType::TYPE_TASK, $this->assessmentTypes, true)) {
+        if (in_array(AssessmentType::TYPE_DUE_WORK, $this->assessmentTypes, true)) {
             $selectClause .= ",
                  dw.id        AS 'dw.id'
             ";
