@@ -77,9 +77,10 @@ class RubricContext
      * @param DueWork $dueWork
      * @param User $student
      * @param User $currentUser
+     * @param Access $access
      * @return array
      */
-    public function generate(DueWork $dueWork, User $student, User $currentUser)
+    public function generate(DueWork $dueWork, User $student, User $currentUser, Access $access)
     {
         if(!$dueWork->getUseRubric()){
             return ['rubric' => null];
@@ -93,8 +94,8 @@ class RubricContext
         ];
 
         // Hide total mark from students and parents
-        $access = Access::getInstance()->getFolderAccess($currentUser, [ $dueWork->getBaseContext()->getFolder()->getId() ]);
-        if ($access < UserAccess::ACCESS_WRITE) {
+        $accessLevel = $access->getFolderAccess($currentUser, [ $dueWork->getBaseContext()->getFolder()->getId() ]);
+        if ($accessLevel < UserAccess::ACCESS_WRITE) {
             unset($context['rubric']['total']);
         }
 
