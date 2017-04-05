@@ -2,44 +2,37 @@
  # @learningAssessment/fragments/progressTick.twig
  #
  # Params:
- # * participant: Participant       - The participant object
- # * disabled:    bool              - whether the viewee cannot change the assessment's marking state
- #                                  - Non-tasks can never be changed this way, thus this will be ignored
- #                                  - For participants, it should be disabled if:
- #                                    * task is not open, or
- #                                    * participant is already marked as teacher-complete, or
- #                                    * task is not self-assessable
- #                                  - For teacher, it should be disabled if teacher lacks write+ perm to class folder
+ # * assessment:  IAssessable  - The assessment object
+ # * participant: Participant  - The participant object
+ # * disabled:    bool         - Whether the viewee can change the assessment's marking state
+ #                               For teacher, it should be disabled if teacher lacks write+ perm to class folder
+ #                               since this fragment is also used in the Markbook
+ #
  #}
 
-{#{% if participant.assessable is task %}#}
-    {#{% include '@learningAssessment/fragments/task/progressTick.twig' with {#}
-        {#participant: participant,#}
-        {#disabled: disabled#}
-    {#} only %}#}
-{#{% elseif participant.assessable is not project %}#}
-    {#{% set mostRecentResponse = participant.findMostRecentSubmittedResponse %}#}
-    {#{% if participant.responseRequired %}#}
-        {#<span class="no-text progress-tick" title="Response Required"></span>#}
-    {#{% elseif participant.feedbackRequired %}#}
-        {#<span class="no-text progress-tick pending" title="Awaiting Feedback"></span>#}
-    {#{% else %}#}
-        {#<span class="no-text progress-tick reviewed" title="Complete"></span>#}
-    {#{% endif %}#}
-{#{% endif %}#}
-
-
 {# Hide the grey square where you can't do anything #}
-{% set canSeeButton = true %}
+{% set canSeeButton = false %}
 
-{# Assessments that aren't open require no interaction from students #}
-{% if assessment is not project and not assessment.isOpen %}
-    {% set canSeeButton = false %}
-{% endif %}
+{# Project status is always made visible as it has no open states
+ # and its status is determined by the activities contained within
+ #}
+{% if assessment is project %}
+    {% set canSeeButton = true %}
+{% else %}
 
-{# Task that are teacher-assessed require no interaction from students #}
-{% if assessment is task and not assessment.isSelfAssessable %}
-    {% set canSeeButton = false %}
+    {# Assessments that are open might require interaction from students #}
+    {% if assessment.isOpen %}
+
+        {# Task that are self-assessed require interaction from students #}
+        {# Due Work and Quiz can always see the button #}
+        {% if assessment is task %}
+            {% if assessment.isSelfAssessable %}
+                {% set canSeeButton = true %}
+            {% endif %}
+        {% else %}
+            {% set canSeeButton = true %}
+        {% endif %}
+    {% endif %}
 {% endif %}
 
 {% if canSeeButton %}
@@ -53,19 +46,19 @@
             {% if participant.isResponseRequired %}
                 <a href="#"
                    disabled
-                   class="no-text progress-tick"
+                   class="no-text progress-tick {% if disabled %}disabled{% endif %}"
                    title="Incomplete"
                    data-progress-tick-status="incomplete"></a>
             {% elseif participant.isFeedbackRequired %}
                 <a href="#"
                    disabled
-                   class="no-text progress-tick pending"
+                   class="no-text progress-tick pending {% if disabled %}disabled{% endif %}"
                    title="Self-assessed"
                    data-progress-tick-status="selfAssessed"></a>
             {% elseif participant.isReviewComplete %}
                 <a href="#"
                    disabled
-                   class="no-text progress-tick reviewed"
+                   class="no-text progress-tick reviewed {% if disabled %}disabled{% endif %}"
                    title="Completed"
                    data-progress-tick-status="teacherAssessed"></a>
             {% endif %}

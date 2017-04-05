@@ -94,8 +94,8 @@
                                             <div class="small-1 columns no-pad">
                                                 {# An icon that shows if the student has attempted the task or not #}
                                                 {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                                participant: participant,
-                                                disabled: false
+                                                    assessment: assessment,
+                                                    participant: participant
                                                 } only %}
                                             </div>
                                         {% else %}
