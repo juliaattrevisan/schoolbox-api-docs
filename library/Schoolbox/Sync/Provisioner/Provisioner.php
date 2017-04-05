@@ -147,8 +147,9 @@ class Provisioner
     public function run($update = false, $forRoleType = null)
     {
         // Give the dry run 30 minutes to execute
-
-        set_time_limit(1800);
+        if (PHP_SAPI != 'cli') {
+            set_time_limit(1800);
+        }
 
         foreach ($this->runOrder as $roleType) {
             if (isset($forRoleType) && $roleType != $forRoleType) {
