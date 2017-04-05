@@ -28,7 +28,7 @@ class Controller extends BaseController
     public function getIndex()
     {
         // TODO
-        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/admin.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/_admin.twig', [
 
         ]));
     }

@@ -13,7 +13,7 @@ use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
-use Schoolbox\Filter\Filters\ClassGroup as ClassGroupFilter;
+use Schoolbox\Filter\Filters\Folder as FolderFilter;
 use Schoolbox\Filter\Filters\Term as TermFilter;
 use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
 use Schoolbox\GenericCollection;
@@ -59,8 +59,8 @@ class FactoryFactory
         switch ($filterDefinitionClass) {
             case AssessmentTypeFilter\Definition::class:
                 return $this->buildAssessmentTypeFilterFactory();
-//            case ClassGroupFilter\Definition::class:
-//                return $this->buildClassGroupFilterFactory();
+//            case Folder\Definition::class:
+//                return $this->buildFolderFilterFactory();
             case TermFilter\Definition::class:
                 return $this->buildTermFilterFactory();
             case WorkTypeFilter\Definition::class:
@@ -104,13 +104,13 @@ class FactoryFactory
 
 //
 //    /**
-//     * @return ClassGroupFilter\Factory
+//     * @return FolderFilter\Factory
 //     * @throws \InvalidArgumentException
 //     */
-//    public function buildClassGroupFilterFactory()
+//    public function FolderGroupFilterFactory()
 //    {
-//        $factory = new ClassGroupFilter\Factory();
-//        $this->setBaseDependencies($factory, ClassGroupFilter\Definition::class);
+//        $factory = new FolderFilter\Factory();
+//        $this->setBaseDependencies($factory, FolderFilter\Definition::class);
 //        return $factory;
 //    }
 

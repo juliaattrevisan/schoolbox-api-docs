@@ -9,12 +9,11 @@ namespace Schoolbox\Filter\Filters\WorkType;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\Assessment\Term;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 
 /**
- * Converts between termFilter concrete keys and WorkType models
+ * Converts between concrete keys (workType.ids) and WorkType models
  * @method GenericCollection|WorkType\Model[] getSelectedItems(GenericCollection $availableSelections)
  */
 class KeyConverter extends AbstractKeyConverter
@@ -43,7 +42,7 @@ class KeyConverter extends AbstractKeyConverter
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *
      * @param string $key
-     * @return mixed|Term\Model
+     * @return mixed|WorkType\Model
      * @throws \InvalidArgumentException
      */
     public function getItem($key)

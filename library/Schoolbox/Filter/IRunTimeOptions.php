@@ -10,7 +10,7 @@ namespace Schoolbox\Filter;
 /**
  * Container for injecting dynamic filter options into a filter when being displayed in the filter panel.
  *
- * No interface methods. Each concrete implmentation will be different. Eg:
+ * No interface methods. Each concrete implementation will be different. Eg:
  * * Terms    - no methods. All options are pre-defined
  * * WorkType - no methods. All options are pre-defined
  * * GroupClass - getClasses() + getGroups()

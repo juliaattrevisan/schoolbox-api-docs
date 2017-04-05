@@ -71,7 +71,7 @@ class Factory extends AbstractFilterFactory
 
 
     /**
-     * Returns a key converter, able to convert between keys (term.id) and the entities they represent (terms)
+     * Returns a key converter, able to convert between keys (workType.id) and the entities they represent (WorkTypes)
      *
      * @return KeyConverter
      */
