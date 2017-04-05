@@ -12,18 +12,74 @@
  #                                  - For teacher, it should be disabled if teacher lacks write+ perm to class folder
  #}
 
-{% if participant.assessable is task %}
-    {% include '@learningAssessment/fragments/task/progressTick.twig' with {
-        participant: participant,
-        disabled: disabled
-    } only %}
-{% elseif participant.assessable is not project %}
-    {% set mostRecentResponse = participant.findMostRecentSubmittedResponse %}
-    {% if participant.responseRequired %}
-        <span class="no-text progress-tick" title="Response Required"></span>
-    {% elseif participant.feedbackRequired %}
-        <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
+{#{% if participant.assessable is task %}#}
+    {#{% include '@learningAssessment/fragments/task/progressTick.twig' with {#}
+        {#participant: participant,#}
+        {#disabled: disabled#}
+    {#} only %}#}
+{#{% elseif participant.assessable is not project %}#}
+    {#{% set mostRecentResponse = participant.findMostRecentSubmittedResponse %}#}
+    {#{% if participant.responseRequired %}#}
+        {#<span class="no-text progress-tick" title="Response Required"></span>#}
+    {#{% elseif participant.feedbackRequired %}#}
+        {#<span class="no-text progress-tick pending" title="Awaiting Feedback"></span>#}
+    {#{% else %}#}
+        {#<span class="no-text progress-tick reviewed" title="Complete"></span>#}
+    {#{% endif %}#}
+{#{% endif %}#}
+
+
+{# Hide the grey square where you can't do anything #}
+{% set canSeeButton = true %}
+
+{# Assessments that aren't open require no interaction from students #}
+{% if assessment is not project and not assessment.isOpen %}
+    {% set canSeeButton = false %}
+{% endif %}
+
+{# Task that are teacher-assessed require no interaction from students #}
+{% if assessment is task and not assessment.isSelfAssessable %}
+    {% set canSeeButton = false %}
+{% endif %}
+
+{% if canSeeButton %}
+
+    {# Tasks have inline interaction #}
+    {% if assessment is task %}
+        <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}"
+              method="POST"
+              class="progress-tick-form"
+              data-progress-tick-form="{{ assessment.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
+            {% if participant.isResponseRequired %}
+                <a href="#"
+                   disabled
+                   class="no-text progress-tick"
+                   title="Incomplete"
+                   data-progress-tick-status="incomplete"></a>
+            {% elseif participant.isFeedbackRequired %}
+                <a href="#"
+                   disabled
+                   class="no-text progress-tick pending"
+                   title="Self-assessed"
+                   data-progress-tick-status="selfAssessed"></a>
+            {% elseif participant.isReviewComplete %}
+                <a href="#"
+                   disabled
+                   class="no-text progress-tick reviewed"
+                   title="Completed"
+                   data-progress-tick-status="teacherAssessed"></a>
+            {% endif %}
+        </form>
     {% else %}
-        <span class="no-text progress-tick reviewed" title="Complete"></span>
+        {% if participant.isResponseRequired %}
+            <span class="no-text progress-tick" title="Response Required"></span>
+        {% elseif participant.isFeedbackRequired %}
+            <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
+        {% elseif participant.isReviewComplete %}
+            <span class="no-text progress-tick reviewed" title="Complete"></span>
+        {% endif %}
     {% endif %}
 {% endif %}
+
+
+
