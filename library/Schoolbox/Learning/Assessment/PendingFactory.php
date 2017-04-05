@@ -916,10 +916,7 @@ class PendingFactory
             GROUP BY q.assessment_id, qa.user_id, qa.attempt_id
         ';
 
-        $quizResults = [];
-        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
-            $quizResults[] = $row;
-        }
+        $quizResults = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
 
         // Find Students who attempted Quizzes but are't in the current studentList
         $this->findExtraStudentResults($quizResults, 'qa.user_id', 'q.assessment_id');
@@ -963,10 +960,7 @@ class PendingFactory
             WHERE ' . implode(' AND ', $pb->getWhere()) . '
             ORDER BY t.assessment_id';
 
-        $taskResults = [];
-        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
-            $taskResults[] = $row;
-        }
+        $taskResults = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
 
         // Find Students who attempted Tasks but are't in the current studentList
         $this->findExtraStudentResults($taskResults, 'tc.student_id', 't.assessment_id');
@@ -1005,10 +999,7 @@ class PendingFactory
             WHERE " . implode(' AND ', $pb->getWhere()) . '
             ORDER BY sb.assessment_id';
 
-        $dueWorkSubmissions = [];
-        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
-            $dueWorkSubmissions[] = $row;
-        }
+        $dueWorkSubmissions = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
 
         // Find Students who submitted DueWorkSubmissions but are't in the current studentList
         $this->findExtraStudentResults($dueWorkSubmissions, 'ss.owner', 'sb.assessment_id');
@@ -1045,10 +1036,7 @@ class PendingFactory
             WHERE " . implode(' AND ', $pb->getWhere()) . '
             ORDER BY sb.assessment_id';
 
-        $dueWorkFeedbacks = [];
-        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
-            $dueWorkFeedbacks[] = $row;
-        }
+        $dueWorkFeedbacks = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
 
         // Find Students who received DueWork Feedback but are't in the current studentList
         $this->findExtraStudentResults($dueWorkFeedbacks, 'sr.owner', 'sb.assessment_id');
