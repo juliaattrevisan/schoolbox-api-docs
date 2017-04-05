@@ -78,6 +78,28 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         return $this->getStack();
     }
 
+
+    /**
+     * Order(N) traversal to returns whether the collection contains
+     * the specified item using strict comparison.
+     *
+     * If the collection contains primitives, then they must be same value + type
+     * If the collection contains objects, they must be the same object
+     *
+     * @param mixed $item
+     * @return bool
+     */
+    public function contains($item)
+    {
+        foreach($this->stack as $stackItem)
+        {
+            if($stackItem === $item){
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Sets key value in collection
      *
