@@ -25,7 +25,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('filter_selection');
         $this->hasModel(Model::class);
 
-        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('filter_id', Filter\Mapper::class, 'id', self::TYPE_MODEL, null, 'filter', 'filter');
         $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
         $this->uses('page', self::TYPE_STRING);

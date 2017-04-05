@@ -44,7 +44,6 @@ CREATE TABLE filter_default (
 -- Note that this table is not normalised with filter_option. This is because we need to be able to save a user's settings before
 -- the admin has configured the availabilities and defaults.
 CREATE TABLE filter_selection (
-  `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `filter_id` INT(11) NOT NULL,
     INDEX filter_selection_filter_id (`filter_id`),
     CONSTRAINT fk_filter_selection_filter_id

@@ -133,9 +133,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
         $savedSelections = $this->getSavedSelections();
         foreach ($availableSelections as $key => $availableSelection) {
             if ($savedSelections->offsetExists($key)) {
-                $availableSelection
-                    ->setId($savedSelections[$key]->getId())
-                    ->setSelected($savedSelections[$key]->getSelected());
+                $availableSelection->setSelected($savedSelections[$key]->getSelected());
             }
         }
 

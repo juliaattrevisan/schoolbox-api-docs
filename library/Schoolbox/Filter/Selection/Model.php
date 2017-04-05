@@ -7,14 +7,11 @@
 
 namespace Schoolbox\Filter\Selection;
 
-use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 use Schoolbox\Filter;
 
 class Model
 {
-    use Id;
-
     /** @var Filter\Model */
     private $filter;
 
