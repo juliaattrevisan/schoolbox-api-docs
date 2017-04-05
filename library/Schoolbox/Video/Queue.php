@@ -82,11 +82,11 @@ class Queue extends ResourceVideo
      */
     public function process()
     {
-        if ($this->getFile()->getMimetype()->isAudio()){
-            return $this->processAudio($this->getSourceLocation($this->getFile()));
+        if ($this->getStorage()->getMimetype()->isAudio()){
+            return $this->processAudio($this->getSourceLocation($this->getStorage()));
         }
-        else if($this->getFile()->getMimeType()->isVideo()){
-            return $this->processVideo($this->getSourceLocation($this->getFile()));
+        else if($this->getStorage()->getMimeType()->isVideo()){
+            return $this->processVideo($this->getSourceLocation($this->getStorage()));
         }
 
         return false;
