@@ -1,3 +1,4 @@
+-- TODO remove this debug aids
 DROP TABLE IF EXISTS filter_default;
 DROP TABLE IF EXISTS filter_selection;
 DROP TABLE IF EXISTS filter_option;
@@ -61,10 +62,14 @@ CREATE TABLE filter_selection (
   `selected` BOOL
 ) ENGINE=INNODB;
 
+-- We don't need this anymore - it's superseded by the 'AssessmentType' filter
+DELETE FROM config WHERE `name` = 'pending_assessment_types';
+
 -- Add Filters
 INSERT INTO filter (id, `class`) VALUES
   (1, 'Schoolbox\\Filter\\Filters\\Term\\Definition'),
-  (2, 'Schoolbox\\Filter\\Filters\\AssessmentType\\Definition')
+  (2, 'Schoolbox\\Filter\\Filters\\AssessmentType\\Definition'),
+  (3, 'Schoolbox\\Filter\\Filters\\WorkType\\Definition')
 ;
 
 

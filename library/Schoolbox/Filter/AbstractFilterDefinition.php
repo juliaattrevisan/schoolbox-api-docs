@@ -83,12 +83,13 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
         }
 
         // Ensure all possible options are present in graph
+        $customKeys = $this->getCustomKeys();
         /** @var GenericCollection|Option\Model[] $pageOptions */
         foreach ($optionsPerPage as $page => $pageOptions) {
             $pageOptions->indexBy('key');
 
             // Ensure it contains 'all', 'current', etc
-            foreach ($this->getCustomKeys() as $customAbstractKey) {
+            foreach ($customKeys as $customAbstractKey) {
                 if (!$pageOptions->offsetExists($customAbstractKey)) {
                     $option = $this->getFilterOptionMapper()->createModel();
 

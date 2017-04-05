@@ -7,8 +7,11 @@
 
 namespace Schoolbox\Filter\Filters\AssessmentType;
 
+use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter\Option;
+use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 
@@ -31,18 +34,33 @@ class Definition extends AbstractFilterDefinition
     const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
     const KEY_TASK     = AssessmentType::TYPE_TASK;
 
+    /** @var Collection|string[] */
+    private $assessmentTypes;
+
+
+    /**
+     * @param Filter\Model    $filter
+     * @param Option\Mapper   $filterOptionMapper
+     * @param Defaults\Mapper $filterDefaultMapper
+     * @param Collection      $assessmentTypes
+     */
+    public function __construct(
+        Filter\Model $filter,
+        Option\Mapper $filterOptionMapper,
+        Defaults\Mapper $filterDefaultMapper,
+        Collection $assessmentTypes
+    ) {
+        parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
+        $this->assessmentTypes = $assessmentTypes->shallowClone();
+    }
+
 
     /**
      * @inheritdoc
      */
     protected function getCustomKeys()
     {
-        return [
-            self::KEY_PROJECT,
-            self::KEY_QUIZ,
-            self::KEY_DUE_WORK,
-            self::KEY_TASK,
-        ];
+        return $this->assessmentTypes->getAll();
     }
 
 

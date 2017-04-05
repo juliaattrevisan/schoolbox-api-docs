@@ -6,6 +6,7 @@
 
 namespace Schoolbox\Filter\Filters\Term;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Term;
@@ -14,6 +15,7 @@ use Schoolbox\Filter;
 
 /**
  * Converts between termFilter concrete keys and Term models
+ * @method GenericCollection|Term\Model[] getSelectedItems(GenericCollection $selections)
  */
 class KeyConverter extends AbstractKeyConverter
 {
@@ -25,7 +27,7 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @param Filter\Model $filter
+     * @param Filter\Model                   $filter
      * @param GenericCollection|Term\Model[] $terms
      */
     public function __construct(Filter\Model $filter, GenericCollection $terms)
@@ -44,24 +46,21 @@ class KeyConverter extends AbstractKeyConverter
      * @return mixed|Term\Model
      * @throws \InvalidArgumentException
      */
-    public function getItem($key)
+    protected function getItem($key)
     {
-        if(!$this->terms->offsetExists($key)){
-            throw new \InvalidArgumentException("No term found for key:  $key");
-        }
+        $this->assertValidKey($key);
         return $this->terms[$key];
     }
 
 
     /**
-     * Return a concrete key for the specified element
+     * Return all available concrete items
      *
-     * @param Term\Model $element
-     * @return string
+     * @return Collection|GenericCollection|Term\Model[]
      */
-    public function getKey($element)
+    public function getItems()
     {
-        return (string)$element->getId();
+        return $this->terms->shallowClone();
     }
 
 
@@ -70,6 +69,18 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function sanitiseKey($key)
     {
+        $this->assertValidKey($key);
         return (string)(int)$key;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function assertValidKey($key)
+    {
+        if (!$this->terms->offsetExists($key)) {
+            throw new \InvalidArgumentException("No term found for key:  $key");
+        }
     }
 }

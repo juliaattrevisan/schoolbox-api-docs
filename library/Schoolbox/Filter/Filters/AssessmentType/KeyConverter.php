@@ -6,39 +6,53 @@
 
 namespace Schoolbox\Filter\Filters\AssessmentType;
 
+use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\Assessment\Term;
+use Schoolbox\GenericCollection;
 
 
 /**
- * Converts between termFilter concrete keys and Term models
+ * Converts between termFilter concrete keys and AssessmentType strings
+ * @method Collection|string[] getSelectedItems(GenericCollection $selections)
  */
 class KeyConverter extends AbstractKeyConverter
 {
 
     /**
-     * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
-     *
-     * @param string $key
-     * @return mixed|Term\Model
-     * @throws \InvalidArgumentException
+     * @var Collection|string
      */
-    public function getItem($key)
+    private $assessmentTypes;
+
+
+    /**
+     * @param Filter\Model $filter
+     * @param Collection|string[]   $assessmentTypes
+     */
+    public function __construct(Filter\Model $filter, Collection $assessmentTypes)
     {
-        // Simply returns the key, representing an AssessmentType
+        parent::__construct($filter);
+        $this->assessmentTypes = $assessmentTypes;
+    }
+
+
+    /**
+     * @inheritdoc
+     * @return string
+     */
+    protected function getItem($key)
+    {
+        $this->assertValidKey($key);
         return $key;
     }
 
 
     /**
-     * Return a concrete key for the specified element
-     *
-     * @param string $element
-     * @return string
+     * @return Collection|string[]
      */
-    public function getKey($element)
+    protected function getItems()
     {
-        return $element;
+        return $this->assessmentTypes->shallowClone();
     }
 
 
@@ -47,12 +61,19 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function sanitiseKey($key)
     {
-        $validKeys = [
-            Definition::KEY_TASK,
-            Definition::KEY_DUE_WORK,
-            Definition::KEY_QUIZ,
-            Definition::KEY_PROJECT,
-        ];
-        return in_array($key, $validKeys, true) ? $key : '';
+        $this->assertValidKey($key);
+        return (string)$key;
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function assertValidKey($key)
+    {
+        if(!in_array($key, $this->assessmentTypes->getAll(), true)){
+            throw new \InvalidArgumentException('AssessmentType Key is invalid: ' . $key);
+        }
+    }
+
 }

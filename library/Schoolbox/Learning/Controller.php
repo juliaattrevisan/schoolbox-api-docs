@@ -218,12 +218,14 @@ class Controller extends Base
         // Build Filter Panel Components
         $termFilterComponent  = $filterFactoryFactory->buildTermFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
         $assessmentTypeComponent = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+        $workTypeComponent = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
 
         // TODO add other filters
 
         $filterComponents =  $filterFactoryFactory->createFilterComponentCollection([
             $termFilterComponent,
             $assessmentTypeComponent,
+            $workTypeComponent,
         ]);
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
@@ -280,6 +282,12 @@ class Controller extends Base
         $assessmentTypeKeyConverter = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildKeyConverter();
         $keyConverters->offsetSet($assessmentTypeKeyConverter->getFilter()->getId(), $assessmentTypeKeyConverter);
 
+        // WorkType Filter
+        $workTypeKeyConverter = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildKeyConverter();
+        $keyConverters->offsetSet($workTypeKeyConverter->getFilter()->getId(), $workTypeKeyConverter);
+
+
+
         // TODO add other filters here
 
         /**
@@ -310,39 +318,10 @@ class Controller extends Base
         $filterSelectionMapper->save($selectionsToSave);
 
 
-        // Get the terms
-        $availableTerms = $this->termMapper->createCollection();
-        $selectedTerms  = $this->termMapper->createCollection();
-        $termSelections = $selectionsPerFilter[$termKeyConverter->getFilter()->getId()];
-        /** @var FilterSelection\Model[] $termSelections */
-        foreach ($termSelections as $termSelection) {
-            $term = $termKeyConverter->getItem($termSelection->getKey());
-            $availableTerms->add($term);
-            if ($termSelection->getSelected()) {
-                $selectedTerms->add($term);
-            }
-        }
-        // Were no terms selected ?
-        if (0 === $selectedTerms->count()) {
-            $selectedTerms = $availableTerms;
-        }
+        $selectedTerms           = $termKeyConverter->getSelectedItems($selectionsPerFilter[$termKeyConverter->getFilter()->getId()]);
+        $selectedWorkTypes       = $workTypeKeyConverter->getSelectedItems($selectionsPerFilter[$workTypeKeyConverter->getFilter()->getId()]);
+        $selectedAssessmentTypes = $assessmentTypeKeyConverter->getSelectedItems($selectionsPerFilter[$assessmentTypeKeyConverter->getFilter()->getId()]);
 
-        // Get the AssessmentTypes selected by the user
-        $availableAssessmentTypes = [];
-        $selectedAssessmentTypes  = [];
-        $assessmentTypeSelections = $selectionsPerFilter[$assessmentTypeKeyConverter->getFilter()->getId()];
-        /** @var FilterSelection\Model[] $assessmentTypeSelections */
-        foreach ($assessmentTypeSelections as $assessmentTypeSelection) {
-            $assessmentType = $assessmentTypeKeyConverter->getItem($assessmentTypeSelection->getKey());
-            $availableAssessmentTypes[] = $assessmentType;
-            if ($assessmentTypeSelection->getSelected()) {
-                $selectedAssessmentTypes[] = $assessmentType;
-            }
-        }
-        // Were no assessmentTypes selected ?
-        if (0 === count($selectedAssessmentTypes)) {
-            $selectedAssessmentTypes = $availableAssessmentTypes;
-        }
 
 
         // If currentUser == viewee, use currentUser as it may already have class codes
@@ -354,10 +333,7 @@ class Controller extends Base
 
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
-        // Should we include tasks?
-        $includeTasks = $this->getConfigLoader()->get('pending_assessment_types');
-
-        // TODO -UP TO HERE - assessment TYpes
+        // TODO -UP TO HERE - assessment Types
 
         $factory     = new PendingFactory($viewee, $this->database, $this->externalClass, $selectedTerms, $toChaseLimit, $selectedAssessmentTypes, $this->folderMapper);
         $assessments = $factory->getPendingAssessments();

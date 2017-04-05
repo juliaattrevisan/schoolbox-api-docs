@@ -90,7 +90,6 @@ interface IFilterDefinition
      * @param null|string $pageFilter If supplied, get defaults just for this page
      * @param null|string $roleTypeFilter If supplied, get defaults just for this roleType
      * @return Collection|GenericCollection[]|FilterOption\Model[][]
-     * @todo consider renaming to 'getAvailableOptions()'
      */
     public function getAvailableOptions($pageFilter = null, $roleTypeFilter = null);
 

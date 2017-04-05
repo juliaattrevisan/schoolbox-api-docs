@@ -7,9 +7,12 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+
 /**
- * Knows how to map between an option.key and the entity
- * represented by the key, and get the key from an entity
+ * Knows how to map between an option.key and the item
+ * represented by the key, and get the key from an item
  */
 interface IKeyConverter
 {
@@ -19,28 +22,25 @@ interface IKeyConverter
      */
     public function getFilter();
 
-    /**
-     * Given a key (such as returned from a user's filter panel selections), return the corresponding item
-     *
-     * @param string $key
-     * @return mixed
-     */
-    public function getItem($key);
-
-
-    /**
-     * For a given option, return its key
-     *
-     * @param mixed $element
-     * @return string
-     */
-    public function getKey($element);
 
     /**
      * Sanitises a key before insertion in filter_selection table
+     *
+     * Ensures the key is logically valid, and always returns a string
+     *
      * @param string $key
      * @return string
-     * @todo should this throw an exception if the key is invalid ? Or just return an empty string?
+     * @throws \InvalidArgumentException if the key is invalid
      */
     public function sanitiseKey($key);
+
+
+    /**
+     * For the user's posted selections, generate a collection of items they represent
+     *
+     * @param GenericCollection|Selection\Model[] $selections Indexed by setting.key
+     * @return Collection (intentionally not GenericCollection)
+     * @throws \InvalidArgumentException
+     */
+    public function getSelectedItems(GenericCollection $selections);
 }

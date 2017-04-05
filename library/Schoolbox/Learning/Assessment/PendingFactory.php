@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -204,7 +205,7 @@ class PendingFactory
     /**
      * The assessment types to include in the report
      *
-     * @var string[]
+     * @var Collection|string[]
      */
     private $assessmentTypes;
 
@@ -222,13 +223,13 @@ class PendingFactory
 
 
     /**
-     * @param User                           $viewee
-     * @param IConnector                      $database
-     * @param \External_ClassInterface       $externalClass
-     * @param GenericCollection|Term\Model[] $terms            Only display assessments that are due in these terms
-     * @param \Alaress_Date_Format           $toChaseLimit
-     * @param string[]                     $selectedAssessmentTypes
-     * @param FolderMapper                   $folderMapper
+     * @param User                         $viewee
+     * @param IConnector                    $database
+     * @param \External_ClassInterface     $externalClass
+     * @param GenericCollection|Term                         \Model[] $terms            Only display assessments that are due in these terms
+     * @param \Alaress_Date_Format         $toChaseLimit
+     * @param Collection|string[]                     $selectedAssessmentTypes
+     * @param FolderMapper                 $folderMapper
      */
     public function __construct(
         User $viewee,
@@ -236,7 +237,7 @@ class PendingFactory
         \External_ClassInterface $externalClass,
         GenericCollection $terms,
         \Alaress_Date_Format $toChaseLimit,
-        array $selectedAssessmentTypes,
+        Collection $selectedAssessmentTypes,
         FolderMapper $folderMapper
 
     ) {
@@ -435,7 +436,7 @@ class PendingFactory
         $idClauseArray = [];
 
         // Task
-        if (in_array(AssessmentType::TYPE_TASK, $this->assessmentTypes, true)) {
+        if ($this->assessmentTypes->contains(AssessmentType::TYPE_TASK)) {
             $selectClause .= ",
                  tk.id                    AS 'tk.id',
                  tk.requires_confirmation AS 'tk.requires_confirmation'
@@ -447,7 +448,7 @@ class PendingFactory
         }
 
         // Quiz
-        if (in_array(AssessmentType::TYPE_QUIZ, $this->assessmentTypes, true)) {
+        if ($this->assessmentTypes->contains(AssessmentType::TYPE_QUIZ)) {
             $selectClause .= ",
                  qz.assess_id AS 'qz.id'
             ";
@@ -458,7 +459,7 @@ class PendingFactory
         }
 
         // DueWork
-        if (in_array(AssessmentType::TYPE_DUE_WORK, $this->assessmentTypes, true)) {
+        if ($this->assessmentTypes->contains(AssessmentType::TYPE_DUE_WORK)) {
             $selectClause .= ",
                  dw.id        AS 'dw.id'
             ";

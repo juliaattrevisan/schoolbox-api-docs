@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\AssessmentType;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\User;
@@ -27,8 +28,23 @@ class Factory extends AbstractFilterFactory
         return new Definition(
             $filter,
             $this->getFilterOptionMapper(),
-            $this->getFilterDefaultMapper()
+            $this->getFilterDefaultMapper(),
+            $this->getAssessmentTypes()
         );
+    }
+
+
+    /**
+     * @return Collection|string[]
+     */
+    private function getAssessmentTypes()
+    {
+        return new Collection([
+            Definition::KEY_PROJECT,
+            Definition::KEY_QUIZ,
+            Definition::KEY_DUE_WORK,
+            Definition::KEY_TASK,
+        ]);
     }
 
 
@@ -55,7 +71,7 @@ class Factory extends AbstractFilterFactory
     public function buildKeyConverter()
     {
         $filter = $this->getFilterMapper()->findForClass(Definition::class);
-        return new KeyConverter($filter);
+        return new KeyConverter($filter, $this->getAssessmentTypes());
     }
 
 }

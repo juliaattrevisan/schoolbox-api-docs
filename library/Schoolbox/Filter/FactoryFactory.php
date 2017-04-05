@@ -63,8 +63,8 @@ class FactoryFactory
 //                return $this->buildClassGroupFilterFactory();
             case TermFilter\Definition::class:
                 return $this->buildTermFilterFactory();
-//            case WorkTypeFilter\Definition::class:
-//                return $this->buildWorkTypeFilterFactory();
+            case WorkTypeFilter\Definition::class:
+                return $this->buildWorkTypeFilterFactory();
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
@@ -132,21 +132,22 @@ class FactoryFactory
         );
     }
 
-
-//
-//
-//    /**
-//     * @return WorkTypeFilter\Factory
-//     * @throws \InvalidArgumentException
-//     */
-//    public function buildWorkTypeFilterFactory()
-//    {
-//        /** @var WorkType\Mapper $workTypeMapper */
-//        $workTypeMapper = $this->mapperFactory->get(WorkType\Mapper::class);
-//        $factory        = new WorkTypeFilter\Factory($workTypeMapper);
-//        $this->setBaseDependencies($factory, WorkTypeFilter\Definition::class);
-//        return $factory;
-//    }
+    /**
+     * @return WorkTypeFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    public function buildWorkTypeFilterFactory()
+    {
+        /** @var WorkType\Mapper $workTypeMapper */
+        $workTypeMapper = $this->mapperFactory->get(WorkType\Mapper::class);
+        return new WorkTypeFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper(),
+            $workTypeMapper
+        );
+    }
 
 
     /**
