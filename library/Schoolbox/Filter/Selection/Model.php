@@ -26,6 +26,8 @@ class Model
 
     /**
      * A concrete key, eg '1', '3' that matches 1 entity
+     * This entity may be fictional, eg an assessment has no WorkType, a selection will exist with key 'None'
+     *
      * @var string
      */
     private $key;

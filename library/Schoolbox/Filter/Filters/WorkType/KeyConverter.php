@@ -6,6 +6,7 @@
 
 namespace Schoolbox\Filter\Filters\WorkType;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\Assessment\Term;
@@ -28,10 +29,10 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @param Filter\Model      $filter
-     * @param GenericCollection $workTypes
+     * @param Filter\Model $filter
+     * @param Collection   $workTypes
      */
-    public function __construct(Filter\Model $filter, GenericCollection $workTypes)
+    public function __construct(Filter\Model $filter, Collection $workTypes)
     {
         parent::__construct($filter);
         $this->workTypes = $workTypes->shallowClone();
@@ -70,6 +71,9 @@ class KeyConverter extends AbstractKeyConverter
     public function sanitiseKey($key)
     {
         $this->assertValidKey($key);
+        if(in_array($key, $this->workTypes->keys(), true)){
+            return (string)$key;
+        }
         return (string)(int)$key;
     }
 
@@ -79,7 +83,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
-        if (!$this->workTypes->offsetExists($key)) {
+        if ($key !== Definition::KEY_NONE && !$this->workTypes->offsetExists($key)) {
             throw new \InvalidArgumentException("No WorkType found for key: $key");
         }
     }

@@ -163,7 +163,8 @@ class PendingFactory
     private $teacherCache;
 
     /**
-     * @var GenericCollection|WorkType\Model[]
+     * Intentionally not a GenericCollection so we can insert NULL items
+     * @var Collection|WorkType\Model[]
      */
     private $workTypes;
 
@@ -228,21 +229,21 @@ class PendingFactory
 
 
     /**
-     * @param User                         $viewee
-     * @param IConnector                   $database
-     * @param \External_ClassInterface     $externalClass
-     * @param GenericCollection|Term                         \Model[] $terms            Only display assessments that are due in these terms
-     * @param GenericCollection|WorkType\Model[] $selectedWorkTypes
-     * @param\Alaress_Date_Format         $toChaseLimit
-     * @param Collection|string[]                     $selectedAssessmentTypes
-     * @param FolderMapper                 $folderMapper
+     * @param User                           $viewee
+     * @param IConnector                     $database
+     * @param \External_ClassInterface       $externalClass
+     * @param GenericCollection|Term\Model[] $terms Only display assessments that are due in these terms
+     * @param Collection|WorkType\Model[] $selectedWorkTypes
+     * @param\Alaress_Date_Format           $toChaseLimit
+     * @param Collection|string[]            $selectedAssessmentTypes
+     * @param FolderMapper                   $folderMapper
      */
     public function __construct(
         User $viewee,
         IConnector $database,
         \External_ClassInterface $externalClass,
         GenericCollection $terms,
-        GenericCollection $selectedWorkTypes,
+        Collection $selectedWorkTypes,
         \Alaress_Date_Format $toChaseLimit,
         Collection $selectedAssessmentTypes,
         FolderMapper $folderMapper
@@ -517,7 +518,11 @@ class PendingFactory
         $where = [];
 
         foreach($this->workTypes as $workType){
-            $where[] = " wt.id = {$workType->getId()} ";
+            if(null === $workType){
+                $where[] = ' wt.id IS NULL ';
+            } else {
+                $where[] = " wt.id = {$workType->getId()} ";
+            }
         }
         return [$select, $join, implode(' OR ', $where)];
     }

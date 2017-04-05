@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\WorkType;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter\Option;
@@ -17,17 +18,18 @@ use Schoolbox\Learning\Assessment\WorkType;
 
 /**
  * Available options:
- * * Project
- * * Quiz
- * * DueWork
- * * Task
- *
- * Defaults to full set, but run-time options will enable controller to exclude individual items
- *
- */
+ * * None
+ * * One per configured workType
+  */
 class Definition extends AbstractFilterDefinition
 {
-    /** @var GenericCollection|WorkType\Model[] */
+    // If assessment does not have a WorkType at all
+    const KEY_NONE = ' none';
+
+    /**
+     * Intentionally not a GenericCollection so we can include null (ie assessment does not have a workType at all)
+     * @var Collection|WorkType\Model[]
+     */
     private $workTypes;
 
 
@@ -35,13 +37,13 @@ class Definition extends AbstractFilterDefinition
      * @param Filter\Model      $filter
      * @param Option\Mapper     $filterOptionMapper
      * @param Defaults\Mapper   $filterDefaultMapper
-     * @param GenericCollection $workTypes
+     * @param Collection $workTypes
      */
     public function __construct(
         Filter\Model $filter,
         Option\Mapper $filterOptionMapper,
         Defaults\Mapper $filterDefaultMapper,
-        GenericCollection $workTypes
+        Collection $workTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->workTypes = $workTypes;
@@ -53,8 +55,9 @@ class Definition extends AbstractFilterDefinition
      */
     protected function getCustomKeys()
     {
-        // No custom keys - all are pulled dynamically
-        return [];
+        return [
+            self::KEY_NONE,
+        ];
     }
 
 
@@ -84,6 +87,9 @@ class Definition extends AbstractFilterDefinition
         return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
             $leftKey  = $left->getKey();
             $rightKey = $right->getKey();
+            if($leftKey === self::KEY_NONE){
+                return -1;
+            }
             if($leftKey === $right){
                 return 0;
             }
@@ -108,6 +114,9 @@ class Definition extends AbstractFilterDefinition
      */
     public function getLabel($key)
     {
+        if(self::KEY_NONE === $key){
+            return 'None';
+        }
         return $this->workTypes[$key]->getName();
     }
 
@@ -119,14 +128,16 @@ class Definition extends AbstractFilterDefinition
     {
         // Ensure it contains all WorkTypes
         foreach ($this->workTypes as $workType) {
-            if (!$pageOptions->offsetExists($workType->getId())) {
+
+            $abstractKey = null === $workType ? self::KEY_NONE : (string)$workType->getId();
+
+            if (!$pageOptions->offsetExists($abstractKey)) {
                 $option = $this->getFilterOptionMapper()->createModel();
-                $key = (string)$workType->getId();
                 $option
                     ->setFilter($this->getFilter())
-                    ->setKey($key)
+                    ->setKey($abstractKey)
                     ->setPage($page)
-                    ->setAvailable($this->getInitialAvailability($key, $page));
+                    ->setAvailable($this->getInitialAvailability($abstractKey, $page));
                 $pageOptions->setOffset($option->getKey(), $option);
             }
         }
@@ -140,8 +151,9 @@ class Definition extends AbstractFilterDefinition
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
         foreach ($pageOptions as $filterOption) {
+            $abstractKey = $filterOption->getKey();
             // Does option refer to a non-existent workType ? (eg if deleted)
-            if (!$this->workTypes->offsetExists($filterOption->getKey())) {
+            if ($abstractKey !== self::KEY_NONE && !$this->workTypes->offsetExists($abstractKey)) {
                 $pageOptions->offsetUnset($filterOption->getKey());
             }
         }

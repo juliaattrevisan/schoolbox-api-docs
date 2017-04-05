@@ -7,12 +7,12 @@
 
 namespace Schoolbox\Filter\Filters\WorkType;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
-use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Mapper;
 use Schoolbox\Filter;
@@ -73,7 +73,6 @@ class Factory extends AbstractFilterFactory
     /**
      * Returns a key converter, able to convert between keys (term.id) and the entities they represent (terms)
      *
-     * @param
      * @return KeyConverter
      */
     public function buildKeyConverter()
@@ -84,11 +83,19 @@ class Factory extends AbstractFilterFactory
 
 
     /**
-     * @return GenericCollection|WorkType\Model[]
+     * Includes a NULL for when an assessment has no WorkType
+     *
+     * @return Collection|WorkType\Model[]
      */
     protected function getWorkTypes()
     {
-        return $this->workTypeMapper->findAll()->indexBy('id');
+        $genericCollection = $this->workTypeMapper->findAll();
+        $collection = new Collection();
+        $collection->offsetSet(Definition::KEY_NONE, null);
+        foreach($genericCollection as $workType){
+            $collection->offsetSet($workType->getId(), $workType);
+        }
+        return $collection;
     }
 
 }
