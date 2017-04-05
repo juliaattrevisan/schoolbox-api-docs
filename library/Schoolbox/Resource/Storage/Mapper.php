@@ -16,6 +16,10 @@ use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper\PredicateBuilder;
+use Schoolbox\Video\Queue;
+use Schoolbox\Video\QueueMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+
 
 /**
  * Class Mapper
@@ -161,6 +165,49 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
+        $queueMapper = QueueMapper::getInstance();
+
+        // Check if the file uploaded was a video/audio file requiring transcoding
+
+        if ($storage->getMimetype()->isVideo() || $storage->getMimetype()->isAudio()) {
+
+            // Houston- we need a transcode
+
+            try {
+
+                // Check if there is an existing transcode request in Complete/Pending/Processing state. If there is, then we
+                // don't want to create a duplicate transcode request
+
+                $queueMapper->findOneByColumnList([
+                    'hash' => $storage->getHash(),
+                    'status' => [
+                        QueueMapper::STATUS_COMPLETED,
+                        QueueMapper::STATUS_PENDING,
+                        QueueMapper::STATUS_PROCESSING
+                    ]
+                ]);
+
+                // There is an existing transcode request for this file that hasn't completed/failed, we don't want to
+                // touch the video_queue table so we leave $this->queue set to null
+
+            } catch (MapperException $e) {
+
+                // There was no existing/outstanding transcode request, so we need to kick one off. Start creating a record
+                // in $this->queue. We might not be able to complete this yet however. To create the record we require a file ID
+                // which we will only have in pre-save if there was an existing file record... which we will find out in a second
+                // when we check for duplicate uploads.
+
+                /** @var Queue $queue */
+                $this->queue = $queueMapper->createModel();
+                $this->queue->setStorage($storage);
+                $this->queue->setStatus(QueueMapper::STATUS_PENDING);
+                $this->queue->setCreatedAt(\Alaress_Date_Format::now());
+                $this->queue->setUpdatedAt(\Alaress_Date_Format::now());
+
+                $queueMapper->save($this->queue);
+            }
+        }
+
         if ($previous) {
             // not the first time we've seen this file? no copying to take place
             return true;
