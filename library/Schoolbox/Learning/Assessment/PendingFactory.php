@@ -605,10 +605,9 @@ class PendingFactory
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
-        $statement = $this->database->prepare("$query1 UNION $query2 UNION $query3 UNION $query4");
-
-        $statement->execute();
-        $this->parseAssessments($statement);
+        $this->parseAssessments(
+            $this->database->executeQueryIterator("$query1 UNION $query2 UNION $query3 UNION $query4")
+        );
     }
 
 
@@ -622,7 +621,7 @@ class PendingFactory
      */
     private function parseAssessments($statement)
     {
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        foreach ($statement as $row) {
 
             $assessmentId = (int)$row['a.id'];
 
@@ -837,11 +836,9 @@ class PendingFactory
                 $groupJoin 
                 WHERE $whereClause
         ";
-        $statement = $this->database->prepare($query);
-        $statement->execute(array_merge($pb->getParams(), $groupPb->getParams(), $classPb->getParams()));
-        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $params = array_merge($pb->getParams(), $groupPb->getParams(), $classPb->getParams());
 
-        foreach ($rows as $row) {
+        foreach ($this->database->executeQueryIterator($query, $params) as $row) {
             $this->cacheUser((int)$row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
 
             // Was this user from a Group ?
@@ -919,9 +916,10 @@ class PendingFactory
             GROUP BY q.assessment_id, qa.user_id, qa.attempt_id
         ';
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $quizResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $quizResults = [];
+        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
+            $quizResults[] = $row;
+        }
 
         // Find Students who attempted Quizzes but are't in the current studentList
         $this->findExtraStudentResults($quizResults, 'qa.user_id', 'q.assessment_id');
@@ -965,9 +963,10 @@ class PendingFactory
             WHERE ' . implode(' AND ', $pb->getWhere()) . '
             ORDER BY t.assessment_id';
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $taskResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $taskResults = [];
+        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
+            $taskResults[] = $row;
+        }
 
         // Find Students who attempted Tasks but are't in the current studentList
         $this->findExtraStudentResults($taskResults, 'tc.student_id', 't.assessment_id');
@@ -1005,9 +1004,11 @@ class PendingFactory
             JOIN student_submission ss ON ss.box_id = sb.id
             WHERE " . implode(' AND ', $pb->getWhere()) . '
             ORDER BY sb.assessment_id';
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $dueWorkSubmissions = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        $dueWorkSubmissions = [];
+        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
+            $dueWorkSubmissions[] = $row;
+        }
 
         // Find Students who submitted DueWorkSubmissions but are't in the current studentList
         $this->findExtraStudentResults($dueWorkSubmissions, 'ss.owner', 'sb.assessment_id');
@@ -1044,9 +1045,10 @@ class PendingFactory
             WHERE " . implode(' AND ', $pb->getWhere()) . '
             ORDER BY sb.assessment_id';
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $dueWorkFeedbacks = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $dueWorkFeedbacks = [];
+        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
+            $dueWorkFeedbacks[] = $row;
+        }
 
         // Find Students who received DueWork Feedback but are't in the current studentList
         $this->findExtraStudentResults($dueWorkFeedbacks, 'sr.owner', 'sb.assessment_id');
@@ -1078,9 +1080,8 @@ class PendingFactory
                     u.alt_email   AS 'u.alt_email'
                 FROM user u
                 WHERE " . implode(' AND ', $pb->getWhere());
-            $statement = $this->database->prepare($query);
-            $statement->execute($pb->getParams());
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
                 $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'],
                     $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
             }
