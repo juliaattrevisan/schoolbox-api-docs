@@ -102,7 +102,6 @@ $pickr-month-padding: 5px;
         input {
             border: 0;
             background: transparent;
-            font-size: 14px;
         }
     }
 
@@ -135,7 +134,6 @@ $pickr-month-padding: 5px;
         &.pickerDouble.pickerWide {
             width: 750px;
         }
-
     }
 
 
@@ -188,6 +186,8 @@ $pickr-month-padding: 5px;
 
         .period-description {
             border-right: 1px solid #ededed;
+            font-size: $small-font-size;
+            padding: 0 2px;
         }
     }
 
@@ -222,7 +222,6 @@ $pickr-month-padding: 5px;
         .adtp-response {
             margin-top: 0;
         }
-
     }
 
 
