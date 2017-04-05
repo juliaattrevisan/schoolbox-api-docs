@@ -16,17 +16,6 @@ use UnderflowException;
 
 class PredicateBuilder implements IPredicateBuilder
 {
-    const OPERATOR_EQUALS     = '=';
-    const OPERATOR_NOT_EQUALS = '<>';
-    const OPERATOR_LIKE       = 'LIKE';
-    const OPERATOR_NOT_LIKE   = 'NOT LIKE';
-    const OPERATOR_LT         = '<';
-    const OPERATOR_LTE        = '<=';
-    const OPERATOR_GT         = '>';
-    const OPERATOR_GTE        = '>=';
-    const OPERATOR_INTERSECT  = 'AND';
-    const OPERATOR_UNION      = 'OR';
-
     /** @var IQuoter */
     protected $quoter;
 
@@ -54,10 +43,10 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * Query the intersection (AND) of the conditions in the given predicate builder
      *
-     * @param PredicateBuilder $predicate
+     * @param IPredicateBuilder $predicate
      * @return $this
      */
-    public function all(self $predicate)
+    public function all(IPredicateBuilder $predicate)
     {
         return $this->addSubPredicate(IPredicateBuilder::OPERATOR_INTERSECT, $predicate);
     }
@@ -65,10 +54,10 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * Query the union (OR) of the conditions in the given predicate builder
      *
-     * @param PredicateBuilder $predicate
+     * @param IPredicateBuilder $predicate
      * @return $this
      */
-    public function any(self $predicate)
+    public function any(IPredicateBuilder $predicate)
     {
         return $this->addSubPredicate(IPredicateBuilder::OPERATOR_UNION, $predicate);
     }
@@ -76,11 +65,11 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * Helper function for adding multiple predicates to this object.
      *
-     * @param string             $glue
-     * @param PredicateBuilder $predicate
+     * @param string            $glue
+     * @param IPredicateBuilder $predicate
      * @return $this
      */
-    protected function addSubPredicate($glue, self $predicate)
+    protected function addSubPredicate($glue, IPredicateBuilder $predicate)
     {
         // Extract this object's where and params
         $this->params  = array_merge($this->getParams(), $predicate->getParams());
