@@ -15,6 +15,7 @@ use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
+use Schoolbox\Mapper\PredicateBuilder;
 
 interface IConnector
 {
@@ -220,4 +221,11 @@ interface IConnector
      * @return mixed
      */
     public function prepareInBindings($externalIds, $prefix = 'param');
+
+    /**
+     * Returns a predicate builder for this connector's database.
+     *
+     * @return PredicateBuilder
+     */
+    public function buildPredicateBuilder();
 }
