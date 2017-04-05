@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use Database;
 use PDO;
@@ -921,7 +921,7 @@ class RubricMapper
      */
     public function getLongitudinal(Folder $subject, User $student, Alaress_Date_Format $noEarlierThan = null, Alaress_Date_Format $noLaterThan = null)
     {
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = new Builder($this->database, '');
 
         $pb
             ->equals('rc.parent_type', 'category')

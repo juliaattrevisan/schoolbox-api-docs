@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -215,11 +215,11 @@ class Mapper extends BaseMapper
      * If another order is defined, the sequence ordering will apply as a lower
      * priority to that order.
      *
-     * @param PredicateBuilder $pb
+     * @param Builder $pb
      * @param array $options
      * @return Collection
      */
-    public function findByPredicates(PredicateBuilder $pb, array $options = [])
+    public function findByPredicates(Builder $pb, array $options = [])
     {
         if (empty($options['order']['sequence'])) {
             $options['order']['sequence'] = 'asc';
@@ -456,23 +456,23 @@ class Mapper extends BaseMapper
      * are attached directly to this folder or through a course implementation
      * that is attached to this folder.
      *
-     * @param int|array        $folderId  A folder ID or list thereof
-     * @param PredicateBuilder $builder   A PredicateBuilder which contains columns to query on.
-     * @param array            $uniqueIds IDs of any assessables that should also be included
-     * @param array            $options   Any other options to pass to the final search to `findByColumnList`.
+     * @param int|array $folderId  A folder ID or list thereof
+     * @param Builder   $builder   A PredicateBuilder which contains columns to query on.
+     * @param array     $uniqueIds IDs of any assessables that should also be included
+     * @param array     $options   Any other options to pass to the final search to `findByColumnList`.
      *
      * @return Collection|Model[]
      */
-    public function findAllForFolderId($folderId, PredicateBuilder $builder, $uniqueIds = [], $options = [])
+    public function findAllForFolderId($folderId, Builder $builder, $uniqueIds = [], $options = [])
     {
         // Support stuff for query
-        $folderList = PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
+        $folderList = Builder::canTraverse($folderId) ? $folderId : [$folderId];
         if (count($folderList) === 0) {
             // Exit early if empty
             return $this->createCollection();
         }
-        $params       = PredicateBuilder::getArrayParameters($folderList, 'folder');
-        $placeholders = PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
+        $params       = Builder::getArrayParameters($folderList, 'folder');
+        $placeholders = Builder::getArrayPlaceholders($folderList, 'folder');
 
         $idQuery = "
             SELECT a.id
@@ -944,7 +944,7 @@ class Mapper extends BaseMapper
         $thisKey   = $multiJoin['this_key'];
         $otherKey  = $multiJoin['other_key'];
 
-        $pb = new BaseMapper\PredicateBuilder($this->database, $this->table);
+        $pb = new Builder($this->database, $this->table);
         $query = "
             SELECT COALESCE(max(`a`.`sequence`), 0) + 1
             FROM `{$this->getTable()}` `a`

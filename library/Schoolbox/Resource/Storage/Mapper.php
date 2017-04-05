@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Resource\Storage;
 
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Alaress_Byte_Format;
 use PDO;
 use PDOStatement;
@@ -244,12 +244,12 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     }
 
     /**
-     * @param PredicateBuilder $predicate
-     * @param array $columnList
-     * @param array $options
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @return array
      */
-    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    protected function buildWherePart(Builder $predicate, $columnList, $options)
     {
         // if the mime is specified, add a LIKE predicate to the query
         if (isset($options['mime'])) {

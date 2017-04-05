@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Response\SubSource;
 
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -132,7 +132,7 @@ abstract class AbstractSubSource implements IResponseDataSource
     }
 
     /**
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function getPredicateBuilder()
     {
@@ -142,11 +142,11 @@ abstract class AbstractSubSource implements IResponseDataSource
     /**
      * Gets a typed Collection of objects that match the specified predicates
      *
-     * @param PredicateBuilder $pb
-     * @param array $options
+     * @param Builder $pb
+     * @param array   $options
      * @return GenericCollection
      */
-    public function findByPredicates(PredicateBuilder $pb, $options = array())
+    public function findByPredicates(Builder $pb, $options = array())
     {
         return $this->mapperProxy->findByPredicates($pb, $options);
     }

@@ -6,14 +6,14 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\PredicateBuilder;
+namespace Alaress\Database\Predicate;
 
 use Alaress\Database\Quoter\IQuoter;
 use Countable;
 use Traversable;
 use UnderflowException;
 
-class PredicateBuilder implements IPredicateBuilder
+class Builder implements IBuilder
 {
     const OPERATOR_EQUALS     = '=';
     const OPERATOR_NOT_EQUALS = '<>';
@@ -53,10 +53,10 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * Query the intersection (AND) of the conditions in the given predicate builder
      *
-     * @param IPredicateBuilder $predicate
+     * @param IBuilder $predicate
      * @return $this
      */
-    public function all(IPredicateBuilder $predicate)
+    public function all(IBuilder $predicate)
     {
         return $this->addSubPredicate(self::OPERATOR_INTERSECT, $predicate);
     }
@@ -64,10 +64,10 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * Query the union (OR) of the conditions in the given predicate builder
      *
-     * @param IPredicateBuilder $predicate
+     * @param IBuilder $predicate
      * @return $this
      */
-    public function any(IPredicateBuilder $predicate)
+    public function any(IBuilder $predicate)
     {
         return $this->addSubPredicate(self::OPERATOR_UNION, $predicate);
     }
@@ -75,11 +75,11 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * Helper function for adding multiple predicates to this object.
      *
-     * @param string            $glue
-     * @param IPredicateBuilder $predicate
+     * @param string   $glue
+     * @param IBuilder $predicate
      * @return $this
      */
-    protected function addSubPredicate($glue, IPredicateBuilder $predicate)
+    protected function addSubPredicate($glue, IBuilder $predicate)
     {
         // Extract this object's where and params
         $this->params  = array_merge($this->getParams(), $predicate->getParams());
@@ -112,7 +112,7 @@ class PredicateBuilder implements IPredicateBuilder
 
     /**
      * @param string $columnName
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function isNull($columnName)
     {
@@ -121,7 +121,7 @@ class PredicateBuilder implements IPredicateBuilder
 
     /**
      * @param string $columnName
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function notNull($columnName)
     {
@@ -130,7 +130,7 @@ class PredicateBuilder implements IPredicateBuilder
 
     /**
      * @param string $columnName
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function isTrue($columnName)
     {
@@ -139,7 +139,7 @@ class PredicateBuilder implements IPredicateBuilder
 
     /**
      * @param string $columnName
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function isFalse($columnName)
     {
@@ -149,7 +149,7 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * @param string     $columnName
      * @param string|int $columnValue
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function equals($columnName, $columnValue)
     {
@@ -159,7 +159,7 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * @param string     $columnName
      * @param string|int $columnValue
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function notEquals($columnName, $columnValue)
     {
@@ -175,7 +175,7 @@ class PredicateBuilder implements IPredicateBuilder
      * @param string $columnName
      * @param string $columnValue Used directly in LIKE statement.
      *                            @see \Database::escapeForLike for escaping user input.
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function like($columnName, $columnValue)
     {
@@ -194,7 +194,7 @@ class PredicateBuilder implements IPredicateBuilder
      * @param string $columnName
      * @param string $columnValue Used directly in NOT LIKE statement.
      *                            @see \Database::escapeForLike for escaping user input.
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function notLike($columnName, $columnValue)
     {
@@ -204,7 +204,7 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function lessThan($columnName, $columnValue)
     {
@@ -215,7 +215,7 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function greaterThan($columnName, $columnValue)
     {
@@ -225,7 +225,7 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function notLessThan($columnName, $columnValue)
     {
@@ -235,7 +235,7 @@ class PredicateBuilder implements IPredicateBuilder
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function notGreaterThan($columnName, $columnValue)
     {
@@ -248,7 +248,7 @@ class PredicateBuilder implements IPredicateBuilder
      * @param string $columnName
      * @param mixed  $from If null, this value is excluded.
      * @param mixed  $to   If null, this value is excluded.
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function between($columnName, $from, $to)
     {
@@ -269,7 +269,7 @@ class PredicateBuilder implements IPredicateBuilder
      * @param \Alaress_Date_Format $from If null, this value is excluded.
      * @param \Alaress_Date_Format $to   If null, this value is excluded.
      * @param string               $compareFormat
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function betweenDates(
         $columnName,

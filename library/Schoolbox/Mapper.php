@@ -10,7 +10,7 @@
 namespace Schoolbox;
 
 use Alaress\Cache;
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use Aura\Di;
@@ -1357,7 +1357,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList, array $options = [])
     {
-        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList,  $options);
+        return $this->executeDelete($this->getDeleteString(), new Builder($this->getDatabase(), $this->getTable()), $columnList,  $options);
     }
 
 
@@ -1365,13 +1365,13 @@ abstract class Mapper implements IMapper, Serializable
      * Deletes (whether hard or soft) all records that match the given set of column values
      * Returns the number of records deleted.
      *
-     * @param string           $deleteString
-     * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param string  $deleteString
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @return int
      */
-    protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList, array $options = [])
+    protected function executeDelete($deleteString, Builder $predicate, array $columnList, array $options = [])
     {
         // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
         if (empty($columnList) && empty($predicate->getWhere())) {
@@ -1552,12 +1552,12 @@ abstract class Mapper implements IMapper, Serializable
      * This is used in `updateAll` and `hardDelete`.
      *
      * @param Collection $collection A collection of models
-     * @return PredicateBuilder[]
+     * @return Builder[]
      */
     protected function buildPredicateBuildersForCollection(Collection $collection)
     {
         // Build a WHERE part using the predicate builder.
-        /** @var PredicateBuilder[] $pbs */
+        /** @var Builder[] $pbs */
         $pbs = [];
         if ($this->hasIdentifier()) {
             // Building the query is easy, just set where any identifier matches
@@ -1852,17 +1852,17 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findByColumnList($columnList, $options = array())
     {
-        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
     }
 
     /**
      * Generates a custom query
      *
-     * @param PredicateBuilder $pb
-     * @param array $options
+     * @param Builder $pb
+     * @param array   $options
      * @return GenericCollection
      */
-    public function findByPredicates(PredicateBuilder $pb, array $options = [])
+    public function findByPredicates(Builder $pb, array $options = [])
     {
         return $this->executeSelect($this->getSelectString(), $this->getFromString(), $pb, [], $options);
     }
@@ -1871,12 +1871,12 @@ abstract class Mapper implements IMapper, Serializable
      * Deletes (whether hard or soft) all records that match the given Predicates
      * Returns the number of records deleted.
      *
-     * @param PredicateBuilder $pb
-     * @param  array $options
+     * @param Builder $pb
+     * @param  array  $options
      * @see $this->findByColumnList()
      * @return int
      */
-    public function countByPredicates(PredicateBuilder $pb, array $options = [])
+    public function countByPredicates(Builder $pb, array $options = [])
     {
         try {
             $stmt = $this->selectScalarByPredicates('COUNT(*)', $pb, $options);
@@ -1890,10 +1890,10 @@ abstract class Mapper implements IMapper, Serializable
      * Deletes (whether hard or soft) all records that match the given Predicates
      * Returns the number of records deleted.
      *
-     * @param PredicateBuilder $pb
+     * @param Builder $pb
      * @return int
      */
-    public function deleteByPredicates(PredicateBuilder $pb)
+    public function deleteByPredicates(Builder $pb)
     {
         return $this->executeDelete($this->getDeleteString(), $pb, []);
     }
@@ -1901,22 +1901,22 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Create a PredicateBuilder for this Mapper's table.
      *
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function getPredicateBuilder()
     {
-        return new PredicateBuilder($this->getDatabase(), $this->getTable());
+        return new Builder($this->getDatabase(), $this->getTable());
     }
 
     /**
-     * @param string           $select
-     * @param string           $from
-     * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param string  $select
+     * @param string  $from
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @return GenericCollection
      */
-    protected function executeSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
+    protected function executeSelect($select, $from, Builder $predicate, array $columnList, array $options = [])
     {
         try {
             // fold the column list into the predicate builder
@@ -1955,15 +1955,15 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * @param string           $select
-     * @param string           $from
-     * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param string  $select
+     * @param string  $from
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @throws UnderflowException
      * @return PDOStatement
      */
-    protected function prepareSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
+    protected function prepareSelect($select, $from, Builder $predicate, array $columnList, array $options = [])
     {
         $query = "$select $from";
 
@@ -2217,7 +2217,7 @@ abstract class Mapper implements IMapper, Serializable
             $from = "FROM {$this->getTable()}";
         }
 
-        $statement = $this->prepareSelect($select, $from, new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
 
@@ -2227,14 +2227,14 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Returns a statement that attempts to select the scalar given by $selection
      *
-     * @param  string $selection
-     * @param  PredicateBuilder $pb
-     * @param  array  $options
+     * @param  string  $selection
+     * @param  Builder $pb
+     * @param  array   $options
      *
      * @throws UnderflowException YOU MUST CATCH THIS. Thrown if the query could not possibly return any results.
      * @return PDOStatement
      */
-    protected function selectScalarByPredicates($selection, PredicateBuilder $pb, array $options = [])
+    protected function selectScalarByPredicates($selection, Builder $pb, array $options = [])
     {
         $select = "SELECT $selection";
 
@@ -2293,15 +2293,15 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Builds a where part and params for this query out of a column list
      *
-     * @param PredicateBuilder $predicate
-     * @param  array $columnList
-     * @param  array $options
+     * @param Builder $predicate
+     * @param  array  $columnList
+     * @param  array  $options
      *
      * @return array where:  The where parts of the query
      *               params: the parameters
      * @throws \UnderflowException
      */
-    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    protected function buildWherePart(Builder $predicate, $columnList, $options)
     {
         return $predicate->addColumnList($columnList)->getPredicates();
     }
@@ -3177,7 +3177,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getArrayPlaceholders($input, $prefix = null)
     {
-        return PredicateBuilder::getArrayPlaceholders($input, $prefix);
+        return Builder::getArrayPlaceholders($input, $prefix);
     }
 
     /**
@@ -3196,7 +3196,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getArrayParameters($input, $prefix = null)
     {
-        return PredicateBuilder::getArrayParameters($input, $prefix);
+        return Builder::getArrayParameters($input, $prefix);
     }
 
     /**

@@ -11,7 +11,7 @@
 namespace Alaress\Database\Connector;
 
 use Alaress\Database\Broker\IBroker;
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
@@ -425,6 +425,6 @@ class Base implements Serializable, IConnector
      */
     public function buildPredicateBuilder($table)
     {
-        return new PredicateBuilder($this->broker, $table);
+        return new Builder($this->broker, $table);
     }
 }

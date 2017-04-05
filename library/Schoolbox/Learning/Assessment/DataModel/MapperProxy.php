@@ -6,7 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
@@ -786,7 +786,7 @@ class MapperProxy
      *   (see AssessmentType::TYPE_* constants)
      *
      * @param array $options
-     * @return PredicateBuilder
+     * @return Builder
      * @throws \InvalidArgumentException
      */
     protected function convertOptionsToPredicateBuilder($options)

@@ -5,64 +5,64 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\PredicateBuilder;
+namespace Alaress\Database\Predicate;
 
 /**
  * Interface for predicate builder implementations.
  */
-interface IPredicateBuilder
+interface IBuilder
 {
     /**
      * Query the intersection (AND) of the conditions in the given predicate builder
      *
-     * @param IPredicateBuilder $predicate
-     * @return IPredicateBuilder
+     * @param IBuilder $predicate
+     * @return IBuilder
      */
-    public function all(IPredicateBuilder $predicate);
+    public function all(IBuilder $predicate);
 
     /**
      * Query the union (OR) of the conditions in the given predicate builder
      *
-     * @param IPredicateBuilder $predicate
-     * @return IPredicateBuilder
+     * @param IBuilder $predicate
+     * @return IBuilder
      */
-    public function any(IPredicateBuilder $predicate);
+    public function any(IBuilder $predicate);
 
     /**
      * @param string $columnName
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function isNull($columnName);
 
     /**
      * @param string $columnName
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function notNull($columnName);
 
     /**
      * @param string $columnName
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function isTrue($columnName);
 
     /**
      * @param string $columnName
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function isFalse($columnName);
 
     /**
      * @param string     $columnName
      * @param string|int $columnValue
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function equals($columnName, $columnValue);
 
     /**
      * @param string     $columnName
      * @param string|int $columnValue
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function notEquals($columnName, $columnValue);
 
@@ -75,7 +75,7 @@ interface IPredicateBuilder
      * @param string $columnName
      * @param string $columnValue Used directly in LIKE statement.
      *                            @see \Database::escapeForLike for escaping user input.
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function like($columnName, $columnValue);
 
@@ -91,14 +91,14 @@ interface IPredicateBuilder
      * @param string $columnName
      * @param string $columnValue Used directly in NOT LIKE statement.
      *                            @see \Database::escapeForLike for escaping user input.
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function notLike($columnName, $columnValue);
 
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function lessThan($columnName, $columnValue);
 
@@ -106,21 +106,21 @@ interface IPredicateBuilder
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function greaterThan($columnName, $columnValue);
 
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function notLessThan($columnName, $columnValue);
 
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function notGreaterThan($columnName, $columnValue);
 
@@ -130,7 +130,7 @@ interface IPredicateBuilder
      * @param string $columnName
      * @param mixed  $from If null, this value is excluded.
      * @param mixed  $to   If null, this value is excluded.
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function between($columnName, $from, $to);
 
@@ -141,7 +141,7 @@ interface IPredicateBuilder
      * @param \Alaress_Date_Format $from If null, this value is excluded.
      * @param \Alaress_Date_Format $to   If null, this value is excluded.
      * @param string               $compareFormat
-     * @return IPredicateBuilder
+     * @return IBuilder
      */
     public function betweenDates(
         $columnName,

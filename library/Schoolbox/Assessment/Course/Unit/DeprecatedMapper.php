@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Assessment\Course\Unit;
 
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Component_Homepage_CourseBuilderController;
 use PDO;
 use PDOStatement;
@@ -80,15 +80,15 @@ class DeprecatedMapper extends Folder\Mapper
     /**
      * Builds a where part and params for this query out of a column list
      *
-     * @param PredicateBuilder $predicate
-     * @param  array           $columnList
-     * @param  array           $options
+     * @param Builder $predicate
+     * @param  array  $columnList
+     * @param  array  $options
      *
      * @return array where:  The where parts of the query
      *               params: the parameters
      * @throws \UnderflowException
      */
-    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    protected function buildWherePart(Builder $predicate, $columnList, $options)
     {
         // append the custom predicates from the select string
         $predicate->equals('cd.class', Component_Homepage_CourseBuilderController::class);

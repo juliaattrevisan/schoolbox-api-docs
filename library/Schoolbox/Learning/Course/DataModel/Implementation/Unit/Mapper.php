@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Column\Date;
@@ -26,7 +26,7 @@ use Schoolbox\Resource\HomepageConfig;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method GenericCollection|Model[] findByPredicates(PredicateBuilder $pb, array $options = [])
+ * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */
 class Mapper extends AbstractUnitMapper
 {

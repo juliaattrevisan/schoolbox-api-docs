@@ -8,7 +8,7 @@
 namespace Schoolbox\Fixtures\Season;
 
 
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 use Schoolbox\Fixtures\Season\Model as Season;
@@ -99,14 +99,14 @@ class Mapper extends BaseMapper
         }
 
         if(count($seasonIds)){
-            $query .= " AND s.id IN ". PredicateBuilder::getArrayPlaceholders($seasonIds);
+            $query .= " AND s.id IN ". Builder::getArrayPlaceholders($seasonIds);
         }
 
         $query .= " GROUP BY s.id";
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute(count($seasonIds) ? PredicateBuilder::getArrayParameters($seasonIds) : null);
+        $statement->execute(count($seasonIds) ? Builder::getArrayParameters($seasonIds) : null);
 
         $seasonDivisionCounts = [];
         while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
@@ -142,14 +142,14 @@ class Mapper extends BaseMapper
         }
 
         if(count($seasonIds)){
-            $query .= " AND s.id IN ". PredicateBuilder::getArrayPlaceholders($seasonIds);
+            $query .= " AND s.id IN ". Builder::getArrayPlaceholders($seasonIds);
         }
 
         $query .= " GROUP BY s.id";
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute(count($seasonIds) ? PredicateBuilder::getArrayParameters($seasonIds) : null);
+        $statement->execute(count($seasonIds) ? Builder::getArrayParameters($seasonIds) : null);
 
         $seasonMatchCounts = [];
         while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
