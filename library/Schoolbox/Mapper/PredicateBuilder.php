@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Mapper;
 
-use Alaress\IDatabase;
+use Alaress\Database\Quoter\IQuoter;
 use Countable;
 use Traversable;
 use UnderflowException;
@@ -26,8 +26,8 @@ class PredicateBuilder
     const OPERATOR_INTERSECT  = 'AND';
     const OPERATOR_UNION      = 'OR';
 
-    /** @var IDatabase */
-    protected $database;
+    /** @var IQuoter */
+    protected $quoter;
 
     /** @var string */
     protected $table;
@@ -41,13 +41,13 @@ class PredicateBuilder
     /**
      * PredicateBuilder constructor.
      *
-     * @param IDatabase $db
-     * @param string    $table
+     * @param IQuoter $quoter
+     * @param string  $table
      */
-    public function __construct(IDatabase $db, $table)
+    public function __construct(IQuoter $quoter, $table)
     {
         $this->setTable($table);
-        $this->database = $db;
+        $this->quoter = $quoter;
     }
 
     /**
@@ -323,7 +323,7 @@ class PredicateBuilder
             $whereNot = "";
         }
 
-        $escaped_name = $this->database->quoteIdentifier($table) . '.' . $this->database->quoteIdentifier($field);
+        $escaped_name = $this->quoter->quoteIdentifier($table) . '.' . $this->quoter->quoteIdentifier($field);
 
         if (!isset($columnValue)) {
             $this->where[] = "$escaped_name IS {$whereNot}NULL";
