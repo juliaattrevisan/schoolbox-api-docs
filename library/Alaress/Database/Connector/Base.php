@@ -423,7 +423,7 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function buildPredicateBuilder()
+    public function buildPredicateBuilder($table)
     {
         // TODO: Implement buildPredicateBuilder() method.
     }

@@ -225,7 +225,8 @@ interface IConnector
     /**
      * Returns a predicate builder for this connector's database.
      *
+     * @param string $table The table to build the predicate builder for
      * @return PredicateBuilder
      */
-    public function buildPredicateBuilder();
+    public function buildPredicateBuilder($table);
 }
