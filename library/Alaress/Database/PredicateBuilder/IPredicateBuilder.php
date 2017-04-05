@@ -12,17 +12,6 @@ namespace Alaress\Database\PredicateBuilder;
  */
 interface IPredicateBuilder
 {
-    const OPERATOR_EQUALS     = '=';
-    const OPERATOR_NOT_EQUALS = '<>';
-    const OPERATOR_LIKE       = 'LIKE';
-    const OPERATOR_NOT_LIKE   = 'NOT LIKE';
-    const OPERATOR_LT         = '<';
-    const OPERATOR_LTE        = '<=';
-    const OPERATOR_GT         = '>';
-    const OPERATOR_GTE        = '>=';
-    const OPERATOR_INTERSECT  = 'AND';
-    const OPERATOR_UNION      = 'OR';
-
     /**
      * Query the intersection (AND) of the conditions in the given predicate builder
      *
