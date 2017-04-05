@@ -39,7 +39,7 @@
 
     {# Tasks have inline interaction #}
     {% if assessment is task %}
-        <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}"
+        <form action="{{ routeLookupIfAuthorized('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}"
               method="POST"
               class="progress-tick-form"
               data-progress-tick-form="{{ assessment.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
