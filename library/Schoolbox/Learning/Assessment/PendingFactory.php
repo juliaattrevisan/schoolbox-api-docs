@@ -6,7 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\IDatabase;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\PredicateBuilder;
@@ -36,7 +36,7 @@ use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 class PendingFactory
 {
 
-    /** @var IDatabase */
+    /** @var IConnector */
     private $database;
 
     /** @var \External_ClassInterface */
@@ -224,7 +224,7 @@ class PendingFactory
 
     /**
      * @param User                         $viewee
-     * @param \Database                    $database
+     * @param IConnector                   $database
      * @param \External_ClassInterface     $externalClass
      * @param Term                         $term
      * @param \Alaress_Date_Format         $toChaseLimit
@@ -233,7 +233,7 @@ class PendingFactory
      */
     public function __construct(
         User $viewee,
-        \Database $database,
+        IConnector $database,
         \External_ClassInterface $externalClass,
         Term $term,
         \Alaress_Date_Format $toChaseLimit,
