@@ -8,15 +8,17 @@
             {% if student %}
                 {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, assessment: assessable}) %}
             {% else %}
-                {% set route = routeLookup('learningAssessment.getPreview',{assessmentId: assessable.id}) %}
+                {% set route = routeLookupIfAuthorized('learningAssessment.getPreview',{assessmentId: assessable.id}) %}
             {% endif %}
+
             {% if route %}
-            <a href="{{ route }}">
-                <h3>{{ assessable.title }}</h3>
-            </a>
+                <a href="{{ route }}">
+                    <h3>{{ assessable.title }}</h3>
+                </a>
             {% else %}
                 <h3>{{ assessable.title }}</h3>
             {% endif %}
+
             <p class="meta">
                 {{ dueDate.dueDate(assessable, student ?: USER) }}
             </p>

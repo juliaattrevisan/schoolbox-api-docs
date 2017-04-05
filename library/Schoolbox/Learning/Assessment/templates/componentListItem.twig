@@ -12,9 +12,9 @@
     <div class="list-item">
         <div class="card small-12">
             {% if assessable.isParticipant(USER) or canWrite %}
-                {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id, studentId: USER.id}) %}
+                {% set href = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id}) %}
             {%  else %}
-                {% set href = routeLookup('learningAssessment.getPreview', {assessmentId: assessable.id}) %}
+                {% set href = routeLookupIfAuthorized('learningAssessment.getPreview', {assessmentId: assessable.id, assessment: assessable}) %}
             {% endif %}
             {% if viewRoute %}<a href="{{ href }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>

@@ -8,8 +8,9 @@
             {% if student %}
                 {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, assessment: assessable}) %}
             {% else %}
-                {% set route = routeLookup('learningAssessment.getPreview',{assessmentId: assessable.id}) %}
-            {%  endif %}
+                {% set route = routeLookupIfAuthorized('learningAssessment.getPreview',{assessmentId: assessable.id}) %}
+            {% endif %}
+
             {% if route %}
                 <a href="{{ route }}">
                     <h3 data-assessment-title>{{ assessable.title }}</h3>
@@ -17,6 +18,7 @@
             {% else %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
             {% endif %}
+
             {% if student %}
                 <p class="meta"><a href="{% if route %}{{ route }}{% else %}#{% endif %}" class="meta">{% include '@learningAssessment/fragments/statusLine.twig' with {assessable: assessable} %}</a></p>
             {% endif %}
