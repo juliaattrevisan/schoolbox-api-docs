@@ -54,7 +54,7 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 $assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
 if (!$assessment->isParticipant($_SESSION['user']) && $groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE) {
     // Show quiz preview to someone who's none of above, but has read access to the folder
-    $assessmentFolder = $assessment->getBaseContext();
+    $assessmentFolder = $assessment->getBaseContext()->getFolder();
     if (Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]) == UserAccess::ACCESS_READ) {
         $readOnly = true;
     }
