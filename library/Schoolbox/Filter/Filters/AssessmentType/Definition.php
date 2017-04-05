@@ -144,10 +144,27 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * @inheritdoc
+     * There may be existing availability settings saved to the DB that refer
+     * to (most likely dynamic) items that no longer exist.
+     *
+     * Eg the admin may have configured that the Term 2017 should be available, but
+     * it has subsequently been deleted from the system.
+     *
+     * Concrete classes can unset their relevant options here for similar reasons.
+     *
+     * @param GenericCollection|Option\Model[] $pageOptions
+     * @return GenericCollection|Option\Model[]
      */
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
+        // Do not permit 'projects' on the 'pendingAssessments' page
+        foreach($pageOptions as $idx => $option)
+        {
+            if(self::KEY_PROJECT === $option->getKey() && Option\Model::PAGE_PENDING_ASSESSMENTS === $option->getPage()){
+                $pageOptions->offsetUnset($idx);
+            }
+        }
+
         // noop - AssessmentTypes are purely hard-coded.
         return $pageOptions;
     }

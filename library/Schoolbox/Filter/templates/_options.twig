@@ -62,14 +62,18 @@ Usage:
             <tr>
                 <td>{{ definition.label(key) }}</td>
                 {% for page in definition.pages %}
-                    <td>
-                        <input
-                            id="checkbox_{{ key }}_{{ page }}"
-                            type="checkbox"
-                            name="filter_option[{{ key }}][{{ page }}]"
-                            {% if options[key][page].available %}checked{% endif %}>
-                        <label for="checkbox_{{ key }}_{{ page }}" class="checkbox-label"></label>
-                    </td>
+                    {% if options[key][page] %}
+                        <td>
+                            <input
+                                    id="checkbox_{{ key }}_{{ page }}"
+                                    type="checkbox"
+                                    name="filter_option[{{ key }}][{{ page }}]"
+                                    {% if options[key][page].available %}checked{% endif %}>
+                            <label for="checkbox_{{ key }}_{{ page }}" class="checkbox-label"></label>
+                        </td>
+                    {% else %}
+                        <td>NA</td>
+                    {% endif %}
                 {% endfor %}
             </tr>
             {% endfor %}
