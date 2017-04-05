@@ -19,6 +19,9 @@ class Quoter extends Base
      */
     public function quoteIdentifier($string)
     {
-        return '`'.str_replace('`', '``', $string).'`';
+        // [identifier] is supported whether setting QUOTED_IDENTIFIER is on or off.
+        // If someone for some reason used [ or ] in an identifier:
+        // escape with an extra of the same character
+        return '['.strtr($string, ['[' => '[[', ']' => ']]',]).']';
     }
 }
