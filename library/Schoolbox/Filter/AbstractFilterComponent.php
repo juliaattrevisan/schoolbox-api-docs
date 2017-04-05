@@ -107,16 +107,18 @@ abstract class AbstractFilterComponent implements IFilterComponent
         // In the latter case, you MUST override this method (see TermFilter for an example)
 
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
+        $filter = $this->getDefinition()->getFilter();
+        $roleType = $this->getUser()->getRole()->getType();
 
         foreach ($optionDefaults as $option) {
 
             $selection = $this->getFilterSelectionMapper()->createModel();
             $selection
-                ->setFilter($this->getDefinition()->getFilter())
+                ->setFilter($filter)
                 ->setUser($this->getUser())
                 ->setPage($this->getPage())
                 ->setKey($option->getKey())
-                ->setSelected($option->getDefaults()[$this->getUser()->getRole()->getType()]->getSelected());
+                ->setSelected($option->getDefaults()[$roleType]->getSelected());
             $availableSelections[$selection->getKey()] = $selection;
         }
         return $availableSelections;
