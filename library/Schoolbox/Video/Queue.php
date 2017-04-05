@@ -23,14 +23,8 @@ class Queue extends ResourceVideo
     /** @var string */
     protected $message;
 
-    /** @var Storage */
-    protected $file;
-
     /** @var string */
     private $type;
-
-    /** @var int */
-    protected $fileId;
 
     /** @var string */
     private $audioBitrate;
