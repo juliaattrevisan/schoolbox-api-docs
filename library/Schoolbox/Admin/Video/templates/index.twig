@@ -61,16 +61,20 @@
                             <thead>
                             <tr>
                                 <th>Uploaded</th>
-                                <th>Video Name</th>
+                                <th>Name</th>
+                                <th>Duration</th>
+                                <th>Size</th>
+                                <th>Mime</th>
                                 <th data-sortable="false"></th>
                             </tr>
                             </thead>
                     {% endif %}
                             <tr>
                                 <td>{{ video.createdAt.database }}</td>
-                                <td>
-                                    {{ video.storage.filename }}
-                                </td>
+                                <td>{{ video.storage.filename }}</td>
+                                <td>{{ video.duration }}</td>
+                                <td>{{ video.storage.size | bytes}}</td>
+                                <td>{{ video.storage.mime }}</td>
                                 <td class="actions-small-3">
                                     <nav>
                                         {% if video.isFailed %}
