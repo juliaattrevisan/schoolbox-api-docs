@@ -39,30 +39,34 @@
 
     {# Tasks have inline interaction #}
     {% if assessment is task %}
-        <form action="{{ routeLookupIfAuthorized('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}"
-              method="POST"
-              class="progress-tick-form"
-              data-progress-tick-form="{{ assessment.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
-            {% if participant.isResponseRequired %}
-                <a href="#"
-                   disabled
-                   class="no-text progress-tick {% if disabled %}disabled{% endif %}"
-                   title="Incomplete"
-                   data-progress-tick-status="incomplete"></a>
-            {% elseif participant.isFeedbackRequired %}
-                <a href="#"
-                   disabled
-                   class="no-text progress-tick pending {% if disabled %}disabled{% endif %}"
-                   title="Self-assessed"
-                   data-progress-tick-status="selfAssessed"></a>
-            {% elseif participant.isReviewComplete %}
-                <a href="#"
-                   disabled
-                   class="no-text progress-tick reviewed {% if disabled %}disabled{% endif %}"
-                   title="Completed"
-                   data-progress-tick-status="teacherAssessed"></a>
-            {% endif %}
-        </form>
+        {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: participant.user.id}) %}
+
+        {% if postRoute %}
+            <form action="{{ postRoute }}"
+                  method="POST"
+                  class="progress-tick-form"
+                  data-progress-tick-form="{{ assessment.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
+                {% if participant.isResponseRequired %}
+                    <a href="#"
+                       disabled
+                       class="no-text progress-tick {% if disabled %}disabled{% endif %}"
+                       title="Incomplete"
+                       data-progress-tick-status="incomplete"></a>
+                {% elseif participant.isFeedbackRequired %}
+                    <a href="#"
+                       disabled
+                       class="no-text progress-tick pending {% if disabled %}disabled{% endif %}"
+                       title="Self-assessed"
+                       data-progress-tick-status="selfAssessed"></a>
+                {% elseif participant.isReviewComplete %}
+                    <a href="#"
+                       disabled
+                       class="no-text progress-tick reviewed {% if disabled %}disabled{% endif %}"
+                       title="Completed"
+                       data-progress-tick-status="teacherAssessed"></a>
+                {% endif %}
+            </form>
+        {% endif %}
     {% else %}
         {% if participant.isResponseRequired %}
             <span class="no-text progress-tick" title="Response Required"></span>
