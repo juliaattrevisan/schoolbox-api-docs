@@ -9,10 +9,6 @@
             $(formName + ' input[name="videoAction"]').val('resubmit');
             form.submit();
         });
-        $('[data-view]').click(function (e) {
-            e.preventDefault();
-            window.location.href = '{{ routeLookup('adminVideo.getIndex') }}/' +  $(this).data('view');
-        });
         $('[data-delete]').click(function (e) {
             e.preventDefault();
             var deleteId = $(this).data('delete');
@@ -37,6 +33,12 @@
                 }
             });
         });
+
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
     });
 </script>
 
@@ -53,36 +55,38 @@
 
                     {% if loop.first %}
                         <h2 class="subheader">
-                            {{ status }} Media
+                            {{ status }} Media Conversions
                         </h2>
-                        <section>
-                        <ul class="information-list">
+                        <table data-sortable>
+                            <thead>
+                            <tr>
+                                <th>Uploaded</th>
+                                <th>Video Name</th>
+                                <th data-sortable="false"></th>
+                            </tr>
+                            </thead>
                     {% endif %}
-
-                    <li class="actions-small-2">
-                        <div class="list-item">
-                            <div class="compact card small-12">
-                                <div class="icon-{{ statusIcon.statusIcon(video) }}" title="Video processing {{ video.status }}"></div>
-                                <h3>{{ video.storage.filename }}</h3>
-                                <p class="meta">{{ video.createdAt.long }}</p>
-                            </div>
-                        </div>
-                        <nav>
-                            {% if video.isFailed %}
-                                <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
-                                    <input type="hidden" value="{{ video.id }}" name="videoId">
-                                    <input type="hidden" value="" name="videoAction">
-                                    <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results"></a>
-                                    <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
-                                    <a class="icon-delete no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
-                                </form>
-                            {% endif %}
-                        </nav>
-                    </li>
-
+                            <tr>
+                                <td>{{ video.createdAt.database }}</td>
+                                <td>
+                                    {{ video.storage.filename }}
+                                </td>
+                                <td class="actions-small-3">
+                                    <nav>
+                                        {% if video.isFailed %}
+                                            <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
+                                                <input type="hidden" value="{{ video.id }}" name="videoId">
+                                                <input type="hidden" value="" name="videoAction">
+                                                <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results" data-reveal-id="ajax-load" data-reveal-ajax="/adminv2/video/{{ video.id }}"></a>
+                                                <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
+                                                <a class="icon-delete no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
+                                            </form>
+                                        {% endif %}
+                                    </nav>
+                                </td>
+                            </tr>
                     {% if loop.last %}
-                        </ul>
-                        </section>
+                        </table>
                     {% endif %}
 
                 {% endfor %}
@@ -106,20 +110,7 @@
     </div>
 </div>
 
-{% if log.message is not empty %}
-
-    <div class="row">
-        <div class="small-12 island">
-            <h2 class="subheader">
-                Transcoding Results - {{ log.storage.filename }}
-            </h2>
-            <section class="content">
-            <pre>{{ log.message }}</pre>
-            </section>
-        </div>
-    </div>
-
-{% endif %}
+<div data-reveal id="ajax-load" class="reveal-modal"></div>
 
 <div class="toast" id="toaster"></div>
 
