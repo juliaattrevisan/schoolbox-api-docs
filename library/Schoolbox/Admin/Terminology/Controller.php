@@ -9,24 +9,23 @@ namespace Schoolbox\Admin\Terminology;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Localisation\Mapper as LocalisationMapper;
+use Schoolbox\L10n\Mapper as L10nMapper;
 
 class Controller extends Base
 {
     const PAGE_CURRENT = 'terminology';
 
     /**
-     * @var LocalisationMapper
+     * @var L10nMapper
      */
-    protected $localisationMapper;
+    protected $l10nMapper;
 
     /**
      * Lets build this thing!
-     * @param $localisationMapper
      */
-    public function __construct($localisationMapper)
+    public function __construct()
     {
-        $this->localisationMapper = $localisationMapper;
+        $this->l10nMapper = L10nMapper::getInstance();
     }
 
     /**
@@ -38,7 +37,7 @@ class Controller extends Base
             'template' => '@adminTerminology/index.twig',
             'data'     => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'terms' => $this->localisationMapper->findAll()
+                'terms' => $this->l10nMapper->findAll()
             ],
             'title' => 'Admin - Terminology'
         ]);
@@ -47,18 +46,19 @@ class Controller extends Base
     /**
      * Update the term
      */
-    public function postUpdateTerm()
+    public function postUpdateTerms()
     {
         $post = $this->getRequest()->post;
 
         try {
 
-            $localisation = $this->localisationMapper->findById($post['term']);
-            $localisation->setSingularForm($post['singularForm']);
-            $localisation->setPluralForm($post['pluralForm']);
-            $localisation->setCapitaliseFirst(!empty($post['capitaliseFirst']));
-
-            $this->localisationMapper->save($localisation);
+            foreach ($post['singularForm'] as $term => $singularForm) {
+                $localisation = $this->l10nMapper->findById($term);
+                $localisation->setSingularForm($singularForm);
+                $localisation->setPluralForm($post['pluralForm'][$term]);
+                $localisation->setCapitaliseFirst(!empty($post['capitaliseFirst'][$term]));
+                $this->l10nMapper->save($localisation);
+            }
 
         } catch (MapperException $e) {
         }

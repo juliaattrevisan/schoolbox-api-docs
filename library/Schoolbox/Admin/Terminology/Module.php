@@ -38,8 +38,7 @@ class Module extends BaseModule
                 '' => 'getIndex',
             ],
             'POST' => [
-                '/{id}/create' => 'postCreateTerm',
-                '/{id}/update' => 'postUpdateTerm'
+                '/update' => 'postUpdateTerms'
             ]
         ];
 
