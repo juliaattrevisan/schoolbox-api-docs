@@ -775,9 +775,9 @@ class PendingFactory
         }
 
         // Efficient but complex (until OR support goes in) predicate building
-        $pb      = new PredicateBuilder($this->database, '');
-        $groupPb = new PredicateBuilder($this->database, '');
-        $classPb = new PredicateBuilder($this->database, '');
+        $pb      = $this->database->buildPredicateBuilder('');
+        $groupPb = $this->database->buildPredicateBuilder('');
+        $classPb = $this->database->buildPredicateBuilder('');
 
         // Always ensure user is not deleted
         $pb->isNull('u.deleted_at');
@@ -899,7 +899,7 @@ class PendingFactory
         }
 
         // Get QuizAttempts for specified Quizzes
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = $this->database->buildPredicateBuilder('');
         $pb->isNull('q.deleted_at');
         $pb->equals('q.availability', QuizModel::AVAILABILITY_ASSESS);
         $pb->equals('q.assessment_id', $this->quizAssessmentIds);
@@ -943,7 +943,7 @@ class PendingFactory
         }
 
         // Get Task Completions for all selected students
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = $this->database->buildPredicateBuilder('');
         $pb->isNull('t.deleted_at');
         $pb->equals('t.assessment_id', $this->taskAssessmentIds);
         $query = "
@@ -989,7 +989,7 @@ class PendingFactory
         }
 
         // Get Due Work Submissions for all selected students
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = $this->database->buildPredicateBuilder('');
         $pb->equals('sb.deleted', 0);
         $pb->notNull('ss.submitted_at');
         $pb->equals('sb.assessment_id', $this->dueWorkAssessmentIds);
@@ -1027,7 +1027,7 @@ class PendingFactory
         if (!count($this->dueWorkAssessmentIds)) {
             return [];
         }
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = $this->database->buildPredicateBuilder('');
         $pb->equals('sb.deleted', 0);
         $pb->notNull('sr.published_at');
         $pb->equals('sb.assessment_id', $this->dueWorkAssessmentIds);
@@ -1065,7 +1065,7 @@ class PendingFactory
     {
         // Do we have Responses / Feedbacks for students that are not yet loaded?
         if (count($this->assessmentExtraStudentIds)) {
-            $pb = new PredicateBuilder($this->database, '');
+            $pb = $this->database->buildPredicateBuilder('');
             $pb->equals('u.id', $this->assessmentExtraStudentIds);
             $query     = "
                 SELECT 
