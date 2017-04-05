@@ -26,9 +26,9 @@ class Broker extends Base implements IBroker
     /**
      * @inheritdoc
      */
-    protected function setupQuoter()
+    protected function buildQuoter()
     {
-        $this->quoter = new DblibQuoter();
+        return new DblibQuoter();
     }
 
     /**

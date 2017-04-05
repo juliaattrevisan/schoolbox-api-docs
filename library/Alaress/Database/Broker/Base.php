@@ -48,7 +48,7 @@ abstract class Base implements IBroker
     protected $postProcessors = [];
 
     /** @var IQuoter */
-    protected $quoter;
+    private $quoter;
 
     /**
      * Constructor. Sets up the statement cache, and grabs a handle to the connector that holds all
@@ -61,7 +61,7 @@ abstract class Base implements IBroker
         $this->statementCache = new Cache(function ($statement, $options) {
             return $this->pdo->prepare($statement, $options);
         });
-        $this->setupQuoter();
+        $this->quoter = $this->buildQuoter();
     }
 
     /**
@@ -259,11 +259,13 @@ abstract class Base implements IBroker
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Sets up the quoter object to which IQuoter method calls are passed to.
+     * Builds the quoter object to which IQuoter method calls are passed to.
      *
      * This will be called on construction.
+     *
+     * @return IQuoter
      */
-    protected abstract function setupQuoter();
+    protected abstract function buildQuoter();
 
     /**
      * @inheritdoc
