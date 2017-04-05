@@ -14,12 +14,14 @@ use Schoolbox\Learning\Assessment\WorkType;
 
 /**
  * Converts between termFilter concrete keys and WorkType models
- * @method GenericCollection|WorkType\Model[] getSelectedItems(GenericCollection $selections)
+ * @method GenericCollection|WorkType\Model[] getSelectedItems(GenericCollection $availableSelections)
  */
 class KeyConverter extends AbstractKeyConverter
 {
 
     /**
+     * All WorkTypes known to the system (regardless of whether they are available)
+     *
      * @var GenericCollection|WorkType\Model[]
      */
     private $workTypes;
@@ -46,8 +48,8 @@ class KeyConverter extends AbstractKeyConverter
     public function getItem($key)
     {
         $this->assertValidKey($key);
-        // Simply returns the key, representing an AssessmentType
-        return $key;
+
+        return $this->workTypes[$key];
     }
 
 
@@ -56,7 +58,7 @@ class KeyConverter extends AbstractKeyConverter
      *
      * @return GenericCollection|WorkType\Model[]
      */
-    public function getItems()
+    public function getAllPossibleItems()
     {
         return $this->workTypes->shallowClone();
     }

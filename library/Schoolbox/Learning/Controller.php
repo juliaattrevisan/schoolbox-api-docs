@@ -216,9 +216,13 @@ class Controller extends Base
     public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
         // Build Filter Panel Components
-        $termFilterComponent  = $filterFactoryFactory->buildTermFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+        $termFilterComponent     = $filterFactoryFactory->buildTermFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
         $assessmentTypeComponent = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
-        $workTypeComponent = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+        $workTypeComponent       = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+
+        // Protect against misconfiguration - projects should not be available on the assessmentType filter for this page
+
+
 
         // TODO add other filters
 
@@ -335,7 +339,16 @@ class Controller extends Base
 
         // TODO -UP TO HERE - assessment Types
 
-        $factory     = new PendingFactory($viewee, $this->database, $this->externalClass, $selectedTerms, $toChaseLimit, $selectedAssessmentTypes, $this->folderMapper);
+        $factory = new PendingFactory(
+            $viewee,
+            $this->database,
+            $this->externalClass,
+            $selectedTerms,
+            $selectedWorkTypes,
+            $toChaseLimit,
+            $selectedAssessmentTypes,
+            $this->folderMapper
+        );
         $assessments = $factory->getPendingAssessments();
 
         /**

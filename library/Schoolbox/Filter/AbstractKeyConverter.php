@@ -28,9 +28,13 @@ abstract class AbstractKeyConverter implements IKeyConverter
 
 
     /**
+     * Get all possible items for this filter (regardless of whether they are configured to be availble).
+     *
+     * If the selected set of items equals the full possible set, we can forgo the filter check in our DB query for a performance boost
+     *
      * @return Collection (intentionally not a GenericCollection)
      */
-    abstract protected function getItems();
+    abstract protected function getAllPossibleItems();
 
 
     /**
@@ -46,22 +50,26 @@ abstract class AbstractKeyConverter implements IKeyConverter
     /**
      * @inheritdoc
      */
-    public function getSelectedItems(GenericCollection $selections)
+    public function getSelectedItems(GenericCollection $availableSelections)
     {
-        $availableItems = $this->getItems();
-        $selectedItems  = $availableItems->emptyClone();
+        $allItems      = $this->getAllPossibleItems();
+        $selectedItems = $allItems->emptyClone();
 
-        foreach ($selections as $selection) {
+        foreach ($availableSelections as $selection) {
             $item = $this->getItem($selection->getKey());
 
             if ($selection->getSelected()) {
                 $selectedItems->add($item);
             }
         }
-        // Were no items selected ?
-        if (0 === $selectedItems->count()) {
-            $selectedItems = $availableItems->shallowClone();
+
+        // Are all possible options available for selection? And user did not select any, or selected all?
+        if($allItems->count() === $availableSelections->count() && (0 === $selectedItems->count() || $allItems->count() === $selectedItems->count())){
+            // Return an empty collection - so the DB generator can forgo the filter entirely
+            return $allItems->emptyClone();
         }
+
+        // Either non all possible items were available for selection, or a subset of items was selected.
         return $selectedItems;
     }
 

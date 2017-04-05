@@ -163,6 +163,11 @@ class PendingFactory
     private $teacherCache;
 
     /**
+     * @var GenericCollection|WorkType\Model[]
+     */
+    private $workTypes;
+
+    /**
      * @var Term\Model[] $terms
      */
     private $terms;
@@ -224,10 +229,11 @@ class PendingFactory
 
     /**
      * @param User                         $viewee
-     * @param IConnector                    $database
+     * @param IConnector                   $database
      * @param \External_ClassInterface     $externalClass
      * @param GenericCollection|Term                         \Model[] $terms            Only display assessments that are due in these terms
-     * @param \Alaress_Date_Format         $toChaseLimit
+     * @param GenericCollection|WorkType\Model[] $selectedWorkTypes
+     * @param\Alaress_Date_Format         $toChaseLimit
      * @param Collection|string[]                     $selectedAssessmentTypes
      * @param FolderMapper                 $folderMapper
      */
@@ -236,6 +242,7 @@ class PendingFactory
         IConnector $database,
         \External_ClassInterface $externalClass,
         GenericCollection $terms,
+        GenericCollection $selectedWorkTypes,
         \Alaress_Date_Format $toChaseLimit,
         Collection $selectedAssessmentTypes,
         FolderMapper $folderMapper
@@ -246,6 +253,7 @@ class PendingFactory
         $this->externalClass    = $externalClass;
         $this->assessmentsCache = new GenericCollection(IAssessable::class);  // TODO SA-2631
         $this->terms            = $terms;
+        $this->workTypes        = $selectedWorkTypes;
         $this->toChaseLimit     = $toChaseLimit;
         $this->nullDate         = new \Alaress_Date_NullDate();
         $this->assessmentTypes  = $selectedAssessmentTypes;
@@ -420,8 +428,10 @@ class PendingFactory
             $andPart .= ')';
             $orParts[] = $andPart;
         }
-        return '(' . implode(' OR ', $orParts) . ')';
+        return implode(' OR ', $orParts);
     }
+
+
 
     /**
      * Build an assessment type clause to inject into assessment-retrieval query
@@ -477,6 +487,35 @@ class PendingFactory
     }
 
 
+    /**
+     * Build the assessment.workType filter
+     * @return string
+     */
+    private function buildWorkTypeClause()
+    {
+        // If no workTypes selected, don't filter
+        $select = '';
+        $join   = '';
+        $where  = ' TRUE ';
+        if(0 === $this->workTypes->count()){
+            return [$select, $join, $where];
+        }
+
+
+        // A subset of workTypes is in play, apply filter
+        $select = ",
+                 wt.id                    AS 'wt.id'
+            ";
+        $join = '
+                LEFT JOIN lu_work_type wt         ON wt.id = a.work_type_id
+            ';
+        $where = [];
+
+        foreach($this->workTypes as $workType){
+            $where[] = " wt.id = {$workType->getId()} ";
+        }
+        return [$select, $join, implode(' OR ', $where)];
+    }
 
     /**
      * Get Assessments associated with Classes taught, or Groups administered, by User.
@@ -504,10 +543,9 @@ class PendingFactory
 
         $dueDateClause = $this->buildDueDateClause();
         list($aTypeSelect, $aTypeJoin, $aTypeClause) = $this->buildAssessmentTypeClause();
-
+        list($workTypeSelect, $workTypeJoin, $workTypeClause) = $this->buildWorkTypeClause();
 
         $folderIds = array_keys($this->foldersCache);
-
 
 
         $query1       = "
@@ -532,15 +570,18 @@ class PendingFactory
                 a.due_date   AS 'a.due_date'
                 
                 $aTypeSelect
+                $workTypeSelect
             FROM assessment a 
             $aTypeJoin
+            $workTypeJoin
             
             JOIN assessment_folder af   ON af.assessment_id = a.id 
             JOIN folder f               ON f.id = af.folder_id AND f.deleted_at IS NULL
             
             WHERE f.id IN (" . implode(',', $folderIds) . ")
             AND ($aTypeClause)
-            AND $dueDateClause
+            AND ($dueDateClause)
+            AND ($workTypeClause)
         ";
 
         $query2       = "
@@ -565,9 +606,11 @@ class PendingFactory
                 a.due_date   AS 'a.due_date'
                 
                 $aTypeSelect
+                $workTypeSelect
            
             FROM assessment a 
             $aTypeJoin
+            $workTypeJoin
             
             JOIN project_assessment pra ON pra.assessment_id = a.id
             JOIN project p              ON pra.project_id = p.id
@@ -577,7 +620,8 @@ class PendingFactory
             
             WHERE pf.id IN (" . implode(',', $folderIds) . ")
             AND ($aTypeClause)
-            AND $dueDateClause
+            AND ($dueDateClause)
+            AND ($workTypeClause)
         ";
 
         $query3       = "
@@ -602,9 +646,11 @@ class PendingFactory
                 a.due_date   AS 'a.due_date'
                 
                 $aTypeSelect
+                $workTypeSelect
             FROM assessment a 
 
             $aTypeJoin
+            $workTypeJoin
             
             JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
             JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id
@@ -617,7 +663,8 @@ class PendingFactory
             
             WHERE cif.id IN (" . implode(',', $folderIds) . ")
             AND ($aTypeClause)
-            AND $dueDateClause
+            AND ($dueDateClause)
+            AND ($workTypeClause)
         ";
 
         // Assessment in Project in UnitImpl imported on Folder
@@ -643,9 +690,11 @@ class PendingFactory
                 a.due_date   AS 'a.due_date'
                 
                 $aTypeSelect
+                $workTypeSelect
             FROM assessment a 
             
             $aTypeJoin
+            $workTypeJoin
             
             JOIN project_assessment pa                     ON pa.assessment_id = a.id
             JOIN project p                                 ON p.id = pa.project_id
@@ -662,7 +711,8 @@ class PendingFactory
             WHERE a.deleted_at IS NULL
             AND cif.id IN (" . implode(',', $folderIds) . ")
             AND ($aTypeClause)
-            AND $dueDateClause
+            AND ($dueDateClause)
+            AND ($workTypeClause)
         ";
 
         $this->parseAssessments(

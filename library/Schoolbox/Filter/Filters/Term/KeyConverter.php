@@ -15,12 +15,14 @@ use Schoolbox\Filter;
 
 /**
  * Converts between termFilter concrete keys and Term models
- * @method GenericCollection|Term\Model[] getSelectedItems(GenericCollection $selections)
+ * @method GenericCollection|Term\Model[] getSelectedItems(GenericCollection $availableSelections)
  */
 class KeyConverter extends AbstractKeyConverter
 {
 
     /**
+     * All Terms in the system (regardless of whether they are available)
+     *
      * @var GenericCollection|Term\Model[]
      */
     private $terms;
@@ -58,7 +60,7 @@ class KeyConverter extends AbstractKeyConverter
      *
      * @return Collection|GenericCollection|Term\Model[]
      */
-    public function getItems()
+    public function getAllPossibleItems()
     {
         return $this->terms->shallowClone();
     }

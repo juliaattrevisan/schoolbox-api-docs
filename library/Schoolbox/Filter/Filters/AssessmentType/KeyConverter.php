@@ -14,20 +14,22 @@ use Schoolbox\GenericCollection;
 
 /**
  * Converts between termFilter concrete keys and AssessmentType strings
- * @method Collection|string[] getSelectedItems(GenericCollection $selections)
+ * @method Collection|string[] getSelectedItems(GenericCollection $availableSelections)
  */
 class KeyConverter extends AbstractKeyConverter
 {
 
     /**
+     * All AssessmentTypes known to the system (regardless of whether they are available)
+     *
      * @var Collection|string
      */
     private $assessmentTypes;
 
 
     /**
-     * @param Filter\Model $filter
-     * @param Collection|string[]   $assessmentTypes
+     * @param Filter\Model        $filter
+     * @param Collection|string[] $assessmentTypes
      */
     public function __construct(Filter\Model $filter, Collection $assessmentTypes)
     {
@@ -50,7 +52,7 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @return Collection|string[]
      */
-    protected function getItems()
+    protected function getAllPossibleItems()
     {
         return $this->assessmentTypes->shallowClone();
     }
@@ -71,7 +73,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
-        if(!in_array($key, $this->assessmentTypes->getAll(), true)){
+        if (!in_array($key, $this->assessmentTypes->getAll(), true)) {
             throw new \InvalidArgumentException('AssessmentType Key is invalid: ' . $key);
         }
     }
