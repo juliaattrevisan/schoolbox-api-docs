@@ -15,9 +15,8 @@ use Alaress\Database\Quoter\Base;
 class Quoter extends Base
 {
     /**
-     * [identifier] is supported whether setting QUOTED_IDENTIFIER is on or off.
-     * If someone for some reason used [ or ] in an identifier:
-     * escape with an extra of the same character
+     * MSSQL identifiers are quoted with open/close square brackets. Either of
+     * these can be escaped with another copy of the same character.
      *
      * @param string $string
      * @return string

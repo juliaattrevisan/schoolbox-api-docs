@@ -15,7 +15,11 @@ use Alaress\Database\Quoter\Base;
 class Quoter extends Base
 {
     /**
-     * @inheritdoc
+     * MySQL identifiers are quoted with backticks. A backtick can be escaped
+     * with another backtick.
+     *
+     * @param string $string
+     * @return string
      */
     public function quoteIdentifier($string)
     {
