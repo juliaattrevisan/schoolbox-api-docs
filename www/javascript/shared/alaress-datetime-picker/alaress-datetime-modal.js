@@ -405,7 +405,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     function renderAllday(instance) {
         var timeDiv = $('#pickerCalendar' + twigVars.id).closest('#picker' + twigVars.id).find('.flatpickr-time');
 
-        var html = '<div class="row"><div class="small-6 columns">';
+        var html = '';
 
         // Build an All Day switch if it's been set in the options
         if (pickerOptions.allDay === true) {
@@ -413,7 +413,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 '<label for="hideTime' + twigVars.id + '" class="checkbox-label">All Day</label></div>' +
                 '</div>';
         }
-        html += '<div class="small-6 columns"></div></div>';
+
+        //html += '<div class="small-6 columns"></div></div>';
 
         timeDiv.after(html);
 
