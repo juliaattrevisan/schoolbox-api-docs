@@ -60,6 +60,13 @@ interface IFilterDefinition
      */
     public function getDefaultsTemplate();
 
+    /**
+     * Returns the twig template to render this filter's panel component into
+     *
+     * @return string
+     */
+    public function getPanelComponentTemplate();
+
 
     /**
      * Get all possible filter options, grouped by option.key, then indexed by option.page

@@ -14,11 +14,5 @@ use Schoolbox\Filter\AbstractFilterComponent;
  */
 class Component extends AbstractFilterComponent
 {
-    /**
-     * @return string
-     */
-    protected function getTemplateFile()
-    {
-        return 'assessmentType.twig';
-    }
+    // no methods - all defined by abstract
 }

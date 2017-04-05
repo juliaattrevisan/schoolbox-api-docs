@@ -11,10 +11,6 @@ use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Quiz;
-use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\Task;
 
 
 /**
@@ -29,10 +25,12 @@ use Schoolbox\Learning\Assessment\Task;
  */
 class Definition extends AbstractFilterDefinition
 {
+
     const KEY_PROJECT  = AssessmentType::TYPE_PROJECT;
     const KEY_QUIZ     = AssessmentType::TYPE_QUIZ;
     const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
     const KEY_TASK     = AssessmentType::TYPE_TASK;
+
 
     /**
      * @inheritdoc
@@ -43,9 +41,10 @@ class Definition extends AbstractFilterDefinition
             self::KEY_PROJECT,
             self::KEY_QUIZ,
             self::KEY_DUE_WORK,
-            self::KEY_TASK
+            self::KEY_TASK,
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -60,13 +59,6 @@ class Definition extends AbstractFilterDefinition
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getTemplateFile()
-    {
-        return 'assessmentType.twig';
-    }
 
     /**
      * @param GenericCollection|Option\Model[] $options
@@ -89,9 +81,6 @@ class Definition extends AbstractFilterDefinition
             return +1;
         });
     }
-
-
-
 
 
     /**

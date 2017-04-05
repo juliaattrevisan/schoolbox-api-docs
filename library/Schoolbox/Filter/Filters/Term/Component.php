@@ -18,13 +18,6 @@ use Schoolbox\Filter\Selection;
 class Component extends AbstractFilterComponent
 {
 
-    /**
-     * @return string
-     */
-    protected function getTemplateFile()
-    {
-        return 'term.twig';
-    }
 
 
     /**

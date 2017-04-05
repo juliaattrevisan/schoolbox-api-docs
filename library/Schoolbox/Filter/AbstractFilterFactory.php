@@ -60,6 +60,9 @@ abstract class AbstractFilterFactory implements IFilterFactory
         ])->indexBy('key');
     }
 
+    /* Getters
+     */
+
     /**
      * @return Filter\Mapper
      */

@@ -59,20 +59,13 @@ abstract class AbstractFilterComponent implements IFilterComponent
      */
     public function getTemplate()
     {
-        return "@filters/panel/{$this->getTemplateFile()}";
+        return $this->definition->getPanelComponentTemplate();
     }
 
 
     /**
-     * @return string
-     */
-    abstract protected function getTemplateFile();
-
-    /**
      * @return \Schoolbox\Filter\Selection\Model[]|GenericCollection
      * @throws Mapper\Exception
-     * @todo break this into smaller private methods
-     * @todo move common bits into abstract parent
      */
     protected function getSelections()
     {

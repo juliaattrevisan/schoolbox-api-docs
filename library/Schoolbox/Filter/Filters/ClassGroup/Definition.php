@@ -48,29 +48,9 @@ class Definition extends AbstractFilterDefinition
         return $this;
     }
 
-    public function getTemplateFile()
-    {
-        return 'classGroup.twig';
-    }
 
 
-    /**
-     * Returns the twig template to render this filters options
-     *
-     * Intended to be called in Controller
-     *
-     * @return string
-     */
-    public function getOptionsTemplate()
-    {
-        // TODO: Implement getOptionsTemplate() method.
-    }
 
-
-    public function getDefaultsTemplate()
-    {
-        // TODO: Implement getRoleDefaultsTemplate() method.
-    }
 
 
     /**

@@ -31,13 +31,6 @@ class Definition extends AbstractFilterDefinition
         $this->workTypes = $workTypes;
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getTemplateFile()
-    {
-        return 'workType.twig';
-    }
 
 
     /**

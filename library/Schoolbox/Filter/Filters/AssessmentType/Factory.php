@@ -18,6 +18,7 @@ use Schoolbox\Filter;
  */
 class Factory extends AbstractFilterFactory
 {
+
     /**
      * @inheritdoc
      */

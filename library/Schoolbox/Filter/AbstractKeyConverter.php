@@ -11,6 +11,7 @@ use Schoolbox\Filter;
 
 abstract class AbstractKeyConverter implements IKeyConverter
 {
+
     /** @var Filter\Model */
     private $filter;
 
@@ -23,6 +24,8 @@ abstract class AbstractKeyConverter implements IKeyConverter
         $this->filter = $filter;
     }
 
+    /* Getters
+     */
 
     /**
      * @return Filter\Model

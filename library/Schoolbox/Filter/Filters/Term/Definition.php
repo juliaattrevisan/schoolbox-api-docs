@@ -28,11 +28,11 @@ use Schoolbox\Assessment\Term;
 class Definition extends AbstractFilterDefinition
 {
 
-    const KEY_ALL = 'all';        // All terms
-    const KEY_FUTURE = 'future';     // All terms in future
-    const KEY_CURRENT = 'current';    // current term
+    const KEY_ALL      = 'all';        // All terms
+    const KEY_FUTURE   = 'future';     // All terms in future
+    const KEY_CURRENT  = 'current';    // current term
     const KEY_PREVIOUS = 'previous';   // one before current term
-    const KEY_PAST = 'past';       // All terms in past
+    const KEY_PAST     = 'past';       // All terms in past
 
     /**
      * @var GenericCollection|Term\Model[]
@@ -93,16 +93,6 @@ class Definition extends AbstractFilterDefinition
             FilterOption\Model::PAGE_MARK_BOOK,
         ];
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getTemplateFile()
-    {
-        return 'term.twig';
-    }
-
 
 
     /**
@@ -218,9 +208,6 @@ class Definition extends AbstractFilterDefinition
     }
 
 
-
-
-
     /**
      * Return the set of possible keys for this filter's options
      *
@@ -232,8 +219,9 @@ class Definition extends AbstractFilterDefinition
     }
 
 
-
-
+    /**
+     * @inheritdoc
+     */
     public function getLabel($key)
     {
         if (self::KEY_ALL === $key) {

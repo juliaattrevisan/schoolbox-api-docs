@@ -248,16 +248,8 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      * @param string $page
      * @param string $roleType
      * @return bool
-     * @todo how get rid of grey squiggles? No base implementation? Promote to interface?
      */
     abstract protected function getInitialSelectedState($key, $page, $roleType);
-
-
-
-    /**
-     * @return string
-     */
-    abstract protected function getTemplateFile();
 
 
     /**
@@ -289,13 +281,25 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      */
     abstract protected function getInitialAvailability($customAbstractKey, $page);
 
+    /**
+     * Return the templates directory for the concrete filter definition's twig templates
+     *
+     * @return string
+     */
+    protected function getTemplatesDir()
+    {
+        $class_info = new \ReflectionClass($this);
+        $filterDefinitionDir = basename(dirname($class_info->getFileName()))  . DIRECTORY_SEPARATOR;
+        return '@filterDefinitions'  . DIRECTORY_SEPARATOR . $filterDefinitionDir . DIRECTORY_SEPARATOR . 'templates';
+    }
+
 
     /**
      * @inheritdoc
      */
     public function getAdminTemplate()
     {
-        return "@filters/admin/{$this->getTemplateFile()}";
+        return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'admin.twig';
     }
 
 
@@ -304,7 +308,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      */
     public function getOptionsTemplate()
     {
-        return "@filters/options/{$this->getTemplateFile()}";
+        return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'options.twig';
     }
 
 
@@ -313,8 +317,19 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      */
     public function getDefaultsTemplate()
     {
-        return "@filters/defaults/{$this->getTemplateFile()}";
+        return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'defaults.twig';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPanelComponentTemplate()
+    {
+        return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'component.twig';
+    }
+
+    /* Getters
+     */
 
 
     /**
