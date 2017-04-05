@@ -15,10 +15,14 @@ use Alaress\Database\Quoter\Base;
 class Quoter extends Base
 {
     /**
-     * @inheritdoc
+     * DB2 identifiers are quoted with double quotes. A double quote can be
+     * escaped with another double quote.
+     *
+     * @param string $string
+     * @return string
      */
     public function quoteIdentifier($string)
     {
-        return '`'.str_replace('`', '``', $string).'`';
+        return '"'.str_replace('"', '""', $string).'"';
     }
 }
