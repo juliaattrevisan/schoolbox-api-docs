@@ -27,7 +27,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as Grad
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\L10n\Mapper as L10nMapper;
-use Schoolbox\L10n\Model as L10nModel;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;

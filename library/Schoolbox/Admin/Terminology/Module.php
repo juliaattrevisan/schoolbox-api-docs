@@ -13,7 +13,7 @@ use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Loader_Chain;
-use Schoolbox\Localisation\Mapper as LocalisationMapper;
+use Schoolbox\L10n\Mapper as L10nMapper;
 
 /**
  * The module for managing school terms through the admin section.
@@ -68,7 +68,7 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'localisationMapper' => $this->getMapperFactory()->getLazy(LocalisationMapper::class),
+                    'localisationMapper' => $this->getMapperFactory()->getLazy(L10nMapper::class),
                 ]
             )
         );
