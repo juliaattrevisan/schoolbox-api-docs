@@ -425,6 +425,6 @@ class Base implements Serializable, IConnector
      */
     public function buildPredicateBuilder($table)
     {
-        // TODO: Implement buildPredicateBuilder() method.
+        return new PredicateBuilder($this->broker, $table);
     }
 }
