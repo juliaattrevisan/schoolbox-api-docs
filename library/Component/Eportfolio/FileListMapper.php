@@ -8,10 +8,10 @@
  * @version     SVN: $Id$
  */
 namespace Component\Eportfolio;
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\PredicateBuilder;
 
 class FileListMapper extends Schoolbox\Mapper
 {

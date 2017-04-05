@@ -8,12 +8,11 @@
 namespace Schoolbox\Fixtures\Season;
 
 
-use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\Fixtures\Season\Model as Season;
-use Schoolbox\Mapper\Exception as MapperException;
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Mapper\PredicateBuilder;
+use Schoolbox\Fixtures\Season\Model as Season;
+use Schoolbox\Mapper as BaseMapper;
 
 
 /**
@@ -107,7 +106,7 @@ class Mapper extends BaseMapper
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute(count($seasonIds) ? BaseMapper\PredicateBuilder::getArrayParameters($seasonIds) : null);
+        $statement->execute(count($seasonIds) ? PredicateBuilder::getArrayParameters($seasonIds) : null);
 
         $seasonDivisionCounts = [];
         while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
@@ -150,7 +149,7 @@ class Mapper extends BaseMapper
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute(count($seasonIds) ? BaseMapper\PredicateBuilder::getArrayParameters($seasonIds) : null);
+        $statement->execute(count($seasonIds) ? PredicateBuilder::getArrayParameters($seasonIds) : null);
 
         $seasonMatchCounts = [];
         while($row = $statement->fetch(\PDO::FETCH_ASSOC)){

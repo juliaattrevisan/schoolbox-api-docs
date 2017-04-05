@@ -8,12 +8,12 @@
 
 namespace Schoolbox\Assessment\Course\Unit;
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Component_Homepage_CourseBuilderController;
 use PDO;
 use PDOStatement;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 

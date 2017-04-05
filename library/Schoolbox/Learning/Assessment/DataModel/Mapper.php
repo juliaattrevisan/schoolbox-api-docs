@@ -5,32 +5,28 @@
  * @link      http://www.alaress.com.au/
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress_Date_Format;
 use PDOStatement;
-use Schoolbox\Assessment\Term\Model as Term;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\PredicateBuilder;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
-use Alaress_Date_Format;
-use UnderflowException;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 /**
@@ -464,20 +460,19 @@ class Mapper extends BaseMapper
      * @param PredicateBuilder $builder   A PredicateBuilder which contains columns to query on.
      * @param array            $uniqueIds IDs of any assessables that should also be included
      * @param array            $options   Any other options to pass to the final search to `findByColumnList`.
-
      *
      * @return Collection|Model[]
      */
     public function findAllForFolderId($folderId, PredicateBuilder $builder, $uniqueIds = [], $options = [])
     {
         // Support stuff for query
-        $folderList = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
+        $folderList = PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
         if (count($folderList) === 0) {
             // Exit early if empty
             return $this->createCollection();
         }
-        $params       = BaseMapper\PredicateBuilder::getArrayParameters($folderList, 'folder');
-        $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
+        $params       = PredicateBuilder::getArrayParameters($folderList, 'folder');
+        $placeholders = PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
 
         $idQuery = "
             SELECT a.id

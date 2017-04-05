@@ -7,15 +7,16 @@
 
 namespace Schoolbox\Assessment\Course;
 
-use Component_Instance;
-use Schoolbox\Assessment\Course;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Collection;
-use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\User;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Alaress_Date_Format;
+use Component_Instance;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Course;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 
 /**
  * Mapper for the unit instance model.
@@ -706,8 +707,8 @@ class UnitInstanceMapper extends BaseMapper {
     {
         // Allow null dates in from/to
         $dateFilter = '';
-        $params = BaseMapper\PredicateBuilder::getArrayParameters($folderIds, 'folderId');
-        $arrayPlaceholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderIds, 'folderId');
+        $params = PredicateBuilder::getArrayParameters($folderIds, 'folderId');
+        $arrayPlaceholders = PredicateBuilder::getArrayPlaceholders($folderIds, 'folderId');
 
         if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
             $dateFilter      = $dateFilter . ' AND cui.due_date >= :from';

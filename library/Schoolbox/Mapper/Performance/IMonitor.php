@@ -9,6 +9,7 @@
 namespace Schoolbox\Mapper\Performance;
 
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 
@@ -23,26 +24,26 @@ interface IMonitor extends LoggerInterface
 
 
     /**
-     * @param Mapper\PredicateBuilder $predicate
-     * @param string $selectFrom
+     * @param PredicateBuilder $predicate
+     * @param string           $selectFrom
      * @return void
      */
-    public function assessPredicate(Mapper\PredicateBuilder $predicate, $selectFrom);
+    public function assessPredicate(PredicateBuilder $predicate, $selectFrom);
 
 
     /**
-     * @param Mapper                  $mapper
-     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @param Mapper           $mapper
+     * @param PredicateBuilder $predicateBuilder
      * @return void
      */
-    public function startExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder);
+    public function startExecuteSelectTimer(Mapper $mapper, PredicateBuilder $predicateBuilder);
 
 
     /**
-     * @param Mapper                  $mapper
-     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @param Mapper           $mapper
+     * @param PredicateBuilder $predicateBuilder
      * @return void
      */
-    public function stopExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder);
+    public function stopExecuteSelectTimer(Mapper $mapper, PredicateBuilder $predicateBuilder);
 
 }

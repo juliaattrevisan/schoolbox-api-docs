@@ -10,6 +10,7 @@
 namespace Schoolbox;
 
 use Alaress\Cache;
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use Aura\Di;
@@ -26,7 +27,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
 use Schoolbox\Mapper\Performance\IMonitor;
 use Schoolbox\Mapper\Performance\LiveMonitor;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\NotifInterface;

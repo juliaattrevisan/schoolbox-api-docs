@@ -10,9 +10,9 @@
 namespace Schoolbox\Realtime\Message;
 
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception;
 
 class RerouteOverrideMapper extends Mapper {
 
@@ -130,8 +130,8 @@ class RerouteOverrideMapper extends Mapper {
             $userIds[] = $userId;
         }
 
-        $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($userIds, 'user');
-        $parameters   = Mapper\PredicateBuilder::getArrayParameters($userIds, 'user');
+        $placeholders = PredicateBuilder::getArrayPlaceholders($userIds, 'user');
+        $parameters   = PredicateBuilder::getArrayParameters($userIds, 'user');
 
         // Check all permutations of route key:
         // exact match

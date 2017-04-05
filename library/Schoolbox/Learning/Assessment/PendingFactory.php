@@ -8,27 +8,26 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\PredicateBuilder;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
-use Schoolbox\Learning\Quiz\Model as QuizModel;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use \Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Quiz\Model as QuizModel;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 
 /**
  * Optimised DB queries to build graph of Assessments a user needs to mark or chase

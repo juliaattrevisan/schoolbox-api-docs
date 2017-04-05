@@ -9,19 +9,14 @@
  */
 namespace Schoolbox\Assessment\Course;
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Component_Homepage_CourseBuilderController;
-use Config\Modules\Course;
 use PDO;
 use PDOStatement;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\PredicateBuilder;
-use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  * Class Mapper

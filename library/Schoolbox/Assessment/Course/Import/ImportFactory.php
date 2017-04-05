@@ -6,16 +6,16 @@
  */
 namespace Schoolbox\Assessment\Course\Import;
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Alaress\IDatabase;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessment;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
-use Schoolbox\Mapper\PredicateBuilder;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**

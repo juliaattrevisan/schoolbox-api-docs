@@ -6,9 +6,8 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Mapper;
+namespace Alaress\Database\PredicateBuilder;
 
-use Alaress\Database\PredicateBuilder\IPredicateBuilder;
 use Alaress\Database\Quoter\IQuoter;
 use Countable;
 use Traversable;

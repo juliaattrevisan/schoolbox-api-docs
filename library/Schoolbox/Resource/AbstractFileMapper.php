@@ -9,11 +9,11 @@
 
 namespace Schoolbox\Resource;
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\Model as Storage;

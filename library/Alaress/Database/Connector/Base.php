@@ -11,10 +11,10 @@
 namespace Alaress\Database\Connector;
 
 use Alaress\Database\Broker\IBroker;
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
-use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Statement\Query\IQuery;
-use Schoolbox\Mapper\PredicateBuilder;
+use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Serializable;
 
 class Base implements Serializable, IConnector

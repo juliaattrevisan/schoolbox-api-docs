@@ -9,27 +9,27 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Alaress_Date_Format;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\Factory;
-use Schoolbox\GenericCollection;
-use Schoolbox\IMapper;
 use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
+use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\IMapper;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Mapper\PredicateBuilder;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...

@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Mapper;
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -250,14 +251,14 @@ abstract class AbstractMapperProxy
             $externalValues = [$externalValues];
         }
 
-        $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($externalValues);
+        $placeholders = PredicateBuilder::getArrayPlaceholders($externalValues);
 
         $query = "
             {$this->getSelectString()}
             WHERE {$this->getDatabase()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
         ";
 
-        $statement = $this->getDatabase()->query($query, Mapper\PredicateBuilder::getArrayParameters($externalValues));
+        $statement = $this->getDatabase()->query($query, PredicateBuilder::getArrayParameters($externalValues));
         return $statement->fetchAll(\PDO::FETCH_COLUMN) ?: [];
     }
 

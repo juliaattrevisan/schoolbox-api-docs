@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Mapper\PredicateBuilder;
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface

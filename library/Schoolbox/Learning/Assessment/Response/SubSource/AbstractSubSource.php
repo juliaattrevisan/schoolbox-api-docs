@@ -7,13 +7,13 @@
 
 namespace Schoolbox\Learning\Assessment\Response\SubSource;
 
+use Alaress\Database\PredicateBuilder\PredicateBuilder;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 use Schoolbox\Mapper\AbstractMapperProxy;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\User;
 
 /**
