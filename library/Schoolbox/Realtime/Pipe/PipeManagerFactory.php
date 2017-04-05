@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Realtime\Pipe;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Database;
@@ -45,7 +46,7 @@ class PipeManagerFactory
      */
     private $sessionLength;
     /**
-     * @var Database
+     * @var IConnector
      */
     private $db;
     /**
@@ -75,7 +76,7 @@ class PipeManagerFactory
      * @param ClientInterface           $redis
      * @param Async\Client              $asyncRedis
      * @param int                       $sessionLength
-     * @param Database                  $db
+     * @param IConnector                $db
      * @param string                    $instanceId
      * @param DispatchStrategyInterface $strat
      * @param int                       $fdLimit

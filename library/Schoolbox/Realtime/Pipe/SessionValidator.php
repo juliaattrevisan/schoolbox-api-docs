@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Realtime\Pipe;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
 use Predis\ClientInterface;
 use Predis\CommunicationException;
 use Ratchet\Session\Serialize\HandlerInterface;
@@ -28,7 +28,7 @@ class SessionValidator
     /** @var int */
     protected $length;
 
-    /** @var Database */
+    /** @var IConnector */
     protected $database;
 
     /**
@@ -43,9 +43,9 @@ class SessionValidator
      * @param ClientInterface  $redis
      * @param HandlerInterface $handler
      * @param int              $sessionLength
-     * @param Database         $database
+     * @param IConnector       $database
      */
-    public function __construct(ClientInterface $redis, HandlerInterface $handler, $sessionLength, Database $database)
+    public function __construct(ClientInterface $redis, HandlerInterface $handler, $sessionLength, IConnector $database)
     {
         $this->redis    = $redis;
         $this->handler  = $handler;
@@ -70,7 +70,7 @@ class SessionValidator
             if (empty($this->userIdCache[$username])) {
                 // *sigh*
                 $id = (int)$this->database
-                    ->query('SELECT `id` FROM `user` WHERE `username` = ? LIMIT 0, 1', [ $username ])
+                    ->executeQuery('SELECT `id` FROM `user` WHERE `username` = ? LIMIT 0, 1', [ $username ])
                     ->fetchColumn()
                 ;
 
@@ -143,4 +143,4 @@ class SessionValidator
         return $redisResponse;
     }
 
-} 
+}
