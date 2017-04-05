@@ -418,6 +418,11 @@ class PendingFactory
      */
     private function buildDueDateClause()
     {
+        // Is this filter being applied ?
+        if(0 === $this->terms->count()){
+            return ' TRUE ';
+        }
+
         // Generate the dueDate filtering
         $orParts = [];
         foreach($this->terms as $term){

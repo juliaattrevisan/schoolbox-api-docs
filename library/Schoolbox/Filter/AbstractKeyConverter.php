@@ -53,24 +53,31 @@ abstract class AbstractKeyConverter implements IKeyConverter
     public function getSelectedItems(GenericCollection $availableSelections)
     {
         $allItems      = $this->getAllPossibleItems();
+        $availableItems = $allItems->emptyClone();
         $selectedItems = $allItems->emptyClone();
 
         foreach ($availableSelections as $selection) {
             $item = $this->getItem($selection->getKey());
-
+            $availableItems->add($item);
             if ($selection->getSelected()) {
                 $selectedItems->add($item);
             }
         }
 
-        // Are all possible options available for selection? And user did not select any, or selected all?
-        if($allItems->count() === $availableSelections->count() && (0 === $selectedItems->count() || $allItems->count() === $selectedItems->count())){
-            // Return an empty collection - so the DB generator can forgo the filter entirely
-            return $allItems->emptyClone();
+        // Was nothing selected ?
+        if(0 === $selectedItems->count()){
+            // Were all possible options available ?
+            if($allItems->count() === $availableItems->count()){
+                // Return an empty collection - so the DB generator can forgo the filter entirely
+                return $allItems->emptyClone();
+            }
+            // Return the available options (ie none of a subset being selected equals all of the subset being selected)
+            return $availableItems;
         }
 
         // Either non all possible items were available for selection, or a subset of items was selected.
         return $selectedItems;
+
     }
 
 
