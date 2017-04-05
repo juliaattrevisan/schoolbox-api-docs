@@ -616,10 +616,10 @@ class PendingFactory
      *
      * Extract and cache any GroupIds or ClassCodes to later retrieve the studentLists
      *
-     * @param \PDOStatement $statement
+     * @param \Traversable $statement
      * @throws \LogicException If assessment type is not recognised
      */
-    private function parseAssessments($statement)
+    private function parseAssessments(\Traversable $statement)
     {
         foreach ($statement as $row) {
 
