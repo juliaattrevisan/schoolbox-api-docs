@@ -12,10 +12,10 @@ namespace Alaress\Database\Connector;
 
 use Alaress\Database\Collector;
 use Alaress\Database\Iterator\IIterator;
+use Alaress\Database\PredicateBuilder\IPredicateBuilder;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
-use Schoolbox\Mapper\PredicateBuilder;
 
 interface IConnector
 {
@@ -226,7 +226,7 @@ interface IConnector
      * Returns a predicate builder for this connector's database.
      *
      * @param string $table The table to build the predicate builder for
-     * @return PredicateBuilder
+     * @return IPredicateBuilder
      */
     public function buildPredicateBuilder($table);
 }
