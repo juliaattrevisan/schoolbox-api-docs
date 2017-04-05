@@ -4,8 +4,8 @@
  # Params:
  # * assessment:  IAssessable  - The assessment object
  # * participant: Participant  - The participant object
- # * disabled:    bool         - Whether the viewee can change the assessment's marking state
- #                               For teacher, it should be disabled if teacher lacks write+ perm to class folder
+ # * writable:    bool        -  Whether the viewee can change the assessment's marking state
+ #                               For teacher, it should be false if teacher lacks write+ perm to class folder
  #                               since this fragment is also used in the Markbook
  #}
 
@@ -13,7 +13,7 @@
 {% set canInteract = false %}
 
 {# Assessments that are open might require interaction from students #}
-{% if assessment is task and assessment.isOpen and assessment.isSelfAssessable %}
+{% if assessment is task and (assessment.isOpen and assessment.isSelfAssessable) or writable %}
     {# Task that are self-assessed require interaction from students #}
     {% set canInteract = true %}
 {% endif %}
@@ -35,19 +35,19 @@
             {% if participant.isResponseRequired %}
                 <a href="#"
                    disabled
-                   class="no-text progress-tick {% if disabled %}disabled{% endif %}"
+                   class="no-text progress-tick"
                    title="Incomplete"
                    data-progress-tick-status="incomplete"></a>
             {% elseif participant.isFeedbackRequired %}
                 <a href="#"
                    disabled
-                   class="no-text progress-tick pending {% if disabled %}disabled{% endif %}"
+                   class="no-text progress-tick pending"
                    title="Self-assessed"
                    data-progress-tick-status="selfAssessed"></a>
             {% elseif participant.isReviewComplete %}
                 <a href="#"
                    disabled
-                   class="no-text progress-tick reviewed {% if disabled %}disabled{% endif %}"
+                   class="no-text progress-tick reviewed"
                    title="Completed"
                    data-progress-tick-status="teacherAssessed"></a>
             {% endif %}

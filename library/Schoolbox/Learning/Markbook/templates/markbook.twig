@@ -163,7 +163,7 @@
                                     {% include '@learningAssessment/fragments/progressTick.twig' with {
                                         assessment: assessment,
                                         participant: participant,
-                                        disabled: not writable
+                                        writable: writable
                                     } only %}
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
