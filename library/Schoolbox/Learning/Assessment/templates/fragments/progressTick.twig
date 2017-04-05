@@ -7,7 +7,6 @@
  # * disabled:    bool         - Whether the viewee can change the assessment's marking state
  #                               For teacher, it should be disabled if teacher lacks write+ perm to class folder
  #                               since this fragment is also used in the Markbook
- #
  #}
 
 {# Hide the grey square where you can't do anything #}
@@ -35,6 +34,10 @@
     {% endif %}
 {% endif %}
 
+{# If you can see the button, decide what it can do
+ # and how it displays - it might be displayed in a
+ # read-only (non-interactive) manner on the Markbook
+ #}
 {% if canSeeButton %}
 
     {# Tasks have inline interaction #}
