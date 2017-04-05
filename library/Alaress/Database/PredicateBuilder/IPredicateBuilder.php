@@ -149,4 +149,25 @@ interface IPredicateBuilder
         \Alaress_Date_Format $to = null,
         $compareFormat = \Alaress_Date_Format::DATABASE_FORMAT
     );
+
+    /**
+     * Retrieves all predicates that have been added to this builder.
+     *
+     * The result of this method may be concatenated into a single string
+     * (joined with AND or OR), and injected into a WHERE part of a SQL query.
+     * There may be query parameters - use `getParams()` to get this list.
+     *
+     * @return string[]
+     */
+    public function getWhere();
+
+    /**
+     * Retrieves all parameters that have been added to this builder.
+     *
+     * The result of this method may be used as the $params parameter of
+     * `IConnector::executeQuery` and its related methods.
+     *
+     * @return mixed[]
+     */
+    public function getParams();
 }
