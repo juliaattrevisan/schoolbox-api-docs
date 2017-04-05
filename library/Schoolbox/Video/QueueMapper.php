@@ -42,7 +42,6 @@ class QueueMapper extends Mapper {
         $this->hasTable('video_queue');
         $this->hasModel(Queue::class);
         $this->uses('video_queue_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->joins('file_id', File\Mapper::class, 'id', null, null, 'file', 'file');
         $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('status', self::TYPE_STRING);
         $this->uses('message', self::TYPE_STRING);
@@ -126,17 +125,14 @@ class QueueMapper extends Mapper {
     {
         $table = $this->database->quoteIdentifier($this->table);
 
-        $fileMapper = $this->getJoinMapper('file');
         $storageMapper = $this->getJoinMapper('storage');
 
         $query = "
             SELECT      {$this->getColumnString()},
-                        {$fileMapper->getColumnString('f')},
                         {$storageMapper->getColumnString('s')},
 				        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
             FROM        {$table}
-			LEFT JOIN   {$this->getJoinSql('storage', '', 's')}
-			LEFT JOIN   {$this->getJoinSql('file', '', 'f')}
+			JOIN   {$this->getJoinSql('storage', '', 's')}
 			LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime', true)}
         ";
 
@@ -171,9 +167,6 @@ class QueueMapper extends Mapper {
 
             // Can't hydrate storage if there isn't a hash
 
-            /** @var File\Model $fileObject */
-            $fileObject = $this->hydrateJoin($row, 'file', 'f');
-
             if (!empty($row['hash'])) {
 
                 /** @var Storage\Model $storageObject */
@@ -188,9 +181,6 @@ class QueueMapper extends Mapper {
                     $storageObject->setMimetype($mime);
                 }
 
-                $fileObject->setStorage($storageObject);
-
-                $record->setFile($fileObject);
                 $record->setStorage($storageObject);
             }
 

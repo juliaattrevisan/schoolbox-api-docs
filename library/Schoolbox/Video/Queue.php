@@ -423,19 +423,5 @@ class Queue extends ResourceVideo
         return $this;
     }    
 
-    /**
-     * @return int
-     */
-    public function getFileId() {
-        return $this->fileId;
-    }
 
-    /**
-     * @param int
-     * @return $this
-     */
-    public function setFileId($fileId) {
-        $this->fileId = $fileId;
-        return $this;
-    }    
 }
