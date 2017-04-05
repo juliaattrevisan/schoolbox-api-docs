@@ -13,7 +13,7 @@ namespace Alaress\Database\Broker\Dblib;
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
-use Alaress\Database\Quoter\Mssql\Quoter as MssqlQuoter;
+use Alaress\Database\Quoter\Dblib\Quoter as DblibQuoter;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
 use PDO;
@@ -28,7 +28,7 @@ class Broker extends Base implements IBroker
      */
     protected function setupQuoter()
     {
-        $this->quoter = new MssqlQuoter();
+        $this->quoter = new DblibQuoter();
     }
 
     /**

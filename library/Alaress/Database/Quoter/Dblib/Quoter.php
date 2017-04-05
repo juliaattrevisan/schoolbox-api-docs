@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\Quoter\Mssql;
+namespace Alaress\Database\Quoter\Dblib;
 
 use Alaress\Database\Quoter\Base;
 
@@ -15,7 +15,7 @@ use Alaress\Database\Quoter\Base;
 class Quoter extends Base
 {
     /**
-     * MSSQL identifiers are quoted with open/close square brackets. Either of
+     * DBlib identifiers are quoted with open/close square brackets. Either of
      * these can be escaped with another copy of the same character.
      *
      * @param string $string
