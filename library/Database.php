@@ -10,11 +10,12 @@
  */
 
 use Alaress\Cache;
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use DebugBar\DataCollector\PDO as DebugPDO;
 
-class Database implements IDatabase, Serializable
+class Database implements IDatabase, Serializable, IQuoter
 {
     /**
      * An instance of database
