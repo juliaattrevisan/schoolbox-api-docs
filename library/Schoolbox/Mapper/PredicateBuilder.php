@@ -8,12 +8,13 @@
 
 namespace Schoolbox\Mapper;
 
+use Alaress\Database\PredicateBuilder\IPredicateBuilder;
 use Alaress\Database\Quoter\IQuoter;
 use Countable;
 use Traversable;
 use UnderflowException;
 
-class PredicateBuilder
+class PredicateBuilder implements IPredicateBuilder
 {
     const OPERATOR_EQUALS     = '=';
     const OPERATOR_NOT_EQUALS = '<>';
@@ -58,7 +59,7 @@ class PredicateBuilder
      */
     public function all(self $predicate)
     {
-        return $this->addSubPredicate(self::OPERATOR_INTERSECT, $predicate);
+        return $this->addSubPredicate(IPredicateBuilder::OPERATOR_INTERSECT, $predicate);
     }
 
     /**
@@ -69,7 +70,7 @@ class PredicateBuilder
      */
     public function any(self $predicate)
     {
-        return $this->addSubPredicate(self::OPERATOR_UNION, $predicate);
+        return $this->addSubPredicate(IPredicateBuilder::OPERATOR_UNION, $predicate);
     }
 
     /**
@@ -125,7 +126,7 @@ class PredicateBuilder
      */
     public function notNull($columnName)
     {
-        return $this->addPredicate($columnName, null, self::OPERATOR_NOT_EQUALS);
+        return $this->addPredicate($columnName, null, IPredicateBuilder::OPERATOR_NOT_EQUALS);
     }
 
     /**
@@ -163,7 +164,7 @@ class PredicateBuilder
      */
     public function notEquals($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
+        return $this->addPredicate($columnName, $columnValue, IPredicateBuilder::OPERATOR_NOT_EQUALS);
     }
 
     /**
@@ -179,7 +180,7 @@ class PredicateBuilder
      */
     public function like($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LIKE);
+        return $this->addPredicate($columnName, $columnValue, IPredicateBuilder::OPERATOR_LIKE);
     }
 
     /**
@@ -198,7 +199,7 @@ class PredicateBuilder
      */
     public function notLike($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_LIKE);
+        return $this->addPredicate($columnName, $columnValue, IPredicateBuilder::OPERATOR_NOT_LIKE);
     }
 
     /**
@@ -208,7 +209,7 @@ class PredicateBuilder
      */
     public function lessThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
+        return $this->addPredicate($columnName, $columnValue, IPredicateBuilder::OPERATOR_LT);
     }
 
 
@@ -219,7 +220,7 @@ class PredicateBuilder
      */
     public function greaterThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
+        return $this->addPredicate($columnName, $columnValue, IPredicateBuilder::OPERATOR_GT);
     }
 
     /**
@@ -229,7 +230,7 @@ class PredicateBuilder
      */
     public function notLessThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
+        return $this->addPredicate($columnName, $columnValue, IPredicateBuilder::OPERATOR_GTE);
     }
 
     /**
@@ -239,7 +240,7 @@ class PredicateBuilder
      */
     public function notGreaterThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
+        return $this->addPredicate($columnName, $columnValue, IPredicateBuilder::OPERATOR_LTE);
     }
 
     /**
@@ -254,10 +255,10 @@ class PredicateBuilder
     {
         // Either is null: ignore
         if (isset($from)) {
-            $this->addPredicate($columnName, $from, self::OPERATOR_GTE);
+            $this->addPredicate($columnName, $from, IPredicateBuilder::OPERATOR_GTE);
         }
         if (isset($to)) {
-            $this->addPredicate($columnName, $to, self::OPERATOR_LTE);
+            $this->addPredicate($columnName, $to, IPredicateBuilder::OPERATOR_LTE);
         }
         return $this;
     }
@@ -278,10 +279,10 @@ class PredicateBuilder
         $compareFormat = \Alaress_Date_Format::DATABASE_FORMAT
     ) {
         if (isset($from) && !$from->isNull()) {
-            $this->addPredicate($columnName, $from->getUsingFormat($compareFormat), self::OPERATOR_GTE);
+            $this->addPredicate($columnName, $from->getUsingFormat($compareFormat), IPredicateBuilder::OPERATOR_GTE);
         }
         if (isset($to) && !$to->isNull()) {
-            $this->addPredicate($columnName, $to->getUsingFormat($compareFormat), self::OPERATOR_LTE);
+            $this->addPredicate($columnName, $to->getUsingFormat($compareFormat), IPredicateBuilder::OPERATOR_LTE);
         }
         return $this;
     }
@@ -293,11 +294,11 @@ class PredicateBuilder
      * @throws UnderflowException if an empty IN is attempted
      * @return self
      */
-    protected function addPredicate($columnName, $columnValue, $operator = self::OPERATOR_EQUALS)
+    protected function addPredicate($columnName, $columnValue, $operator = IPredicateBuilder::OPERATOR_EQUALS)
     {
         // prepare operator modifiers
-        $negate = self::OPERATOR_NOT_EQUALS == $operator || self::OPERATOR_NOT_LIKE == $operator;
-        $fuzzy  = self::OPERATOR_LIKE == $operator || self::OPERATOR_NOT_LIKE == $operator;
+        $negate = IPredicateBuilder::OPERATOR_NOT_EQUALS == $operator || IPredicateBuilder::OPERATOR_NOT_LIKE == $operator;
+        $fuzzy  = IPredicateBuilder::OPERATOR_LIKE == $operator || IPredicateBuilder::OPERATOR_NOT_LIKE == $operator;
 
         // accommodate joins
         $xpl = explode('.', $columnName) ?: [];
