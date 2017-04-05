@@ -90,6 +90,11 @@ $pickr-month-padding: 5px;
         border-bottom: 1px solid #e6e6e6;
     }
 
+    .flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {
+        border-top: none;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
     .flatpickr-time {
         overflow: visible;
         border-top: 0;
@@ -189,6 +194,7 @@ $pickr-month-padding: 5px;
 
     td.period-description {
         border-right: 1px solid #ededed;
+
     }
 
     input[type=radio]:not(.plain) + label.input-toggle {
