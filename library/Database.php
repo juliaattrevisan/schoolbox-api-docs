@@ -16,6 +16,11 @@ use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use DebugBar\DataCollector\PDO as DebugPDO;
 
+/**
+ * Database connection
+ *
+ * @deprecated use IConnector objects instead
+ */
 class Database implements IDatabase, Serializable, IQuoter
 {
     /**
