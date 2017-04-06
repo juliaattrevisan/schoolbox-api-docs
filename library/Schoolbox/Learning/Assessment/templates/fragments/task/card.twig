@@ -8,7 +8,7 @@
             {% if student %}
                 {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, assessment: assessable}) %}
             {% else %}
-                {% set route = routeLookupIfAuthorized('learningAssessment.getPreview',{assessmentId: assessable.id}) %}
+                {% set route = routeLookupIfAuthorized('learningAssessment.getPreview',{assessmentId: assessable.id, assessment: assessable}) %}
             {% endif %}
 
             {% if route %}
