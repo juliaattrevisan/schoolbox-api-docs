@@ -16,8 +16,11 @@ Usage:
 
     $(function() {
 
+        // ============== Plugins
+
         $('[data-collapser]').collapsable();
 
+        // ============== Vars
 
         var $reportContent = $('#{{ contentId }}');
         var $filterPanel = $('#{{ filterPanelId }}');
@@ -26,11 +29,15 @@ Usage:
         var $submitButton = $('#{{ submitButtonId }}');
         var $optionCheckboxes = $filterPanel.find('input[type=checkbox], input[type=hidden]');
         var $toast = $('[data-relation="submit-label"]');
+        var $restrictFiltersHelp = $filterPanel.find('#filter_restriction_help');
+        var $filterLoaderIcon = $filterPanel.find('#filter-loader');
+        var $filterRestrictionHelpHTML = '';
+
+        // ============== Event Handlers
 
         // Listen for clicks on the submit button
         $submitButton.on('click', function(event){
             event.preventDefault();
-
             $toast.toastActivate({text: 'Requesting report...'});
             fetchReport();
         });
@@ -40,11 +47,13 @@ Usage:
             updateFiltersInUseLabel();
         });
 
+        // ============== Helpers
+
         /**
          * Requests a filtered report via AJAX
          */
         function fetchReport() {
-
+            showFilterLoader();
             var href = $submitButton.data('href');
             var data = $optionCheckboxes.serialize();
             $submitButton.val($submitButton.data('working'));
@@ -52,23 +61,23 @@ Usage:
             disableInputs();
 
             $.post(href, data)
-                .done(function(html){
+                .success(function(html){
+                    $restrictFiltersHelp.hide();
                     hidePanel();
                     $reportContent.html(html);
-                    $toast.toastTimeout({text: 'Report loaded!', css: 'success'});
+                    $toast.toastTimeout({text: 'Success!', css: 'success'});
                 })
-                .fail(function(data){
-                    $toast.toastTimeout({
-                        text: 'Failure. Please set your filters to a more restrictive set of data',
-                        css: 'alert',
-                        duration: 5000
-                    });
+                .fail(function(){
+                    $toast.toastTimeout({text: 'Failure!', css: 'alert'});
+                    $restrictFiltersHelp.html($filterRestrictionHelpHTML).show();
                 })
                 .always(function() {
                     $submitButton.val('Submit');
+                    hideFilterLoader();
                     enableInputs();
                 });
         }
+
 
         /**
          * Disable panel inputs
@@ -93,6 +102,13 @@ Usage:
             if('uncollapsed' === $filterPanel.find('[data-collapsable]').attr('data-collapse-state')){
                 $filterPanel.find('[data-collapser]').trigger('click');
             }
+        }
+
+        /**
+         * Fetch the HTML we will render by JS into an alert. Then remove the template from the DOM.
+         */
+        function cacheFilterRestrictionHtml(){
+            $filterRestrictionHelpHTML = $restrictFiltersHelp.html();
         }
 
         /**
@@ -121,9 +137,26 @@ Usage:
         }
 
         /**
+         * Indicate a request is in progress
+         */
+        function showFilterLoader(){
+            $filterLoaderIcon.prop('disabled', false);
+            $filterLoaderIcon.css('opacity', 1);
+        }
+
+        /**
+         * Indicated a request is not in progress
+         */
+        function hideFilterLoader(){
+            $filterLoaderIcon.prop('disabled', true);
+            $filterLoaderIcon.css('opacity', 0);
+        }
+
+        /**
          * Populates the 'in-use' filter label and fetches the report
          */
         function init() {
+            cacheFilterRestrictionHtml();
             updateFiltersInUseLabel();
             fetchReport();
         }
@@ -143,7 +176,7 @@ Usage:
 <div class="toast" data-alert data-relation="submit-label"></div>
 
 <fieldset id="{{ filterPanelId }}">
-    <legend data-collapser="panel-components" class="icon-down-arrow">Filters in use: <span data-filters-in-use></span></legend>
+    <legend data-collapser="panel-components" class="icon-up-arrow"><span id="filter-loader" class="loader" title="request sent ..."></span>Filters in use: <span data-filters-in-use></span></legend>
 
     <div data-collapsable="panel-components" data-collapse-state="uncollapsed">
         <div>
@@ -156,11 +189,23 @@ Usage:
             </div>
         </div>
         <input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}" data-working="Submitting ...">
+
     </div>
+
+    {# Will contain error message HTML, as defined in template below #}
+    <div id="filter_restriction_help" style="display: none;" >
+        <div data-alert="" class="alert-box alert">
+            Unable to generate filtered report. This is usually due to filters being too liberal, which generates too much data to process.<br>
+            Please try setting your filters to be more restrictive to return a smaller data set.
+            <a href="" class="close">×</a>
+        </div>
+    </div>
+
 </fieldset>
 
 
 <hr>
+
 
 
 
