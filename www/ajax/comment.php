@@ -39,7 +39,7 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 	$body = $_POST['commentBody'];
 
 	if (!strlen(trim($body))) {
-		respond('400 Bad Request', 'Comment cannot be blank.');
+		respond(400, 'Comment cannot be blank.');
 	}
 
 	$forceStudentVisible = $sessionUser->getRole()->getType() == Role::STUDENT;
@@ -81,17 +81,17 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 	switch($comment->getCommenter()->getRole()->getType()) {
 		case Role::PARENT:
 			if(!$gHandler->isParentOfChild($comment->getStudent()->getId())) {
-				respond('400 Bad Request', 'You do not have permission to view this category.');
+				respond(400, 'You do not have permission to view this category.');
 			}
 			break;
 		case Role::STAFF:
 			if(!$gHandler->involvedInSubject($comment->getCategory()->getId())) {
-				respond('400 Bad Request', 'You do not have permission to view this category.');
+				respond(400, 'You do not have permission to view this category.');
 			}
 			break;
 		case Role::STUDENT:
 			if($comment->getCommenter()->getId() != $comment->getStudent()->getId()) {
-				respond('400 Bad Request', 'You do not have permission to view this category.');
+				respond(400, 'You do not have permission to view this category.');
 			}
 			break;
 	}
@@ -99,7 +99,7 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 	/** @var $commentMapper CommentMapper */
 	$commentMapper = CommentMapper::getInstance();
 	if(!$commentMapper->save($comment)) {
-		respond('400 Bad Request', 'You do not have permission to view this category.');
+		respond(400, 'You do not have permission to view this category.');
 	}
 }
 
@@ -118,7 +118,7 @@ else if(isset($_REQUEST['commentId']) && is_numeric($_REQUEST['commentId'])) {
 
 	}
 	catch(\Schoolbox\Mapper\Exception $e) {
-		respond('400 Bad Request', $e->getMessage());
+		respond(400, $e->getMessage());
 	}
 
 	if(isset($_POST['commentId'])) {
@@ -130,10 +130,10 @@ else if(isset($_REQUEST['commentId']) && is_numeric($_REQUEST['commentId'])) {
 		if(isset($_POST['deleteComment']) && $_POST['deleteComment'] == true) {
 			if(isset($comment)) {
 				if($cMap->softDelete($comment)) {
-					respond('204 No Content', '');
+					respond(240, '');
 				}
 				else {
-					respond('410 Gone', 'Comment has already been deleted.');
+					respond(410, 'Comment has already been deleted.');
 				}
 			}
 		}
@@ -144,29 +144,29 @@ else if(isset($_REQUEST['commentId']) && is_numeric($_REQUEST['commentId'])) {
 			$comment->setModified(new Alaress_Date_Format(time(), 'U'));
 		}
 		else {
-			respond('400 Bad Request', 'Comment cannot be blank.');
+			respond(400, 'Comment cannot be blank.');
 		}
 
 		if(isset($_POST['studentVisibility']) && is_numeric($_POST['studentVisibility'])) {
 			$comment->setStudentVisibility(!!$_POST['studentVisibility']);
 		}
 		else {
-			respond('400 Bad Request', 'Invalid student visibility.');
+			respond(400, 'Invalid student visibility.');
 		}
 
 		if(isset($_POST['parentVisibility']) && is_numeric($_POST['parentVisibility'])) {
 			$comment->setParentVisibility(!!$_POST['parentVisibility']);
 		}
 		else {
-			respond('400 Bad Request', 'Invalid parent visibility.');
+			respond(400, 'Invalid parent visibility.');
 		}
 
 		if($cMap->save($comment)) {
 			// success
-			respond('204 No Content', null);
+			respond(204, null);
 
 		}
-		respond('409 Conflict', 'Something went wrong updating the comment.');
+		respond(409, 'Something went wrong updating the comment.');
 
 	}
 	elseif(isset($_GET['commentId'])) {
@@ -184,12 +184,12 @@ else if(isset($_REQUEST['commentId']) && is_numeric($_REQUEST['commentId'])) {
 		}
 		else {
 			// this should be theoretically impossible, but account for it regardless
-			respond('400 Bad Request', "No comment found.");
+			respond(400, "No comment found.");
 		}
 	}
 	else {
 		// also theoretically impossible
-		respond('400 Bad Request', "No comment specified.");
+		respond(400, "No comment specified.");
 	}
 }
 
@@ -221,7 +221,7 @@ function checkOwnership($userId, $commentId) {
  * @param $body
  */
 function respond($responseCode, $body) {
-	header("HTTP/1.1 $responseCode");
+	http_response_code($responseCode);
 	header('Content-Type: text/plain');
 	die($body);
 }

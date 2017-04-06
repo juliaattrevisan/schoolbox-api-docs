@@ -209,7 +209,6 @@ try {
             $code = 500;
             break;
     }
-    $protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
     http_response_code($code);
     echo $e->getMessage();
 }
