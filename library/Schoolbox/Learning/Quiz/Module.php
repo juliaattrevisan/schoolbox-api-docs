@@ -79,7 +79,7 @@ class Module extends RestfulModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getQuizSummary)';
+        $ruleRegexp = '(getQuizSummary|postAttemptDelete)';
         $this->addRoutePermission($authorizer, $ruleRegexp,
             new Rule\All(
                 new Rule\IsLoggedIn(),
