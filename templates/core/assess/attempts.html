@@ -30,6 +30,9 @@
                             <td>{ATTEMPT_REVIEWED_AT}</td>
                             <td>{ATTEMPT_MARKS}</td>
                             <td>
+
+                                <a href='/quiz/attempts/{ATTEMPT_ATTEMPT_ID}/delete' class="icon-delete no-text" title="Delete Attempt"></a>
+
                                 <!-- BEGIN attempt_review -->
                                 <a href='/assess/{ATTEMPT_REVIEW_URL}/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}{RETURN_URL_SUFFIX}' class="icon-view no-text" title="Review"></a>
                                 <!-- END attempt_review -->
