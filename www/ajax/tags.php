@@ -49,14 +49,14 @@ if(empty($registry[$this->arg[0]])){
 $tagsArray = [];
 
 if ($errors) {
-    header(':', true, 400);
+    http_response_code(400);
 } else {
     /** @var \Schoolbox\Mapper\UsableAsTagSource $mapper */
     $mapper = $registry[$this->arg[0]]();
     if ($mapper instanceof \Schoolbox\Mapper\UsableAsTagSource) {
         $tagsArray = $mapper->findForTag($_SESSION['user'], $_GET['query']);
     } else {
-        header(':', true, 500);
+        http_response_code(500);
     }
 }
 

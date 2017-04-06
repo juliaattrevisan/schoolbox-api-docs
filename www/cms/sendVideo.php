@@ -94,12 +94,14 @@ if (isset($type) && isset($id)) {
                 }
 
                 if ($byteOffset > $byteLength) {
-                    header('HTTP/1.1 416 Requested Range Not Satisfiable');
+                    // Requested Range Not Satisfiable
+                    http_response_code(416);
                     header('Content-Range: bytes */' . $filesize); // Required in 416.
                     exit;
                 }
 
-                header('HTTP/1.1 206 Partial content');
+                // Partial content
+                http_response_code(206);
                 // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
                 header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength, $filesize));
             }

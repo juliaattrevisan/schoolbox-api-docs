@@ -72,7 +72,7 @@ if($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']
     echo json_encode($result);
 }
 else {
-    header('HTTP/1.1 403 Forbidden, invalid attempt');
+    http_response_code(403);
 }
 
 /* Prevent rendering of template
