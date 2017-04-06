@@ -157,12 +157,13 @@ if (is_array($allAttempts) && count($allAttempts)) {
         /* Misc details
          */
         $available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
+        $reviewed = '';
 
         if ($currentAttempt['reviewed_at'] != null) {
             $reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'Y-m-d H:i:s');
             $reviewed = $reviewedAt->getShort();
 
-            if ($available && ($canReview || $canStudentReview)) {
+            if (($available > 0) && ($canReview || $canStudentReview)) {
                 $marks = round($currentAttempt['totalMarks'],2).' / '.round($available);
             }
             else {
@@ -174,10 +175,12 @@ if (is_array($allAttempts) && count($allAttempts)) {
             $numUnmarkedQuestions = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
             $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($currentAttempt['attempt_id']);
 
-            $reviewed = 'Not reviewed ('.(100 - round(($valueUnmarkedQuestions / $available ) * 100)).'% graded)';
+            if ($available > 0) {
+                $reviewed = 'Not reviewed (' . (100 - round(($valueUnmarkedQuestions / $available) * 100)) . '% graded)';
 
-            if($canReview || $canStudentReview) {
-                $marks = round($currentAttempt['totalMarks']).'/'.round($available);
+                if($canReview || $canStudentReview) {
+                    $marks = round($currentAttempt['totalMarks']).'/'.round($available);
+                }
             }
         }
 
