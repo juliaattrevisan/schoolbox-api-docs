@@ -17,6 +17,7 @@ use \Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
 
 abstract class Base {
@@ -69,7 +70,7 @@ abstract class Base {
 
 			case QueueMapper::FILE_TYPE_SBFS:
 
-                // For SBFS we must first check submission then resolve the hash
+                // For SBFS we must first load file, then resolve the hash
                 $file = FileMapper::getInstance()->findById($this->getId());
                 $this->permissionCheck($file);
 
@@ -79,7 +80,12 @@ abstract class Base {
                 return $videoMapper->findByStorageHash($this->getId());
 
 			case QueueMapper::FILE_TYPE_MYFILE:
-                return $videoMapper->findByMyFileId($this->getId());
+
+                // For my files we must first load myfile, then resolve the hash
+                $file = MyFileMapper::getInstance()->findById($this->getId());
+                $this->permissionCheck($file);
+
+                return $videoMapper->findByStorageHash($file->getHash());
 		}
 
         throw new \Schoolbox\Mapper\Exception('Instance of object not found');
