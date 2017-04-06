@@ -15,6 +15,8 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
+use \Schoolbox\Permission\Access\Access;
+use \Schoolbox\Permission\Access\UserAccess;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -65,6 +67,7 @@ $this->setBlock(TEMPLATE_content, 'has_attempts', 'has_attempts_block');
 $this->setBlock('has_attempts', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_review', 'attempt_review_block');
 $this->setBlock('attempt', 'attempt_resume', 'attempt_resume_block');
+$this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 
 /* Generic details
  */
@@ -79,6 +82,16 @@ $this->setVar(array(
  */
 $this->setVar('has_attempts_block', '');
 $this->setVar('attempt_block', '');
+
+/* Only Instructors can delete attempts
+ */
+$canDeleteAttempt = false;
+
+$perm = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assess['category_id']]);
+
+if ($perm >= UserAccess::ACCESS_WRITE) {
+    $canDeleteAttempt = true;
+}
 
 /* Iterate
  */
@@ -224,6 +237,17 @@ if (is_array($allAttempts) && count($allAttempts)) {
             $this->parse('attempt_resume_block', 'attempt_resume');
         }
 
+        /* Only instructors can delete attempts
+         */
+        if ($canDeleteAttempt) {
+            $this->parse('attempt_delete_block', 'attempt_delete');
+        }
+        else {
+            $this->setVar([
+                'attempt_delete_block' => ''
+            ]);
+        }
+
         $this->parse('attempt_block', 'attempt', true);
 
         /* Clear children after parsing out the parent
@@ -232,6 +256,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			'respondent_name_block' => '',
             'attempt_review_block' => '',
 			'attempt_resume_block' => '',
+            'attempt_delete_block' => '',
 		));
     }
 
