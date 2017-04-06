@@ -24,7 +24,7 @@ if ($user instanceof Schoolbox\User) {
     echo json_encode(['id' => $user->getId(),]);
 } else {
     // Something's wrong
-    header(':', true, 400);
+    http_response_code(400);
     echo json_encode(['error' => 'Unauthenticated']);
 }
 exit;

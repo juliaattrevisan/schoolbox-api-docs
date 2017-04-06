@@ -60,7 +60,7 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
 //            $catMapper->findById($categoryId);
 //            $group->setCategory($categoryId);
 //        } catch (\Schoolbox\Mapper\Exception $e) {
-//            header(':', true, 404);
+//            http_response_code(404);
 //            die("The specified folder ({$categoryId}) does not exist.");
 //        }
     }

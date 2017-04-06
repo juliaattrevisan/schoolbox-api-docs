@@ -52,7 +52,7 @@ if (!isset($_GET['code'])) {
 } elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION[$sesskey])) {
 
     unset($_SESSION[$sesskey]);
-    header(':', true, 400);
+    http_response_code(400);
     exit;
 
 } else {
@@ -76,6 +76,6 @@ if (!isset($_GET['code'])) {
 
     $_SESSION['azureAccessToken'] = $token->accessToken;
 
-    header(':', true, 201);
+    http_response_code(201);
     die('<html><script type="text/javascript">window.close();</script></html>');
 }

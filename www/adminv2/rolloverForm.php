@@ -109,6 +109,6 @@ function rollover($categoryId)
 
 function respond($content, $code = 200)
 {
-    header(':', true, $code);
+    http_response_code($code);
     die(json_encode($content));
 }

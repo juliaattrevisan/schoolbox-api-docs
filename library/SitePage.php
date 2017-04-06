@@ -319,7 +319,7 @@ class SitePage extends Page
     {
         header('Content-Type: application/json');
         if (isset($responseCode)) {
-            header(':', true, $responseCode);
+            http_response_code($responseCode);
         }
         $jsonOutput = json_encode($output);
         if (!$keepProcessing) {
@@ -733,7 +733,7 @@ class SitePage extends Page
          */
         $error->setMessage(str_replace("%MESSAGE%", $args['message'], $error->getMessage()));
 
-        header(':', true, $code);
+        http_response_code($code);
 
         // if we're in ajax mode, spit out in ajax-friendly (ie JSON) format
         if ($this->ajax) {

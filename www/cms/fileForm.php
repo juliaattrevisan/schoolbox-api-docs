@@ -171,7 +171,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             SitePage::localRedir($_POST['return']);
 
         } elseif ($ajax) {
-            header(':', true, 201);
+            http_response_code(201);
             die(json_encode(array('id' => $affectedIds[0])));
 
         } else {
@@ -297,7 +297,7 @@ function outputException(Exception $e, IFile $file, $ajax = false) {
     }
 
     if ($ajax) {
-        header(':', true, 400);
+        http_response_code(400);
         die(json_encode(array('code' => $code, 'error' => $msg)));
     } else {
         error($code, $msg);

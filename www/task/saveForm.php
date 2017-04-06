@@ -182,7 +182,7 @@ if ($page->detectAjax()) {
         }
     }
 
-    header(':', true, $result['error']);
+    http_response_code($result['error']);
     echo json_encode($result);
     exit;
 } else {

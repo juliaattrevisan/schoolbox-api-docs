@@ -31,7 +31,7 @@ if (isset($_POST['user'])) {
 $groupHandler = new Group();
 if (!($groupHandler->isStaff() || $_SESSION['user']->getId() == $user->getId())) {
     if ($ajax) {
-        header(':', true, 400);
+        http_response_code(400);
         die(json_encode('You do not have write permission to this ePortfolio.'));
     } else {
         error(47);
@@ -162,7 +162,7 @@ if (isset($_POST['description'])) {
             SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
 
         } elseif ($ajax) {
-            header(':', true, 201);
+            http_response_code(201);
             die(json_encode(array('id' => $affectedIds[0])));
 
         } else {
@@ -276,7 +276,7 @@ function outputException(Exception $e, IFile $file, $ajax = false) {
     }
 
     if ($ajax) {
-        header(':', true, 400);
+        http_response_code(400);
         die(json_encode(array('code' => $code, 'error' => $msg)));
     } else {
         error($code, $msg);
