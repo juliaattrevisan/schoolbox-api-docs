@@ -467,8 +467,13 @@ class Controller extends AbstractController
      */
     public function postAttemptDelete()
     {
-        $this->quizAttemptMapper->findById($this->getRequest()->post['attemptId']);
-        new \Alaress_Probe($this->getRequest()->post);
+        try {
+            $attempt = $this->quizAttemptMapper->findById($this->getRequest()->post['attemptId']);
+            $this->quizAttemptMapper->delete($attempt);
+        }
+        catch (MapperException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
+        }
     }
 
     /* Getters / Setters
