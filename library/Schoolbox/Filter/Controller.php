@@ -15,8 +15,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Role;
-use Schoolbox\Sync\Navigator\Navigator;
-use Schoolbox\Sync\Navigator\Node;
 
 
 class Controller extends BaseController
