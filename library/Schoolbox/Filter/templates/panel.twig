@@ -15,18 +15,25 @@ Usage:
 <script type="text/javascript">
 
     $(function() {
+
+        $('[data-collapser]').collapsable();
+
+
         var $contentPanel = $('#{{ contentId }}');
         var $filterPanel = $('#{{ filterPanelId }}');
+        var $panelComponents = $filterPanel.find('[data-component]');
+        var $filtersInUseLabel = $filterPanel.find('[data-filters-in-use]');
         var $submitButton = $('#{{ submitButtonId }}');
         var $optionCheckboxes = $filterPanel.find('input[type=checkbox], input[type=hidden]');
+
 
         $submitButton.on('click', function(event){
             event.preventDefault();
             var href = $submitButton.data('href');
             var data = $optionCheckboxes.serialize();
+            $submitButton.val($submitButton.data('working'));
 
-            $submitButton.attr('disabled', true);
-            $optionCheckboxes.attr('disabled', true);
+            disableInputs();
 
             // TODO display a toast
             $.post(href, data)
@@ -37,21 +44,89 @@ Usage:
                 console.log(data)
             })
             .always(function() {
-                $submitButton.attr('disabled', false);
-                $optionCheckboxes.attr('disabled', false);
+                $submitButton.val('Submit');
+                enableInputs();
             });
         });
+
+        $optionCheckboxes.on('change', function(){
+            console.log('checkbox changed');
+            updateFiltersInUseLabel();
+        });
+
+
+        function enableInputs(){
+            $submitButton.attr('disabled', false);
+            $optionCheckboxes.attr('disabled', false);
+        }
+
+        function disableInputs(){
+            $submitButton.attr('disabled', true);
+            $optionCheckboxes.attr('disabled', true);
+        }
+
+        /**
+         * Update the
+         * @todo rename
+         */
+        function updateFiltersInUseLabel(){
+            console.log('updateFiltersInUse');
+            var $componentsInUse = [];
+            $panelComponents.each(function (idx, component) {
+                console.log();
+                $.each($(component).find('input[type=checkbox]'), function(idx, checkbox){
+
+                    if($(checkbox).prop('checked')){
+                        $componentsInUse.push($(component).find('[data-filter-name]').html());
+                        return true;
+                    }
+                });
+            });
+            console.log($componentsInUse.join(', '));
+            $filtersInUseLabel.html($componentsInUse.length ? $componentsInUse.join(', ') : 'None');
+        }
+
+        function init() {
+            console.log('init');
+            updateFiltersInUseLabel();
+            $submitButton.trigger('click');
+
+        }
+
+        init();
     });
+
 </script>
 
+<style>
+    .flex-container{
+        display: flex;
+        flex-direction: row;
+    }
+</style>
 
-<h1>A Panel containing various filters</h1>
 
-<div id="{{ filterPanelId }}" style="background-color: rgba(200,100,150,0.5)">
-{% for component in panel.components %}
-    {% include component.template with component.toContext() %}
-{% endfor %}
-</div>
+<fieldset id="{{ filterPanelId }}">
+    <legend data-collapser="panel-components" class="icon-down-arrow">Filters in use: <span data-filters-in-use></span></legend>
 
-<input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}">
+    <div data-collapsable="panel-components" data-collapse-state="collapsed" style="display: none;">
+        <div>
+            <div class="flex-container" style="margin: 0 -20px;">
+                {% for component in panel.components %}
+                <div class="checklist" data-component style="margin: 0 20px;">
+                    {% include component.template with component.toContext() %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}" data-working="Submitting ...">
+    </div>
+</fieldset>
+
+
+<hr>
+
+
+
+
 

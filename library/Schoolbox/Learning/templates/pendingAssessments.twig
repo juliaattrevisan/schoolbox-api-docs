@@ -14,16 +14,17 @@
                 teacherAssessed: 'incomplete'
             }
         });
+
+        // Just the stuff we've AJAXed in
+        $('#pending_assessments').find('[data-collapser]').collapsable();
     });
 </script>
 
 
 
-<div class="row">
-    <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
-</div>
 
-<div class="row">
+
+<div class="row" id="pending_assessments">
     <div class="small-12 columns island">
         {% if assessmentsToMark|length %}
             <h2 class="subheader">Requires Assessment</h2>
@@ -223,8 +224,4 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    $(function () {
-        $('[data-collapser]').collapsable();
-    });
-</script>
+

@@ -236,6 +236,7 @@ class Controller extends Base
         $filterPanel = new Filter\Panel($route, $filterComponents);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
+            'viewee'      => $viewee,
             'filterPanel' => $filterPanel,
         ])->setTab('submission'));
     }
@@ -402,7 +403,6 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/pendingAssessments.twig', [
-            'viewee'             => $viewee,
             'statistics'         => $assessmentStatistics,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,

@@ -12,7 +12,9 @@ Usage:
 ['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { viewee: viewee })]
 ) }}
 
-<h1>Pending Assessments</h1>
+<div class="row">
+    <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
+</div>
 
 <div class="row">
     <div class="small-12 columns island">
@@ -22,9 +24,10 @@ Usage:
         } only %}
     </div>
 </div>
-<hr>
 
 <div class="small-12 columns island">
-    <div id="content_id">This should get replaced ... </div>
+    <div id="content_id">
+        <img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;">
+    </div>
 </div>
 
