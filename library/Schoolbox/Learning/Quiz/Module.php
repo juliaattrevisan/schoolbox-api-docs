@@ -61,7 +61,7 @@ class Module extends RestfulModule
             ],
             'POST' => [
                 '/quiz/submit'                                              => 'postQuizSubmit',
-                '/quiz/attempts/{attemptId}/delete'                         => 'postAttemptDelete',
+                '/quiz/attempts/delete'                                     => 'postAttemptDelete',
             ]
         ];
 

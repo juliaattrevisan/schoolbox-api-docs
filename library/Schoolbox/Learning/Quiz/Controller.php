@@ -463,10 +463,11 @@ class Controller extends AbstractController
     }
 
     /**
-     * @api   POST /quiz/attempts/{attemptId}/delete/
+     * @api   POST /quiz/attempts/delete
      */
     public function postAttemptDelete()
     {
+        $this->quizAttemptMapper->findById($this->getRequest()->post['attemptId']);
         new \Alaress_Probe($this->getRequest()->post);
     }
 
