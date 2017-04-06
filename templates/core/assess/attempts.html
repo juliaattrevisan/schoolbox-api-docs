@@ -8,44 +8,41 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Attempts by {ATTEMPT_USER_NAME}</h2>
-        <section>
-            <div class="scrollable">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Start</th>
-                            <th>Finish</th>
-                            <th>Time Taken</th>
-                            <th>Reviewed</th>
-                            <th>Grade</th>
-                            <th>&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- BEGIN attempt -->
-                        <tr>
-                            <td>{ATTEMPT_START}</td>
-                            <td>{ATTEMPT_FINISH}</td>
-                            <td>{ATTEMPT_TIME_TAKEN}</td>
-                            <td>{ATTEMPT_REVIEWED_AT}</td>
-                            <td>{ATTEMPT_MARKS}</td>
-                            <td>
+        <table>
+            <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>Finish</th>
+                    <th>Time Taken</th>
+                    <th>Reviewed</th>
+                    <th>Grade</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN attempt -->
+                <tr>
+                    <td>{ATTEMPT_START}</td>
+                    <td>{ATTEMPT_FINISH}</td>
+                    <td>{ATTEMPT_TIME_TAKEN}</td>
+                    <td>{ATTEMPT_REVIEWED_AT}</td>
+                    <td>{ATTEMPT_MARKS}</td>
+                    <td class="actions-small-3">
+                        <nav>
+                            <a href='/quiz/attempts/{ATTEMPT_ATTEMPT_ID}/delete' class="icon-delete" title="Delete Attempt"></a>
 
-                                <a href='/quiz/attempts/{ATTEMPT_ATTEMPT_ID}/delete' class="icon-delete no-text" title="Delete Attempt"></a>
-
-                                <!-- BEGIN attempt_review -->
-                                <a href='/assess/{ATTEMPT_REVIEW_URL}/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}{RETURN_URL_SUFFIX}' class="icon-view no-text" title="Review"></a>
-                                <!-- END attempt_review -->
-                                <!-- BEGIN attempt_resume -->
-                                <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}{RETURN_URL_SUFFIX}' class="icon-next no-text" title="Resume"></a>
-                                <!-- END attempt_resume -->
-                            </td>
-                        </tr>
-                        <!-- END attempt -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                            <!-- BEGIN attempt_review -->
+                            <a href='/assess/{ATTEMPT_REVIEW_URL}/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}{RETURN_URL_SUFFIX}' class="icon-view" title="Review"></a>
+                            <!-- END attempt_review -->
+                            <!-- BEGIN attempt_resume -->
+                            <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}{RETURN_URL_SUFFIX}' class="icon-next" title="Resume"></a>
+                            <!-- END attempt_resume -->
+                        </nav>
+                    </td>
+                </tr>
+                <!-- END attempt -->
+            </tbody>
+        </table>
     </div>
 </div>
 
