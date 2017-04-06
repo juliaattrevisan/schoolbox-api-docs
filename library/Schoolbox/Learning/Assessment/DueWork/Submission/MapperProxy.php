@@ -133,7 +133,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $hash = $dataModelFile->getStorage()->getHash();
 
             foreach ($domainObject->getAllFiles() as $domainObjectFile) {
-                if ($domainObjectFile->getStorage()->getHash() == $hash) {
+                if (!$domainObjectFile->getId() && $domainObjectFile->getStorage()->getHash() == $hash) {
                     // Match found
                     $domainObjectFile->setId($dataModelFile->getId());
                     break;
