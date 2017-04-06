@@ -51,10 +51,6 @@ use Schoolbox\Mapper;
 
 class Controller extends Base
 {
-
-    // Enable pagination of both part1 and part2 of the screen, with this many items per page.
-    const COUNT_ASSESSMENTS_PER_PAGE = 100;
-
     /**
      * @var QuizMapper
      */
@@ -379,37 +375,10 @@ class Controller extends Base
         }
         $assessmentsToChase->sortBy('dueAt', 'asc');
 
-        $path        = $this->request->url->get(PHP_URL_PATH);
-        $partOnePage = $this->request->query->get('p1', 1);
-        $partTwoPage = $this->request->query->get('p2', 1);
-        $url         = "$path?p1=$partOnePage&p2=$partTwoPage";
-
-        // Pagination
-        $partOnePaginator = (new UrlPaginator())
-            ->setPaginator((new Paginator())->setTotal(count($assessmentsToMark))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
-            ->setUrl($url)
-            ->setParam('p1');
-        $partTwoPaginator = (new UrlPaginator())->setPaginator(
-            (new Paginator())->setTotal(count($assessmentsToChase))->setPageSize(self::COUNT_ASSESSMENTS_PER_PAGE))
-                                                ->setUrl($url)
-                                                ->setParam('p2');
-
-        // Did user request a page that does not exist?
-        if ($partOnePage < 0 || ($partOnePaginator->getPageCount() && $partOnePage > $partOnePaginator->getPageCount())) {
-            throw new \DomainException("Invalid part one page: $partOnePage");
-        }
-        if ($partTwoPage < 0 || ($partTwoPaginator->getPageCount() && $partTwoPage > $partTwoPaginator->getPageCount())) {
-            throw new \DomainException("Invalid part two page: $partTwoPage");
-        }
-
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/pendingAssessments.twig', [
             'statistics'         => $assessmentStatistics,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,
-            'partOnePaginator'   => $partOnePaginator,
-            'partOnePage'        => $partOnePage,
-            'partTwoPaginator'   => $partTwoPaginator,
-            'partTwoPage'        => $partTwoPage,
         ]));
     }
 
