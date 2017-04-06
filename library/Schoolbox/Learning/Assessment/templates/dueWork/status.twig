@@ -48,37 +48,32 @@
 
     {% set pActionResponses  = routeLookupIfAuthorized('learningResponse.getParticularResponse', routeArgs) %}
 
-    {% if not assessment.acceptOnline %}
-        {% set pStatusClass = '' %}
-        {% set pTooltip     = '' %}
-    {% else %}
-        {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}
-        {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
-        {% set pSobo = true %}
+    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}
+    {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
+    {% set pSobo        = assessment.acceptOnline %}
 
-        {% set pStatusText %}
-            {%- spaceless %}
-                {% if not latestResponse %}
-                    {% if participant.reviewComplete %}
-                        {{ labelReviewed }}
-                    {% else %}
-                        Not submitted
-                    {% endif %}
+    {% set pStatusText %}
+        {%- spaceless %}
+            {% if not latestResponse %}
+                {% if participant.reviewComplete %}
+                    {{ labelReviewed }}
                 {% else %}
-                    {% if multipleResponses %}
-                        Resubmitted
-                    {% else %}
-                        Submitted
-                    {% endif %}
-                    {% if latestResponse.submittedOnTime %}
-                        on time
-                    {% else %}
-                        late
-                    {% endif %}
+                    Not submitted
                 {% endif %}
-            {% endspaceless -%}
-        {% endset %}
-    {% endif %}
+            {% else %}
+                {% if multipleResponses %}
+                    Resubmitted
+                {% else %}
+                    Submitted
+                {% endif %}
+                {% if latestResponse.submittedOnTime %}
+                    on time
+                {% else %}
+                    late
+                {% endif %}
+            {% endif %}
+        {% endspaceless -%}
+    {% endset %}
 
     {{ parent() }}
 {% endblock %}
