@@ -80,8 +80,11 @@ $this->setVar(array(
 
 /* Default
  */
-$this->setVar('has_attempts_block', '');
-$this->setVar('attempt_block', '');
+$this->setVar([
+    'CURRENT_USER' => $user->getFullName(),
+    'attempt_block' => '',
+    'has_attempts_block' => ''
+]);
 
 /* Only Instructors can delete attempts
  */
