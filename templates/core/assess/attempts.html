@@ -22,7 +22,8 @@
                                 done: function() {
                                     listItem.remove();
 
-                                    if (!attemptList.find('tr').length) {
+                                    if (!attemptList.find('tbody tr').length) {
+                                        $('#attempts').hide();
                                         $('#attempt-list-empty-state').removeClass('hide');
                                     }
                                 }
@@ -48,6 +49,7 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Attempts by {ATTEMPT_USER_NAME}</h2>
+        <!-- BEGIN has_attempts -->
         <table id="attempts">
             <thead>
                 <tr>
@@ -83,8 +85,9 @@
                 <!-- END attempt -->
             </tbody>
         </table>
+        <!-- END has_attempts -->
 
-        <div id='attempt-list-empty-state' class="empty-state">
+        <div id='attempt-list-empty-state' class="empty-state {EMPTY_STATE_CSS}">
             <i class="icon-quiz"></i>
             <p>You don't have any attempts for this quiz.</p>
         </div>

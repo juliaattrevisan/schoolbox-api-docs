@@ -61,7 +61,8 @@ catch (\Exception $e) {
 }
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
-$this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+$this->setBlock(TEMPLATE_content, 'has_attempts', 'has_attempts_block');
+$this->setBlock('has_attempts', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_review', 'attempt_review_block');
 $this->setBlock('attempt', 'attempt_resume', 'attempt_resume_block');
 
@@ -76,6 +77,7 @@ $this->setVar(array(
 
 /* Default
  */
+$this->setVar('has_attempts_block', '');
 $this->setVar('attempt_block', '');
 
 /* Iterate
@@ -229,6 +231,17 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			'attempt_resume_block' => '',
 		));
     }
+
+    $this->parse('has_attempts_block', 'has_attempts');
+
+    $this->setVar([
+        'EMPTY_STATE_CSS' => 'hide'
+    ]);
+}
+else {
+    $this->setVar([
+        'EMPTY_STATE_CSS' => ''
+    ]);
 }
 
 $trail = new Breadcrumbs();
