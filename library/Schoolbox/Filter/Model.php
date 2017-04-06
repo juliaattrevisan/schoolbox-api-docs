@@ -23,6 +23,17 @@ class Model
     private $class;
 
 
+    /**
+     * @return string
+     * @todo Think of a better way to do this. Should be twig responsibility
+     */
+    public function getName()
+    {
+        $pathFragments = explode('\\', $this->class);
+        return $pathFragments[count($pathFragments) - 2];
+    }
+
+
     /* Getters/Setters
      */
 

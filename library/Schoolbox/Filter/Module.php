@@ -39,6 +39,16 @@ class Module extends AlaressModule
     {
         $isSuper = new IsSuperuser();
 
+        $loadFilters = function (){
+            try {
+                return [
+                    'filters' => $this->getFilterMapper()->findAll(),
+                ];
+            } catch (MapperException $e) {
+                throw new NotFound($e->getMessage());
+            }
+        };
+
         $loadDefinition = function (array $params){
             try {
                 $filterInstance = $this->getFilterMapper()->findById($params['filter']);
@@ -66,9 +76,9 @@ class Module extends AlaressModule
 
 
 
-        $this->register('GET', '', 'getIndex', $isSuper);
-        $this->register('GET', '/{filter:\d+}/options', 'getAdminOptions', $isSuper, $loadDefinition);
-        $this->register('GET', '/{filter:\d+}/defaults', 'getAdminDefaults', $isSuper, $loadDefinition);
+        $this->register('GET', '', 'getIndex', $isSuper, $loadFilters);
+        $this->register('GET', '/{filter:\d+}/options', 'getAvailableOptions', $isSuper, $loadDefinition);
+        $this->register('GET', '/{filter:\d+}/defaults', 'getDefaultsSelections', $isSuper, $loadDefinition);
 
         $this->register('POST', '/{filter:\d+}/options/save', 'postSaveOptions', $isSuper, $optionDependencies);
         $this->register('POST', '/{filter:\d+}/defaults/save', 'postSaveDefaults', $isSuper, $defaultDependencies);

@@ -9,6 +9,7 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
@@ -23,13 +24,14 @@ class Controller extends BaseController
      *
      * @api   GET /adminv2/filters
      * @level 17.0
+     * @param GenericCollection|Model[] $filters
      * @throws ServiceNotFound
      */
-    public function getIndex()
+    public function getIndex(GenericCollection $filters)
     {
-        // TODO
-        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/_admin.twig', [
 
+        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
+            'filters' => $filters,
         ]));
     }
 
@@ -41,7 +43,7 @@ class Controller extends BaseController
      * @param IFilterDefinition $definition
      * @throws ServiceNotFound
      */
-    public function getAdminOptions(IFilterDefinition $definition)
+    public function getAvailableOptions(IFilterDefinition $definition)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getOptionsTemplate(), [
             'filter'           => $definition->getFilter(),
@@ -58,7 +60,7 @@ class Controller extends BaseController
      * @param IFilterDefinition $definition
      * @throws ServiceNotFound
      */
-    public function getAdminDefaults(IFilterDefinition $definition)
+    public function getDefaultsSelections(IFilterDefinition $definition)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getDefaultsTemplate(), [
             'filter'                 => $definition->getFilter(),
