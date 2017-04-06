@@ -19,14 +19,14 @@ Usage:
         $('[data-collapser]').collapsable();
 
 
-        var $contentPanel = $('#{{ contentId }}');
+        var $reportContent = $('#{{ contentId }}');
         var $filterPanel = $('#{{ filterPanelId }}');
         var $panelComponents = $filterPanel.find('[data-component]');
         var $filtersInUseLabel = $filterPanel.find('[data-filters-in-use]');
         var $submitButton = $('#{{ submitButtonId }}');
         var $optionCheckboxes = $filterPanel.find('input[type=checkbox], input[type=hidden]');
 
-
+        // Listen for clicks on the submit button
         $submitButton.on('click', function(event){
             event.preventDefault();
             var href = $submitButton.data('href');
@@ -38,7 +38,8 @@ Usage:
             // TODO display a toast
             $.post(href, data)
             .done(function(html){
-                $contentPanel.html(html);
+                hidePanel();
+                $reportContent.html(html);
             })
             .fail(function(data){
                 console.log(data)
@@ -49,48 +50,67 @@ Usage:
             });
         });
 
+        // Listen for user checking filter options
         $optionCheckboxes.on('change', function(){
-            console.log('checkbox changed');
             updateFiltersInUseLabel();
         });
 
-
+        /**
+         * Disable panel inputs
+         */
         function enableInputs(){
             $submitButton.attr('disabled', false);
             $optionCheckboxes.attr('disabled', false);
         }
 
+        /**
+         * Disable panel inputs
+         */
         function disableInputs(){
             $submitButton.attr('disabled', true);
             $optionCheckboxes.attr('disabled', true);
         }
 
         /**
-         * Update the
-         * @todo rename
+         * Hide the filter panel components
          */
-        function updateFiltersInUseLabel(){
-            console.log('updateFiltersInUse');
+        function hidePanel() {
+            if('uncollapsed' === $filterPanel.find('[data-collapsable]').attr('data-collapse-state')){
+                $filterPanel.find('[data-collapser]').trigger('click');
+            }
+        }
+
+        /**
+         * Update the 'in-use' filter label according to current filter option selections
+         *
+         * A filter is not selected if either:
+         * * all options are selected, or
+         * * no options are selected.
+         *
+         */
+        function updateFiltersInUseLabel()
+        {
             var $componentsInUse = [];
             $panelComponents.each(function (idx, component) {
-                console.log();
-                $.each($(component).find('input[type=checkbox]'), function(idx, checkbox){
+                var $component = $(component);
+                var countAvailable = $component.find('input[type=checkbox]').length;
+                var countSelected = $component.find('input:checked[type=checkbox]').length;
 
-                    if($(checkbox).prop('checked')){
-                        $componentsInUse.push($(component).find('[data-filter-name]').html());
-                        return true;
-                    }
-                });
+                // Is a subset selected
+                if(countSelected !== 0 && countSelected !== countAvailable){
+                    // Filter is being used
+                    $componentsInUse.push($component.find('[data-filter-name]').html());
+                }
             });
-            console.log($componentsInUse.join(', '));
             $filtersInUseLabel.html($componentsInUse.length ? $componentsInUse.join(', ') : 'None');
         }
 
+        /**
+         * Populates the 'in-use' filter label and fetches the report
+         */
         function init() {
-            console.log('init');
             updateFiltersInUseLabel();
             $submitButton.trigger('click');
-
         }
 
         init();
