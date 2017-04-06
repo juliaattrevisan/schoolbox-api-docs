@@ -110,7 +110,7 @@ class Definition extends AbstractFilterDefinition
                 $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
                 break;
             case self::KEY_FUTURE:
-                $isAvailable = false;
+                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
                 break;
             case self::KEY_CURRENT:
                 $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
@@ -131,7 +131,10 @@ class Definition extends AbstractFilterDefinition
      */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
-        return self::KEY_CURRENT === $key && FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
+        if(FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page){
+            return in_array($key, [self::KEY_FUTURE, self::KEY_CURRENT], true);
+        }
+        return false;
     }
 
 
