@@ -420,6 +420,9 @@ if(typeof window.location.origin == 'undefined') {
                 explorer.removeAttr('data-text');
                 var elems = self.attach(message.data);
                 $(elems).each(function() { this.addClass('dz-success') });
+
+                // Trigger attachzone success event
+                $(self.element).trigger('success.attachzone', [ message ]);
             }
         });
     };
