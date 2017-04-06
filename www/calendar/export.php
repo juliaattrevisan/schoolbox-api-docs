@@ -199,25 +199,17 @@ try {
 
     $exporter->renderAll();
 } catch (SchoolboxException $e) {
-    //
-    // I wish I could use http_response_code() method here!
     $code = $e->getCode();
-    $text = '';
     switch ($code) {
         case 400:
-            $text = 'Bad Request';
-            break;
-
         case 401:
-            $text = 'Unauthorized';
             break;
 
         default:
             $code = 500;
-            $text = 'Internal Server Error';
             break;
     }
     $protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
-    header($protocol . ' ' . $code . ' ' . $text);
+    http_response_code($code);
     echo $e->getMessage();
 }

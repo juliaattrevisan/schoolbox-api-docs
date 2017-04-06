@@ -70,7 +70,7 @@ die(json_encode($response));
  */
 function sendError($errString)
 {
-    header('HTTP/1.1 400 Bad Request');
+    http_response_code(400);
     header('Content-Type: application/json');
     die(json_encode(array('error', $errString)));
 }

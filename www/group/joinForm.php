@@ -86,7 +86,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 
 // if there is an ajax flag, return a json response
 if ($page->detectAjax()) {
-	header($_SERVER['SERVER_PROTOCOL'] . ' 202 Accepted');
+	http_response_code(202);
 	header('Content-Type: application/json');
 	die(json_encode(array('status' => $response)));
 }

@@ -56,10 +56,10 @@ function httpError($code, $message) {
         '405' => 'Method Not Allowed',
     );
     if(isset($codes[$code])) {
-        header('HTTP/1.1 '.$code.' '.$codes[$code]);
+        http_response_code($code);
     }
     else {
-        header('HTTP/1.1 400 Bad Request');
+        http_response_code(400);
     }
     die($msg);
 }
