@@ -15,6 +15,7 @@ use Alaress\Cache;
 use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\Query\Base as Query;
 use Alaress\DebugBar\Instance as DebugBar;
 use DebugBar\DataCollector\DataCollectorInterface;
@@ -46,6 +47,9 @@ abstract class Base implements IBroker
     /** @var callable[] $postProcessors This contains an array of callbacks that need to be run on all database queries */
     protected $postProcessors = [];
 
+    /** @var IQuoter */
+    private $quoter;
+
     /**
      * Constructor. Sets up the statement cache, and grabs a handle to the connector that holds all
      * of the relevant information we require to connect
@@ -57,6 +61,7 @@ abstract class Base implements IBroker
         $this->statementCache = new Cache(function ($statement, $options) {
             return $this->pdo->prepare($statement, $options);
         });
+        $this->quoter = $this->buildQuoter();
     }
 
     /**
@@ -247,5 +252,34 @@ abstract class Base implements IBroker
     public function getPostProcessors()
     {
         return $this->postProcessors;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Quoter stuff
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Builds the quoter object to which IQuoter method calls are passed to.
+     *
+     * This will be called on construction.
+     *
+     * @return IQuoter
+     */
+    protected abstract function buildQuoter();
+
+    /**
+     * @inheritdoc
+     */
+    public function quoteIdentifier($string)
+    {
+        return $this->quoter->quoteIdentifier($string);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function escapeForLike($string)
+    {
+        return $this->quoter->escapeForLike($string);
     }
 }

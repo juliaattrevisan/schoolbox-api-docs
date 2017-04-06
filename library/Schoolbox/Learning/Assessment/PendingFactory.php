@@ -6,7 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\IDatabase;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\PredicateBuilder;
@@ -36,7 +36,7 @@ use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 class PendingFactory
 {
 
-    /** @var IDatabase */
+    /** @var IConnector */
     private $database;
 
     /** @var \External_ClassInterface */
@@ -224,7 +224,7 @@ class PendingFactory
 
     /**
      * @param User                         $viewee
-     * @param \Database                    $database
+     * @param IConnector                   $database
      * @param \External_ClassInterface     $externalClass
      * @param Term                         $term
      * @param \Alaress_Date_Format         $toChaseLimit
@@ -233,7 +233,7 @@ class PendingFactory
      */
     public function __construct(
         User $viewee,
-        \Database $database,
+        IConnector $database,
         \External_ClassInterface $externalClass,
         Term $term,
         \Alaress_Date_Format $toChaseLimit,
@@ -605,10 +605,9 @@ class PendingFactory
             AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
-        $statement = $this->database->prepare("$query1 UNION $query2 UNION $query3 UNION $query4");
-
-        $statement->execute();
-        $this->parseAssessments($statement);
+        $this->parseAssessments(
+            $this->database->executeQueryIterator("$query1 UNION $query2 UNION $query3 UNION $query4")
+        );
     }
 
 
@@ -617,12 +616,12 @@ class PendingFactory
      *
      * Extract and cache any GroupIds or ClassCodes to later retrieve the studentLists
      *
-     * @param \PDOStatement $statement
+     * @param \Traversable $statement
      * @throws \LogicException If assessment type is not recognised
      */
-    private function parseAssessments($statement)
+    private function parseAssessments(\Traversable $statement)
     {
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        foreach ($statement as $row) {
 
             $assessmentId = (int)$row['a.id'];
 
@@ -775,9 +774,9 @@ class PendingFactory
         }
 
         // Efficient but complex (until OR support goes in) predicate building
-        $pb      = new PredicateBuilder($this->database, '');
-        $groupPb = new PredicateBuilder($this->database, '');
-        $classPb = new PredicateBuilder($this->database, '');
+        $pb      = $this->database->buildPredicateBuilder('');
+        $groupPb = $this->database->buildPredicateBuilder('');
+        $classPb = $this->database->buildPredicateBuilder('');
 
         // Always ensure user is not deleted
         $pb->isNull('u.deleted_at');
@@ -837,11 +836,9 @@ class PendingFactory
                 $groupJoin 
                 WHERE $whereClause
         ";
-        $statement = $this->database->prepare($query);
-        $statement->execute(array_merge($pb->getParams(), $groupPb->getParams(), $classPb->getParams()));
-        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $params = array_merge($pb->getParams(), $groupPb->getParams(), $classPb->getParams());
 
-        foreach ($rows as $row) {
+        foreach ($this->database->executeQueryIterator($query, $params) as $row) {
             $this->cacheUser((int)$row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
 
             // Was this user from a Group ?
@@ -899,7 +896,7 @@ class PendingFactory
         }
 
         // Get QuizAttempts for specified Quizzes
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = $this->database->buildPredicateBuilder('');
         $pb->isNull('q.deleted_at');
         $pb->equals('q.availability', QuizModel::AVAILABILITY_ASSESS);
         $pb->equals('q.assessment_id', $this->quizAssessmentIds);
@@ -919,9 +916,7 @@ class PendingFactory
             GROUP BY q.assessment_id, qa.user_id, qa.attempt_id
         ';
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $quizResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $quizResults = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
 
         // Find Students who attempted Quizzes but are't in the current studentList
         $this->findExtraStudentResults($quizResults, 'qa.user_id', 'q.assessment_id');
@@ -943,7 +938,7 @@ class PendingFactory
         }
 
         // Get Task Completions for all selected students
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = $this->database->buildPredicateBuilder('');
         $pb->isNull('t.deleted_at');
         $pb->equals('t.assessment_id', $this->taskAssessmentIds);
         $query = "
@@ -965,9 +960,7 @@ class PendingFactory
             WHERE ' . implode(' AND ', $pb->getWhere()) . '
             ORDER BY t.assessment_id';
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $taskResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $taskResults = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
 
         // Find Students who attempted Tasks but are't in the current studentList
         $this->findExtraStudentResults($taskResults, 'tc.student_id', 't.assessment_id');
@@ -989,7 +982,7 @@ class PendingFactory
         }
 
         // Get Due Work Submissions for all selected students
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = $this->database->buildPredicateBuilder('');
         $pb->equals('sb.deleted', 0);
         $pb->notNull('ss.submitted_at');
         $pb->equals('sb.assessment_id', $this->dueWorkAssessmentIds);
@@ -1005,9 +998,8 @@ class PendingFactory
             JOIN student_submission ss ON ss.box_id = sb.id
             WHERE " . implode(' AND ', $pb->getWhere()) . '
             ORDER BY sb.assessment_id';
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $dueWorkSubmissions = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        $dueWorkSubmissions = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
 
         // Find Students who submitted DueWorkSubmissions but are't in the current studentList
         $this->findExtraStudentResults($dueWorkSubmissions, 'ss.owner', 'sb.assessment_id');
@@ -1027,7 +1019,7 @@ class PendingFactory
         if (!count($this->dueWorkAssessmentIds)) {
             return [];
         }
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = $this->database->buildPredicateBuilder('');
         $pb->equals('sb.deleted', 0);
         $pb->notNull('sr.published_at');
         $pb->equals('sb.assessment_id', $this->dueWorkAssessmentIds);
@@ -1044,9 +1036,7 @@ class PendingFactory
             WHERE " . implode(' AND ', $pb->getWhere()) . '
             ORDER BY sb.assessment_id';
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $dueWorkFeedbacks = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $dueWorkFeedbacks = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
 
         // Find Students who received DueWork Feedback but are't in the current studentList
         $this->findExtraStudentResults($dueWorkFeedbacks, 'sr.owner', 'sb.assessment_id');
@@ -1065,7 +1055,7 @@ class PendingFactory
     {
         // Do we have Responses / Feedbacks for students that are not yet loaded?
         if (count($this->assessmentExtraStudentIds)) {
-            $pb = new PredicateBuilder($this->database, '');
+            $pb = $this->database->buildPredicateBuilder('');
             $pb->equals('u.id', $this->assessmentExtraStudentIds);
             $query     = "
                 SELECT 
@@ -1078,9 +1068,8 @@ class PendingFactory
                     u.alt_email   AS 'u.alt_email'
                 FROM user u
                 WHERE " . implode(' AND ', $pb->getWhere());
-            $statement = $this->database->prepare($query);
-            $statement->execute($pb->getParams());
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $row) {
                 $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'],
                     $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
             }

@@ -14,6 +14,7 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Statement\Query\IQuery;
+use Schoolbox\Mapper\PredicateBuilder;
 use Serializable;
 
 class Base implements Serializable, IConnector
@@ -417,5 +418,13 @@ class Base implements Serializable, IConnector
             'sql' => $sql,
             'bindings' => $bindings
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildPredicateBuilder($table)
+    {
+        return new PredicateBuilder($this->broker, $table);
     }
 }

@@ -13,6 +13,7 @@ namespace Alaress\Database\Broker\Dblib;
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
+use Alaress\Database\Quoter\Dblib\Quoter as DblibQuoter;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
 use PDO;
@@ -21,6 +22,14 @@ class Broker extends Base implements IBroker
 {
     // This extends the parent connect function with MSSQL specific connection attributes and
     // post connection queries that need to be executed
+
+    /**
+     * @inheritdoc
+     */
+    protected function buildQuoter()
+    {
+        return new DblibQuoter();
+    }
 
     /**
      * @inheritdoc

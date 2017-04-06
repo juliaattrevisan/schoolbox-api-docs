@@ -10,19 +10,20 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Csv\Writer AS CsvWriter;
+use Alaress\Database\Connector\IConnector;
 
 class Exporter
 {
     /**
-     * @var \Database
+     * @var IConnector
      */
     private $database;
 
     /**
      * Exporter constructor.
-     * @param \Database $database
+     * @param IConnector $database
      */
-    public function __construct(\Database $database)
+    public function __construct(IConnector $database)
     {
         $this->database = $database;
     }
@@ -67,10 +68,7 @@ class Exporter
             ORDER BY        folder_code.code
         ";
 
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'currentYear' => date('Y')
-        ]);
+        $resultSet = $this->database->executeQueryIterator($query, ['currentYear' => date('Y')]);
 
         $headings = [
             'student code',
@@ -81,7 +79,7 @@ class Exporter
 
         $data = [];
 
-        foreach ($statement as $result) {
+        foreach ($resultSet as $result) {
 
             /*
              * Check if there are square brackets inside the submission box name, if so - pull the contents from

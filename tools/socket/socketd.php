@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
@@ -58,8 +59,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     // TODO put this in DI
     $asyncRedis = new Async\Client($di->get('config')->get('redis_url'), $loop);
 
-    /** @var Database $db */
-    $db = $di->get('database');
+    /** @var IConnector $db */
+    $db = $di->get('databaseInternal');
 
     /** @var IConfigLoader $conf */
     $conf = $di->get('config');

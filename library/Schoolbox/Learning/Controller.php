@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Paginator\Paginator;
 use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
@@ -107,7 +108,7 @@ class Controller extends Base
     private $access;
 
     /**
-     * @var \Database
+     * @var IConnector
      */
     private $database;
 
@@ -127,7 +128,7 @@ class Controller extends Base
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param CourseSpecificationMapper $courseSpecificationMapper
      * @param \External_ClassInterface $externalClass
-     * @param \Database $database
+     * @param IConnector $database
      * @param Access $access
      */
     public function __construct(
@@ -144,7 +145,7 @@ class Controller extends Base
         CourseImplementationMapper $courseImplementationMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
         \External_ClassInterface $externalClass,
-        \Database $database,
+        IConnector $database,
         Access $access
     ) {
         $this->errorMapper                = $errorMapper;

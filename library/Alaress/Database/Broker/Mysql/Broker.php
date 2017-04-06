@@ -13,6 +13,7 @@ namespace Alaress\Database\Broker\Mysql;
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Mysql\Iterator;
+use Alaress\Database\Quoter\Mysql\Quoter as MysqlQuoter;
 use Alaress\Database\Statement\FunctionCall\Mysql\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Mysql\StoredProcedure;
 use PDO;
@@ -20,6 +21,14 @@ use PDO;
 class Broker extends Base implements IBroker
 {
     // These return MySQL specific statement objects
+
+    /**
+     * @inheritdoc
+     */
+    protected function buildQuoter()
+    {
+        return new MysqlQuoter();
+    }
 
     /**
      * @inheritdoc

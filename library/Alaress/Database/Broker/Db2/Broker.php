@@ -14,6 +14,7 @@ use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\Db2\Iterator;
+use Alaress\Database\Quoter\Db2\Quoter as Db2Quoter;
 use Alaress\Database\Statement\FunctionCall\Db2\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Db2\StoredProcedure;
 use Alaress\Database\Wrapper\Db2\PDO;
@@ -23,6 +24,14 @@ use DebugBar\DataCollector\DataCollectorInterface;
 class Broker extends Base implements IBroker
 {
     // These return DB2 specific statement objects
+
+    /**
+     * @inheritdoc
+     */
+    protected function buildQuoter()
+    {
+        return new Db2Quoter();
+    }
 
     /** @var PDO $pdo The PDO object that does all the real work */
     protected $pdo;

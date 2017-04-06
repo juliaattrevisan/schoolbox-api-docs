@@ -10,11 +10,18 @@
  */
 
 use Alaress\Cache;
+use Alaress\Database\Quoter\IQuoter;
+use Alaress\Database\Quoter\Mysql\Quoter as MysqlQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use DebugBar\DataCollector\PDO as DebugPDO;
 
-class Database implements IDatabase, Serializable
+/**
+ * Database connection
+ *
+ * @deprecated use IConnector objects instead
+ */
+class Database implements IDatabase, Serializable, IQuoter
 {
     /**
      * An instance of database
@@ -61,6 +68,9 @@ class Database implements IDatabase, Serializable
     /** @var Cache|PDOStatement[] */
     private $qCache = [];
 
+    /** @var IQuoter */
+    private $quoter;
+
     /**
      * Returns the singleton instance of Database. If it doesn't exist it is instantiated.
      *
@@ -90,6 +100,7 @@ class Database implements IDatabase, Serializable
         $this->qCache = new Cache(function ($statement, array $driverOptions = []) {
             return $this->connection->prepare($statement, $driverOptions);
         });
+        $this->quoter = new MysqlQuoter();
     }
 
 
@@ -238,8 +249,9 @@ class Database implements IDatabase, Serializable
      * @param  string $string
      * @return string
      */
-    public function quoteIdentifier($string) {
-        return '`'.str_replace('`', '``', $string).'`';
+    public function quoteIdentifier($string)
+    {
+        return $this->quoter->quoteIdentifier($string);
     }
 
     /**
@@ -252,14 +264,9 @@ class Database implements IDatabase, Serializable
      * @param  string $string
      * @return string
      */
-    public function escapeForLike($string) {
-        return strtr(
-            $string,
-            array(
-                '_' => '\\_',
-                '%' => '\\%',
-            )
-        );
+    public function escapeForLike($string)
+    {
+        return $this->quoter->escapeForLike($string);
     }
 
     /**
