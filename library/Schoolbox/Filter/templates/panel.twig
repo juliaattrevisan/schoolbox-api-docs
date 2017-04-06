@@ -25,35 +25,50 @@ Usage:
         var $filtersInUseLabel = $filterPanel.find('[data-filters-in-use]');
         var $submitButton = $('#{{ submitButtonId }}');
         var $optionCheckboxes = $filterPanel.find('input[type=checkbox], input[type=hidden]');
+        var $toast = $('[data-relation="submit-label"]');
 
         // Listen for clicks on the submit button
         $submitButton.on('click', function(event){
             event.preventDefault();
-            var href = $submitButton.data('href');
-            var data = $optionCheckboxes.serialize();
-            $submitButton.val($submitButton.data('working'));
 
-            disableInputs();
-
-            // TODO display a toast
-            $.post(href, data)
-            .done(function(html){
-                hidePanel();
-                $reportContent.html(html);
-            })
-            .fail(function(data){
-                console.log(data)
-            })
-            .always(function() {
-                $submitButton.val('Submit');
-                enableInputs();
-            });
+            $toast.toastActivate({text: 'Requesting report...'});
+            fetchReport();
         });
 
         // Listen for user checking filter options
         $optionCheckboxes.on('change', function(){
             updateFiltersInUseLabel();
         });
+
+        /**
+         * Requests a filtered report via AJAX
+         */
+        function fetchReport() {
+
+            var href = $submitButton.data('href');
+            var data = $optionCheckboxes.serialize();
+            $submitButton.val($submitButton.data('working'));
+
+            disableInputs();
+
+            $.post(href, data)
+                .done(function(html){
+                    hidePanel();
+                    $reportContent.html(html);
+                    $toast.toastTimeout({text: 'Report loaded!', css: 'success'});
+                })
+                .fail(function(data){
+                    $toast.toastTimeout({
+                        text: 'Failure. Please set your filters to a more restrictive set of data',
+                        css: 'alert',
+                        duration: 5000
+                    });
+                })
+                .always(function() {
+                    $submitButton.val('Submit');
+                    enableInputs();
+                });
+        }
 
         /**
          * Disable panel inputs
@@ -110,7 +125,7 @@ Usage:
          */
         function init() {
             updateFiltersInUseLabel();
-            $submitButton.trigger('click');
+            fetchReport();
         }
 
         init();
@@ -125,6 +140,7 @@ Usage:
     }
 </style>
 
+<div class="toast" data-alert data-relation="submit-label"></div>
 
 <fieldset id="{{ filterPanelId }}">
     <legend data-collapser="panel-components" class="icon-down-arrow">Filters in use: <span data-filters-in-use></span></legend>
