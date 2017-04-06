@@ -323,7 +323,6 @@ class Controller extends AbstractController
 
     /**
      * Marks an attempt as completed
-     * @param $attemptId
      */
     public function postQuizSubmit()
     {
