@@ -344,10 +344,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
             ->setParams(array(
                 'user' => new UserParam($user, ParameterInterface::STACKING_REPLACE),
-                'box'  => new Param($boxName, "/submission/submissionHistory/$boxId"),
+                'box'  => new Param($boxName, "/learning/assessment/".$submissionBox->getAssessmentId()),
                 'cat'  => new CategoryParam($folder)
             ))
-            ->setHref("/submission/submissionHistory/$boxId")
+            ->setHref("/learning/assessment/".$submissionBox->getAssessmentId())
             ->setIcon("/portrait?userId=$authorExtId&size={$this->iconSize}")
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.open")
@@ -412,7 +412,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
-            ->setHref("/submission/submissionHistory/$boxId")
+            ->setHref("/learning/assessment/".$submissionBox->getAssessmentId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addFilter('roletype', Role::STUDENT);
@@ -476,7 +476,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setParams(array(
                 'author'  => new UserParam($author),
                 'oldname' => new Param($diff['name'][1]),
-                'newname' => new Param($diff['name'][0], "/submission/submissionHistory/" . $box->getId()),
+                'newname' => new Param($diff['name'][0], "/learning/assessment/".$box->getAssessmentId()),
                 'catname' => new CategoryParam($box->getCategory())
             ))
             ->setTopics(array("duework.{$box->getId()}.renamed"));
@@ -509,7 +509,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setTopics(array("duework.{$box->getId()}.datechanged"))
             ->setParams(array(
                 'author'  => new UserParam($author),
-                'boxname' => new Param($box->getName(), "/submission/submissionHistory/" . $box->getId()),
+                'boxname' => new Param($box->getName(), "/learning/assessment/".$box->getAssessmentId()),
                 'date'    => new Param($dateformat),
                 'catname' => new CategoryParam($box->getCategory())
             ));
@@ -533,7 +533,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         return $bob->setTitle($m)
             ->setParams(array(
-                'boxname' => new Param($box->getName(), "/submission/submissionHistory/{$box->getId()}"),
+                'boxname' => new Param($box->getName(), "/learning/assessment/".$box->getAssessmentId()),
                 'catname' => new CategoryParam($box->getCategory())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
@@ -553,7 +553,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         return $bob->setTitle(":author updated :boxname in :catname")
             ->setParams(array(
                 'author'  => new UserParam($author),
-                'boxname' => new Param($box->getName(), "/submission/submissionHistory/" . $box->getId()),
+                'boxname' => new Param($box->getName(), "/learning/assessment/".$box->getAssessmentId()),
                 'catname' => new CategoryParam($box->getCategory())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
@@ -637,7 +637,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $bob->setTitle(":child has not yet submitted work for :boxname, which is due $when from now in :catname")
             ->setParams(array(
                 'catname' => new CategoryParam($folder),
-                'boxname' => new Param($submissionBox->getName(), "/submission/submissionHistory/$boxId")
+                'boxname' => new Param($submissionBox->getName(), "/learning/assessment/".$submissionBox->getAssessmentId())
             ))
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::WARNING)
@@ -650,7 +650,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             $childId = $student->getId();
             // target the parents of this particular student
             $bob->setIcon('/portrait?size=square64&userId=' . $student->getExternalId())
-                ->setHref("/submission/submissionHistory/$boxId/$childId")
+                ->setHref("/learning/assessment/".$submissionBox->getAssessmentId()."/".$childId)
                 ->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'));
             $envelope->targetToParent($childId, $bob->build());
         }
@@ -701,7 +701,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
-            ->setHref("/submission/submissionHistory/$boxId")
+            ->setHref("/learning/assessment/".$submissionBox->getAssessmentId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addFilter('roletype', Role::PARENT);
@@ -801,7 +801,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
-        $href = "/submission/submissionHistory/$boxId";
+        $href = "/learning/assessment/".$submissionBox->getAssessmentId();
         $bob->setTitle("Submissions have closed for :boxname in :catname")
             ->setParams(array(
                 'boxname' => new Param($submissionBox->getName(), $href),
@@ -845,7 +845,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         $boxName = $submissionBox->getName();
-        $href    = "/submission/submissionHistory/$boxId";
+        $href    = "/learning/assessment/".$submissionBox->getAssessmentId();
 
         $bob->setParams(array(
             'boxname' => new Param($boxName, $href),
@@ -948,7 +948,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $bob->setTitle(":boxname has closed and :number did not submit work")
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
-            ->setHref("/submission/viewSubmission/$boxId")
+            ->setHref("/learning/assessments/".$submissionBox->getAssessmentId()."/status")
             ->setNamespace($this->getSlug())
             ->setParams(array(
                 'boxname' => new Param($submissionBox->getName(), "/submission/viewSubmission/$boxId"),
