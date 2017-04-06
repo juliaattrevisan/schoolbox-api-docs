@@ -1067,11 +1067,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 			SELECT
 				{$this->getColumnString('c')},
 				{$this->getJoinColumnString('homepages', 'h')},
-				{$this->getJoinColumnString('codes', 'cc')}
+				{$this->getJoinColumnString('codes', 'cc')},
+				{$this->getJoinColumnString('groups', 'g')}
 			FROM {$this->getTable()} c
 			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
 			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
 			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
+			LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
 			WHERE c.deleted_at IS NULL AND a.uid = :user
 		";
         if ($exactAccess) {
@@ -1121,24 +1123,33 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement->execute($params);
 
         /** @var Collection|Model[] $collection */
-        $collection = new Collection();
-        foreach ($statement as $row) {
+        $collection = $this->createCollection();
+        while($row = $statement->fetch(PDO::FETCH_ASSOC)){
             $id = $row['c.id'];
+
+            // First time we've seen folder?
             if (!isset($collection[$id])) {
-                $collection[$id] = $this->hydrate(
-                    $row,
-                    'c',
-                    function ($mapper, $model, $row) {
-                        /**
-                         * @var self $mapper
-                         * @var Model $model
-                         * @var array $row
-                         */
-                        $model->setHomepage($mapper->hydrateJoin($row, 'homepages', 'h'));
-                        return $model;
-                    }
-                );
+                $collection[$id] = $this->hydrate($row, 'c');
             }
+            $folder = $collection[$id];
+
+            // Does this folder have a homepage, and we've not attached it yet?
+            $homepageId = $row['h.cid'];
+            if(!$folder->getHomepage() && isset($homepageId)){
+                /** @var HomepageConfig $homePage */
+                $homePage = $this->hydrateJoin($row, 'homepages', 'h');
+                $folder->setHomepage($homePage);
+            }
+
+            // Does folder have a group, and we haven't attached it yet?
+            $groupId = $row['g.cid'];
+            if(!$folder->getGroup() && isset($groupId)){
+                /** @var Group $group */
+                $group = $this->hydrateJoin($row, 'groups', 'g');
+                $folder->setGroup($group);
+            }
+
+            // Ensure the codes exists on the folder if present in row
             $code           = $row['cc.code'];
             $codeCollection = $collection[$id]->getCodes();
             if (isset($code) && !isset($codeCollection[$code])) {
