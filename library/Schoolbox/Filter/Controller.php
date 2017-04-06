@@ -9,11 +9,14 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Role;
+use Schoolbox\Sync\Navigator\Navigator;
+use Schoolbox\Sync\Navigator\Node;
 
 
 class Controller extends BaseController
@@ -42,6 +45,7 @@ class Controller extends BaseController
      * @level 17.0
      * @param IFilterDefinition $definition
      * @throws ServiceNotFound
+     * @throws RouteNotFound
      */
     public function getAvailableOptions(IFilterDefinition $definition)
     {

@@ -9,6 +9,12 @@ Usage:
     optionsPerPage         FilterOption[][]    - Grouped by option.page, then indexed by option.key. Option.defaults are indexed by roleType
     roleTypes              string[]            - all known roleTypes
 #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Home', routeLookup('adminHome.getIndex') ],
+    [ 'Filters', routeLookup('filters.getIndex') ],
+    [ 'Default ' ~ filter.name ~ ' Selections' ]
+) }}
 
 
 {% set saveButtonId = 'save_button' %}
@@ -38,12 +44,6 @@ Usage:
 
 <div class="row">
     <div class="small-12">
-        {{ renderAdminNavigation(pageCurrent) }}
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12">
         <h1>Role type defaults for {% block title %}{% endblock %} filters</h1>
         <p>{% block description %}{% endblock %}</p>
     </div>
@@ -51,8 +51,21 @@ Usage:
 
 <div class="row">
     <div class="small-12">
+        <dl class="tabs">
+            <dd class="">
+                <a href="{{ routeLookup('filters.getAvailableOptions', {filter: filter.id}) }}">Available {{ filter.name }} Options</a>
+            </dd>
+            <dd class="active">
+                <a href="#">Default {{ filter.name }} Selections</a>
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
         {% for page, pageOptions in optionsPerPage %}
-            <h2>Page: {{ page }}</h2>
+            <h2>{{ page | capitalize }}</h2>
             <table data-page="{{ page }}">
                 <tr>
                     <th></th>
@@ -90,7 +103,7 @@ Usage:
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 ">
         <section class="content">
             <input type="submit" id="{{ saveButtonId }}" value="Save Role Defaults" data-href="{{ routeLookup('filters.postSaveDefaults', { filter: filter.id }) }}">
         </section>

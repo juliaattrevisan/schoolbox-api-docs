@@ -7,6 +7,14 @@ Usage:
     definition   IFilter
     options      FilterOption[]
 #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Home', routeLookup('adminHome.getIndex') ],
+    [ 'Filters', routeLookup('filters.getIndex') ],
+    [ 'Available ' ~ filter.name ~ ' Options' ]
+) }}
+
+
 
 {% set saveButtonId = 'save_button' %}
 {% set optionsTableId = 'options_table' %}
@@ -30,21 +38,28 @@ Usage:
                     $saveButton.attr('disabled', false);
                 });
         });
-
     });
 </script>
 
-<div class="row">
-    <div class="small-12">
-    {{ renderAdminNavigation(pageCurrent) }}
-    </div>
-</div>
 
 <div class="row">
     <div class="small-12">
         <h1>Available {% block title %}{% endblock %} options</h1>
         <p>Select which options should be displayed for this filter.</p>
         <p>{% block description %}{% endblock %}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        <dl class="tabs">
+            <dd class="active">
+                <a href="#">Available {{ filter.name }} Options</a>
+            </dd>
+            <dd class="">
+                <a href="{{ routeLookup('filters.getDefaultsSelections', {filter: filter.id}) }}">Default {{ filter.name }} Selections</a>
+            </dd>
+        </dl>
     </div>
 </div>
 
@@ -83,7 +98,7 @@ Usage:
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12">
         <section class="content">
             <input type="submit" id="{{ saveButtonId }}" value="Save Options" data-href="{{ routeLookup('filters.postSaveOptions', { filter: filter.id }) }}">
         </section>
