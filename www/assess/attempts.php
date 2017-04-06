@@ -195,6 +195,9 @@ if (is_array($allAttempts) && count($allAttempts)) {
                     $marks = round($currentAttempt['totalMarks']).'/'.round($available);
                 }
             }
+            else {
+                $marks = 'N/A';
+            }
         }
 
         $returnUrlSuffix = isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "";
