@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Permission\Access\Access;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -52,7 +53,14 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
  */
 $assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
 if (!$assessment->isParticipant($_SESSION['user']) && $groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE) {
+    // Show quiz preview to someone who's none of above, but has read access to the folder
+    $assessmentFolder = $assessment->getBaseContext()->getFolder();
+    if (Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]) == UserAccess::ACCESS_READ) {
+        $readOnly = true;
+    }
+    else {
         error(19);
+    }
 }
 
 /* Check if this assessment can be started
@@ -139,6 +147,7 @@ $this->setVar(array(
     'ASSESS_FOLDER' => Scrub::text($folder->getName() . ($folder->getCodeString() ? ' ('.$folder->getCodeString().')': '')),
     'ASSESS_FOLDER_ID' => $folder->getId(),
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'READ_ONLY' => $readOnly,
 ));
 
 $assess['description'] = trim($assess['description']);
@@ -163,6 +172,9 @@ if (is_array($allSummary) && count($allSummary)) {
     }
 
     $this->parse('startTest_block', 'startTest');
+    if($readOnly) {
+        $this->setVar('startTest_block', '');
+    }
 } else {
     $this->setVar('section_block', '');
     $this->setVar('startTest_block', '');

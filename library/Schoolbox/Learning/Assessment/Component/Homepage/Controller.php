@@ -113,6 +113,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             'assessables'  => $this->assessments,
             'termCode'     => $this->getTermMapper()->findForToday()->getCode(),
             'readOnly'     => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
+            'canWrite'     => ($this->getContentPermission() >= UserAccess::ACCESS_WRITE),
         ];
     }
 

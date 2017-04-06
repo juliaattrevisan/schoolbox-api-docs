@@ -248,8 +248,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* If you're a student, get redirected to the summary
          */
         else if ($perms >= UserAccess::ACCESS_READ) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
-
+            if ($assessment->isParticipant($this->getUser())) {
+                $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
+            }
+            else {
+                $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
+            }
             $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
             if ($redirOverride) {

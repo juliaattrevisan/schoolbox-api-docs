@@ -14,6 +14,8 @@ use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 class RubricContext
 {
@@ -75,9 +77,10 @@ class RubricContext
      * @param DueWork $dueWork
      * @param User $student
      * @param User $currentUser
+     * @param Access $access
      * @return array
      */
-    public function generate(DueWork $dueWork, User $student, User $currentUser)
+    public function generate(DueWork $dueWork, User $student, User $currentUser, Access $access)
     {
         if(!$dueWork->getUseRubric()){
             return ['rubric' => null];
@@ -91,9 +94,32 @@ class RubricContext
         ];
 
         // Hide total mark from students and parents
-        if (!($currentUser->isSuperuser() || $currentUser->getRole()->isStaff())) {
+        $accessLevel = $access->getFolderAccess($currentUser, [ $dueWork->getBaseContext()->getFolder()->getId() ]);
+        if ($accessLevel < UserAccess::ACCESS_WRITE) {
             unset($context['rubric']['total']);
         }
+
+        return $context;
+    }
+
+    /**
+     * Get a student agnostic readonly grid
+     *
+     * @param DueWork $dueWork
+     * @return array
+     */
+    public function generateBasic(DueWork $dueWork, User $currentUser)
+    {
+        if(!$dueWork->getUseRubric()){
+            return ['rubric' => null];
+        }
+
+        $context = [
+            'rubric' => $dueWork->getRubric()->toContext($currentUser),
+        ];
+
+        // Don't show total mark here at all (it's zero anyway when there is no Participant)
+        unset($context['rubric']['total']);
 
         return $context;
     }

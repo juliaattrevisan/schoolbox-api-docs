@@ -151,6 +151,45 @@ class Controller extends Assessment\Controller
         );
     }
 
+    /**
+     * Display appropriate landing page based on role
+     *
+     * @api   GET /learning/assessments/:assessmentId/:userId
+     * @level 165
+     *
+     * @param Participant $participant
+     * @throws NotFound
+     */
+    public function getPreview(IAssessable $assessment)
+    {
+
+        if($assessment->getUseRubric()){
+            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+        }
+
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+
+        $twigData = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+
+            /* Rubrics data
+             */
+            'rubricContext' => (new RubricContext($this->rubricMapper))->generateBasic($assessment, $this->getUser()),
+            'assessment'   => $assessment,
+
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/dueWork/summary/preview.twig",
+                $twigData, "{$assessment->getTitle()}", 'submission'
+            )
+        );
+    }
+
 
     /**
      * Display appropriate landing page based on role
@@ -193,7 +232,7 @@ class Controller extends Assessment\Controller
 
             /* Rubrics data
              */
-            'rubricContext' => (new RubricContext($this->rubricMapper))->generate($assessment, $student, $this->getUser()),
+            'rubricContext' => (new RubricContext($this->rubricMapper))->generate($assessment, $student, $this->getUser(), $this->getAccess()),
         ];
 
         try {
