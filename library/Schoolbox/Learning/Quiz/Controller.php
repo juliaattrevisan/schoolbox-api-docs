@@ -462,6 +462,14 @@ class Controller extends AbstractController
         throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
+    /**
+     * @api   POST /quiz/attempts/{attemptId}/delete/
+     */
+    public function postAttemptDelete()
+    {
+        new \Alaress_Probe($this->getRequest()->post);
+    }
+
     /* Getters / Setters
      */
 
