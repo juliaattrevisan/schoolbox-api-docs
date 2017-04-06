@@ -32,7 +32,8 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '{/queueId}' => 'getIndex',
+                '' => 'getIndex',
+                '{/queueId}' => 'getLog',
             ],
             'POST' => [
                 '/submit' => 'postSubmit',

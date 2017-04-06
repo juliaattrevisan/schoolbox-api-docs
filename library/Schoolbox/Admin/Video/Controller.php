@@ -26,9 +26,8 @@ class Controller extends Base
      *
      * @api   GET /adminv2/video
      * @level 165
-     * @param VideoQueue $queue
      */
-    public function getIndex($queue)
+    public function getIndex()
     {
         // Render this thing out
 
@@ -45,11 +44,27 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => self::PAGE_CURRENT,
                 'queue' => $queueItems,
-                'log' => $queue,
                 'statusOrder' => $statuses
             ],
             'title' => 'Admin - Video Queue'
         ]);
+    }
+
+    /**
+     * Display log for particular video
+     *
+     * @api   GET /adminv2/video/:id
+     * @level 165
+     * @param VideoQueue $queue
+     */
+    public function getLog($queue) {
+        $this->getResponse()->content->set( $this->buildUnthemedHtmlOutput(
+            '@adminVideo/log.twig',
+             [
+                'log' => $queue,
+            ]
+        ));
+
     }
 
     /**
