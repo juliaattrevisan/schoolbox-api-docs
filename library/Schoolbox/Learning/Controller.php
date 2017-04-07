@@ -48,6 +48,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
+use Schoolbox\Filter\Filters\Folder as FolderFilter;
 
 class Controller extends Base
 {
@@ -211,10 +212,19 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
+
+        // Generate a list of classes/groups that the viewee teaches
+        $getSubjects = true;
+        $groupAccessLevel = UserAccess::ACCESS_WRITE;
+        $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel);
+        $folderRunTimeOptions = new FolderFilter\RunTimeOptions($folders);
+
+
         // Build Filter Panel Components
         $termFilterComponent     = $filterFactoryFactory->buildTermFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
         $assessmentTypeComponent = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
         $workTypeComponent       = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
+        $folderComponent         = $filterFactoryFactory->buildFolderFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS, $folderRunTimeOptions);
 
         // Protect against misconfiguration - projects should not be available on the assessmentType filter for this page
 
@@ -226,6 +236,7 @@ class Controller extends Base
             $termFilterComponent,
             $assessmentTypeComponent,
             $workTypeComponent,
+            $folderComponent,
         ]);
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
@@ -287,6 +298,10 @@ class Controller extends Base
         $workTypeKeyConverter = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildKeyConverter();
         $keyConverters->offsetSet($workTypeKeyConverter->getFilter()->getId(), $workTypeKeyConverter);
 
+        // FolderFilter
+        $folderKeyConverter = $filterFactoryFactory->buildFolderFilterFactory()->buildKeyConverter();
+        $keyConverters->offsetSet($folderKeyConverter->getFilter()->getId(), $folderKeyConverter);
+
 
 
         // TODO add other filters here
@@ -322,7 +337,7 @@ class Controller extends Base
         $selectedTerms           = $termKeyConverter->getSelectedItems($selectionsPerFilter[$termKeyConverter->getFilter()->getId()]);
         $selectedWorkTypes       = $workTypeKeyConverter->getSelectedItems($selectionsPerFilter[$workTypeKeyConverter->getFilter()->getId()]);
         $selectedAssessmentTypes = $assessmentTypeKeyConverter->getSelectedItems($selectionsPerFilter[$assessmentTypeKeyConverter->getFilter()->getId()]);
-
+        $selectedFolderIds       = $folderKeyConverter->getSelectedItems($selectionsPerFilter[$folderKeyConverter->getFilter()->getId()]);
 
 
         // If currentUser == viewee, use currentUser as it may already have class codes
@@ -342,6 +357,7 @@ class Controller extends Base
             $this->externalClass,
             $selectedTerms,
             $selectedWorkTypes,
+            $selectedFolderIds,
             $toChaseLimit,
             $selectedAssessmentTypes,
             $this->folderMapper

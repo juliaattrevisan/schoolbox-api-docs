@@ -119,6 +119,7 @@ interface IFilterDefinition
      *     '2'   => '2016-1 (current)'
      * @param string $key
      * @return string
+     * @throws \InvalidArgumentException If key is recognised as invalid
      */
     public function getLabel($key);
 }

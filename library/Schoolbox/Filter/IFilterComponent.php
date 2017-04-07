@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\User;
 
 /**
  * A component knows how to render itself in a filter panel.
@@ -20,6 +19,12 @@ use Schoolbox\User;
  */
 interface IFilterComponent
 {
+    /**
+     * @return IFilterDefinition
+     */
+    public function getDefinition();
+
+
     /**
      * Return the sub-template to include in the filter panel
      *
