@@ -67,6 +67,11 @@
                 confirmLabel: 'Delete',
                 cancelLabel: 'Cancel',
                 confirmEvent: function() {
+
+                    // A toast
+                    var $toast = $('#toaster');
+                    $toast.toastActivate({text: 'Deleting submission...'});
+
                     $.ajax(element.data('delete'), {
                         headers: {
                             'X-HTTP-Method-Override': 'DELETE'
@@ -103,7 +108,7 @@
                         window.location.href = destination;
                     })
                     .fail(function () {
-                        $('#toaster').toastTimeout({
+                        $toast.toastTimeout({
                             text: 'Could not delete this submission',
                             css: 'pop alert'
                         });
