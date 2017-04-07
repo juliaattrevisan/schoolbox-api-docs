@@ -1,6 +1,7 @@
 {#
     The most basic filter sub-panel template, renders a flat list of checkboxes
     Usage:
+        isAvailable:     bool              - Should this component be available in the panel ?
         definition:      IFilterDefinition
         classSelections: FilterSelection[] - A set of filter selections made by the current user.
         groupSelections: FilterSelection[] - A set of filter selections made by the current user.
@@ -30,51 +31,55 @@
     });
 </script>
 
+{# Are any options available? If not, don't render this filter at all #}
+{% if isAvailable %}
 
+    <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px;">
 
-<div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px;">
+        <h4 data-filter-name style="display: none;">{{ filterName }}</h4>
 
-    <h4 data-filter-name style="display: none;">{{ filterName }}</h4>
+        {% if hasClasses %}
+            <h4>Classes</h4>
+            {% for selection in classSelections %}
+                <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">
+                <input
+                        id="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_class"
+                        type="checkbox"
+                        name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
+                        value="1"
+                        data-duplicate-checkbox="{{ selection.filter.id }}_{{ selection.key }}"
+                        {% if selection.selected %}checked{% endif %}
+                >
+                <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_class">{{ component.label(selection.key) }}</label>
+            {% endfor %}
+        {% endif %}
 
-    {% if hasClasses %}
-        <h4>Classes</h4>
-        {% for selection in classSelections %}
-            <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">
-            <input
-                    id="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_class"
-                    type="checkbox"
-                    name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
-                    value="1"
-                    data-duplicate-checkbox="{{ selection.filter.id }}_{{ selection.key }}"
-                    {% if selection.selected %}checked{% endif %}
-            >
-            <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_class">{{ component.label(selection.key) }}</label>
-        {% endfor %}
-    {% endif %}
+        {% if hasClasses and hasGroups %}
+        <hr>
+        {% endif %}
 
-    {% if hasClasses and hasGroups %}
-    <hr>
-    {% endif %}
+        {% if hasGroups %}
+            <h4>Groups</h4>
+            {% for selection in groupSelections %}
+                <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">
+                <input
+                        id="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_group"
+                        type="checkbox"
+                        name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
+                        value="1"
+                        data-duplicate-checkbox="{{ selection.filter.id }}_{{ selection.key }}"
+                        {% if selection.selected %}checked{% endif %}
+                >
+                <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_group">{{ component.label(selection.key) }}</label>
+            {% endfor %}
+        {% endif %}
 
-    {% if hasGroups %}
-        <h4>Groups</h4>
-        {% for selection in groupSelections %}
-            <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">
-            <input
-                    id="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_group"
-                    type="checkbox"
-                    name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
-                    value="1"
-                    data-duplicate-checkbox="{{ selection.filter.id }}_{{ selection.key }}"
-                    {% if selection.selected %}checked{% endif %}
-            >
-            <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_group">{{ component.label(selection.key) }}</label>
-        {% endfor %}
-    {% endif %}
+        {% if not hasClasses and not hasGroups %}
+            <h4>Class / Group</h4>
+            <div data-alert="" class="alert-box alert">
+                Warning. No Classes or Groups. No results possible.
+            </div>
+        {% endif %}
+    </div>
 
-    {% if not hasClasses and not hasGroups %}
-        <div data-alert="" class="alert-box alert">
-            Warning. No Classes or Groups. No results possible.
-        </div>
-    {% endif %}
-</div>
+{% endif %}

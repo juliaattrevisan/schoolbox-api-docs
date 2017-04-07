@@ -110,7 +110,7 @@ class FactoryFactory
      */
     public function buildFolderFilterFactory()
     {
-        /** @var Folder\Mapper $termMapper */
+        /** @var Folder\Mapper $folderMapper */
         $folderMapper = $this->mapperFactory->get(Folder\Mapper::class);
         return new FolderFilter\Factory(
             $this->getFilterMapper(),

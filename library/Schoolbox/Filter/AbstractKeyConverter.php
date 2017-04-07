@@ -6,7 +6,6 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 
@@ -28,16 +27,6 @@ abstract class AbstractKeyConverter implements IKeyConverter
 
 
     /**
-     * Get all possible items for this filter (regardless of whether they are configured to be available).
-     *
-     * If the selected set of items equals the full possible set, we can forgo the filter check in our DB query for a performance boost
-     *
-     * @return Collection (intentionally not a GenericCollection)
-     */
-    abstract protected function getAllPossibleItems();
-
-
-    /**
      * Fetch the item represented by the key
      *
      * @param string $key
@@ -50,8 +39,12 @@ abstract class AbstractKeyConverter implements IKeyConverter
     /**
      * @inheritdoc
      */
-    public function getSelectedItems(GenericCollection $availableSelections)
+    public function getSelectedItems(GenericCollection $availableSelections = null)
     {
+        if(!$availableSelections){
+            return $this->getAllPossibleItems();
+        }
+
         $allItems      = $this->getAllPossibleItems();
         $availableItems = $allItems->emptyClone();
         $selectedItems = $allItems->emptyClone();

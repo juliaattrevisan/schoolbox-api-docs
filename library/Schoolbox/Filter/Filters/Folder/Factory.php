@@ -119,7 +119,7 @@ class Factory extends AbstractFilterFactory
     /**
      * Returns a key converter, able to convert between concrete keys and the entities they represent
      *
-     * @return IKeyConverter
+     * @return KeyConverter
      */
     public function buildKeyConverter()
     {

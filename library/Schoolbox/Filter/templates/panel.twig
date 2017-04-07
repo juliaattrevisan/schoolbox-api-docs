@@ -289,9 +289,22 @@ Usage:
     <div data-collapsable="panel-components" data-collapse-state="uncollapsed">
         <div>
             <div class="flex-container" style="margin: 0 -20px;">
+                {% set countComponents = 0 %}
                 {% for component in panel.components %}
-                    {% include component.template with component.toContext() %}
+                    {% set template = component.template %}
+                    {% set data = component.toContext() %}
+                    {% if data.isAvailable %}
+                        {% set countComponents = countComponents + 1 %}
+                        {% include component.template with component.toContext() %}
+                    {% endif %}
                 {% endfor %}
+
+                {% if not countComponents %}
+                    <div class="empty-state" style="flex-grow: 1; margin: 0 20px;">
+                        <i class="icon-info"></i>
+                        <p>No filters are configured for this page.</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
         <input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}" data-working="Submitting ...">

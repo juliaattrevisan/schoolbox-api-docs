@@ -103,6 +103,7 @@ class Component extends AbstractFilterComponent
         $abstractGroupSelection = $availableAbstractSelections[Definition::KEY_GROUPS];
 
         return [
+            'isAvailable'     => $availableAbstractOptions->count() ? true : false,
             'component'       => $this,
             'classSelections' => $this->getConcreteSelections($abstractClassSelection, $this->classes),
             'groupSelections' => $this->getConcreteSelections($abstractGroupSelection, $this->groups),

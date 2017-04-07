@@ -312,33 +312,35 @@ class Controller extends Base
          */
         $selectionsPerFilter = new Collection();
 
-        foreach ($postFilterSelections as $filterId => $postFilterSelection) {
-            $keyConverter = $keyConverters[$filterId];
-            $filter = $keyConverter->getFilter();
+        // Are any components present in panel ?
+        if($postFilterSelections){
+            foreach ($postFilterSelections as $filterId => $postFilterSelection) {
+                $keyConverter = $keyConverters[$filterId];
+                $filter = $keyConverter->getFilter();
 
-            $filterSelections = $filterSelectionMapper->createCollection();
-            $selectionsPerFilter->setOffset($filterId, $filterSelections);
+                $filterSelections = $filterSelectionMapper->createCollection();
+                $selectionsPerFilter->setOffset($filterId, $filterSelections);
 
-            foreach ($postFilterSelection as $key => $selected) {
-                $selection = $filterSelectionMapper->createModel();
-                $selection
-                    ->setFilter($filter)
-                    ->setUser($this->getUser())
-                    ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
-                    ->setKey($keyConverter->sanitiseKey($key))
-                    ->setSelected((bool)$selected);
-                $selectionsToSave->add($selection);
-                $filterSelections->offsetSet($key, $selection);
+                foreach ($postFilterSelection as $key => $selected) {
+                    $selection = $filterSelectionMapper->createModel();
+                    $selection
+                        ->setFilter($filter)
+                        ->setUser($this->getUser())
+                        ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
+                        ->setKey($keyConverter->sanitiseKey($key))
+                        ->setSelected((bool)$selected);
+                    $selectionsToSave->add($selection);
+                    $filterSelections->offsetSet($key, $selection);
+                }
             }
+            $filterSelectionMapper->save($selectionsToSave);
         }
-        $filterSelectionMapper->save($selectionsToSave);
 
-
-        $selectedTerms           = $termKeyConverter->getSelectedItems($selectionsPerFilter[$termKeyConverter->getFilter()->getId()]);
-        $selectedWorkTypes       = $workTypeKeyConverter->getSelectedItems($selectionsPerFilter[$workTypeKeyConverter->getFilter()->getId()]);
+        // Get selections, defaulting to full possible set if filter not present in panel (ie disabled by admin)
+        $selectedTerms = $termKeyConverter->getSelectedItems($selectionsPerFilter[$termKeyConverter->getFilter()->getId()]);
+        $selectedWorkTypes = $workTypeKeyConverter->getSelectedItems($selectionsPerFilter[$workTypeKeyConverter->getFilter()->getId()]);
         $selectedAssessmentTypes = $assessmentTypeKeyConverter->getSelectedItems($selectionsPerFilter[$assessmentTypeKeyConverter->getFilter()->getId()]);
-        $selectedFolderIds       = $folderKeyConverter->getSelectedItems($selectionsPerFilter[$folderKeyConverter->getFilter()->getId()]);
-
+        $selectedFolderIds = $folderKeyConverter->getSelectedItems($selectionsPerFilter[$folderKeyConverter->getFilter()->getId()]);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.

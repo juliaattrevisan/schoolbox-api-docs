@@ -105,7 +105,7 @@ class Definition extends AbstractFilterDefinition
      */
     public function getAbstractKeys()
     {
-        return $this->getCustomKeys();
+        return array_merge($this->getCustomKeys(), $this->workTypes->keys());
     }
 
 

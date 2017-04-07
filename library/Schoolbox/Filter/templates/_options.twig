@@ -38,6 +38,41 @@ Usage:
                     $saveButton.attr('disabled', false);
                 });
         });
+
+        // Listen for changes to checkboxes
+        $optionsTable.find('input[type=checkbox]').on('change', function(){
+            checkAllOptionsDisabled($(this).data('page'));
+        });
+
+
+        /**
+         * If admin deselects all options to be available for a page, update column header
+         * @param {string} page
+         */
+        function checkAllOptionsDisabled(page)
+        {
+            var $pageCheckboxes  = $optionsTable.find('input:checked[type=checkbox][data-page='+page+']');
+            var $rowHeader       = $optionsTable.find('th[data-page='+page+']');
+
+            if(0 === $pageCheckboxes.length){
+                $rowHeader.css({
+                    'text-decoration': 'line-through',
+                    'color': '#9a9a9a'
+                });
+                $rowHeader.attr('title', 'Filter will not be available for this page');
+            } else {
+                $rowHeader.css({
+                    'text-decoration': 'none',
+                    'color': 'inherit'
+                });
+                $rowHeader.attr('title', '');
+            }
+        }
+
+        // Check if any pages are disabled
+        $optionsTable.find('th[data-page]').each(function(idx, elem){
+            checkAllOptionsDisabled($(elem).data('page'));
+        });
     });
 </script>
 
@@ -78,7 +113,7 @@ Usage:
             <tr>
                 <th></th>
                 {% for page in definition.pages %}
-                    <th>{{ page }}</th>
+                    <th data-page="{{ page }}" >{{ page | capitalize }}</th>
                 {% endfor %}
             </tr>
             {% for key, option in options %}
@@ -91,7 +126,8 @@ Usage:
                                     id="checkbox_{{ key }}_{{ page }}"
                                     type="checkbox"
                                     name="filter_option[{{ key }}][{{ page }}]"
-                                    {% if options[key][page].available %}checked{% endif %}>
+                                    {% if options[key][page].available %}checked{% endif %}
+                                    data-page="{{ page }}">
                             <label for="checkbox_{{ key }}_{{ page }}" class="checkbox-label"></label>
                         </td>
                     {% else %}

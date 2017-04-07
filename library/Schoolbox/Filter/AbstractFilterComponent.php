@@ -64,18 +64,12 @@ abstract class AbstractFilterComponent implements IFilterComponent
 
 
     /**
+     * @param GenericCollection|Option\Model[] $availableOptions
      * @return \Schoolbox\Filter\Selection\Model[]|GenericCollection
      * @throws Mapper\Exception
      */
-    protected function getSelections()
+    protected function getSelections(GenericCollection $availableOptions)
     {
-        // Get option defaults for current user's roleType
-        $page     = $this->getPage();
-        $roleType = $this->getUser()->getRole()->getType();
-
-        /** @var GenericCollection|Option\Model[] $availableOptions */
-        $availableOptions = $this->getDefinition()->getAvailableOptions($page, $roleType)[$page];
-
         $availableSelections = $this->getDefaultSelections($availableOptions);
         $this->overlayUserSelections($availableSelections);
 
@@ -146,9 +140,17 @@ abstract class AbstractFilterComponent implements IFilterComponent
      */
     public function toContext()
     {
+        // Get option defaults for current user's roleType
+        $page     = $this->getPage();
+        $roleType = $this->getUser()->getRole()->getType();
+
+        /** @var GenericCollection|Option\Model[] $availableOptions */
+        $availableOptions = $this->getDefinition()->getAvailableOptions($page, $roleType)[$page];
+
         return [
-            'definition' => $this->getDefinition(),
-            'selections' => $this->getSelections(),
+            'isAvailable' => $availableOptions->count() ? true : false,
+            'definition'  => $this->getDefinition(),
+            'selections'  => $availableOptions ? $this->getSelections($availableOptions) : null,
         ];
     }
 

@@ -210,7 +210,12 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
             if ($pageFilter && $pageFilter !== $page) {
                 continue;
             }
-            $sortedOptionsPerPage[$page] = $optionsPerPage[$page];
+            if ($optionsPerPage[$page]){
+                $sortedOptionsPerPage[$page] = $optionsPerPage[$page];
+            } else {
+                $sortedOptionsPerPage[$page] = $this->getFilterOptionMapper()->createCollection();
+            }
+
         }
 
         // Ensure all defaults are present in our model graph

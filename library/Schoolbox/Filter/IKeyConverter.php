@@ -45,9 +45,21 @@ interface IKeyConverter
      * selected or none are selected, then return an empty collection to inform the DB query generator
      * that it can skip this filter entirely.
      *
-     * @param GenericCollection|Selection\Model[] $availableSelections Indexed by setting.key
+     * If $availableSelections is null, then the filter is not being uses, so return all possible items
+     *
+     *
+     * @param null|GenericCollection|Selection\Model[] $availableSelections Indexed by setting.key
      * @return Collection (intentionally not GenericCollection)
      * @throws \InvalidArgumentException
      */
-    public function getSelectedItems(GenericCollection $availableSelections);
+    public function getSelectedItems(GenericCollection $availableSelections = null);
+
+    /**
+     * Get all possible items for this filter (regardless of whether they are configured to be available).
+     *
+     * If the selected set of items equals the full possible set, we can forgo the filter check in our DB query for a performance boost
+     *
+     * @return Collection (intentionally not a GenericCollection)
+     */
+    public function getAllPossibleItems();
 }

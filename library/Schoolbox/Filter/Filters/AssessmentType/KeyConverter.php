@@ -52,7 +52,7 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @return Collection|string[]
      */
-    protected function getAllPossibleItems()
+    public function getAllPossibleItems()
     {
         return $this->assessmentTypes->shallowClone();
     }
