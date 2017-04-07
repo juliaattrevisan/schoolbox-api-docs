@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Preview\Chain;
 
+use Schoolbox\Preview\Chain\Strategy\External\IFrame;
 use Schoolbox\Preview\Chain\Strategy\External\Image;
 use Schoolbox\Preview\Chain\Strategy\External\Embed;
 use Schoolbox\Preview\Chain\Strategy\External\Redirect;
@@ -36,6 +37,7 @@ class External extends Base
         $this->start([
             new Image($decodedUrl, $headers),
             new Embed($decodedUrl, $headers),
+            new IFrame($decodedUrl, $headers),
             new Redirect($decodedUrl, $headers),
         ]);
     }

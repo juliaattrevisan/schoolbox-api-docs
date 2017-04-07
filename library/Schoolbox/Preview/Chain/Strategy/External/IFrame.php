@@ -20,8 +20,8 @@ class IFrame extends Base {
      *
      * @var array
      */
-    private $contentTypes = [
-        'text/html',
+    private $allowedUrls = [
+        'https://reports.lauriston.vic.edu.au/',
     ];
 
     /**
@@ -30,8 +30,8 @@ class IFrame extends Base {
      * @return string
      */
     public function test() {
-        foreach ($this->getContentTypes() as $currentContentType) {
-            if (strstr($this->findContentType(), $currentContentType)) {
+        foreach ($this->getAllowedURLs() as $allowedURL) {
+            if (false !== stripos($this->getUrl(), $allowedURL)) {
                 return [
                     'type' => 'iframe',
                     'src' => $this->getUrl(),
@@ -48,11 +48,11 @@ class IFrame extends Base {
     /**
      * Set content types
      *
-     * @param array $contentTypes
+     * @param array $allowedUrls
      */
-    private function setContentTypes($contentTypes)
+    private function setAllowedURLs($allowedUrls)
     {
-        $this->contentTypes = $contentTypes;
+        $this->allowedUrls = $allowedUrls;
     }
 
     /**
@@ -60,8 +60,8 @@ class IFrame extends Base {
      *
      * @return array
      */
-    private function getContentTypes()
+    private function getAllowedURLs()
     {
-        return $this->contentTypes;
+        return $this->allowedUrls;
     }
 }

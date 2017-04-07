@@ -1,5 +1,6 @@
 {% extends '@core/user/student.twig' %}
 
+
 {% block details_studiesCode %}
     {% if externalUser.StudentStudiesCode %}
     <dt class="small-12 medium-3">Studies Code:</dt>
@@ -8,24 +9,38 @@
 {% endblock details_studiesCode %}
 
 {% block buttons_island %}
+    <script type="text/javascript">
+        $(function() {
+            // Preview
+            $('[data-plugin="preview"]').preview();
+        });
+    </script>
     {{ parent() }}
     {% if isStaff %}
         <ul class="flex-list flex-wrap buttons">
             <li>
                 <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Assessment%20Data&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class="icon-due-work" rel="external">Assessment Data</a>
+                   class=" icon-due-work"
+                   data-plugin="preview"
+                   >Assessment Data</a>
             </li>
             <li>
                 <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Reporting%20Grades&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class="icon-progress" rel="external">Reporting Grades</a>
+                   class=" icon-progress"
+                   data-plugin="preview"
+                   >Reporting Grades</a>
             </li>
             <li>
                 <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Learning%20Support&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class="icon-staff" rel="external">Learning Support</a>
+                   class=" icon-staff"
+                   data-plugin="preview"
+                   >Learning Support</a>
             </li>
             <li>
                 <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Student%20Notes&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class="icon-forms" rel="external">Student Notes</a>
+                   class=" icon-forms"
+                   data-plugin="preview"
+                   >Student Notes</a>
             </li>
         </ul>
     {% endif %}
