@@ -11,14 +11,6 @@
 
             // Set up the browser
             var browser = $('[data-role="curriculum-browser"]').curriculumBrowser({
-                areas: {
-                    data: {{ areas|json_encode|raw }},
-                    dialog: $('[data-role="add-area-dialog"]')
-                },
-                levels: {
-                    data: {{ levels|json_encode|raw }},
-                    dialog: $('[data-role="add-level-dialog"]')
-                },
                 view: {
                     readonly: {% if readonly %}true{% else %}false{% endif %},
                     selector: '[data-role="curriculum-editor"]',
@@ -95,30 +87,6 @@
                 <input type="hidden" name="parent" value="{{! it.parent }}" />
                 {{? !it.id && !it.parent }}
                 <h3 id="nodeTitle">Create New Curriculum</h3>
-                <label for="curriculumLearningLevel">Level</label>
-                <select name="learningLevel" id="curriculumLearningLevel">
-                    <option value="">-- select a level --</option>
-                    {{~ it.levels :levelGroup }}
-                    <optgroup label="{{! levelGroup.name || 'Uncategorized' }}">
-                        {{~ levelGroup.list :level }}
-                        <option value="{{! level.id }}" label="{{! level.name }}">{{! level.name }}</option>
-                        {{~ }}
-                    </optgroup>
-                    {{~}}
-                    <option value="" data-interaction="add-level-dialog-open">Add New Level...</option>
-                </select>
-                <label for="curriculumLearningArea">Learning Area</label>
-                <select name="learningArea" id="curriculumLearningArea">
-                    <option value="">-- select an area --</option>
-                    {{~ it.areas :areaGroup }}
-                    <optgroup label="{{! areaGroup.name || 'Uncategorized' }}">
-                        {{~ areaGroup.list :area }}
-                        <option value="{{! area.id }}" label="{{! area.name }}">{{! area.name }}</option>
-                        {{~ }}
-                    </optgroup>
-                    {{~}}
-                    <option value="" data-interaction="add-area-dialog-open">Add New Area...</option>
-                </select>
                 {{?}}
 
                 {{? it.id }}
@@ -211,24 +179,6 @@
             </div>
         </section>
     </div>
-</div>
-
-<div class="reveal-modal" data-reveal data-role="add-area-dialog" aria-labelledby="addAreaTitle" aria-hidden="true" role="dialog">
-    <h2 id="addAreaTitle">Create New Learning Area</h2>
-    <form action="{{ routeLookup('curriculumLearningArea.create') }}" method="post" data-relation="[name='learningArea']">
-        <input name="name" type="text" value="" />
-        <input type="submit" value="Create" />
-    </form>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div class="reveal-modal" data-reveal data-role="add-level-dialog" aria-labelledby="addLevelTitle" aria-hidden="true" role="dialog">
-    <h2 id="addLevelTitle">Create New Learning Level</h2>
-    <form action="{{ routeLookup('curriculumLearningLevel.create') }}" method="post" data-relation="[name='learningLevel']">
-        <input name="name" type="text" value="" />
-        <input type="submit" value="Create" />
-    </form>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 {# Dialog that replaces the second panel on medium down - for now, readonly #}
