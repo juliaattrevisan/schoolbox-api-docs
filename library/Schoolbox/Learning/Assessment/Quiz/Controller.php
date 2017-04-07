@@ -159,7 +159,6 @@ class Controller extends Assessment\Controller
 
         // Has user not yet attempted the quiz
         if ($participant->getAllResponses()->count() == 0) {
-
             $this->redirectToSummaryOrIntro($this->getUser(), $participant->getUser(), $assessment);
             return;
         }
