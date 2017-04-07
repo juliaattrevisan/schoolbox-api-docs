@@ -135,7 +135,7 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li>
-            <a class="icon-delete" data-delete="{{ routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id }) }}">Delete Submission</a>
+            <a class="icon-delete" data-delete="{{ deleteRoute }}">Delete Submission</a>
         </li>
     </ul>
     {% endif %}
