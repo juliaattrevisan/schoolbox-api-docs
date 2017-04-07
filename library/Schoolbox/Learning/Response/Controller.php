@@ -208,7 +208,7 @@ class Controller extends Base
     public function deleteParticularResponse(Participant $participant, Submission $response)
     {
         $code = 204;
-        $data = null;
+        $data = [];
 
         try {
             $this->getResponseDataSource()->delete($response);
