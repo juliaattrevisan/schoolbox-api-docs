@@ -19,6 +19,9 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\MarkScheme\Completion;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -361,8 +364,15 @@ class Controller extends Base
 
             $titlesFound[$title]            = true;
             $data[$title]                   = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
-            $data[$title . ' (Normalized)'] = '';
-            $data[$title . ' (Comment)']    = '';
+            if( $assessment->getMarkScheme() instanceof TotalMarkAbstract) {
+                $data[$title . ' (Total)'] = '';
+            }
+            if( !( $assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion)) {
+                $data[$title . ' (Normalized)'] = '';
+                if(!$assessment->getMarkScheme() instanceof Completion) {
+                    $data[$title . ' (Comment)']    = '';
+                }
+            }
         }
 
         $export[] = $data;
@@ -393,13 +403,22 @@ class Controller extends Base
 
                     $comment = $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
 
-                    $data[$title]                   = $assessment->getHumanReadableMark($student, true);
-                    $data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
-                    $data[$title . ' (Comment)']    = $comment;
-                } else {
-                    $data[$title]                   = '';
-                    $data[$title . ' (Normalized)'] = '';
-                    $data[$title . ' (Comment)']    = '';
+                    if( $assessment->getMarkScheme() instanceof TotalMarkAbstract) {
+                        preg_match('/(\d+) \/ (\d+)/',$assessment->getHumanReadableMark($student, true), $markParts);
+                        $data[$title] = $markParts[1];
+                        $data[$title. ' (Total)'] = $markParts[2];
+                    } else {$data[$title] = $assessment->getHumanReadableMark($student, true);
+                    }
+                    if( !( $assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion)) {$data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
+                    if(!$assessment->getMarkScheme() instanceof Completion) {$data[$title . ' (Comment)'] = $comment;
+                }
+               }
+                } else
+                {
+                    $data[$title] = '';
+                    if( !( $assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion)) {$data[$title . ' (Normalized)'] = '';
+                    if(!$assessment->getMarkScheme() instanceof Completion) {$data[$title . ' (Comment)'] = '';}
+                    }
                 }
 
             }
