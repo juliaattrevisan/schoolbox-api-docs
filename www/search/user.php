@@ -139,9 +139,12 @@ function renderStudent(
                 continue;
             }
         }
+
         $subject['teachers'] = $userMapper->findByColumnList([
-            'synergy_id' => $classHandler->getTeacherName($subject['code']),
-            'group_id'   => $teacherRoles,
+            'synergy_id' => $classHandler->getTeacherName(
+                $subject['folder']->getCodeString() ?: $subject['code']
+            ),
+            'group_id' => $teacherRoles,
         ]);
 
         $subjects[$group][] = $subject;
