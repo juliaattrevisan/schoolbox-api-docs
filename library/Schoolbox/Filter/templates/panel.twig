@@ -290,9 +290,7 @@ Usage:
         <div>
             <div class="flex-container" style="margin: 0 -20px;">
                 {% for component in panel.components %}
-                <div class="checklist" data-component="{{ component.definition.filter.id }}" style="margin: 0 20px;">
                     {% include component.template with component.toContext() %}
-                </div>
                 {% endfor %}
             </div>
         </div>
