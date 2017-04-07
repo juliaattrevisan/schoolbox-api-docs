@@ -19,6 +19,7 @@ use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Resource\Folder;
 
 
 /**
@@ -59,8 +60,8 @@ class FactoryFactory
         switch ($filterDefinitionClass) {
             case AssessmentTypeFilter\Definition::class:
                 return $this->buildAssessmentTypeFilterFactory();
-//            case Folder\Definition::class:
-//                return $this->buildFolderFilterFactory();
+            case FolderFilter\Definition::class:
+                return $this->buildFolderFilterFactory();
             case TermFilter\Definition::class:
                 return $this->buildTermFilterFactory();
             case WorkTypeFilter\Definition::class:
@@ -102,17 +103,23 @@ class FactoryFactory
         );
     }
 
-//
-//    /**
-//     * @return FolderFilter\Factory
-//     * @throws \InvalidArgumentException
-//     */
-//    public function FolderGroupFilterFactory()
-//    {
-//        $factory = new FolderFilter\Factory();
-//        $this->setBaseDependencies($factory, FolderFilter\Definition::class);
-//        return $factory;
-//    }
+
+    /**
+     * @return FolderFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    public function buildFolderFilterFactory()
+    {
+        /** @var Folder\Mapper $termMapper */
+        $folderMapper = $this->mapperFactory->get(Folder\Mapper::class);
+        return new FolderFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper(),
+            $folderMapper
+        );
+    }
 
 
     /**

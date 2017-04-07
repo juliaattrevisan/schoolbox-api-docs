@@ -87,6 +87,12 @@ class PendingFactory
     private $foldersCache = [];
 
     /**
+     * Folders that the user has requested and we have confirmed they teach
+     * @var GenericCollection|Folder[]
+     */
+    private $selectedFolders;
+
+    /**
      * Each Project requires an ID and Title. Indexed by assessment.id
      *
      * @var Project[] $projectCache
@@ -163,6 +169,12 @@ class PendingFactory
     private $teacherCache;
 
     /**
+     * Not authenticated!! TODO - consider authenticating before inserting into this factory to avoid re-lookup
+     * @var Collection|int[]
+     */
+    private $selectedFolderIds;
+
+    /**
      * Intentionally not a GenericCollection so we can insert NULL items
      * @var Collection|WorkType\Model[]
      */
@@ -232,9 +244,10 @@ class PendingFactory
      * @param User                           $viewee
      * @param IConnector                     $database
      * @param \External_ClassInterface       $externalClass
-     * @param GenericCollection|Term\Model[] $terms Only display assessments that are due in these terms
-     * @param Collection|WorkType\Model[] $selectedWorkTypes
-     * @param\Alaress_Date_Format           $toChaseLimit
+     * @param GenericCollection|Term\Model[] $terms             Only display assessments that are due in these terms
+     * @param Collection|WorkType\Model[]    $selectedWorkTypes
+     * @param Collection                     $selectedFolderIds Not yet authorised, need to confirm user has permission
+     * @param \Alaress_Date_Format           $toChaseLimit
      * @param Collection|string[]            $selectedAssessmentTypes
      * @param FolderMapper                   $folderMapper
      */
@@ -244,21 +257,24 @@ class PendingFactory
         \External_ClassInterface $externalClass,
         GenericCollection $terms,
         Collection $selectedWorkTypes,
+        Collection $selectedFolderIds,
         \Alaress_Date_Format $toChaseLimit,
         Collection $selectedAssessmentTypes,
         FolderMapper $folderMapper
 
     ) {
-        $this->viewee           = $viewee;
-        $this->database         = $database;
-        $this->externalClass    = $externalClass;
-        $this->assessmentsCache = new GenericCollection(IAssessable::class);  // TODO SA-2631
-        $this->terms            = $terms;
-        $this->workTypes        = $selectedWorkTypes;
-        $this->toChaseLimit     = $toChaseLimit;
-        $this->nullDate         = new \Alaress_Date_NullDate();
-        $this->assessmentTypes  = $selectedAssessmentTypes;
-        $this->folderMapper     = $folderMapper;
+        $this->viewee            = $viewee;
+        $this->database          = $database;
+        $this->externalClass     = $externalClass;
+        $this->assessmentsCache  = new GenericCollection(IAssessable::class);  // TODO SA-2631
+        $this->terms             = $terms;
+        $this->workTypes         = $selectedWorkTypes;
+        $this->selectedFolderIds = $selectedFolderIds;
+        $this->toChaseLimit      = $toChaseLimit;
+        $this->nullDate          = new \Alaress_Date_NullDate();
+        $this->assessmentTypes   = $selectedAssessmentTypes;
+        $this->folderMapper      = $folderMapper;
+        $this->selectedFolders   = $folderMapper->createCollection();
     }
 
 
@@ -547,7 +563,7 @@ class PendingFactory
     private function getAssessments()
     {
         // Is user not teaching or administering any classes or groups?
-        if(!count($this->foldersCache)){
+        if(!count($this->selectedFolders)){
             return;
         }
 
@@ -555,7 +571,7 @@ class PendingFactory
         list($aTypeSelect, $aTypeJoin, $aTypeClause) = $this->buildAssessmentTypeClause();
         list($workTypeSelect, $workTypeJoin, $workTypeClause) = $this->buildWorkTypeClause();
 
-        $folderIds = array_keys($this->foldersCache);
+        $folderIds = $this->selectedFolders->keys();
 
 
         $query1       = "
@@ -1569,6 +1585,9 @@ class PendingFactory
 
         foreach($folders as $folder){
             $this->foldersCache[$folder->getId()] = $folder;
+            if($this->selectedFolderIds->offsetExists($folder->getId())){
+                $this->selectedFolders->setOffset($folder->getId(), $folder);
+            }
         }
     }
 }

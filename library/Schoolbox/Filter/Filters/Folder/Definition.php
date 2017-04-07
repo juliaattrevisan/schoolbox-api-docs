@@ -12,7 +12,7 @@ use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder;
 
 /**
  * @todo
@@ -20,28 +20,8 @@ use Schoolbox\Resource\Folder\Model as Folder;
 class Definition extends AbstractFilterDefinition
 {
 
-    /**
-     * @var GenericCollection|Folder[]
-     */
-    private $classes;
-
-    /**
-     * @var GenericCollection|Folder[]
-     */
-    private $groups;
-
-
-    public function __construct(
-        Filter\Model $filter,
-        Option\Mapper $filterOptionMapper,
-        Defaults\Mapper $filterDefaultMapper,
-        GenericCollection $classes,
-        GenericCollection $groups
-    ) {
-        parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
-        $this->classes = $classes;
-        $this->groups  = $groups;
-    }
+    const KEY_CLASSES = 'classes';
+    const KEY_GROUPS = 'groups';
 
 
     /**
@@ -49,118 +29,102 @@ class Definition extends AbstractFilterDefinition
      */
     protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
     {
-        // TODO: Implement insertDynamicOptions() method.
+        // noop - abstract options are hard-coded, concrete options are run-time
+        return $pageOptions;
     }
 
 
     /**
-     * There may be existing availability settings saved to the DB that refer
-     * to (most likely dynamic) items that no longer exist.
-     *
-     * Eg the admin may have configured that the Term 2017 should be available, but
-     * it has subsequently been deleted from the system.
-     *
-     * Concrete classes can unset their relevant options here for similar reasons.
-     *
-     * @param GenericCollection|Option\Model[] $pageOptions
-     * @return GenericCollection|Option\Model[]
+     * @inheritdoc
      */
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
-        // TODO: Implement unsetInvalidOptions() method.
+        // noop - abstract options are hard-coded, concrete options are run-time
+        return $pageOptions;
     }
 
 
     /**
-     * If not yet configured by the admin, should this filter option be selected by default
-     *
-     * By default, return false (never setting available option to be pre-selected)
-     *
-     * @param string $key
-     * @param string $page
-     * @param string $roleType
-     * @return bool
+     * @inheritdoc
      */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
-        // TODO: Implement getInitialSelectedState() method.
+        // Nothing is selected, meaning filter is not applied
+        return false;
     }
 
 
     /**
-     * Return the ordered, hard-codes list of custom keys for this filter.
-     * These may represent concepts, eg 'all', 'past' etc, or concrete items, like '1' => Project, '2' => Quiz
-     *
-     * @return string[]
+     * @inheritdoc
      */
     protected function getCustomKeys()
     {
-        // TODO: Implement getCustomKeys() method.
+        return [
+            self::KEY_CLASSES,
+            self::KEY_GROUPS,
+        ];
     }
 
 
     /**
-     * Each filter definition must know how to sort options
-     *
-     * @param GenericCollection|Option\Model[] $options
-     * @return GenericCollection
+     * @inheritdoc
      */
     protected function sortFilterOptions(GenericCollection $options)
     {
-        // TODO: Implement sortFilterOptions() method.
+        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
+            $leftKey  = $left->getKey();
+            $rightKey = $right->getKey();
+            if($leftKey === $rightKey) {
+                return 0;
+            }
+
+            return self::KEY_CLASSES === $leftKey ? -1 : +1;
+        });
     }
 
 
     /**
-     * If the admin has not configured this option, should it be available in filter panels?
-     *
-     * By default, all possible options will be available on all pages. (ie just return true)
-     *
-     * @param string $customAbstractKey
-     * @param string $page
-     * @return bool
+     * @inheritdoc
      */
     protected function getInitialAvailability($customAbstractKey, $page)
     {
-        // TODO: Implement getInitialAvailability() method.
+        // Initial config is both classes and groups are available for all pages
+        return true;
     }
 
 
     /**
-     * Return an ordered list of pages where this filter is available
-     *
-     * @see FilterOption::PAGE_* constants
-     * @return string[]
+     * @inheritdoc
      */
     public function getPages()
     {
-        // TODO: Implement getPages() method.
+        return [
+            Option\Model::PAGE_PENDING_ASSESSMENTS,
+            Option\Model::PAGE_MARK_BOOK,
+        ];
     }
 
 
     /**
-     * Return the set of possible keys for this filter's options
-     *
-     * @return string[]
+     * @inheritdoc
      */
     public function getAbstractKeys()
     {
-        // TODO: Implement getAbstractKeys() method.
+        return $this->getCustomKeys();
     }
 
 
     /**
-     * Convert an key into a label suitable for rendering in admin pages
-     *
-     * eg: 'all' => 'All'
-     *     '1'   => 'Something that represents #1'
-     *     '2'   => '2016-1 (current)'
-     *
-     * @param string $key
-     * @return string
+     * @inheritdoc
      */
     public function getLabel($key)
     {
-        // TODO: Implement getLabel() method.
+        switch($key) {
+            case self::KEY_CLASSES:
+                return 'Classes';
+            case self::KEY_GROUPS:
+                return 'Groups';
+        }
+        throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
     }
 }

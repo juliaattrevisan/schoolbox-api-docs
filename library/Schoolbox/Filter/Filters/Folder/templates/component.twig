@@ -1,0 +1,62 @@
+{#
+    The most basic filter sub-panel template, renders a flat list of checkboxes
+    Usage:
+        definition:      IFilterDefinition
+        classSelections: FilterSelection[] - A set of filter selections made by the current user.
+        groupSelections: FilterSelection[] - A set of filter selections made by the current user.
+#}
+
+<script>
+    $(function() {
+        // Ensure if a folder is both a class and a group, they are either both selected, or neither selected
+        // This solves issue of later checkedState clobbering first.
+        // TODO merge this list so no duplicates
+        $('[data-duplicate-checkbox]').on('change', function(){
+            var checkedState = $(this).prop('checked');
+            $('[data-duplicate-checkbox='+$(this).data('duplicate-checkbox')+']').prop('checked', checkedState);
+        });
+    });
+
+</script>
+
+
+{% if classSelections | length %}
+    <h4>Classes:</h4>
+    {% for selection in classSelections %}
+        <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">
+        <input
+                id="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_class"
+                type="checkbox"
+                name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
+                value="1"
+                data-duplicate-checkbox="{{ selection.filter.id }}_{{ selection.key }}"
+                {% if selection.selected %}checked{% endif %}
+        >
+        <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_class">{{ component.label(selection.key) }}</label>
+    {% endfor %}
+{% endif %}
+
+{% if classSelections | length and groupSelections | length %}
+<hr>
+{% endif %}
+
+{% if groupSelections | length %}
+    <h4>Groups:</h4>
+    {% for selection in groupSelections %}
+        <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">
+        <input
+                id="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_group"
+                type="checkbox"
+                name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
+                value="1"
+                data-duplicate-checkbox="{{ selection.filter.id }}_{{ selection.key }}"
+                {% if selection.selected %}checked{% endif %}
+        >
+        <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}_group">{{ component.label(selection.key) }}</label>
+    {% endfor %}
+{% endif %}
+
+{% if 0 == (classSelections | length) and 0 == (groupSelections | length) %}
+    {# TODO make this cleaner #}
+    Warning. No Classes or Groups. Cannot generate results.
+{% endif %}

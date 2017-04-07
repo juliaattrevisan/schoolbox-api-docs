@@ -6,6 +6,7 @@
 
 namespace Schoolbox\Filter\Filters\Folder;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
@@ -19,21 +20,22 @@ class KeyConverter extends AbstractKeyConverter
 {
 
     /**
-     * All Folders known to the system (regardless of whether they are available)
+     * All Folders IDs known to the system (regardless of whether they are available)
+     * (using IDs instead of Models as too slow for no value)
      *
-     * @var GenericCollection|Folder\Model[]
+     * @var Collection|int[]
      */
-    private $folders;
+    private $folderIds;
 
 
     /**
      * @param Filter\Model      $filter
-     * @param GenericCollection $folders
+     * @param Collection $folderIds
      */
-    public function __construct(Filter\Model $filter, GenericCollection $folders)
+    public function __construct(Filter\Model $filter, Collection $folderIds)
     {
         parent::__construct($filter);
-        $this->folders = $folders->shallowClone();
+        $this->folderIds = $folderIds->shallowClone();
     }
 
 
@@ -47,19 +49,18 @@ class KeyConverter extends AbstractKeyConverter
     public function getItem($key)
     {
         $this->assertValidKey($key);
-
-        return $this->folders[$key];
+        return $this->folderIds[$key];
     }
 
 
     /**
      * Return all available concrete items
      *
-     * @return GenericCollection|Folder\Model[]
+     * @return Collection|int[]
      */
     public function getAllPossibleItems()
     {
-        return $this->folders->shallowClone();
+        return $this->folderIds->shallowClone();
     }
 
 
@@ -78,7 +79,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
-        if (!$this->folders->offsetExists($key)) {
+        if (!$this->folderIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No Folder found for key: $key");
         }
     }

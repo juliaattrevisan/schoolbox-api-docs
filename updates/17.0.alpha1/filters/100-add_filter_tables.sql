@@ -65,10 +65,11 @@ CREATE TABLE filter_selection (
 DELETE FROM config WHERE `name` = 'pending_assessment_types';
 
 -- Add Filters
-INSERT INTO filter (id, `class`) VALUES
-  (1, 'Schoolbox\\Filter\\Filters\\Term\\Definition'),
-  (2, 'Schoolbox\\Filter\\Filters\\AssessmentType\\Definition'),
-  (3, 'Schoolbox\\Filter\\Filters\\WorkType\\Definition')
+INSERT INTO filter (`class`) VALUES
+  ('Schoolbox\\Filter\\Filters\\Term\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\AssessmentType\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\WorkType\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Folder\\Definition')
 ;
 
 
