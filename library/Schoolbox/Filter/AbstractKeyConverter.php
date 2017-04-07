@@ -28,7 +28,7 @@ abstract class AbstractKeyConverter implements IKeyConverter
 
 
     /**
-     * Get all possible items for this filter (regardless of whether they are configured to be availble).
+     * Get all possible items for this filter (regardless of whether they are configured to be available).
      *
      * If the selected set of items equals the full possible set, we can forgo the filter check in our DB query for a performance boost
      *
@@ -57,10 +57,11 @@ abstract class AbstractKeyConverter implements IKeyConverter
         $selectedItems = $allItems->emptyClone();
 
         foreach ($availableSelections as $selection) {
-            $item = $this->getItem($selection->getKey());
-            $availableItems->add($item);
+            $key = $selection->getKey();
+            $item = $this->getItem($key);
+            $availableItems->offsetSet($key, $item);
             if ($selection->getSelected()) {
-                $selectedItems->add($item);
+                $selectedItems->offsetSet($key, $item);
             }
         }
 
