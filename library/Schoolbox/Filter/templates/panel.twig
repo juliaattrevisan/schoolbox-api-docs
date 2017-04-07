@@ -14,6 +14,54 @@ Usage:
 
 <script type="text/javascript">
 
+
+
+
+    $(function() {
+        {#TODO - move this to plugin called 'multi-checkbox-select' or similar#}
+        {# TODO - fix bug with folder filter duplicating action for classes + groups #}
+
+        // Track the most recently changed checkbox per component
+        var mostRecentChangePerComponent = [];
+
+        $(document).on('click', '[data-component] label', function (e) {
+
+            var $component           = $(this).closest('[data-component]');
+            var $componentId         = $component.data('component');
+            var $componentLabels     = $component.find('label');
+            var $componentCheckboxes = $component.find('input[type=checkbox]');
+            var labelIndex           = $componentLabels.index(this);
+
+            // Is this not the first checkbox changed for this component ?
+            var mostRecentChangedIndex = mostRecentChangePerComponent[$componentId];
+
+            // Was this a shiftClick on a different checkbox ?
+            if(e.shiftKey && typeof mostRecentChangedIndex === 'number' && mostRecentChangedIndex !== labelIndex){
+
+                // Change all intervening checkboxes to the new value
+                var changedCheckbox  = $componentCheckboxes.get(labelIndex);
+                var newState         = !$(changedCheckbox).prop('checked');
+                var increment = labelIndex > mostRecentChangedIndex ? +1 : -1;
+                for(var i = mostRecentChangedIndex; i !== labelIndex; i += increment){
+                    var checkbox = $componentCheckboxes.get(i);
+                    $(checkbox).prop('checked', newState);
+                }
+                clearSelection();
+            }
+            mostRecentChangePerComponent[$componentId] = labelIndex;
+
+        });
+
+        function clearSelection() {
+            if ( document.selection ) {
+                document.selection.empty();
+            } else if ( window.getSelection ) {
+                window.getSelection().removeAllRanges();
+            }
+        }
+    });
+
+
     $(function() {
 
         // ============== Plugins
@@ -22,23 +70,27 @@ Usage:
 
         // ============== Vars
 
-        var $reportContent = $('#{{ contentId }}');
-        var $filterPanel = $('#{{ filterPanelId }}');
-        var $panelComponents = $filterPanel.find('[data-component]');
-        var $filtersInUseLabel = $filterPanel.find('[data-filters-in-use]');
-        var $submitButton = $('#{{ submitButtonId }}');
-        var $optionCheckboxes = $filterPanel.find('input[type=checkbox], input[type=hidden]');
-        var $toast = $('[data-relation="submit-label"]');
-        var $restrictFiltersHelp = $filterPanel.find('#filter_restriction_help');
-        var $filterLoaderIcon = $filterPanel.find('#filter-loader');
-        var $filterRestrictionHelpHTML = '';
+        var $reportContent       = $('#{{ contentId }}');
+        var $filterPanel         = $('#{{ filterPanelId }}');
+        var $panelComponents     = $filterPanel.find('[data-component]');
+        var $filtersInUseLabel   = $filterPanel.find('[data-filters-in-use]');
+        var $submitButton        = $('#{{ submitButtonId }}');
+        var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden]');
+        var $toast               = $('[data-relation="submit-label"]');
+        var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
+        var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
+
+        //  Error messages to display for different server errors
+        var $alertOutOfMemory  = null;
+        var $alertFatalError   = null;
+        var $alertErrorUnknown = null;
+
 
         // ============== Event Handlers
 
         // Listen for clicks on the submit button
         $submitButton.on('click', function(event){
             event.preventDefault();
-            $toast.toastActivate({text: 'Requesting report...'});
             fetchReport();
         });
 
@@ -53,6 +105,7 @@ Usage:
          * Requests a filtered report via AJAX
          */
         function fetchReport() {
+            $toast.toastActivate({text: 'Requesting report...'});
             showFilterLoader();
             var href = $submitButton.data('href');
             var data = $optionCheckboxes.serialize();
@@ -62,14 +115,21 @@ Usage:
 
             $.post(href, data)
                 .success(function(html){
-                    $restrictFiltersHelp.hide();
+
+                    // Does the first 400 chars indicate a fatal error? But returned 200 for some reason? why does this happen sometimes??
+                    var fatalErrorStringIndex = html.indexOf('Fatal error:');
+                    if( -1 !== fatalErrorStringIndex && fatalErrorStringIndex < 400 ){
+                        processServerError();
+                        return;
+                    }
+
+                    $serverErrorFeedback.hide();
                     hidePanel();
                     $reportContent.html(html);
                     $toast.toastTimeout({text: 'Success!', css: 'success'});
                 })
-                .fail(function(){
-                    $toast.toastTimeout({text: 'Failure!', css: 'alert'});
-                    $restrictFiltersHelp.html($filterRestrictionHelpHTML).show();
+                .fail(function(response){
+                    processServerError(response.responseText);
                 })
                 .always(function() {
                     $submitButton.val('Submit');
@@ -77,6 +137,38 @@ Usage:
                     enableInputs();
                 });
         }
+
+        /**
+         * Try to figure out why the server failed to return a report
+         */
+        function processServerError(responseText)
+        {
+            console.log(responseText);
+            if('string' !== typeof responseText) {
+                console.log('unknwone 1');
+                displayAlert($alertErrorUnknown);
+                return;
+            }
+
+            // Was this an OOM error ?
+            var oomErrorIndex = responseText.indexOf('Fatal error: Allowed memory size of');
+            if(-1 !== oomErrorIndex && oomErrorIndex < 400) {
+                displayAlert($alertOutOfMemory);
+                console.log('oom');
+                return;
+            }
+
+            // Was an uncaught exception thrown ?
+            var uncaughtExceptionIndex = responseText.indexOf('Error Encountered');
+            if(-1 !== uncaughtExceptionIndex && uncaughtExceptionIndex < 400) {
+                displayAlert($alertFatalError);
+                console.log('uncaught');
+                return;
+            }
+            console.log('unknwone 2');
+            displayAlert($alertErrorUnknown);
+        }
+
 
 
         /**
@@ -107,8 +199,24 @@ Usage:
         /**
          * Fetch the HTML we will render by JS into an alert. Then remove the template from the DOM.
          */
-        function cacheFilterRestrictionHtml(){
-            $filterRestrictionHelpHTML = $restrictFiltersHelp.html();
+        function cacheErrorAlerts(){
+            // Cache error messages
+            $alertOutOfMemory  = $serverErrorFeedback.find('[data-reason="out-of-memory"]');
+            $alertFatalError   = $serverErrorFeedback.find('[data-reason="uncaught-exception"]');
+            $alertErrorUnknown = $serverErrorFeedback.find('[data-reason=unknown]');
+
+            // Remove from DOM
+            $serverErrorFeedback.find('[data-reason]').detach();
+        }
+
+        /**
+         * Show an alert in the server feedback panel
+         */
+        function displayAlert($alert){
+            $toast.toastTimeout({text: 'Failure!', css: 'alert'});
+            $alert.removeClass('alert-close');
+            $serverErrorFeedback.append($alert);
+            $serverErrorFeedback.show();
         }
 
         /**
@@ -156,7 +264,7 @@ Usage:
          * Populates the 'in-use' filter label and fetches the report
          */
         function init() {
-            cacheFilterRestrictionHtml();
+            cacheErrorAlerts();
             updateFiltersInUseLabel();
             fetchReport();
         }
@@ -182,7 +290,7 @@ Usage:
         <div>
             <div class="flex-container" style="margin: 0 -20px;">
                 {% for component in panel.components %}
-                <div class="checklist" data-component style="margin: 0 20px;">
+                <div class="checklist" data-component="{{ component.definition.filter.id }}" style="margin: 0 20px;">
                     {% include component.template with component.toContext() %}
                 </div>
                 {% endfor %}
@@ -193,10 +301,22 @@ Usage:
     </div>
 
     {# Will contain error message HTML, as defined in template below #}
-    <div id="filter_restriction_help" style="display: none;" >
-        <div data-alert="" class="alert-box alert">
-            Unable to generate filtered report. This is usually due to filters being too liberal, which generates too much data to process.<br>
+    <div id="server_error_feedback" style="display: none;" >
+        <div data-reason="out-of-memory" data-alert="" class="alert-box alert">
+            The server has run out of memory while attempting to build the requested report.<br>
+            This is usually due to filters being too liberal, which generates too much data to process.<br>
             Please try setting your filters to be more restrictive to return a smaller data set.
+            <a href="" class="close">×</a>
+        </div>
+
+        <div data-reason="uncaught-exception" data-alert="" class="alert-box alert">
+            An exception was thrown during report generation. Please report this to Schoolbox support.
+            <a href="" class="close">×</a>
+        </div>
+
+        <div data-reason="unknown" data-alert="" class="alert-box alert">
+            The server failed to generate the report. Please try setting your filters to be more restrictive to generate a smaller data set.
+            If the issue continues, please report this to Schoolbox support.
             <a href="" class="close">×</a>
         </div>
     </div>
