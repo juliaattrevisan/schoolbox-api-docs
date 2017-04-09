@@ -118,10 +118,11 @@ class Controller extends Base
      */
     private $database;
 
+    /** @var FilterSelection\Mapper */
+    private $filterSelectionMapper;
+
 
     /**
-     * Controller constructor.
-     *
      * @param ErrorMapper                $errorMapper
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param FolderMapper               $folderMapper
@@ -133,10 +134,11 @@ class Controller extends Base
      * @param QuizAttemptMapper          $quizAttemptMapper
      * @param Timetable_ColourMapper     $timetableColourMapper
      * @param CourseImplementationMapper $courseImplementationMapper
-     * @param CourseSpecificationMapper $courseSpecificationMapper
-     * @param \External_ClassInterface $externalClass
-     * @param IConnector $database
-     * @param Access $access
+     * @param CourseSpecificationMapper  $courseSpecificationMapper
+     * @param FilterSelection\Mapper     $filterSelectionMapper
+     * @param \External_ClassInterface   $externalClass
+     * @param IConnector                 $database
+     * @param Access                     $access
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -151,6 +153,7 @@ class Controller extends Base
         Timetable_ColourMapper $timetableColourMapper,
         CourseImplementationMapper $courseImplementationMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
+        FilterSelection\Mapper $filterSelectionMapper,
         \External_ClassInterface $externalClass,
         IConnector $database,
         Access $access
@@ -167,6 +170,7 @@ class Controller extends Base
         $this->timetableColourMapper      = $timetableColourMapper;
         $this->courseImplementationMapper = $courseImplementationMapper;
         $this->courseSpecificationMapper  = $courseSpecificationMapper;
+        $this->filterSelectionMapper      = $filterSelectionMapper;
         $this->externalClass              = $externalClass;
         $this->database                   = $database;
         $this->access                     = $access;
@@ -273,16 +277,6 @@ class Controller extends Base
          */
         $postFilterSelections = $this->request->post['filter_selection'];
 
-        // Delete user's current selections for this page
-        $filterSelectionMapper = Filter\Selection\Mapper::getInstance();
-        $filterSelectionMapper->deleteByColumnList([
-            'user_id' => $this->getUser()->getId(),
-            'page'    => FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
-        ]);
-
-        // Save User's current selections
-        $selectionsToSave = $filterSelectionMapper->createCollection();
-
         // What filters are in use on this page? Get their key converters
         $keyConverters = $filterFactoryFactory->createKeyConverterCollection();
 
@@ -302,39 +296,10 @@ class Controller extends Base
         $folderKeyConverter = $filterFactoryFactory->buildFolderFilterFactory()->buildKeyConverter();
         $keyConverters->offsetSet($folderKeyConverter->getFilter()->getId(), $folderKeyConverter);
 
+        // Save
+        $page = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
+        $selectionsPerFilter = $this->filterSelectionMapper->updateSelections($keyConverters, $this->getUser(), $page, $postFilterSelections);
 
-
-        // TODO add other filters here
-
-        /**
-         * Parse the post data to build a graph of all user selections, grouped by filter.id
-         * @var Collection|GenericCollection[]|FilterSelection\Model[][] $selectionsPerFilter
-         */
-        $selectionsPerFilter = new Collection();
-
-        // Are any components present in panel ?
-        if($postFilterSelections){
-            foreach ($postFilterSelections as $filterId => $postFilterSelection) {
-                $keyConverter = $keyConverters[$filterId];
-                $filter = $keyConverter->getFilter();
-
-                $filterSelections = $filterSelectionMapper->createCollection();
-                $selectionsPerFilter->setOffset($filterId, $filterSelections);
-
-                foreach ($postFilterSelection as $key => $selected) {
-                    $selection = $filterSelectionMapper->createModel();
-                    $selection
-                        ->setFilter($filter)
-                        ->setUser($this->getUser())
-                        ->setPage(FilterOption\Model::PAGE_PENDING_ASSESSMENTS)
-                        ->setKey($keyConverter->sanitiseKey($key))
-                        ->setSelected((bool)$selected);
-                    $selectionsToSave->add($selection);
-                    $filterSelections->offsetSet($key, $selection);
-                }
-            }
-            $filterSelectionMapper->save($selectionsToSave);
-        }
 
         // Get selections, defaulting to full possible set if filter not present in panel (ie disabled by admin)
         $selectedTerms = $termKeyConverter->getSelectedItems($selectionsPerFilter[$termKeyConverter->getFilter()->getId()]);
@@ -351,7 +316,6 @@ class Controller extends Base
 
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
-        // TODO -UP TO HERE - assessment Types
 
         $factory = new PendingFactory(
             $viewee,

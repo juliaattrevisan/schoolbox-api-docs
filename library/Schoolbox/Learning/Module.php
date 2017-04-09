@@ -31,6 +31,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Filter\Selection as FilterSelection;
 
 class Module extends BaseModule
 {
@@ -192,6 +193,7 @@ class Module extends BaseModule
             'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
             'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
             'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
+            'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
             'externalClass'              => $this->getInjector()->get('externalClass'),
             'database'                   => $this->getInjector()->get('databaseInternal'),
         ];
