@@ -19,8 +19,6 @@ Usage:
 
     $(function() {
         {#TODO - move this to plugin called 'multi-checkbox-select' or similar#}
-        {# TODO - fix bug with folder filter duplicating action for classes + groups #}
-
         // Track the most recently changed checkbox per component
         var mostRecentChangePerComponent = [];
 
@@ -52,6 +50,9 @@ Usage:
 
         });
 
+        /**
+         * Clears any text selection that occurred when shift+clicking a selection of text-boxes
+         */
         function clearSelection() {
             if ( document.selection ) {
                 document.selection.empty();
@@ -73,7 +74,7 @@ Usage:
         var $reportContent       = $('#{{ contentId }}');
         var $filterPanel         = $('#{{ filterPanelId }}');
         var $panelComponents     = $filterPanel.find('[data-component]');
-        var $filtersInUseLabel   = $filterPanel.find('[data-filters-in-use]');
+        var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#{{ submitButtonId }}');
         var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden]');
         var $toast               = $('[data-relation="submit-label"]');
@@ -85,6 +86,8 @@ Usage:
         var $alertFatalError   = null;
         var $alertErrorUnknown = null;
 
+        // A tab to insert in filter summary - illustrating what filters are being used
+        var $tabAppliedFilter  = null;
 
         // ============== Event Handlers
 
@@ -99,7 +102,24 @@ Usage:
             updateFiltersInUseLabel();
         });
 
+        $appliedFilters.on('click', '[data-close]', function(event){
+            var $filterTab = $(this).closest('[data-applied-filter-tab]');
+            clearFilter($filterTab.find('[data-filter]').data('filter'));
+            $filterTab.remove();
+            return false; // don't bubble
+        });
+
         // ============== Helpers
+
+        /**
+         * Remove filter ta
+         * Clears checkboxes for the specified filter
+         * @param {int} filterId
+         */
+        function clearFilter(filterId) {
+            $panelComponents.filter('[data-component='+filterId+']').find('input[type=checkbox]').prop('checked', false);
+            updateFiltersInUseLabel();
+        }
 
         /**
          * Requests a filtered report via AJAX
@@ -210,6 +230,13 @@ Usage:
         }
 
         /**
+         * Grab the applied filter template so we can insert as required
+         */
+        function cacheAppliedFilterTab() {
+            $tabAppliedFilter = $('[data-applied-filter-tab]').remove().removeClass('hide');
+        }
+
+        /**
          * Show an alert in the server feedback panel
          */
         function displayAlert($alert){
@@ -225,23 +252,42 @@ Usage:
          * A filter is not selected if either:
          * * all options are selected, or
          * * no options are selected.
-         *
          */
         function updateFiltersInUseLabel()
         {
-            var $componentsInUse = [];
+            var componentsInUse = {};
             $panelComponents.each(function (idx, component) {
                 var $component = $(component);
+                console.log($component);
+                var filterId   = $component.data('component');
+                console.log('filterId: ' + filterId);
                 var countAvailable = $component.find('input[type=checkbox]').length;
                 var countSelected = $component.find('input:checked[type=checkbox]').length;
 
                 // Is a subset selected
                 if(countSelected !== 0 && countSelected !== countAvailable){
                     // Filter is being used
-                    $componentsInUse.push($component.find('[data-filter-name]').html());
+
+                    componentsInUse[filterId] = $component.find('[data-filter-name]').html();
                 }
             });
-            $filtersInUseLabel.html($componentsInUse.length ? $componentsInUse.join(', ') : 'None');
+            console.log(componentsInUse);
+
+            // Are any filters being used?
+            if(Object.keys(componentsInUse).length){
+                $appliedFilters.html('');
+                for (var property in componentsInUse) {
+                    if (componentsInUse.hasOwnProperty(property)) {
+                        var $newTab = $tabAppliedFilter.clone();
+                        $newTab.find('[data-filter]').attr('data-filter', property).html(componentsInUse[property]);
+                        $appliedFilters.append($newTab);
+                    }
+                }
+            } else {
+                $appliedFilters.html('None');
+            }
+
+//            $filtersInUseLabel.html($componentsInUse.length ? $componentsInUse.join(', ') : 'None');
         }
 
         /**
@@ -265,6 +311,7 @@ Usage:
          */
         function init() {
             cacheErrorAlerts();
+            cacheAppliedFilterTab();
             updateFiltersInUseLabel();
             fetchReport();
         }
@@ -274,17 +321,30 @@ Usage:
 
 </script>
 
+{# Rip outta DOM on load, and remove 'hide' #}
+<span data-applied-filter-tab class="label highlight hide"><span data-filter></span> <a href="#" data-close class="close" style="font-size: 24px;line-height: 14px; vertical-align: text-bottom;" >×</a></span>
+
 <style>
     .flex-container{
         display: flex;
         flex-direction: row;
     }
+
+    #filter_panel .label{
+        cursor: default;
+    }
+
+    #filter_panel .label .close:hover{
+        color: red;
+    }
 </style>
 
 <div class="toast" data-alert data-relation="submit-label"></div>
 
-<fieldset id="{{ filterPanelId }}">
-    <legend data-collapser="panel-components" class="icon-up-arrow"><span id="filter-loader" class="loader" title="request sent ..."></span>Filters in use: <span data-filters-in-use></span></legend>
+<div id="{{ filterPanelId }}">
+    <div data-collapser="panel-components" class="icon-up-arrow">
+        <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Applied filters: <span data-applied-filters></span>
+    </div>
 
     <div data-collapsable="panel-components" data-collapse-state="uncollapsed">
         <div>
@@ -307,8 +367,6 @@ Usage:
                 {% endif %}
             </div>
         </div>
-        <input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}" data-working="Submitting ...">
-
     </div>
 
     {# Will contain error message HTML, as defined in template below #}
@@ -332,7 +390,10 @@ Usage:
         </div>
     </div>
 
-</fieldset>
+    {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
+    <input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}" data-working="Submitting ...">
+
+</div>
 
 
 <hr>

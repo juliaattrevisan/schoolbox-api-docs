@@ -2,7 +2,7 @@
     The most basic filter sub-panel template, renders a flat list of checkboxes
     Usage:
         isAvailable:     bool              - Should this component be available in the panel ?
-        definition:      IFilterDefinition
+        component:      IFilterComponent
         classSelections: FilterSelection[] - A set of filter selections made by the current user.
         groupSelections: FilterSelection[] - A set of filter selections made by the current user.
 #}
@@ -34,7 +34,7 @@
 {# Are any options available? If not, don't render this filter at all #}
 {% if isAvailable %}
 
-    <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px;">
+    <div class="checklist" data-component="{{ component.definition.filter.id }}" style="margin: 0 20px;">
 
         <h4 data-filter-name style="display: none;">{{ filterName }}</h4>
 
