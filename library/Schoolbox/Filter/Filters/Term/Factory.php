@@ -73,8 +73,8 @@ class Factory extends AbstractFilterFactory
      */
     public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
     {
-        $filter     = $this->getFilterMapper()->findForClass(Definition::class);
-        $definition = $this->buildDefinition($filter);
+        $filter          = $this->getFilterMapper()->findForClass(Definition::class);
+        $definition      = $this->buildDefinition($filter);
         $savedSelections = $this->getSavedSelections($filter, $user, $page);
 
         return new Component($definition, $user, $page, $savedSelections, $this->getFilterSelectionMapper());
@@ -90,7 +90,7 @@ class Factory extends AbstractFilterFactory
     public function buildKeyConverter()
     {
         $filter = $this->getFilterMapper()->findForClass(Definition::class);
-        $terms = $this->getSortedTerms();
+        $terms  = $this->getSortedTerms();
         return new KeyConverter($filter, $terms);
     }
 

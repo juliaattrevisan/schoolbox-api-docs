@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
  * represented by the key, and get the key from an item
  *
  * Must know about all possible items so it can decide whether a filter needs to be applied
+ *
  * @see AbstractKeyConverter::getAllPossibleItems()
  */
 interface IKeyConverter
@@ -53,6 +54,7 @@ interface IKeyConverter
      * @throws \InvalidArgumentException
      */
     public function getSelectedItems(GenericCollection $availableSelections = null);
+
 
     /**
      * Get all possible items for this filter (regardless of whether they are configured to be available).

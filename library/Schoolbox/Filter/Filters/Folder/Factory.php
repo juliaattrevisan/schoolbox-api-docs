@@ -11,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IFilterDefinition;
-use Schoolbox\Filter\IKeyConverter;
 use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
@@ -47,8 +46,8 @@ class Factory extends AbstractFilterFactory
         Option\Mapper $optionMapper,
         Defaults\Mapper $defaultMapper,
         Selection\Mapper $selectionMapper,
-        Folder\Mapper $folderMapper)
-    {
+        Folder\Mapper $folderMapper
+    ) {
         parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
         $this->folderMapper = $folderMapper;
     }
@@ -80,7 +79,7 @@ class Factory extends AbstractFilterFactory
      */
     public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
     {
-        if(!$runTimeOptions instanceof RunTimeOptions) {
+        if (!$runTimeOptions instanceof RunTimeOptions) {
             $type  = gettype($runTimeOptions);
             $found = 'object' === $type ? get_class($runTimeOptions) : $type;
             $msg   = 'Options must be an instance of ' . RunTimeOptions::class . ". Found: $found";
@@ -91,12 +90,12 @@ class Factory extends AbstractFilterFactory
         $folders = $runTimeOptions->getFolders();
 
         // Does the folder have class codes ?
-        $classes = $folders->filter(function(Folder\Model $folder){
+        $classes = $folders->filter(function (Folder\Model $folder) {
             return $folder->getCodes()->count();
         })->indexBy('id');
 
         // Does the folder have a group ?
-        $groups = $folders->filter(function(Folder\Model $folder){
+        $groups = $folders->filter(function (Folder\Model $folder) {
             return $folder->getGroup();
         })->indexBy('id');
 
@@ -123,8 +122,8 @@ class Factory extends AbstractFilterFactory
      */
     public function buildKeyConverter()
     {
-        $filter = $this->getFilterMapper()->findForClass(Definition::class);
-        $folderIds = (new Collection($this->folderMapper->findAllIds()))->indexByCallback(function ($folderId){
+        $filter    = $this->getFilterMapper()->findForClass(Definition::class);
+        $folderIds = (new Collection($this->folderMapper->findAllIds()))->indexByCallback(function ($folderId) {
             return $folderId;
         });
 

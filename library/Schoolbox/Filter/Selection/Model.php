@@ -12,6 +12,7 @@ use Schoolbox\Filter;
 
 class Model
 {
+
     /** @var Filter\Model */
     private $filter;
 
@@ -32,6 +33,7 @@ class Model
     /** @var bool */
     private $selected;
 
+
     /**
      * @return Filter\Model
      */
@@ -50,6 +52,7 @@ class Model
         $this->filter = $filter;
         return $this;
     }
+
 
     /**
      * @return User

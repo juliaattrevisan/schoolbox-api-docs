@@ -8,11 +8,11 @@
 namespace Schoolbox\Filter;
 
 
-
 use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
 {
+
     use Id;
 
     /**

@@ -44,6 +44,7 @@ abstract class AbstractFilterFactory implements IFilterFactory
         $this->filterSelectionMapper = $selectionMapper;
     }
 
+
     /**
      * Get user's existing selections for this filter and page
      *
@@ -72,6 +73,7 @@ abstract class AbstractFilterFactory implements IFilterFactory
     {
         return $this->filterMapper;
     }
+
 
     /**
      * @return Option\Mapper

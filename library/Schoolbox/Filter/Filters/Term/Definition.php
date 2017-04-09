@@ -45,6 +45,7 @@ class Definition extends AbstractFilterDefinition
     /** @var null|Term\Model */
     private $previousTerm;
 
+
     /**
      * @param Filter\Model         $filter
      * @param FilterOption\Mapper  $filterOptionMapper
@@ -81,6 +82,7 @@ class Definition extends AbstractFilterDefinition
             self::KEY_PAST,
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -131,7 +133,7 @@ class Definition extends AbstractFilterDefinition
      */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
-        if(FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page){
+        if (FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page) {
             return in_array($key, [self::KEY_FUTURE, self::KEY_CURRENT], true);
         }
         return false;
@@ -140,7 +142,7 @@ class Definition extends AbstractFilterDefinition
 
     /**
      * @param GenericCollection|FilterOption\Model[] $pageOptions
-     * @param string $page
+     * @param string                                 $page
      * @return GenericCollection|FilterOption\Model[]
      */
     protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
@@ -149,7 +151,7 @@ class Definition extends AbstractFilterDefinition
         foreach ($this->terms as $term) {
             if (!$pageOptions->offsetExists($term->getId())) {
                 $option = $this->getFilterOptionMapper()->createModel();
-                $key = (string)$term->getId();
+                $key    = (string)$term->getId();
                 $option
                     ->setFilter($this->getFilter())
                     ->setKey($key)
@@ -160,6 +162,7 @@ class Definition extends AbstractFilterDefinition
         }
         return $pageOptions;
     }
+
 
     /**
      * @param GenericCollection|FilterOption\Model[] $pageOptions

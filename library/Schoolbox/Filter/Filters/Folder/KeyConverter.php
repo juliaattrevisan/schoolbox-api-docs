@@ -14,7 +14,7 @@ use Schoolbox\Resource\Folder;
 
 /**
  * Converts between folder concrete keys (folder.ids) and Folder models
- * @method GenericCollection|Folder\Model[] getSelectedItems(GenericCollection $availableSelections)
+ * @method GenericCollection|Folder\Model[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {

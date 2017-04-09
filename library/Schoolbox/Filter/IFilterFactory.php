@@ -18,6 +18,7 @@ use Schoolbox\Filter;
  */
 interface IFilterFactory
 {
+
     /**
      * Build a filter definition, ready to use in the admin pages
      *
@@ -28,15 +29,17 @@ interface IFilterFactory
      */
     public function buildDefinition(Filter\Model $filter);
 
+
     /**
      * Build a filter component, ready to inject into a filter panel
      *
-     * @param User $user
-     * @param string $page
+     * @param User                 $user
+     * @param string               $page
      * @param null|IRunTimeOptions $runTimeOptions
      * @return IFilterDefinition
      */
     public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null);
+
 
     /**
      * Returns a key converter, able to convert between concrete keys and the entities they represent

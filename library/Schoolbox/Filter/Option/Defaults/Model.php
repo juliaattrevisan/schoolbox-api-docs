@@ -12,6 +12,7 @@ use Schoolbox\Filter\Option\Model as FilterOption;
 
 class Model
 {
+
     use Id;
 
     /** @var FilterOption */
@@ -71,6 +72,7 @@ class Model
     {
         return $this->getSelected();
     }
+
 
     /**
      * Mapper-compatible getter

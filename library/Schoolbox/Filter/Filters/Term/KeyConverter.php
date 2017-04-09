@@ -15,7 +15,7 @@ use Schoolbox\Filter;
 
 /**
  * Converts between termFilter concrete keys and Term models
- * @method GenericCollection|Term\Model[] getSelectedItems(GenericCollection $availableSelections)
+ * @method GenericCollection|Term\Model[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {

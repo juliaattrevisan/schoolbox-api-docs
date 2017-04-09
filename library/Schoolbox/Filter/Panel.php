@@ -41,12 +41,18 @@ class Panel
     }
 
 
+    /**
+     * @return string
+     */
     public function getTemplate()
     {
         return '@filters/panel.twig';
     }
 
 
+    /**
+     * @return string
+     */
     public function getRoute()
     {
         return $this->route;

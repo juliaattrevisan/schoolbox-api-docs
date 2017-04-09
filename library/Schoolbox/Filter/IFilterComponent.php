@@ -19,6 +19,7 @@ namespace Schoolbox\Filter;
  */
 interface IFilterComponent
 {
+
     /**
      * @return IFilterDefinition
      */

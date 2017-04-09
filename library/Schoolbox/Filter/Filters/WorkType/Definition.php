@@ -20,24 +20,26 @@ use Schoolbox\Learning\Assessment\WorkType;
  * Available options:
  * * None
  * * One per configured workType
-  */
+ */
 class Definition extends AbstractFilterDefinition
 {
+
     // If assessment does not have a WorkType at all
     const KEY_NONE = ' none';
 
     /**
      * Intentionally not a GenericCollection so we can include null (ie assessment does not have a workType at all)
+     *
      * @var Collection|WorkType\Model[]
      */
     private $workTypes;
 
 
     /**
-     * @param Filter\Model      $filter
-     * @param Option\Mapper     $filterOptionMapper
-     * @param Defaults\Mapper   $filterDefaultMapper
-     * @param Collection $workTypes
+     * @param Filter\Model    $filter
+     * @param Option\Mapper   $filterOptionMapper
+     * @param Defaults\Mapper $filterDefaultMapper
+     * @param Collection      $workTypes
      */
     public function __construct(
         Filter\Model $filter,
@@ -59,7 +61,6 @@ class Definition extends AbstractFilterDefinition
             self::KEY_NONE,
         ];
     }
-
 
 
     /**
@@ -87,10 +88,10 @@ class Definition extends AbstractFilterDefinition
         return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
             $leftKey  = $left->getKey();
             $rightKey = $right->getKey();
-            if($leftKey === self::KEY_NONE){
+            if ($leftKey === self::KEY_NONE) {
                 return -1;
             }
-            if($leftKey === $right){
+            if ($leftKey === $right) {
                 return 0;
             }
             return $leftKey < $rightKey ? -1 : +1;
@@ -114,7 +115,7 @@ class Definition extends AbstractFilterDefinition
      */
     public function getLabel($key)
     {
-        if(self::KEY_NONE === $key){
+        if (self::KEY_NONE === $key) {
             return 'None';
         }
         return $this->workTypes[$key]->getName();

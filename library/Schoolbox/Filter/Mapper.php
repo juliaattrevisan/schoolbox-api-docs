@@ -17,6 +17,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+
     /**
      * @inheritdoc
      */
@@ -47,14 +48,14 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function hydrateSelect(PDOStatement $statement)
     {
-        $c = $this->createCollection();
+        $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /** @var Model $model */
             $model = $this->hydrate($row);
-            $c->add($model);
+            $collection->add($model);
         }
 
-        return $c;
+        return $collection;
     }
 }

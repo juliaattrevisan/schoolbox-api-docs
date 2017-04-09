@@ -43,6 +43,7 @@ class FactoryFactory
         $this->mapperFactory = $mapperFactory;
     }
 
+
     /**
      * A registry of filter factories. Registered by filter definition class name.
      *
@@ -70,6 +71,7 @@ class FactoryFactory
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
 
+
     /**
      * @param null|IFilterComponent[] $contents
      * @return GenericCollection|IFilterComponent[]
@@ -78,6 +80,7 @@ class FactoryFactory
     {
         return new GenericCollection(IFilterComponent::class, $contents);
     }
+
 
     /**
      * @param null|IKeyConverter[] $contents
@@ -139,6 +142,7 @@ class FactoryFactory
         );
     }
 
+
     /**
      * @return WorkTypeFilter\Factory
      * @throws \InvalidArgumentException
@@ -166,6 +170,7 @@ class FactoryFactory
         return $this->mapperFactory->get(Filter\Mapper::class);
     }
 
+
     /**
      * @return \Schoolbox\Mapper|Option\Mapper
      * @throws \InvalidArgumentException
@@ -175,6 +180,7 @@ class FactoryFactory
         return $this->mapperFactory->get(Option\Mapper::class);
     }
 
+
     /**
      * @return \Schoolbox\Mapper|Defaults\Mapper
      * @throws \InvalidArgumentException
@@ -183,6 +189,7 @@ class FactoryFactory
     {
         return $this->mapperFactory->get(Defaults\Mapper::class);
     }
+
 
     /**
      * @return \Schoolbox\Mapper|Selection\Mapper

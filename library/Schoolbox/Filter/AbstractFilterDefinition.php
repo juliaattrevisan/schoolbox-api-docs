@@ -132,14 +132,16 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
         return $optionsPerKey;
     }
 
+
     /**
      * Insert dynamic options into list. Eg each WorkType or Term that exists in the system right now.
      *
      * @param GenericCollection|Option\Model[] $pageOptions
-     * @param string $page
+     * @param string                           $page
      * @return GenericCollection|Option\Model[]
      */
     abstract protected function insertDynamicOptions(GenericCollection $pageOptions, $page);
+
 
     /**
      * There may be existing availability settings saved to the DB that refer
@@ -184,10 +186,10 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
         // Load existing defaults for existing options, and group by option
         $columnList = ['filter_option_id' => $existingOptions->keys()];
-        if($roleTypeFilter){
+        if ($roleTypeFilter) {
             $columnList['role_type'] = $roleTypeFilter;
         }
-        $existingDefaults = $this->getFilterDefaultMapper()->findByColumnList($columnList);
+        $existingDefaults          = $this->getFilterDefaultMapper()->findByColumnList($columnList);
         $defaultsPerExistingOption = $existingDefaults->groupByCallback(function (Defaults\Model $default) {
             return $default->getFilterOption()->getId();
         });
@@ -210,7 +212,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
             if ($pageFilter && $pageFilter !== $page) {
                 continue;
             }
-            if ($optionsPerPage[$page]){
+            if ($optionsPerPage[$page]) {
                 $sortedOptionsPerPage[$page] = $optionsPerPage[$page];
             } else {
                 $sortedOptionsPerPage[$page] = $this->getFilterOptionMapper()->createCollection();
@@ -226,7 +228,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
                 // Does it contain a Default for all relevant roleTypes?
                 foreach (Option\Model::getRoleTypesForPage($page) as $roleType) {
                     // Are we filtering results ?
-                    if($roleTypeFilter && $roleTypeFilter !== $roleType){
+                    if ($roleTypeFilter && $roleTypeFilter !== $roleType) {
                         continue;
                     }
                     if (!$defaults->offsetExists($roleType)) {
@@ -287,6 +289,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      */
     abstract protected function getInitialAvailability($customAbstractKey, $page);
 
+
     /**
      * Return the templates directory for the concrete filter definition's twig templates
      *
@@ -294,9 +297,9 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      */
     protected function getTemplatesDir()
     {
-        $class_info = new \ReflectionClass($this);
-        $filterDefinitionDir = basename(dirname($class_info->getFileName()))  . DIRECTORY_SEPARATOR;
-        return '@filterDefinitions'  . DIRECTORY_SEPARATOR . $filterDefinitionDir . DIRECTORY_SEPARATOR . 'templates';
+        $class_info          = new \ReflectionClass($this);
+        $filterDefinitionDir = basename(dirname($class_info->getFileName())) . DIRECTORY_SEPARATOR;
+        return '@filterDefinitions' . DIRECTORY_SEPARATOR . $filterDefinitionDir . DIRECTORY_SEPARATOR . 'templates';
     }
 
 
@@ -325,6 +328,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
     {
         return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'defaults.twig';
     }
+
 
     /**
      * @inheritdoc

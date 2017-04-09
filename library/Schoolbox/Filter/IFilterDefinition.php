@@ -27,10 +27,12 @@ use Schoolbox\Filter;
  */
 interface IFilterDefinition
 {
+
     /**
      * @return Filter\Model
      */
     public function getFilter();
+
 
     /**
      * Get a fragment to insert in the admin's filter summary screen
@@ -42,6 +44,7 @@ interface IFilterDefinition
      */
     public function getAdminTemplate();
 
+
     /**
      * Returns the twig template to render this filter's available options
      *
@@ -51,6 +54,7 @@ interface IFilterDefinition
      */
     public function getOptionsTemplate();
 
+
     /**
      * Returns the twig template to render this filters roleType default selections
      *
@@ -59,6 +63,7 @@ interface IFilterDefinition
      * @return string
      */
     public function getDefaultsTemplate();
+
 
     /**
      * Returns the twig template to render this filter's panel component into
@@ -87,7 +92,7 @@ interface IFilterDefinition
      * Returns sets of available options, grouped by option.page, then indexed by option.key.
      * Each Option contains a set of Defaults, indexed by roleType
      *
-     * @param null|string $pageFilter If supplied, get defaults just for this page
+     * @param null|string $pageFilter     If supplied, get defaults just for this page
      * @param null|string $roleTypeFilter If supplied, get defaults just for this roleType
      * @return Collection|GenericCollection[]|FilterOption\Model[][]
      */
@@ -117,6 +122,7 @@ interface IFilterDefinition
      * eg: 'all' => 'All'
      *     '1'   => 'Something that represents #1'
      *     '2'   => '2016-1 (current)'
+     *
      * @param string $key
      * @return string
      * @throws \InvalidArgumentException If key is recognised as invalid

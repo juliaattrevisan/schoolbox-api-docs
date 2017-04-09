@@ -23,6 +23,7 @@ use Schoolbox\Filter\Option\Defaults\Mapper as FilterDefaultMapper;
  */
 class Model
 {
+
     // Pages with configurable filters
     // These are enums in DB, you will need to update column definition if you add to this list
     const PAGE_PENDING_ASSESSMENTS = 'pending';
@@ -34,6 +35,7 @@ class Model
 
     /**
      * Return the enum set
+     *
      * @return string[]
      */
     public static function getPages()
@@ -61,6 +63,7 @@ class Model
 
     /**
      * Returns a list of roleTypes that can view each page
+     *
      * @return string[][]
      * @todo - this does not belong here. FilterOption should not be coupled to Role.
      */
@@ -70,18 +73,18 @@ class Model
             self::PAGE_PENDING_ASSESSMENTS => [
                 Role::STAFF,
             ],
-            self::PAGE_GRADES => [
+            self::PAGE_GRADES              => [
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,
             ],
-            self::PAGE_MARK_BOOK => [
+            self::PAGE_MARK_BOOK           => [
                 Role::STAFF,
             ],
-            self::PAGE_LEARNING_ANALYTICS => [
+            self::PAGE_LEARNING_ANALYTICS  => [
                 Role::STAFF,
             ],
-            self::PAGE_DUE_WORK_CALENDAR => [
+            self::PAGE_DUE_WORK_CALENDAR   => [
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,
@@ -89,23 +92,6 @@ class Model
         ];
     }
 
-//
-//    /**
-//     * Get the pages this roleType can visit
-//     *
-//     * @param string $roleType
-//     * @return string[]
-//     */
-//    public static function getRoleTypePages($roleType)
-//    {
-//        $pages = [];
-//        foreach(self::getPageRoleTypes() as $page => $roleTypes){
-//            if(in_array($roleType, $roleTypes, true)){
-//                $pages[] = $roleType;
-//            }
-//        }
-//        return $pages;
-//    }
 
     use Id;
 
@@ -116,6 +102,7 @@ class Model
 
     /**
      * Which page does this option relate to?
+     *
      * @var string
      */
     private $page;
@@ -124,19 +111,21 @@ class Model
      * An abstract key. Eg 'all', 'future', '1', '3', etc which may represent 1 or more concrete keys.
      *
      * It is up to the concrete filter definitions to apply semantics to this value.
-     * 
+     *
      * @var string
      */
     private $key;
 
     /**
      * Should this option be selectable in the filter?
+     *
      * @var bool
      */
     private $available;
 
     /**
      * The roleType-specific defaults configured by the admin for this option
+     *
      * @var GenericCollection|FilterDefault[]
      */
     private $defaults;
@@ -166,6 +155,7 @@ class Model
         $this->filter = $filter;
         return $this;
     }
+
 
     /**
      * @return string

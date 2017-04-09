@@ -14,5 +14,6 @@ use Schoolbox\Filter\AbstractFilterComponent;
  */
 class Component extends AbstractFilterComponent
 {
+
     // no methods - all defined by abstract
 }

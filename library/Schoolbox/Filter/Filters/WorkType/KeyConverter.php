@@ -14,7 +14,7 @@ use Schoolbox\Learning\Assessment\WorkType;
 
 /**
  * Converts between concrete keys (workType.ids) and WorkType models
- * @method GenericCollection|WorkType\Model[] getSelectedItems(GenericCollection $availableSelections)
+ * @method GenericCollection|WorkType\Model[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {
@@ -70,7 +70,7 @@ class KeyConverter extends AbstractKeyConverter
     public function sanitiseKey($key)
     {
         $this->assertValidKey($key);
-        if(in_array($key, $this->workTypes->keys(), true)){
+        if (in_array($key, $this->workTypes->keys(), true)) {
             return (string)$key;
         }
         return (string)(int)$key;

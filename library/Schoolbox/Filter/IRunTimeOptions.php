@@ -15,6 +15,7 @@ namespace Schoolbox\Filter;
  * * WorkType - no methods. All options are pre-defined
  * * GroupClass - getClasses() + getGroups()
  */
-interface IRunTimeOptions {
+interface IRunTimeOptions
+{
 
 }

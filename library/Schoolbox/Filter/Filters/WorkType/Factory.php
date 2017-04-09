@@ -30,6 +30,7 @@ class Factory extends AbstractFilterFactory
      */
     private $workTypeMapper;
 
+
     public function __construct(
         Filter\Mapper $filterMapper,
         Option\Mapper $optionMapper,
@@ -90,9 +91,9 @@ class Factory extends AbstractFilterFactory
     protected function getWorkTypes()
     {
         $genericCollection = $this->workTypeMapper->findAll();
-        $collection = new Collection();
+        $collection        = new Collection();
         $collection->offsetSet(Definition::KEY_NONE, null);
-        foreach($genericCollection as $workType){
+        foreach ($genericCollection as $workType) {
             $collection->offsetSet($workType->getId(), $workType);
         }
         return $collection;

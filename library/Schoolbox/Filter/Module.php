@@ -19,6 +19,7 @@ use Schoolbox\Filter\Option\Defaults;
 
 class Module extends AlaressModule
 {
+
     /**
      * @param ContainerInterface $injector
      * @param string             $basename
@@ -39,7 +40,7 @@ class Module extends AlaressModule
     {
         $isSuper = new IsSuperuser();
 
-        $loadFilters = function (){
+        $loadFilters = function () {
             try {
                 return [
                     'filters' => $this->getFilterMapper()->findAll(),
@@ -49,11 +50,11 @@ class Module extends AlaressModule
             }
         };
 
-        $loadDefinition = function (array $params){
+        $loadDefinition = function (array $params) {
             try {
-                $filterInstance = $this->getFilterMapper()->findById($params['filter']);
+                $filterInstance       = $this->getFilterMapper()->findById($params['filter']);
                 $filterFactoryFactory = new FactoryFactory($this->getMapperFactory());
-                $filterFactory = $filterFactoryFactory->buildFilterFactoryForFilter($filterInstance->getClass());
+                $filterFactory        = $filterFactoryFactory->buildFilterFactoryForFilter($filterInstance->getClass());
                 return [
                     'definition' => $filterFactory->buildDefinition($filterInstance),
                 ];
@@ -62,18 +63,17 @@ class Module extends AlaressModule
             }
         };
 
-        $optionDependencies = function (array $params) use ($loadDefinition){
+        $optionDependencies = function (array $params) use ($loadDefinition) {
             return array_merge([
-                'optionMapper' => $this->getMapperFactory()->get(Option\Mapper::class)
+                'optionMapper' => $this->getMapperFactory()->get(Option\Mapper::class),
             ], $loadDefinition($params));
         };
 
-        $defaultDependencies = function (array $params) use ($optionDependencies){
+        $defaultDependencies = function (array $params) use ($optionDependencies) {
             return array_merge([
-                'defaultMapper' => $this->getMapperFactory()->get(Defaults\Mapper::class)
+                'defaultMapper' => $this->getMapperFactory()->get(Defaults\Mapper::class),
             ], $optionDependencies($params));
         };
-
 
 
         $this->register('GET', '', 'getIndex', $isSuper, $loadFilters);
@@ -82,14 +82,8 @@ class Module extends AlaressModule
 
         $this->register('POST', '/{filter:\d+}/options/save', 'postSaveOptions', $isSuper, $optionDependencies);
         $this->register('POST', '/{filter:\d+}/defaults/save', 'postSaveDefaults', $isSuper, $defaultDependencies);
-
-//        $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
-//        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', null, $preloadCourseSpec);
-//        $this->register('POST', '/modify/{id}', 'updateCourse', null, $preloadCourseSpec);
-//        $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', null, $preloadUnitSpec);
-//        $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', null, $preloadUnitSpec);
-//        $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnitImpl);
     }
+
 
     /**
      * @inheritdoc
@@ -98,6 +92,7 @@ class Module extends AlaressModule
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
+
 
     /**
      * {@inheritdoc}

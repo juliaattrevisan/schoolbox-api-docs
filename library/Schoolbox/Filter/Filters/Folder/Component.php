@@ -50,8 +50,7 @@ class Component extends AbstractFilterComponent
         Selection\Mapper $filterSelectionMapper,
         GenericCollection $classes,
         GenericCollection $groups
-    )
-    {
+    ) {
         parent::__construct($definition, $user, $page, $savedSelections, $filterSelectionMapper);
         $this->classes = $classes;
         $this->groups  = $groups;
@@ -67,11 +66,11 @@ class Component extends AbstractFilterComponent
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
 
-        if(!$abstractSelection) {
+        if (!$abstractSelection) {
             return $availableSelections;
         }
 
-        foreach($concreteFolders as $classFolder) {
+        foreach ($concreteFolders as $classFolder) {
             $concreteSelection = $this->getFilterSelectionMapper()->createModel();
             $concreteSelection
                 ->setFilter($this->getDefinition()->getFilter())
@@ -113,16 +112,17 @@ class Component extends AbstractFilterComponent
 
     /**
      * Converts a folder.id to the folder name
+     *
      * @param string $key
      * @return string
      * @throws \InvalidArgumentException If no folder found with the specified ID
      */
     public function getLabel($key)
     {
-        if($this->classes->offsetExists($key)) {
+        if ($this->classes->offsetExists($key)) {
             return $this->classes[$key]->getNameWithCodes();
         }
-        if($this->groups->offsetExists($key)) {
+        if ($this->groups->offsetExists($key)) {
             return $this->groups[$key]->getName();
         }
         throw new \InvalidArgumentException("Unknown FolderFilter key: $key");

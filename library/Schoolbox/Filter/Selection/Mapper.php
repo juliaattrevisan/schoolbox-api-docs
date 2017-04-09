@@ -19,6 +19,7 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+
     /**
      * @inheritdoc
      */
@@ -59,12 +60,13 @@ class Mapper extends \Schoolbox\Mapper
 
         /**
          * Parse the array data to build a graph of all user selections, grouped by filter.id
+         *
          * @var Collection|GenericCollection[]|Model[][] $selectionsPerFilter
          */
         $selectionsPerFilter = new Collection();
 
         // Has any data been passed in? (will be empty if no filters available on this page)
-        if (count($filterSelectionsArray)){
+        if (count($filterSelectionsArray)) {
             foreach ($filterSelectionsArray as $filterId => $filterSelectionArray) {
                 $keyConverter = $keyConverters[$filterId];
                 $filter       = $keyConverter->getFilter();

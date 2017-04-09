@@ -36,6 +36,7 @@ class Controller extends BaseController
         ]));
     }
 
+
     /**
      * Display a page where admins can alter default filter selections
      *
@@ -48,11 +49,12 @@ class Controller extends BaseController
     public function getAvailableOptions(IFilterDefinition $definition)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getOptionsTemplate(), [
-            'filter'           => $definition->getFilter(),
-            'definition'       => $definition,
-            'options'          => $definition->getOptions(),
+            'filter'     => $definition->getFilter(),
+            'definition' => $definition,
+            'options'    => $definition->getOptions(),
         ]));
     }
+
 
     /**
      * Display a page where admins can alter default filter selections
@@ -65,10 +67,10 @@ class Controller extends BaseController
     public function getDefaultsSelections(IFilterDefinition $definition)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getDefaultsTemplate(), [
-            'filter'                 => $definition->getFilter(),
-            'definition'             => $definition,
-            'optionsPerPage'         => $definition->getAvailableOptions(),
-            'roleTypes'              => [
+            'filter'         => $definition->getFilter(),
+            'definition'     => $definition,
+            'optionsPerPage' => $definition->getAvailableOptions(),
+            'roleTypes'      => [
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,
@@ -82,8 +84,8 @@ class Controller extends BaseController
      * Saves which options should be available for each filter on each page
      *
      * @param IFilterDefinition $definition
-     * @param Option\Mapper $optionMapper
-     * @var string[][]          $_POST['filter_option'] indexed by filterOption.key then page
+     * @param Option\Mapper     $optionMapper
+     * @var string[][]          $_POST ['filter_option'] indexed by filterOption.key then page
      * @throws MapperException
      */
     public function postSaveOptions(IFilterDefinition $definition, Option\Mapper $optionMapper)
@@ -96,8 +98,8 @@ class Controller extends BaseController
         $optionsToDelete = $optionMapper->createCollection();
         $existingOptions = $optionMapper->findByColumn('filter_id', $definition->getFilter()->getId());
 
-        foreach($existingOptions as $option){
-            if(!in_array($option->getPage(), $definition->getPages(), true) || !in_array($option->getKey(), $definition->getAbstractKeys(), true)){
+        foreach ($existingOptions as $option) {
+            if (!in_array($option->getPage(), $definition->getPages(), true) || !in_array($option->getKey(), $definition->getAbstractKeys(), true)) {
                 $optionsToDelete->add($option);
             }
         }
@@ -105,20 +107,20 @@ class Controller extends BaseController
 
 
         // Save selections. We *do* save unchecked items. These are explicitly set to not-selected
-        $optionsToSave   = $optionMapper->createCollection();
+        $optionsToSave                = $optionMapper->createCollection();
         $existingOptionsByKeyThenPage = $existingOptions->groupBy('key');
-        foreach($existingOptionsByKeyThenPage as $key => $pageFilterOptions){
+        foreach ($existingOptionsByKeyThenPage as $key => $pageFilterOptions) {
             $pageFilterOptions->indexBy('page');
         }
 
         // Examine all possible options
-        foreach($definition->getAbstractKeys() as $key){
-            foreach($definition->getPages() as $page){
+        foreach ($definition->getAbstractKeys() as $key) {
+            foreach ($definition->getPages() as $page) {
 
                 // Does this option exist ?
                 $filterOption = $existingOptionsByKeyThenPage[$key][$page];
 
-                if(!$filterOption){
+                if (!$filterOption) {
                     $filterOption = $optionMapper->createModel();
                     $filterOption
                         ->setFilter($definition->getFilter())
@@ -140,9 +142,9 @@ class Controller extends BaseController
      * Saves which filter options should be selected by default per role and page
      *
      * @param IFilterDefinition $definition
-     * @param Option\Mapper $optionMapper
-     * @param Defaults\Mapper $defaultMapper
-     * @var string[][][]        $_POST['filter_defaults'] indexed by option.page, option.key, default.roleType
+     * @param Option\Mapper     $optionMapper
+     * @param Defaults\Mapper   $defaultMapper
+     * @var string[][][]        $_POST ['filter_defaults'] indexed by option.page, option.key, default.roleType
      * @throws MapperException
      */
     public function postSaveDefaults(IFilterDefinition $definition, Option\Mapper $optionMapper, Defaults\Mapper $defaultMapper)
@@ -151,12 +153,12 @@ class Controller extends BaseController
         $postFilterDefaults = $this->getRequest()->post->get('filter_defaults');
 
         // Upgrade implicitly selectable options to explicitly selectable
-        $optionsToSave = $optionMapper->createCollection();
+        $optionsToSave  = $optionMapper->createCollection();
         $defaultsToSave = $defaultMapper->createCollection();
 
         $optionsPerPageAndKey = $definition->getAvailableOptions();
 
-        foreach($optionsPerPageAndKey as $page => $pageOptions) {
+        foreach ($optionsPerPageAndKey as $page => $pageOptions) {
             /** @var Option\Model[] $pageOptions */
             foreach ($pageOptions as $key => $options) {
                 $optionsToSave->add($options);

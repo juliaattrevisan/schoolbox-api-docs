@@ -6,6 +6,7 @@
  */
 
 namespace Schoolbox\Filter\Option;
+
 use Schoolbox\Filter\Mapper as FilterMapper;
 use Schoolbox\GenericCollection;
 
@@ -17,6 +18,7 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+
     /**
      * @inheritdoc
      */

@@ -14,7 +14,7 @@ use Schoolbox\GenericCollection;
 
 /**
  * Converts between termFilter concrete keys and AssessmentType strings
- * @method Collection|string[] getSelectedItems(GenericCollection $availableSelections)
+ * @method Collection|string[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {

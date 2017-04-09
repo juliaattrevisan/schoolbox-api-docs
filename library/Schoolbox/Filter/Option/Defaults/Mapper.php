@@ -14,6 +14,7 @@ use Schoolbox\Filter\Option\Mapper as FilterOptionMapper;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+
     /**
      * @inheritdoc
      */

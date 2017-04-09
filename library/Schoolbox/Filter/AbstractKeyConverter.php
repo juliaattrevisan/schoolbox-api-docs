@@ -41,16 +41,16 @@ abstract class AbstractKeyConverter implements IKeyConverter
      */
     public function getSelectedItems(GenericCollection $availableSelections = null)
     {
-        if(!$availableSelections){
+        if (!$availableSelections) {
             return $this->getAllPossibleItems();
         }
 
-        $allItems      = $this->getAllPossibleItems();
+        $allItems       = $this->getAllPossibleItems();
         $availableItems = $allItems->emptyClone();
-        $selectedItems = $allItems->emptyClone();
+        $selectedItems  = $allItems->emptyClone();
 
         foreach ($availableSelections as $selection) {
-            $key = $selection->getKey();
+            $key  = $selection->getKey();
             $item = $this->getItem($key);
             $availableItems->offsetSet($key, $item);
             if ($selection->getSelected()) {
@@ -59,9 +59,9 @@ abstract class AbstractKeyConverter implements IKeyConverter
         }
 
         // Was nothing selected ?
-        if(0 === $selectedItems->count()){
+        if (0 === $selectedItems->count()) {
             // Were all possible options available ?
-            if($allItems->count() === $availableItems->count()){
+            if ($allItems->count() === $availableItems->count()) {
                 // Return an empty collection - so the DB generator can forgo the filter entirely
                 return $allItems->emptyClone();
             }

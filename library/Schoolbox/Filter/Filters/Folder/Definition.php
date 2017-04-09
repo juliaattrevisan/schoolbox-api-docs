@@ -7,15 +7,14 @@
 
 namespace Schoolbox\Filter\Filters\Folder;
 
-use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder;
 
 /**
- * @todo
+ * Display a list of folders (either classes, groups or both)
+ * Whether classes, groups or both are available for selection is configured by the admin
+ * The list of folders is generated at run-time for the current user and page
  */
 class Definition extends AbstractFilterDefinition
 {
@@ -74,7 +73,7 @@ class Definition extends AbstractFilterDefinition
         return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
             $leftKey  = $left->getKey();
             $rightKey = $right->getKey();
-            if($leftKey === $rightKey) {
+            if ($leftKey === $rightKey) {
                 return 0;
             }
 
@@ -119,7 +118,7 @@ class Definition extends AbstractFilterDefinition
      */
     public function getLabel($key)
     {
-        switch($key) {
+        switch ($key) {
             case self::KEY_CLASSES:
                 return 'Classes';
             case self::KEY_GROUPS:
