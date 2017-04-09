@@ -306,15 +306,6 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
     /**
      * @inheritdoc
      */
-    public function getAdminTemplate()
-    {
-        return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'admin.twig';
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getOptionsTemplate()
     {
         return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'options.twig';

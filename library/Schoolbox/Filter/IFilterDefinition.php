@@ -35,17 +35,6 @@ interface IFilterDefinition
 
 
     /**
-     * Get a fragment to insert in the admin's filter summary screen
-     *
-     * Called from twig.
-     *
-     * @return string
-     * @todo - is this required? Or should we just have a simple table with links to availableOptions|RoleDefaults pages
-     */
-    public function getAdminTemplate();
-
-
-    /**
      * Returns the twig template to render this filter's available options
      *
      * Intended to be called in Controller
