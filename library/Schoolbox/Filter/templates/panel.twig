@@ -95,6 +95,7 @@ Usage:
         $submitButton.on('click', function(event){
             event.preventDefault();
             fetchReport();
+            return false; // don't bubble
         });
 
         // Listen for user checking filter options
@@ -102,6 +103,7 @@ Usage:
             updateFiltersInUseLabel();
         });
 
+        // Listen for user removing an applied filter
         $appliedFilters.on('click', '[data-close]', function(event){
             var $filterTab = $(this).closest('[data-applied-filter-tab]');
             clearFilter($filterTab.find('[data-filter]').data('filter'));
@@ -312,7 +314,7 @@ Usage:
 </script>
 
 {# Rip outta DOM on load, and remove 'hide' #}
-<span data-applied-filter-tab class="label highlight hide"><span data-filter></span> <a href="#" data-close class="close" style="font-size: 24px;line-height: 14px; vertical-align: text-bottom;" >×</a></span>
+<span data-applied-filter-tab class="label highlight hide"><span data-filter></span> <a href="#" data-close class="close" title="Remove filter" style="font-size: 24px;line-height: 14px; vertical-align: text-bottom;" >×</a></span>
 
 <style>
     .flex-container{
@@ -336,7 +338,7 @@ Usage:
         <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Applied filters: <span data-applied-filters></span>
 
         {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
-        <input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}" data-working="Submitting ..." style="width: auto; min-width: 120px;">
+        <input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}" data-working="Submitting ..." style="width: auto; min-width: 120px; float:right;">
     </div>
 
     <div data-collapsable="panel-components" data-collapse-state="uncollapsed">
