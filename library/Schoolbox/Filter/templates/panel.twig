@@ -163,9 +163,7 @@ Usage:
          */
         function processServerError(responseText)
         {
-            console.log(responseText);
             if('string' !== typeof responseText) {
-                console.log('unknwone 1');
                 displayAlert($alertErrorUnknown);
                 return;
             }
@@ -174,7 +172,6 @@ Usage:
             var oomErrorIndex = responseText.indexOf('Fatal error: Allowed memory size of');
             if(-1 !== oomErrorIndex && oomErrorIndex < 400) {
                 displayAlert($alertOutOfMemory);
-                console.log('oom');
                 return;
             }
 
@@ -182,10 +179,8 @@ Usage:
             var uncaughtExceptionIndex = responseText.indexOf('Error Encountered');
             if(-1 !== uncaughtExceptionIndex && uncaughtExceptionIndex < 400) {
                 displayAlert($alertFatalError);
-                console.log('uncaught');
                 return;
             }
-            console.log('unknwone 2');
             displayAlert($alertErrorUnknown);
         }
 
@@ -258,20 +253,16 @@ Usage:
             var componentsInUse = {};
             $panelComponents.each(function (idx, component) {
                 var $component = $(component);
-                console.log($component);
                 var filterId   = $component.data('component');
-                console.log('filterId: ' + filterId);
                 var countAvailable = $component.find('input[type=checkbox]').length;
                 var countSelected = $component.find('input:checked[type=checkbox]').length;
 
-                // Is a subset selected
+                // Are a subset of available options selected ?
                 if(countSelected !== 0 && countSelected !== countAvailable){
-                    // Filter is being used
-
+                    // Filter is being applied
                     componentsInUse[filterId] = $component.find('[data-filter-name]').html();
                 }
             });
-            console.log(componentsInUse);
 
             // Are any filters being used?
             if(Object.keys(componentsInUse).length){
@@ -287,7 +278,6 @@ Usage:
                 $appliedFilters.html('None');
             }
 
-//            $filtersInUseLabel.html($componentsInUse.length ? $componentsInUse.join(', ') : 'None');
         }
 
         /**
@@ -392,9 +382,6 @@ Usage:
             <a href="" class="close">×</a>
         </div>
     </div>
-
-
-
 </div>
 
 
