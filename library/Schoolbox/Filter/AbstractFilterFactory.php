@@ -45,18 +45,20 @@ abstract class AbstractFilterFactory implements IFilterFactory
     }
 
     /**
-     * Get user's existing selections for this page
+     * Get user's existing selections for this filter and page
      *
-     * @param User $user
-     * @param string  $page
+     * @param Filter\Model $filter
+     * @param User         $user
+     * @param string       $page
      * @return GenericCollection|Selection\Model[]
      * @throws Mapper\Exception
      */
-    protected function getSavedSelections(User $user, $page)
+    protected function getSavedSelections(Filter\Model $filter, User $user, $page)
     {
         return $this->getFilterSelectionMapper()->findByColumnList([
-            'user_id' => $user->getId(),
-            'page'    => $page,
+            'filter_id' => $filter->getId(),
+            'user_id'   => $user->getId(),
+            'page'      => $page,
         ])->indexBy('key');
     }
 

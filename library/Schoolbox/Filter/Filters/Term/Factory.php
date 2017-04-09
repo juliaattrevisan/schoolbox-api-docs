@@ -75,7 +75,7 @@ class Factory extends AbstractFilterFactory
     {
         $filter     = $this->getFilterMapper()->findForClass(Definition::class);
         $definition = $this->buildDefinition($filter);
-        $savedSelections = $this->getSavedSelections($user, $page);
+        $savedSelections = $this->getSavedSelections($filter, $user, $page);
 
         return new Component($definition, $user, $page, $savedSelections, $this->getFilterSelectionMapper());
     }
