@@ -12,6 +12,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Survey\Model as Survey;
 use Schoolbox\User;
+use Scrub;
 
 class Controller extends Component_Eportfolio_ControllerAbstract
 {
@@ -79,7 +80,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
                 // Strip the section title of tags and create an array entry for it if none already exists
 
-                $sectionTitle = strip_tags($response['section_title']);
+                $sectionTitle = Scrub::html2text($response['section_title']);
 
                 if (!isset($answersRenderArray[$sectionTitle])) {
                     $answersRenderArray[$sectionTitle] = [];
@@ -109,10 +110,10 @@ class Controller extends Component_Eportfolio_ControllerAbstract
                     $answers = [];
 
                     foreach ($selectedAnswers as $answer) {
-                        $answers[] = $answersArray[$answer];
+                        $answers[] = $answersArray[Scrub::html2text($answer)];
                     }
 
-                    $answersRenderArray[$sectionTitle][strip_tags($response['question'])] = $answers;
+                    $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = $answers;
                 }
             }
         }
