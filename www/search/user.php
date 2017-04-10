@@ -256,7 +256,7 @@ function renderStudent(
     $isRelatedToStudent = false;
     if (!$isParentOfStudent) {
         foreach ($synUserHandler->getEnrolledStudents($user->getExternalId()) as $enrolledStudentId) {
-            if ($enrolledStudentId == $student->getExternalId()) {
+            if ($enrolledStudentId['RelatedID'] == $student->getExternalId()) {
                 $isRelatedToStudent = true;
                 break;
             }
