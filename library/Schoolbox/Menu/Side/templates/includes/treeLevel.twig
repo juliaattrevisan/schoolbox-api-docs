@@ -1,34 +1,24 @@
-{# This is a flag used to indicate if we should open the <ul> tag #}
-
-{% set first = true %}
-
 {# Iterate all child nodes #}
 {% spaceless %}
-{% for node in nodes %}
-
-    {% if first == true %}
-        {% set first = false %}
-
+{% for childNode in node.children %}
+    {% if loop.first %}
         {# This is the first child, open the <ul> tag #}
-
         <ul class="left-submenu">
             <li class="back"><a href="#">Back</a></li>
-    {% endif %}
-
-    <li {% if node.children | length %}class="has-submenu"{% endif %}>
-        <a href="{{ node.url }}" {%  if node.target is not empty %}target="{{ node.target }}"{% endif %}>
-            <span>{{ node.title }}</span>
-        </a>
-        {% if node.children | length %}
-            {% include "@menuSide/includes/treeLevel.twig" with {'nodes': node.children } %}
+        {% if node.url %}
+            <a href="{{ node.url }}" {%  if node.target is not empty %}target="{{ node.target }}"{% endif %}>
+                <span>{{ node.title }}</span>
+            </a>
         {% endif %}
-    </li>
-
+    {% endif %}
+            <li {% if childNode.children | length %}class="has-submenu"{% endif %}>
+                <a href="{{ childNode.url }}" {%  if childNode.target is not empty %}target="{{ childNode.target }}"{% endif %}>
+                    <span>{{ childNode.title }}</span>
+                </a>
+                {% if childNode.children | length %}
+                    {% include "@menuSide/includes/treeLevel.twig" with {'node': childNode } %}
+                {% endif %}
+            </li>
 {% endfor %}
-
-{# If we opened a <ul> tag in our loop we need to close it here #}
-
-{% if first == false %}
-    </ul>
-{% endif %}
+        </ul>
 {% endspaceless %}
