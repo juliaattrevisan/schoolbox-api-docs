@@ -63,6 +63,7 @@ catch (\Exception $e) {
 }
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
+$this->setBlock(TEMPLATE_content, 'has_preview_link', 'has_preview_link_block');
 $this->setBlock(TEMPLATE_content, 'has_attempts', 'has_attempts_block');
 $this->setBlock('has_attempts', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_review', 'attempt_review_block');
@@ -83,7 +84,8 @@ $this->setVar(array(
 $this->setVar([
     'CURRENT_USER' => $user->getFullName(),
     'attempt_block' => '',
-    'has_attempts_block' => ''
+    'has_attempts_block' => '',
+    'has_preview_link_block' => '',
 ]);
 
 /* Only Instructors can delete attempts
@@ -94,6 +96,12 @@ $perm = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assess['cate
 
 if ($perm >= UserAccess::ACCESS_WRITE) {
     $canDeleteAttempt = true;
+
+    $this->setVar([
+        'ASSESS_ID' => $assess['assess_id']
+    ]);
+
+    $this->parse('has_preview_link_block', 'has_preview_link');
 }
 
 /* Iterate
