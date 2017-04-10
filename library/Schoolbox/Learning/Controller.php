@@ -296,13 +296,13 @@ class Controller extends Base
      * Displays a list of classes for the current logged in user
      *
      * If the term includes now (ie is current) then we use current enrollment.
-     * Else term is historical, so we display classes for which the user has LMS activity.
+     * Else term is historical, so we display classes where a student has submitted responses or received feedback
      *
      * @api GET /learning/classes{/term}
      * @level 165
      *
      * @param Term $term
-     * @throws ServiceNotFound
+     * @throws ServiceNotFound If unable to find HTML builder
      */
     public function getClasses(Term $term)
     {
