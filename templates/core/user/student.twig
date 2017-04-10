@@ -7,8 +7,8 @@
 {% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
 {% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaff %}
 {% set showComments = config.synergetic_student_comment and isStaff %}
-{# details: su, staff, self or parent #}
-{% set showDetails = isStaff or isSelf or isParentOfStudent %}
+{# details: su, staff, self, parent or relation #}
+{% set showDetails = isStaff or isSelf or isParentOfStudent or isRelatedToStudent %}
 {# emails: students may view other student's emails #}
 {% set showEmail = showDetails or session.user.getRole().isStudent() %}
 
@@ -19,7 +19,7 @@
 {% set showContactsAlert = showContacts and isStaff %}
 {% set showSubjects = showDetails %}
 {% set showGroups = showDetails %}
-{% set showClasses = showClasses %}
+{% set showClasses = showClasses and showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
