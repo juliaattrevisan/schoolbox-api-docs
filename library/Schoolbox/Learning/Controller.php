@@ -12,6 +12,7 @@ use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Eportfolio\ShowcaseMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Mark;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
@@ -24,6 +25,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Statistics;
 use Schoolbox\Learning\Classes\ClassList;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -350,35 +352,41 @@ class Controller extends Base
      * @param User $viewee
      * @param Term $term
      * @throws ServiceNotFound If unable to find mail handler service
+     * @throws DefinitionException
+     * @throws MapperException
      */
     public function getGrades(User $viewee, Term $term)
     {
-        // Storage for each folders markbook
-        $markbooks = [];
-        $markbooksFolders = [];
+        $folders = $this->folderMapper->createCollection();
 
-        // Keep a collection of all folders student has an assessment in for use in the dropdown
-
-        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
-
-        /** @var IAssessable $assessment */
-        foreach ($assessments as $assessment) {
-            $folder = $assessment->getContext()->getFolder();
-
-            if ($folder instanceof Folder) {
-                if (!isset($foldersFound[$folder->getId()])) {
-
-                    if (!isset($markbooksFolders[$folder->getId()])) {
-                        $markbooksFolders[$folder->getId()] = new Collection();
-                    }
-
-                    $markbooksFolders[$folder->getId()]->add($assessment);
-                }
-            }
+        // Are we viewing current term?
+        if($term->contains(Alaress_Date_Format::now())){
+            // Add current enrollment
+            $folders = $folders->mergeUnique($this->folderMapper->findForUser($viewee, true), 'id');
         }
 
-        $folders = $this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term);
-        $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
+        // Add folders with response or feedback
+        $folders = $folders
+            ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term), 'id')
+            ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id')
+            ->sortBy('name', 'ASC');
+
+
+        // Get all assessments for this user in the specified term, grouped by folder
+        /** @var Collection|GenericCollection[]|IAssessable[][] Sets grouped by folder.id */
+        $assessmentsPerFolder = $this->getAssessmentMapperProxy()
+            ->findAllByStudent($viewee, $term)
+            ->groupByCallback(function(IAssessable $assessment){
+                return $assessment->getBaseContext()->getFolder()->getId();
+            });
+
+        // Generate markbooks for these assessments
+        /** @var GenericCollection|Markbook[] Indexed by folder.id */
+        $markbooks = new GenericCollection(Markbook::class);
+
+        foreach($assessmentsPerFolder as $folderId => $assessments){
+            $markbooks->setOffset($folderId, new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()));
+        }
 
         // Squish this mess out
 

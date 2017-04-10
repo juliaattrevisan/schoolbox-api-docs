@@ -1,3 +1,11 @@
+{# Usage:
+    terms:      GenericCollection|Term\Model[]   - All terms known to system
+    term:       Term\Model                       - Current visible term
+    student:    User                             - The visible student
+    folders:    GenericCollection|Folder\Model[] - Classes/Groups that student is enrolled in or has feedback or responses in the current term
+    mailHandle: string                           - Prefix for sending mail
+#}
+
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
