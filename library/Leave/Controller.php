@@ -1280,8 +1280,8 @@ class Leave_Controller extends Controller
 
         $this->getPage()->setVar(
             array(
-                'USER_ID' => $user->getId(),
-                'USER_NAME' => $user->formatName(),
+                'REPORT_USER_ID' => $user->getId(),
+                'REPORT_USER_NAME' => $user->formatName(),
                 'HOUSE_NAME' => Scrub::text($house->getHouse()),
                 'HOUSE_ID' => $house->getId(),
                 'ALLOWED_ACTION' => $this->hasApprovePermission($house->getId()) ? 'modify' : 'view',
@@ -1300,9 +1300,9 @@ class Leave_Controller extends Controller
                     /** @var \Leave_Request $request */
                     $this->getPage()->setVar(
                         array(
-                            'USER_ID' => $request->getUser()->getId(),
-                            'USER_NAME' => $request->getUser()->formatName(),
-                            'USER_YEAR' => $request->getUser()->getYear(),
+                            'REQUEST_USER_ID' => $request->getUser()->getId(),
+                            'REQUEST_USER_NAME' => $request->getUser()->formatName(),
+                            'REQUEST_USER_YEAR' => $request->getUser()->getYear(),
                             'REQUEST_ID' => $request->getId(),
                             'REQUEST_START' => $request->getStart()->getLocal(),
                             'REQUEST_DURATION' => $request->getDuration(),
