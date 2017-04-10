@@ -2,11 +2,12 @@
 CUSTOM Generic Term (aka Semester) selector for BTAC
 
 Usage: include 'sub/semesterSelector.twig
-    currentTerm: Term                    - (optional) the current selected Term
+    currentTerm: null|Term               - (optional) the current selected Term
     terms:       Collection|Term[]       - all Terms to render in dropdown
-    route:       string                  - Aura route
+    termRoute:   string                  - Aura route
+    yearRoute:   string                  - Aura route
     routeArgs:   JSON object             - Aura route args to be merged with {Term.code} inside loop
-    year:        null|int                - If viewing an entire year of results
+    year:        null|int                - (optional) If viewing an entire year of results
 #}
 
 <script type="text/javascript">
@@ -50,18 +51,17 @@ Usage: include 'sub/semesterSelector.twig
         {% set foundYear = {} %}
         {% set selected = false %}
         {% for term in terms %}
-            {% if routeYear is not empty %}
+            {% if yearRoute is not empty %}
                 {% if not term.displayFinish.isNull() %}
-                    <h1>XXX {{ term.displayFinish.year }}</h1>
                     {% if not foundYear['_'~term.displayFinish.year] %}
                         {% set foundYear = foundYear | merge({('_'~term.displayFinish.year):true}) %}
-                        <option data-href="{{ routeLookup(routeYear, routeArgs | merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
+                        <option data-href="{{ routeLookup(yearRoute, routeArgs | merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
                             {#- dessicate -#}{{ term.displayFinish.year }} Grades Summary{#- dessicate -#}
                         </option>
                     {% endif %}
                 {% endif %}
             {% endif %}
-            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected%}selected{% endif %}>
+            <option data-href="{{ routeLookup(termRoute, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected%}selected{% endif %}>
                 {#- dessicate -#}{{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }}){#- dessicate -#}
             </option>
         {% endfor %}

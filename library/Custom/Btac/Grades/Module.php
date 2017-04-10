@@ -51,7 +51,7 @@ class Module extends \Schoolbox\Learning\Module
 
         $this->addRoutePermission(
                 $authorizer,
-                '(?:getGradesYear)',
+                '(?:getCustomGradesYear)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
@@ -69,7 +69,7 @@ class Module extends \Schoolbox\Learning\Module
 
         $this->addRoutePreload(
             $matcher,
-            '(?:getGradesYear)',
+            '(?:getCustomGradesYear)',
             function ($params) {
                 if (array_key_exists('userId', $params)) {
                     try {

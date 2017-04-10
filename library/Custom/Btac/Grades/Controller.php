@@ -29,10 +29,9 @@ class Controller extends \Schoolbox\Learning\Controller
             $term = $this->getTermMapper()->findForToday();
         }
         $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
-        $year        = $term->getStart()->getYear();
 
-        $route = 'learning.getGrades';
-        $this->getCustomGrades($viewee, $assessments, $year, $term, $route);
+        $year = null;
+        $this->getCustomGrades($viewee, $assessments, $year, $term);
     }
 
 
@@ -43,18 +42,14 @@ class Controller extends \Schoolbox\Learning\Controller
      * @param int  $year
      * @throws ServiceNotFound If unable to find mail handler service
      */
-    public function getGradesYear(User $viewee, $year)
+    public function getCustomGradesYear(User $viewee, $year)
     {
         $from        = new \Alaress_Date_Format("{$year}-01-01 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
         $to          = new \Alaress_Date_Format("{$year}-12-31 23:59:59", \Alaress_Date_Format::DATABASE_FORMAT);
         $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, $from, $to);
 
-        // If they are viewing an entire year, default to first semester for results
-        // Note that we have one year of assessments, but $term duration may not be a year.
-        $term = $this->getTermMapper()->findForYear($year)->first();
-
-        $route = 'learning.getGradesYear';
-        $this->getCustomGrades($viewee, $assessments, $year, $term, $route);
+        $term = null;
+        $this->getCustomGrades($viewee, $assessments, $year, $term);
     }
 
 
@@ -64,10 +59,9 @@ class Controller extends \Schoolbox\Learning\Controller
      * @param Collection|IAssessable[] $assessments
      * @param int                      $year
      * @param Term\Model               $term
-     * @param string                   $route
      * @throws ServiceNotFound If unable to find mail handler service
      */
-    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, $route)
+    protected function getCustomGrades(User $viewee, Collection $assessments, $year = null, Term\Model $term = null)
     {
         // Storage for each folders markbook
         $markbooks        = [];
@@ -123,7 +117,6 @@ class Controller extends \Schoolbox\Learning\Controller
             'markbooks'       => $markbooks,
             'mailHandle'      => $this->getSession()->get('mailhandle'),
             'currentUser'     => $this->getUser(),
-            'route'           => $route,
         ]));
     }
 
