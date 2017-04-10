@@ -206,7 +206,26 @@ class Controller extends Assessment\Controller
     {
         $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
 
-        if ($sessionUser->getId() == $participantUser->getId() && $assessment->isOpen()) {
+        /* Attempts List for this user
+         */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+        $attemptsListUrl = "/assess/attempts/{$quiz->getId()}/{$participantUser->getId()}" . $returnUrlSuffix;
+
+        /* If you're a teacher viewing the summary screen for your own attempts
+         * you should end up at the attempts list rather than be magically prompted
+         * to attempt the quiz
+         */
+        $access = $this->getAccess()->getFolderAccess($sessionUser, [$assessment->getContext()->getFolder()->getId()]);
+
+        if ($access >= UserAccess::ACCESS_WRITE) {
+            $this->getResponse()->redirect->to($attemptsListUrl);
+        }
+        elseif ($sessionUser->getId() == $participantUser->getId() && $assessment->isOpen()) {
+
+            /* If you're a participant, and the quiz is available for attemptation
+             * go to the intro screen so you can begin
+             */
+
             // this is the special case: redirect to intro
             $this->getResponse()->redirect->afterPost(
                 $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
@@ -214,9 +233,7 @@ class Controller extends Assessment\Controller
             return;
         }
 
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-
-        $this->getResponse()->redirect->to("/assess/attempts/{$quiz->getId()}/{$participantUser->getId()}" . $returnUrlSuffix);
+        $this->getResponse()->redirect->to($attemptsListUrl);
     }
 
 
