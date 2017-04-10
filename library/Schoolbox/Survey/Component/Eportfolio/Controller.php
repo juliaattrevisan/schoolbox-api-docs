@@ -69,6 +69,8 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
         // Retrieve all responses to the survey and mash them into an array format that we can iterate and render easily
 
+        $maximumQuestions = 0;
+
         if ($this->survey instanceof Survey) {
 
             $responses = $this->surveyMapper->getMatrix(
@@ -115,6 +117,10 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
                     $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = $answers;
                 }
+
+                if (count($answersRenderArray[$sectionTitle]) > $maximumQuestions) {
+                    $maximumQuestions = count($answersRenderArray[$sectionTitle]);
+                }
             }
         }
 
@@ -142,7 +148,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
                 'showStudentHeading'    => $showStudentHeading,
                 'survey'                => $this->survey,
                 'answers'               => $answersRenderArray,
-                'columnWidth'           => 90 / $this->config['size']
+                'columnWidth'           => $maximumQuestions > 0 ? (90 / $maximumQuestions) . "%" : ""
             ],
             true,                       // This does nothing useful on ePortfolio components
             $showStaffHeading,          // Show configuration from PHPLIB if the user is staff/superuser
