@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
@@ -79,6 +80,8 @@ class ClassList
      * @var Collection|Folder[]     return['classList']
      * @var string[]                return['classTypes'] Indexed by folder.id
      * @var CourseSpecification[][] return['courses'] Grouped by folder.id
+     * @throws DefinitionException
+     * @throws MapperException
      */
     public function getClassList(Term $term, Alaress_Date_Format $now)
     {
@@ -103,7 +106,9 @@ class ClassList
             if ($this->user->getRole()->isStaff()) {
                 $folderList = $this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term);
             } elseif ($this->user->getRole()->isStudent()) {
-                $folderList = $this->folderMapper->findFoldersWithResponses($this->user, $term);
+                $folderList = $this->folderMapper
+                    ->findFoldersWithResponses($this->user, $term)
+                    ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id');
             }
         }
 

@@ -305,6 +305,8 @@ class Controller extends Base
      *
      * @param Term $term
      * @throws ServiceNotFound If unable to find HTML builder
+     * @throws DefinitionException
+     * @throws MapperException
      */
     public function getClasses(Term $term)
     {
