@@ -6,6 +6,7 @@ Usage: include 'sub/semesterSelector.twig
     terms:       Collection|Term[]       - all Terms to render in dropdown
     route:       string                  - Aura route
     routeArgs:   JSON object             - Aura route args to be merged with {Term.code} inside loop
+    year:        null|int                - If viewing an entire year of results
 #}
 
 <script type="text/javascript">
@@ -49,13 +50,15 @@ Usage: include 'sub/semesterSelector.twig
         {% set foundYear = {} %}
         {% set selected = false %}
         {% for term in terms %}
-            <h1>routeYear: {{ routeYear }}</h1>
             {% if routeYear is not empty %}
-                {% if not foundYear['_'~term.displayFinish.year] %}
-                    {% set foundYear = foundYear|merge({('_'~term.displayFinish.year):true}) %}
-                    <option data-href="{{ routeLookup(routeYear, routeArgs|merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
-                        {#- dessicate -#}{{ term.displayFinish.year }} Grades Summary{#- dessicate -#}
-                    </option>
+                {% if not term.displayFinish.isNull() %}
+                    <h1>XXX {{ term.displayFinish.year }}</h1>
+                    {% if not foundYear['_'~term.displayFinish.year] %}
+                        {% set foundYear = foundYear | merge({('_'~term.displayFinish.year):true}) %}
+                        <option data-href="{{ routeLookup(routeYear, routeArgs | merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
+                            {#- dessicate -#}{{ term.displayFinish.year }} Grades Summary{#- dessicate -#}
+                        </option>
+                    {% endif %}
                 {% endif %}
             {% endif %}
             <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected%}selected{% endif %}>

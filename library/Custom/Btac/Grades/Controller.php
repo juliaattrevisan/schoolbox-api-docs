@@ -31,7 +31,8 @@ class Controller extends \Schoolbox\Learning\Controller
         $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
         $year        = $term->getStart()->getYear();
 
-        $this->getCustomGrades($viewee, $assessments, $year, $term);
+        $route = 'learning.getGrades';
+        $this->getCustomGrades($viewee, $assessments, $year, $term, $route);
     }
 
 
@@ -51,7 +52,9 @@ class Controller extends \Schoolbox\Learning\Controller
         // If they are viewing an entire year, default to first semester for results
         // Note that we have one year of assessments, but $term duration may not be a year.
         $term = $this->getTermMapper()->findForYear($year)->first();
-        $this->getCustomGrades($viewee, $assessments, $year, $term);
+
+        $route = 'learning.getGradesYear';
+        $this->getCustomGrades($viewee, $assessments, $year, $term, $route);
     }
 
 
@@ -61,9 +64,10 @@ class Controller extends \Schoolbox\Learning\Controller
      * @param Collection|IAssessable[] $assessments
      * @param int                      $year
      * @param Term\Model               $term
+     * @param string                   $route
      * @throws ServiceNotFound If unable to find mail handler service
      */
-    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term)
+    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, $route)
     {
         // Storage for each folders markbook
         $markbooks        = [];
@@ -119,6 +123,7 @@ class Controller extends \Schoolbox\Learning\Controller
             'markbooks'       => $markbooks,
             'mailHandle'      => $this->getSession()->get('mailhandle'),
             'currentUser'     => $this->getUser(),
+            'route'           => $route,
         ]));
     }
 

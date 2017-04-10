@@ -33,12 +33,11 @@
         <div class="content">
             <div class="context-switch clearfix">
                 {% include '@learning/Btac/semesterSelector.twig' with {
-                terms:       terms,
-                year:        year,
                 currentTerm: term,
-                routeYear:   'learning.getGradesYear',
+                terms:       terms,
                 route:       'learning.getGrades',
-                routeArgs:   {viewee: student, userId: student.id}
+                routeArgs:   {viewee: student, userId: student.id},
+                year:        year
                 } only %}
             </div>
         </div>
