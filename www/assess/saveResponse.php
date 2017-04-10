@@ -7,6 +7,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $questionHandler = new Assess_Question();
@@ -29,8 +35,21 @@ if ($assessHandler->isOwner($section['assess_id'])) {
 
  */
 
+/**
+ * @var SitePage $this
+ * @var AssessmentDataSource $assessmentDataSource
+ */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
+$assessment = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
+
 if ($assessHandler->isExpired($section['assess_id'])) {
-    error(120);
+    // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
+    $assessmentFolder = $assessment->getBaseContext()->getFolder();
+    $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
+    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->getBaseContext() instanceof UnitSpecification)) {
+        error(120);
+    }
 }
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
