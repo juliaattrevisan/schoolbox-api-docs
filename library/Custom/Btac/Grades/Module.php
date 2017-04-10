@@ -26,7 +26,7 @@ class Module extends \Schoolbox\Learning\Module
         /** @var string[][] $routes */
         $routes = [
             'GET' => [
-                '/grades-year/{userId}/year/{year}'       => 'getGradesYear',                // student && year
+                '/grades-year/{userId}/year/{year}'       => 'getCustomGradesYear',                // student && year
             ],
             'POST' => []
         ];

@@ -18,7 +18,7 @@ class Controller extends \Schoolbox\Learning\Controller
      * @param User $viewee
      * @param $year
      */
-    public function getGradesYear(User $viewee, $year) {
+    public function getCustomGradesYear(User $viewee, $year) {
 
         $assessments = $this->getAssessmentMapperProxy()->createCollection();
 
@@ -47,7 +47,7 @@ class Controller extends \Schoolbox\Learning\Controller
      * @param int|null $year
      * @param Collection $assessments
      */
-    public function getGrades(User $viewee, Collection $assessments = null, $year = null, Term $term = null)
+    protected function getCustomGrades(User $viewee, Collection $assessments = null, $year = null, Term $term = null)
     {
         // Storage for each folders markbook
         $markbooks = [];
