@@ -9,11 +9,12 @@
  */
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
-$groupHandler = new Group();
 $userHandler = new User();
 
 /**
@@ -45,21 +46,27 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
-if (!$assessment->isParticipant($_SESSION['user']) && $groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE) {
+$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+$assessmentFolder = $assessment->getBaseContext()->getFolder();
+$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
+
+if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessment->isParticipant($_SESSION['user'])) {
 	error(19);
 }
 
 /* Check if this assessment can be started
  */
 if ($assessHandler->isExpired($assess['assess_id'])) {
-	error(120);
+    // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
+    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->getBaseContext() instanceof UnitSpecification)) {
+        error(120);
+    }
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
+if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessHandler->isOpen($assess)) {
 	error(143);
 }
 
