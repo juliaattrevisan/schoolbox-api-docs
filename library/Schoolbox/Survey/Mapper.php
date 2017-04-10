@@ -11,7 +11,6 @@
 
 namespace Schoolbox\Survey;
 
-use MssqlResultIterator;
 use PDO;
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
