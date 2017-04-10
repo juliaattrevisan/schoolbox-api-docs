@@ -360,43 +360,47 @@ class Controller extends Base
         $folders = $this->folderMapper->createCollection();
 
         // Are we viewing current term?
-        if($term->contains(Alaress_Date_Format::now())){
+        if ($term->contains(Alaress_Date_Format::now())) {
             // Add current enrollment
             $folders = $folders->mergeUnique($this->folderMapper->findForUser($viewee, true), 'id');
         }
 
         // Add folders with response or feedback
+        /** @var GenericCollection|Folder[] $folders */
         $folders = $folders
             ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term), 'id')
             ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id')
             ->sortBy('name', 'ASC');
 
+        // Load Teachers
+        foreach ($folders as $folder) {
+            $folder->loadTeachers();
+        }
 
         // Get all assessments for this user in the specified term, grouped by folder
-        /** @var Collection|GenericCollection[]|IAssessable[][] Sets grouped by folder.id */
         $assessmentsPerFolder = $this->getAssessmentMapperProxy()
-            ->findAllByStudent($viewee, $term)
-            ->groupByCallback(function(IAssessable $assessment){
-                return $assessment->getBaseContext()->getFolder()->getId();
-            });
+                                     ->findAllByStudent($viewee, $term)
+                                     ->groupByCallback(function (IAssessable $assessment) {
+                                         return $assessment->getBaseContext()->getFolder()->getId();
+                                     });
 
         // Generate markbooks for these assessments
         /** @var GenericCollection|Markbook[] Indexed by folder.id */
         $markbooks = new GenericCollection(Markbook::class);
 
-        foreach($assessmentsPerFolder as $folderId => $assessments){
+        foreach ($assessmentsPerFolder as $folderId => $assessments) {
             $markbooks->setOffset($folderId, new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()));
         }
 
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
-            'student'       => $viewee,
-            'term'          => $term,
-            'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'       => $folders,
-            'markbooks'     => $markbooks,
-            'mailHandle'    => $this->getSession()->get('mailhandle'),
+            'student'    => $viewee,
+            'term'       => $term,
+            'terms'      => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
+            'folders'    => $folders,
+            'markbooks'  => $markbooks,
+            'mailHandle' => $this->getSession()->get('mailhandle'),
         ])->setTab('grade'));
     }
 

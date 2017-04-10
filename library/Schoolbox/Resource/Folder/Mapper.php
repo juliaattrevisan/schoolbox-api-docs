@@ -1725,8 +1725,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
 
             $collection->add($folder);
-
-            $folder->loadTeachers();
         }
 
         return $collection;
@@ -1839,7 +1837,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement->execute($whereParams);
 
         // Maintain separate cache so we can preserve query result ordering
-        /** @var Model[] $folderCache */
+        /** @var Model[] $folderCache - Indexed by folder.id */
         $folderCache = [];
         $folders = $this->createCollection();
 
