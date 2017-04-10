@@ -220,11 +220,19 @@ class Markbook
         $this->weightedMean = $overallMarkScheme->getHumanReadableMark($this->normalisedMean);
     }
 
+
+    /**
+     * @return float
+     */
     public function getNormalisedMean()
     {
         return $this->normalisedMean;
     }
 
+
+    /**
+     * @return float
+     */
     public function getWeightedMean()
     {
         return $this->weightedMean;
