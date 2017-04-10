@@ -43,6 +43,9 @@ then
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
+echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
+find $cachedir -type f -empty -delete;
+
 # function to retrieve latest files from S3, needs $S3file set first
 S3file_short='';
 getS3file() {
@@ -53,9 +56,10 @@ getS3file() {
         predir=`pwd`;
         cd $cachedir;
 
-        etag=`curl -I $data_source/$S3file 2>/dev/null | grep ETag | cut -d'"' -f2`;
+        curletag=`curl -I $data_source/$S3file 2>/dev/null`;
         if [ $? -eq 0 ];
         then
+            etag=`echo "$curletag" | grep ETag | cut -d'"' -f2`;
             # If S3file_short is not set, assume same as S3file for simplicity
             if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
             # Auto cleanup etag cache file if actual file is missing
@@ -72,10 +76,15 @@ getS3file() {
                     sed -i "/$S3file_short/d" $S3file_short.etag.cache 2>/dev/null;
                     # Add new file to etag cache
                     echo "$etag $S3file_short" >> $S3file_short.etag.cache;
+                else
+                    # when download fails, remove bad download
+                    rm -f $S3file_short;
                 fi
             else
                 echo "[SB][`date +%Y-%m-%d\ %X`] File up to date: $S3file_short";
             fi
+        else
+            echo "[SB][`date +%Y-%m-%d\ %X`] File unable to be retrieved, using cache: $S3file";
         fi
 
         cd $predir;
@@ -85,7 +94,7 @@ getS3file() {
 S3file='vagrant.sql'
 S3file_short='vagrant.sql'
 getS3file;
-if [ ! -f $cachedir/$S3file ];
+if [ ! -f $cachedir/$S3file_short ];
 then
     echo "Error: file missing $S3file";
     exit 1;
@@ -94,7 +103,7 @@ fi
 S3file='vagrant-cleanup.sql'
 S3file_short='vagrant-cleanup.sql'
 getS3file;
-if [ ! -f $cachedir/$S3file ];
+if [ ! -f $cachedir/$S3file_short ];
 then
     echo "Error: file missing $S3file";
     exit 1;
@@ -103,7 +112,7 @@ fi
 S3file="$data_filename";
 S3file_short="$data_filename_short";
 getS3file;
-if [ ! -f $cachedir/$S3file ];
+if [ ! -f $cachedir/$S3file_short ];
 then
     echo "Error: file missing $S3file";
     exit 1;
