@@ -1,14 +1,63 @@
+{% if showStudentHeading %}
+    <div class="row">
+        <div class="small-12 columns">
+            <ul class="component-titlebar">
+                <li class="actions-small-3">
+                    <div class="list-item">
+                        <div class="small-12 card ui-sortable-handle" data-component-handle>
+                            <h2 title="config.componentname"><a href="#">{{ config.componentname }}</a></h2>
+                        </div>
+                    </div>
+                    <nav></nav>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
 {# Make sure a survey has been selected in the components configuration #}
 
 {% if config.survey is empty %}
 
-    {# No survey seledted #}
+    {# No survey selected #}
 
     <div class="empty-state">
         <i class="icon-surveys"></i>
-        <p>This component has not yet been setup.</p>
+        <p>This component has not yet been setup, please select a survey to be displayed.</p>
     </div>
 
 {% else %}
+
+    {% if answers is empty %}
+
+        {# The owner of the ePortfolio has not completed the survey #}
+
+        <div class="empty-state">
+            <i class="icon-surveys"></i>
+            <p>You have not yet completed the survey.</p>
+            <p>Click here to complete the '<a href="/survey/intro/{{ survey.id }}">{{ survey.title }}</a>' survey.</p>
+        </div>
+
+    {% else %}
+
+        <table class="no-margin">
+            <tbody>
+                {% for section, questions in answers %}
+                    <tr>
+                        <td width="10%"><b>{{ section }}</b></td>
+                        {% for question, answers in questions %}
+                            <td width="{{ columnWidth }}%">
+                                <p><b>{{ question }}</b></p>
+                                {% for answer in answers %}
+                                    <p>{{ answer }}</p>
+                                {% endfor %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
 
 {% endif %}

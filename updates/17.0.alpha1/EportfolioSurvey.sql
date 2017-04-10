@@ -41,21 +41,6 @@ INSERT INTO component_config_definition
   description
 ) VALUES (
   (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
-  'compactMode',
-  '0',
-  'Compact Mode',
-  ''
-);
-
-INSERT INTO component_config_definition
-(
-  component_definition_id,
-  `key`,
-  default_value,
-  label,
-  description
-) VALUES (
-  (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
   'componentname',
   'Survey',
   'Heading',
@@ -71,8 +56,23 @@ INSERT INTO component_config_definition
   description
 ) VALUES (
   (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
-  'src',
+  'survey',
   '',
-  'Source',
+  'Select Survey',
+  null
+);
+
+INSERT INTO component_config_definition
+(
+  component_definition_id,
+  `key`,
+  default_value,
+  label,
+  description
+) VALUES (
+  (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
+  'size',
+  '4',
+  'Number Of Questions To Display',
   null
 );

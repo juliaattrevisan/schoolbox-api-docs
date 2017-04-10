@@ -11,6 +11,7 @@
 
 namespace Schoolbox\Survey;
 
+use MssqlResultIterator;
 use PDO;
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
@@ -54,16 +55,21 @@ class Mapper extends BaseMapper
 
     /**
      * Retrieve the data required for the ePortfolio matrix component
+     *
+     * @param int $surveyId
+     * @param int $userId
+     * @return array
      */
-    public function getMatrix() {
+    public function getMatrix($surveyId, $userId)
+    {
         $sql =
-        "
+            "
             SELECT      survey.assess_id AS survey_id,
                         survey.title AS survey_title,
-                        section.title as section_title,
-                        question.question as question,
-                        answer.answer as answer,
-                        response.response
+                        section.title AS section_title,
+                        question.question AS question,
+                        answer.answer AS answers,
+                        response.response AS selectedAnswers
             FROM        assess survey
             JOIN        assess_section section ON section.assess_id = survey.assess_id
             JOIN        assess_question question ON question.section_id = section.section_id
@@ -82,9 +88,19 @@ class Mapper extends BaseMapper
                             response.section_id = section.section_id AND
                             response.question_id = question.question_id
             JOIN        assess_answer answer ON answer.question_id = question.question_id                            
-            WHERE       survey.assess_id = :assess_id
+            WHERE       survey.assess_id = :survey_id AND
+                        survey.availability = 'survey'
             ORDER BY    section.sequence,
                         question.sequence
         ";
+
+        $statement = $this->database->prepare($sql);
+
+        $statement->execute([
+            'survey_id' => $surveyId,
+            'user_id' => $userId
+        ]);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }

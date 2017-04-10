@@ -8,33 +8,52 @@
 namespace Schoolbox\Survey\Component\Eportfolio;
 
 use Component_Eportfolio_ControllerAbstract;
-
-use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
-use Schoolbox\Survey\Attempt\Model as Attempt;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Survey\Model as Survey;
-use Schoolbox\Survey\Question\Mapper as SurveyQuestionMapper;
-use Schoolbox\Survey\Response\Mapper as SurveyResponseMapper;
-use Schoolbox\Survey\Response\Model as Response;
-use Schoolbox\Survey\Section\Mapper as SurveySectionMapper;
-use Schoolbox\Survey\Section\Model as Section;
+use Schoolbox\User;
 
 class Controller extends Component_Eportfolio_ControllerAbstract
 {
-    /**
-     * @var mixed
-     */
-    protected $source;
+    /** @var Survey $survey  */
+    protected $survey;
+
+    /** @var SurveyMapper $surveyMapper */
+    protected $surveyMapper;
+
+    /** @var User $currentUser */
+    protected $currentUser;
+
+    /** @var array $config */
+    protected $config;
 
     /**
-     * Loads the grid component into its set configuration.
-     *
-     * @return true
+     * Work out whether we should display this thing or not
+     * @return bool
      */
     public function execute()
     {
-        if (is_numeric($this->getConfig('src'))) {
+        $this->surveyMapper = SurveyMapper::getInstance();
+        $this->config = $this->getConfig();
+        $this->currentUser = $this->getSitePage()->getDi()->get('user');
+
+        // Try to retrieve the survey this component is linked to
+
+        try {
+            $this->survey = $this->surveyMapper->findById($this->config['survey']);
+
+        } catch (MapperException $e) {
+
+            // The survey was not found, only show the component if the user is a staff member so they can configure it
+
+            if ($this->currentUser->getRole()->isStaff || $this->currentUser->isSuperuser()) {
+                return true;
+            } else {
+                return false;
+            }
         }
+
+        // We found the survey, lets get this party on the road
 
         return true;
     }
@@ -45,62 +64,72 @@ class Controller extends Component_Eportfolio_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Get the ID of the student whose ePortfolio we are viewing
+        $answersRenderArray = [];
 
-        // Retrieve the survey ID from the component configuration
+        // Retrieve all responses to the survey and mash them into an array format that we can iterate and render easily
 
-        $surveyId = $this->getConfig('survey');
+        if ($this->survey instanceof Survey) {
 
-        $studentId = $this->getContext()->getUserId();
+            $responses = $this->surveyMapper->getMatrix(
+                $this->survey->getId(),
+                $this->getContext()->getUserId()
+            );
 
+            foreach ($responses as &$response) {
 
-        if (!empty($surveyId)) {
+                // Strip the section title of tags and create an array entry for it if none already exists
 
-            // Retrieve the survey
+                $sectionTitle = strip_tags($response['section_title']);
 
-            /** @var Survey $survey */
-            $survey = SurveyMapper::getInstance()->findById($surveyId);
+                if (!isset($answersRenderArray[$sectionTitle])) {
+                    $answersRenderArray[$sectionTitle] = [];
+                }
 
-            // Retrieve all attempts for the survey
+                // Unserialize the available answers (into an array of objects) and then mash into an indexed array so we can easily lookup
+                // the persons selected answer
 
-            $survey->setAttempts(SurveyAttemptMapper::getInstance()->findByColumnList([
-                'user_id' => $studentId,
-                'assess_id' => $surveyId
-            ], ['start' => 'desc']
-            ));
+                $answers = unserialize($response['answers']);
 
-            // Retrieve the responses for each of these attempts
+                $answersArray = [];
 
-            /** @var Attempt $attempt */
-            foreach ($survey->getAttempts() as $attempt) {
-                $attempt->setResponses(SurveyResponseMapper::getInstance()->findByColumn('attempt_id', $attempt->getId()));
+                foreach ($answers as $answer) {
+                    $answersArray[$answer->value] = $answer->description;
+                }
+
+                // Add each question for the section to the array
+
+                // The number of questions is restricted by the components configuration
+
+                if (count($answersRenderArray[$sectionTitle]) < $this->config['size']) {
+
+                    // Unserialize the persons selected answer(s) and store them with the question for rendering
+
+                    $selectedAnswers = unserialize($response['selectedAnswers']);
+
+                    $answers = [];
+
+                    foreach ($selectedAnswers as $answer) {
+                        $answers[] = $answersArray[$answer];
+                    }
+
+                    $answersRenderArray[$sectionTitle][strip_tags($response['question'])] = $answers;
+                }
             }
-
-            // Retrieve all of the surveys sections in sequence order
-
-            $survey->setSections(SurveySectionMapper::getInstance()->findByColumn('assess_id', $survey->getId(), [
-                'order' => [
-                    'sequence' => 'ASC'
-                ]
-            ]));
-
-            // For each section get its questions in sequence order
-
-            /** @var Section $section */
-            foreach ($survey->getSections() as $section) {
-                $section->setQuestions(SurveyQuestionMapper::getInstance()->findByColumn('section_id', $section->getId(), [
-                    'order' => [
-                        'sequence' => 'ASC'
-                    ]
-                ]));
-            }
-
-            new \Alaress_Probe($survey);
-
-        } else {
-            $survey = null;
-            $responses = null;
         }
+
+        // There is a bit of fudgery going on here. We need to hide the configuration options from students, but
+        // students have write access to ePortfolio pages- so the normal component configuration visible setting
+        // fails miserable on ePortfolio components.
+
+        // Staff and superusers can see the heading
+
+        $showStaffHeading = $this->currentUser->getRole()->isStaff() || $this->currentUser->isSuperuser();
+
+        // Students see a static title bar
+
+        $showStudentHeading = (!$this->currentUser->getRole()->isStaff() && !$this->currentUser->isSuperuser()) && $this->config['collapse'];
+
+        // Render this mess out
 
         return $this->renderTwigTemplate(
             $templateHandle,
@@ -108,9 +137,15 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             [
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
-                'config'                => $this->getConfig(),
-                'survey'                => $survey
-            ]
+                'config'                => $this->config,
+                'showStudentHeading'    => $showStudentHeading,
+                'survey'                => $this->survey,
+                'answers'               => $answersRenderArray,
+                'columnWidth'           => 90 / $this->config['size']
+            ],
+            true,                       // This does nothing useful on ePortfolio components
+            $showStaffHeading,          // Show configuration from PHPLIB if the user is staff/superuser
+            $showStudentHeading         // We need to raw render if showing the student heading, the heading HTML is in the Twig template
         );
     }
 }
