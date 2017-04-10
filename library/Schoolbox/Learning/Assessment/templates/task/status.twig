@@ -43,8 +43,9 @@
                 statusTip:   pTooltip,
                 cardSize:    "small-9 medium-10 xlarge-11"
             } only %}
+
             <div class="small-1">
-                {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+                {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme, writable: writable } %}
             </div>
         </div>
         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="user-completions-{{ participant.user.id }}">
