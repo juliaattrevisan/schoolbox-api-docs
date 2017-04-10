@@ -23,6 +23,7 @@ class Module extends \Schoolbox\Learning\Module
      */
     public function initRoutes(Router $router, $basePath)
     {
+        /** @var string[][] $routes */
         $routes = [
             'GET' => [
                 '/grades-year/{userId}/year/{year}'       => 'getGradesYear',                // student && year
