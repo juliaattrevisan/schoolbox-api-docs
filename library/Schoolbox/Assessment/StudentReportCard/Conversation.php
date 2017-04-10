@@ -70,7 +70,7 @@ class Conversation
              * list of participants
              */
             
-            $this->participants = ($this->participants->add($student))
+            $this->participants = $this->participants->add($student)
                 ->merge($student->getParents())
                 ->merge($category->getTeachers());
         }
