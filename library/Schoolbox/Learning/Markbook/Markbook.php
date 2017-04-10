@@ -34,6 +34,13 @@ class Markbook
     protected $assessments;
 
     /**
+     * Assessments part of this markbook on the top level (not including assessments inside projects)
+     *
+     * @var Collection|IAssessable[]
+     */
+    protected $topLevelAssessments;
+
+    /**
      * The grade group to use when summarising a student's overall grade for these assessments.
      *
      * @var GradeGroup
@@ -88,6 +95,10 @@ class Markbook
         $this->assessments = $assessments;
         $this->gradeGroup  = $gradeGroup;
         $this->viewingUser = $viewingUser;
+        $this->topLevelAssessments = $assessments->filter(function(IAssessable $assessment) {
+            return !$assessment->getContext() instanceof Project;
+        });
+
         $this->collateStatistics();
     }
 
@@ -99,6 +110,16 @@ class Markbook
     public function getAssessments()
     {
         return $this->assessments;
+    }
+
+    /**
+     * Get all top level assessments in this collection.
+     *
+     * @return Collection|IAssessable[]
+     */
+    public function getTopLevelAssessments()
+    {
+        return $this->topLevelAssessments;
     }
 
     /**
@@ -155,14 +176,14 @@ class Markbook
     protected function collateStatistics()
     {
         // Collate assessments and weight
-        foreach ($this->getAssessments() as $assessment) {
+        foreach ($this->getTopLevelAssessments() as $assessment) {
             $this->collateAssessmentStatistics($assessment);
             $this->markbookStatistics['totalWeight'] += $assessment->getWeight();
         }
 
         // Collate weight percent for each assessment
         if ($this->markbookStatistics['totalWeight'] > 0) {
-            foreach ($this->getAssessments() as $assessment) {
+            foreach ($this->getTopLevelAssessments() as $assessment) {
                 $this->assessmentStatistics[$assessment->getId()]['weightPercent'] =
                     $this->assessmentStatistics[$assessment->getId()]['weight'] / $this->markbookStatistics['totalWeight'] * 100;
             }
@@ -280,12 +301,9 @@ class Markbook
      */
     public function getAssessmentsWithProjectContents()
     {
-        foreach ($this->getAssessments() as $assessment) {
+        foreach ($this->getTopLevelAssessments() as $assessment) {
 
-            // Show assessment if it's not inside a project (cause they get covered below)
-            if (!$assessment->getContext() instanceof Project) {
-                yield $assessment;
-            }
+            yield $assessment;
 
             // If this is a project - loop through assessments inside it
             if ($assessment instanceof Project) {
