@@ -75,7 +75,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
                 $this->getContext()->getUserId()
             );
 
-            foreach ($responses as &$response) {
+            foreach ($responses as $response) {
 
                 // Strip the section title of tags and create an array entry for it if none already exists
 
