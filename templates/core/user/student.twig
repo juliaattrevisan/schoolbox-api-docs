@@ -2,7 +2,6 @@
 {% set isSuperuser = session.user.isSuperUser() %}
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
-{% set isParentOfStudent = session.user.isParentOf(user) %}
 
 {# medical: if allowed in config, and user is staff or parent of this child #}
 {% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
