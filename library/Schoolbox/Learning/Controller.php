@@ -507,7 +507,7 @@ class Controller extends Base
                 $graphInfo[] = [];
             }
 
-            $hasStats = $statistics[$assessment->getId()]['count'] > 0;
+            $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()->isQuantitative();
 
             if ($hasStats && $canSeeBoxplot) {
                 $graphData[] = [
