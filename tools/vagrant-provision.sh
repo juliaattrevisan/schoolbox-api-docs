@@ -59,7 +59,7 @@ getS3file() {
         curletag=`curl -I $data_source/$S3file 2>/dev/null`;
         if [ $? -eq 0 ];
         then
-	    etag=`echo "$curletag" | grep ETag | cut -d'"' -f2`;
+            etag=`echo "$curletag" | grep ETag | cut -d'"' -f2`;
             # If S3file_short is not set, assume same as S3file for simplicity
             if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
             # Auto cleanup etag cache file if actual file is missing
