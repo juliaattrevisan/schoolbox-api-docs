@@ -12,6 +12,7 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -66,7 +67,10 @@ if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessment->isParticipant($_SES
 /* Check if this assessment can be started
  */
 if ($assessHandler->isExpired($assess['assess_id'])) {
-    error(120);
+    // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
+    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->getBaseContext() instanceof UnitSpecification)) {
+        error(120);
+    }
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
