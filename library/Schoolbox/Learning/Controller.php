@@ -433,52 +433,35 @@ class Controller extends Base
             ]
         );
 
+        /** @var GenericCollection|IAssessable[] $assessments */
         $assessments = $assessments->filter( function(IAssessable $activity) {
             return $activity->isPublished();
         });
 
-        /* If you're an Instructor/superuser, you can see the graph regardless of
-         * the config settings. getFolderAccess() seems to do a lot of stuff,
-         * maybe there is a faster or at least, less costly, way of doing this
-         */
-        $isInstructor = false;
+        // Instructors can see the graph regardless of the config settings.
+        $isInstructor = $this->getAccess()->isInstructor($this->getUser(), $subject);
 
-        $perms = $this->getAccess()->getFolderAccess($this->getUser(), [$subject->getId()]);
+        // Show the box/whisker plot for instructors and for students if the config var is on
+        $canSeeBoxPlot = $isInstructor || $this->getConfigLoader()->get('display_grade_average');
 
-        if ($perms >= UserAccess::ACCESS_WRITE) {
-            $isInstructor = true;
-        }
-
-        /* Show the box/whisker plot on the graph for instructors
-         * and for students if the config var is on
-         */
-        $canSeeBoxplot = $isInstructor || $this->getConfigLoader()->get('display_grade_average');
-
-        /* Show the graph for instructors
-         * and for students if the config var is on
-         */
+        // Show the graph for instructors and for students if the config var is on
         $canSeeGraph = $isInstructor || $this->getConfigLoader()->get('display_grade_graph');
 
-        /* Show the Current Grade Average for instructors
-         * and for students if the config var is on
-         */
+        // Show the Current Grade Average for instructors and for students if the config var is on
         $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Let markbook calculate the statistics
-
         $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
         $statistics = $markbook->getAssessmentStatistics();
 
         // Get the data for the graph
-
-        $graphInfo = [];
+        $graphInfo        = [];
         $graphAssessments = [];
-        $graphData = [];
-        $graphScatter = [];
-        $graphFeedback = [];
-        $quizzes = [];
+        $graphData        = [];
+        $graphScatter     = [];
+        $graphFeedback    = [];
+        $quizzes          = [];
 
-        /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
 
             // If this is a quiz we need to find out if the student has made any attempts so we can display a link to view them
@@ -501,10 +484,9 @@ class Controller extends Base
 
             $graphAssessments[] = $assessment->getTitle();
 
+            $feedback = null;
             if ($assessment->isParticipant($viewee)) {
                 $feedback = $assessment->getParticipant($viewee)->findMostRecentVisibleFeedback($this->getUser());
-            } else {
-                $feedback = null;
             }
 
             if ($feedback) {
@@ -514,7 +496,7 @@ class Controller extends Base
                     $graphInfo[] = [
                         'displayMark' => $feedback->getHumanReadableMark(),
                         'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
-                        'info' => $feedback->getComment() == null ? '' : $feedback->getComment(),
+                        'info' => null === $feedback->getComment() ? '' : $feedback->getComment(),
                     ];
                 } else {
                     $graphInfo[] = [];
@@ -526,7 +508,7 @@ class Controller extends Base
 
             $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()->isQuantitative();
 
-            if ($hasStats && $canSeeBoxplot) {
+            if ($hasStats && $canSeeBoxPlot) {
                 $graphData[] = [
                     // Minimum
                     [
@@ -568,16 +550,16 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
-        $folders = $this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term);
-        $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
+        $folders = $this->folderMapper
+            ->findFoldersWithFeedbackToStudent($viewee, $term)
+            ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
 
-        // Grab the students conversation history
-
+        // Grab the students conversation history (this also implicitly loads teachers)
         $conversation = new Conversation($this->getConfigLoader(), $viewee, $subject);
 
         // Squeeze it on out
 
-        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER["REQUEST_URI"]);
+        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER['REQUEST_URI']);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
             'student'            => $viewee,
