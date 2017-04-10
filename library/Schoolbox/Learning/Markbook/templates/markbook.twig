@@ -100,8 +100,8 @@
                         <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                         Class Average
                     </th>
-                    {% set weightedMean = markbook.markbookStatistics.weightedMean %}
-                    <th class="{{ urgency.marks(markbook.markbookStatistics.normalisedMean) }}-bg">
+                    {% set weightedMean = markbook.weightedMean %}
+                    <th class="{{ urgency.marks(markbook.normalisedMean) }}-bg">
                             {{ weightedMean | default('–') }}
                     </th>
                     {% for assessment in markbook.assessmentsWithProjectContents %}

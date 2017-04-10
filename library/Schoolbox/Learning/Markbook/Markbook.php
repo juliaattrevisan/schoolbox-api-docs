@@ -55,11 +55,19 @@ class Markbook
     protected $viewingUser;
 
     /**
-     * Statistics for the whole markbook.
-     *
-     * @var array Currently, only contains weightedMean
+     * @var int
      */
-    protected $markbookStatistics = [];
+    private $totalWeight;
+
+    /**
+     * @var float
+     */
+    private $normalisedMean;
+
+    /**
+     * @var float
+     */
+    private $weightedMean;
 
     /**
      * Statistics for each assessment.
@@ -141,16 +149,6 @@ class Markbook
     }
 
     /**
-     * Gets all stats that span the entire markbook.
-     *
-     * @return array
-     */
-    public function getMarkbookStatistics()
-    {
-        return $this->markbookStatistics;
-    }
-
-    /**
      * Gets all stats for the assessments in this markbook.
      *
      * @return array
@@ -178,14 +176,14 @@ class Markbook
         // Collate assessments and weight
         foreach ($this->getTopLevelAssessments() as $assessment) {
             $this->collateAssessmentStatistics($assessment);
-            $this->markbookStatistics['totalWeight'] += $assessment->getWeight();
+            $this->totalWeight += $assessment->getWeight();
         }
 
         // Collate weight percent for each assessment
-        if ($this->markbookStatistics['totalWeight'] > 0) {
+        if ($this->totalWeight > 0) {
             foreach ($this->getTopLevelAssessments() as $assessment) {
                 $this->assessmentStatistics[$assessment->getId()]['weightPercent'] =
-                    $this->assessmentStatistics[$assessment->getId()]['weight'] / $this->markbookStatistics['totalWeight'] * 100;
+                    $this->assessmentStatistics[$assessment->getId()]['weight'] / $this->totalWeight * 100;
             }
         }
 
@@ -214,12 +212,22 @@ class Markbook
         // Then, summate the result as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
 
-        $this->markbookStatistics['normalisedMean'] = $weightedSummator->summateAllAssessables(
+        $this->normalisedMean = $weightedSummator->summateAllAssessables(
             $this->getAssessments(),
             true,
             new Average()
         );
-        $this->markbookStatistics['weightedMean'] = $overallMarkScheme->getHumanReadableMark($this->markbookStatistics['normalisedMean']);
+        $this->weightedMean = $overallMarkScheme->getHumanReadableMark($this->normalisedMean);
+    }
+
+    public function getNormalisedMean()
+    {
+        return $this->normalisedMean;
+    }
+
+    public function getWeightedMean()
+    {
+        return $this->weightedMean;
     }
 
     /**

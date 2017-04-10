@@ -222,7 +222,7 @@ class Controller extends Base
         $data['Student Id'] = 'Class Average';
         $data['Student First Name'] = '';
         $data['Student Last Name'] = '';
-        $data['Student Average'] = $markbook->getMarkbookStatistics()['weightedMean'];
+        $data['Student Average'] = $markbook->getWeightedMean();
 
         // This is an ugly hack to get duplicate task names to appear as is the case in demo data
         // Just prepending spaces to the end of the assessment name
