@@ -8,9 +8,12 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Breadcrumbs;
 
 $assessHandler   = new Assess_Main();
@@ -48,8 +51,21 @@ if ($assessHandler->isOwner($this->arg[0])) {
 }
 */
 
-if ($assessHandler->isExpired($assess['assess_id'])) {
-    error(120);
+/**
+ * @var SitePage $this
+ * @var AssessmentDataSource $assessmentDataSource
+ */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
+$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+
+if ($assessHandler->isExpired($section['assess_id'])) {
+    // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
+    $assessmentFolder = $assessment->getBaseContext()->getFolder();
+    $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
+    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->getBaseContext() instanceof UnitSpecification)) {
+        error(120);
+    }
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
