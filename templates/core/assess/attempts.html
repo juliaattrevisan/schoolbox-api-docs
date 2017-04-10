@@ -48,7 +48,19 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Attempts by {ATTEMPT_USER_NAME}</h2>
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Attempts by {ATTEMPT_USER_NAME}</h2>
+                </div>
+            </div>
+            <!-- BEGIN has_preview_action -->
+            <nav>
+                <a class="icon-add" href="/assess/intro/{ASSESS_ID}" title="Preview Quiz"></a>
+            </nav>
+            <!-- END has_preview_action -->
+        </div>
+
         <!-- BEGIN has_attempts -->
         <table id="attempts">
             <thead>

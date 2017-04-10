@@ -63,6 +63,7 @@ catch (\Exception $e) {
 }
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
+$this->setBlock(TEMPLATE_content, 'has_preview_action', 'has_preview_action_block');
 $this->setBlock(TEMPLATE_content, 'has_preview_link', 'has_preview_link_block');
 $this->setBlock(TEMPLATE_content, 'has_attempts', 'has_attempts_block');
 $this->setBlock('has_attempts', 'attempt', 'attempt_block');
@@ -85,6 +86,7 @@ $this->setVar([
     'CURRENT_USER' => $user->getFullName(),
     'attempt_block' => '',
     'has_attempts_block' => '',
+    'has_preview_action_block' => '',
     'has_preview_link_block' => '',
 ]);
 
@@ -101,6 +103,7 @@ if ($perm >= UserAccess::ACCESS_WRITE) {
         'ASSESS_ID' => $assess['assess_id']
     ]);
 
+    $this->parse('has_preview_action_block', 'has_preview_action');
     $this->parse('has_preview_link_block', 'has_preview_link');
 }
 
