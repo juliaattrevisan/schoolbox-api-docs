@@ -1659,8 +1659,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function findFoldersWithResponses(User $student, Term $term)
     {
         $codeMapper           = $this->getJoinMapper('codes');
-        $homepageConfigMapper = $this->getJoinMapper('homepages');
-        $groupMapper          = $this->getJoinMapper('groups');
 
         $whereParams = [
             ':studentId' => $student->getId(),
@@ -1670,13 +1668,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $query = "
             SELECT
                 {$this->getColumnString('f')},
-                {$codeMapper->getColumnString('fc')},
-                {$homepageConfigMapper->getColumnString('hp')},
-                {$groupMapper->getColumnString('ug')}
+                {$codeMapper->getColumnString('fc')}
             FROM {$this->getTable()} f
             LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
-            LEFT JOIN {$this->getJoinSql('homepages', 'f', 'hp')}
-            LEFT JOIN {$this->getJoinSql('groups', 'f', 'ug')}
             WHERE f.deleted_at IS NULL AND f.id IN
             ( 
               SELECT DISTINCT COALESCE(`af`.`folder_id`, `ci`.`folder_id`) AS `folder_id`
@@ -1701,18 +1695,21 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement = $this->database->prepare($query);
         $statement->execute($whereParams);
 
-        $collection = $this->createCollection();
+        /** @var GenericCollection|Model[] $folders Sorted by query order */
+        $folders = $this->createCollection();
+
+        /** @var Model[] $folderCache - Indexed by folder.id */
+        $folderCache = [];
 
         while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $folder = $this->hydrate($row, 'f');
 
-            /** @var HomepageConfig $homepageConfig */
-            $homepageConfig = $homepageConfigMapper->hydrate($row, 'hp');
-            $folder->setHomepage($homepageConfig);
+            $folderId = $row["f.{$this->getIdentifierColumn()}"];
 
-            /** @var \Schoolbox\Resource\Group $group */
-            $group = $groupMapper->hydrate($row, 'ug');
-            $folder->setGroup($group);
+            if (!$folderCache[$folderId] instanceof Model) {
+                $folderCache[$folderId] = $this->hydrate($row, 'f');
+                $folders->add($folderCache[$folderId]);
+            }
+            $folder = $folderCache[$folderId];
 
             // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
             $codeCollection = $folder->getCodes();
@@ -1724,10 +1721,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $folderCode->setFolder($folder);
             }
 
-            $collection->add($folder);
+            $folders->add($folder);
         }
 
-        return $collection;
+        return $folders;
     }
 
 
