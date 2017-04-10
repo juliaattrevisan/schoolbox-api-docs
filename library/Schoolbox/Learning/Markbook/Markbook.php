@@ -281,7 +281,13 @@ class Markbook
     public function getAssessmentsWithProjectContents()
     {
         foreach ($this->getAssessments() as $assessment) {
-            yield $assessment;
+
+            // Show assessment if it's not inside a project (cause they get covered below)
+            if (!$assessment->getContext() instanceof Project) {
+                yield $assessment;
+            }
+
+            // If this is a project - loop through assessments inside it
             if ($assessment instanceof Project) {
                 foreach ($assessment->getAssessables() as $projectAssessment) {
                     yield $projectAssessment;
