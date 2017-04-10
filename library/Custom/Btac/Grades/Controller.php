@@ -20,7 +20,7 @@ class Controller extends \Schoolbox\Learning\Controller
      */
     public function getGradesYear(User $viewee, $year) {
 
-        $assessments = new Collection();
+        $assessments = $this->getAssessmentMapperProxy()->createCollection();
 
         $term = $this->getTermMapper()->createModel();
 
@@ -67,7 +67,7 @@ class Controller extends \Schoolbox\Learning\Controller
             $term = $this->getTermMapper()->findForYear($year)->first();
         }
 
-        $folders = new Collection();
+        $folders = $this->getFolderMapper()->createCollection();
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
@@ -77,7 +77,7 @@ class Controller extends \Schoolbox\Learning\Controller
                 if (!isset($foldersFound[$folder->getId()])) {
 
                     if (!isset($markbooksFolders[$folder->getId()])) {
-                        $markbooksFolders[$folder->getId()] = new Collection();
+                        $markbooksFolders[$folder->getId()] = $this->getAssessmentMapperProxy()->createCollection();
                         $folder->loadTeachers();
                         $folders->add($folder);
                     }
