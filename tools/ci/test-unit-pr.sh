@@ -44,6 +44,17 @@ fi
 echo "Preparing conf.php"
 cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
+if [ -f tools/ci/php_version_whitelist.txt ];
+then
+    echo "Checking PHP version";
+    phpver=`php -v | head -n1 | cut -d' ' -f2 | cut -d'.' -f1-2`;
+    if [ `grep $phpver tools/ci/php_version_whitelist.txt | wc -l` -eq 0 ];
+    then
+        echo "PHP Version '$phpver' is not valid for this test";
+        exit 0;
+    fi
+fi
+
 echo "Running php unit"
 php vendor/bin/phpunit;
 if [ $? -ne 0 ];
