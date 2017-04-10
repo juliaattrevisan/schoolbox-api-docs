@@ -292,9 +292,9 @@ class Controller extends Base
         $writer = new CsvWriter($file, $export);
         $writer->write();
 
-        $filename = strtolower(str_replace(' ', '_', 'markbookexport-' . $class->getFolder()->getNameWithCodes()));
+        $filename = preg_replace('/[^\w-(),]/', '_', 'Markbook_' . $class->getFolder()->getNameWithCodes());
 
-        header("Content-Disposition: attachment;filename={$filename}.csv;");
+        header('Content-Disposition: attachment; filename="'.$filename.'.csv";');
         header('Content-Type: application/csv; charset=UTF-8');
         rewind($file);
         echo stream_get_contents($file);
