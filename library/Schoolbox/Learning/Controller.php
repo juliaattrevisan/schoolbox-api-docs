@@ -412,6 +412,10 @@ class Controller extends Base
      * @param User $viewee
      * @param Term $term
      * @param Folder $subject
+     * @throws DefinitionException
+     * @throws MapperException
+     * @throws ServiceNotFound
+     * @throws \InvalidArgumentException
      */
     public function getGradesForSubject(User $viewee, Term $term, Folder $subject)
     {

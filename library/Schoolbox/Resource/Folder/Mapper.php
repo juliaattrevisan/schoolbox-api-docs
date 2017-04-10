@@ -1737,6 +1737,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param User $student
      * @param Term|null $term
      * @return GenericCollection
+     * @throws DefinitionException
      */
     public function findFoldersWithFeedbackToStudent(User $student, Term $term = null) {
 
@@ -1789,6 +1790,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param $whereClause
      * @param $whereParams
      * @return GenericCollection
+     * @throws DefinitionException
      */
     private function findFoldersWithFeedbacks($whereClause, $whereParams)
     {
