@@ -348,9 +348,10 @@ class Controller extends Base
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
      * @param User $viewee
-     * @param Term|null $term If null, default to current term
+     * @param Term $term
+     * @throws ServiceNotFound If unable to find mail handler service
      */
-    public function getGrades(User $viewee, Term $term = null)
+    public function getGrades(User $viewee, Term $term)
     {
         // Storage for each folders markbook
         $markbooks = [];

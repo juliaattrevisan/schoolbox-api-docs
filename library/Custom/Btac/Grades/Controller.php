@@ -19,11 +19,11 @@ class Controller extends \Schoolbox\Learning\Controller
      *
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
-     * @param User            $viewee
-     * @param null|Term\Model $term  If null, default to current term
+     * @param User       $viewee
+     * @param Term\Model $term
      * @throws ServiceNotFound If unable to find mail handler service
      */
-    public function getGrades(User $viewee, Term\Model $term = null)
+    public function getGrades(User $viewee, Term\Model $term)
     {
         if (!$term) {
             $term = $this->getTermMapper()->findForToday();
@@ -39,7 +39,7 @@ class Controller extends \Schoolbox\Learning\Controller
      * @api   GET /learning/grades-year/{userId}/year/{year}
      * @level 165
      * @param User $viewee
-     * @param      $year
+     * @param int  $year
      * @throws ServiceNotFound If unable to find mail handler service
      */
     public function getGradesYear(User $viewee, $year)
