@@ -132,6 +132,7 @@ module.exports = function(grunt) {
                     'www/javascript/components/flatpickr/dist/flatpickr.js',
 
                     // Loads Flatpickr into a modal
+                    'www/javascript/shared/datetime/attacher.datepicker.js',
                     'www/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js',
                     'www/javascript/shared/alaress-datetime-picker/alaress-datetime-modal.js',
 
