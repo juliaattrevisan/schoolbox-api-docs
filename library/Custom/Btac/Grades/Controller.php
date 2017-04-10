@@ -2,70 +2,75 @@
 
 namespace Custom\Btac\Grades;
 
-use Schoolbox\Assessment\Term\Model as Term;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Markbook\Markbook;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Schoolbox\Assessment\Term;
 
 class Controller extends \Schoolbox\Learning\Controller
 {
-    /**
-     * @api GET /learning/grades-year/{userId}/year/{year}
-     * @level 165
-     * @param User $viewee
-     * @param $year
-     */
-    public function getCustomGradesYear(User $viewee, $year) {
-
-        $assessments = $this->getAssessmentMapperProxy()->createCollection();
-
-        $term = $this->getTermMapper()->createModel();
-
-        $termStart = new \Alaress_Date_Format("{$year}-01-01 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
-        $termFinish = new \Alaress_Date_Format("{$year}-12-31 23:59:59", \Alaress_Date_Format::DATABASE_FORMAT);
-
-        $term->setStart($termStart);
-        $term->setActualFinish($termFinish);
-        $term->setDisplayFinish($termFinish);
-
-        $assessments = $assessments->merge($this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term));
-
-        $this->getGrades($viewee, $assessments, $year);
-    }
 
     /**
      * Displays a list of grades/results for the specified user and term for all subjects
      *
-     * @api GET /learning/grades/{userId}{/termCode}
+     * @api   GET /learning/grades/{userId}{/termCode}
+     * @level 165
+     * @param User            $viewee
+     * @param null|Term\Model $term  If null, default to current term
+     * @throws ServiceNotFound If unable to find mail handler service
+     */
+    public function getGrades(User $viewee, Term\Model $term = null)
+    {
+        if (!$term) {
+            $term = $this->getTermMapper()->findForToday();
+        }
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
+        $year        = $term->getStart()->getYear();
+
+        $this->getCustomGrades($viewee, $assessments, $year, $term);
+    }
+
+
+    /**
+     * @api   GET /learning/grades-year/{userId}/year/{year}
      * @level 165
      * @param User $viewee
-     * @param Collection|null $assessments
-     * @param Term $term
-     * @param int|null $year
-     * @param Collection $assessments
+     * @param      $year
+     * @throws ServiceNotFound If unable to find mail handler service
      */
-    protected function getCustomGrades(User $viewee, Collection $assessments = null, $year = null, Term $term = null)
+    public function getGradesYear(User $viewee, $year)
+    {
+        $from        = new \Alaress_Date_Format("{$year}-01-01 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
+        $to          = new \Alaress_Date_Format("{$year}-12-31 23:59:59", \Alaress_Date_Format::DATABASE_FORMAT);
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, $from, $to);
+
+        // If they are viewing an entire year, default to first semester for results
+        // Note that we have one year of assessments, but $term duration may not be a year.
+        $term = $this->getTermMapper()->findForYear($year)->first();
+        $this->getCustomGrades($viewee, $assessments, $year, $term);
+    }
+
+
+    /**
+     *
+     * @param User                     $viewee
+     * @param Collection|IAssessable[] $assessments
+     * @param int                      $year
+     * @param Term\Model               $term
+     * @throws ServiceNotFound If unable to find mail handler service
+     */
+    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term)
     {
         // Storage for each folders markbook
-        $markbooks = [];
+        $markbooks        = [];
         $markbooksFolders = [];
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
-
         $assessmentTasks = [];
-
-        if ($assessments == null) {
-            $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
-        }
-
-        // If they are viewing an entire year, default to first semester for results
-
-        if ($term == null) {
-            $term = $this->getTermMapper()->findForYear($year)->first();
-        }
 
         $folders = $this->getFolderMapper()->createCollection();
 
@@ -73,7 +78,7 @@ class Controller extends \Schoolbox\Learning\Controller
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
 
-            if ($folder instanceof Folder) {
+            if ($folder instanceof Folder\Model) {
                 if (!isset($foldersFound[$folder->getId()])) {
 
                     if (!isset($markbooksFolders[$folder->getId()])) {
@@ -82,13 +87,13 @@ class Controller extends \Schoolbox\Learning\Controller
                         $folders->add($folder);
                     }
 
-                    if ($assessment instanceof DueWork) {
-                        if ($assessment->getWorkType()->getName() == "Assessment Task") {
-                            if (!isset($assessmentTasks[$folder->getId()])) {
-                                $assessmentTasks[$folder->getId()] = [];
-                            }
-                            $assessmentTasks[$folder->getId()][] = $assessment;
+                    if ($assessment instanceof DueWork\Model && $assessment->getWorkType()
+                        && 'Assessment Task' === $assessment->getWorkType()->getName()
+                    ) {
+                        if (!isset($assessmentTasks[$folder->getId()])) {
+                            $assessmentTasks[$folder->getId()] = [];
                         }
+                        $assessmentTasks[$folder->getId()][] = $assessment;
                     }
 
                     $markbooksFolders[$folder->getId()]->add($assessment);
@@ -96,24 +101,25 @@ class Controller extends \Schoolbox\Learning\Controller
             }
         }
 
-        foreach ($markbooksFolders as $folderId => $assessments) {
+        foreach ($markbooksFolders as $folderId => $assessmentsArray) {
             $markbooks[$folderId] =
-                (new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()))
+                (new Markbook($assessmentsArray, $this->getDefaultGradeGroup(), $this->getUser()))
                     ->getStudentStatistics()[$viewee->getId()];
         }
 
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
-            'student'       => $viewee,
-            'term'          => $term,
-            'year'          => $year,
-            'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'       => $folders,
+            'student'         => $viewee,
+            'term'            => $term,
+            'year'            => $year,
+            'terms'           => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
+            'folders'         => $folders,
             'assessmentTasks' => $assessmentTasks,
-            'markbooks'     => $markbooks,
-            'mailHandle'    => $this->getSession()->get('mailhandle'),
-            'currentUser'   => $this->getUser(),
+            'markbooks'       => $markbooks,
+            'mailHandle'      => $this->getSession()->get('mailhandle'),
+            'currentUser'     => $this->getUser(),
         ]));
     }
+
 }

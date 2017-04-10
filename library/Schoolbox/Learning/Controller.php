@@ -348,11 +348,9 @@ class Controller extends Base
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
      * @param User $viewee
-     * @param Collection|null $assessments
-     * @param null $year
-     * @param Term|null $term
+     * @param Term|null $term If null, default to current term
      */
-    public function getGrades(User $viewee, Collection $assessments = null, $year = null, Term $term = null)
+    public function getGrades(User $viewee, Term $term = null)
     {
         // Storage for each folders markbook
         $markbooks = [];
