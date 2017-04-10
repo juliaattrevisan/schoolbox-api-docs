@@ -500,6 +500,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     {
         $merged = $this->emptyClone();
         $merged->setStack(array_merge($this->getStack(), $other->getStack()));
+
         return $merged;
     }
 
