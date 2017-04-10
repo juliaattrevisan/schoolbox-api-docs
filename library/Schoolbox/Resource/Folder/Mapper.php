@@ -1790,7 +1790,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param $whereParams
      * @return GenericCollection
      */
-    private function findFoldersWithFeedbacks($whereClause, $whereParams) {
+    private function findFoldersWithFeedbacks($whereClause, $whereParams)
+    {
         $codeMapper = $this->getJoinMapper('codes');
 
         $query = "
@@ -1825,6 +1826,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               LEFT JOIN `task`                                  AS `tk`   ON `tk`.`assessment_id` = `a`.`id`
               LEFT JOIN `assess`                                AS `qz`   ON `qz`.`assessment_id` = `a`.`id`
               LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id`
+
               LEFT JOIN `task_completion`                       AS `tkc`  ON `tkc`.`task_id` = `tk`.`id`
               LEFT JOIN `assess_attempt`                        AS `qza`  ON `qza`.`assess_id` = `qz`.`assess_id`
               LEFT JOIN `submission_return`                     AS `dwr`  ON `dwr`.`box_id` = `dw`.id
@@ -1839,13 +1841,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // Maintain separate cache so we can preserve query result ordering
         /** @var Model[] $folderCache - Indexed by folder.id */
         $folderCache = [];
-        $folders = $this->createCollection();
+        $folders     = $this->createCollection();
 
-        while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             $folderId = $row["f.{$this->getIdentifierColumn()}"];
 
-            if(!$folderCache[$folderId] instanceof Model){
+            if (!$folderCache[$folderId] instanceof Model) {
                 $folderCache[$folderId] = $this->hydrate($row, 'f');
                 $folders->add($folderCache[$folderId]);
             }
@@ -1854,10 +1856,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
             $codeCollection = $folder->getCodes();
-            $code = $row['fc.code'];
-            if($code && !$codeCollection->offsetExists($code)){
+            $code           = $row['fc.code'];
+            if ($code && !$codeCollection->offsetExists($code)) {
                 /** @var FolderCode $folderCode */
-                $folderCode = $this->hydrateJoin($row, 'codes', 'fc');
+                $folderCode            = $this->hydrateJoin($row, 'codes', 'fc');
                 $codeCollection[$code] = $folderCode;
                 $folderCode->setFolder($folder);
             }
