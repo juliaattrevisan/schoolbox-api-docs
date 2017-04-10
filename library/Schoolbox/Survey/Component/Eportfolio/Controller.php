@@ -148,6 +148,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
                 'showStudentHeading'    => $showStudentHeading,
                 'survey'                => $this->survey,
                 'answers'               => $answersRenderArray,
+                'questionCount'         => $maximumQuestions,
                 'columnWidth'           => $maximumQuestions > 0 ? (90 / $maximumQuestions) . "%" : ""
             ],
             true,                       // This does nothing useful on ePortfolio components

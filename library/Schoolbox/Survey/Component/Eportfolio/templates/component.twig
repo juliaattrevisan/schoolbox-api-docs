@@ -46,14 +46,26 @@
                 {% for section, questions in answers %}
                     <tr>
                         <td width="10%"><b>{{ section }}</b></td>
+                        {% set count = 0 %}
+
                         {% for question, answers in questions %}
                             <td width="{{ columnWidth }}">
                                 <p><b>{{ question }}</b></p>
                                 {% for answer in answers %}
-                                    <p>{{ answer }}</p>
+                                    <p>{{ count }}{{ answer }}</p>
                                 {% endfor %}
                             </td>
+                            {% set count = count + 1 %}
                         {% endfor %}
+
+                        {# Add blank cells for missing questions #}
+
+                        {% if count < questionCount %}
+                            {% for count in count .. (questionCount - 1) %}
+                                <td width="{{ columnWidth }}"></td>
+                            {% endfor %}
+                        {% endif %}
+
                     </tr>
                 {% endfor %}
             </tbody>
