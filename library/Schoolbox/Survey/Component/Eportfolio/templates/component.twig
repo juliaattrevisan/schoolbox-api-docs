@@ -52,7 +52,7 @@
                             <td width="{{ columnWidth }}">
                                 <p><b>{{ question }}</b></p>
                                 {% for answer in answers %}
-                                    <p>{{ count }}{{ answer }}</p>
+                                    <p>{{ answer }}</p>
                                 {% endfor %}
                             </td>
                             {% set count = count + 1 %}
