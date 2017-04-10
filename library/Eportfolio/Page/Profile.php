@@ -188,13 +188,14 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 $latestSubmission = $this->getLatestSubmission($this->getUser(), $currentBox);
                 $latestReturn = $this->getLatestReturn($this->getUser(), $currentBox);
+                $workType = $currentBox->getAssessmentModel()->getWorkType();
 
                 $this->getPage()->setVar(array(
                     'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
                     'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentBox->getCategory()->getName(),
                     'SHOWCASED_WORK_BOX_CATEGORY_ID' => $currentBox->getCategory()->getId(),
                     'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
-                    'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getAssessmentModel()->getWorkType()->getName(),
+                    'SHOWCASED_WORK_BOX_TYPE' => $workType ? $workType->getName() : '',
                 ));
 
                 /* Show submitted work information (if available)

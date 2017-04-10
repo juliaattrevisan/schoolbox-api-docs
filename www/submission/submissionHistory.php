@@ -255,6 +255,7 @@ $submission_history->sortBy('date', 'desc');
 
 $gradient = $box->getGradientIndex();
 
+$workType = $box->getAssessmentModel()->getWorkType();
 $this->setVar(
     array(
         'CATEGORY_NAME' => Scrub::text($box->getCategory()->getName()),
@@ -269,7 +270,7 @@ $this->setVar(
         'BOX_OWNER' => $userHandler->formatName($user),
         'BOX_OWNER_ID' => $userID,
         'BOX_DESCRIPTION' => Scrub::html($box->getDescription()),
-        'BOX_TYPE' => $workTypeMapper->getNameFromId($box->getAssessmentModel()->getWorkType()->getId()),
+        'BOX_TYPE' => $workType ? $workTypeMapper->getNameFromId($workType->getId()) : '',
         'BOX_CREATED' => $createdDate->getRelativeTime(),
         'BOX_CREATED_EXACT' => $createdDate->getLong()
     )

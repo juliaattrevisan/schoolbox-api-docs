@@ -69,12 +69,14 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
                 $action = 'View Details';
             }
 
+            $workType = $submission->getAssessmentModel()->getWorkType();
+
             $output = array(
                 'id'          => $submission_id,
                 'cid'         => $submission_cat_id,
                 'uid'         => $_REQUEST['uid'],
                 'category'    => Scrub::text($submission->getCategory()->getName()),
-                'typeName'    => Scrub::text($submission->getAssessmentModel()->getWorkType()->getName()),
+                'typeName'    => $workType ? Scrub::text($workType->getName()) : '',
                 'name'        => Scrub::text($submission->getName()),
                 'description' => Scrub::html($submission->getDescription()),
                 'action'      => $action,

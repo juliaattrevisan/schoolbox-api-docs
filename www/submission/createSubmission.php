@@ -233,7 +233,8 @@ $this->setVar(
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 // Output submission work_type drop down.
-$work_type = $submission->getAssessmentModel()->getWorkType()->getId();
+$workType = $submission->getAssessmentModel()->getWorkType();
+$work_type = $workType ? $workType->getId() : null;
 $this->dropDown(
     'type_drop',
     $work_types,

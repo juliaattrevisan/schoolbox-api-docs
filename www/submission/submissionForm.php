@@ -192,7 +192,7 @@ if (!$is_task) {
 }
 $submission->setName($_POST['name']);
 $submission->setDescription($_POST['description']);
-$submission->getAssessmentModel()->getWorkType()->setId($_POST['type']);
+$submission->getAssessmentModel()->setWorkType((new Schoolbox\Learning\Assessment\WorkType\Model())->setId($_POST['type']));
 $submission->getMarkType()->setId($markTypeID);
 $submission->getGradeGroup()->setId($_POST['gradegroup']);
 $submission->setUseRubric($useRubric);

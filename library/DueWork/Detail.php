@@ -190,12 +190,14 @@ class DueWork_Detail
             $closeString = $closeADF->getLong();
         }
 
+        $workType = $this->submissionBox->getAssessmentModel()->getWorkType();
+
         $page->setVar(
             array(
                 'DUEWORK_DESCRIPTION'   => Scrub::text($this->submissionBox->getName()),
                 'DUEWORK_TERM'          => $this->term->getCode(),
                 'CATEGORY_NAME'         => Scrub::text($this->submissionBox->getCategory()->getName()),
-                'DUEWORK_TYPE'          => $this->submissionBox->getAssessmentModel()->getWorkType()->getName(),
+                'DUEWORK_TYPE'          => $workType ? $workType->getName() : '',
                 'DUEWORK_MARKTYPE'      => $this->submissionBox->getMarkType()->getName(),
                 'DUEWORK_DUEDATE'       => $closeString,
                 'GRADE_VISIBILITY'      => $this->submissionBox->getMarkVisibilityDescription(),

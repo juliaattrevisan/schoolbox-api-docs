@@ -264,7 +264,13 @@ class Activity {
 	}
 
 	public function getType() {
-		return $this->isAssessment() ? $this->getAssessment()->getWorkType()->getId() : $this->getSubmissionBox()->getAssessmentModel()->getWorkType()->getId();
+	    if($this->isAssessment()){
+            $assessmentModel =  $this->getAssessment()->getAssessmentModel();
+        } else {
+            $assessmentModel = $this->getSubmissionBox()->getAssessmentModel();
+        }
+        $workType = $assessmentModel->getWorkType();
+	    return $workType ? $workType->getId() : null;
 	}
 
 	public function getTypeName() {
