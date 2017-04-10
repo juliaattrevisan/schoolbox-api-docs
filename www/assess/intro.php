@@ -20,7 +20,6 @@ use Schoolbox\Permission\Access\Access;
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
-$groupHandler = new Group();
 $userHandler = new User();
 
 /**
@@ -51,14 +50,15 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
-if (!$assessment->isParticipant($_SESSION['user']) && $groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE) {
+$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+$assessmentFolder = $assessment->getBaseContext()->getFolder();
+$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
+
+if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessment->isParticipant($_SESSION['user'])) {
     // Show quiz preview to someone who's none of above, but has read access to the folder
-    $assessmentFolder = $assessment->getBaseContext()->getFolder();
-    if (Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]) == UserAccess::ACCESS_READ) {
+    if ($accessLevel == UserAccess::ACCESS_READ) {
         $readOnly = true;
-    }
-    else {
+    } else {
         error(19);
     }
 }
@@ -72,7 +72,7 @@ if ($assessHandler->isExpired($assess['assess_id'])) {
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
+if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessHandler->isOpen($assess)) {
     error(143);
 }
 
