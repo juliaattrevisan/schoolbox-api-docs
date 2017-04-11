@@ -142,7 +142,7 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
         if ($parser->getWorkType()) {
             // TODO inject
             try {
-                $workType = WorkType\Mapper::getInstance()->findByColumn('name', $parser->getWorkType());
+                $workType = WorkType\Mapper::getInstance()->findOneByColumn('name', $parser->getWorkType());
             } catch (MapperException $e) {
                 // noop
             }
