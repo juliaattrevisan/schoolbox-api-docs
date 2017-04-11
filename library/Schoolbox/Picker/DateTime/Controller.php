@@ -270,9 +270,16 @@ class Controller extends Base
             $api = $factory->produceForUser($this->getUser());
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
             foreach ($events as $event) {
+                if($event->getAllDay()) {
+                    $displayDateTime = 'All day event';
+                }
+                else {
+                    $displayDateTime = $event->getStartTime()->getDateOnly() != $event->getEndTime()->getDateOnly() ?
+                        $event->getStartTime() . ' - ' . $event->getEndTime() :
+                        $event->getStartTime()->getTimeOnly() . ' - ' . $event->getEndTime()->getTimeOnly();
+                }
                 $appointments[] = [
-                    'startDateTime' => $event->getStartTime()->getLocal(),
-                    'endDateTime' => $event->getEndTime()->getLocal(),
+                    'displayDateTime' => $displayDateTime,
                     'title' => $event->getTitle()
                 ];
             }
@@ -303,6 +310,17 @@ class Controller extends Base
         // http://192.168.36.10/picker/datetime/date/01-07-2018/class/CH123
 
         // This will be our return array
+
+        //Don't show other students' due work to anyone but staff
+        if(!$this->getUser()->getRole()->isStaff()) {
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data' => []
+                )
+            );
+            return '';
+        }
 
         $students = [];
 

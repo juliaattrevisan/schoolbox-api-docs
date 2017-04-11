@@ -1,19 +1,4 @@
 {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
-<script type="text/javascript">
-    $(function () {
-
-        /* Datepickers
-         */
-//        $('[data-datepicker]').datepicker();
-//        $('[data-timepicker]').timepicker({
-//            appendTo: function ($input) {
-//                return $input.closest('.timepick');
-//            }
-//        });
-
-//        $('[name*="publishDate"], [name*="openDate"], [name*="dueDate"], [name*="closeDate"]').alaressDateTimePicker({type:'duework', enableTime:true});
-    });
-</script>
 
 {% if acceptingResponses %}
     {% set publishEndSelector = 'input[name="openDate"]' %}

@@ -79,7 +79,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         if (template == 'duework') {
 
-            if (data.students.length == 0) {
+            if (data.students === undefined) {
+                html = 'Error loading data';
+            }
+            else if (data.students.length == 0) {
                 html += 'Nothing due on ' + displayDate + '';
                 pickerResponse.addClass('meta');
             }
@@ -124,7 +127,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             }
         }
         else if (template == 'events') {
-            if (data.appointments.length == 0) {
+            if (data.appointents === undefined) {
+                html = 'Error loading data';
+            }
+            else if (data.appointments.length == 0) {
                 html += 'No events found for ' + displayDate;
                 pickerResponse.addClass('meta');
             }
@@ -139,11 +145,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 for (var i = 0; i < data.appointments.length; i++) {
                     html += '<li>';
                     html += '<h3>' + data.appointments[i].title + '</h3>';
-                    html += '<p class="meta">' + data.appointments[i].startDateTime;
-                    if (data.appointments[i].startDateTime !== data.appointments[i].endDateTime) {
-                        html += ' - ' + data.appointments[i].endDateTime;
-                    }
-                    html += '</p>';
+                    html += '<p class="meta">' + data.appointments[i].displayDateTime + '</p>';
                 }
                 html += '</ul>';
                 html += '</div>';
