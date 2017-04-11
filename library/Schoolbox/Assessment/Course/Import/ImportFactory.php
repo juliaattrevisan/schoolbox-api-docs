@@ -6,16 +6,16 @@
  */
 namespace Schoolbox\Assessment\Course\Import;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessment;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
-use Schoolbox\Mapper\PredicateBuilder;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -109,7 +109,7 @@ class ImportFactory
             LEFT JOIN project spr ON spr.assessment_id = sa.id
         ";
 
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = new Builder($this->database, '');
         $pb->equals('us.id', array_keys($unitSpecCache));
         $pb->isNull('sa.deleted_at');
         $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
@@ -223,7 +223,7 @@ class ImportFactory
             JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
         ";
 
-        $pbInner1 = new PredicateBuilder($this->database, '');
+        $pbInner1 = new Builder($this->database, '');
         $pbInner1->equals('ui_inner.id', $unitImplIds);
         $pbInner1->isNull('ia.deleted_at');
         $innerQuery1 .= 'WHERE ' . implode(' AND ', $pbInner1->getWhere());
@@ -272,7 +272,7 @@ class ImportFactory
             LEFT JOIN task itk                            ON itk.assessment_id = ia.id
             LEFT JOIN project ipr                         ON ipr.assessment_id = ia.id
         ";
-        $pbOuter1 = new PredicateBuilder($this->database, '');
+        $pbOuter1 = new Builder($this->database, '');
         $pbOuter1->equals('us.id', array_keys($unitSpecCache));
         $query1 .= ' WHERE ' . implode(' AND ', $pbOuter1->getWhere());
 
@@ -317,7 +317,7 @@ class ImportFactory
             LEFT JOIN project ipr ON ipr.assessment_id = ia.id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
         ";
-        $pbOuter2 = new PredicateBuilder($this->database, '');
+        $pbOuter2 = new Builder($this->database, '');
         $pbOuter2->isNull('ia.deleted_at');
         $pbOuter2->isNull('asi.implementation_assessment_id');
         $pbOuter2->equals('ui.id', $unitImplIds);
@@ -411,7 +411,7 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz         ON sqz.assessment_id = sa.id
             LEFT JOIN task stk           ON stk.assessment_id = sa.id";
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = new Builder($this->database, '');
         $pb->equals('p.assessment_id', $projectSpecs->keys());
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
 
@@ -485,7 +485,7 @@ class ImportFactory
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz         ON iqz.assessment_id = ia.id
             LEFT JOIN task itk           ON itk.assessment_id = ia.id";
-        $pb = new PredicateBuilder($this->database, '');
+        $pb = new Builder($this->database, '');
         $pb->equals('p.assessment_id', $projectImpls->keys());
         $pb->isNull('ia.deleted_at');
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
@@ -610,7 +610,7 @@ class ImportFactory
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
             LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
         ";
-        $pb1 = new PredicateBuilder($this->database, '');
+        $pb1 = new Builder($this->database, '');
         $pb1->equals('aui.course_unit_implementation_id', $unitImplIds);
         $query1 .= ' WHERE ' . implode(' AND ', $pb1->getWhere());
 
@@ -628,7 +628,7 @@ class ImportFactory
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
             LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
         ";
-        $pb2 = new PredicateBuilder($this->database, '');
+        $pb2 = new Builder($this->database, '');
         $pb2->equals('pui.course_unit_implementation_id', $unitImplIds);
         $query2 .= ' WHERE ' . implode(' AND ', $pb2->getWhere());
 

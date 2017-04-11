@@ -8,10 +8,10 @@
  * @version     SVN: $Id$
  */
 namespace Component\Eportfolio;
+use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\PredicateBuilder;
 
 class FileListMapper extends Schoolbox\Mapper
 {
@@ -164,12 +164,12 @@ class FileListMapper extends Schoolbox\Mapper
 
 
     /**
-     * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @return array
      */
-    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    protected function buildWherePart(Builder $predicate, $columnList, $options)
     {
         // if the mime is specified, add a LIKE predicate to the query
         if (isset($options['mime'])) {

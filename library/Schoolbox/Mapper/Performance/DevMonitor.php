@@ -9,6 +9,7 @@
 namespace Schoolbox\Mapper\Performance;
 
 
+use Alaress\Database\Predicate\Builder;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
 use Psr\Log\AbstractLogger;
@@ -75,11 +76,11 @@ class DevMonitor extends AbstractLogger implements IMonitor
 
 
     /**
-     * @param Mapper\PredicateBuilder $predicate
-     * @param string                  $selectFrom
+     * @param Builder $predicate
+     * @param string  $selectFrom
      * @return void
      */
-    public function assessPredicate(Mapper\PredicateBuilder $predicate, $selectFrom)
+    public function assessPredicate(Builder $predicate, $selectFrom)
     {
         $where = $predicate->getWhere();
 
@@ -154,11 +155,11 @@ class DevMonitor extends AbstractLogger implements IMonitor
 
 
     /**
-     * @param Mapper                  $mapper
-     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @param Mapper  $mapper
+     * @param Builder $predicateBuilder
      * @return void
      */
-    public function startExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    public function startExecuteSelectTimer(Mapper $mapper, Builder $predicateBuilder)
     {
         $query = $this->deriveQuery($mapper, $predicateBuilder);
         $key   = sha1($query);
@@ -168,11 +169,11 @@ class DevMonitor extends AbstractLogger implements IMonitor
 
 
     /**
-     * @param Mapper                  $mapper
-     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @param Mapper  $mapper
+     * @param Builder $predicateBuilder
      * @return void
      */
-    public function stopExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    public function stopExecuteSelectTimer(Mapper $mapper, Builder $predicateBuilder)
     {
         $key = sha1($this->deriveQuery($mapper, $predicateBuilder));
 
@@ -181,11 +182,11 @@ class DevMonitor extends AbstractLogger implements IMonitor
 
 
     /**
-     * @param Mapper                  $mapper
-     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @param Mapper  $mapper
+     * @param Builder $predicateBuilder
      * @return string
      */
-    private function deriveQuery(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    private function deriveQuery(Mapper $mapper, Builder $predicateBuilder)
     {
         $query  = "SELECT ... FROM {$mapper->getTable()} ... ";
         $params = $predicateBuilder->getParams();

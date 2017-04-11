@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Mapper\PredicateBuilder;
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
@@ -202,7 +202,7 @@ class External_Synergetic_User implements External_UserInterface
             $synID = [$synID];
         }
 
-        $externalIdBindings = PredicateBuilder::getArrayBindings($synID, 'externalId');
+        $externalIdBindings = Builder::getArrayBindings($synID, 'externalId');
 
         $query =
         "
@@ -264,7 +264,7 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
 
-        $externalIdBindings = PredicateBuilder::getArrayBindings($synergyIds, 'externalId');
+        $externalIdBindings = Builder::getArrayBindings($synergyIds, 'externalId');
 
         $query =
         "
@@ -867,7 +867,7 @@ class External_Synergetic_User implements External_UserInterface
             $relationships = explode(',', $this->config->get('external_synergetic_student_relationships'));
         }
 
-        $relationshipBindings = PredicateBuilder::getArrayBindings($relationships, 'relationship');
+        $relationshipBindings = Builder::getArrayBindings($relationships, 'relationship');
 
         $query = "
             SELECT      Relationships.RelatedID
@@ -951,7 +951,7 @@ class External_Synergetic_User implements External_UserInterface
             $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
         }
 
-        $contactTypes = PredicateBuilder::getArrayBindings($studentContactTypes, 'types');
+        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
 
         $query =
         "

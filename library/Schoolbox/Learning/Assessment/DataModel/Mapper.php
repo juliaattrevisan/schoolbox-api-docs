@@ -5,32 +5,28 @@
  * @link      http://www.alaress.com.au/
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
+use Alaress\Database\Predicate\Builder;
+use Alaress_Date_Format;
 use PDOStatement;
-use Schoolbox\Assessment\Term\Model as Term;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\PredicateBuilder;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
-use Alaress_Date_Format;
-use UnderflowException;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 /**
@@ -219,11 +215,11 @@ class Mapper extends BaseMapper
      * If another order is defined, the sequence ordering will apply as a lower
      * priority to that order.
      *
-     * @param PredicateBuilder $pb
+     * @param Builder $pb
      * @param array $options
      * @return Collection
      */
-    public function findByPredicates(PredicateBuilder $pb, array $options = [])
+    public function findByPredicates(Builder $pb, array $options = [])
     {
         if (empty($options['order']['sequence'])) {
             $options['order']['sequence'] = 'asc';
@@ -460,24 +456,23 @@ class Mapper extends BaseMapper
      * are attached directly to this folder or through a course implementation
      * that is attached to this folder.
      *
-     * @param int|array        $folderId  A folder ID or list thereof
-     * @param PredicateBuilder $builder   A PredicateBuilder which contains columns to query on.
-     * @param array            $uniqueIds IDs of any assessables that should also be included
-     * @param array            $options   Any other options to pass to the final search to `findByColumnList`.
-
+     * @param int|array $folderId  A folder ID or list thereof
+     * @param Builder   $builder   A PredicateBuilder which contains columns to query on.
+     * @param array     $uniqueIds IDs of any assessables that should also be included
+     * @param array     $options   Any other options to pass to the final search to `findByColumnList`.
      *
      * @return Collection|Model[]
      */
-    public function findAllForFolderId($folderId, PredicateBuilder $builder, $uniqueIds = [], $options = [])
+    public function findAllForFolderId($folderId, Builder $builder, $uniqueIds = [], $options = [])
     {
         // Support stuff for query
-        $folderList = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
+        $folderList = Builder::canTraverse($folderId) ? $folderId : [$folderId];
         if (count($folderList) === 0) {
             // Exit early if empty
             return $this->createCollection();
         }
-        $params       = BaseMapper\PredicateBuilder::getArrayParameters($folderList, 'folder');
-        $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
+        $params       = Builder::getArrayParameters($folderList, 'folder');
+        $placeholders = Builder::getArrayPlaceholders($folderList, 'folder');
 
         $idQuery = "
             SELECT a.id
@@ -949,7 +944,7 @@ class Mapper extends BaseMapper
         $thisKey   = $multiJoin['this_key'];
         $otherKey  = $multiJoin['other_key'];
 
-        $pb = new BaseMapper\PredicateBuilder($this->database, $this->table);
+        $pb = new Builder($this->database, $this->table);
         $query = "
             SELECT COALESCE(max(`a`.`sequence`), 0) + 1
             FROM `{$this->getTable()}` `a`
