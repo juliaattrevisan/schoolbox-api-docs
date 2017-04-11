@@ -70,36 +70,71 @@ class WarpGate
      */
     public function transmit(SubmissionFile $submissionFile)
     {
-        $documentName = $submissionFile->getBasename();
+        $filepath = $this->makeTempFile($submissionFile);
 
-        /** @var \Schoolbox\Resource\Storage\Model $file */
-        $file = $submissionFile->getStorage();
+        if ($filepath === null) {
+            echo "Could not create temp file";
+        }
+
+        /* Temp file created, ready to transmit
+         */
+        $filepointer = fopen($filepath, 'r');
 
         $postData = [[
-            'name' => $documentName,
-            'contents' => fopen($this->getConfigLoader()->get('storage_dir') . '/' . $file->getPath(), 'r')
+            "name" => "fileUpload",
+            "contents" => $filepointer
         ]];
 
         $client = new Client([
-            'base_uri' => $this->getApiUrl(),
-            'timeout' => 20.0,
-            'http_errors' => false
+            "base_uri" => $this->getApiUrl(),
+            "timeout" => 20.0,
+            "http_errors" => false
         ]);
 
         $response = $client->post("documents/?access_token={$this->getAccessToken()}", [
             "multipart" => $postData
         ]);
 
-        if ($response->getStatusCode() == 201) {
+        if($response->getStatusCode() == 201){
             $content = json_decode($response->getBody(), true);
-            $data    = $content["data"];
+            $data = $content["data"];
 
-            echo "ID: " . $data["docID"] . "\n";
-            echo "Location: " . $content["location"] . "\n";
+            echo "ID: ".$data["docID"]."\n";
+            echo "Location: ".$content["location"]."\n";
         }
         else {
             echo $response->getBody();
         }
+    }
+
+    /**
+     * Move $submissionFile data to a temp location for upload
+     *
+     * @param SubmissionFile $submissionFile
+     * @return null|string
+     */
+    private function makeTempFile(SubmissionFile $submissionFile)
+    {
+        $documentName = $submissionFile->getStorage()->getBasename();
+
+        /* Shank the file into a temp dir; the file extension must be included
+         */
+        $destination = \Cfg::get('plagscan_upload_tmp_dir') . '/' . $submissionFile->getId() . '_' . $documentName;
+
+        // copy the file contents to the temp directory
+        if ($submissionFile->getStorage()->exists() && $fp = fopen($destination, 'w')) {
+            $input = $submissionFile->getStorage()->readStream();
+
+            while($chunk = fgets($input, 1024)) {
+                fwrite($fp, $chunk);
+            }
+
+            fclose($fp);
+
+            return $destination;
+        }
+
+        return null;
     }
 
     /* Getters/Setters
