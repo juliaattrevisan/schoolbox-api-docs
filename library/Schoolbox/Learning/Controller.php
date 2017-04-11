@@ -275,7 +275,7 @@ class Controller extends Base
          *
          * @var string[][] $postFilterSelections
          */
-        $postFilterSelections = $this->request->post['filter_selection'];
+        $postFilterSelections = $this->request->post['filter_selection'] ?: [];
 
         // What filters are in use on this page? Get their key converters
         $keyConverters = $filterFactoryFactory->createKeyConverterCollection();
