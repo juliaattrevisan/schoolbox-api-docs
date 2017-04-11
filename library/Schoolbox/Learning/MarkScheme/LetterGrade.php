@@ -20,11 +20,12 @@ class LetterGrade extends AbstractMarkScheme
     private $gradeGroup;
 
     /**
-     * This type is not comparable numerically.
+     * This type is comparable numerically, through the levels within this
+     * object's grade group.
      *
      * @var bool
      */
-    protected $quantitative = false;
+    protected $quantitative = true;
 
     /**
      * @param GradeGroup $gradeGroup
