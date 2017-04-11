@@ -95,16 +95,20 @@ class WarpGate
             "multipart" => $postData
         ]);
 
-        if($response->getStatusCode() == 201){
-            $content = json_decode($response->getBody(), true);
+        /* What was the outcome?
+         */
+        $content = json_decode($response->getBody(), true);
+
+        if ($response->getStatusCode() == 201){
             $data = $content["data"];
 
             echo "ID: ".$data["docID"]."\n";
             echo "Location: ".$content["location"]."\n";
+
+            return;
         }
-        else {
-            echo $response->getBody();
-        }
+
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
