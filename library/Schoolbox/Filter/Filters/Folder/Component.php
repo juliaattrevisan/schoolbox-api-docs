@@ -72,12 +72,13 @@ class Component extends AbstractFilterComponent
 
         foreach ($concreteFolders as $classFolder) {
             $concreteSelection = $this->getFilterSelectionMapper()->createModel();
+            $key = (string)$classFolder->getId();
             $concreteSelection
                 ->setFilter($this->getDefinition()->getFilter())
-                ->setKey((string)$classFolder->getId())
+                ->setKey($key)
                 ->setPage($this->getPage())
                 ->setSelected($abstractSelection->getSelected());
-            $availableSelections->add($concreteSelection);
+            $availableSelections->setOffset($key, $concreteSelection);
         }
 
         return $this->overlayUserSelections($availableSelections);
