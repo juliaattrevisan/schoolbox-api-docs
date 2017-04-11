@@ -36,6 +36,13 @@ abstract class AbstractAssessment implements IAssessable
     use DeletedAtDate;
 
     /**
+     * Default type name for this assessment.
+     *
+     * @var string
+     */
+    protected $defaultTypeName = 'Assessment';
+
+    /**
      * @var string
      */
     private $title;
@@ -582,6 +589,14 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getTypeName()
+    {
+        $subTypeName = $this->getWorkType() ? $this->getWorkType()->getName() : '';
+        return $subTypeName ?: $this->defaultTypeName;
+    }
 
     /* Getters/Setters
      */

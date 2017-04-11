@@ -25,6 +25,11 @@ use Schoolbox\Learning\Assessment\Participant;
 class Model extends AbstractAssessment
 {
     /**
+     * @var string
+     */
+    protected $defaultTypeName = 'Due Work';
+
+    /**
      * Accept zero submissions online
      */
     const ACCEPT_ONLINE_NONE = 0;
@@ -238,17 +243,6 @@ class Model extends AbstractAssessment
     public function getFamilyName()
     {
         return 'dueWork';
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function getTypeName()
-    {
-        $subTypeName = $this->getWorkType() ? $this->getWorkType()->getName() : '';
-        return $subTypeName ?: 'Due Work';
     }
 
     /**
