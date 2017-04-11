@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -21,7 +22,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMap
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
-
+use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Mapper\Exception as MapperException;
 
 
 /**
@@ -136,6 +138,16 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
         $inUnitSpec = $context->getBaseContext() instanceof UnitSpec;
         $nullDate = new Alaress_Date_NullDate();
 
+        $workType = null;
+        if ($parser->getWorkType()) {
+            // TODO inject
+            try {
+                $workType = WorkType\Mapper::getInstance()->findByColumn('name', $parser->getWorkType());
+            } catch (MapperException $e) {
+                // noop
+            }
+        }
+
         // Create the IAssessable
         $quizAssessable = (new QuizAssessable())
             ->setCreator($_SESSION['user'])
@@ -143,6 +155,7 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setDuration($parser->getDuration())
             ->setContext($context)
             ->setTitle($parser->getTitle())
+            ->setWorkType($workType)
             ->setDescription($parser->getDescription())
             ->setPublishAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
             ->setOpenAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
