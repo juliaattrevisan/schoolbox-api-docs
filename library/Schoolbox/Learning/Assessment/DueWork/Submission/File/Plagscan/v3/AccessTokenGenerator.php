@@ -15,8 +15,6 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3;
 
 
-use Schoolbox\Config\Loader;
-
 class AccessTokenGenerator
 {
 
