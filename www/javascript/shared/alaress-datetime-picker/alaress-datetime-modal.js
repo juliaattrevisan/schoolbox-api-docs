@@ -162,18 +162,22 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             timetable.submit.attr('data-timetable-value', data.date);
 
             var $byTimetable = $('#byTimetable-' + twigVars.id),
-                periodSelected = $byTimetable.find('table').find('[data-selected=1]').attr('data-period'),
-                periodStart = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-start'),
-                periodEnd = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-end');
-
-            $((pickerOptions.endPeriod ? '#periodEnd' : '#periodStart') + twigVars.id).prop('checked', true);
+                periodSelected = $byTimetable.find('table').find('[data-selected=1]').attr('data-period');
 
             $('.timetableDate' + twigVars.id)
                 .css('display', 'block')
                 .find('.displayDate').empty().append(displayDate);
 
-            $('label[for="periodStart' + twigVars.id + '"]').empty().append(periodStart);
-            $('label[for="periodEnd' + twigVars.id + '"]').empty().append(periodEnd);
+            if (periodSelected) {
+                var periodStart = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-start'),
+                    periodEnd = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-end');
+
+                $((pickerOptions.endPeriod ? '#periodEnd' : '#periodStart') + twigVars.id).prop('checked', true);
+
+                $('label[for="periodStart' + twigVars.id + '"]').empty().append(periodStart);
+                $('label[for="periodEnd' + twigVars.id + '"]').empty().append(periodEnd);
+                $('#periodStart' + twigVars.id).closest('div').removeClass('hide');
+            }
         }
 
         if (template == 'duework') {
