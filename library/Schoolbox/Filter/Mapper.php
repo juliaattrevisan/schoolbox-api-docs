@@ -40,22 +40,4 @@ class Mapper extends \Schoolbox\Mapper
         return $this->findByColumn('class', $class)->first();
     }
 
-
-    /**
-     * @param PDOStatement $statement
-     * @return GenericCollection|Model[]
-     * @throws MapperException
-     */
-    public function hydrateSelect(PDOStatement $statement)
-    {
-        $collection = $this->createCollection();
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            /** @var Model $model */
-            $model = $this->hydrate($row);
-            $collection->add($model);
-        }
-
-        return $collection;
-    }
 }
