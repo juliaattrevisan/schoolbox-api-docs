@@ -61,7 +61,7 @@ $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
 
-if ($assessHandler->isExpired($section['assess_id'])) {
+if ($assessHandler->isExpired($assess['assess_id'])) {
     // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
     if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->getBaseContext() instanceof UnitSpecification)) {
         error(120);
