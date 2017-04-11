@@ -16,14 +16,12 @@ Usage:
     <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
 </div>
 
-<div class="row">
-    <div class="small-12 columns island">
-        {% include filterPanel.template with {
-            contentId: 'content_id',
-            panel: filterPanel
-        } only %}
-    </div>
-</div>
+
+{% include filterPanel.template with {
+    contentId: 'content_id',
+    panel: filterPanel
+} only %}
+
 
 <div id="content_id"></div>
 

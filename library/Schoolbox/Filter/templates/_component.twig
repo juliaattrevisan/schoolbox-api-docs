@@ -12,7 +12,7 @@
     {# Concrete component template to define #}
     {% set filterName = filterName ?: 'undefined' %}
 
-    <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px;">
+    <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px; min-width: 150px;">
         <h4 data-filter-name>{{ filterName }}</h4>
         {% for selection in selections %}
             <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">

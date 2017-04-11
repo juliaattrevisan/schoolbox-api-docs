@@ -154,7 +154,7 @@ Usage:
                     processServerError(response.responseText);
                 })
                 .always(function() {
-                    $submitButton.val('Submit');
+                    $submitButton.val($submitButton.data('value'));
                     hideFilterLoader();
                     enableInputs();
                 });
@@ -324,73 +324,74 @@ Usage:
 
     #filter_panel .label{
         cursor: default;
+        margin-bottom: 0;
     }
 
     #filter_panel .label .close:hover{
         color: red;
     }
+
 </style>
 
 <div class="toast" data-alert data-relation="submit-label"></div>
 
-<div id="{{ filterPanelId }}">
-    <div data-collapser="panel-components" class="icon-up-arrow">
-        <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Applied filters: <span data-applied-filters></span>
+<div class="row">
+    <div class="small-12 island" id="{{ filterPanelId }}">
+        <section>
+            <fieldset class="content">
+                <legend data-collapser="panel-components" class="icon-up-arrow columns">
+                    <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Applied filters: <span data-applied-filters></span>
 
-        {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
-        <input id="{{ submitButtonId }}" type="submit" value="Submit" href="{{ panel.route }}" data-working="Submitting ..." style="width: auto; min-width: 120px; float:right;">
-    </div>
+                    {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
+                    <input id="{{ submitButtonId }}" type="submit" data-value="Apply Filters" value="Apply Filters" href="{{ panel.route }}" data-working="Submitting ..." style="width: auto; min-width: 120px; right: 1rem; position: absolute; top: -3px;">
+                </legend>
+            </fieldset>
 
-    <div data-collapsable="panel-components" data-collapse-state="uncollapsed">
-        <div>
-            <div class="flex-container" style="margin: 0 -20px;">
-                {% set countComponents = 0 %}
-                {% for component in panel.components %}
-                    {% set template = component.template %}
-                    {% set data = component.toContext() %}
-                    {% if data.isAvailable %}
-                        {% set countComponents = countComponents + 1 %}
-                        {% include component.template with component.toContext() %}
+            <fieldset class="content" data-collapsable="panel-components" data-collapse-state="uncollapsed">
+
+                <div class="flex-container" style="margin: 0 0px;">
+                    {% set countComponents = 0 %}
+                    {% for component in panel.components %}
+                        {% set template = component.template %}
+                        {% set data = component.toContext() %}
+                        {% if data.isAvailable %}
+                            {% set countComponents = countComponents + 1 %}
+                            {% include component.template with component.toContext() %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if not countComponents %}
+                        <div class="empty-state" style="flex-grow: 1; margin: 16px 20px 0;">
+                            <i class="icon-info"></i>
+                            <p>No filters are configured for this page.</p>
+                        </div>
                     {% endif %}
-                {% endfor %}
+                </div>
+            </fieldset>
 
-                {% if not countComponents %}
-                    <div class="empty-state" style="flex-grow: 1; margin: 0 20px;">
-                        <i class="icon-info"></i>
-                        <p>No filters are configured for this page.</p>
-                    </div>
-                {% endif %}
+        </section>
+
+        {# Will contain error message HTML, as defined in template below #}
+        <div id="server_error_feedback" style="display: none;" >
+            <div data-reason="out-of-memory" data-alert="" class="alert-box alert">
+                The server has run out of memory while attempting to build the requested report.<br>
+                This is usually due to filters being too liberal, which generates too much data to process.<br>
+                Please try setting your filters to be more restrictive to return a smaller data set.
+                <a href="" class="close">×</a>
+            </div>
+
+            <div data-reason="uncaught-exception" data-alert="" class="alert-box alert">
+                An exception was thrown during report generation. Please report this to Schoolbox support.
+                <a href="" class="close">×</a>
+            </div>
+
+            <div data-reason="unknown" data-alert="" class="alert-box alert">
+                The server failed to generate the report. Please try setting your filters to be more restrictive to generate a smaller data set.
+                If the issue continues, please report this to Schoolbox support.
+                <a href="" class="close">×</a>
             </div>
         </div>
     </div>
-
-    {# Will contain error message HTML, as defined in template below #}
-    <div id="server_error_feedback" style="display: none;" >
-        <div data-reason="out-of-memory" data-alert="" class="alert-box alert">
-            The server has run out of memory while attempting to build the requested report.<br>
-            This is usually due to filters being too liberal, which generates too much data to process.<br>
-            Please try setting your filters to be more restrictive to return a smaller data set.
-            <a href="" class="close">×</a>
-        </div>
-
-        <div data-reason="uncaught-exception" data-alert="" class="alert-box alert">
-            An exception was thrown during report generation. Please report this to Schoolbox support.
-            <a href="" class="close">×</a>
-        </div>
-
-        <div data-reason="unknown" data-alert="" class="alert-box alert">
-            The server failed to generate the report. Please try setting your filters to be more restrictive to generate a smaller data set.
-            If the issue continues, please report this to Schoolbox support.
-            <a href="" class="close">×</a>
-        </div>
-    </div>
 </div>
-
-
-<hr>
-
-
-
-
 
 
