@@ -26,7 +26,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param  $question_id
      * @return bool|int
      */
-    public function create($object, $question_id) {
+    public function create($object, $question_id = '') {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
@@ -168,10 +168,9 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      *
      * @return array
      */
-    public function saveResponse($data) {
-        $processedResponse = $data['answer'];
-
-        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
+    public function saveResponse($data, $sectionId = '', $questionId = '', $processedResponse = '')
+    {
+        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $data['answer']);
     }
 
     /**

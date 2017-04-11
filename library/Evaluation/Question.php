@@ -133,7 +133,7 @@ abstract class Evaluation_Question extends DeprecatedModel
      * @param $assess_id
      * @return array|bool
      */
-    public function getAll($assess_id) {
+    public function getAll($assess_id = '') {
         $query = "
 			SELECT
 				assess_section.section_id,

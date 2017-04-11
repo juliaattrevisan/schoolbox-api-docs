@@ -26,7 +26,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * @param int $question_id
      * @return bool|int
      */
-    public function create($object, $question_id) {
+    public function create($object, $question_id = '') {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
