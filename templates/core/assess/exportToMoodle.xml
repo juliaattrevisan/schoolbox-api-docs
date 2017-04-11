@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <quiz>
-    <version>16.5</version>
+    <version>17.0</version>
     <title>{ASSESS_TITLE}</title>
     <worktype>{ASSESS_WORKTYPE}</worktype>
     <description><![CDATA[
