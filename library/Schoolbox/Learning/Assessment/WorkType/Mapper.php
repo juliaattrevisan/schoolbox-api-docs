@@ -32,36 +32,23 @@ class Mapper extends Schoolbox\Mapper
      * @param int $id
      * @return string|bool
      */
-    public function getNameFromId($id)
+    public function findNameById($id)
     {
-        $query     = "SELECT `name` FROM {$this->getTable()} t WHERE t.id=?";
-        $statement = $this->database->prepare($query);
-        $statement->execute([$id]);
-        if ($row = $statement->fetch()) {
-            return $row['name'];
+        try {
+            return $this->selectScalarByColumnList('name', ['id' => $id])->fetchColumn();
+        } catch (\UnderflowException $e) {
+            return false;
         }
-        return false;
     }
 
 
     /**
-     * @param int $type
+     * @param int $id
      * @return Schoolbox\GenericCollection
      * @throws Schoolbox\Mapper\Exception
      */
-    public function getAllExcept($type)
+    public function findAllExcept($id)
     {
-        $query     = "
-            SELECT {$this->getColumnString('t')}
-            FROM {$this->getTable()} t
-            WHERE t.id != ?
-        ";
-        $statement = $this->database->prepare($query);
-        $statement->execute([$type]);
-        $collection = $this->createCollection();
-        foreach ($statement as $row) {
-            $collection->add($this->hydrate($row, 't'));
-        }
-        return $collection;
+        return $this->findByPredicates($this->getPredicateBuilder()->notEquals('id', $id));
     }
 }

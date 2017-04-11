@@ -119,7 +119,7 @@ $zone
 //
 // Should work types include or not include online assessments?
 // They do for pre-existing items, they don't for new items.
-$work_types  = $workTypeMapper->getAllExcept(QuizMapper::WORK_TYPE_QUIZ);
+$work_types  = $workTypeMapper->findAllExcept(QuizMapper::WORK_TYPE_QUIZ);
 $mark_types  = $mark_mapper->getAll();
 $gradeGroups = $groupMapper->findAllWithGradeLevels();
 
