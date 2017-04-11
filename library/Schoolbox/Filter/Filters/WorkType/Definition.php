@@ -116,7 +116,7 @@ class Definition extends AbstractFilterDefinition
     public function getLabel($key)
     {
         if (self::KEY_NONE === $key) {
-            return 'None';
+            return '(none)';
         }
         return $this->workTypes[$key]->getName();
     }
