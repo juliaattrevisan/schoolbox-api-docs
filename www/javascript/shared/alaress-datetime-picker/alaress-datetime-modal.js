@@ -127,7 +127,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             }
         }
         else if (template == 'events') {
-            if (data.appointents === undefined) {
+            if (data.appointments === undefined) {
                 html = 'Error loading data';
             }
             else if (data.appointments.length == 0) {
