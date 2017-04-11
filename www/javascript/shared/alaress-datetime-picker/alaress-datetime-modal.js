@@ -35,6 +35,105 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         return true;
     }
 
+    function requestDataByDate(date, target) {
+        if (twigVars.type == 'duework') {
+
+            loadingResponse(target);
+
+            var folder = $('*[name = "folderId"]').val();
+
+            $.get((twigVars.routeLookup.getDueByDate).replace(/{folder}/g, folder).replace(/{date}/g, date))
+
+                .done(function (data) {
+
+                    appendResponse(data, 'duework', target);
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified date');
+                });
+        }
+        else if (twigVars.type == 'event') {
+
+            // AJAX in appointments for the selected date
+
+            loadingResponse(target);
+            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
+                .done(function (data) {
+
+                    appendResponse(data, 'events', target);
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified date');
+                });
+        }
+        else {
+            // Do nothing
+        }
+    }
+
+    function requestDataByDay(element) {
+
+        var day = element.attr('data-day');
+        var period = element.attr('data-period');
+
+        $('.period-selected').removeClass('period-selected');
+        $('table').find('[data-selected=1]').attr('data-selected', 0);
+        element.addClass('period-selected');
+        element.attr('data-selected', 1);
+        $('.day-' + day).addClass('period-selected');
+        $('.description-' + period).addClass('period-selected');
+        periodClicked = 'period' + day + '_' + period;
+
+        var campus = timetable.campus.val(),
+            term = timetable.term.val(),
+            cycle = timetable.cycle.val();
+
+        if (twigVars.type == 'duework') {
+
+            // Can the assessment form have dates and be called outside the class page?
+            var folder = $('*[name = "folderId"]').val();
+
+            loadingResponse('timetable');
+
+            $.get((twigVars.routeLookup.getByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{folder}/g, folder))
+                .done(function (data) {
+
+                    appendResponse(data, 'duework', 'timetable');
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified period');
+                });
+        }
+        else if (twigVars.type == 'event') {
+            // Or fetch events
+
+            loadingResponse('timetable');
+            $.get((twigVars.routeLookup.getEventsByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                .done(function (data) {
+
+                    appendResponse(data, 'events', 'timetable');
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified period');
+                });
+        }
+        else {
+            // Fetch a timetable day date
+            loadingResponse('timetable');
+            $.get((twigVars.routeLookup.getTimetableDate).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                .done(function (data) {
+                    appendResponse(data, '', 'timetable');
+                })
+                .fail(function () {
+                    console.log('Timetable day to date conversion failed');
+                });
+        }
+    }
+
     // Show loader
     function loadingResponse(target) {
         var pickerResponse = $('#' + target + 'Response' + twigVars.id);
@@ -302,6 +401,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         buildCycles();
         showPeriod();
         revealTimetable();
+        // On first load request data by date for the timetable
+        requestDataByDate(encodeURIComponent(twigVars.date.getDate() + '/' + (twigVars.date.getMonth() + 1) + '/' + twigVars.date.getFullYear()), 'timetable');
+
 
         // Update cycles on Campus or Term change
         timetable.campus.change(function () {
@@ -341,63 +443,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         var displayDate = moment().format(convertFormat(twigVars.displayFormat)); //today
         $('.has-period').click(function () {
 
-            var day = $(this).attr('data-day');
-            var period = $(this).attr('data-period');
-
-            $('.period-selected').removeClass('period-selected');
-            $('table').find('[data-selected=1]').attr('data-selected', 0);
-            $(this).addClass('period-selected');
-            $(this).attr('data-selected', 1);
-            $('.day-' + day).addClass('period-selected');
-            $('.description-' + period).addClass('period-selected');
-            periodClicked = 'period' + day + '_' + period;
-
-            var campus = timetable.campus.val(),
-                term = timetable.term.val(),
-                cycle = timetable.cycle.val();
-
-            if (twigVars.type == 'duework') {
-
-                // Can the assessment form have dates and be called outside the class page?
-                var folder = $('*[name = "folderId"]').val();
-
-                loadingResponse('timetable');
-
-                $.get((twigVars.routeLookup.getByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{folder}/g, folder))
-                    .done(function (data) {
-
-                        appendResponse(data, 'duework', 'timetable');
-
-                    })
-                    .fail(function () {
-                        console.log('Failed to retrieve appointments for specified period');
-                    });
-            }
-            else if (twigVars.type == 'event') {
-                // Or fetch events
-
-                loadingResponse('timetable');
-                $.get((twigVars.routeLookup.getEventsByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
-                    .done(function (data) {
-
-                        appendResponse(data, 'events', 'timetable');
-
-                    })
-                    .fail(function () {
-                        console.log('Failed to retrieve appointments for specified period');
-                    });
-            }
-            else {
-                // Fetch a timetable day date
-                loadingResponse('timetable');
-                $.get((twigVars.routeLookup.getTimetableDate).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
-                    .done(function (data) {
-                        appendResponse(data, '', 'timetable');
-                    })
-                    .fail(function () {
-                        console.log('Timetable day to date conversion failed');
-                    });
-            }
+            requestDataByDay($(this));
         });
     }
 
@@ -464,6 +510,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     }
                 });
             }
+
+            requestDataByDate(encodeURIComponent(twigVars.date.getDate() + '/' + (twigVars.date.getMonth() + 1) + '/' + twigVars.date.getFullYear()), 'calendar');
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -478,41 +526,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             newDate = selectedObj.getDate() + '/' + (selectedObj.getMonth() + 1) + '/' + selectedObj.getFullYear();
             if (newDate !== latestDate) {
 
-                if (twigVars.type == 'duework') {
-
-                    loadingResponse('calendar');
-
-                    var folder = $('*[name = "folderId"]').val();
-
-                    $.get((twigVars.routeLookup.getDueByDate).replace(/{folder}/g, folder).replace(/{date}/g, encodeURIComponent(dateSplit[0])))
-
-                        .done(function (data) {
-
-                            appendResponse(data, 'duework', 'calendar');
-
-                        })
-                        .fail(function () {
-                            console.log('Failed to retrieve appointments for specified date');
-                        });
-                }
-                else if (twigVars.type == 'event') {
-
-                    // AJAX in appointments for the selected date
-
-                    loadingResponse('calendar');
-                    $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, encodeURIComponent(dateSplit[0])))
-                        .done(function (data) {
-
-                            appendResponse(data, 'events', 'calendar');
-
-                        })
-                        .fail(function () {
-                            console.log('Failed to retrieve appointments for specified date');
-                        });
-                }
-                else {
-                    // Do nothing
-                }
+                requestDataByDate(encodeURIComponent(dateSplit[0]), 'calendar');
             }
             latestDate = newDate;
         }
