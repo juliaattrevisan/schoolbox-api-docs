@@ -99,7 +99,7 @@ class Factory extends AbstractFilterFactory
             return $folder->getGroup();
         })->indexBy('id');
 
-        $filter          = $this->getFilterMapper()->findForClass(Definition::class);
+        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
         $definition      = $this->buildDefinition($filter);
         $savedSelections = $this->getSavedSelections($filter, $user, $page);
 
@@ -122,7 +122,7 @@ class Factory extends AbstractFilterFactory
      */
     public function buildKeyConverter()
     {
-        $filter    = $this->getFilterMapper()->findForClass(Definition::class);
+        $filter    = $this->getFilterMapper()->findByClass(Definition::class);
         $folderIds = (new Collection($this->folderMapper->findAllIds()))->indexByCallback(function ($folderId) {
             return $folderId;
         });

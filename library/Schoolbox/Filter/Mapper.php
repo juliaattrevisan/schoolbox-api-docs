@@ -35,7 +35,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param string $class
      * @return Model
      */
-    public function findForClass($class)
+    public function findByClass($class)
     {
         return $this->findByColumn('class', $class)->first();
     }
