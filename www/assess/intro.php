@@ -126,9 +126,6 @@ $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['cat
 $allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
 $allSections = $sectionHandler->getList($assess['assess_id']);
 
-$assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-$assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
-
 $this->setFile(TEMPLATE_content, 'assess/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
@@ -141,8 +138,8 @@ $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
-    'ASSESS_START' => $assessStartDate->getShort(),
-    'ASSESS_FINISH' => $assessFinishDate->getShort(),
+    'ASSESS_START' => $assessment->getOpenAt()->isNull() ? '' : $assessment->getOpenAt()->getShort(),
+    'ASSESS_FINISH' => $assessment->getCloseAt()->isNull() ? '' : $assessment->getCloseAt()->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
     'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
     'ASSESS_AUTHOR_ID' => $author->getId(),
