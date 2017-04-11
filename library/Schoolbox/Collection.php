@@ -91,9 +91,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function contains($item)
     {
-        foreach($this->stack as $stackItem)
-        {
-            if($stackItem === $item){
+        foreach ($this->stack as $stackItem) {
+            if ($stackItem === $item) {
                 return true;
             }
         }
