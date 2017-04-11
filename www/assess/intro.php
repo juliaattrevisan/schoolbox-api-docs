@@ -96,8 +96,12 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  */
 if (!$attempt) {
     /* Clear and exit when you attempt to make more than is allowed
-      */
-    if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
+     * (Teachers may preview this quiz as many attempts as they want)
+     */
+    if ($accessLevel < UserAccess::ACCESS_WRITE
+        && ($assess['max_attempts'] > 0)
+        && ($numAttempts + 1 > $assess['max_attempts'])
+    ) {
         error(146);
     }
 }

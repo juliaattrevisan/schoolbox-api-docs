@@ -83,13 +83,16 @@ $attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $use
  * Otherwise start a new attempt if there is a limit
  */
 if (!$attempt) {
-	if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
-		/* Clear and exit when you attempt to make more than is allowed
-		 */
-		error(146);
-	}
-	else {
-		$attemptId = $attemptHandler->start($userId, $this->arg[0]);
+    /* Clear and exit when you attempt to make more than is allowed
+     * (Teachers may preview this quiz as many attempts as they want)
+     */
+    if ($accessLevel < UserAccess::ACCESS_WRITE
+        && ($assess['max_attempts'] > 0)
+        && ($numAttempts + 1 > $assess['max_attempts'])
+    ) {
+        error(146);
+    } else {
+        $attemptId = $attemptHandler->start($userId, $this->arg[0]);
         // Assign all questions on quiz init, not starting a section.
         // This ensures that a response is created for all answers,
         // so they contribute to total mark. (SB-7928)
