@@ -2,6 +2,7 @@
 <quiz>
     <version>16.5</version>
     <title>{ASSESS_TITLE}</title>
+    <worktype>{ASSESS_WORKTYPE}</worktype>
     <description><![CDATA[
         {ASSESS_DESCRIPTION}
         ]]></description>
