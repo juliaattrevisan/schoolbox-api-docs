@@ -28,25 +28,26 @@ abstract class Base extends RendererBase
      * Helper function to control showing the attendance link
      */
     public function showAttendanceLink() {
-        
+
+        $config = new \Schoolbox\Config\Loader();
         if (
-            $this->getEvent() instanceof Event 
-            && Config::get('external_type') == 'synergetic'
-            && Config::get('external_attendance')
+            $this->getEvent() instanceof Event
+            && $config->get('external_type') == 'synergetic'
+            && $config->get('external_attendance')
             && $this->getViewer()->getRole()->isStaff()
             && $this->getEvent()->getCode() != ''
         )
         {
             $now = new \Alaress_Date_Format();
             $now->endOfDay();
-            
+
             $from = new \Alaress_Date_Format();
-            $from->addDays(Config::get('external_attendance_days') * -1);
-        
+            $from->addDays($config->get('external_attendance_days') * -1);
+
             if($this->getEvent()->getStartTime()->gte($from) && $this->getEvent()->getStartTime()->lte($now)) {
                 return true;
             }
-        } 
+        }
         return false;
     }
-} 
+}
