@@ -36,11 +36,6 @@ class AccessTokenGenerator
     private $tokenUrl = 'https://api.plagscan.com/v3/token';
 
     /**
-     * @var Loader
-     */
-    private $configLoader;
-
-    /**
      * AccessTokenGenerator constructor.
      *
      * @param $clientId
@@ -71,14 +66,13 @@ class AccessTokenGenerator
 
         $curl->exec();
 
-        if (count($curl->getErrors())) {
-            new \Alaress_Probe($curl->getErrors());
-        }
-        else {
+        if (!count($curl->getErrors())) {
             $result = json_decode($curl->getResult());
 
-            new \Alaress_Probe("Your access token is: {$result->access_token}");
+            return $result->access_token;
         }
+
+        throw new \DomainException('Error generating access token');
     }
 
     /* Getters/Setters

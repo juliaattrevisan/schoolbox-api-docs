@@ -13,7 +13,9 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3;
 
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\ValidFiles;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use GuzzleHttp\Client;
 
 class WarpGate
@@ -42,24 +44,40 @@ class WarpGate
     private $validFiles;
 
     /**
+     * A ConfigLoader instance
+     *
+     * @var IConfigLoader
+     */
+    private $configLoader;
+
+    /**
      * WarpGate constructor.
      *
+     * @param $configLoader
      * @param $accessToken
      */
-    public function __construct($accessToken)
+    public function __construct(IConfigLoader $configLoader, $accessToken)
     {
+        $this->setConfigLoader($configLoader);
         $this->setAccessToken($accessToken);
         $this->setValidFiles(new ValidFiles());
     }
 
     /**
      * Transmit a document to Plagscan
+     *
+     * @param SubmissionFile $submissionFile
      */
-    public function transmit($filename, $filepath)
+    public function transmit(SubmissionFile $submissionFile)
     {
+        $documentName = $submissionFile->getBasename();
+
+        /** @var \Schoolbox\Resource\Storage\Model $file */
+        $file = $submissionFile->getStorage();
+
         $postData = [[
-            'name' => $filename,
-            'contents' => fopen($filepath, 'r')
+            'name' => $documentName,
+            'contents' => fopen($this->getConfigLoader()->get('storage_dir') . '/' . $file->getPath(), 'r')
         ]];
 
         $client = new Client([
@@ -86,6 +104,22 @@ class WarpGate
 
     /* Getters/Setters
      */
+
+    /**
+     * @return IConfigLoader
+     */
+    private function getConfigLoader()
+    {
+        return $this->configLoader;
+    }
+
+    /**
+     * @param IConfigLoader $configLoader
+     */
+    private function setConfigLoader($configLoader)
+    {
+        $this->configLoader = $configLoader;
+    }
 
     /**
      * @return string
