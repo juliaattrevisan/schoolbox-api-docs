@@ -17,7 +17,6 @@ $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $questionHandler = new Assess_Question();
 $sectionHandler = new Assess_Section();
-$groupHandler = new Group();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
@@ -41,12 +40,12 @@ if ($assessHandler->isOwner($section['assess_id'])) {
  */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
-$assessment = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
+$assessment       = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
+$assessmentFolder = $assessment->getBaseContext()->getFolder();
+$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
 
 if ($assessHandler->isExpired($section['assess_id'])) {
     // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
-    $assessmentFolder = $assessment->getBaseContext()->getFolder();
-    $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
     if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->getBaseContext() instanceof UnitSpecification)) {
         error(120);
     }
@@ -65,7 +64,7 @@ if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
     $this->pageNotFound();
 }
 
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessHandler->isOpen($assess)) {
 	error(143);
 }
 
