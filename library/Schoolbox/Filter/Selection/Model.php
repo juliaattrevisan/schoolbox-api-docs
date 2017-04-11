@@ -65,7 +65,7 @@ class Model
 
     /**
      * @param User $user
-     * @return static
+     * @return $this
      */
     public function setUser(User $user)
     {
@@ -85,7 +85,7 @@ class Model
 
     /**
      * @param string $page
-     * @return static
+     * @return $this
      */
     public function setPage($page)
     {
@@ -105,7 +105,7 @@ class Model
 
     /**
      * @param string $key
-     * @return static
+     * @return $this
      */
     public function setKey($key)
     {
@@ -125,7 +125,7 @@ class Model
 
     /**
      * @param bool $selected
-     * @return static
+     * @return $this
      */
     public function setSelected($selected)
     {

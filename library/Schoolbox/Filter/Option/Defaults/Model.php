@@ -36,7 +36,7 @@ class Model
 
     /**
      * @param FilterOption $filterOption
-     * @return static
+     * @return $this
      */
     public function setFilterOption(FilterOption $filterOption)
     {
@@ -56,7 +56,7 @@ class Model
 
     /**
      * @param string $roleType
-     * @return static
+     * @return $this
      */
     public function setRoleType($roleType)
     {
@@ -87,7 +87,7 @@ class Model
 
     /**
      * @param bool $selected
-     * @return static
+     * @return $this
      */
     public function setSelected($selected)
     {

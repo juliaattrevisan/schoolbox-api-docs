@@ -148,7 +148,7 @@ class Model
 
     /**
      * @param Filter $filter
-     * @return static
+     * @return $this
      */
     public function setFilter(Filter $filter)
     {
@@ -168,7 +168,7 @@ class Model
 
     /**
      * @param string $page
-     * @return static
+     * @return $this
      */
     public function setPage($page)
     {
@@ -188,7 +188,7 @@ class Model
 
     /**
      * @param string $key
-     * @return static
+     * @return $this
      */
     public function setKey($key)
     {
@@ -208,7 +208,7 @@ class Model
 
     /**
      * @param bool $available
-     * @return static
+     * @return $this
      */
     public function setAvailable($available)
     {
@@ -228,7 +228,7 @@ class Model
 
     /**
      * @param FilterDefault[]|GenericCollection $defaults
-     * @return static
+     * @return $this
      */
     public function setDefaults(GenericCollection $defaults)
     {

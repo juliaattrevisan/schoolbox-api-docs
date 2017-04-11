@@ -38,7 +38,7 @@ class Model
      */
 
     /**
-     * @return string|
+     * @return string
      */
     public function getClass()
     {
@@ -48,7 +48,7 @@ class Model
 
     /**
      * @param string $class
-     * @return static
+     * @return $this
      */
     public function setClass($class)
     {
