@@ -18,6 +18,11 @@ use Alaress_Date_Format;
 interface IParser extends \Evaluation\Import\Parser\IParser
 {
     /**
+     * @return string|null
+     */
+    public function getWorkType();
+
+    /**
      * @return Alaress_Date_Format
      */
     public function getPublishDate();
