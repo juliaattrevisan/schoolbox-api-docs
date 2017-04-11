@@ -73,7 +73,7 @@ class WarpGate
         $filepath = $this->makeTempFile($submissionFile);
 
         if ($filepath === null) {
-            echo "Could not create temp file";
+            throw new \DomainException("Could not create temp file");
         }
 
         /* Temp file created, ready to transmit
