@@ -69,6 +69,10 @@ class AccessTokenGenerator
         if (!count($curl->getErrors())) {
             $result = json_decode($curl->getResult());
 
+            if ($result->error) {
+                throw new \DomainException($result->error_description);
+            }
+
             return $result->access_token;
         }
 
