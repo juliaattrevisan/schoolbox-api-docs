@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Database\Predicate\Builder;
-use Component_Homepage_CourseBuilderController;
+use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as Component_Homepage_CourseBuilderController;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
