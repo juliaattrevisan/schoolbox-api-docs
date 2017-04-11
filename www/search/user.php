@@ -114,14 +114,14 @@ function renderStudent(
         PREG_SPLIT_NO_EMPTY
     );
 
-    $userObject = $userMapper->findById($user['uid']);
+    $student = $userMapper->findById($user['uid']);
 
     // Load the list of subjects, and their teacher.
     // Then group by subject type?
     $subjects      = [];
     $splitSubjects = \Config::get('mysubjects_split');
     $teacherRoles  = $groupHandler->getStaffGroupTypeIds();
-    foreach ($synUserHandler->getSubjectList($userObject) as $subject) {
+    foreach ($synUserHandler->getSubjectList($student) as $subject) {
         $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
 
         // Load a bunch of category and teacher info too
@@ -247,16 +247,33 @@ function renderStudent(
         }
     }
 
+    // Determine whether current user is student's parent, and if not if they
+    // are related in some other way.
+    /** @var Schoolbox\User $user */
+    $user = $_SESSION["user"];
+    $student->loadParents();
+    $isParentOfStudent  = $user->isParentOf($student);
+    $isRelatedToStudent = false;
+    if (!$isParentOfStudent) {
+        $studentList = $synUserHandler->getEnrolledStudents($user->getExternalId());
+        if(is_array($studentList)) {
+            foreach ($studentList as $enrolledStudentId) {
+                if ($enrolledStudentId['RelatedID'] == $student->getExternalId()) {
+                    $isRelatedToStudent = true;
+                    break;
+                }
+            }
+        }
+    } else {
+        $isRelatedToStudent = true;
+    }
+
     // TwigLib
     // TODO make preg_replace available to Twig
     // TODO make session contents available to Twig by default, either through whole _SESSION or Aura
     // TODO make $now available to Twig by default
-    $userObject->loadParents();
 
     $page->setFile(TEMPLATE_content, 'output.html');
-
-    /** @var Schoolbox\User $user */
-    $user = $_SESSION["user"];
 
     $showPastoral = Config::get('pastoral_enabled');
 
@@ -265,7 +282,7 @@ function renderStudent(
 
     $protectStudentContacts = \Config::get('protect_student_contacts');
 
-    $hideContacts = $userObject->getHideContacts() ? 1 : 0;
+    $hideContacts = $student->getHideContacts() ? 1 : 0;
 
     switch ($protectStudentContacts) {
         case Access::VISIBILITY_EVERYONE : // Everyone
@@ -285,22 +302,24 @@ function renderStudent(
         $page->getTwig()->render(
             'user/student.twig',
             [
-                'session'        => $_SESSION,
-                'user'           => $userObject,
-                'externalUser'   => $externalUser,
-                'showPastoral'   => $showPastoral,
-                'eportfolioAuth' => $authenticator->canView(),
-                'hideContacts'   => $hideContacts,
-                'showClasses'    => $userObject->getHideTimetable() ? 0 : 1,
-                'now'            => Alaress_Date_Format::now(),
-                'boarderType'    => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
-                'contacts'       => $contacts,
-                'subjects'       => $subjects,
-                'groups'         => $groups,
-                'formTeacher'    => $formTeacher,
-                'tutorTeacher'   => $tutorTeacher,
-                'hohTeacher'     => $hohTeacher,
-                'coordTeacher'   => $coordTeacher
+                'session'            => $_SESSION,
+                'user'               => $student,
+                'externalUser'       => $externalUser,
+                'showPastoral'       => $showPastoral,
+                'eportfolioAuth'     => $authenticator->canView(),
+                'hideContacts'       => $hideContacts,
+                'showClasses'        => $student->getHideTimetable() ? 0 : 1,
+                'now'                => Alaress_Date_Format::now(),
+                'boarderType'        => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
+                'contacts'           => $contacts,
+                'subjects'           => $subjects,
+                'groups'             => $groups,
+                'formTeacher'        => $formTeacher,
+                'tutorTeacher'       => $tutorTeacher,
+                'hohTeacher'         => $hohTeacher,
+                'coordTeacher'       => $coordTeacher,
+                'isParentOfStudent'  => $isParentOfStudent,
+                'isRelatedToStudent' => $isRelatedToStudent,
             ]
         )
     );
