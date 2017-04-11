@@ -31,6 +31,7 @@ use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 /**
  * Tests for the assessment data model translator (projects only).
@@ -73,6 +74,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     ->setId(3)
                     ->setTitle('Sub-work')
                     ->setSequence(3)
+                    ->setWorkType(new WorkType())
                 );
 
         /** @var ProjectModel $projectModel */
@@ -594,7 +596,9 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                                 ->setContext($unitSpec)
                                 ->setId(3)
                                 ->setTitle('Sub-work')
+                                ->setWorkType(new WorkType())
                         )
+                        ->setWorkType(new WorkType())
                 );
 
         /** @var ProjectModel $projectModel */

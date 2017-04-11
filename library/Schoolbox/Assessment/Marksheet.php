@@ -688,12 +688,13 @@ class Marksheet
                             )
                         );
                     } elseif ($item['object'] instanceof SubmissionBox) {
+                        $workType = $item['object']->getAssessmentModel()->getWorkType();
                         $page->setVar(
                             array(
                                 'WORK_TITLE' => $item['object']->getName(),
                                 'WORK_ID'    => $item['object']->getId(),
                                 'WORK_PATH'  => '/submission/viewSubmission',
-                                'WORK_TYPE'  => $item['object']->getWorkType()->getName()
+                                'WORK_TYPE'  => $workType ? $workType->getName() : '',
                             )
                         );
                     }

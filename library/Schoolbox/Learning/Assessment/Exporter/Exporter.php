@@ -41,14 +41,16 @@ class Exporter
                             sr.mark,
                             sb.name,
                             folder_code.code,
-                            lu_submission_type.name AS type_name
+                            lu_work_type.name AS type_name
             FROM            submission_return AS sr
             INNER JOIN      submission_box AS sb ON
                             sb.id = sr.box_id
+            INNER JOIN      assessment a ON
+                            sb.assessment_id = a.id
             LEFT JOIN       assessment_folder AS af ON 
-                            af.assessment_id = sb.assessment_id
+                            af.assessment_id = a.id
             LEFT JOIN       assessment_course_unit_implementation AS acui ON 
-                            acui.assessment_id = sb.assessment_id
+                            acui.assessment_id = a.id
             LEFT JOIN       course_unit_implementation AS cui ON 
                             cui.id = acui.course_unit_implementation_id
             LEFT JOIN       course_implementation AS ci ON 
@@ -59,8 +61,8 @@ class Exporter
                             folder_code.folder_id = folder.id
             INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
-            LEFT JOIN       lu_submission_type ON 
-                            lu_submission_type.id = sb.type
+            LEFT JOIN       lu_work_type ON
+                            lu_work_type.id = a.work_type_id
             WHERE           YEAR(sr.created_at) = :currentYear
                             AND sr.deleted_at IS NULL
                             AND sr.mark != ''

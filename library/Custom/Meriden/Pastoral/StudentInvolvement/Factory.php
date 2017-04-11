@@ -25,6 +25,9 @@ use Schoolbox\UserMapper;
 
 class Factory
 {
+    // This is pretty fragile. Must match value configured in Admin WorkType lists
+    const WORK_TYPE_ASSESSMENT_TASK = 1;
+
     /**
      * @var Gateway
      */
@@ -427,7 +430,7 @@ class Factory
         // Fetch only assessment tasks
         $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
             'id'   => $assessKeys,
-            'type' => SubmissionBox\WorkType::TYPE_ASSESSMENT_TASK,
+            'type' => self::WORK_TYPE_ASSESSMENT_TASK,
         ]);
         foreach ($assessments as $assess) {
             /** @var SubmissionBox $assess */
@@ -507,7 +510,7 @@ class Factory
             array(
                 'name'     => $assessmentName,
                 'category' => $cohortFolderIds,
-                'type'     => SubmissionBox\WorkType::TYPE_ASSESSMENT_TASK,
+                'type'     => self::WORK_TYPE_ASSESSMENT_TASK,
             )
         );
         $assessments->add($grade['assessment']);

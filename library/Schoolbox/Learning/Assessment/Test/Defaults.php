@@ -25,7 +25,6 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSu
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use \Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
 
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;

@@ -331,13 +331,15 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
+        $assessmentModel = $submissionBox->getAssessmentModel();
 
-        $boxType = mb_strtolower($submissionBox->getWorkType()->getName());
+        $workType = $assessmentModel->getWorkType();
+        $boxType = mb_strtolower($workType ? $workType->getName() : '');
         $boxName = $submissionBox->getName();
 
         $authorExtId = $user->getExternalId();
 
-        $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $folder = $assessmentModel->getAssessmentContext()->getFolder();
 
         $indefArticle = in_array(strtolower($boxType[0]), array('a', 'e', 'i', 'o', 'u')) ? 'an' : 'a';
 
@@ -675,7 +677,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
-        $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $assessmentModel = $submissionBox->getAssessmentModel();
+        $folder = $assessmentModel->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions or is blocked from parents
         if (!$submissionBox->getAcceptOnline() || $this->conf->get('restrict_student_submissions')) {
@@ -712,7 +715,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         );
 
         // renamed
-        $boxType = mb_strtolower($submissionBox->getWorkType()->getName());
+        $workType = $assessmentModel->getWorkType();
+        $boxType = mb_strtolower($workType ? $workType->getName() : '');
         if (!empty($diff['name'])) {
             foreach ($students as $student) {
                 $bob = $this

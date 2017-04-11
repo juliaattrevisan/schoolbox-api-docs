@@ -144,12 +144,13 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                         $box        = $currentItem['currentBox'];
                         $submission = $currentItem['latestSubmission'];
                         $return     = $currentItem['latestReturn'];
+                        $workType   = $box->getAssessmentModel()->getWorkType();
                         $this->getPage()->setVar(
                             array(
                                 'SHOWCASED_WORK_ITEM_ID' => $showcase->getId(),
                                 'SHOWCASED_WORK_ITEM_USER_ID' => $showcase->getUid(),
                                 'SHOWCASED_WORK_BOX_NAME' => $box->getName(),
-                                'SHOWCASED_WORK_BOX_TYPE' => $box->getWorkType()->getName(),
+                                'SHOWCASED_WORK_BOX_TYPE' => $workType ? $workType->getName() : '',
                             )
                         );
 

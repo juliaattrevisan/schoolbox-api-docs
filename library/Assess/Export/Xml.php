@@ -52,8 +52,9 @@ class Assess_Export_Xml extends Evaluation_Export_Xml
         $quiz   = $this->quizAssessment;
 
         $this->getPage()->setVar([
-            'ASSESS_TITLE'             => htmlspecialchars($quiz->getTitle(), ENT_QUOTES),
-            'ASSESS_DESCRIPTION'       => Scrub::HTML($quiz->getDescription()),
+            'ASSESS_TITLE'             => Scrub::text($quiz->getTitle()),
+            'ASSESS_WORKTYPE'          => Scrub::text($quiz->getWorkType()->getName()),
+            'ASSESS_DESCRIPTION'       => Scrub::html($quiz->getDescription()),
             'ASSESS_PUBLISH'           => $quiz->getPublishDate()->getDatabase(),
             'ASSESS_OPEN'              => $quiz->getOpenDate()->getDatabase(),
             'ASSESS_DUE'               => $quiz->getDueDate()->getDatabase(),

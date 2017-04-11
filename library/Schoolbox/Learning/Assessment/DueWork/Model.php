@@ -25,6 +25,11 @@ use Schoolbox\Learning\Assessment\Participant;
 class Model extends AbstractAssessment
 {
     /**
+     * @var string
+     */
+    protected $defaultTypeName = 'Due Work';
+
+    /**
      * Accept zero submissions online
      */
     const ACCEPT_ONLINE_NONE = 0;
@@ -47,14 +52,6 @@ class Model extends AbstractAssessment
      * @var Collection|File[]
      */
     protected $attachedFiles;
-
-    /**
-     * The "type" of the Due Work
-     * (Essay, Homework, etc)
-     *
-     * @var WorkType
-     */
-    protected $workType;
 
     /**
      * An enum for accepting submissions online
@@ -110,7 +107,6 @@ class Model extends AbstractAssessment
         parent::__construct();
 
         $this->setAttachedFiles(new Collection());
-        $this->setWorkType(new WorkType());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         $this->setAttachedFiles(new Collection());
     }
@@ -247,17 +243,6 @@ class Model extends AbstractAssessment
     public function getFamilyName()
     {
         return 'dueWork';
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function getTypeName()
-    {
-        $subTypeName = $this->getWorkType()->getName();
-        return $subTypeName ?: 'Due Work';
     }
 
     /**
@@ -471,24 +456,6 @@ class Model extends AbstractAssessment
     public function setRubric(Rubric $rubric = null)
     {
         $this->rubric = $rubric;
-        return $this;
-    }
-
-    /**
-     * @return WorkType
-     */
-    public function getWorkType()
-    {
-        return $this->workType;
-    }
-
-    /**
-     * @param WorkType $workType
-     * @return self
-     */
-    public function setWorkType($workType)
-    {
-        $this->workType = $workType;
         return $this;
     }
 

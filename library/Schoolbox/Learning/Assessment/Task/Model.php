@@ -38,6 +38,11 @@ use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 class Model extends AbstractAssessment
 {
     /**
+     * @var string
+     */
+    protected $defaultTypeName = 'Task';
+
+    /**
      * Is this task self-markable?
      *
      * @var bool
@@ -64,16 +69,6 @@ class Model extends AbstractAssessment
     public function getFamilyName()
     {
         return 'task';
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function getTypeName()
-    {
-        return 'Task';
     }
 
     /**

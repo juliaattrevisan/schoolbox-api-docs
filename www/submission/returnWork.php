@@ -67,7 +67,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
 
     $this->setTitle('Grading ' . \Scrub::text($submissionBox->getCategory()->getName()) . ' for ' . \Scrub::text($submissionBox->getName()));
 
-
+    $workType = $submissionBox->getAssessmentModel()->getWorkType();
     $this->setVar(
         array(
             'CATEGORY'              => \Scrub::text($submissionBox->getCategory()->getName()),
@@ -75,7 +75,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
             'BOX_ID'                => $submissionBox->getId(),
             'BOX_GRADIENT'          => $submissionBox->getGradientIndex(),
             'CAT_ID'                => $submissionBox->getCategory()->getId(),
-            'DUEWORK_TYPE'          => $submissionBox->getWorkType()->getName(),
+            'DUEWORK_TYPE'          => $workType ? $workType->getName() : '',
             'DUEWORK_DUEDATE'       => $submissionBox->getDueDate()->getLongDateOnly(),
             'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
             'GRADE_VISIBILITY_CODE' => $submissionBox->getMarkVisibility(),

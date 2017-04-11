@@ -8,6 +8,9 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 
 if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
@@ -96,7 +99,7 @@ if (Config::get('curriculum_tagging_enabled')) {
 
 $mapper      = new SubmissionBoxMapper();
 $cat_mapper  = new FolderMapper();
-$type_mapper = new SubmissionBox\WorkTypeMapper();
+$workTypeMapper = WorkTypeMapper::getInstance();
 $mark_mapper = new SubmissionBox\MarkTypeMapper();
 $groupMapper = new SubmissionBox\GradeLevel\Group\Mapper();
 $conf_mapper = ConfigMapper::getInstance();
@@ -116,7 +119,7 @@ $zone
 //
 // Should work types include or not include online assessments?
 // They do for pre-existing items, they don't for new items.
-$work_types  = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
+$work_types  = $workTypeMapper->findAllExcept(QuizMapper::WORK_TYPE_QUIZ);
 $mark_types  = $mark_mapper->getAll();
 $gradeGroups = $groupMapper->findAllWithGradeLevels();
 
@@ -171,7 +174,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         ->setOpenDate(new Alaress_Date_Format(new DateTime('00:00:00')))
         ->setDueDate(new Alaress_Date_Format(new DateTime('+1 day 23:59:59')))
         ->setLateDate(new Alaress_Date_Format(new DateTime('+2 day 23:59:59')))
-        ->setWorkType(new SubmissionBox\WorkType())
+        ->setWorkType(new WorkType())
         ->setMarkType(new SubmissionBox\MarkType())
         ->setMarkVisibility($conf_mapper->get('submission_access'))
         ->setMarkVisibility(Config::get('submission_access'))
@@ -230,7 +233,8 @@ $this->setVar(
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 // Output submission work_type drop down.
-$work_type = $submission->getWorkType()->getId();
+$workType = $submission->getAssessmentModel()->getWorkType();
+$work_type = $workType ? $workType->getId() : null;
 $this->dropDown(
     'type_drop',
     $work_types,

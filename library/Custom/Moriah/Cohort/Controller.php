@@ -9,7 +9,6 @@ namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
 use Custom\Moriah\Cohort\Course\Statistics as CourseStatistics;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 use Schoolbox\Assessment\Term;
@@ -23,6 +22,9 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
+    // This is pretty fragile. Must match value configured in Admin WorkType lists
+    const WORK_TYPE_ASSESSMENT_TASK = 1;
+
     /**
      * @var Folder\Mapper
      */
@@ -146,7 +148,7 @@ class Controller extends Base
                     $term,
                     $student,
                     $this->getUser(),
-                    [WorkType::TYPE_ASSESSMENT_TASK]
+                    [self::WORK_TYPE_ASSESSMENT_TASK]
                 );
                 $courseId    = $course->getId();
                 $allFolders  = $courseStats->getAllFolders();

@@ -28,6 +28,11 @@ use Schoolbox\Resource\Folder\Model as Folder;
 class Project extends AbstractAssessment implements AssessmentContext
 {
     /**
+     * @var string
+     */
+    protected $defaultTypeName = 'Project';
+
+    /**
      * @var GenericCollection|IAssessable[]
      */
     protected $assessables;
@@ -437,16 +442,6 @@ class Project extends AbstractAssessment implements AssessmentContext
     public function getFamilyName()
     {
         return 'project';
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function getTypeName()
-    {
-        return 'Project';
     }
 
     /**

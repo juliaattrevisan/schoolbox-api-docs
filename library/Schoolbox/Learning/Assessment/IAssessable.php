@@ -20,6 +20,7 @@ use \Schoolbox\User;
 use \Schoolbox\Collection;
 use Alaress_Date_Format;
 use \DomainException;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 interface IAssessable extends ISoftDeletable
 {
@@ -515,6 +516,18 @@ interface IAssessable extends ISoftDeletable
      * @return static
      */
     public function setSequence($sequence);
+
+    /**
+     * @return null|WorkType
+     */
+    public function getWorkType();
+
+
+    /**
+     * @param null|WorkType $workType
+     * @return static
+     */
+    public function setWorkType(WorkType $workType = null);
 
     /**
      * @return GradeGroup|null

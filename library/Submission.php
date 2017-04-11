@@ -73,7 +73,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
             FROM submission_box s
             JOIN folder c ON s.category = c.id
             LEFT JOIN folder_code cc ON cc.folder_id = c.id AND cc.deleted_at IS NULL
-            LEFT JOIN lu_submission_type ft ON s.type = ft.id
+            LEFT JOIN lu_work_type ft ON s.type = ft.id
             LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
             WHERE $field $conditional
             AND s.task_id IS NULL
@@ -154,7 +154,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
                 sb.accept_submission,
                 sb.mark_visibility
             FROM submission_box sb
-            LEFT JOIN lu_submission_type ft ON sb.type = ft.id
+            LEFT JOIN lu_work_type ft ON sb.type = ft.id
             LEFT JOIN submission_mark_type smt ON sb.mark_type = smt.mark_type_id
             WHERE sb.category = '$categoryID'
             $ownerCondA
@@ -539,7 +539,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
               UNIX_TIMESTAMP(sb.late_date) AS late_date,
               c.`name` subj_name, c.id subj_id, sb.accept_submission submittable, sb.multi_submission multi_submit, COUNT(ss.id) submit_count
             FROM submission_box sb
-            LEFT JOIN lu_submission_type ft ON ft.id = sb.type
+            LEFT JOIN lu_work_type ft ON ft.id = sb.type
             LEFT JOIN folder c ON c.`id` = sb.`category`
             LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID' AND ss.submitted_at IS NOT NULL
             LEFT JOIN submission_return sr ON sb.id = sr.box_id AND sr.owner = '$studentID'
@@ -561,7 +561,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
               UNIX_TIMESTAMP(a.finish) AS `late_date`,
               c.`name` subj_name, c.id subj_id, a.max_attempts, COUNT(aa.attempt_id) attempt_count
             FROM assess a
-            LEFT JOIN lu_submission_type ft ON ft.id = a.`type`
+            LEFT JOIN lu_work_type ft ON ft.id = a.`type`
             LEFT JOIN folder c ON c.`id` = a.`category_id`
             LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id` AND aa.user_id = '$studentID'
             WHERE c.id $conditional

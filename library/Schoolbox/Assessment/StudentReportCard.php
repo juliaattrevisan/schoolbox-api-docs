@@ -27,6 +27,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 class StudentReportCard
 {
@@ -781,8 +782,9 @@ class StudentReportCard
      */
     protected function outputDueWorkRow(SubmissionBox $box, $marks)
     {
-        $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
-        $workType       = $workTypeMapper->findById($box->getWorkType()->getId());
+        $workTypeMapper = WorkTypeMapper::getInstance();
+        $workType       = $box->getAssessmentModel()->getWorkType();
+        $workType       = $workType ? $workTypeMapper->findById($workType->getId()) : $workType;
         $urgency        = $box->getGradientIndex();
         $output         = array(
             'WORK_TITLE'   => $box->getName(),
@@ -825,7 +827,7 @@ class StudentReportCard
      */
     protected function outputOnlineAssessRow(Quiz $oa, $marks, \SitePage $page)
     {
-        $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+        $workTypeMapper = WorkTypeMapper::getInstance();
         $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());
         // marks are contained inside a single-element array, pull it out of itself
         $marks                     = $marks[0];

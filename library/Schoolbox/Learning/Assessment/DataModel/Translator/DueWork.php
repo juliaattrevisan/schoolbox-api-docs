@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use Schoolbox\Learning\Assessment\DueWork\WorkType;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
@@ -19,6 +18,7 @@ use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 /**
  * Sub-translator for due work specific fields.
@@ -82,13 +82,6 @@ class DueWork implements IAssessmentTypeTranslator
                 );
             }
 
-            // Translate work type
-            $model->setWorkType(
-                (new DueWorkModel\WorkType())
-                    ->setId($assessment->getWorkType()->getId())
-                    ->setName($assessment->getWorkType()->getName())
-            );
-
             // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
             // TODO figure out rubric result set
             // TODO figure out mark per rubric group
@@ -149,11 +142,7 @@ class DueWork implements IAssessmentTypeTranslator
             }
 
             // Convert work type
-            $assessable->setWorkType(
-                (new WorkType())
-                    ->setId($model->getWorkType()->getId())
-                    ->setName($model->getWorkType()->getName())
-            );
+            $assessable->setWorkType($model->getAssessmentModel()->getWorkType());
 
             // Convert mark type
             $assessable->setMarkType(
