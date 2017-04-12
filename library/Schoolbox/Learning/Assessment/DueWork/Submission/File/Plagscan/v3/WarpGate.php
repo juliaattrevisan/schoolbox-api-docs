@@ -159,6 +159,10 @@ class WarpGate
      */
     public function analyse($plagscanId)
     {
+        if (!$plagscanId) {
+            throw new \DomainException('No plagscan document id - document has not been transmitted yet');
+        }
+
         $postData = [
             'access_token' => $this->getAccessToken(),
         ];
@@ -231,6 +235,35 @@ class WarpGate
         $postData = [
             'access_token' => $this->getAccessToken(),
             'mode' => 6
+        ];
+
+        $client = new Client([
+            "base_uri" => $this->getApiUrl(),
+            "timeout" => 20.0,
+            "http_errors" => false
+        ]);
+
+        $response = $client->get("documents/{$plagscanId}/retrieve", [
+            'query' => $postData
+        ]);
+
+        if ($response->getStatusCode() == 200) {
+            return $response->getBody();
+        }
+
+        $content = json_decode($response->getBody());
+
+        /* If you ended up here, the document can't be reported for various reasons
+         * so just shove them out for logging purposes
+         */
+        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+    }
+
+    public function fetchScore($plagscanId, $mode)
+    {
+        $postData = [
+            'access_token' => $this->getAccessToken(),
+            'mode' => $mode
         ];
 
         $client = new Client([
