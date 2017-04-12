@@ -23,10 +23,10 @@
     $(function() {
         // Ensure if a folder is both a class and a group, they are either both selected, or neither selected
         // This solves issue of later checkedState clobbering first.
-        // TODO merge this list so no duplicates
         $('[data-duplicate-checkbox]').on('change', function(){
-            var checkedState = $(this).prop('checked');
-            $('[data-duplicate-checkbox='+$(this).data('duplicate-checkbox')+']').prop('checked', checkedState);
+            var $checkbox = $(this);
+            var checkedState = $checkbox.prop('checked');
+            $('[data-duplicate-checkbox='+$checkbox.data('duplicate-checkbox')+']').prop('checked', checkedState);
         });
     });
 </script>

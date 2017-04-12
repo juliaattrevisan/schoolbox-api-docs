@@ -41,8 +41,12 @@ Usage:
                 var newState         = !$(changedCheckbox).prop('checked');
                 var increment = labelIndex > mostRecentChangedIndex ? +1 : -1;
                 for(var i = mostRecentChangedIndex; i !== labelIndex; i += increment){
-                    var checkbox = $componentCheckboxes.get(i);
-                    $(checkbox).prop('checked', newState);
+                    var $checkbox = $($componentCheckboxes.get(i));
+
+                    $checkbox.prop('checked', newState);
+
+                    // Ensure 'change' listeners get triggered
+                    $checkbox.trigger('change');
                 }
                 clearSelection();
             }
