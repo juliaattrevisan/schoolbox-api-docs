@@ -21,6 +21,7 @@
                 type="checkbox"
                 name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
                 value="1"
+                data-value-original="{% if selection.selected %}1{% else %}0{% endif %}"
                 {% if selection.selected %}checked{% endif %}
             >
             <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}">{{ definition.label(selection.key) }}</label>

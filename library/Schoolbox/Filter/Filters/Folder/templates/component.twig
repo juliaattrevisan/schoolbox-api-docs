@@ -47,6 +47,7 @@
                         type="checkbox"
                         name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
                         value="1"
+                        data-value-original="{% if selection.selected %}1{% else %}0{% endif %}"
                         data-duplicate-checkbox="{{ selection.filter.id }}_{{ selection.key }}"
                         {% if selection.selected %}checked{% endif %}
                 >
@@ -67,6 +68,7 @@
                         type="checkbox"
                         name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
                         value="1"
+                        data-value-original="{% if selection.selected %}1{% else %}0{% endif %}"
                         data-duplicate-checkbox="{{ selection.filter.id }}_{{ selection.key }}"
                         {% if selection.selected %}checked{% endif %}
                 >
