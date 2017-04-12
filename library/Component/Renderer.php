@@ -160,7 +160,6 @@ class Component_Renderer
         /* These aren't normally parsed so have to do it explicitly
          */
         $component->getPageTemplate()->setVar(array(
-            'USER_ID' => $eportfolioPage->getUserId(),
             'PAGE_ID' => $eportfolioPage->getPageId(),
         ));
         $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
