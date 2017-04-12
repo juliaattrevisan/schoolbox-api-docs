@@ -38,8 +38,7 @@ foreach ($allCampuses as $currentCampus) {
         array(
             'SEARCH_CAMPUS_ID' => $currentCampus->getId(),
             'SEARCH_CAMPUS_NAME' => $currentCampus->getName(),
-            'SEARCH_CAMPUS_SELECTED' => ($currentCampus->getId(
-                    ) == $_POST['search_campus']) && isset($_POST['search_campus']) ? 'selected="selected"' : '',
+            'SEARCH_CAMPUS_SELECTED' => ($currentCampus->getId() == $_POST['search_campus']) && isset($_POST['search_campus']) ? 'selected="selected"' : '',
         )
     );
 
@@ -226,6 +225,7 @@ if (!empty($_POST)) {
 
     if ($allUsers->count()) {
         foreach ($allUsers as $currentUser) {
+            /** @var \Schoolbox\User $currentUser */
             $campusNames = array();
 
             foreach ($currentUser->getCampusCollection() as $currentCampus) {
@@ -234,13 +234,13 @@ if (!empty($_POST)) {
 
             $this->setVar(
                 array(
-                    'USER_ID' => $currentUser->getId(),
-                    'USER_FIRSTNAME' => $currentUser->getFirstname(),
-                    'USER_LASTNAME' => $currentUser->getLastname(),
-                    'USER_EXTERNAL_ID' => $currentUser->getExternalId(),
-                    'USER_CAMPUS' => implode(', ', $campusNames),
-                    'USER_GROUP' => $currentUser->getRole()->getName(),
-                    'USER_YEAR' => $currentUser->getYear(),
+                    'BULK_USER_ID' => $currentUser->getId(),
+                    'BULK_USER_FIRSTNAME' => $currentUser->getFirstname(),
+                    'BULK_USER_LASTNAME' => $currentUser->getLastname(),
+                    'BULK_USER_EXTERNAL_ID' => $currentUser->getExternalId(),
+                    'BULK_USER_CAMPUS' => implode(', ', $campusNames),
+                    'BULK_USER_GROUP' => $currentUser->getRole()->getName(),
+                    'BULK_USER_YEAR' => $currentUser->getYear(),
                 )
             );
 
