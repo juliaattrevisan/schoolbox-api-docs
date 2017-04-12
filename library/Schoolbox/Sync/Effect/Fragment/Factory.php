@@ -68,7 +68,8 @@ class Factory {
         'webmail' => 'Enable Webmail Tab',
         'eportfolioEnable' => 'E-Portfolio Enabled',
         'hideContacts' => 'Hide Contact Details',
-        'hideTimetable' => 'Hide Timetable'
+        'hideTimetable' => 'Hide Timetable',
+        'displayGradeAverage' => 'Display Class Average on Student Grade Graph',
     ];
 
     /**
