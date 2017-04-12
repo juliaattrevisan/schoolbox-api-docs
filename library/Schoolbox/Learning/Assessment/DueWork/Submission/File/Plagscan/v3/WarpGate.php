@@ -187,6 +187,7 @@ class WarpGate
 
             /* noop: need to wait for plagscan to do its thing
              */
+            return false;
         }
         elseif ($response->getStatusCode() == 400) {
 
@@ -204,6 +205,7 @@ class WarpGate
              * - in the queue to be checked
              * - currently being checked
              */
+            return false;
         }
 
         /* If you ended up here, the document can't be analysed for various reasons
