@@ -701,7 +701,7 @@ abstract class Mapper implements IMapper, Serializable
         $currentDepth = 1
     ) {
         // Recursive relation protection
-        if ($currentDepth <= 50) {
+        if ($currentDepth >= 50) {
             return $object;
         }
         $collection = $this->getModelAsCollection($object);
