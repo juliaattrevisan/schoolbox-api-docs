@@ -44,12 +44,16 @@ ALTER TABLE `user`
 ALTER TABLE `user`
   ADD INDEX `fk_user_house_id_idx` (`house` ASC);
 
+UPDATE user LEFT JOIN house ON user.house = house.id SET user.house = null WHERE house.id is null and user.house is not null;
+
 ALTER TABLE `user`
   ADD CONSTRAINT `fk_user_house_id`
 FOREIGN KEY (`house`)
 REFERENCES `house` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+UPDATE user LEFT JOIN luResidentialHouse ON user.residential_house_id = luResidentialHouse.id SET user.residential_house_id = null WHERE luResidentialHouse.id is null and user.residential_house_id is not null;
 
 ALTER TABLE `user`
   ADD CONSTRAINT `fk_user_residential_house_id`
