@@ -100,16 +100,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     ) {
         $query = "
             SELECT
-                {$this->getColumnString('n')},
-                {$this->getJoinColumnString('level', 'nl')},
-                {$this->getJoinColumnString('level.source', 'nls')},
-                {$this->getJoinColumnString('area', 'na')},
-                {$this->getJoinColumnString('area.source', 'nas')}
+                {$this->getColumnString('n')}
             FROM {$this->getTable()} n
-            LEFT JOIN {$this->getJoinSql('level', 'n', 'nl')}
-            LEFT JOIN {$this->getJoinSql('level.source', 'nl', 'nls')}
-            LEFT JOIN {$this->getJoinSql('area', 'n', 'na')}
-            LEFT JOIN {$this->getJoinSql('area.source', 'na', 'nas')}
             WHERE n.deleted_at IS NULL
             AND   (n.code LIKE :codeLike OR (n.code != '' AND n.name LIKE :nameLike))
         ";
