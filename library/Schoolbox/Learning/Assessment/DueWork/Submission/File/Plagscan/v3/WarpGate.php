@@ -106,7 +106,7 @@ class WarpGate
          */
         $content = json_decode($response->getBody(), true);
 
-        if ($response->getStatusCode() == 201){
+        if ($response->getStatusCode() == 201) {
             $data = $content["data"];
 
             return $data['docID'];
@@ -143,6 +143,64 @@ class WarpGate
         }
 
         return null;
+    }
+
+    /**
+     * Analyse a document that we sent to plag
+     *
+     * @param $plagscanId
+     * @return bool
+     */
+    public function analyse($plagscanId)
+    {
+        $postData = [
+            'access_token' => $this->getAccessToken(),
+        ];
+
+        $client = new Client([
+            "base_uri" => $this->getApiUrl(),
+            "timeout" => 20.0,
+            "http_errors" => false
+        ]);
+
+        $response = $client->put("documents/{$plagscanId}/check", [
+            'form_params' => $postData
+        ]);
+
+        /* What was the outcome?
+         */
+        $content = json_decode($response->getBody(), true);
+
+        /* As far as I know, the only success state is statusCode 204
+         */
+        if ($response->getStatusCode() == 204) {
+
+            /* noop: need to wait for plagscan to do its thing
+             */
+        }
+        elseif ($response->getStatusCode() == 400) {
+
+            /* This document has already been checked
+             * Get the latest version of the report and cache it locally
+             * Sadly must check error strings, because plagscan
+             */
+            if ($content['error']['message'] == 'The document is already checked') {
+                echo 'retrieve a copy of the report';
+                return;
+            }
+
+            /* Otherwise document is one of the following and we don't need
+             * to take any further action at the moment
+             *
+             * - in the queue to be checked
+             * - currently being checked
+             */
+        }
+
+        /* If you ended up here, the document can't be checked for various reasons
+         * so just shove them out for logging purposes
+         */
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /* Getters/Setters
