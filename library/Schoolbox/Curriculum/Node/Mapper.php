@@ -128,15 +128,11 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
 
         $statement->execute();
-        return $this->hydrateList(
-            $statement,
-            'n',
-            function ($mapper, $model, $row) {
-                /** @var self $mapper */
-                /** @var Model $model */
-                return $mapper->hydrateWithRelatedJoins($row, 'n', 'na', 'nas', 'nl', 'nls');
-            }
-        );
+        $result = $this->hydrateList($statement, 'n')
+            ->map(function (Model $model) {
+                return $this->loadAncestors($model, 'parent');
+            });
+        return $result;
     }
 
     /**
