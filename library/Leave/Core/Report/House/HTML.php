@@ -233,10 +233,10 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
 
                     $this->getPage()->setVar(
                         array(
-                            'USER_ID'              => $currentPerson['user_id'],
-                            'USER_NAME'            => $currentPerson['user_name'],
-                            'USER_YEAR'            => $currentPerson['user_year'],
-                            'USER_BOARDING_STATUS' => $currentPerson['user_boarding_status'],
+                            'LEAVE_USER_ID'              => $currentPerson['user_id'],
+                            'LEAVE_USER_NAME'            => $currentPerson['user_name'],
+                            'LEAVE_USER_YEAR'            => $currentPerson['user_year'],
+                            'LEAVE_USER_BOARDING_STATUS' => $currentPerson['user_boarding_status'],
                             'REQUEST_STATUS'       => implode('<hr />', $currentPerson['request_status']),
                             'REQUEST_HOST'         => implode('<hr />', $hostTypes),
                             'REQUEST_ACTIVITY'     => implode('<hr />', $currentPerson['request_description']),
