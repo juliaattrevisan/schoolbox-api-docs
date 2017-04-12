@@ -13,11 +13,12 @@ namespace Alaress\Database\Connector;
 use Alaress\Database\Collector;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Predicate\IBuilder;
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 
-interface IConnector
+interface IConnector extends IQuoter
 {
     /**
      * Connect to database
