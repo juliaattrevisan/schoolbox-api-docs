@@ -70,6 +70,7 @@ class WarpGate
      *
      * @param SubmissionFile $submissionFile
      * @return int
+     * @throws DomainException
      */
     public function transmit(SubmissionFile $submissionFile)
     {
@@ -107,15 +108,16 @@ class WarpGate
 
         /* What was the outcome?
          */
-        $content = json_decode($response->getBody(), true);
+        $content = json_decode($response->getBody());
 
         if ($response->getStatusCode() == 201) {
-            $data = $content["data"];
-
-            return $data['docID'];
+            return $content->data->docID;
         }
 
-        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
+        /* If you ended up here, the document can't be transmitted for various reasons
+         * so just shove them out for logging purposes
+         */
+        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
     }
 
     /**
@@ -173,7 +175,7 @@ class WarpGate
 
         /* What was the outcome?
          */
-        $content = json_decode($response->getBody(), true);
+        $content = json_decode($response->getBody());
 
         /* As far as I know, the only success state is statusCode 204
          */
@@ -188,7 +190,7 @@ class WarpGate
              * Get the latest version of the report and cache it locally
              * Sadly must check error strings, because plagscan
              */
-            if ($content['error']['message'] == 'The document is already checked') {
+            if ($content->error->message == 'The document is already checked') {
                 return true;
             }
 
@@ -200,10 +202,10 @@ class WarpGate
              */
         }
 
-        /* If you ended up here, the document can't be checked for various reasons
+        /* If you ended up here, the document can't be analysed for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
+        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
     }
 
     /**
@@ -245,12 +247,12 @@ class WarpGate
             return $response->getBody();
         }
 
-        $content = json_decode($response->getBody(), true);
+        $content = json_decode($response->getBody());
 
-        /* If you ended up here, the document can't be checked for various reasons
+        /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
+        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
     }
 
     /* Getters/Setters
