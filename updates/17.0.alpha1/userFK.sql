@@ -29,16 +29,29 @@ REFERENCES `groups` (`id`)
 
 ALTER TABLE `house`
   CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL ;
+ALTER TABLE `luResidentialHouse`
+  CHANGE COLUMN `id` `id` INT(20) UNSIGNED NOT NULL AUTO_INCREMENT ;
+
+
+ALTER TABLE `user`
+  CHANGE COLUMN `house` `house` INT(11) UNSIGNED NULL DEFAULT NULL ,
+  CHANGE COLUMN `residential_house_id` `residential_house_id` INT(11) UNSIGNED NULL DEFAULT NULL ;
 
 
 ALTER TABLE `user`
   ADD INDEX `fk_user_residential_house_id_idx` (`residential_house_id` ASC);
+
+ALTER TABLE `user`
+  ADD INDEX `fk_user_house_id_idx` (`house` ASC);
+
 ALTER TABLE `user`
   ADD CONSTRAINT `fk_user_house_id`
 FOREIGN KEY (`house`)
 REFERENCES `house` (`id`)
   ON DELETE NO ACTION
-  ON UPDATE NO ACTION,
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `user`
   ADD CONSTRAINT `fk_user_residential_house_id`
 FOREIGN KEY (`residential_house_id`)
 REFERENCES `luResidentialHouse` (`id`)
@@ -54,3 +67,44 @@ FOREIGN KEY (`id`)
 REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+ALTER TABLE `bookmarks`
+  CHANGE COLUMN `owner` `owner` INT(11) UNSIGNED NOT NULL DEFAULT '0' ;
+
+DELETE bookmarks FROM bookmarks
+  LEFT JOIN `user` ON `owner` = `user`.id
+WHERE `user`.id is null;
+
+ALTER TABLE `bookmarks`
+  ADD CONSTRAINT `fk_bookmarks_user_id`
+FOREIGN KEY (`owner`)
+REFERENCES `user` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
+ALTER TABLE `user_link`
+  ADD CONSTRAINT `fk_user_link_user_id`
+FOREIGN KEY (`user_id`)
+REFERENCES `user` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_user_link_linked_user_id`
+FOREIGN KEY (`linked_user_id`)
+REFERENCES `user` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `user_password_reset_request`
+  CHANGE COLUMN `user_id` `user_id` INT(11) UNSIGNED NOT NULL ;
+
+ALTER TABLE `user_password_reset_request`
+  ADD INDEX `fk_user_password_reset_request_user_id_idx` (`user_id` ASC);
+ALTER TABLE `user_password_reset_request`
+  ADD CONSTRAINT `fk_user_password_reset_request_user_id`
+FOREIGN KEY (`user_id`)
+REFERENCES `user` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
