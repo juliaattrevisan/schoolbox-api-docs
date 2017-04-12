@@ -14,18 +14,18 @@ DELETE userCampus FROM userCampus
   LEFT JOIN `luCampus` ON campus = `luCampus`.id
 WHERE `luCampus`.id is null;
 
-ALTER TABLE `schoolbox`.`perms`
+ALTER TABLE `perms`
   ADD CONSTRAINT `fk_perms_folder_id`
 FOREIGN KEY (`cid`)
-REFERENCES `schoolbox`.`folder` (`id`)
+REFERENCES `folder` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-ALTER TABLE `schoolbox`.`perms`
+ALTER TABLE `perms`
   ADD INDEX `fk_perms_role_id_idx` (`gid` ASC);
-ALTER TABLE `schoolbox`.`perms`
+ALTER TABLE `perms`
   ADD CONSTRAINT `fk_perms_role_id`
 FOREIGN KEY (`gid`)
-REFERENCES `schoolbox`.`groups` (`id`)
+REFERENCES `groups` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
