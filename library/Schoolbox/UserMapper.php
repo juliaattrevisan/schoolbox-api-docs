@@ -106,6 +106,7 @@ class UserMapper extends Mapper
 
         // Setup callbacks
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setDefaultDisplayGradeAverage']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidRole']);
@@ -134,6 +135,20 @@ class UserMapper extends Mapper
         );
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
+    }
+
+    /**
+     * Pre-save callback: if the user's display grade average flag isn't set, set it to its default value.
+     *
+     * @param User $model
+     * @return bool Always true
+     */
+    public function setDefaultDisplayGradeAverage(User $model)
+    {
+        if ($model->getDisplayGradeAverage() === null) {
+            $model->setDisplayGradeAverage((bool)$this->getConfigLoader()->get('display_grade_average'));
+        }
+        return true;
     }
 
     /**
