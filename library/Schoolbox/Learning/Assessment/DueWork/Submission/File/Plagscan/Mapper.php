@@ -63,13 +63,14 @@ class Mapper extends \Schoolbox\Mapper
         $plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
         $plagscanClientId = $this->getConfigLoader()->get('plagscan_client_id');
 
-        /* Set up access token
-         */
-        $accessToken = (new AccessTokenGenerator($plagscanClientId, $plagscanApiKey))->generate();
-
         /* If plagscan credentials exist, set up all the other stuff
          */
         if (strlen($plagscanApiKey) && strlen($plagscanUsername)) {
+
+            /* Set up access token
+             */
+            $accessToken = (new AccessTokenGenerator($plagscanClientId, $plagscanApiKey))->generate();
+
             $this->setGateway(new WarpGate($this->getConfigLoader(), $accessToken));
         }
     }
