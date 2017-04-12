@@ -276,6 +276,8 @@ class Url
         if (preg_match($pattern, $this->getUrl())) {
             return true;
         }
+
+        return false;
     }
 
     /**
