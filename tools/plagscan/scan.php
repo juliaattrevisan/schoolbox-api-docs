@@ -117,5 +117,5 @@ $log->info("Plagscan scan completed. $numUpdated documents were scanned");
 $numFailed = $allDocuments->count() - $numUpdated;
 
 if ($numFailed) {
-    $log->info("$numFailed documents failed scanning");
+    $log->info("$numFailed documents failed scanning or analysis is still in progress");
 }
