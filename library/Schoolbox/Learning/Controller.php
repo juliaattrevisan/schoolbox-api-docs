@@ -521,7 +521,7 @@ class Controller extends Base
         $isInstructor = $this->getAccess()->isInstructor($this->getUser(), $subject);
 
         // Show the box/whisker plot for instructors and for students if the config var is on
-        $canSeeBoxPlot = $isInstructor || $this->getConfigLoader()->get('display_grade_average');
+        $canSeeBoxplot = $isInstructor || $viewee->getDisplayGradeAverage();
 
         // Show the graph for instructors and for students if the config var is on
         $canSeeGraph = $isInstructor || $this->getConfigLoader()->get('display_grade_graph');
