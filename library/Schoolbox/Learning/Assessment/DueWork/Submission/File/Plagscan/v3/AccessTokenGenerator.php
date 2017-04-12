@@ -13,7 +13,7 @@
  */
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3;
-
+use GuzzleHttp\Client;
 
 class AccessTokenGenerator
 {
@@ -29,9 +29,11 @@ class AccessTokenGenerator
     private $apiKey = '';
 
     /**
+     * Api url where stuff is sent
+     *
      * @var string
      */
-    private $tokenUrl = 'https://api.plagscan.com/v3/token';
+    private $apiUrl = 'https://api.plagscan.com/v3/';
 
     /**
      * AccessTokenGenerator constructor.
@@ -56,33 +58,34 @@ class AccessTokenGenerator
          * an access token, a curl request must be sent to plag
          */
 
-        /* TODO:  Can use guzzle instead of alaress curl url
-         */
-        $curl = new \Alaress_Curl_Url($this->getTokenUrl());
-
-        $postfields = array(
+        $postData = [
+            'grant_type' => 'client_credentials',
             'client_id' => $this->getClientId(),
             'client_secret' => $this->getApiKey()
-        );
+        ];
 
-        $curl->addOptions([
-            CURLOPT_POST => 1,
-            CURLOPT_POSTFIELDS => $postfields,
+        $client = new Client([
+            "base_uri" => $this->getApiUrl(),
+            "timeout" => 2.0,
+            "http_errors" => false
         ]);
 
-        $curl->exec();
+        $response = $client->post('token', [
+            'form_params' => $postData
+        ]);
 
-        if (!count($curl->getErrors())) {
-            $result = json_decode($curl->getResult());
+        /* What was the outcome?
+         */
+        $content = json_decode($response->getBody());
 
-            if ($result->error) {
-                throw new \DomainException($result->error_description);
-            }
-
-            return $result->access_token;
+        if ($response->getStatusCode() == 200) {
+            return $content->access_token;
         }
 
-        throw new \DomainException('Error generating access token');
+        /* If you ended up here, the document can't be transmitted for various reasons
+         * so just shove them out for logging purposes
+         */
+        throw new \DomainException("Error: {$content->error} - {$content->error_description}");
     }
 
     /* Getters/Setters
@@ -127,18 +130,18 @@ class AccessTokenGenerator
     /**
      * @return string
      */
-    private function getTokenUrl()
+    private function getApiUrl()
     {
-        return $this->tokenUrl;
+        return $this->apiUrl;
     }
 
     /**
-     * @param string $tokenUrl
+     * @param string $apiUrl
      * @return $this
      */
-    private function setTokenUrl($tokenUrl)
+    private function setApiUrl($apiUrl)
     {
-        $this->tokenUrl = $tokenUrl;
+        $this->apiUrl = $apiUrl;
         return $this;
     }
 }
