@@ -136,6 +136,13 @@ class User implements JsonSerializable, ISoftDeletable
     private $hideNotificationsTray;
 
     /**
+     * Is the grade average displayed for this user?
+     *
+     * @var bool
+     */
+    private $displayGradeAverage;
+
+    /**
      * @var SubjectCollection|Subject[]
      */
     protected $subject_collection;
@@ -1203,6 +1210,24 @@ class User implements JsonSerializable, ISoftDeletable
     public function showNotificationsTray()
     {
         $this->setHideNotificationsTray(false);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisplayGradeAverage()
+    {
+        return $this->displayGradeAverage;
+    }
+
+    /**
+     * @param bool $displayGradeAverage
+     * @return static
+     */
+    public function setDisplayGradeAverage($displayGradeAverage)
+    {
+        $this->displayGradeAverage = $displayGradeAverage;
+        return $this;
     }
 
     /* Getters/Setters
