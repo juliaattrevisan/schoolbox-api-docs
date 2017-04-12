@@ -360,7 +360,7 @@ class External_Tass_User implements External_UserInterface
             $result = $this->getDatabase()->getAll($query);
 
             // parse the array, because this data is stored in a funky way
-            if (count($result)) {
+            if (count($result) && is_array($result)) {
                 foreach ($result as $row) {
                     // data is stored in a single field, comma separated
                     $list = explode(',', $row['RelatedID']);
