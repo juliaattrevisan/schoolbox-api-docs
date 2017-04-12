@@ -8,14 +8,7 @@ Usage:
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
 
-{% set filterPanelId = 'filter_panel' %}
-{% set submitButtonId = 'submit_button' %}
-
-
 <script type="text/javascript">
-
-
-
 
     $(function() {
         {#TODO - move this to plugin called 'multi-checkbox-select' or similar#}
@@ -76,19 +69,20 @@ Usage:
         // ============== Vars
 
         var $reportContent       = $('#{{ contentId }}');
-        var $filterPanel         = $('#{{ filterPanelId }}');
+        var $filterPanel         = $('#filter_panel');
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
-        var $submitButton        = $('#{{ submitButtonId }}');
+        var $submitButton        = $('#submit_button');
         var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden]');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
 
         //  Error messages to display for different server errors
-        var $alertOutOfMemory  = null;
-        var $alertFatalError   = null;
-        var $alertErrorUnknown = null;
+        var $alertOutOfMemory       = null;
+        var $alertTimeout           = null;
+        var $alertUncaughtException = null;
+        var $alertErrorUnknown      = null;
 
         // A tab to insert in filter summary - illustrating what filters are being used
         var $tabAppliedFilter  = null;
@@ -108,7 +102,7 @@ Usage:
         });
 
         // Listen for user removing an applied filter
-        $appliedFilters.on('click', '[data-close]', function(event){
+        $appliedFilters.on('click', '[data-close]', function(){
             var $filterTab = $(this).closest('[data-applied-filter-tab]');
             clearFilter($filterTab.find('[data-filter]').data('filter'));
             $filterTab.remove();
@@ -118,8 +112,8 @@ Usage:
         // ============== Helpers
 
         /**
-         * Remove filter ta
          * Clears checkboxes for the specified filter
+         *
          * @param {int} filterId
          */
         function clearFilter(filterId) {
@@ -138,21 +132,24 @@ Usage:
             $submitButton.val($submitButton.data('working'));
 
             disableInputs();
+            hidePanel();
 
             $.post(href, data)
-                .success(function(html){
+                .success(function(response){
 
-                    // Does the first 400 chars indicate a fatal error? But returned 200 for some reason? why does this happen sometimes??
-                    var fatalErrorStringIndex = html.indexOf('Fatal error:');
-                    if( -1 !== fatalErrorStringIndex && fatalErrorStringIndex < 400 ){
-                        processServerError();
+                    // Did we get not get JSON ?
+                    if('object' !== typeof response){
+                        processServerError(response);
                         return;
                     }
 
-                    $serverErrorFeedback.hide();
-                    hidePanel();
-                    $reportContent.html(html);
-                    $toast.toastTimeout({text: 'Success!', css: 'success'});
+                    // Was an exception thrown?
+                    if(200 !== response.status){
+                        renderExceptionThrown(response.code, response.message, response.line, response.file);
+                        return;
+                    }
+
+                    processServerSuccess(response.content);
                 })
                 .fail(function(response){
                     processServerError(response.responseText);
@@ -165,37 +162,66 @@ Usage:
         }
 
         /**
-         * Try to figure out why the server failed to return a report
+         * Handle a successful AJAX call
+         *
+         * @param {string} html
          */
-        function processServerError(responseText)
-        {
-            if('string' !== typeof responseText) {
-                displayAlert($alertErrorUnknown);
-                return;
-            }
+        function processServerSuccess(html) {
+            $serverErrorFeedback.hide();
+            $reportContent.html(html);
+            $toast.toastTimeout({text: 'Success!', css: 'success'});
+        }
+
+        /**
+         * Try to figure out why the server failed to return a report
+         *
+         * @param {string} responseText
+         */
+        function processServerError(responseText) {
 
             // Was this an OOM error ?
             var oomErrorIndex = responseText.indexOf('Fatal error: Allowed memory size of');
             if(-1 !== oomErrorIndex && oomErrorIndex < 400) {
                 displayAlert($alertOutOfMemory);
+                showPanel();
                 return;
             }
 
-            // Was an uncaught exception thrown ?
-            var uncaughtExceptionIndex = responseText.indexOf('Error Encountered');
-            if(-1 !== uncaughtExceptionIndex && uncaughtExceptionIndex < 400) {
-                displayAlert($alertFatalError);
+            // Was this a Timeout ?
+            var timeoutIndex = responseText.indexOf('Fatal error: Maximum execution time');
+            if(-1 !== timeoutIndex && timeoutIndex < 400) {
+                displayAlert($alertTimeout);
+                showPanel();
                 return;
             }
+
+            // Not sure what went wrong - show generic error alert messge
             displayAlert($alertErrorUnknown);
         }
 
+
+        /**
+         * Render a helpful HTML error alert when the server indicates an uncaught exception has occurred
+         *
+         * @param {int}    code
+         * @param {string} message
+         * @param {int}    line
+         * @param {string} file
+         **/
+        function renderExceptionThrown(code, message, line, file)
+        {
+            $alertUncaughtException.find('[data-code]').html(code);
+            $alertUncaughtException.find('[data-message]').html(message);
+            $alertUncaughtException.find('[data-line]').html(line);
+            $alertUncaughtException.find('[data-file]').html(file);
+            displayAlert($alertUncaughtException);
+        }
 
 
         /**
          * Disable panel inputs
          */
-        function enableInputs(){
+        function enableInputs() {
             $submitButton.attr('disabled', false);
             $optionCheckboxes.attr('disabled', false);
         }
@@ -203,7 +229,7 @@ Usage:
         /**
          * Disable panel inputs
          */
-        function disableInputs(){
+        function disableInputs() {
             $submitButton.attr('disabled', true);
             $optionCheckboxes.attr('disabled', true);
         }
@@ -218,13 +244,23 @@ Usage:
         }
 
         /**
+         * Show the filter panel components
+         */
+        function showPanel() {
+            if('collapsed' === $filterPanel.find('[data-collapsable]').attr('data-collapse-state')){
+                $filterPanel.find('[data-collapser]').trigger('click');
+            }
+        }
+
+        /**
          * Fetch the HTML we will render by JS into an alert. Then remove the template from the DOM.
          */
-        function cacheErrorAlerts(){
+        function cacheErrorAlerts() {
             // Cache error messages
-            $alertOutOfMemory  = $serverErrorFeedback.find('[data-reason="out-of-memory"]');
-            $alertFatalError   = $serverErrorFeedback.find('[data-reason="uncaught-exception"]');
-            $alertErrorUnknown = $serverErrorFeedback.find('[data-reason=unknown]');
+            $alertOutOfMemory       = $serverErrorFeedback.find('[data-reason="out-of-memory"]');
+            $alertTimeout           = $serverErrorFeedback.find('[data-reason="timeout"]');
+            $alertUncaughtException = $serverErrorFeedback.find('[data-reason="uncaught-exception"]');
+            $alertErrorUnknown      = $serverErrorFeedback.find('[data-reason="unknown"]');
 
             // Remove from DOM
             $serverErrorFeedback.find('[data-reason]').detach();
@@ -239,8 +275,13 @@ Usage:
 
         /**
          * Show an alert in the server feedback panel
+         *
+         * @param {jQuery} $alert
          */
-        function displayAlert($alert){
+        function displayAlert($alert) {
+            // Remove previous alerts
+            $serverErrorFeedback.children().remove();
+
             $toast.toastTimeout({text: 'Failure!', css: 'alert'});
             $alert.removeClass('alert-close');
             $serverErrorFeedback.append($alert);
@@ -254,8 +295,7 @@ Usage:
          * * all options are selected, or
          * * no options are selected.
          */
-        function updateFiltersInUseLabel()
-        {
+        function updateFiltersInUseLabel() {
             var componentsInUse = {};
             $panelComponents.each(function (idx, component) {
                 var $component = $(component);
@@ -289,7 +329,7 @@ Usage:
         /**
          * Indicate a request is in progress
          */
-        function showFilterLoader(){
+        function showFilterLoader() {
             $filterLoaderIcon.prop('disabled', false);
             $filterLoaderIcon.css('opacity', 1);
         }
@@ -297,7 +337,7 @@ Usage:
         /**
          * Indicated a request is not in progress
          */
-        function hideFilterLoader(){
+        function hideFilterLoader() {
             $filterLoaderIcon.prop('disabled', true);
             $filterLoaderIcon.css('opacity', 0);
         }
@@ -340,20 +380,20 @@ Usage:
 <div class="toast" data-alert data-relation="submit-label"></div>
 
 <div class="row">
-    <div class="small-12 island" id="{{ filterPanelId }}">
+    <div class="small-12 island" id="filter_panel">
         <section>
             <fieldset class="content">
-                <legend data-collapser="panel-components" class="icon-up-arrow columns">
+                <legend data-collapser="panel-components" class="icon-down-arrow columns">
                     <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Applied filters: <span data-applied-filters></span>
 
                     {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
-                    <input id="{{ submitButtonId }}" type="submit" data-value="Apply Filters" value="Apply Filters" href="{{ panel.route }}" data-working="Submitting ..." style="width: auto; min-width: 120px; right: 1rem; position: absolute; top: -3px;">
+                    <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" href="{{ panel.route }}" data-working="Submitting ..." style="width: auto; min-width: 120px; right: 1rem; position: absolute; top: -3px;">
                 </legend>
             </fieldset>
 
-            <fieldset class="content" data-collapsable="panel-components" data-collapse-state="uncollapsed">
+            <fieldset class="content" data-collapsable="panel-components" data-collapse-state="collapsed" style="display: none;">
 
-                <div class="flex-container" style="margin: 0 0px;">
+                <div class="flex-container" style="margin: 0;">
                     {% set countComponents = 0 %}
                     {% for component in panel.components %}
                         {% set template = component.template %}
@@ -378,14 +418,26 @@ Usage:
         {# Will contain error message HTML, as defined in template below #}
         <div id="server_error_feedback" style="display: none;" >
             <div data-reason="out-of-memory" data-alert="" class="alert-box alert">
-                The server has run out of memory while attempting to build the requested report.<br>
-                This is usually due to filters being too liberal, which generates too much data to process.<br>
+                The server has run out of memory while attempting to build the requested report.<br><br>
+                This is usually due to filters being too liberal, which generates too much data to process.
+                Please try setting your filters to be more restrictive to return a smaller data set.
+                <a href="" class="close">×</a>
+            </div>
+            <div data-reason="timeout" data-alert="" class="alert-box alert">
+                Maximum server execution time exceeded.<br><br>
+                This is usually due to filters being too liberal, which generates too much data to process.
                 Please try setting your filters to be more restrictive to return a smaller data set.
                 <a href="" class="close">×</a>
             </div>
 
             <div data-reason="uncaught-exception" data-alert="" class="alert-box alert">
-                An exception was thrown during report generation. Please report this to Schoolbox support.
+                An exception was thrown during report generation. Please report this to Schoolbox support.<br>
+                <pre><br>
+                    {#- dessicate -#}Code:    <span data-code></span><br>
+                    {#- dessicate -#}Message: <span data-message></span><br>
+                    {#- dessicate -#}File:    <span data-file></span><br>
+                    {#- dessicate -#}Line:    <span data-line></span>
+                </pre>
                 <a href="" class="close">×</a>
             </div>
 

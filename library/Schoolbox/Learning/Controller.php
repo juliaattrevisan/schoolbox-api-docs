@@ -228,12 +228,7 @@ class Controller extends Base
         $workTypeComponent       = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
         $folderComponent         = $filterFactoryFactory->buildFolderFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS, $folderRunTimeOptions);
 
-        // Protect against misconfiguration - projects should not be available on the assessmentType filter for this page
-
-
-
-        // TODO add other filters
-
+        // Combine components
         $filterComponents =  $filterFactoryFactory->createFilterComponentCollection([
             $termFilterComponent,
             $assessmentTypeComponent,
@@ -268,18 +263,46 @@ class Controller extends Base
      */
     public function postPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
-        /**
-         * Indexed by filter.id, then concrete key
-         *
-         * @var string[][] $postFilterSelections
-         */
-        $postFilterSelections = $this->request->post['filter_selection'] ?: [];
+        try {
+            $postFilterSelections = $this->request->post['filter_selection'] ?: [];
 
+
+            $content = $this->generatePendingAssessmentReport($viewee, $filterFactoryFactory, $postFilterSelections);
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'status'  => 200,
+                'content' => $content,
+            ]));
+
+        } catch (\Exception $e){
+            $this->returnJsonError($e);
+        } catch (\Throwable $e){
+            $this->returnJsonError($e);
+        }
+    }
+
+
+    /**
+     * Generate a pending assessment report as HTML string
+     *
+     * @param User                  $viewee
+     * @param Filter\FactoryFactory $filterFactoryFactory
+     * @param string[][]            $postFilterSelections - Indexed by filter.id, then concrete key
+     * @return string
+     * @throws \InvalidArgumentException
+     * @throws \DomainException
+     * @throws \LogicException
+     */
+    protected function generatePendingAssessmentReport(
+        User $viewee,
+        Filter\FactoryFactory $filterFactoryFactory,
+        array $postFilterSelections
+    ) {
         // What filters are in use on this page? Get their key converters
         $keyConverters = $filterFactoryFactory->createKeyConverterCollection();
 
         // Term Filter
-        $termKeyConverter  = $filterFactoryFactory->buildTermFilterFactory()->buildKeyConverter();
+        $termKeyConverter = $filterFactoryFactory->buildTermFilterFactory()->buildKeyConverter();
         $keyConverters->offsetSet($termKeyConverter->getFilter()->getId(), $termKeyConverter);
 
         // AssessmentType Filter
@@ -295,15 +318,15 @@ class Controller extends Base
         $keyConverters->offsetSet($folderKeyConverter->getFilter()->getId(), $folderKeyConverter);
 
         // Save
-        $page = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
+        $page                = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
         $selectionsPerFilter = $this->filterSelectionMapper->updateSelections($keyConverters, $this->getUser(), $page, $postFilterSelections);
 
 
         // Get selections, defaulting to full possible set if filter not present in panel (ie disabled by admin)
-        $selectedTerms = $termKeyConverter->getSelectedItems($selectionsPerFilter[$termKeyConverter->getFilter()->getId()]);
-        $selectedWorkTypes = $workTypeKeyConverter->getSelectedItems($selectionsPerFilter[$workTypeKeyConverter->getFilter()->getId()]);
+        $selectedTerms           = $termKeyConverter->getSelectedItems($selectionsPerFilter[$termKeyConverter->getFilter()->getId()]);
+        $selectedWorkTypes       = $workTypeKeyConverter->getSelectedItems($selectionsPerFilter[$workTypeKeyConverter->getFilter()->getId()]);
         $selectedAssessmentTypes = $assessmentTypeKeyConverter->getSelectedItems($selectionsPerFilter[$assessmentTypeKeyConverter->getFilter()->getId()]);
-        $selectedFolderIds = $folderKeyConverter->getSelectedItems($selectionsPerFilter[$folderKeyConverter->getFilter()->getId()]);
+        $selectedFolderIds       = $folderKeyConverter->getSelectedItems($selectionsPerFilter[$folderKeyConverter->getFilter()->getId()]);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
@@ -311,11 +334,9 @@ class Controller extends Base
             $viewee = $this->getUser();
         }
 
-
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
-
-        $factory = new PendingFactory(
+        $factory     = new PendingFactory(
             $viewee,
             $this->database,
             $this->externalClass,
@@ -355,10 +376,27 @@ class Controller extends Base
         }
         $assessmentsToChase->sortBy('dueAt', 'asc');
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/pendingAssessments.twig', [
+        return $this->buildUnthemedHtmlOutput('@learning/pendingAssessmentsContent.twig', [
             'statistics'         => $assessmentStatistics,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,
+        ])->getAsString();
+    }
+
+
+    /**
+     * Returns a JSON representation of an exception suitable for AJAX HTML alert divs
+     *
+     * @param \Throwable $e
+     */
+    protected function returnJsonError($e)
+    {
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'status'    => 500,
+            'code'      => $e->getCode(),
+            'message'   => $e->getMessage(),
+            'line'      => $e->getLine(),
+            'file'      => $e->getFile(),
         ]));
     }
 
