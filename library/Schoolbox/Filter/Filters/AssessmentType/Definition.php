@@ -96,7 +96,8 @@ class Definition extends AbstractFilterDefinition
             if (self::KEY_DUE_WORK === $leftKey) {
                 return in_array($rightKey, [self::KEY_PROJECT, self::KEY_QUIZ], true) ? +1 : -1;
             }
-            return +1;
+            // left key must be TASK, which should be placed after other keys
+            return self::KEY_TASK === $rightKey ? 0 : +1;
         });
     }
 
