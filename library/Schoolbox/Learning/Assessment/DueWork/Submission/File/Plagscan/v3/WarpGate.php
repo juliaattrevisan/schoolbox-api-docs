@@ -54,8 +54,8 @@ class WarpGate
     /**
      * WarpGate constructor.
      *
-     * @param $configLoader
-     * @param $accessToken
+     * @param IConfigLoader $configLoader
+     * @param string $accessToken
      * @throws DomainException
      */
     public function __construct(IConfigLoader $configLoader, $accessToken)
@@ -153,7 +153,7 @@ class WarpGate
     /**
      * Analyse a document that we sent to plag
      *
-     * @param $plagscanId
+     * @param int $plagscanId
      * @return bool
      * @throws DomainException
      */
@@ -215,43 +215,19 @@ class WarpGate
     /**
      * Fetch report contents. I formatted their crappy paragraph for ease of use
      *
-     * 0 Retrieve statistics only, such as plagiarism level, number of words, wait etc. (n.b.: wait is in ms, the report timestamp - creation timestamp, so a negative value indicates that the analysis has not started at all or finished yet.)
-     * 1 Retrieve document's plain text and report links; to list of possible plagiarism sources and in-document view of possible plagiarism sources; e.g. https://www.plagscan.com/view?6055
-     * 2 Retrieve XML with data on all possible plagiarism sources
-     * 3 Retrieve annotated Docx document (if available, depending on user configuration)
-     * 4 Retrieve HTML document with annotations
-     * 5 Retrieve HTML report of matches sorted by relevance
-     * 6 Retrieve new style (interactive) HTML document with annotations
-     * 7 Retrieve latest report type (with formatting and images) - returns URL (link gives temporary access for one hour)
-     * 8 PDF version of HTML document with annotations
-     * 9 PDF version of HTML report of matches sorted by relevance
-     *
-     * @param $plagscanId
+     * @param int $plagscanId
      * @return string
      * @throws DomainException
      */
     public function fetchReport($plagscanId)
     {
-        $postData = [
-            'access_token' => $this->getAccessToken(),
-            'mode' => 6
-        ];
-
-        $client = new Client([
-            "base_uri" => $this->getApiUrl(),
-            "timeout" => 20.0,
-            "http_errors" => false
-        ]);
-
-        $response = $client->get("documents/{$plagscanId}/retrieve", [
-            'query' => $postData
-        ]);
-
-        $content = json_decode($response->getBody());
+        $response = $this->retrieve($plagscanId, 6);
 
         if ($response->getStatusCode() == 200) {
             return $response->getBody();
         }
+
+        $content = json_decode($response->getBody());
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
@@ -268,9 +244,48 @@ class WarpGate
      */
     public function fetchScore($plagscanId)
     {
+        $response = $this->retrieve($plagscanId, 0);
+
+        $content = json_decode($response->getBody());
+
+        if ($response->getStatusCode() == 200) {
+
+            /* ...really - is a shame it's not synonymous with fetchReport()
+             */
+            return $content->data->level;
+        }
+
+        /* If you ended up here, the document can't be reported for various reasons
+         * so just shove them out for logging purposes
+         */
+        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+    }
+
+    /**
+     * Retrieve report data for $plagscanId in mode selection integer $mode
+     *
+     * $mode is one of the following:
+     *
+     * 0 Retrieve statistics only, such as plagiarism level, number of words, wait etc. (n.b.: wait is in ms, the report timestamp - creation timestamp, so a negative value indicates that the analysis has not started at all or finished yet.)
+     * 1 Retrieve document's plain text and report links; to list of possible plagiarism sources and in-document view of possible plagiarism sources; e.g. https://www.plagscan.com/view?6055
+     * 2 Retrieve XML with data on all possible plagiarism sources
+     * 3 Retrieve annotated Docx document (if available, depending on user configuration)
+     * 4 Retrieve HTML document with annotations
+     * 5 Retrieve HTML report of matches sorted by relevance
+     * 6 Retrieve new style (interactive) HTML document with annotations
+     * 7 Retrieve latest report type (with formatting and images) - returns URL (link gives temporary access for one hour)
+     * 8 PDF version of HTML document with annotations
+     * 9 PDF version of HTML report of matches sorted by relevance
+     *
+     * @param int $plagscanId
+     * @param int $mode
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    private function retrieve($plagscanId, $mode)
+    {
         $postData = [
             'access_token' => $this->getAccessToken(),
-            'mode' => 0
+            'mode' => $mode
         ];
 
         $client = new Client([
@@ -283,16 +298,7 @@ class WarpGate
             'query' => $postData
         ]);
 
-        $content = json_decode($response->getBody());
-
-        if ($response->getStatusCode() == 200) {
-            return $content->data->level;
-        }
-
-        /* If you ended up here, the document can't be reported for various reasons
-         * so just shove them out for logging purposes
-         */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        return $response;
     }
 
     /* Getters/Setters
