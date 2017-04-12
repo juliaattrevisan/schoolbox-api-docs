@@ -50,6 +50,12 @@ class AccessTokenGenerator
      */
     public function generate()
     {
+
+        /* TODO: Cache plagscanAccessToken here. If it is about to expire, regenerate; otherwise reuse
+         * At the moment access token is respawned every time which isn't always necessary. To respawn
+         * an access token, a curl request must be sent to plag
+         */
+
         $curl = new \Alaress_Curl_Url($this->getTokenUrl());
 
         $postfields = array(
