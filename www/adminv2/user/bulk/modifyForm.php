@@ -41,7 +41,8 @@ if (isset($_POST['updateUsers'])) {
                 $_POST['apply_accountenabled'],
                 $_POST['apply_hidecontacts'],
                 $_POST['apply_hidetimetable'],
-                $_POST['apply_position_title']
+                $_POST['apply_position_title'],
+                $_POST['apply_displaygradeaverage']
             );
 
             $modified->add($user);
