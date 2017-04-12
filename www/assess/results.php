@@ -101,7 +101,7 @@ function processAttempt(
         'ASSESS_ASSESS_ID' => $page->arg[0],
         'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
         'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-        'USER_ID' => $currentAttempt['user_id'],
+        'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
         'ATTEMPT_EXTERNAL_ID' => $currentAttempt['synergy_id'],
         'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
         'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
@@ -382,7 +382,7 @@ if (is_array($allStudents) && count($allStudents)) {
             $this->setVar(array(
                 'ASSESS_FIRST_SECTION_ID' => '',
                 'ATTEMPT_ATTEMPT_ID' => '',
-                'USER_ID' => $currentStudent['uid'],
+                'ATTEMPT_USER_ID' => $currentStudent['uid'],
                 'ATTEMPT_EXTERNAL_ID' => $currentStudent['synergy_id'],
                 'ATTEMPT_FIRSTNAME' => $currentStudent['firstname'],
                 'ATTEMPT_SURNAME' => $currentStudent['lastname'],
