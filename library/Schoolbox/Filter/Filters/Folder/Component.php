@@ -80,8 +80,7 @@ class Component extends AbstractFilterComponent
                 ->setSelected($abstractSelection->getSelected());
             $availableSelections->setOffset($key, $concreteSelection);
         }
-
-        return $this->overlayUserSelections($availableSelections);
+        return $availableSelections;
     }
 
 
@@ -103,10 +102,12 @@ class Component extends AbstractFilterComponent
         $abstractGroupSelection = $availableAbstractSelections[Definition::KEY_GROUPS];
 
         return [
-            'isAvailable'     => $availableAbstractOptions->count() ? true : false,
-            'component'       => $this,
-            'classSelections' => $this->getConcreteSelections($abstractClassSelection, $this->classes),
-            'groupSelections' => $this->getConcreteSelections($abstractGroupSelection, $this->groups),
+            'isAvailable'            => $availableAbstractOptions->count() ? true : false,
+            'component'              => $this,
+            'defaultClassSelections' => $this->getConcreteSelections($abstractClassSelection, $this->classes),
+            'defaultGroupSelections' => $this->getConcreteSelections($abstractGroupSelection, $this->groups),
+            'userClassSelections'    => $this->overlayUserSelections($this->getConcreteSelections($abstractClassSelection, $this->classes)),
+            'userGroupSelections'    => $this->overlayUserSelections($this->getConcreteSelections($abstractGroupSelection, $this->groups)),
         ];
     }
 

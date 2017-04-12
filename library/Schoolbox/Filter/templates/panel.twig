@@ -94,6 +94,7 @@ Usage:
         // Listen for clicks on the submit button
         $submitButton.on('click', function(event){
             event.preventDefault();
+            updateOriginalSelections();
             fetchReport();
             return false; // don't bubble
         });
@@ -120,7 +121,30 @@ Usage:
             updateFiltersInUseLabel();
         });
 
+        // Reset to role-specific default selections
+        $resetToDefaultsBtn.on('click', function (){
+            $filterPanel.find('input[type=checkbox][data-value-default]').each(function(idx, elem){
+                var $checkbox = $(elem);
+                $checkbox.prop('checked', $checkbox.data('value-default'));
+            });
+            updateFiltersInUseLabel();
+        });
+
         // ============== Helpers
+
+        /**
+         * To ensure each checkbox's original value data attribute is synchronised with the DB, we need to
+         * update their values each time we submit a set of filter selections to the server
+         */
+        function updateOriginalSelections(){
+            $filterPanel.find('input[type=checkbox][data-value-original]').each(function(idx, elem){
+                var $checkbox = $(elem);
+                var checkedState = $checkbox.prop('checked') ? 1 : 0;
+                $checkbox.data('value-original', checkedState);
+                $checkbox.attr('data-value-original', checkedState);
+            });
+            updateFiltersInUseLabel();
+        }
 
         /**
          * Clears checkboxes for the specified filter
@@ -399,7 +423,7 @@ Usage:
         <section>
             <fieldset class="content">
                 <legend data-collapser="panel-components" class="icon-down-arrow columns">
-                    <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Applied filters: <span data-applied-filters></span>
+                    <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Filters: <span data-applied-filters></span>
 
                     {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
                     <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ..." style="width: auto; min-width: 150px; right: 1rem; position: absolute; top: -3px;">
@@ -409,7 +433,7 @@ Usage:
             <fieldset class="content" data-collapsable="panel-components" data-collapse-state="collapsed" style="display: none;">
                 <div style="text-align: right; padding-right: 1rem;">
                     <a id="defaults_reset" class="button" title="Revert to default selections" style="width: auto; min-width: 150px;">Reset to Defaults</a>
-                    <a id="cancel_changes" class="button" title="Revert to your most recently submitted selections" style="width: auto; min-width: 150px;">Cancel Changes</a>
+                    <a id="cancel_changes" class="button" title="Revert to your most recently applied filter" style="width: auto; min-width: 150px;">Cancel Changes</a>
                 </div>
 
                 <div class="flex-container" style="margin: 0;">

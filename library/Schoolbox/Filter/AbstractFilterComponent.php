@@ -68,7 +68,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
      * @return \Schoolbox\Filter\Selection\Model[]|GenericCollection
      * @throws Mapper\Exception
      */
-    protected function getSelections(GenericCollection $availableOptions)
+    protected function getUserSelections(GenericCollection $availableOptions)
     {
         $availableSelections = $this->getDefaultSelections($availableOptions);
         $this->overlayUserSelections($availableSelections);
@@ -148,9 +148,10 @@ abstract class AbstractFilterComponent implements IFilterComponent
         $availableOptions = $this->getDefinition()->getAvailableOptions($page, $roleType)[$page];
 
         return [
-            'isAvailable' => $availableOptions->count() ? true : false,
-            'definition'  => $this->getDefinition(),
-            'selections'  => $availableOptions ? $this->getSelections($availableOptions) : null,
+            'isAvailable'       => $availableOptions->count() ? true : false,
+            'definition'        => $this->getDefinition(),
+            'defaultSelections' => $availableOptions ? $this->getDefaultSelections($availableOptions) : null,
+            'userSelections'    => $availableOptions ? $this->getUserSelections($availableOptions) : null,
         ];
     }
 
