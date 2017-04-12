@@ -183,10 +183,13 @@ class Controller extends Base
      */
     public function getInsert()
     {
+        $user = $this->userMapper->createModel()
+            ->setDisplayGradeAverage($this->getConfigLoader()->get('display_grade_average'));
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'pageCurrent' => 'user',
+                'user' => $user,
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
