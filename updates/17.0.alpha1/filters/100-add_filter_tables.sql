@@ -1,8 +1,8 @@
 -- TODO remove this debug aids
-DROP TABLE IF EXISTS filter_default;
-DROP TABLE IF EXISTS filter_selection;
-DROP TABLE IF EXISTS filter_option;
-DROP TABLE IF EXISTS filter;
+# DROP TABLE IF EXISTS filter_default;
+# DROP TABLE IF EXISTS filter_selection;
+# DROP TABLE IF EXISTS filter_option;
+# DROP TABLE IF EXISTS filter;
 
 -- A list of filters available in the system
 CREATE TABLE filter (
@@ -69,7 +69,8 @@ INSERT INTO filter (`class`) VALUES
   ('Schoolbox\\Filter\\Filters\\Term\\Definition'),
   ('Schoolbox\\Filter\\Filters\\AssessmentType\\Definition'),
   ('Schoolbox\\Filter\\Filters\\WorkType\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Folder\\Definition')
+  ('Schoolbox\\Filter\\Filters\\Folder\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\WeightingType\\Definition')
 ;
 
 

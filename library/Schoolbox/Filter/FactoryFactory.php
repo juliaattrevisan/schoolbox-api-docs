@@ -16,6 +16,7 @@ use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
 use Schoolbox\Filter\Filters\Folder as FolderFilter;
 use Schoolbox\Filter\Filters\Term as TermFilter;
 use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
+use Schoolbox\Filter\Filters\WeightingType as WeightingTypeFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -67,6 +68,8 @@ class FactoryFactory
                 return $this->buildTermFilterFactory();
             case WorkTypeFilter\Definition::class:
                 return $this->buildWorkTypeFilterFactory();
+            case WeightingTypeFilter\Definition::class:
+                return $this->buildWeightingTypeFilterFactory();
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
@@ -159,6 +162,22 @@ class FactoryFactory
             $workTypeMapper
         );
     }
+
+    /**
+     * @return WeightingTypeFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    public function buildWeightingTypeFilterFactory()
+    {
+        return new WeightingTypeFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper()
+        );
+    }
+
+
 
 
     /**
