@@ -8,8 +8,6 @@
 namespace Schoolbox\Learning;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Paginator\Paginator;
-use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
