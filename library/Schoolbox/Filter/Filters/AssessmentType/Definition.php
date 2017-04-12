@@ -130,7 +130,7 @@ class Definition extends AbstractFilterDefinition
         if (self::KEY_TASK) {
             return 'Task';
         }
-        return '';
+        throw new \InvalidArgumentException("Unknown AssessmentType key: $key");
     }
 
 
