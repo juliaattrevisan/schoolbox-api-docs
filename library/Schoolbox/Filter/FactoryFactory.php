@@ -69,7 +69,7 @@ class FactoryFactory
             case WorkTypeFilter\Definition::class:
                 return $this->buildWorkTypeFilterFactory();
             case WeightingTypeFilter\Definition::class:
-                return $this->buildWeightingTypeFilterFactory();
+                return $this->buildWeightingFilterFactory();
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
@@ -167,7 +167,7 @@ class FactoryFactory
      * @return WeightingTypeFilter\Factory
      * @throws \InvalidArgumentException
      */
-    public function buildWeightingTypeFilterFactory()
+    public function buildWeightingFilterFactory()
     {
         return new WeightingTypeFilter\Factory(
             $this->getFilterMapper(),

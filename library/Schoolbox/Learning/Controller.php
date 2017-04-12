@@ -221,18 +221,24 @@ class Controller extends Base
         $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel);
         $folderRunTimeOptions = new FolderFilter\RunTimeOptions($folders);
 
+        /* TODO - Each definition defines the pages where it appears.
+         * Consider making the factoryFactory build this filterComponentCollection, passing in
+         * a single $runTimeOptions array, indexed by filterDefinition::class
+         */
 
         // Build Filter Panel Components
         $termFilterComponent     = $filterFactoryFactory->buildTermFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
         $assessmentTypeComponent = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
         $workTypeComponent       = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
         $folderComponent         = $filterFactoryFactory->buildFolderFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS, $folderRunTimeOptions);
+        $weightingComponent      = $filterFactoryFactory->buildWeightingFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
 
         // Combine components
         $filterComponents =  $filterFactoryFactory->createFilterComponentCollection([
             $termFilterComponent,
             $assessmentTypeComponent,
             $workTypeComponent,
+            $weightingComponent,
             $folderComponent,
         ]);
 
@@ -265,7 +271,6 @@ class Controller extends Base
     {
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
-
 
             $content = $this->generatePendingAssessmentReport($viewee, $filterFactoryFactory, $postFilterSelections);
 
@@ -317,6 +322,10 @@ class Controller extends Base
         $folderKeyConverter = $filterFactoryFactory->buildFolderFilterFactory()->buildKeyConverter();
         $keyConverters->offsetSet($folderKeyConverter->getFilter()->getId(), $folderKeyConverter);
 
+        // Weighting
+        $weightingKeyConverter = $filterFactoryFactory->buildWeightingFilterFactory()->buildKeyConverter();
+        $keyConverters->offsetSet($weightingKeyConverter->getFilter()->getId(), $weightingKeyConverter);
+
         // Save
         $page                = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
         $selectionsPerFilter = $this->filterSelectionMapper->updateSelections($keyConverters, $this->getUser(), $page, $postFilterSelections);
@@ -327,6 +336,7 @@ class Controller extends Base
         $selectedWorkTypes       = $workTypeKeyConverter->getSelectedItems($selectionsPerFilter[$workTypeKeyConverter->getFilter()->getId()]);
         $selectedAssessmentTypes = $assessmentTypeKeyConverter->getSelectedItems($selectionsPerFilter[$assessmentTypeKeyConverter->getFilter()->getId()]);
         $selectedFolderIds       = $folderKeyConverter->getSelectedItems($selectionsPerFilter[$folderKeyConverter->getFilter()->getId()]);
+        $selectedWeightings      = $weightingKeyConverter->getSelectedItems($selectionsPerFilter[$weightingKeyConverter->getFilter()->getId()]);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
@@ -342,6 +352,7 @@ class Controller extends Base
             $this->externalClass,
             $selectedTerms,
             $selectedWorkTypes,
+            $selectedWeightings,
             $selectedFolderIds,
             $toChaseLimit,
             $selectedAssessmentTypes,

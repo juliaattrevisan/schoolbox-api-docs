@@ -29,6 +29,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Schoolbox\Filter\Filters\WeightingType;
 
 /**
  * Optimised DB queries to build graph of Assessments a user needs to mark or chase
@@ -181,6 +182,12 @@ class PendingFactory
     private $workTypes;
 
     /**
+     * Intentionally not a GenericCollection as it contains strings
+     * @var Collection|string[]
+     */
+    private $weightingTypes;
+
+    /**
      * @var Term\Model[] $terms
      */
     private $terms;
@@ -246,6 +253,7 @@ class PendingFactory
      * @param \External_ClassInterface       $externalClass
      * @param GenericCollection|Term\Model[] $terms             Only display assessments that are due in these terms
      * @param Collection|WorkType\Model[]    $selectedWorkTypes
+     * @param Collection|string[]            $selectedWeightings
      * @param Collection                     $selectedFolderIds Not yet authorised, need to confirm user has permission
      * @param \Alaress_Date_Format           $toChaseLimit
      * @param Collection|string[]            $selectedAssessmentTypes
@@ -257,6 +265,7 @@ class PendingFactory
         \External_ClassInterface $externalClass,
         GenericCollection $terms,
         Collection $selectedWorkTypes,
+        Collection $selectedWeightings,
         Collection $selectedFolderIds,
         \Alaress_Date_Format $toChaseLimit,
         Collection $selectedAssessmentTypes,
@@ -269,6 +278,7 @@ class PendingFactory
         $this->assessmentsCache  = new GenericCollection(IAssessable::class);  // TODO SA-2631
         $this->terms             = $terms;
         $this->workTypes         = $selectedWorkTypes;
+        $this->weightingTypes    = $selectedWeightings;
         $this->selectedFolderIds = $selectedFolderIds;
         $this->toChaseLimit      = $toChaseLimit;
         $this->nullDate          = new \Alaress_Date_NullDate();
@@ -544,6 +554,37 @@ class PendingFactory
     }
 
     /**
+     * Build the assessment.weighting filter
+     * @return string
+     */
+    private function buildWeightingClause()
+    {
+        // If no weighting types are selected, don't filter
+        $select = '';
+        $where  = ' TRUE ';
+        if(0 === $this->weightingTypes->count()){
+            return [$select, $where];
+        }
+
+        // A subset of weightings is in play, apply filter
+        $select = ",
+                 a.weight                    AS 'a.weight'
+            ";
+        $where = [];
+
+        foreach($this->weightingTypes as $weightingType){
+            if(WeightingType\Definition::KEY_WEIGHTED === $weightingType){
+                $where[] = ' a.weight != 0 ';
+            } else {
+                $where[] = ' a.weight  = 0 ';
+            }
+        }
+        return [$select, implode(' OR ', $where)];
+    }
+
+
+
+    /**
      * Get Assessments associated with Classes taught, or Groups administered, by User.
      *
      * Required Data:
@@ -567,9 +608,10 @@ class PendingFactory
             return;
         }
 
-        $dueDateClause = $this->buildDueDateClause();
-        list($aTypeSelect, $aTypeJoin, $aTypeClause) = $this->buildAssessmentTypeClause();
+        $dueDateClause                                        = $this->buildDueDateClause();
+        list($aTypeSelect, $aTypeJoin, $aTypeClause)          = $this->buildAssessmentTypeClause();
         list($workTypeSelect, $workTypeJoin, $workTypeClause) = $this->buildWorkTypeClause();
+        list($weightingSelect, $weightingClause)              = $this->buildWeightingClause();
 
         $folderIds = $this->selectedFolders->keys();
 
@@ -597,6 +639,7 @@ class PendingFactory
                 
                 $aTypeSelect
                 $workTypeSelect
+                $weightingSelect
             FROM assessment a 
             $aTypeJoin
             $workTypeJoin
@@ -608,6 +651,7 @@ class PendingFactory
             AND ($aTypeClause)
             AND ($dueDateClause)
             AND ($workTypeClause)
+            AND ($weightingClause)
         ";
 
         $query2       = "
@@ -633,7 +677,7 @@ class PendingFactory
                 
                 $aTypeSelect
                 $workTypeSelect
-           
+                $weightingSelect
             FROM assessment a 
             $aTypeJoin
             $workTypeJoin
@@ -648,6 +692,7 @@ class PendingFactory
             AND ($aTypeClause)
             AND ($dueDateClause)
             AND ($workTypeClause)
+            AND ($weightingClause)
         ";
 
         $query3       = "
@@ -673,6 +718,7 @@ class PendingFactory
                 
                 $aTypeSelect
                 $workTypeSelect
+                $weightingSelect
             FROM assessment a 
 
             $aTypeJoin
@@ -691,6 +737,7 @@ class PendingFactory
             AND ($aTypeClause)
             AND ($dueDateClause)
             AND ($workTypeClause)
+            AND ($weightingClause)
         ";
 
         // Assessment in Project in UnitImpl imported on Folder
@@ -717,6 +764,7 @@ class PendingFactory
                 
                 $aTypeSelect
                 $workTypeSelect
+                $weightingSelect
             FROM assessment a 
             
             $aTypeJoin
@@ -739,6 +787,7 @@ class PendingFactory
             AND ($aTypeClause)
             AND ($dueDateClause)
             AND ($workTypeClause)
+            AND ($weightingClause)
         ";
 
         $this->parseAssessments(
