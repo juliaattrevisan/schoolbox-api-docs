@@ -59,29 +59,36 @@ getS3file() {
         curletag=`curl -I $data_source/$S3file 2>/dev/null`;
         if [ $? -eq 0 ];
         then
-            etag=`echo "$curletag" | grep ETag | cut -d'"' -f2`;
-            # If S3file_short is not set, assume same as S3file for simplicity
-            if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
-            # Auto cleanup etag cache file if actual file is missing
-            if [ ! -f $S3file_short ]; then rm -f $S3file_short.etag.cache; fi;
-            checketag=`grep $etag $S3file_short.etag.cache 2>/dev/null | wc -l`;
-            if [ $checketag -eq 0 ];
+            responsecode=`echo "$curletag" | egrep 'HTTP/(1.0|1.1|2)' | cut -d' ' -f2`;
+            if [ "$responsecode" != "200" ];
             then
-                # New/updated version available - download it
-                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file_short";
-                wget --no-verbose $data_source/$S3file -O $S3file_short 2>&1;
-                if [ $? -eq 0 ];
-                then
-                    # This is a new file, so remove old references
-                    sed -i "/$S3file_short/d" $S3file_short.etag.cache 2>/dev/null;
-                    # Add new file to etag cache
-                    echo "$etag $S3file_short" >> $S3file_short.etag.cache;
-                else
-                    # when download fails, remove bad download
-                    rm -f $S3file_short;
-                fi
+                echo "[SB][`date +%Y-%m-%d\ %X`] File unable to be retrieved (code $responsecode), using cache: $S3file";
             else
-                echo "[SB][`date +%Y-%m-%d\ %X`] File up to date: $S3file_short";
+                etag=`echo "$curletag" | grep ETag | cut -d'"' -f2`;
+                # If S3file_short is not set, assume same as S3file for simplicity
+                if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
+                # Auto cleanup etag cache file if actual file is missing
+                if [ ! -f $S3file_short ]; then rm -f $S3file_short.etag.cache; fi;
+                checketag=`grep $etag $S3file_short.etag.cache 2>/dev/null | wc -l`;
+                if [ $checketag -eq 0 ];
+                then
+                    # New/updated version available - download it
+                    echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file_short";
+                    wget --no-verbose $data_source/$S3file -O $S3file_short 2>&1;
+                    if [ $? -eq 0 ];
+                    then
+                        # This is a new file, so remove old references
+                        sed -i "/$S3file_short/d" $S3file_short.etag.cache 2>/dev/null;
+                        # Add new file to etag cache
+                        echo "$etag $S3file_short" >> $S3file_short.etag.cache;
+                    else
+                        # when download fails, remove bad download
+                        echo "[SB][`date +%Y-%m-%d\ %X`] Download failed of: $S3file_short";
+                        rm -vf $S3file_short;
+                    fi
+                else
+                    echo "[SB][`date +%Y-%m-%d\ %X`] File up to date: $S3file_short";
+                fi
             fi
         else
             echo "[SB][`date +%Y-%m-%d\ %X`] File unable to be retrieved, using cache: $S3file";
