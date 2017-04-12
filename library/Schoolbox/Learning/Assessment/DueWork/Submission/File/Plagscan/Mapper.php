@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\AccessToke
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use Schoolbox\User;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Mapper extends \Schoolbox\Mapper
 {
@@ -163,21 +164,11 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Send it to plag
          */
-        $documentId = $this->getGateway()->submit($file);
+        $plagscanId = $this->getGateway()->transmit($file);
 
         /* Plagscan death
          */
-        if (empty($documentId)) {
-            return [];
-        }
-
-        /* Otherwise, proceed normally
-         */
-        $this->getGateway()->check($documentId);
-
-        /* plagscan returned adocumentId that isn't useful?
-         */
-        if (!$documentId) {
+        if (empty($plagscanId)) {
             return [];
         }
 
@@ -191,7 +182,7 @@ class Mapper extends \Schoolbox\Mapper
         try {
             $plagscan = $this->findOneByColumn('student_submission_file_id', $file->getId(), ['cache' => false]);
         }
-        catch (\Schoolbox\Mapper\Exception $e) {
+        catch (MapperException $e) {
 
             /* No plagscan stub existed for this file
              * Spawn one and continue
@@ -201,7 +192,7 @@ class Mapper extends \Schoolbox\Mapper
             $plagscan->setCreatedAt(\Alaress_Date_Format::now());
         }
 
-        $plagscan->setPlagscanId($documentId);
+        $plagscan->setPlagscanId($plagscanId);
         $plagscan->setStatus(Plagscan::STATUS_QUEUED);
         $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
 
