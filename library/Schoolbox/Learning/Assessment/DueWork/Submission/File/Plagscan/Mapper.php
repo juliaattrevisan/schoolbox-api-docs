@@ -11,6 +11,8 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\WarpGate;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\AccessTokenGenerator;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use Schoolbox\User;
@@ -22,7 +24,7 @@ class Mapper extends \Schoolbox\Mapper
      * An instance of the Plagscan Gateway
      * which is where files end up
      * 
-     * @var Gateway
+     * @var WarpGate
      */
     private $gateway;
 
@@ -59,11 +61,16 @@ class Mapper extends \Schoolbox\Mapper
 
         $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
         $plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
+        $plagscanClientId = $this->getConfigLoader()->get('plagscan_client_id');
+
+        /* Set up access token
+         */
+        $accessToken = (new AccessTokenGenerator($plagscanClientId, $plagscanApiKey))->generate();
 
         /* If plagscan credentials exist, set up all the other stuff
          */
         if (strlen($plagscanApiKey) && strlen($plagscanUsername)) {
-            $this->setGateway(new Gateway($plagscanUsername, $plagscanApiKey));
+            $this->setGateway(new WarpGate($this->getConfigLoader(), $accessToken));
         }
     }
 
@@ -204,7 +211,7 @@ class Mapper extends \Schoolbox\Mapper
      */
 
     /**
-     * @return Gateway
+     * @return WarpGate
      */
     public function getGateway()
     {
@@ -212,7 +219,7 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * @param Gateway $gateway
+     * @param WarpGate $gateway
      * @return $this
      */
     private function setGateway($gateway)
