@@ -102,10 +102,7 @@ class WarpGate
         if ($response->getStatusCode() == 201){
             $data = $content["data"];
 
-            echo "ID: ".$data["docID"]."\n";
-            echo "Location: ".$content["location"]."\n";
-
-            return;
+            return $data['docID'];
         }
 
         throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
