@@ -70,10 +70,17 @@ class WarpGate
      */
     public function transmit(SubmissionFile $submissionFile)
     {
+        /* Check valid extensions and die early if trying
+         * to analyse an illegal file type
+         */
+        if (!$this->getValidFiles()->isPlagscannable($submissionFile->getBasename())) {
+            throw new \DomainException('Invalid file type');
+        }
+
         $filepath = $this->makeTempFile($submissionFile);
 
         if ($filepath === null) {
-            throw new \DomainException("Could not create temp file");
+            throw new \DomainException('Could not create temp file');
         }
 
         /* Temp file created, ready to transmit
