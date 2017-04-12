@@ -17,6 +17,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\ValidFiles;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use GuzzleHttp\Client;
+use Zend\Stdlib\Exception\DomainException;
 
 class WarpGate
 {
@@ -55,6 +56,7 @@ class WarpGate
      *
      * @param $configLoader
      * @param $accessToken
+     * @throws DomainException
      */
     public function __construct(IConfigLoader $configLoader, $accessToken)
     {
@@ -67,6 +69,7 @@ class WarpGate
      * Transmit a document to Plagscan
      *
      * @param SubmissionFile $submissionFile
+     * @return int
      */
     public function transmit(SubmissionFile $submissionFile)
     {
@@ -150,6 +153,7 @@ class WarpGate
      *
      * @param $plagscanId
      * @return bool
+     * @throws DomainException
      */
     public function analyse($plagscanId)
     {
@@ -185,8 +189,7 @@ class WarpGate
              * Sadly must check error strings, because plagscan
              */
             if ($content['error']['message'] == 'The document is already checked') {
-                echo 'retrieve a copy of the report';
-                return;
+                return true;
             }
 
             /* Otherwise document is one of the following and we don't need
@@ -196,6 +199,53 @@ class WarpGate
              * - currently being checked
              */
         }
+
+        /* If you ended up here, the document can't be checked for various reasons
+         * so just shove them out for logging purposes
+         */
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
+    }
+
+    /**
+     * Fetch report contents. I formatted their crappy paragraph for ease of use
+     *
+     * 0 Retrieve statistics only, such as plagiarism level, number of words, wait etc. (n.b.: wait is in ms, the report timestamp - creation timestamp, so a negative value indicates that the analysis has not started at all or finished yet.)
+     * 1 Retrieve document's plain text and report links; to list of possible plagiarism sources and in-document view of possible plagiarism sources; e.g. https://www.plagscan.com/view?6055
+     * 2 Retrieve XML with data on all possible plagiarism sources
+     * 3 Retrieve annotated Docx document (if available, depending on user configuration)
+     * 4 Retrieve HTML document with annotations
+     * 5 Retrieve HTML report of matches sorted by relevance
+     * 6 Retrieve new style (interactive) HTML document with annotations
+     * 7 Retrieve latest report type (with formatting and images) - returns URL (link gives temporary access for one hour)
+     * 8 PDF version of HTML document with annotations
+     * 9 PDF version of HTML report of matches sorted by relevance
+     *
+     * @param $plagscanId
+     * @return string
+     * @throws DomainException
+     */
+    public function fetchReport($plagscanId)
+    {
+        $postData = [
+            'access_token' => $this->getAccessToken(),
+            'mode' => 6
+        ];
+
+        $client = new Client([
+            "base_uri" => $this->getApiUrl(),
+            "timeout" => 20.0,
+            "http_errors" => false
+        ]);
+
+        $response = $client->get("documents/{$plagscanId}/retrieve", [
+            'query' => $postData
+        ]);
+
+        if ($response->getStatusCode() == 200) {
+            return $response->getBody();
+        }
+
+        $content = json_decode($response->getBody(), true);
 
         /* If you ended up here, the document can't be checked for various reasons
          * so just shove them out for logging purposes
