@@ -334,12 +334,12 @@
                         <li data-relation="member">
                             <div class="actions-small-4">
                                 <div class="selector">
-                                    <input id="delete-{USER_ID}" name="delete[]" type="checkbox" value="{USER_ID}">
-                                    <label for="delete-{USER_ID}" class="checkbox-label"></label>
+                                    <input id="delete-{MEMBER_USER_ID}" name="delete[]" type="checkbox" value="{MEMBER_USER_ID}">
+                                    <label for="delete-{MEMBER_USER_ID}" class="checkbox-label"></label>
                                 </div>
                                 <div class="list-item">
                                     <div class="card small-12">
-                                        <a href="/search/user/{USER_ID}">
+                                        <a href="/search/user/{MEMBER_USER_ID}">
                                             <!-- BEGIN show_photo -->
                                             <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
                                             <!-- END show_photo -->
@@ -358,20 +358,20 @@
                                     <!-- END make_owner -->
                                     <form action="/group/modifyForm.php" method="post" class="no-margin">
                                         <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                                        <input id="accessLevel-{USER_ID}-1" type="radio" name="accessLevel[{USER_ID}]" value="1" {READ_CHECKED} />
-                                        <label for="accessLevel-{USER_ID}-1" class="input-toggle" title="Grant Read Access">
+                                        <input id="accessLevel-{MEMBER_USER_ID}-1" type="radio" name="accessLevel[{MEMBER_USER_ID}]" value="1" {READ_CHECKED} />
+                                        <label for="accessLevel-{MEMBER_USER_ID}-1" class="input-toggle" title="Grant Read Access">
                                             <i class="icon-view"></i>
                                         </label>
-                                        <input id="accessLevel-{USER_ID}-2" type="radio" name="accessLevel[{USER_ID}]" value="2" {WRITE_CHECKED} />
-                                        <label for="accessLevel-{USER_ID}-2" class="input-toggle" title="Grant Write Access">
+                                        <input id="accessLevel-{MEMBER_USER_ID}-2" type="radio" name="accessLevel[{MEMBER_USER_ID}]" value="2" {WRITE_CHECKED} />
+                                        <label for="accessLevel-{MEMBER_USER_ID}-2" class="input-toggle" title="Grant Write Access">
                                             <i class="icon-modify"></i>
                                         </label>
-                                        <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
-                                        <label for="accessLevel-{USER_ID}-3" class="input-toggle" title="Make Admin">
+                                        <input id="accessLevel-{MEMBER_USER_ID}-3" type="radio" name="accessLevel[{MEMBER_USER_ID}]" value="3" {ADMIN_ALLOWED} />
+                                        <label for="accessLevel-{MEMBER_USER_ID}-3" class="input-toggle" title="Make Admin">
                                             <i class="icon-favourite"></i>
                                         </label>
-                                        <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
-                                        <label for="accessLevel-{USER_ID}-0" class="input-toggle" title="Remove From Group">
+                                        <input id="accessLevel-{MEMBER_USER_ID}-0" type="radio" name="accessLevel[{MEMBER_USER_ID}]" value="0" />
+                                        <label for="accessLevel-{MEMBER_USER_ID}-0" class="input-toggle" title="Remove From Group">
                                             <i class="icon-close alert"></i>
                                         </label>
                                     </form>
