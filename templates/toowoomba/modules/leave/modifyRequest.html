@@ -60,10 +60,10 @@
     <!-- BEGIN prev_pending -->
     <li><a class="icon-previous" href='/modules/leave/modify/{PREV_PENDING_ID}'><span></span>Previous Pending</a></li>
     <!-- END prev_pending -->
-    <li><a class="icon-up" href='/modules/leave/house/{USER_HOUSE_ID}'><span></span>Back to list</a></li>
+    <li><a class="icon-up" href='/modules/leave/house/{REQUEST_USER_HOUSE_ID}'><span></span>Back to list</a></li>
 </ul>
 
-<h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
+<h1>Leave Request: {REQUEST_USER_NAME}, Year {REQUEST_USER_YEAR}, {REQUEST_USER_HOUSE}</h1>
 
 <form method="post" action="/modules/leave/processModify" data-validate>
     <fieldset>
@@ -71,7 +71,7 @@
         <div class="large-6 columns">
             <dl>
                 <dt>Name</dt>
-                <dd>{USER_NAME}</dd>
+                <dd>{REQUEST_USER_NAME}</dd>
             </dl>
         </div>
         <div class="large-6 columns">
