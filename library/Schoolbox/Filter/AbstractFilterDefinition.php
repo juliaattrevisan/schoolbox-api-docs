@@ -262,7 +262,9 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
     /**
      * Return the ordered, hard-codes list of custom keys for this filter.
-     * These may represent abstract concepts, eg 'all', 'past' etc, or concrete items, like '1' => Project, '2' => Quiz
+     *
+     * These may represent abstract concepts, eg 'all', 'past', '1' => Project, '2' => Quiz
+     * They do not include those abstract keys that relate to concrete items, eg '1' => Term(2017)
      *
      * @return string[]
      */

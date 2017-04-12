@@ -80,7 +80,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
 
     /**
-     * Order(N) traversal to returns whether the collection contains
+     * Order(N) traversal to return whether the collection contains
      * the specified item using strict comparison.
      *
      * If the collection contains primitives, then they must be same value + type
@@ -911,7 +911,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     /**
      * Creates a shallow clone of this collection.
      *
-     * Enables preservation of indexing and sort order, but non-duplication of items.
+     * Enables preservation of indexing and sort order, but does
+     * not duplicate/clone objects in collection
      *
      * @return static
      */
