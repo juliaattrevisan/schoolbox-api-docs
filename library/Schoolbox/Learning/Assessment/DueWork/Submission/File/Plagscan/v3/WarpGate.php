@@ -247,11 +247,11 @@ class WarpGate
             'query' => $postData
         ]);
 
+        $content = json_decode($response->getBody());
+
         if ($response->getStatusCode() == 200) {
             return $response->getBody();
         }
-
-        $content = json_decode($response->getBody());
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
@@ -259,11 +259,18 @@ class WarpGate
         throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
     }
 
-    public function fetchScore($plagscanId, $mode)
+    /**
+     * Have to et the score separately -_-
+     *
+     * @param $plagscanId
+     * @return string
+     * @throws DomainException
+     */
+    public function fetchScore($plagscanId)
     {
         $postData = [
             'access_token' => $this->getAccessToken(),
-            'mode' => $mode
+            'mode' => 0
         ];
 
         $client = new Client([
@@ -276,11 +283,11 @@ class WarpGate
             'query' => $postData
         ]);
 
-        if ($response->getStatusCode() == 200) {
-            return $response->getBody();
-        }
-
         $content = json_decode($response->getBody());
+
+        if ($response->getStatusCode() == 200) {
+            return $content->data->level;
+        }
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
