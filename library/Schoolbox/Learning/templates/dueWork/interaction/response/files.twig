@@ -4,7 +4,14 @@
             <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
             <p>{{ currentFile.filename }}</p>
 
-            {% include '@learning/dueWork/plagscan/status.twig' with {currentFile: currentFile, plagscanEnabled: plagscanEnabled} %}
+            {% include '@learning/dueWork/plagscan/status.twig' with {
+                currentFile: currentFile,
+                plagscanEnabled: plagscanEnabled,
+                assessment: assessment,
+                assessmentId: assessmentId,
+                response: response,
+                plagscanId: plagscanId
+            } only %}
         </a>
     </div>
 </div>

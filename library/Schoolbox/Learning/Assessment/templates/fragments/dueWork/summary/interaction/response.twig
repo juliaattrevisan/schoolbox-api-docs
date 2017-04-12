@@ -52,7 +52,12 @@
     <ul class="information-list">
         {% for currentFile in currentInteraction.allFiles %}
         <li class="actions-small-1">
-            {% include '@learning/dueWork/interaction/response/files.twig' %}
+            {% include '@learning/dueWork/interaction/response/files.twig' with {
+                assessment: currentInteraction.assessable,
+                assessmentId: currentInteraction.assessable.id,
+                response: currentInteraction,
+                plagscanId: currentFile.plagscan.plagscanId
+            } %}
         </li>
         {% endfor %}
     </ul>
