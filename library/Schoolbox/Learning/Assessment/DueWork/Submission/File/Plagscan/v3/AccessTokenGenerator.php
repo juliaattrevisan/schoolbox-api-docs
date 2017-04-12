@@ -56,6 +56,8 @@ class AccessTokenGenerator
          * an access token, a curl request must be sent to plag
          */
 
+        /* TODO:  Can use guzzle instead of alaress curl url
+         */
         $curl = new \Alaress_Curl_Url($this->getTokenUrl());
 
         $postfields = array(
