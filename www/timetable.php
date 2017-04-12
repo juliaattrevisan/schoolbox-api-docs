@@ -127,9 +127,9 @@ foreach ($userList as $user) {
                 /* Only display subnav elements for timetables that contain data
                  */
                 $this->setVar([
-                    'PERSON'      => $user->formatName(),
-                    'YEAR'        => $user->getYear() ? ', Year ' . $user->getYear() : '',
-                    'USER_ID'     => $user->getId(),
+                    'TIMETABLE_PERSON'      => $user->formatName(),
+                    'TIMETABLE_YEAR'        => $user->getYear() ? ', Year ' . $user->getYear() : '',
+                    'TIMETABLE_USER_ID'     => $user->getId(),
                     'CAMPUS_ID'   => $campus->getId(),
                     'CAMPUS_CODE' => $campus->getExtTimetableCode(),
                     'CAMPUS_NAME' => $campus->getName(),
