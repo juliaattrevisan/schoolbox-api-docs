@@ -22,7 +22,7 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * All AssessmentTypes known to the system (regardless of whether they are available)
      *
-     * @var Collection|string
+     * @var Collection|string[]
      */
     private $assessmentTypes;
 
