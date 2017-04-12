@@ -418,6 +418,7 @@ class Controller extends Base
         $user->setLocalEmail(!empty($post['local_email']));
         $user->setUseInternalMail(!empty($post['mail_handler']));
         $user->setWebmail(!empty($post['webmail']));
+        $user->setDisplayGradeAverage(!empty($post['display_grade_average']));
         $user->setSuperuser(isset($post['superuser']));
         $user->setUsername($post['modusername']);
 
