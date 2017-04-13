@@ -15,9 +15,12 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Gateway as PlagscanGateway;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Callback
 {
@@ -37,28 +40,58 @@ class Callback
 
     /**
      * Executed when callback from PlagScan is triggered, and requests the report from PlagScan
-     * @param $documentId
+     * Performs the same kind of stuff as scan.php
+     *
+     * @param $plagscanId
      * @return bool
      */
-    public function notifyComplete($documentId)
+    public function notifyComplete($plagscanId)
     {
+        /* Plagscan not configured - nothing to do
+         */
+        if (!$this->getMapper()->getGateway()) {
+            return false;
+        }
+
         try {
             /* @var $document Plagscan */
-            $document = $this->getMapper()->findOneByColumn('plagscan_id', $documentId);
+            $currentDocument = $this->getMapper()->findOneByColumn('plagscan_id', $plagscanId);
 
-            if (!($document instanceof Plagscan)) {
-                return false;
-            }
+            /** @var StudentSubmissionFile $studentSubmissionFile */
+            $studentSubmissionFile = StudentSubmissionFileMapper::getInstance()->findById($currentDocument->getStudentSubmissionFileId());
 
-            $plagscanStat = $this->getMapper()->getGateway()->retrieve($documentId, PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
-            $plagscanHtml = $this->getMapper()->getGateway()->retrieve($documentId, PlagscanGateway::MODE_RETRIEVE_HTML_INTERACTIVE);
+            /* Convert to new format
+             */
+            $submissionFile = new SubmissionFile();
+            $submissionFile->setStorage($studentSubmissionFile->getStorage());
 
-            $document->setScore($plagscanStat->LEVEL / 10);
-            $document->setStatus(Plagscan::STATUS_COMPLETE);
-            $document->setHtml($plagscanHtml);
+            /* Make a somewhat infamous assumption that plagscan completed its stuff
+             * which is the only reason we'd be running this Callback
+             */
+            $reportContents = $this->getMapper()->getGateway()->fetchReport($currentDocument->getPlagscanId());
+            $score = $this->getMapper()->getGateway()->fetchScore($currentDocument->getPlagscanId());
 
-            $this->getMapper()->save($document);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* Update the db with the report contents for this document
+             */
+            $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
+            $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
+            $currentDocument->setScore($score);
+            $currentDocument->setHtml($reportContents);
+            $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+            $this->getMapper()->save($currentDocument);
+        }
+        catch (\DomainException $e) {
+
+            /* Some kind of plagscan error occurred - perhaps log it?
+             * noop
+             */
+            return false;
+        }
+        catch (MapperException $e) {
+
+            /* Plagscan record not found - perhaps log it?
+             * noop
+             */
             return false;
         }
 
