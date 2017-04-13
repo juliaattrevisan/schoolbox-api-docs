@@ -4,13 +4,14 @@
         id     (string) used as the element ID
         list   (string; html) the block content that will be injected
 #}
-
-<ul class="flex-list flex-wrap buttons">
-    {{- list -}}
-    <li class="overflow">
-        <a class="icon-more" data-options="align:top;" data-dropdown="{{ id }}" title="Actions"></a>
-        <ul class="f-dropdown drop-top" id="{{ id }}" data-dropdown-content>
-            {{- list -}}
-        </ul>
-    </li>
-</ul>
+<div class="hide-for-small-only">
+    <ul class="flex-list flex-wrap buttons">
+        {{- list -}}
+    </ul>
+</div>
+<div class="show-for-small-only">
+    <a class="button icon-more expand" data-options="align:top;" data-dropdown="{{ id }}" title="Actions">Options</a>
+    <ul class="f-dropdown drop-top" id="{{ id }}" data-dropdown-content>
+        {{- list -}}
+    </ul>
+</div>

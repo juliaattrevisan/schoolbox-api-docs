@@ -45,7 +45,7 @@ These are its args, which is given for you
 </ul>
 
 <div class="row">
-    <div class="small-4 column text-center meta-preview">
+    <div class="small-6 medium-4 column text-center meta-preview">
         {% if file.mimetype.isImage %}
             <a data-plugin="preview" href="{{ send ~ file.id }}&width=1024&height=1024">
                 <img class="icon" src="{{ image ~ file.id }}&width=256&height=256" alt="{{ file.title }}" />
@@ -73,7 +73,7 @@ These are its args, which is given for you
             </a>
         {% endif %}
     </div>
-    <div class="small-8 column">
+    <div class="small-6 medium-8 column">
         <h3><a href="{{ send ~ file.id }}" target="_blank">{{ file.title }}</a><span class="hint has-tip" data-reveal-id="modal-file-{{ file.id }}" title="View file information">?</span></h3>
         {% if namespace == 'resourceBrowser' and file.description %}
             <p>{{ file.description }}</p>
