@@ -408,11 +408,27 @@ Usage:
 
     #filter_panel .label{
         cursor: default;
-        margin-bottom: 0;
+        margin-bottom: 8px;
     }
 
     #filter_panel .label .close:hover{
         color: red;
+    }
+
+    #submit_button{
+        width: auto;
+        min-width: 150px;
+        right: 1rem;
+        top: -3px;
+        float: right;
+        margin: 0 -1rem 0 0;
+    }
+    #applied_filters{
+        display: inline-block;
+    }
+
+    #panel-summary{
+        margin: 0;
     }
 
 </style>
@@ -423,11 +439,11 @@ Usage:
     <div class="small-12 island" id="filter_panel">
         <section>
             <fieldset class="content">
-                <legend data-collapser="panel-components" class="icon-down-arrow columns">
-                    <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Filters: <span data-applied-filters></span>
-
+                <legend id="panel-summary" data-collapser="panel-components" class="icon-down-arrow columns">
                     {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
-                    <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ..." style="width: auto; min-width: 150px; right: 1rem; position: absolute; top: -3px;">
+                    <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ...">
+
+                    <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Filters: <span id="applied_filters" data-applied-filters></span>
                 </legend>
             </fieldset>
 
