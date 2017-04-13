@@ -201,6 +201,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 html += '<ul class="small-12 information-list expandable-card">';
                 for (var i = 0; i < data.students.length; i++) {
                     html += '<li>';
+                    html += '<div>';
                     html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
                     html += '<div class="card small-12">';
                     html += '<a href="/search/user/' + data.students[i].id + '">';
@@ -208,6 +209,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
                     html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
                     html += '</a>';
+                    html += '</div>';
                     html += '</div>';
                     html += '<div class="small-12 column" data-collapse-state="collapsed" data-collapsable="collap-' + i + '" style="display: none;">';
                     html += '<table class="assessment-list">';
