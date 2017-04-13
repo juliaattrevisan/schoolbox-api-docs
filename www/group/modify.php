@@ -187,7 +187,7 @@ if (is_numeric($this->arg[0])) {
             $output = array(
                 'USER_NAME'           => $userHandler->formatName($member),
                 'USER_JAVA'           => addslashes($userHandler->formatName($member)),
-                'USER_ID'             => $member['uid'],
+                'MEMBER_USER_ID'      => $member['uid'],
                 'USER_EXTERNAL_ID'    => Scrub::text($member['synergy_id']),
                 'GROUP_CHECKED'       => $member['type'] > 1 ? 'checked=\'checked\'' : '',
                 'READ_SELECTED'       => $member['type'] == UserAccess::ACCESS_READ ? 'selected' : '',

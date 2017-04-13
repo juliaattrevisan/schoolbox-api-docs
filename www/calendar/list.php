@@ -69,9 +69,9 @@ $this->setVar(
 
 $this->setVar(
     array(
-        'USER_ID'                   => $user->getId(),
-        'USER_TOKEN'                => $user->getKey(),
-        'USER_FULLNAME'             => $user->getFullname(),
+        'CALENDAR_USER_ID'                   => $user->getId(),
+        'CALENDAR_USER_TOKEN'                => $user->getKey(),
+        'CALENDAR_USER_FULLNAME'             => $user->getFullname(),
         'CALENDAR_PARAMS'           => "{$start->getURLDate()}/{$user->getId()}",
         'SELECTED_START'            => $start->getLocalShort(),
         'SELECTED_FINISH'           => $finish->getLocalShort(),
