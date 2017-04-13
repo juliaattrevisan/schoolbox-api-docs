@@ -223,10 +223,12 @@ class WarpGate
      */
     public function fetchReport($plagscanId)
     {
-        $response = $this->retrieve($plagscanId, 6);
+        $response = $this->retrieve($plagscanId, 7);
 
+        /* Save the report url
+         */
         if ($response->getStatusCode() == 200) {
-            return $response->getBody();
+            return json_decode($response->getBody())->data->reportlink;
         }
 
         $content = json_decode($response->getBody());
