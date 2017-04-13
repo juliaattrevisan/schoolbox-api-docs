@@ -6,13 +6,13 @@
 
     {% if context is folder %}
         {{ crumbs.basic(
-            [ context.folder.name,    '/homepage/' ~ context.folder.id ]
+            [ context.folder.title,    '/homepage/' ~ context.folder.id ]
         ) }}
     {% elseif context is unitImplementation %}
         {{ crumbs.basic(
             [ context.course.specification.folder.name,    '/homepage/' ~ context.course.specification.folder.id ],
             [ context.specification.folder.name,    '/homepage/' ~ context.specification.folder.id ],
-            [ context.course.folder.name,    '/homepage/' ~ context.course.folder.id ]
+            [ context.course.folder.title,    '/homepage/' ~ context.course.folder.id ]
         ) }}
     {% elseif context is project %}
 
@@ -20,14 +20,14 @@
 
         {% if projectContext is folder %}
             {{ crumbs.basic(
-                [ projectContext.folder.name,    '/homepage/' ~ projectContext.folder.id ],
+                [ projectContext.folder.title,    '/homepage/' ~ projectContext.folder.id ],
                 [ context.title, routeLookup('learningAssessment.getStatus', { assessmentId: context.id }) ]
             ) }}
         {% elseif projectContext is unitImplementation %}
             {{ crumbs.basic(
                 [ projectContext.course.specification.folder.name,    '/homepage/' ~ projectContext.course.specification.folder.id ],
                 [ projectContext.specification.folder.name,    '/homepage/' ~ projectContext.specification.folder.id ],
-                [ projectContext.course.folder.name,    '/homepage/' ~ projectContext.course.folder.id ],
+                [ projectContext.course.folder.title,    '/homepage/' ~ projectContext.course.folder.id ],
                 [ context.title, routeLookup('learningAssessment.getStatus', { assessmentId: context.id }) ]
             ) }}
         {% endif %}
