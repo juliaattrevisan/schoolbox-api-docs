@@ -32,38 +32,6 @@ use Schoolbox\User;
 class FactoryFactory
 {
 
-    /**
-     * Builds a filter panel for the specified user and page, which submits selections to the specified route
-     * @param User   $user
-     * @param string $page
-     * @param string $route
-     * @param array  $runTimeOptions Indexed by filter definition class
-     * @return Panel
-     * @throws \InvalidArgumentException
-     */
-    public function buildPanel(User $user, $page, $route, array $runTimeOptions = [])
-    {
-        $allFilters = $this->getFilterMapper()->findAll();
-
-        $filterComponents = $this->createFilterComponentCollection();
-
-        foreach($allFilters as $filter){
-            /** @var string|IFilterDefinition $definitionClass */
-            $definitionClass = $filter->getClass();
-
-            // Does this filter appear on the specified page?
-            if(in_array($page, $definitionClass::getPages(), true)){
-                $filterFactory = $this->buildFilterFactoryForFilter($definitionClass);
-                $component = $filterFactory->buildComponent($user, $page, $runTimeOptions[$definitionClass]);
-                $filterComponents->add($component);
-            }
-        }
-
-        return new Panel($route, $filterComponents);
-    }
-
-
-
     /** @var MapperFactory */
     private $mapperFactory;
 
@@ -109,10 +77,85 @@ class FactoryFactory
 
 
     /**
+     * Build a set of key converters for the specified page
+     *
+     * @param string $page
+     * @return IKeyConverter[]|GenericCollection Indexed by filter.id
+     * @throws \InvalidArgumentException
+     */
+    public function buildKeyConverters($page)
+    {
+        $keyConverters = $this->createKeyConverterCollection();
+
+        foreach ($this->getFilterMapper()->findAll() as $filter) {
+
+            /** @var IFilterDefinition $class */
+            $class = $filter->getClass();
+
+            // Does this filter appear on the specified page?
+            if (in_array($page, $class::getPages(), true)) {
+                $filterFactory = $this->buildFilterFactoryForFilter($class);
+                $keyConverter  = $filterFactory->buildKeyConverter($filter);
+                $keyConverters->offsetSet($filter->getId(), $keyConverter);
+            }
+        }
+        return $keyConverters;
+    }
+
+
+    /**
+     * Get the set of filters that are implemented by the specified page
+     *
+     * @param string $page
+     * @return string[]|IFilterDefinition[]
+     * @throws \InvalidArgumentException
+     */
+    private function getDefinitions($page)
+    {
+        $allFilters        = $this->getFilterMapper()->findAll();
+        $definitionClasses = [];
+        foreach ($allFilters as $filter) {
+            /** @var string|IFilterDefinition $definitionClass */
+            $definitionClass = $filter->getClass();
+
+            // Does this filter appear on the specified page?
+            if (in_array($page, $definitionClass::getPages(), true)) {
+                $definitionClasses[] = $definitionClass;
+            }
+        }
+        return $definitionClasses;
+    }
+
+
+    /**
+     * Builds a filter panel for the specified user and page, which submits selections to the specified route
+     *
+     * @param User   $user
+     * @param string $page
+     * @param string $route
+     * @param array  $runTimeOptions Indexed by filter definition class
+     * @return Panel
+     * @throws \InvalidArgumentException
+     */
+    public function buildPanel(User $user, $page, $route, array $runTimeOptions = [])
+    {
+        $filterComponents = $this->createFilterComponentCollection();
+
+        foreach ($this->getDefinitions($page) as $className) {
+            $filterFactory = $this->buildFilterFactoryForFilter($className);
+            $component     = $filterFactory->buildComponent($user, $page, $runTimeOptions[$className]);
+            $filterComponents->add($component);
+        }
+
+        return new Panel($route, $filterComponents);
+    }
+
+
+    /**
      * @param null|IFilterComponent[] $contents
      * @return GenericCollection|IFilterComponent[]
      */
-    public function createFilterComponentCollection(array $contents = [])
+    private function createFilterComponentCollection(array $contents = [])
     {
         return new GenericCollection(IFilterComponent::class, $contents);
     }
@@ -122,7 +165,7 @@ class FactoryFactory
      * @param null|IKeyConverter[] $contents
      * @return GenericCollection|IKeyConverter[]
      */
-    public function createKeyConverterCollection(array $contents = [])
+    private function createKeyConverterCollection(array $contents = [])
     {
         return new GenericCollection(IKeyConverter::class, $contents);
     }
@@ -132,7 +175,7 @@ class FactoryFactory
      * @return AssessmentTypeFilter\Factory
      * @throws \InvalidArgumentException
      */
-    public function buildAssessmentTypeFilterFactory()
+    private function buildAssessmentTypeFilterFactory()
     {
         return new AssessmentTypeFilter\Factory(
             $this->getFilterMapper(),
@@ -147,7 +190,7 @@ class FactoryFactory
      * @return FolderFilter\Factory
      * @throws \InvalidArgumentException
      */
-    public function buildFolderFilterFactory()
+    private function buildFolderFilterFactory()
     {
         /** @var Folder\Mapper $folderMapper */
         $folderMapper = $this->mapperFactory->get(Folder\Mapper::class);
@@ -165,7 +208,7 @@ class FactoryFactory
      * @return TermFilter\Factory
      * @throws \InvalidArgumentException
      */
-    public function buildTermFilterFactory()
+    private function buildTermFilterFactory()
     {
         /** @var Term\Mapper $termMapper */
         $termMapper = $this->mapperFactory->get(Term\Mapper::class);
@@ -183,7 +226,7 @@ class FactoryFactory
      * @return WorkTypeFilter\Factory
      * @throws \InvalidArgumentException
      */
-    public function buildWorkTypeFilterFactory()
+    private function buildWorkTypeFilterFactory()
     {
         /** @var WorkType\Mapper $workTypeMapper */
         $workTypeMapper = $this->mapperFactory->get(WorkType\Mapper::class);
@@ -196,11 +239,12 @@ class FactoryFactory
         );
     }
 
+
     /**
      * @return WeightingTypeFilter\Factory
      * @throws \InvalidArgumentException
      */
-    public function buildWeightingFilterFactory()
+    private function buildWeightingFilterFactory()
     {
         return new WeightingTypeFilter\Factory(
             $this->getFilterMapper(),
@@ -209,8 +253,6 @@ class FactoryFactory
             $this->getFilterSelectionMapper()
         );
     }
-
-
 
 
     /**

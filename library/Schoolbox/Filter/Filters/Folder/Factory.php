@@ -116,13 +116,11 @@ class Factory extends AbstractFilterFactory
 
 
     /**
-     * Returns a key converter, able to convert between concrete keys and the entities they represent
-     *
+     * @inheritdoc
      * @return KeyConverter
      */
-    public function buildKeyConverter()
+    public function buildKeyConverter(Filter\Model $filter)
     {
-        $filter    = $this->getFilterMapper()->findByClass(Definition::class);
         $folderIds = (new Collection($this->folderMapper->findAllIds()))->indexByCallback(function ($folderId) {
             return $folderId;
         });

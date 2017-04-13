@@ -44,7 +44,8 @@ interface IFilterFactory
     /**
      * Returns a key converter, able to convert between concrete keys and the entities they represent
      *
+     * @param Filter\Model $filter
      * @return IKeyConverter
      */
-    public function buildKeyConverter();
+    public function buildKeyConverter(Filter\Model $filter);
 }

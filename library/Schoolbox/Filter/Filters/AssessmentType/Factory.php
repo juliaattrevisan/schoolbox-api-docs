@@ -63,11 +63,11 @@ class Factory extends AbstractFilterFactory
 
 
     /**
+     * @inheritdoc
      * @return KeyConverter
      */
-    public function buildKeyConverter()
+    public function buildKeyConverter(Filter\Model $filter)
     {
-        $filter = $this->getFilterMapper()->findByClass(Definition::class);
         return new KeyConverter($filter, $this->getAssessmentTypes());
     }
 

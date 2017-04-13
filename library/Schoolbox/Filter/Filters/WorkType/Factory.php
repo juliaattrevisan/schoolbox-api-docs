@@ -74,11 +74,11 @@ class Factory extends AbstractFilterFactory
     /**
      * Returns a key converter, able to convert between keys (workType.id) and the entities they represent (WorkTypes)
      *
+     * @inheritdoc
      * @return KeyConverter
      */
-    public function buildKeyConverter()
+    public function buildKeyConverter(Filter\Model $filter)
     {
-        $filter = $this->getFilterMapper()->findByClass(Definition::class);
         return new KeyConverter($filter, $this->getWorkTypes());
     }
 

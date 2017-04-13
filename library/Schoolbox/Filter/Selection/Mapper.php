@@ -45,7 +45,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param string                                   $page
      * @param bool[][]                                 $filterSelectionsArray Indexed by filter.id, selection.key
      * @throws \InvalidArgumentException If a posted selection.key is invalid
-     * @return Model[][]  Grouped by filter.id, then indexed by selection.key
+     * @return Collection|GenericCollection[]|Model[][]  Grouped by filter.id, then indexed by selection.key
      */
     public function updateSelections(GenericCollection $keyConverters, User $user, $page, array $filterSelectionsArray = [])
     {

@@ -188,7 +188,7 @@ class PendingFactory
     private $weightingTypes;
 
     /**
-     * @var Term\Model[] $terms
+     * @var Collection|Term\Model[] $terms
      */
     private $terms;
 
@@ -251,7 +251,7 @@ class PendingFactory
      * @param User                           $viewee
      * @param IConnector                     $database
      * @param \External_ClassInterface       $externalClass
-     * @param GenericCollection|Term\Model[] $terms             Only display assessments that are due in these terms
+     * @param Collection|Term\Model[]        $terms             Only display assessments that are due in these terms
      * @param Collection|WorkType\Model[]    $selectedWorkTypes
      * @param Collection|string[]            $selectedWeightings
      * @param Collection                     $selectedFolderIds Not yet authorised, need to confirm user has permission
@@ -263,7 +263,7 @@ class PendingFactory
         User $viewee,
         IConnector $database,
         \External_ClassInterface $externalClass,
-        GenericCollection $terms,
+        Collection $terms,
         Collection $selectedWorkTypes,
         Collection $selectedWeightings,
         Collection $selectedFolderIds,

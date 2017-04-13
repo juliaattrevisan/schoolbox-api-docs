@@ -47,6 +47,10 @@ use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Folder as FolderFilter;
+use Schoolbox\Filter\Filters\Term as TermFilter;
+use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
+use Schoolbox\Filter\Filters\WeightingType as WeightingFilter;
+use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
 
 class Controller extends Base
 {
@@ -286,40 +290,19 @@ class Controller extends Base
         Filter\FactoryFactory $filterFactoryFactory,
         array $postFilterSelections
     ) {
-        // What filters are in use on this page? Get their key converters
-        $keyConverters = $filterFactoryFactory->createKeyConverterCollection();
+        $user = $this->getUser();
+        $page = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
 
-        // Term Filter
-        $termKeyConverter = $filterFactoryFactory->buildTermFilterFactory()->buildKeyConverter();
-        $keyConverters->offsetSet($termKeyConverter->getFilter()->getId(), $termKeyConverter);
+        $keyConverters        = $filterFactoryFactory->buildKeyConverters($page);
+        $selectionsPerFilter  = $this->filterSelectionMapper->updateSelections($keyConverters, $user, $page, $postFilterSelections);
+        $selectionTransformer = new Filter\Transformer($keyConverters, $selectionsPerFilter);
 
-        // AssessmentType Filter
-        $assessmentTypeKeyConverter = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildKeyConverter();
-        $keyConverters->offsetSet($assessmentTypeKeyConverter->getFilter()->getId(), $assessmentTypeKeyConverter);
-
-        // WorkType Filter
-        $workTypeKeyConverter = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildKeyConverter();
-        $keyConverters->offsetSet($workTypeKeyConverter->getFilter()->getId(), $workTypeKeyConverter);
-
-        // FolderFilter
-        $folderKeyConverter = $filterFactoryFactory->buildFolderFilterFactory()->buildKeyConverter();
-        $keyConverters->offsetSet($folderKeyConverter->getFilter()->getId(), $folderKeyConverter);
-
-        // Weighting
-        $weightingKeyConverter = $filterFactoryFactory->buildWeightingFilterFactory()->buildKeyConverter();
-        $keyConverters->offsetSet($weightingKeyConverter->getFilter()->getId(), $weightingKeyConverter);
-
-        // Save
-        $page                = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
-        $selectionsPerFilter = $this->filterSelectionMapper->updateSelections($keyConverters, $this->getUser(), $page, $postFilterSelections);
-
-
-        // Get selections, defaulting to full possible set if filter not present in panel (ie disabled by admin)
-        $selectedTerms           = $termKeyConverter->getSelectedItems($selectionsPerFilter[$termKeyConverter->getFilter()->getId()]);
-        $selectedWorkTypes       = $workTypeKeyConverter->getSelectedItems($selectionsPerFilter[$workTypeKeyConverter->getFilter()->getId()]);
-        $selectedAssessmentTypes = $assessmentTypeKeyConverter->getSelectedItems($selectionsPerFilter[$assessmentTypeKeyConverter->getFilter()->getId()]);
-        $selectedFolderIds       = $folderKeyConverter->getSelectedItems($selectionsPerFilter[$folderKeyConverter->getFilter()->getId()]);
-        $selectedWeightings      = $weightingKeyConverter->getSelectedItems($selectionsPerFilter[$weightingKeyConverter->getFilter()->getId()]);
+        // Get selections, defaulting to full possible set if filter not present in panel (ie if disabled by admin)
+        $selectedTerms           = $selectionTransformer->getSelectedItems(TermFilter\Definition::class);
+        $selectedWorkTypes       = $selectionTransformer->getSelectedItems(WorkTypeFilter\Definition::class);
+        $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentTypeFilter\Definition::class);
+        $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderFilter\Definition::class);
+        $selectedWeightings      = $selectionTransformer->getSelectedItems(WeightingFilter\Definition::class);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
