@@ -99,7 +99,7 @@ class Controller extends BaseController
         $existingOptions = $optionMapper->findByColumn('filter_id', $definition->getFilter()->getId());
 
         foreach ($existingOptions as $option) {
-            if (!in_array($option->getPage(), $definition->getPages(), true) || !in_array($option->getKey(), $definition->getAbstractKeys(), true)) {
+            if (!in_array($option->getPage(), $definition::getPages(), true) || !in_array($option->getKey(), $definition->getAbstractKeys(), true)) {
                 $optionsToDelete->add($option);
             }
         }
@@ -115,7 +115,7 @@ class Controller extends BaseController
 
         // Examine all possible options
         foreach ($definition->getAbstractKeys() as $key) {
-            foreach ($definition->getPages() as $page) {
+            foreach ($definition::getPages() as $page) {
 
                 // Does this option exist ?
                 $filterOption = $existingOptionsByKeyThenPage[$key][$page];

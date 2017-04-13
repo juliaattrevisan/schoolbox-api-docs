@@ -7,11 +7,10 @@
 
 namespace Schoolbox\Filter;
 
-use PDOStatement;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception as MapperException;
 
 /**
+ * @method GenericCollection|Model[] findAll($options = [])
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  */

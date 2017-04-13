@@ -21,6 +21,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 
 /**
@@ -30,6 +31,38 @@ use Schoolbox\Resource\Folder;
  */
 class FactoryFactory
 {
+
+    /**
+     * Builds a filter panel for the specified user and page, which submits selections to the specified route
+     * @param User   $user
+     * @param string $page
+     * @param string $route
+     * @param array  $runTimeOptions Indexed by filter definition class
+     * @return Panel
+     * @throws \InvalidArgumentException
+     */
+    public function buildPanel(User $user, $page, $route, array $runTimeOptions = [])
+    {
+        $allFilters = $this->getFilterMapper()->findAll();
+
+        $filterComponents = $this->createFilterComponentCollection();
+
+        foreach($allFilters as $filter){
+            /** @var string|IFilterDefinition $definitionClass */
+            $definitionClass = $filter->getClass();
+
+            // Does this filter appear on the specified page?
+            if(in_array($page, $definitionClass::getPages(), true)){
+                $filterFactory = $this->buildFilterFactoryForFilter($definitionClass);
+                $component = $filterFactory->buildComponent($user, $page, $runTimeOptions[$definitionClass]);
+                $filterComponents->add($component);
+            }
+        }
+
+        return new Panel($route, $filterComponents);
+    }
+
+
 
     /** @var MapperFactory */
     private $mapperFactory;

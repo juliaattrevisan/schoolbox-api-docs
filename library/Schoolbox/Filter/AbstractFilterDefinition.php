@@ -51,7 +51,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      */
     public function getOptions($pageFilter = null)
     {
-        $validPages = $this->getPages();
+        $validPages = static::getPages();
 
         // Did we specify a page, and the page is not in the valid pages?
         if ($pageFilter && !in_array($pageFilter, $validPages, true)) {
@@ -208,7 +208,7 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
         // Ensure the pages are sorted as defined by the filter definition
         $sortedOptionsPerPage = new Collection();
-        foreach ($this->getPages() as $page) {
+        foreach (static::getPages() as $page) {
             if ($pageFilter && $pageFilter !== $page) {
                 continue;
             }

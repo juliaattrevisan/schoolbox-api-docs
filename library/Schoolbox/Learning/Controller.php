@@ -214,36 +214,19 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
-
         // Generate a list of classes/groups that the viewee teaches
-        $getSubjects = true;
-        $groupAccessLevel = UserAccess::ACCESS_WRITE;
-        $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel);
+        $getSubjects          = true;
+        $groupAccessLevel     = UserAccess::ACCESS_WRITE;
+        $folders              = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel);
         $folderRunTimeOptions = new FolderFilter\RunTimeOptions($folders);
 
-        /* TODO - Each definition defines the pages where it appears.
-         * Consider making the factoryFactory build this filterComponentCollection, passing in
-         * a single $runTimeOptions array, indexed by filterDefinition::class
-         */
-
-        // Build Filter Panel Components
-        $termFilterComponent     = $filterFactoryFactory->buildTermFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
-        $assessmentTypeComponent = $filterFactoryFactory->buildAssessmentTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
-        $workTypeComponent       = $filterFactoryFactory->buildWorkTypeFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
-        $folderComponent         = $filterFactoryFactory->buildFolderFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS, $folderRunTimeOptions);
-        $weightingComponent      = $filterFactoryFactory->buildWeightingFilterFactory()->buildComponent($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS);
-
-        // Combine components
-        $filterComponents =  $filterFactoryFactory->createFilterComponentCollection([
-            $termFilterComponent,
-            $assessmentTypeComponent,
-            $workTypeComponent,
-            $weightingComponent,
-            $folderComponent,
-        ]);
+        // All run-time (as opposed to hard-coded and dynamic) options, indexed by filter definition class
+        $runTimeOptions= [
+            FolderFilter\Definition::class => $folderRunTimeOptions,
+        ];
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
-        $filterPanel = new Filter\Panel($route, $filterComponents);
+        $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS, $route, $runTimeOptions);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
             'viewee'      => $viewee,

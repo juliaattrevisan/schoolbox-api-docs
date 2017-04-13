@@ -67,7 +67,7 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    public function getPages()
+    public static function getPages()
     {
         return [
             Option\Model::PAGE_PENDING_ASSESSMENTS,

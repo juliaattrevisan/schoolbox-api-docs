@@ -94,7 +94,7 @@ interface IFilterDefinition
      * @see FilterOption::PAGE_* constants
      * @return string[]
      */
-    public function getPages();
+    public static function getPages();
 
 
     /**
