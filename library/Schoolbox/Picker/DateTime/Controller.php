@@ -57,7 +57,7 @@ class Controller extends Base
      * @param string $value Default date to display
      */
     public function getPicker($type, $element, $id, $value) {
-        $timetable = $this->getTimetable();
+        $timetable = $this->getUserTimetable();
         $terms = $this->getTerms();
         try {
             $dateObject = new Alaress_Date_Format($value, array('d/m/Y g:ia', 'd/m/Y'));
@@ -117,7 +117,7 @@ class Controller extends Base
     /**
      * Return an array of all timetables and campus data
      */
-    public function getTimetable() {
+    public function getUserTimetable() {
         $user = $this->getUser();
 
         $timetable = array();
@@ -152,30 +152,31 @@ class Controller extends Base
     }
 
     /**
-     * Return a first timetable day for a term
+     * Return a first timetable day for the first monday of a term
      * @param $campus
      * @param $term
-     * @return Alaress_Date_Format $date
+     * @return array
      */
     public function  getFirstTimetableDayForTerm($campus, $term) {
         $date = new Alaress_Date_Format($term->getStart());
 
         // We can't base calculations on a date that falls on a weekend
-        // If it is Saturday, we'll get a timetable day number for the following Monday and take away 2 days for the term start day
-        // If it is Sunday, we'll take away 1 day
+        // We'll get return a timetable day number for the following Monday
+        $termActualStart = Array();
+        $dateOffset = 0;
         if($date->isWeekend()) {
-            $weekDay = $date->getWeekDayNumber();
-            // It is Saturday
-            if($weekDay == 6) {
-                $timetableDay =  $this->getTimetableHandler()->getDayNumber($campus, $date->addDays(2)->getUnixTimeStamp());
-                return $timetableDay - 2;
-            }
-            else {
-                $timetableDay = $this->getTimetableHandler()->getDayNumber($campus, $date->addDays(1)->getUnixTimeStamp());
-                return $timetableDay - 1;
+            // It is Sunday
+            $dateOffset = 1;
+            // Or maybe Saturday
+            if($date->getWeekDayNumber() == 6) {
+                $dateOffset = 2;
             }
         }
-        return $timetableDay = $this->getTimetableHandler()->getDayNumber($campus, $date->getUnixTimeStamp());
+        $timetableDay = $this->getTimetableHandler()->getDayNumber($campus, $date->addDays($dateOffset)->getUnixTimeStamp());
+        $termActualStart['date'] = $date;
+        $termActualStart['day'] = $timetableDay;
+
+        return $termActualStart;
     }
 
     /**
@@ -230,13 +231,11 @@ class Controller extends Base
         $campusTimetable = $this->getTimetableHandler()->getTimetableDefinition(null, $campus);
         $daysInCycle = $campusTimetable['dayCount'];
 
-        $termStartDate = $term->getStart();
-
-        $termFirstDay = $this->getFirstTimetableDayForTerm($campus, $term);
+        $termActualStart = $this->getFirstTimetableDayForTerm($campus, $term);
 
         //Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
-        $shiftTimetableDays = $daysInCycle*($cycle-1)+$day-$termFirstDay;
-        $date = $termStartDate->addWeekdays($shiftTimetableDays)->getLocalShort();
+        $shiftTimetableDays = $daysInCycle*($cycle-1)+$day-$termActualStart['day'];
+        $date = $termActualStart['date']->addWeekdays($shiftTimetableDays)->getLocalShort();
         return $date;
     }
 
