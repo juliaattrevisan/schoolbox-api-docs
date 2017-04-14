@@ -46,6 +46,7 @@ class Controller extends Base
         $this->setUserMapper($userMapper);
         $this->setTermMapper($termMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
+        $this->setTimetableHandler();
 
     }
 
@@ -118,12 +119,12 @@ class Controller extends Base
      */
     public function getTimetable() {
         $user = $this->getUser();
-        $timetableHandler = new External_Timetable;
+
         $timetable = array();
         $campusInfo = array();
 
         foreach ($user->getCampusCollection() as $campus) {
-            $campusTimetable = $timetableHandler->getTimetableDefinition(null, $campus);
+            $campusTimetable = $this->getTimetableHandler()->getTimetableDefinition(null, $campus);
 
             if($campusTimetable) {
                 $campusInfo['campusId']     = $campus->getId();
@@ -158,7 +159,6 @@ class Controller extends Base
      */
     public function  getFirstTimetableDayForTerm($campus, $term) {
         $date = new Alaress_Date_Format($term->getStart());
-        $timetable = new External_Timetable;
 
         // We can't base calculations on a date that falls on a weekend
         // If it is Saturday, we'll get a timetable day number for the following Monday and take away 2 days for the term start day
@@ -167,15 +167,15 @@ class Controller extends Base
             $weekDay = $date->getWeekDayNumber();
             // It is Saturday
             if($weekDay == 6) {
-                $timetableDay =  $timetable->getDayNumber($campus, $date->addDays(2)->getUnixTimeStamp());
+                $timetableDay =  $this->getTimetableHandler()->getDayNumber($campus, $date->addDays(2)->getUnixTimeStamp());
                 return $timetableDay - 2;
             }
             else {
-                $timetableDay =  $timetable->getDayNumber($campus, $date->addDays(1)->getUnixTimeStamp());
+                $timetableDay = $this->getTimetableHandler()->getDayNumber($campus, $date->addDays(1)->getUnixTimeStamp());
                 return $timetableDay - 1;
             }
         }
-        return $timetableDay = $timetable->getDayNumber($campus, $date->getUnixTimeStamp());
+        return $timetableDay = $this->getTimetableHandler()->getDayNumber($campus, $date->getUnixTimeStamp());
     }
 
     /**
@@ -227,8 +227,7 @@ class Controller extends Base
      */
     public function getDateForTimetableDay($campus, $term, $cycle, $day) {
 
-        $timetableHandler = new External_Timetable;
-        $campusTimetable = $timetableHandler->getTimetableDefinition(null, $campus);
+        $campusTimetable = $this->getTimetableHandler()->getTimetableDefinition(null, $campus);
         $daysInCycle = $campusTimetable['dayCount'];
 
         $termStartDate = $term->getStart();
@@ -464,6 +463,22 @@ class Controller extends Base
     public function getAssessmentMapperProxy() {
         return $this->assessmentMapperProxy;
     }
+
+    /**
+     * @return mixed $this
+     */
+    public function setTimetableHandler() {
+        $this->timetableHandler = new \External_Timetable;
+        return $this;
+    }
+
+    /**
+     * @return TimetableHandler
+     */
+    public function getTimetableHandler() {
+        return $this->timetableHandler;
+    }
+
 
     // TODO: Remove dummy routines below --------------------------------------------------------------------------------------------
 
