@@ -86,9 +86,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         $('.description-' + period).addClass('period-selected');
         periodClicked = 'period' + day + '_' + period;
 
-        var campus = timetable.campus.val(),
-            term = timetable.term.val(),
-            cycle = timetable.cycle.val();
+        var campus = $timetable.campus.val(),
+            term = $timetable.term.val(),
+            cycle = $timetable.cycle.val();
 
         if (twigVars.type == 'duework') {
 
@@ -141,7 +141,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         pickerResponse.append('<img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;">');
 
         if (target == 'timetable') {
-            timetable.submit.addClass('disabled');
+            $timetable.submit.addClass('disabled');
         }
     }
 
@@ -158,8 +158,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         displayDate = moment(data.date, convertFormat(twigVars.displayFormat)).format(convertFormat('F d, Y'));
 
         if (target == 'timetable') {
-            timetable.submit.removeClass('disabled');
-            timetable.submit.attr('data-timetable-value', data.date);
+            $timetable.submit.removeClass('disabled');
+            $timetable.submit.attr('data-timetable-value', data.date);
 
             var $byTimetable = $('#byTimetable-' + twigVars.id),
                 periodSelected = $byTimetable.find('table').find('[data-selected=1]').attr('data-period');
@@ -275,7 +275,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             addClass = 'pickerNarrow'
         }
         else {
-            var daysInCycle = timetable.campus.find(':selected').attr('data-days');
+            var daysInCycle = $timetable.campus.find(':selected').attr('data-days');
             addClass = daysInCycle > 7 ? 'pickerWide' : 'pickerNarrow';
         }
 
@@ -290,7 +290,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // Timetable elements
         var $byTimetable = $('#byTimetable-' + twigVars.id),
-            timetable = {
+            $timetable = {
                 campus: $byTimetable.find('select[name*="campus"]'),
                 term: $byTimetable.find('select[name*="term"]'),
                 cycle: $byTimetable.find('select[name*="cycle"]'),
@@ -300,8 +300,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Build cycles dynamically
         function buildCycles() {
 
-            var daysInCycle = timetable.campus.find(':selected').attr('data-days'),
-                termDuration = timetable.term.find(':selected').attr('data-duration');
+            var daysInCycle = $timetable.campus.find(':selected').attr('data-days'),
+                termDuration = $timetable.term.find(':selected').attr('data-duration');
 
             // Don't try to divide by zero
             if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
@@ -317,10 +317,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     }
                     optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
                 }
-                timetable.cycle.empty().append(optionsHtml);
+                $timetable.cycle.empty().append(optionsHtml);
 
                 // Increase space to accommodate a table
-                var $byTimetable = $('#byTimetable-' + twigVars.id);
                 if (daysInCycle > 7) {
                     setPickerSize(false);
                     $byTimetable.find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-7');
@@ -340,11 +339,11 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // Highlight day and period
         function showPeriod() {
-            var daysInCycle = timetable.campus.find(':selected').attr('data-days');
+            var daysInCycle = $timetable.campus.find(':selected').attr('data-days');
             if (daysInCycle !== undefined && daysInCycle > 0) {
                 var isWeekend = twigVars.timetableDay.isWeekend;
                 // Highlight day if it doesn't fall on a weekend
-                if (isWeekend == 0) {
+                if (isWeekend === 0) {
                     var period = 0;
                     // Get day of the cycle
                     var cycleDay = twigVars.timetableDay.daysUntilDate % daysInCycle;
@@ -352,21 +351,20 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                         cycleDay = daysInCycle;
                     }
 
-                    var $byTimetable = $('#byTimetable-' + twigVars.id);
                     $byTimetable.find('.day-' + cycleDay).addClass('period-selected');
                     $byTimetable.find('.period-description').each(function () {
 
-                        var s = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm'),
-                            e = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm'),
-                            t = moment(twigVars.date).format('HHmm');
+                        var periodStart = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm'),
+                            periodEnd = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm'),
+                            time = moment(twigVars.date).format('HHmm');
 
-                        if ((t >= s) && (t < e)) {
+                        if ((time >= periodStart) && (time < periodEnd)) {
                             $(this).addClass('period-selected');
                             period = $(this).attr('data-period-number');
                         }
 
                         if ((cycleDay > 0) && (period > 0)) {
-                            $('#byTimetable-' + twigVars.id).find('.period-' + cycleDay + '-' + period).addClass('period-selected');
+                            $byTimetable.find('.period-' + cycleDay + '-' + period).addClass('period-selected');
                         }
                     });
                 }
@@ -378,7 +376,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // Reveal Timetable
         function revealTimetable() {
-            var campus = timetable.campus.find(':selected').val();
+            var campus = $timetable.campus.find(':selected').val();
             $('.timetablePicker' + twigVars.id).css('display', 'none');
             $('#timetable' + twigVars.id + '-' + campus).css('display', 'table');
         }
@@ -386,22 +384,20 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         function noTimetableData() {
             var html = '<div data-alert="" class="alert-box alert">Not enough data to build a timetable <br /> for the selected campus and term.<a href="" class="close">×</a></div>';
 
-            timetable.cycle.empty().css('display', 'none');
+            $timetable.cycle.empty().css('display', 'none');
             $('.timetablePicker' + twigVars.id).empty().css('display', 'none');
-            timetable.submit.css('display', 'none');
+            $timetable.submit.css('display', 'none');
 
-            $('#timetable' + twigVars.id).append(html);
+            $byTimetable.append(html);
         }
 
         function resetTimetable() {
-            var timetable = $('#byTimetable-' + twigVars.id);
 
-            timetable.find('.period-selected').removeClass('period-selected');
-            timetable.find('table').find('[data-selected=1]').attr('data-selected', 0);
+            $byTimetable.find('.period-selected').removeClass('period-selected');
+            $byTimetable.find('table').find('[data-selected=1]').attr('data-selected', 0);
 
             $('.timetableDate' + twigVars.id).css('display', 'none');
-
-            timetable.submit.addClass('disabled');
+            $timetable.submit.addClass('disabled');
         }
 
         buildCycles();
@@ -412,19 +408,19 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
 
         // Update cycles on Campus or Term change
-        timetable.campus.change(function () {
+        $timetable.campus.change(function () {
             buildCycles();
             // Clear selected
             resetTimetable();
             revealTimetable();
         });
 
-        timetable.term.change(function () {
+        $timetable.term.change(function () {
             buildCycles();
             resetTimetable();
         });
 
-        timetable.cycle.change(function () {
+        $timetable.cycle.change(function () {
             resetTimetable();
         });
 
@@ -448,7 +444,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Loading events on timetable picker click
         var displayDate = moment().format(convertFormat(twigVars.displayFormat)); //today
         $('.has-period').click(function () {
-
             requestDataByDay($(this));
         });
     }
@@ -468,10 +463,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 '</div>';
         }
 
-        //html += '<div class="small-6 columns"></div></div>';
-
         timeDiv.after(html);
-
     }
 
     // Accommodating the "start of the week" SB config

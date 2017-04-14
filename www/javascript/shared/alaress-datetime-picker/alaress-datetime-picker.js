@@ -196,16 +196,16 @@ function setValue(element, options, state, trigger, date) {
 
 function checkAllday(state, pickerId) {
 
-    var timeDiv = $('#pickerCalendar' + pickerId).closest('#picker' + pickerId).find('.flatpickr-time');
+    var $timeDiv = $('#pickerCalendar' + pickerId).closest('#picker' + pickerId).find('.flatpickr-time');
 
     // All Day is on
     if (state === true) {
-        timeDiv.css('display', 'none');
+        $timeDiv.css('display', 'none');
         $('#hideTime' + pickerId).prop('checked', true);
 
     }
     else {
-        timeDiv.css('display', 'block');
+        $timeDiv.css('display', 'block');
         $('#hideTime' + pickerId).prop('checked', false);
     }
 
