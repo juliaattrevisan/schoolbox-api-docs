@@ -60,16 +60,42 @@ class Controller extends Base
         $timetable = $this->getUserTimetable();
         $terms = $this->getTerms();
         try {
-            $dateObject = new Alaress_Date_Format($value, array('d/m/Y g:ia', 'd/m/Y'));
+            $date = new Alaress_Date_Format($value, array('d/m/Y g:ia', 'd/m/Y'));
         }
         catch (\Exception $e) {
             var_dump($e->getMessage());
         }
 
-        $timetableDayNumber = false;
-        // Don't bother calculating the day, if the timetable is offline, we'll only display the calendar
+        // Don't bother calculating if the timetable is offline, we'll only display the calendar
         if(is_array($timetable)) {
-            $timetableVars = $this->getTimetableVars($dateObject);
+
+            $term = $this->termMapper->findForDate($date);
+            $timetableVars = Array();
+            $timetableVars['term'] = $term->getId();
+            $timetableVars['daysUntilDate'] = $term->getDuration($date);
+            $timetableVars['isWeekend'] = 0;
+            if($date->isWeekend()) {
+                $timetableVars['isWeekend'] = 1;
+            }
+            // Get all what we need to build proper timetable per campus
+            foreach ($this->getUser()->getCampusCollection() as $campus) {
+                $termActualStart = $this->getFirstTimetableDayForTerm($campus, $term);
+
+                // Don't use $campus->getTimetableDay(), it will return number of days set in SB, rather than from External Timetable
+                $timetableDay = $timetable[$campus->getId()]['dayCount'];
+                $termStartDay = $termActualStart['day'];
+                $termLastDay = $this->getTimetableHandler()->getDayNumber($campus, $term->getActualFinish()->getUnixTimeStamp());
+                $selectedDay = $this->getTimetableHandler()->getDayNumber($campus, $date->getUnixTimeStamp());
+                $timetableCycles = ceil(($term->getDuration()+$termStartDay-1)/$timetableDay);
+                $selectedCycle = ceil(($term->getDuration($date)+$termStartDay-1)/$timetableDay);
+
+                $timetableVars['byCampus'][$campus->getId()]['id'] = $campus->getId();
+                $timetableVars['byCampus'][$campus->getId()]['termStartDay'] = $termStartDay;
+                $timetableVars['byCampus'][$campus->getId()]['termLastDay'] = $termLastDay;
+                $timetableVars['byCampus'][$campus->getId()]['selectedDay'] = $selectedDay;
+                $timetableVars['byCampus'][$campus->getId()]['timetableCycles'] = $timetableCycles;
+                $timetableVars['byCampus'][$campus->getId()]['selectedCycle'] = $selectedCycle;
+            }
         }
 
         $displayFormatDate = strlen(Config::get('date_local')) > 0 ? Config::get('date_local'): 'd/m/Y';
@@ -82,7 +108,7 @@ class Controller extends Base
                 'data' => [
                     'id' => $id,
                     //Pass unix timestamp to flatpicker, it misinterprets day and month in d/m/Y format
-                    'value' => $dateObject->getJSDate(),
+                    'value' => $date->getJSDate(),
                     'element' => $element,
                     'type' => $type,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
@@ -91,7 +117,7 @@ class Controller extends Base
                     'terms' => $terms,
                     // If the connector is offline, pass FALSE
                     'timetable' => $timetable,
-                    'timetableDay' => $timetableVars
+                    'timetableVars' => $timetableVars
                 ]
             )
         );
@@ -233,26 +259,10 @@ class Controller extends Base
 
         $termActualStart = $this->getFirstTimetableDayForTerm($campus, $term);
 
-        //Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
+        // Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
         $shiftTimetableDays = $daysInCycle*($cycle-1)+$day-$termActualStart['day'];
         $date = $termActualStart['date']->addWeekdays($shiftTimetableDays)->getLocalShort();
         return $date;
-    }
-
-    public function getTimetableVars(\Alaress_Date_Format $date) {
-
-        //Get term for given date
-        $term = $this->getTermMapper()->findForDate($date);
-
-        $timetableDay = Array();
-        $timetableDay['term'] = $term->getId();
-        $timetableDay['daysUntilDate'] = $term->getDuration($date);
-        $timetableDay['isWeekend'] = 0;
-        if($date->isWeekend()) {
-            $timetableDay['isWeekend'] = 1;
-        }
-
-        return $timetableDay;
     }
 
     /**

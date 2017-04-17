@@ -300,7 +300,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Build cycles dynamically
         function buildCycles() {
 
-            var daysInCycle = $timetable.campus.find(':selected').attr('data-days'),
+            var selectedCampus = 'campus_'+$timetable.campus.find(':selected').val(),
+                daysInCycle = $timetable.campus.find(':selected').attr('data-days'),
                 termDuration = $timetable.term.find(':selected').attr('data-duration');
 
             // Don't try to divide by zero
@@ -308,8 +309,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 var optionsHtml = '';
 
                 //Select cycle number on first load
-                var cycleSelected = parseInt(twigVars.timetableDay.daysUntilDate / daysInCycle);
-                for (var i = 1; i <= (termDuration / daysInCycle); i++) {
+                var cycleSelected = twigVars.timetableVars[selectedCampus].selectedCycle;
+                for (var i = 1; i <= twigVars.timetableVars[selectedCampus].timetableCycles; i++) {
                     var selected = '';
 
                     if (cycleSelected == i) {
@@ -339,18 +340,15 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // Highlight day and period
         function showPeriod() {
-            var daysInCycle = $timetable.campus.find(':selected').attr('data-days');
+            var selectedCampus = 'campus_'+$timetable.campus.find(':selected').val();
+                daysInCycle = $timetable.campus.find(':selected').attr('data-days');
             if (daysInCycle !== undefined && daysInCycle > 0) {
-                var isWeekend = twigVars.timetableDay.isWeekend;
+                var isWeekend = twigVars.timetableVars.isWeekend;
                 // Highlight day if it doesn't fall on a weekend
                 if (isWeekend === 0) {
                     var period = 0;
                     // Get day of the cycle
-                    var cycleDay = twigVars.timetableDay.daysUntilDate % daysInCycle;
-                    if (cycleDay == 0) {
-                        cycleDay = daysInCycle;
-                    }
-
+                    var cycleDay = twigVars.timetableVars[selectedCampus].selectedDay;
                     $byTimetable.find('.day-' + cycleDay).addClass('period-selected');
                     $byTimetable.find('.period-description').each(function () {
 
@@ -362,7 +360,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                             $(this).addClass('period-selected');
                             period = $(this).attr('data-period-number');
                         }
-
+                        // TODO: what to highlight if the time falls on one period finish and another period start ?
                         if ((cycleDay > 0) && (period > 0)) {
                             $byTimetable.find('.period-' + cycleDay + '-' + period).addClass('period-selected');
                         }
@@ -406,18 +404,18 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // On first load request data by date for the timetable
         requestDataByDate(encodeURIComponent(twigVars.date.getDate() + '/' + (twigVars.date.getMonth() + 1) + '/' + twigVars.date.getFullYear()), 'timetable');
 
-
         // Update cycles on Campus or Term change
         $timetable.campus.change(function () {
             buildCycles();
-            // Clear selected
             resetTimetable();
+            showPeriod();
             revealTimetable();
         });
 
         $timetable.term.change(function () {
             buildCycles();
             resetTimetable();
+            showPeriod();
         });
 
         $timetable.cycle.change(function () {
