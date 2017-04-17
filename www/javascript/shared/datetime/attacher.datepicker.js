@@ -14,7 +14,9 @@
 
     $(function(){
         $('[data-datepicker]').each(function() {
-            $(this).alaressDateTimePicker();
+            if($(this).attr('data-datepicker-id') === undefined) {
+                $(this).alaressDateTimePicker();
+            }
         })
     });
 })(jQuery);
