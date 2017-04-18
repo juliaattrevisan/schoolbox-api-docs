@@ -84,25 +84,17 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         /** @var GenericCollection|IResponse[] $responses */
         $responses = (new GenericCollection(IResponse::class))->merge($studentSubmissions)->merge($quizAttempts);
 
-        // Sort said list by first most recent, because we're only showing x responses
-        $responses = $responses->sortByCallback(function(IResponse $a, IResponse $b) {
-            return $a->getSubmittedAt()->compare($b->getSubmittedAt());
-        });
-
         // Group IResponses by IAssessable
 
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
         $assessmentIds = [];
-        $limit         = $this->getConfig('size');
+        $limit         = $this->getConfig('sizeNoAll');
 
-        // Hard-code limit to max of 30 for now - showing every assessment can still break stuff
-        if ($limit <= 0) {
-            $limit = 30;
-        }
         foreach($responses as $response){
-            $assessmentIds[$response->getAssessable()->getId()] = $response->getAssessable()->getId();
+            $assessmentId = $response->getAssessable()->getId();
+            $assessmentIds[$assessmentId] = $assessmentId;
             if (count($assessmentIds) >= $limit) {
                 break;
             }
