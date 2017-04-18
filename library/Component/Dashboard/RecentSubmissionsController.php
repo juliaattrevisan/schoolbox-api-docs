@@ -82,7 +82,12 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $quizAttempts = $quizAttemptDataSource->findByPredicates($pb);
 
         /** @var GenericCollection|IResponse[] $responses */
-        $responses = (new GenericCollection(IResponse::class))->merge($studentSubmissions)->merge($quizAttempts);
+        $responses = (new GenericCollection(IResponse::class))
+            ->merge($studentSubmissions)
+            ->merge($quizAttempts)
+            ->sortByCallback(function(IResponse $a, IResponse $b) {
+                return $b->getSubmittedAt()->compare($a->getSubmittedAt());
+            });
 
         // Group IResponses by IAssessable
 
@@ -108,11 +113,6 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
             if (isset($assessables[$assessmentId])) {
                 $assessables[$assessmentId]->getResponses()->add($response);
             }
-        }
-
-        // Sort responses most recent first
-        foreach($assessables as $assessable){
-            $assessable->getResponses()->sortBy('submittedAt', 'DESC');
         }
 
         // Sort by most recent first, in most recent first
