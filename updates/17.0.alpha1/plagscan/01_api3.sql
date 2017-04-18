@@ -3,3 +3,6 @@ INSERT INTO `config` (`name`, `title`, `description`, `field_id`, `type_id`, `ed
 
 -- Temp folder for plagscan uploads
 INSERT INTO `config` (`name`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('plagscan_upload_tmp_dir', 'Plagscan File Upload', "Temporary cache folder for uploading submissions to Plagscan", '1', '10', 'true');
+
+-- Rename column for consistency
+ALTER TABLE `plagscan_document` CHANGE `deleted` `deleted_at` DATETIME NULL;
