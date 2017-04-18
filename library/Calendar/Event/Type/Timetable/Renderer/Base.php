@@ -29,7 +29,7 @@ abstract class Base extends RendererBase
      */
     public function showAttendanceLink() {
 
-        $config = new \Schoolbox\Config\Loader();
+        $config = new Config();
         if (
             $this->getEvent() instanceof Event
             && $config->get('external_type') == 'synergetic'
