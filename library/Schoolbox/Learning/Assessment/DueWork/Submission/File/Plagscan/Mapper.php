@@ -60,19 +60,21 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->setValidFiles(new ValidFiles());
 
-        $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
-        $plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
-        $plagscanClientId = $this->getConfigLoader()->get('plagscan_client_id');
-
         /* If plagscan credentials exist, set up all the other stuff
          */
-        if (strlen($plagscanApiKey) && strlen($plagscanUsername)) {
+        $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
+        $plagscanClientId = $this->getConfigLoader()->get('plagscan_client_id');
 
-            /* Set up access token
-             */
+        try {
             $accessToken = (new AccessTokenGenerator($plagscanClientId, $plagscanApiKey))->generate();
 
             $this->setGateway(new WarpGate($this->getConfigLoader(), $accessToken));
+        }
+        catch (\DomainException $e) {
+
+            /* Could not spawn for some reason, but due to mapper usage
+             * we don't want to detonate - just quietly not use plagscan
+             */
         }
     }
 
