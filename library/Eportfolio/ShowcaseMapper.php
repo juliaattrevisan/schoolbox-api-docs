@@ -18,6 +18,9 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 class ShowcaseMapper extends Schoolbox\Mapper
 {
 
+    /**
+     * @inheritdoc
+     */
     protected function mapping()
     {
         $this->hasTable('eportfolio_showcase_item');
@@ -38,6 +41,8 @@ class ShowcaseMapper extends Schoolbox\Mapper
      *
      * @param User $user
      * @return Collection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
      */
     public function getShowcasedSubmissionBoxes(User $user)
     {
@@ -74,7 +79,7 @@ class ShowcaseMapper extends Schoolbox\Mapper
 
         $statement = $this->database->prepare($query);
 
-        $statement->bindParam(":userId", $user->getId());
+        $statement->bindParam(':userId', $user->getId());
         $statement->execute();
 
         $allItems = new Collection();
@@ -105,6 +110,8 @@ class ShowcaseMapper extends Schoolbox\Mapper
      * @param \Schoolbox\User $user
      * @param int             $limit
      * @return Schoolbox\Collection|Showcase[]
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
      */
     public function getRecentShowcasedSubmissionBoxes(User $user, $limit = 5)
     {
@@ -127,12 +134,12 @@ class ShowcaseMapper extends Schoolbox\Mapper
             LIMIT :limit
         ");
 
-        $statement->bindParam(":userId", $user->getId());
+        $statement->bindParam(':userId', $user->getId());
 
         /* Have to do this in a special way, apparently:
          * http://stackoverflow.com/questions/2269840/php-pdo-bindvalue-in-limit
          */
-        $statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
+        $statement->bindParam(':limit', $limit, \PDO::PARAM_INT);
         $statement->execute();
 
         $allItems = new Collection();
