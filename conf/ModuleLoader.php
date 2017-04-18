@@ -9,8 +9,9 @@ namespace Config;
 
 use Alaress\Application\Kernel;
 use Alaress\Module\Module;
+use Config\Modules\ModuleConfigInterface;
 
-class ModuleLoader
+abstract class ModuleLoader implements ModuleConfigInterface
 {
     /**
      * @param string $className Name of module class to load
