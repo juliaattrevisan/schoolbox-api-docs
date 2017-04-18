@@ -9,62 +9,28 @@
  */
 
 namespace Eportfolio;
-use Eportfolio;
+
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
-class ShowcaseMapper extends Schoolbox\Mapper {
+class ShowcaseMapper extends Schoolbox\Mapper
+{
 
-	protected function mapping () {
-		$this->hasTable('eportfolio_showcase_item');
-		$this->hasModel(Showcase::class);
+    protected function mapping()
+    {
+        $this->hasTable('eportfolio_showcase_item');
+        $this->hasModel(Showcase::class);
 
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', self::TYPE_MODEL, null, 'submissionBox', 'submissionBox');
+        $this->uses('uid', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
 
-		$this->hasMap(array(
-			'column'     => 'submission_box_id',
-			'property'   => 'submissionBox',
-			'type'       => self::TYPE_MODEL,
-            'join'       => 'submissionBox'
-		));
-
-		$this->hasMap(array(
-			'column'     => 'uid',
-			'property'   => 'uid',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'created_at',
-			'property'   => 'createdAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'updated_at',
-			'property'   => 'updatedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'deleted_at',
-			'property'   => 'deletedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-        $this->hasJoin('submissionBox', array(
-            'multiple'  => true,
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
-            'this_key'  => 'submission_box_id',
-            'other_key' => 'id',
-        ));
-	}
 
     /**
      * Get all the showcased submission boxes for a particular user,
@@ -73,10 +39,11 @@ class ShowcaseMapper extends Schoolbox\Mapper {
      * @param User $user
      * @return Collection
      */
-	public function getShowcasedSubmissionBoxes(User $user) {
+    public function getShowcasedSubmissionBoxes(User $user)
+    {
         $submissionBoxMapper = $this->getJoinMapper('submissionBox');
-        $folderMapper = $submissionBoxMapper->getJoinMapper('category');
-        $workTypeMapper = $submissionBoxMapper->getJoinMapper('work_type');
+        $folderMapper        = $submissionBoxMapper->getJoinMapper('category');
+        $workTypeMapper      = $submissionBoxMapper->getJoinMapper('work_type');
 
         /* When you make a Showcased Work item, but then later the Folder gets deleted,
          * the Folder object doesn't get hydrated due to softdelete field. It just comes
@@ -105,18 +72,18 @@ class ShowcaseMapper extends Schoolbox\Mapper {
             ORDER BY f.name
         ";
 
-		$statement = $this->database->prepare($query);
+        $statement = $this->database->prepare($query);
 
-		$statement->bindParam(":userId", $user->getId());
-		$statement->execute();
+        $statement->bindParam(":userId", $user->getId());
+        $statement->execute();
 
         $allItems = new Collection();
 
         foreach ($statement as $row) {
             $showcasedWorkItem = $this->hydrate($row, 'si');
-            $submissionBox = $submissionBoxMapper->hydrate($row, 'sb');
-            $workType = $workTypeMapper->hydrate($row, 't');
-            $folder = $folderMapper->hydrate($row, 'f');
+            $submissionBox     = $submissionBoxMapper->hydrate($row, 'sb');
+            $workType          = $workTypeMapper->hydrate($row, 't');
+            $folder            = $folderMapper->hydrate($row, 'f');
 
             $submissionBox->setCategory($folder);
             $submissionBox->setWorkType($workType);
@@ -125,8 +92,9 @@ class ShowcaseMapper extends Schoolbox\Mapper {
             $allItems->add($showcasedWorkItem);
         }
 
-		return $allItems;
-	}
+        return $allItems;
+    }
+
 
     /**
      * Get all the showcased submission boxes for a particular user,
@@ -135,13 +103,14 @@ class ShowcaseMapper extends Schoolbox\Mapper {
      * This is used on the profile screen
      *
      * @param \Schoolbox\User $user
-     * @param int $limit
+     * @param int             $limit
      * @return Schoolbox\Collection|Showcase[]
      */
-	public function getRecentShowcasedSubmissionBoxes(User $user, $limit = 5) {
+    public function getRecentShowcasedSubmissionBoxes(User $user, $limit = 5)
+    {
         $submissionBoxMapper = $this->getJoinMapper('submissionBox');
-        $folderMapper = $submissionBoxMapper->getJoinMapper('category');
-        $workTypeMapper = $submissionBoxMapper->getJoinMapper('work_type');
+        $folderMapper        = $submissionBoxMapper->getJoinMapper('category');
+        $workTypeMapper      = $submissionBoxMapper->getJoinMapper('work_type');
 
         $statement = $this->database->prepare("
             SELECT
@@ -158,21 +127,21 @@ class ShowcaseMapper extends Schoolbox\Mapper {
             LIMIT :limit
         ");
 
-		$statement->bindParam(":userId", $user->getId());
+        $statement->bindParam(":userId", $user->getId());
 
-		/* Have to do this in a special way, apparently:
-		 * http://stackoverflow.com/questions/2269840/php-pdo-bindvalue-in-limit
-		 */
-		$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
-		$statement->execute();
+        /* Have to do this in a special way, apparently:
+         * http://stackoverflow.com/questions/2269840/php-pdo-bindvalue-in-limit
+         */
+        $statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
+        $statement->execute();
 
         $allItems = new Collection();
 
         foreach ($statement as $row) {
             $showcasedWorkItem = $this->hydrate($row, 'si');
-            $submissionBox = $submissionBoxMapper->hydrate($row, 'sb');
-            $workType = $workTypeMapper->hydrate($row, 't');
-            $folder = $folderMapper->hydrate($row, 'f');
+            $submissionBox     = $submissionBoxMapper->hydrate($row, 'sb');
+            $workType          = $workTypeMapper->hydrate($row, 't');
+            $folder            = $folderMapper->hydrate($row, 'f');
 
             $submissionBox->setCategory($folder);
             $submissionBox->setWorkType($workType);
@@ -182,5 +151,5 @@ class ShowcaseMapper extends Schoolbox\Mapper {
         }
 
         return $allItems;
-	}
+    }
 }
