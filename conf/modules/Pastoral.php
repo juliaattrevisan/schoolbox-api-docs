@@ -13,7 +13,7 @@ use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\Pastoral\Module as PastoralModule;
 
-class Pastoral extends ModuleLoader implements ModuleConfigInterface
+class Pastoral extends ModuleLoader
 {
     /**
      * Run configuration for the given module

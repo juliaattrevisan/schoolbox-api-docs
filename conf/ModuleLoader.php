@@ -9,30 +9,21 @@ namespace Config;
 
 use Alaress\Application\Kernel;
 use Alaress\Module\Module;
+use Config\Modules\ModuleConfigInterface;
 
-class ModuleLoader
+
+abstract class ModuleLoader implements ModuleConfigInterface
 {
     /**
      * @param string $className Name of module class to load
-     * @param $path
+     * @param string $path
      * @param Kernel $kernel
      * @return Module
      */
     protected function loadModule($kernel, $className, $path)
     {
-        $di = $kernel->getDependencyInjector();
-
-        $schoolCode = $di->get('config')->get('site_location');
-        $customModuleClass = str_replace('\\Module', '\\Custom\\' . ucfirst($schoolCode) . '\\Module', $className);
-
         /** @var Module $module */
-
-        if (class_exists($customModuleClass)) {
-            $module = new $customModuleClass($di);
-        } else {
-            $module = new $className($di);
-        }
-
+        $module = new $className($kernel->getDependencyInjector());
         $module->init($path);
         return $module;
     }

@@ -14,7 +14,7 @@ use Alaress\Application\Kernel;
 use Schoolbox\LTI\Component\Homepage\Module as LTIComponent;
 use Schoolbox\LTI\Consumer\Module as LTIConsumer;
 
-class LTI extends ModuleLoader implements ModuleConfigInterface
+class LTI extends ModuleLoader
 {
     /**
      * Run configuration for the given module

@@ -165,8 +165,9 @@ class Bootstrap extends AbstractBootstrap {
         $di->get('session')->start();
 
         // Initialise module configuration
-        require_once SITE_root . '/conf/ModuleLoader.php';
         require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
+        require_once SITE_root . '/conf/ModuleLoader.php';
+
         $customModuleLocation = sprintf(
             '/conf/modules/Custom/%s/',
             ucfirst($this->getKernel()->getDependencyInjector()->get('config')->get('site_location'))

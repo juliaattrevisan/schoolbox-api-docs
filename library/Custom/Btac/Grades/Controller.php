@@ -1,17 +1,17 @@
 <?php
 
-namespace Schoolbox\Learning\Custom\Btac;
+namespace Custom\Btac\Grades;
 
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use Schoolbox\Assessment\Term\Model as Term;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 
 class Controller extends \Schoolbox\Learning\Controller
 {
@@ -107,7 +107,7 @@ class Controller extends \Schoolbox\Learning\Controller
 
         // Squish this mess out
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/Btac/grades.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
             'student'       => $viewee,
             'term'          => $term,
             'year'          => $year,
