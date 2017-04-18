@@ -13,7 +13,7 @@ use Alaress\Application\Kernel;
 use Schoolbox\News\Component\Dashboard\Module as DashboardModule;
 use Schoolbox\News\Component\Homepage\Module as HomepageModule;
 
-class News extends ModuleLoader implements ModuleConfigInterface
+class News extends ModuleLoader
 {
     /**
      * Run configuration for the given module

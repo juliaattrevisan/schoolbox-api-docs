@@ -12,7 +12,7 @@ use Alaress\Application\Kernel;
 use Schoolbox\Menu\Side\Module as MenuSideModule;
 use Schoolbox\Menu\Top\Module as MenuTopModule;
 
-class Menu extends ModuleLoader implements ModuleConfigInterface
+class Menu extends ModuleLoader
 {
     /**
      * Run configuration for the given module

@@ -14,7 +14,8 @@ use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\LearningAnalytics\Module as LearningAnalyticsModule;
 
-class LearningAnalytics extends ModuleLoader implements ModuleConfigInterface {
+class LearningAnalytics extends ModuleLoader
+{
     /**
      * Run configuration for the given module
      *
