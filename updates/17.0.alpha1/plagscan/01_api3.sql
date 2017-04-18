@@ -6,3 +6,6 @@ INSERT INTO `config` (`name`, `title`, `description`, `field_id`, `type_id`, `ed
 
 -- Rename column for consistency
 ALTER TABLE `plagscan_document` CHANGE `deleted` `deleted_at` DATETIME NULL;
+
+-- Add Interactive Url column for Mode 7 Report
+ALTER TABLE `plagscan_document` ADD COLUMN `interactive_url` VARCHAR(255) NULL AFTER `html`;
