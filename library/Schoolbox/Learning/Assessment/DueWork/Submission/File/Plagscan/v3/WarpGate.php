@@ -215,7 +215,9 @@ class WarpGate
     }
 
     /**
-     * Fetch report contents. I formatted their crappy paragraph for ease of use
+     * Fetch report contents
+     *
+     * This is the Mode 7 Interactive Report that v3.0 api introduced
      *
      * @param int $plagscanId
      * @return string
@@ -229,6 +231,33 @@ class WarpGate
          */
         if ($response->getStatusCode() == 200) {
             return json_decode($response->getBody())->data->reportlink;
+        }
+
+        $content = json_decode($response->getBody());
+
+        /* If you ended up here, the document can't be reported for various reasons
+         * so just shove them out for logging purposes
+         */
+        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+    }
+
+    /**
+     * Fetch report contents
+     *
+     * This is the old Mode 6 Report which existed prior to v3.0 api
+     *
+     * @param int $plagscanId
+     * @return string
+     * @throws DomainException
+     */
+    public function fetchReport($plagscanId)
+    {
+        $response = $this->retrieve($plagscanId, 6);
+
+        /* Save the report url
+         */
+        if ($response->getStatusCode() == 200) {
+            return $response->getBody();
         }
 
         $content = json_decode($response->getBody());
