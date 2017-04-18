@@ -84,7 +84,9 @@ class Controller extends Base
                 // Don't use $campus->getTimetableDay(), it will return number of days set in SB, rather than from External Timetable
                 $timetableDay = $timetable[$campus->getId()]['dayCount'];
                 $termStartDay = $termActualStart['day'];
-                $termLastDay = $this->getTimetableHandler()->getDayNumber($campus, $term->getActualFinish()->getUnixTimeStamp());
+                // This is used to get the last term time table day.
+                // Alternatively we could have got the last date of term and if it was a weekend we'd gone backwards to get a date for Friday
+                $termLastDay = ($term->getDuration()-($timetableDay+1-$termStartDay))%$timetableDay;
                 $selectedDay = $this->getTimetableHandler()->getDayNumber($campus, $date->getUnixTimeStamp());
                 $timetableCycles = ceil(($term->getDuration()+$termStartDay-1)/$timetableDay);
                 $selectedCycle = ceil(($term->getDuration($date)+$termStartDay-1)/$timetableDay);
