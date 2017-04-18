@@ -14,6 +14,7 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
@@ -408,8 +409,21 @@ class EventMapper extends Schoolbox\Mapper
     private function createCampus($event)
     {
         foreach ($event->getCampusCollection() as $campus) {
+
             if ($campus instanceof Campus) {
-                $campus = $campus->getId();
+                // CampusCollection is a collection of Schoolbox\Campus instances
+                // when importing events from csv or vcal
+                $campusId = $campus->getId();
+            }
+            elseif ($campus instanceof RelationCampus) {
+                // CampusCollection is a collection of Calendar\Relation\Campus instances
+                // when modifying a series of events
+                $campusId = $campus->getCampusId();
+            }
+            else {
+                // CampusCollection is a collection of campus ID's
+                // when editing a single event
+                $campusId = $campus;
             }
 
             $query = "
@@ -420,7 +434,7 @@ class EventMapper extends Schoolbox\Mapper
 
             $statement = $this->database->prepare($query);
             $statement->bindParam(":eventId", $event->getId());
-            $statement->bindParam(":campusId", $campus);
+            $statement->bindParam(":campusId", $campusId);
             $statement->execute();
         }
     }
