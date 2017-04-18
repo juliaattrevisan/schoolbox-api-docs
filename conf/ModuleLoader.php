@@ -11,6 +11,7 @@ use Alaress\Application\Kernel;
 use Alaress\Module\Module;
 use Config\Modules\ModuleConfigInterface;
 
+
 abstract class ModuleLoader implements ModuleConfigInterface
 {
     /**
