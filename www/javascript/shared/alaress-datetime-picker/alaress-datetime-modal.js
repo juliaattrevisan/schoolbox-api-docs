@@ -340,7 +340,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // Highlight day and period
         function showPeriod() {
-            var selectedCampus = 'campus_'+$timetable.campus.find(':selected').val();
+            var campusId = $timetable.campus.find(':selected').val();
+                selectedCampus = 'campus_'+campusId,
                 daysInCycle = $timetable.campus.find(':selected').attr('data-days');
             if (daysInCycle !== undefined && daysInCycle > 0) {
                 var isWeekend = twigVars.timetableVars.isWeekend;
@@ -350,7 +351,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     // Get day of the cycle
                     var cycleDay = twigVars.timetableVars[selectedCampus].selectedDay;
                     $byTimetable.find('.day-' + cycleDay).addClass('period-selected');
-                    $byTimetable.find('.period-description').each(function () {
+                    $('#timetable'+twigVars.id+'-'+campusId).find('.period-description').each(function () {
 
                         var periodStart = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm'),
                             periodEnd = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm'),
@@ -359,11 +360,11 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                         if ((time >= periodStart) && (time < periodEnd)) {
                             $(this).addClass('period-selected');
                             period = $(this).attr('data-period-number');
+                            if ((cycleDay > 0) && (period > 0)) {
+                                $byTimetable.find('.period-' + cycleDay + '-' + period).addClass('period-selected');
+                            }
                         }
-                        // TODO: what to highlight if the time falls on one period finish and another period start ?
-                        if ((cycleDay > 0) && (period > 0)) {
-                            $byTimetable.find('.period-' + cycleDay + '-' + period).addClass('period-selected');
-                        }
+
                     });
                 }
             }
@@ -415,7 +416,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         $timetable.term.change(function () {
             buildCycles();
             resetTimetable();
-            showPeriod();
         });
 
         $timetable.cycle.change(function () {
