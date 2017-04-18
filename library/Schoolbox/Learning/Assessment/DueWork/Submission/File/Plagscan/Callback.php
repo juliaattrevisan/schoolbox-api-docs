@@ -68,7 +68,7 @@ class Callback
             /* Make a somewhat infamous assumption that plagscan completed its stuff
              * which is the only reason we'd be running this Callback
              */
-            $interactiveReportContents = $this->getMapper()->getGateway()->fetchInteractiveReport($currentDocument->getPlagscanId());
+            $interactiveReportUrl = $this->getMapper()->getGateway()->fetchInteractiveReportUrl($currentDocument->getPlagscanId());
             $reportContents = $this->getMapper()->getGateway()->fetchReport($currentDocument->getPlagscanId());
             $score = $this->getMapper()->getGateway()->fetchScore($currentDocument->getPlagscanId());
 
@@ -78,7 +78,7 @@ class Callback
             $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
             $currentDocument->setScore($score);
             $currentDocument->setHtml($reportContents);
-            $currentDocument->setInteractiveUrl($interactiveReportContents);
+            $currentDocument->setInteractiveUrl($interactiveReportUrl);
             $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
             $this->getMapper()->save($currentDocument);
         }

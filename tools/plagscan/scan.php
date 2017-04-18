@@ -83,7 +83,7 @@ foreach ($allDocuments as $currentDocument) {
             $reportReady = $mapper->getGateway()->analyse($currentDocument->getPlagscanId());
 
             if ($reportReady) {
-                $interactiveReportContents = $mapper->getGateway()->fetchInteractiveReport($currentDocument->getPlagscanId());
+                $interactiveReportUrl = $mapper->getGateway()->fetchInteractiveReportUrl($currentDocument->getPlagscanId());
                 $reportContents = $mapper->getGateway()->fetchReport($currentDocument->getPlagscanId());
                 $score = $mapper->getGateway()->fetchScore($currentDocument->getPlagscanId());
 
@@ -93,7 +93,7 @@ foreach ($allDocuments as $currentDocument) {
                 $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
                 $currentDocument->setScore($score);
                 $currentDocument->setHtml($reportContents);
-                $currentDocument->setInteractiveUrl($interactiveReportContents);
+                $currentDocument->setInteractiveUrl($interactiveReportUrl);
                 $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
                 $mapper->save($currentDocument);
 

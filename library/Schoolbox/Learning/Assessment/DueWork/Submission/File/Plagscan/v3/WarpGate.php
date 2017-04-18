@@ -223,7 +223,7 @@ class WarpGate
      * @return string
      * @throws DomainException
      */
-    public function fetchInteractiveReport($plagscanId)
+    public function fetchInteractiveReportUrl($plagscanId)
     {
         $response = $this->retrieve($plagscanId, 7);
 
