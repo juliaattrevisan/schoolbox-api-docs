@@ -68,7 +68,7 @@ class Callback
             /* Make a somewhat infamous assumption that plagscan completed its stuff
              * which is the only reason we'd be running this Callback
              */
-            $reportContents = $this->getMapper()->getGateway()->fetchReport($currentDocument->getPlagscanId());
+            $reportContents = $this->getMapper()->getGateway()->fetchInteractiveReport($currentDocument->getPlagscanId());
             $score = $this->getMapper()->getGateway()->fetchScore($currentDocument->getPlagscanId());
 
             /* Update the db with the report contents for this document

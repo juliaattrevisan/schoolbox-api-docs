@@ -83,7 +83,7 @@ foreach ($allDocuments as $currentDocument) {
             $reportReady = $mapper->getGateway()->analyse($currentDocument->getPlagscanId());
 
             if ($reportReady) {
-                $reportContents = $mapper->getGateway()->fetchReport($currentDocument->getPlagscanId());
+                $reportContents = $mapper->getGateway()->fetchInteractiveReport($currentDocument->getPlagscanId());
                 $score = $mapper->getGateway()->fetchScore($currentDocument->getPlagscanId());
 
                 /* Update the db with the report contents for this document
