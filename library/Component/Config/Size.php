@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,9 +10,31 @@
 class Component_Config_Size extends Component_Config_Abstract
 {
 
-    protected $options       = array(0,1,2,3,4,5,10,15,25,30);
-    protected $showAllOption = true;
+    /**
+     * Returns the options to display in the dropdown
+     *
+     * @return int[]
+     */
+    protected function getOptions()
+    {
+        return [0, 1, 2, 3, 4, 5, 10, 15, 25, 30];
+    }
 
+
+    /**
+     * Returns whether to include 'All' in the dropdown
+     *
+     * @return bool
+     */
+    protected function getShowAllOption()
+    {
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
 
@@ -19,14 +42,14 @@ class Component_Config_Size extends Component_Config_Abstract
         $page->setBlock($keyblock, 'sizes', 'sizes_block');
         $page->setVar('sizes_block', '');
 
-        foreach($this->options as $i) {
+        foreach ($this->getOptions() as $i) {
             // Don't show "All" option if it's disabled
-            if ($i === 0 && !$this->showAllOption) {
+            if ($i === 0 && !$this->getShowAllOption()) {
                 continue;
             }
-            $page->setVar('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
+            $page->setVar('COMPONENT_CONFIG_SIZE_NAME', $i === 0 ? 'All' : $i);
             $page->setVar('COMPONENT_CONFIG_SIZE_VALUE', $i);
-            $page->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $configValue ? ' selected="selected"' : '');
+            $page->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i === $configValue ? ' selected="selected"' : '');
             $page->parse('sizes_block', 'sizes', true);
         }
 
