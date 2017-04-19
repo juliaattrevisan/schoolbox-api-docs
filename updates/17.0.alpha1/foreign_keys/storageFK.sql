@@ -1,7 +1,7 @@
-ALTER TABLE `schoolbox`.`submission_box_file`
+ALTER TABLE `submission_box_file`
   ADD CONSTRAINT `fk_submission_box_file_storage_hash`
 FOREIGN KEY (`storage_id`)
-REFERENCES `schoolbox`.`storage` (`hash`)
+REFERENCES `storage` (`hash`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
@@ -9,10 +9,10 @@ DELETE video_queue FROM video_queue
   LEFT JOIN `storage` ON `storage`.hash = `video_queue`.hash
 WHERE `storage`.hash is null;
 
-ALTER TABLE `schoolbox`.`video_queue`
+ALTER TABLE `video_queue`
   ADD CONSTRAINT `fk_video_queue_storage_hash`
 FOREIGN KEY (`hash`)
-REFERENCES `schoolbox`.`storage` (`hash`)
+REFERENCES `storage` (`hash`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
@@ -22,10 +22,10 @@ UPDATE tile
     SET background_image_hash = NULL
 WHERE `storage`.hash is null;
 
-ALTER TABLE `schoolbox`.`tile`
+ALTER TABLE `tile`
   ADD CONSTRAINT `fk_tile_background_image_hash`
 FOREIGN KEY (`background_image_hash`)
-REFERENCES `schoolbox`.`storage` (`hash`)
+REFERENCES `storage` (`hash`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
@@ -36,19 +36,22 @@ SET item_image = NULL
 WHERE `storage`.hash is null;
 
 
-ALTER TABLE `schoolbox`.`news_items`
+ALTER TABLE `news_items`
   ADD INDEX `fk_news_items_image_hash_idx` (`item_image` ASC);
-ALTER TABLE `schoolbox`.`news_items`
+ALTER TABLE `news_items`
   ADD CONSTRAINT `fk_news_items_image_hash`
 FOREIGN KEY (`item_image`)
-REFERENCES `schoolbox`.`storage` (`hash`)
+REFERENCES `storage` (`hash`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
 
-ALTER TABLE `schoolbox`.`file`
+ALTER TABLE `file`
   CHANGE COLUMN `category` `category` INT(5) UNSIGNED NULL DEFAULT NULL,
   CHANGE COLUMN `hash` `hash` VARCHAR(40) NULL ;
+
+
+DELETE file FROM file LEFT JOIN folder ON file.category = folder.id WHERE folder.id is null;
 
 UPDATE file
   LEFT JOIN `storage` ON `storage`.hash = file.hash
@@ -60,19 +63,39 @@ UPDATE file
 SET owner = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
 WHERE `user`.id is null;
 
-ALTER TABLE `schoolbox`.`file`
+
+ALTER TABLE `file`
   ADD CONSTRAINT `fk_file_folder_id`
 FOREIGN KEY (`category`)
-REFERENCES `schoolbox`.`folder` (`id`)
+REFERENCES `folder` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_file_owner_id`
 FOREIGN KEY (`owner`)
-REFERENCES `schoolbox`.`user` (`id`)
+REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_file_storage_hash`
 FOREIGN KEY (`hash`)
-REFERENCES `schoolbox`.`storage` (`hash`)
+REFERENCES `storage` (`hash`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+DELETE link FROM link LEFT JOIN folder ON link.category = folder.id WHERE folder.id is null;
+
+UPDATE link
+  LEFT JOIN `user` ON `owner` = `user`.id
+SET owner = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
+WHERE `user`.id is null;
+
+ALTER TABLE `link`
+  ADD CONSTRAINT `fk_link_folder_id`
+FOREIGN KEY (`category`)
+REFERENCES `folder` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_link_owner_id`
+FOREIGN KEY (`owner`)
+REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
