@@ -1,3 +1,5 @@
+SET foreign_key_checks = 0;
+
 ALTER TABLE `menu_side_campus`
   CHANGE COLUMN `menu_side_id` `menu_side_id` INT(11) NOT NULL ,
   CHANGE COLUMN `campus_id` `campus_id` TINYINT(2) UNSIGNED NOT NULL ;
@@ -50,3 +52,5 @@ FOREIGN KEY (`role_id`)
 REFERENCES `groups` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+SET foreign_key_checks = 1;
