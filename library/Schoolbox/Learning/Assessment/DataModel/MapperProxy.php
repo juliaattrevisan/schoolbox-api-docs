@@ -762,19 +762,13 @@ class MapperProxy
      *
      * @param Collection|Model[] $collection
      * @return Collection|IAssessable[]
+     * @throws \UnexpectedValueException If assessment's data is broken in database
      */
     public function translateToDomainModelCollection(Collection $collection)
     {
         $newCollection = $this->createCollection();
         foreach ($collection as $model) {
-            if ($model instanceof Model) {
-                try {
-                    $newCollection->add($this->translateToDomainModel($model));
-                } catch (\UnexpectedValueException $e) {
-                    // Broken object from database - not much I can do but...
-                    continue;
-                }
-            }
+            $newCollection->add($this->translateToDomainModel($model));
         }
         return $newCollection;
     }
