@@ -41,15 +41,18 @@ class Controller extends Base
     public function __construct(
         UserMapper $userMapper,
         TermMapper $termMapper,
+        FolderMapper $folderMapper,
+        UserAccessMapper $userAccessMapper,
         AssessmentMapperProxy $assessmentMapperProxy
     ) {
         $this->setUserMapper($userMapper);
         $this->setTermMapper($termMapper);
+        $this->setFolderMapper($folderMapper);
+        $this->setUserAccessMapper($userAccessMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setTimetableHandler();
 
     }
-
 
     /**
      * Return the HTML picker for injecting into modal
@@ -341,8 +344,8 @@ class Controller extends Base
 
         // Get all students for the class or the group
 
-        $folderModel = FolderMapper::getInstance()->findById($folder);
-        $externalStudents = UserAccessMapper::getInstance()->findUsersInCategory(
+        $folderModel = $this->getFolderMapper()->findById($folder);
+        $externalStudents = $this->getUserAccessMapper()->findUsersInCategory(
             $folderModel,
             Role::STUDENT,
             UserAccess::ACCESS_READ,
@@ -457,7 +460,46 @@ class Controller extends Base
         return $this->termMapper;
     }
 
-    /** @var AssessmentMapperProxy */
+    /** @var FolderMapper */
+    private $folderMapper;
+
+    /**
+     * @param FolderMapper $mapper
+     * @return mixed $this
+     */
+    public function setFolderMapper($mapper) {
+        $this->folderMapper = $mapper;
+        return $this;
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    public function getFolderMapper() {
+        return $this->folderMapper;
+
+    }
+
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
+    /**
+     * @param UserAccessMapper $mapper
+     * @return mixed $this
+     */
+    public function setUserAccessMapper($mapper) {
+        $this->userAccessMapper = $mapper;
+        return $this;
+    }
+
+    /**
+     * @return UserAccessMapper
+     */
+    public function getUserAccessMapper() {
+        return $this->userAccessMapper;
+    }
+
+        /** @var AssessmentMapperProxy */
     private $assessmentMapperProxy;
 
     /**

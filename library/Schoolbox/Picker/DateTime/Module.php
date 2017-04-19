@@ -15,9 +15,11 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule
 {
@@ -41,13 +43,14 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
+        $campusRoute = '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}';
         $routes = [
             'GET' => [
                 '/type/{type}/element/{element}/id/{id}/value/{value}' => 'getPicker',
                 '/date/{date}' => 'getByDate',
-                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}' => 'getEventsByTimetableDay',
-                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}/date' => 'getTimetableDate',
-                '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}/folder/{folder}' => 'getByTimetableDay',
+                $campusRoute => 'getEventsByTimetableDay',
+                $campusRoute.'/date' => 'getTimetableDate',
+                $campusRoute.'/folder/{folder}' => 'getByTimetableDay',
                 '/date/{date}/folder/{folder}' => 'getDueByDate',
             ],
             'POST' => [
@@ -82,7 +85,9 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-                'termMapper' => $this->getMapperFactory()->getLazy(TermMapper::class)
+                'termMapper' => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
             ])
         );
     }
