@@ -29,6 +29,11 @@ REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+UPDATE event
+  LEFT JOIN `luEventType` ON luEventType.eventTypeID = event.type
+SET event.type = (SELECT eventTypeID FROM luEventType LIMIT 1)
+WHERE luEventType.eventTypeID is null;
+
 ALTER TABLE `event`
   ADD INDEX `fk_event_type_id_idx` (`type` ASC);
 ALTER TABLE `event`
