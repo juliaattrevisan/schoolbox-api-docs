@@ -20,11 +20,11 @@ sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' 
 sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
 
 # ensure the DB itself is defaulting to UTF8
-mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "ALTER DATABASE $sqldb CHARACTER SET utf8 COLLATE utf8_general_ci; "
+mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "ALTER DATABASE $sqldb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; "
 
 # select all tables that are UTF8, but are NOT collated 'general'
-QUERY="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '$sqldb' AND TABLE_COLLATION NOT LIKE 'utf8_general_ci'"
-AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "CHARSET=utf8 COLLATE=utf8_general_ci; SET foreign_key_checks = 1; "}'
+QUERY="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '$sqldb' AND TABLE_COLLATION NOT LIKE 'utf8mb4_unicode_ci'"
+AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; SET foreign_key_checks = 1; "}'
 
 # log intention
 mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST"
