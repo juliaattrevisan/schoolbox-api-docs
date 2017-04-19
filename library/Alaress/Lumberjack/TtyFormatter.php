@@ -47,7 +47,7 @@ class TtyFormatter extends CliFormatter
     {
         if ($this->tty === 0) {
             // non-interactive, just generate a plain log
-            return trim(parent::generateRecord($record));
+            return rtrim(parent::generateRecord($record));
         }
 
         $map = [
@@ -58,7 +58,7 @@ class TtyFormatter extends CliFormatter
 
         // if this is already formatted like a log, don't reformat it
         if (preg_match('`^\d+-\d+-\d+ \d+:\d+:\d+`', $record['message'])) {
-            return trim($record['message']);
+            return rtrim($record['message']);
         }
 
         /** @var \DateTime $datetime */
@@ -98,7 +98,7 @@ class TtyFormatter extends CliFormatter
         }
 
 
-        return $this->render(implode('', $left), trim($record['message']), $c);
+        return $this->render(implode('', $left), rtrim($record['message']), $c);
     }
 
 
