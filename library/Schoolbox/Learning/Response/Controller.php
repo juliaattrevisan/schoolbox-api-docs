@@ -349,7 +349,7 @@ class Controller extends Base
          */
         $client = new Client([
             "base_uri" => '',
-            "timeout" => 20.0,
+            "timeout" => 1.0,
             "http_errors" => false
         ]);
 
