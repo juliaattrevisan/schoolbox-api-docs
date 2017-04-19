@@ -77,7 +77,7 @@ class AccessTokenGenerator
             ]);
         }
         catch (TransferException $e) {
-            throw new \DomainException('Error: Plagscan unavailable. Could not generate access token.');
+            throw new \RuntimeException('Error: Plagscan unavailable. Could not generate access token.');
         }
 
         /* What was the outcome?

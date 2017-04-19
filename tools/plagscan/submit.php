@@ -88,6 +88,12 @@ foreach ($allDocuments as $currentDocument) {
          */
         $log->warning("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
     }
+    catch (\RuntimeException $e) {
+
+        /* Could not transmit this file to plagscan for some reason
+         */
+        $log->warning("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
+    }
 }
 
 $log->info("Plagscan transmission completed. {$numUpdated} document(s) were resent and queued");

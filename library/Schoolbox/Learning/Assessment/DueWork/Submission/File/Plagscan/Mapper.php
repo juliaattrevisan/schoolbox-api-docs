@@ -77,6 +77,11 @@ class Mapper extends \Schoolbox\Mapper
              * we don't want to detonate - just quietly not use plagscan
              */
         }
+        catch (\RuntimeException $e) {
+
+            /* Could not spawn because plagscan api is down
+             */
+        }
     }
 
     /**

@@ -129,7 +129,7 @@ class WarpGate
             ]);
         }
         catch (TransferException $e) {
-            throw new \DomainException('Error: Plagscan unavailable. Could not transmit file.');
+            throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
 
         $response = $client->post("documents/?access_token={$this->getAccessToken()}", [
@@ -209,7 +209,7 @@ class WarpGate
             ]);
         }
         catch (TransferException $e) {
-            throw new \DomainException('Error: Plagscan unavailable. Could not analyse file.');
+            throw new \RuntimeException('Error: Plagscan unavailable. Could not analyse file.');
         }
 
         /* What was the outcome?
@@ -368,7 +368,7 @@ class WarpGate
             ]);
         }
         catch (TransferException $e) {
-            throw new \DomainException('Error: Plagscan unavailable. Could not retrieve report.');
+            throw new \RuntimeException('Error: Plagscan unavailable. Could not retrieve report.');
         }
 
         return $response;
