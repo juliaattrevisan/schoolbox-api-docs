@@ -8,6 +8,8 @@
 namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -342,10 +344,28 @@ class Controller extends Base
      */
     public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan)
     {
+        /* Find out if plagscan is up
+         * If so, use the interactive report - otherwise use the old crappy version
+         */
+        $client = new Client([
+            "base_uri" => '',
+            "timeout" => 20.0,
+            "http_errors" => false
+        ]);
+
+        try {
+            $client->get($plagscan->getInteractiveUrl());
+            $interactiveAvailable = true;
+        }
+        catch (TransferException $e) {
+            $interactiveAvailable = false;
+        }
+
         $data = [
             'plagscan' => $plagscan,
             'assessment' => $assessment,
-            'response' => $response
+            'response' => $response,
+            'interactiveAvailable' => $interactiveAvailable
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));

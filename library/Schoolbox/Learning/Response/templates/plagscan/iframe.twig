@@ -26,7 +26,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        {% if plagscan.interactiveUrl|length %}
+        {% if interactiveAvailable %}
             <iframe class="fullscreen scroll-wrapper" src="{{ plagscan.interactiveUrl }}"></iframe>
         {% else %}
         <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReportContents', {
