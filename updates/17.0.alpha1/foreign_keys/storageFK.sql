@@ -1,3 +1,17 @@
+DELETE allowedFileExtension FROM allowedFileExtension
+  LEFT JOIN `allowedFileTypes` ON `allowedFileTypes`.fileTypeID = `allowedFileExtension`.fileTypeID
+WHERE `allowedFileTypes`.fileTypeID is null;
+
+ALTER TABLE `allowedFileExtension`
+  CHANGE COLUMN `fileTypeID` `fileTypeID` INT(11) NOT NULL ;
+
+ALTER TABLE `allowedFileExtension`
+  ADD CONSTRAINT `fk_allowedFileExtension_file_type_id`
+FOREIGN KEY (`fileTypeID`)
+REFERENCES `allowedFileTypes` (`fileTypeID`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
 ALTER TABLE `submission_box_file`
   ADD CONSTRAINT `fk_submission_box_file_storage_hash`
 FOREIGN KEY (`storage_id`)
