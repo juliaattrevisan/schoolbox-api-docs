@@ -97,7 +97,7 @@ class External_Tass_User implements External_UserInterface
             }
 
             $query .= "
-                INNER JOIN student s ON scr.par_code=s.par_code AND scr.cmpy_code=s.cmpy_code
+                INNER JOIN student s ON scr.stud_code=s.stud_code AND scr.cmpy_code=s.cmpy_code
                 WHERE s.stud_code IN ($idList) AND pa.cmpy_code = {$companyCode} AND pa.add_num IN ($addnum)
             ";
         }
