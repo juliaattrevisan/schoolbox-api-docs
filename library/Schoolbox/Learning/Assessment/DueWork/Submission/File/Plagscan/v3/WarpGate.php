@@ -13,6 +13,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3;
 
+use GuzzleHttp\Exception\TransferException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\ValidFiles;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
@@ -120,11 +121,16 @@ class WarpGate
             "contents" => $filepointer
         ]];
 
-        $client = new Client([
-            "base_uri" => $this->getApiUrl(),
-            "timeout" => 20.0,
-            "http_errors" => false
-        ]);
+        try {
+            $client = new Client([
+                "base_uri"    => $this->getApiUrl(),
+                "timeout"     => 20.0,
+                "http_errors" => false
+            ]);
+        }
+        catch (TransferException $e) {
+            throw new \DomainException('Error: Plagscan unavailable. Could not transmit file.');
+        }
 
         $response = $client->post("documents/?access_token={$this->getAccessToken()}", [
             "multipart" => $postData
@@ -197,9 +203,14 @@ class WarpGate
             "http_errors" => false
         ]);
 
-        $response = $client->put("documents/{$plagscanId}/check", [
-            'form_params' => $postData
-        ]);
+        try {
+            $response = $client->put("documents/{$plagscanId}/check", [
+                'form_params' => $postData
+            ]);
+        }
+        catch (TransferException $e) {
+            throw new \DomainException('Error: Plagscan unavailable. Could not analyse file.');
+        }
 
         /* What was the outcome?
          */
@@ -351,9 +362,14 @@ class WarpGate
             "http_errors" => false
         ]);
 
-        $response = $client->get("documents/{$plagscanId}/retrieve", [
-            'query' => $postData
-        ]);
+        try {
+            $response = $client->get("documents/{$plagscanId}/retrieve", [
+                'query' => $postData
+            ]);
+        }
+        catch (TransferException $e) {
+            throw new \DomainException('Error: Plagscan unavailable. Could not retrieve report.');
+        }
 
         return $response;
     }

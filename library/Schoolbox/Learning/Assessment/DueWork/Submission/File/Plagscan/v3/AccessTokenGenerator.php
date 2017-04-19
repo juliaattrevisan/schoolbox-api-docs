@@ -13,6 +13,7 @@
  */
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Client;
 
 class AccessTokenGenerator
@@ -70,9 +71,14 @@ class AccessTokenGenerator
             "http_errors" => false
         ]);
 
-        $response = $client->post('token', [
-            'form_params' => $postData
-        ]);
+        try {
+            $response = $client->post('token', [
+                'form_params' => $postData
+            ]);
+        }
+        catch (TransferException $e) {
+            throw new \DomainException('Error: Plagscan unavailable. Could not generate access token.');
+        }
 
         /* What was the outcome?
          */
