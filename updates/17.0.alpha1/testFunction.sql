@@ -1,5 +1,7 @@
 -- This is a custom MySQL function used in the external database unit tests
 
+DROP FUNCTION IF EXISTS testFunction;
+
 DELIMITER $$
 
 CREATE FUNCTION testFunction (`input` VARCHAR(255))
