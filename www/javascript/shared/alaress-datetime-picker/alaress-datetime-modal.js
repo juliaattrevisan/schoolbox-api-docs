@@ -381,7 +381,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         }
 
         function noTimetableData() {
-            var html = '<div data-alert="" class="alert-box alert">Not enough data to build a timetable <br /> for the selected campus and term.<a href="" class="close">×</a></div>';
+            var html = '<div data-alert class="alert-box alert">Not enough data to build a timetable <br /> for the selected campus and term.<a href="#" class="close">×</a></div>';
 
             $timetable.cycle.empty().css('display', 'none');
             $('.timetablePicker' + twigVars.id).empty().css('display', 'none');

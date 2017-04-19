@@ -523,118 +523,111 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      *
      * @return Collection
      */
-    public function getDayEvents($user, $startTimestamp, $endTimestamp, $filter = array())
+    public function getDayEvents(\Schoolbox\User $user, $startTimestamp, $endTimestamp, $filter = array())
     {
         $firstCampus = false;
 
-        if ($user instanceof \Schoolbox\User) {
-            if ($user->getCampusCollection()->count()) {
-                $campusList = array();
+        if ($user->getCampusCollection()->count()) {
+            $campusList = array();
 
-                foreach ($user->getCampusCollection() as $currentCampus) {
-                    if (!$firstCampus) {
-                        $firstCampus = $currentCampus;
-                    }
-
-                    $campusList[] = $currentCampus->getId();
+            foreach ($user->getCampusCollection() as $currentCampus) {
+                if (!$firstCampus) {
+                    $firstCampus = $currentCampus;
                 }
 
-                $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
-            } else {
-                $campusQuery = '1 = 1';
+                $campusList[] = $currentCampus->getId();
             }
 
-            /* get accessible groups
-             */
-            $groupList = array();
-            $groupQuery = '';
+            $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
+        } else {
+            $campusQuery = '1 = 1';
+        }
 
-            $this->groupHandler->setService(HOMEPAGE_SERVICE);
-            $tempList = $this->groupHandler->involvedInCategoryList($user->getId());
+        /* get accessible groups
+         */
+        $groupList = array();
+        $groupQuery = '';
 
-            if (is_array($tempList)) {
-                foreach ($tempList as $temp) {
-                    $groupList[] = $temp['id'];
-                }
+        $this->groupHandler->setService(HOMEPAGE_SERVICE);
+        $tempList = $this->groupHandler->involvedInCategoryList($user->getId());
 
-                // Ensure that requested group is included in filter
-                // (as long as user has at least read permission on that group)
-                if ($filter['group']) {
-                    if ($this->groupHandler->getPermission($filter['group'], $user->getId()) >= READ_ACCESS) {
-                        $groupList[] = intval($filter['group']);
-                    }
-                }
-
-                /* If there are no groups prevent sql error
-                 */
-                if (count($groupList)) {
-                    $groupQuery = "OR (access = " . self::ACCESS_GROUP . " AND event_category.category_id IN (" . implode(
-                            ',',
-                            $groupList
-                        ) . "))";
-                }
+        if (is_array($tempList)) {
+            foreach ($tempList as $temp) {
+                $groupList[] = $temp['id'];
             }
 
-            $this->groupHandler->setService(CALENDAR_SERVICE);
-
-            /* Give people with userAccess to moderate Calendar Access to view all Campus Posts
-             * This check is done against the calendar user, not the logged-in user,
-             * because we don't want to pollute a user's calendar if viewing it as
-             * an admin.
-             */
-            if ($user->getCampusCollection()->count()) {
-                if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > WRITE_ACCESS) {
-                    $groupChunk = "";
-                } else {
-                    $groupChunk = "AND event_group.group_id = {$user->getRole()->getId()}";
-                }
-            }
-
-            //
-            // Filters - some of these are covered by main query anyway, so no need
-            // for extra filters.
-            $filter_query = array();
-
-            if ($filter['campus']) {
-                $filter_query[] = 'access = ' . self::ACCESS_CAMPUS;
-                $filter_query[] = 'event_campus.campus_id = ' . intval($filter['campus']);
-            }
-
+            // Ensure that requested group is included in filter
+            // (as long as user has at least read permission on that group)
             if ($filter['group']) {
-                $filter_query[] = 'access = ' . self::ACCESS_GROUP;
-                $filter_query[] = 'event_category.category_id = ' . intval($filter['group']);
+                if ($this->groupHandler->getPermission($filter['group'], $user->getId()) >= READ_ACCESS) {
+                    $groupList[] = intval($filter['group']);
+                }
             }
 
-            if ($filter['type']) {
-                //            $filter_query[] = 'access = ' . self::ACCESS_PERSONAL;
-                $filter_query[] = 'type = ' . intval($filter['type']);
+            /* If there are no groups prevent sql error
+             */
+            if (count($groupList)) {
+                $groupQuery = "OR (access = " . self::ACCESS_GROUP . " AND event_category.category_id IN (" . implode(
+                        ',',
+                        $groupList
+                    ) . "))";
             }
-
-            if ($filter['personal']) {
-                $filter_query[] = 'access = ' . self::ACCESS_PERSONAL;
-                $filter_query[] = 'event_user.user_id = ' . intval($filter['personal']);
-            }
-
-            if ($filter['id']) {
-                $filter_query[] = 'event.id = ' . intval($filter['id']);
-            }
-
-            $filter_query = implode(' AND ', $filter_query);
-
-            if (strlen($filter_query) > 0) {
-                $filter_query = " AND ($filter_query)";
-            }
-
-            $access_query = "AND (
-                (access = " . self::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
-                $groupQuery
-                OR (access = " . self::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
-            )";
         }
-        else {
-            $access_query = '';
-            $filter_query = '';
+
+        $this->groupHandler->setService(CALENDAR_SERVICE);
+
+        /* Give people with userAccess to moderate Calendar Access to view all Campus Posts
+         * This check is done against the calendar user, not the logged-in user,
+         * because we don't want to pollute a user's calendar if viewing it as
+         * an admin.
+         */
+        if ($user->getCampusCollection()->count()) {
+            if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > WRITE_ACCESS) {
+                $groupChunk = "";
+            } else {
+                $groupChunk = "AND event_group.group_id = {$user->getRole()->getId()}";
+            }
         }
+
+        //
+        // Filters - some of these are covered by main query anyway, so no need
+        // for extra filters.
+        $filter_query = array();
+
+        if ($filter['campus']) {
+            $filter_query[] = 'access = ' . self::ACCESS_CAMPUS;
+            $filter_query[] = 'event_campus.campus_id = ' . intval($filter['campus']);
+        }
+
+        if ($filter['group']) {
+            $filter_query[] = 'access = ' . self::ACCESS_GROUP;
+            $filter_query[] = 'event_category.category_id = ' . intval($filter['group']);
+        }
+
+        if ($filter['type']) {
+            $filter_query[] = 'type = ' . intval($filter['type']);
+        }
+
+        if ($filter['personal']) {
+            $filter_query[] = 'access = ' . self::ACCESS_PERSONAL;
+            $filter_query[] = 'event_user.user_id = ' . intval($filter['personal']);
+        }
+
+        if ($filter['id']) {
+            $filter_query[] = 'event.id = ' . intval($filter['id']);
+        }
+
+        $filter_query = implode(' AND ', $filter_query);
+
+        if (strlen($filter_query) > 0) {
+            $filter_query = " AND ($filter_query)";
+        }
+
+        $access_query = "AND (
+            (access = " . self::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
+            $groupQuery
+            OR (access = " . self::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
+        )";
 
         // Build the date query
         $dateQuery = '';

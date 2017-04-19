@@ -274,14 +274,15 @@ class Controller extends Base
     public function getByDate($date)
     {
         $appointments = [];
+
+        // Get start/end of the date
+        $start = \Alaress_Date_Format::newLocalShort($date);
+        $end = \Alaress_Date_Format::newLocalShort($date)->addDays(1);
+
+        $factory = $this->getDi()->get('calendarApiFactory');
+        $api = $factory->produceForUser($this->getUser());
+
         try {
-
-            // Get start/end of the date
-            $start = \Alaress_Date_Format::newLocalShort($date);
-            $end = \Alaress_Date_Format::newLocalShort($date)->addDays(1);
-
-            $factory = $this->getDi()->get('calendarApiFactory');
-            $api = $factory->produceForUser($this->getUser());
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
             foreach ($events as $event) {
                 if($event->getAllDay()) {
@@ -490,82 +491,4 @@ class Controller extends Base
         return $this->timetableHandler;
     }
 
-
-    // TODO: Remove dummy routines below --------------------------------------------------------------------------------------------
-
-    /**
-     * Create an array of dummy appointments
-     * @return array
-     */
-    private function loadDummyAppointments() {
-        $appointments = [];
-
-        $titles = [
-            'Bavte sa, špeciálne očkovacie sérum môže suspendovať z',
-            'M. Nabrúsení punkeri to naozaj pravda',
-            'Лорем ипсум долор сит амет',
-            'Ет меи агам ехпетенда цонсеяуунтур',
-            'Регионе сплендиде яуо ет',
-            '多ゅ豊況ス枠背覇ヌロフ川答まきふら稿状千大エソ不',
-            '災類おも国提トハノモ載1走ホルミ摩3入版クトホ街10軟',
-            'Λορεμ ιπσθμ δολορ σιτ αμετ',
-            'θτ σεα τατιον νεcεσσιτατιβθσ',
-            'Νισλ εσσεντ ιν μελ',
-            '面経女会真車問方提関相巨井数',
-            '海部一目選昨申海落度載音方',
-            'Znat vrem zubis vi gde, gaz imajsx pomocijsx to',
-            'Hémecht prächteg hannendrun mir un',
-            'Lorem ipsum dolor sit amet',
-            'Audiam persius an sed'
-        ];
-
-        for ($i=0; $i<rand(3,15); $i++) {
-            $appointments[] = [
-                'startDateTime' => \Alaress_Date_Format::now()->addHours(-1 * rand(1, 12))->addMinutes(rand(0,45))->toIso8601String(),
-                'endDateTime' => \Alaress_Date_Format::now()->addHours(rand(1,12))->addMinutes(rand(0,45))->toIso8601String(),
-                'title' => $titles[rand(0,count($titles)-1)]
-            ];
-        }
-
-        return $appointments;
-    }
-
-    /**
-     * Create an array of randomly selected students
-     * @return array
-     */
-    private function loadDummyStudents() {
-        $count = rand(7,15);
-
-        $students = [];
-        $studentsAll = $this->getUserMapper()->findByColumn('group_id', 5);
-
-        /** @var User $student */
-        foreach ($studentsAll as $student) {
-            if (rand(1,5) == 1) {
-                $students[] = [
-                    'firstname' => $student->getFirstname(),
-                    'lastname' => $student->getLastname(),
-                    'externalId' => $student->getExternalId(),
-                    'id' => $student->getId()
-                ];
-            }
-
-            if (count($students) == $count) {
-                break;
-            }
-        }
-
-        return $students;
-    }
 }
-
-/*
- * This code will self-destruct in 5 seconds...
- *
-          ,--.!,
-       __/   -*-
-     ,d08b.  '|`
-     0088MM
-     `9MMP'
-*/
