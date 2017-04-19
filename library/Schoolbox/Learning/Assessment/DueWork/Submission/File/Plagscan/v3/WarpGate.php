@@ -132,7 +132,7 @@ class WarpGate
 
         /* Shank the file into a temp dir; the file extension must be included
          */
-        $destination = \Cfg::get('plagscan_upload_tmp_dir') . '/' . $submissionFile->getId() . '_' . $documentName;
+        $destination = $this->getConfigLoader()->get('plagscan_upload_tmp_dir') . '/' . $submissionFile->getId() . '_' . $documentName;
 
         // copy the file contents to the temp directory
         if ($submissionFile->getStorage()->exists() && $fp = fopen($destination, 'w')) {
