@@ -445,6 +445,26 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
+     * Override: open is always aliased to publish
+     *
+     * @return \Alaress_Date_Format
+     */
+    public function getOpenAt()
+    {
+        return $this->getPublishAt();
+    }
+
+    /**
+     * Override: close is always aliased to due
+     *
+     * @return \Alaress_Date_Format
+     */
+    public function getCloseAt()
+    {
+        return $this->getDueAt();
+    }
+
+    /**
      * Projects have no concept of mark visibility - marks are always visible.
      *
      * @param User $viewingUser
