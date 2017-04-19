@@ -22,6 +22,30 @@ use Zend\Stdlib\Exception\DomainException;
 class WarpGate
 {
 
+    /* Sorry, Plagscan does not have any names for these reports.
+     *
+     * In fact, they are officially known as the "new style" and "latest style"
+     * which is a nomenclature crime against humanity
+     *
+     * 6 Retrieve new style (interactive) HTML document with annotations
+     * 7 Retrieve latest report type (with formatting and images) - returns URL (link gives temporary access for one hour)
+     */
+
+    /**
+     * An int for a data struct that contains the percentage plagiarised
+     */
+    const PLAGSCAN_MODE_SCORE = 0;
+
+    /**
+     * An int for a data struct that contains the old Mode 6 report
+     */
+    const PLAGSCAN_MODE_REPORT = 6;
+
+    /**
+     * An int for a data struct that contains the new Mode 7 report
+     */
+    const PLAGSCAN_MODE_INTERACTIVE = 7;
+
     /**
      * Api url where stuff is sent
      *
@@ -225,7 +249,7 @@ class WarpGate
      */
     public function fetchInteractiveReportUrl($plagscanId)
     {
-        $response = $this->retrieve($plagscanId, 7);
+        $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_INTERACTIVE);
 
         /* Save the report url
          */
@@ -252,7 +276,7 @@ class WarpGate
      */
     public function fetchReport($plagscanId)
     {
-        $response = $this->retrieve($plagscanId, 6);
+        $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_REPORT);
 
         /* Save the report url
          */
@@ -277,7 +301,7 @@ class WarpGate
      */
     public function fetchScore($plagscanId)
     {
-        $response = $this->retrieve($plagscanId, 0);
+        $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_SCORE);
 
         $content = json_decode($response->getBody());
 
