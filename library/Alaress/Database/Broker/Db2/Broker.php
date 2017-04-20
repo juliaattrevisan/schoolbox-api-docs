@@ -31,7 +31,7 @@ class Broker extends Base implements IBroker
     public static function isAvailable()
     {
         // DB2 is loaded as a PHP extension, not a PDO module
-        return extension_loaded('db2');
+        return extension_loaded('ibm_db2');
     }
 
     /**
