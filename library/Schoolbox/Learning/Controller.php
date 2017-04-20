@@ -208,7 +208,7 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User                 $viewee The user whose pending assessments we are viewing.
+     * @param User                  $viewee The user whose pending assessments we are viewing.
      * @param Filter\FactoryFactory $filterFactoryFactory
      * @throws RouteNotFound
      * @throws ServiceNotFound
@@ -218,15 +218,9 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
-        // Generate a list of classes/groups that the viewee teaches
-        $getSubjects          = true;
-        $groupAccessLevel     = UserAccess::ACCESS_WRITE;
-        $folders              = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel);
-        $folderRunTimeOptions = new FolderFilter\RunTimeOptions($folders);
-
         // All run-time (as opposed to hard-coded and dynamic) options, indexed by filter definition class
         $runTimeOptions= [
-            FolderFilter\Definition::class => $folderRunTimeOptions,
+            FolderFilter\Definition::class => new FolderFilter\RunTimeOptions($viewee),
         ];
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
@@ -267,6 +261,7 @@ class Controller extends Base
             ]));
 
         } catch (\Exception $e){
+            // TODO - can remove this block when we abandon PHP 5 support
             $this->returnJsonError($e);
         } catch (\Throwable $e){
             $this->returnJsonError($e);

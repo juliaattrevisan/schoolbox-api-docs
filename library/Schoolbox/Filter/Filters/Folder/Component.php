@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Folder;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterComponent;
 use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\Filter\Selection;
@@ -34,13 +35,13 @@ class Component extends AbstractFilterComponent
 
 
     /**
-     * @param IFilterDefinition                $definition
-     * @param User                             $user
-     * @param string                           $page
-     * @param GenericCollection                $savedSelections
-     * @param Selection\Mapper                 $filterSelectionMapper
-     * @param GenericCollection|Folder\Model[] $classes
-     * @param GenericCollection|Folder\Model[] $groups
+     * @param IFilterDefinition                           $definition
+     * @param User                                        $user
+     * @param string                                      $page
+     * @param GenericCollection                           $savedSelections
+     * @param Selection\Mapper                            $filterSelectionMapper
+     * @param Collection|GenericCollection|Folder\Model[] $classes
+     * @param Collection|GenericCollection|Folder\Model[] $groups
      */
     public function __construct(
         IFilterDefinition $definition,

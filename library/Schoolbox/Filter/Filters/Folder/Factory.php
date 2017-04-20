@@ -15,6 +15,7 @@ use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
@@ -84,8 +85,34 @@ class Factory extends AbstractFilterFactory
             throw new \InvalidArgumentException($msg);
         }
 
-        // Divide folders into Classes and Groups (not mutually exclusive)
-        $folders = $runTimeOptions->getFolders();
+        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
+        $definition      = $this->buildDefinition($filter);
+        $savedSelections = $this->getSavedSelections($filter, $user, $page);
+
+        $viewee = $runTimeOptions->getViewee();
+
+        // Should this role type see classes for this page?
+        /** @var Option\Model $classOptionAvailability */
+        $classOptionAvailability = $this->getFilterOptionMapper()->findByColumnList([
+            'filter_id' => $filter->getId(),
+            'page'      => $page,
+            'key'       => Definition::KEY_CLASSES,
+        ])->first();
+
+        // Has the admin explicitly configured this?
+        // (for performance, don't bother fetching classes from external DB if they are not going to be available)
+        if($classOptionAvailability){
+            $getSubjects = $classOptionAvailability->getAvailable();
+        } else {
+            // No config yet - fall back to initial defaults.
+            $getSubjects = $definition->getInitialAvailability(Definition::KEY_CLASSES, $page);
+        }
+
+        // Generate a list of classes/groups that the viewee teaches
+        $groupAccessLevel     = UserAccess::ACCESS_WRITE;
+        $folders              = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel);
+
+        // Divide folders into Classes and Groups (not mutually exclusive!)
 
         // Does the folder have class codes ?
         $classes = $folders->filter(function (Folder\Model $folder) {
@@ -97,9 +124,6 @@ class Factory extends AbstractFilterFactory
             return $folder->getGroup();
         })->indexBy('id');
 
-        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
-        $definition      = $this->buildDefinition($filter);
-        $savedSelections = $this->getSavedSelections($filter, $user, $page);
 
         return new Component(
             $definition,

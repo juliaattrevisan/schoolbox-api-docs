@@ -117,4 +117,15 @@ interface IFilterDefinition
      * @throws \InvalidArgumentException If key is recognised as invalid
      */
     public function getLabel($key);
+
+    /**
+     * If the admin has not configured this option, should it be available in filter panels?
+     *
+     * By default, all possible options will be available on all pages. (ie just return true)
+     *
+     * @param string $customAbstractKey
+     * @param string $page
+     * @return bool
+     */
+    public function getInitialAvailability($customAbstractKey, $page);
 }

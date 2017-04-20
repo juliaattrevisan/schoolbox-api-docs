@@ -8,35 +8,32 @@
 namespace Schoolbox\Filter\Filters\Folder;
 
 use Schoolbox\Filter\IRunTimeOptions;
-use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 /**
- * For now, folder lists are dynamically generated
- * In the future, the architecture can support admins configuring only sub-sets to be available for each page
+ * For now, folder lists are generated at run-time
  */
 class RunTimeOptions implements IRunTimeOptions
 {
+    /**
+     * @var User $viewee
+     */
+    private $viewee;
 
     /**
-     * @var GenericCollection|Folder\Model[]
+     * @param User $viewee
      */
-    private $folders;
-
-    /**
-     * @param GenericCollection|Folder\Model[] $folders
-     */
-    public function __construct(GenericCollection $folders)
+    public function __construct(User $viewee)
     {
-        $this->folders = $folders;
+        $this->viewee = $viewee;
     }
 
 
     /**
-     * @return GenericCollection|Folder\Model[]
+     * @return User $viewee
      */
-    public function getFolders()
+    public function getViewee()
     {
-        return $this->folders;
+        return $this->viewee;
     }
 }
