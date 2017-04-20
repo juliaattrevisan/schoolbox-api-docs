@@ -15,8 +15,15 @@
             &copy; {{ config.year }}
             <a href="{{ config.school_address }}">{{ config.school_name }}</a> |
             <a href="http://{{ config.fqdn }}/policy.php">Guidelines of Use and Privacy Policy</a>
+
             {% if config.feedback_url|trim is not empty and config.feedback_text|trim is not empty %}
-                | <a href="http://{{ config.fqdn }}/{{ config.feedback_url|purify }}">{{ config.feedback_text|purify }}</a>
+                {% if config.feedback_url_object.isRelativeUrl %}
+                    {% set feedback_url = 'http://' ~ config.fqdn ~ config.feedback_url|trim %}
+                {% else %}
+                    {% set feedback_url = config.feedback_url|trim %}
+                {% endif %}
+
+                | <a href="{{ feedback_url }}">{{ config.feedback_text|trim|purify }}</a>
             {% endif %}
         </p>
     </td>

@@ -31,6 +31,8 @@ class CoreContext {
             'site_domain',
             'skin_builder',
             'forgotten_password',
+            'feedback_url',
+            'feedback_text'
         );
 
         foreach($required as $key) {
@@ -65,6 +67,8 @@ class CoreContext {
             $this->context['config']['logo'] = 'logo';
         }
 
+        // feedback url
+        $this->context['config']['feedback_url_object'] = new \Url($conf->get('feedback_url'));
 
         // extract colours
         $this->context['colours'] = $this->compileLess(array(
