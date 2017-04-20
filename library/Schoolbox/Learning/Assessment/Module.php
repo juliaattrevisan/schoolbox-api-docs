@@ -228,6 +228,18 @@ class Module extends BaseModule
              */
             if ($access >= UserAccess::ACCESS_WRITE) {
                 $participant = new Participant($student, $assessment);
+
+                /* Suck down all the responses from $assessment and put them into $participant
+                 */
+                /** @var Participant $currentParticipant */
+                foreach ($assessment->getAllParticipants() as $currentParticipant) {
+                    if ($currentParticipant->getUser()->getId() == $student->getId()) {
+
+                        $participant->setAllResponses($currentParticipant->getAllResponses());
+
+                        break;
+                    }
+                }
             }
             /* Allow read-accessors to see Summary
              */
