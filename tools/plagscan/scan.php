@@ -104,11 +104,11 @@ foreach ($allDocuments as $currentDocument) {
                     $numUpdated++;
                 }
                 else {
-                    $log->info("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");
+                    $log->warning("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");
                 }
             }
             else {
-                $log->info("{$prefix}: report not yet analysed");
+                $log->warning("{$prefix}: report not yet analysed");
             }
         }
         catch (\DomainException $e) {
@@ -126,12 +126,12 @@ foreach ($allDocuments as $currentDocument) {
     }
 }
 
-$log->info("Plagscan scan completed. $numUpdated documents were scanned");
+$log->notice("Plagscan scan completed. $numUpdated documents were scanned");
 
 /* Also tell me how many died
  */
 $numFailed = $allDocuments->count() - $numUpdated;
 
 if ($numFailed) {
-    $log->info("$numFailed documents failed scanning or analysis is still in progress");
+    $log->notice("$numFailed documents failed scanning or analysis is still in progress");
 }
