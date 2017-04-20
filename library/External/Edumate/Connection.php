@@ -32,7 +32,7 @@ class External_Edumate_Connection
     public function __construct()
     {
         $factory = new DatabaseFactory();
-        $this->connector = $factory->createSqlsrv();
+        $this->connector = $factory->createMssql();
         $this->config = ConfigMapper::getInstance();
 
         $this->connector->connect(

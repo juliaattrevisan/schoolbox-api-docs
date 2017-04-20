@@ -48,7 +48,7 @@ class TestPostProcessor extends PHPUnit_Framework_TestCase
 
         $factory = new Factory();
 
-        $synergetic68 = $factory->createSqlsrv();
+        $synergetic68 = $factory->createMssql();
         $synergetic68->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',

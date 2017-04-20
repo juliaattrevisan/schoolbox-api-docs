@@ -90,7 +90,7 @@ trait TestConnectorTrait
         $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
 
         $factory = new Factory();
-        $this->synergetic67 = $factory->createSqlsrv();
+        $this->synergetic67 = $factory->createMssql();
         $this->synergetic67->connect(
             '172.31.6.236',
             'SynergyOne',
@@ -114,7 +114,7 @@ trait TestConnectorTrait
 
         $factory = new Factory();
 
-        $this->synergetic68 = $factory->createSqlsrv();
+        $this->synergetic68 = $factory->createMssql();
         $this->synergetic68->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',

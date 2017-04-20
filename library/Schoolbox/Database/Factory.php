@@ -35,8 +35,7 @@ class Factory
         if (!isset(self::$connectorExternal)) {
             $factory = new DatabaseFactory();
 
-            self::$connectorExternal = $factory->createSqlsrv();
-            // self::$connectorExternal = $factory->createDblib();
+            self::$connectorExternal = $factory->createMssql();
 
             $config = ConfigMapper::getInstance();
 
@@ -96,8 +95,7 @@ class Factory
             case 'doublefirst':
             case 'humanedge':
 
-                $connectorExternal = $this->factory->createSqlsrv();
-                // $connectorExternal = $this->factory->createDblib();
+                $connectorExternal = $this->factory->createMssql();
                 break;
 
             // MySQL
@@ -133,7 +131,7 @@ class Factory
 
         if ($config['external_type'] == 'humanedge') {
 
-            $connectorAplus = $this->factory->createSqlsrv();
+            $connectorAplus = $this->factory->createMssql();
 
             if (!$connectorAplus->connect(
                 $config['external_humanedge_aplus_db_host'],
