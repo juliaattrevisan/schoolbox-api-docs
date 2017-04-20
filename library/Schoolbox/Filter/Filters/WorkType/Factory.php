@@ -20,7 +20,7 @@ use Schoolbox\Learning\Assessment\WorkType;
 
 
 /**
- * A factory for building WorkTypeFilter objects
+ * A factory for building 'WorkType' filter objects
  */
 class Factory extends AbstractFilterFactory
 {

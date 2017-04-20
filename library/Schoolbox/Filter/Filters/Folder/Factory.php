@@ -21,9 +21,7 @@ use Schoolbox\Resource\Folder;
 
 
 /**
- * A factory for building FolderFilters
- *
- * @todo
+ * A factory for building 'Folder' filter objects
  */
 class Factory extends AbstractFilterFactory
 {

@@ -19,7 +19,7 @@ use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 
 /**
- * A factory for building TermFilter objects
+ * A factory for building 'Term' filter objects
  */
 class Factory extends AbstractFilterFactory
 {
