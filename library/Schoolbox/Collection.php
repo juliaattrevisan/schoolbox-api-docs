@@ -394,6 +394,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             $is_asc[] = (strtolower($direction) === 'asc');
         }
 
+        /** @var iterable $compareFunctions */
         $isCallable = [];
         foreach ($compareFunctions as $compareFunction) {
             $isCallable[] = is_callable($compareFunction);
@@ -402,7 +403,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         $callback = function ($a, $b) use ($get_methods, $is_asc, $isCallable, $compareFunctions) {
             $result = 0;
             $i = 0;
-            for (; $i < count($get_methods); $i++) {
+            for ($iMax = count($get_methods); $i < $iMax; $i++) {
                 $a_value = $a->{$get_methods[$i]}();
                 $b_value = $b->{$get_methods[$i]}();
 
