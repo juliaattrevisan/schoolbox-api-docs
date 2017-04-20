@@ -344,21 +344,32 @@ class Controller extends Base
      */
     public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan)
     {
-        /* Find out if plagscan is up
-         * If so, use the interactive report - otherwise use the old crappy version
-         */
-        $client = new Client([
-            "base_uri" => '',
-            "timeout" => 20.0,
-            "http_errors" => false
-        ]);
+        $interactiveAvailable = false;
 
-        try {
-            $client->get($plagscan->getInteractiveUrl());
-            $interactiveAvailable = true;
-        }
-        catch (TransferException $e) {
-            $interactiveAvailable = false;
+        /* If there is a known interactive report url, try to
+         * use it - otherwise use the old crappy version
+         *
+         * Find out if plagscan is up
+         */
+        if (strlen($plagscan->getInteractiveUrl())) {
+            $client = new Client([
+                "base_uri"    => '',
+                "timeout"     => 20.0,
+                "http_errors" => false
+            ]);
+
+            try {
+                $client->get($plagscan->getInteractiveUrl());
+                $interactiveAvailable = true;
+            }
+            catch (TransferException $e) {
+
+                /* Could log this as an error?
+                 * Plagscan interactive report url not available
+                 *
+                 * noop
+                 */
+            }
         }
 
         $data = [
