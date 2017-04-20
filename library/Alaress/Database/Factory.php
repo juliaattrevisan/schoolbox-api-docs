@@ -56,7 +56,7 @@ class Factory
     }
 
     /**
-     * Create an MSSQL connector
+     * Create a SQLSRV connector
      *
      * @return Connector
      */
