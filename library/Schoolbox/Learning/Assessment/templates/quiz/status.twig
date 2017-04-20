@@ -91,7 +91,7 @@
 
     {% set pStatusText %}
         {%- spaceless %}
-            {% if not latestResponse.submittedAt %}
+            {% if latestResponse.submittedAt.isNull %}
                 Not attempted
             {% else %}
                 {% if multipleResponses %}
