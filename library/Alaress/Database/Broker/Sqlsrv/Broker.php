@@ -26,6 +26,14 @@ class Broker extends Base implements IBroker
     /**
      * @inheritdoc
      */
+    public static function isAvailable()
+    {
+        return in_array('sqlsrv', PDO::getAvailableDrivers(), true);
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function buildQuoter()
     {
         return new SqlsrvQuoter();
