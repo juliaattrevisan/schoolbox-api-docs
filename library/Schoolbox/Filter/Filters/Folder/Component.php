@@ -97,11 +97,12 @@ class Component extends AbstractFilterComponent
         $availableAbstractOptions    = $this->getDefinition()->getAvailableOptions($page, $roleType)[$page];
         $availableAbstractSelections = $this->getDefaultSelections($availableAbstractOptions);
 
-        // Admin has configured whether both classes and groups should be available, and page has generated and inserted
+        // Admin has configured whether both classes and/or groups should be available, and the Factory has generated and inserted
         // the list of available classes and groups. We need to filter that list by the admin's config.
         $abstractClassSelection = $availableAbstractSelections[Definition::KEY_CLASSES];
         $abstractGroupSelection = $availableAbstractSelections[Definition::KEY_GROUPS];
 
+        // Intentionally does not reuse the value of $this->getConcreteSelections() (to ensure distinct models)
         return [
             'isAvailable'            => $availableAbstractOptions->count() ? true : false,
             'component'              => $this,

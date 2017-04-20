@@ -10,12 +10,12 @@ namespace Schoolbox\Filter;
 
 
 /**
- * A component knows how to render itself in a filter panel.
+ * A filter panel component knows how to render itself in a filter panel.
  *
  * A filter factory is responsible for building it.
  *
- * A controller knows which concrete instance it wants, and can pass runtime
- * dynamic parameters into the factory build method.
+ * By its nature, a Controller knows which extra args are required for specific components and
+ * can pass runtime parameters into the factory build method.
  */
 interface IFilterComponent
 {
