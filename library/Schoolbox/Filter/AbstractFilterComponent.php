@@ -150,8 +150,8 @@ abstract class AbstractFilterComponent implements IFilterComponent
         return [
             'isAvailable'       => $availableOptions->count() ? true : false,
             'definition'        => $this->getDefinition(),
-            'defaultSelections' => $availableOptions ? $this->getDefaultSelections($availableOptions) : null,
-            'userSelections'    => $availableOptions ? $this->getUserSelections($availableOptions) : null,
+            'defaultSelections' => $this->getDefaultSelections($availableOptions),
+            'userSelections'    => $this->getUserSelections($availableOptions),
         ];
     }
 
