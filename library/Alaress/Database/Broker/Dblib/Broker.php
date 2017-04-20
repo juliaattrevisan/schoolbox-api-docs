@@ -47,7 +47,7 @@ class Broker extends Base implements IBroker
         // Set MSSQL specific attributes
 
         /** @noinspection PhpUndefinedClassConstantInspection */
-        $this->databaseAttributes = [PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8];
+        $this->databaseAttributes = [];
 
         // Set MSSQL specific post-connect queries
 
