@@ -88,19 +88,27 @@ foreach ($allDocuments as $currentDocument) {
                 $score = $mapper->getGateway()->fetchScore($currentDocument->getPlagscanId());
 
                 /* Update the db with the report contents for this document
+                 * only when we have all three pieces (each seems to generated
+                 * independently of each other on plagscan's end, so one might
+                 * be available before the others etc.)
                  */
-                $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
-                $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
-                $currentDocument->setScore($score);
-                $currentDocument->setHtml($reportContents);
-                $currentDocument->setInteractiveUrl($interactiveReportUrl);
-                $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
-                $mapper->save($currentDocument);
+                if (strlen($interactiveReportUrl) && strlen($reportContents) && strlen($score)) {
+                    $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
+                    $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
+                    $currentDocument->setScore($score);
+                    $currentDocument->setHtml($reportContents);
+                    $currentDocument->setInteractiveUrl($interactiveReportUrl);
+                    $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+                    $mapper->save($currentDocument);
 
-                $numUpdated++;
+                    $numUpdated++;
+                }
+                else {
+                    $log->info("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");
+                }
             }
             else {
-                $log->info("{$prefix}: report not yet ready");
+                $log->info("{$prefix}: report not yet analysed");
             }
         }
         catch (\DomainException $e) {
