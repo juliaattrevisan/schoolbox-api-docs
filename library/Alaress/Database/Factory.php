@@ -31,6 +31,19 @@ class Factory
     }
 
     /**
+     * Create a MSSQL connector (SQLSRV, or DBLIB if that's not available)
+     *
+     * @return Connector
+     */
+    public function createMssql()
+    {
+        if (SqlsrvBroker::isAvailable()) {
+            return $this->createSqlsrv();
+        }
+        return $this->createDblib();
+    }
+
+    /**
      * Create a DBLIB connector
      *
      * @return Connector
