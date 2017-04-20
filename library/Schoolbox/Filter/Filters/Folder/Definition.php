@@ -85,7 +85,7 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, $page)
     {
         // Initial config is both classes and groups are available for all pages
         return true;

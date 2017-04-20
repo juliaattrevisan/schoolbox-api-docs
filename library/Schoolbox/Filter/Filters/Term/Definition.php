@@ -104,7 +104,7 @@ class Definition extends AbstractFilterDefinition
      * @param string $page
      * @return bool
      */
-    protected function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, $page)
     {
         $isAvailable = false;
         switch ($customAbstractKey) {

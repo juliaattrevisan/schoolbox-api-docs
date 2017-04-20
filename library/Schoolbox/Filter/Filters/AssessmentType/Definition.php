@@ -172,7 +172,7 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, $page)
     {
         // by default, all AssessmentTypes are available
         return true;
