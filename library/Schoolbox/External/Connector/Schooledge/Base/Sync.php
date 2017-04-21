@@ -10,8 +10,8 @@
 namespace Schoolbox\External\Connector\Schooledge\Base;
 
 use Schoolbox\External\Connector\Humanedge\Base\Sync as HumanedgeSync;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\ISync;
 
-class Sync extends HumanedgeSync implements SyncInterface
+class Sync extends HumanedgeSync implements ISync
 {
 }
