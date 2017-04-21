@@ -47,6 +47,7 @@ use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Folder as FolderFilter;
+use Schoolbox\Filter\Filters\Unit as UnitFilter;
 use Schoolbox\Filter\Filters\Term as TermFilter;
 use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
 use Schoolbox\Filter\Filters\WeightingType as WeightingFilter;
@@ -221,6 +222,7 @@ class Controller extends Base
         // All run-time (as opposed to hard-coded and dynamic) options, indexed by filter definition class
         $runTimeOptions= [
             FolderFilter\Definition::class => new FolderFilter\RunTimeOptions($viewee),
+            UnitFilter\Definition::class   => new UnitFilter\RunTimeOptions($viewee),
         ];
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);

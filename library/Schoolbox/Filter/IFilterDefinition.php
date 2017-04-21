@@ -72,13 +72,14 @@ interface IFilterDefinition
      *
      * Must ensure inner collections are sorted the same as getPages()
      *
+     * @param null|string $pageFilter If supplied, get options just for this page, otherwise get options for all available pages
      * @return Collection|GenericCollection[]|FilterOption\Model[][]
      */
-    public function getOptions();
+    public function getOptions($pageFilter = null);
 
 
     /**
-     * Returns sets of available options, grouped by option.page, then indexed by option.key.
+     * Returns sets of available abstract options, grouped by option.page, then indexed by option.key.
      * Each Option contains a set of Defaults, indexed by roleType
      *
      * @param null|string $pageFilter     If supplied, get defaults just for this page

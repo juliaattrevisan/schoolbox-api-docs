@@ -92,25 +92,16 @@ class Factory extends AbstractFilterFactory
         $viewee = $runTimeOptions->getViewee();
 
         // Should this role type see classes for this page?
-        /** @var Option\Model $classOptionAvailability */
-        $classOptionAvailability = $this->getFilterOptionMapper()->findByColumnList([
-            'filter_id' => $filter->getId(),
-            'page'      => $page,
-            'key'       => Definition::KEY_CLASSES,
-        ])->first();
+        /** @var Option\Model[][] $options */
+        $options = $definition->getOptions($page);
 
-        // Has the admin explicitly configured this?
-        // (for performance, don't bother fetching classes from external DB if they are not going to be available)
-        if($classOptionAvailability){
-            $getSubjects = $classOptionAvailability->getAvailable();
-        } else {
-            // No config yet - fall back to initial defaults.
-            $getSubjects = $definition->getInitialAvailability(Definition::KEY_CLASSES, $page);
-        }
+        $getSubjects = $options[Definition::KEY_CLASSES][$page]->getAvailable();
 
-        // Generate a list of classes/groups that the viewee teaches
-        $groupAccessLevel     = UserAccess::ACCESS_WRITE;
-        $folders              = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel);
+        $groupAccessLevel = $options[Definition::KEY_GROUPS][$page]->getAvailable()
+            ? UserAccess::ACCESS_WRITE
+            : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
+
+        $folders          = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
 
         // Divide folders into Classes and Groups (not mutually exclusive!)
 
@@ -143,7 +134,7 @@ class Factory extends AbstractFilterFactory
      */
     public function buildKeyConverter(Filter\Model $filter)
     {
-        $folderIds = (new Collection($this->folderMapper->findAllIds()))->indexByCallback(function ($folderId) {
+        $folderIds = (new Collection($this->folderMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($folderId) {
             return $folderId;
         });
 

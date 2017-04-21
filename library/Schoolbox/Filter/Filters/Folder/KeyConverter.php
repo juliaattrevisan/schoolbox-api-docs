@@ -13,8 +13,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 
 /**
- * Converts between folder concrete keys (folder.ids) and Folder models
- * @method GenericCollection|Folder\Model[] getSelectedItems(GenericCollection $availableSelections = null)
+ * No conversion. A int is converted to the same int (representing a folder.id)
+ * @method Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {
@@ -29,13 +29,13 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @param Filter\Model      $filter
-     * @param Collection $folderIds
+     * @param Filter\Model $filter
+     * @param Collection   $unitSpecIds
      */
-    public function __construct(Filter\Model $filter, Collection $folderIds)
+    public function __construct(Filter\Model $filter, Collection $unitSpecIds)
     {
         parent::__construct($filter);
-        $this->folderIds = $folderIds->shallowClone();
+        $this->folderIds = $unitSpecIds->shallowClone();
     }
 
 
@@ -80,7 +80,7 @@ class KeyConverter extends AbstractKeyConverter
     protected function assertValidKey($key)
     {
         if (!$this->folderIds->offsetExists($key)) {
-            throw new \InvalidArgumentException("No Folder found for key: $key");
+            throw new \InvalidArgumentException("No Folder ID found for key: $key");
         }
     }
 }

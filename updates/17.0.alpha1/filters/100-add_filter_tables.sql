@@ -70,7 +70,8 @@ INSERT INTO filter (`class`) VALUES
   ('Schoolbox\\Filter\\Filters\\AssessmentType\\Definition'),
   ('Schoolbox\\Filter\\Filters\\WorkType\\Definition'),
   ('Schoolbox\\Filter\\Filters\\Folder\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\WeightingType\\Definition')
+  ('Schoolbox\\Filter\\Filters\\WeightingType\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Unit\\Definition')
 ;
 
 
