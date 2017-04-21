@@ -335,6 +335,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 					vertical-align: middle;
 				}
 				span {
+					white-space: nowrap;
 					overflow: hidden;
 					text-overflow: ellipsis;
 					font-weight: $font-weight-semibold;
