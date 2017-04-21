@@ -60,12 +60,16 @@ class Markbook
     private $totalWeight;
 
     /**
+     * Normalised (0.0 - 100.0) average mark for all assessments in this markbook
+     *
      * @var float
      */
     private $normalisedMean;
 
     /**
-     * @var float
+     * Human readable weighted average mark for all assessments in this markbook
+     *
+     * @var string
      */
     private $weightedMean;
 
@@ -231,7 +235,7 @@ class Markbook
 
 
     /**
-     * @return float
+     * @return string
      */
     public function getWeightedMean()
     {

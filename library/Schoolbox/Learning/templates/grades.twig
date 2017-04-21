@@ -3,6 +3,7 @@
     term:       Term\Model                       - Current visible term
     student:    User                             - The visible student
     folders:    GenericCollection|Folder\Model[] - Classes/Groups that student is enrolled in or has feedback or responses in the current term
+    markbooks:  GenericCollection|MarkBook[]     - Indexed by folder.id, each composed of the assessments for that folder
     mailHandle: string                           - Prefix for sending mail
 #}
 
@@ -73,8 +74,8 @@
                         </div>
                         <div class="medium-2 small-4 columns no-pad">
                             <div class="grade content">
-                                <span class="{{ urgency.marks(markbooks[folder.id].meanNormalised) }}">
-                                    {{ markbooks[folder.id].weightedMean }}
+                                <span class="{{ urgency.marks(markbooks[folder.id].studentStatistics[student.id].meanNormalised) }}">
+                                    {{ markbooks[folder.id].studentStatistics[student.id].weightedMean }}
                                 </span>
                             </div>
                         </div>
