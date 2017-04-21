@@ -4,7 +4,7 @@ WHERE submission_box_id NOT IN (SELECT id FROM submission_box) OR uid NOT IN (SE
 
 -- Prevent nulls, and add foreign key constraint to submissionBox
 ALTER TABLE eportfolio_showcase_item
-  MODIFY submission_box_id INT(4) UNSIGNED NOT NULL,
+  MODIFY submission_box_id INT(6) UNSIGNED NOT NULL,
   MODIFY created_at DATETIME NOT NULL,
   MODIFY updated_at DATETIME NOT NULL,
   ADD CONSTRAINT eportfolio_showcase_item_submission_box_id_fk
