@@ -75,6 +75,10 @@ class EventRecurrenceMapper
             return array();
         }
 
+        /* This collection was indexed by event id
+         */
+        $series->reindex();
+
         /** @var Alaress_Date_Format $dateFirst */
         $dateFirst = $series->first()->getStartDateTime();
         $dateFirst->startOfDay();
@@ -179,9 +183,12 @@ class EventRecurrenceMapper
      */
     protected function persistSeries(Event $event, EventRelations $eventRelations, $access, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate)
     {
+
         /* Update details of an already-existing set of recurring event incidents
          * (Change details of each instance of a recurring event, for example)
          */
+        $selectedCampuses = $event->getCampusCollection();
+
         $series = $this->getEventMapper()->getAllInSeries($event);
 
         if ($series->count() == 0) {
@@ -193,7 +200,6 @@ class EventRecurrenceMapper
 
         // Use start and end deltas to set time of each series event
         $originalEvent = $this->getEventMapper()->findById($event->getId());
-
         $startDelta    = Interval::createFromDateTimeDifference(
             $originalEvent->getStartDateTime()->getDateTimeObject(),
             $startDate->getDateTimeObject()
@@ -204,6 +210,7 @@ class EventRecurrenceMapper
         )->getAsDateInterval();
 
         foreach ($series as $seriesEvent) {
+            $event->setCampusCollection($selectedCampuses);
             $this->setSeriesEventData($seriesEvent, $event);
 
             // Adjust each event's start and end individually

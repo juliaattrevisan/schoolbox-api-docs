@@ -234,20 +234,19 @@ class EventMapper extends Schoolbox\Mapper
 
         /* Hydrate or die
 		 */
-        $personalCollection = new Collection();
-        $categoryCollection = new Collection();
-        $campusCollection = new Collection();
-        $roleCollection = new Collection();
         $allEvents = [];
 
-        while ($row = $statement->fetch()) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
             /* Assemble event pieces
              */
             if (!isset($allEvents[$row['id']])) {
                 $allEvents[$row['id']] = $this->hydrate($row);
 
+                $allEvents[$row['id']]->setUserCollection(new Collection());
+                $allEvents[$row['id']]->setCategoryCollection(new Collection());
                 $allEvents[$row['id']]->setCampusCollection(new Collection());
+                $allEvents[$row['id']]->setRoleCollection(new Collection());
             }
 
             $eventItem = $allEvents[$row['id']];
@@ -273,22 +272,34 @@ class EventMapper extends Schoolbox\Mapper
             /* Personal de-dupe
 			 */
             $personal = $personalMapper->hydrate($row, 'p');
-            $personalCollection->setOffset($personal->getUserId(), $personal);
+
+            if ($personal->getUserId()) {
+                $eventItem->getUserCollection()->setOffset($personal->getUserId(), $personal);
+            }
 
             /* Category de-dupe
 			 */
             $category = $categoryMapper->hydrate($row, 'c');
-            $categoryCollection->setOffset($category->getCategoryId(), $category);
+
+            if ($category->getCategoryId()) {
+                $eventItem->getCategoryCollection()->setOffset($category->getCategoryId(), $category);
+            }
 
             /* Campus de-dupe
  			 */
             $campus = $campusMapper->hydrate($row, 'ca');
-            $campusCollection->setOffset($campus->getId(), $campus);
+
+            if ($campus->getId()) {
+                $eventItem->getCampusCollection()->setOffset($campus->getId(), $campus);
+            }
 
             /* Role de-dupe
  			 */
             $role = $roleMapper->hydrate($row, 'r');
-            $roleCollection->setOffset($role->getRoleId(), $role);
+
+            if ($role->getRoleId()) {
+                $eventItem->getRoleCollection()->setOffset($role->getRoleId(), $role);
+            }
         }
 
         return new Collection($allEvents);
@@ -338,9 +349,11 @@ class EventMapper extends Schoolbox\Mapper
     public function getAllInSeries($event)
     {
         $seriesId = $event->getSeriesId();
+
         if (!isset($seriesId)) {
             return new Collection();
         }
+
         return $this->findByColumnList(
             array(
                 'series_id' => $seriesId,
@@ -374,7 +387,7 @@ class EventMapper extends Schoolbox\Mapper
 			DELETE FROM event_campus
 			WHERE event_id = :eventId
 		";
-new \Alaress_Probe($event->getId());
+
         $statement = $this->database->prepare($query);
         $statement->bindParam(":eventId", $event->getId());
         $statement->execute();
