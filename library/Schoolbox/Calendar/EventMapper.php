@@ -157,11 +157,19 @@ class EventMapper extends Schoolbox\Mapper
             'this_key'  => 'id',
             'other_key' => 'event_id',
         ));
-        $this->hasJoin('campus', array(
-            'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CampusMapper',
-            'this_key'  => 'id',
-            'other_key' => 'event_id',
-        ));
+
+        $this->joinsVia(
+            'event_campus',
+            CampusMapper::class,
+            'id',
+            'campus_id',
+            'event_id',
+            'id',
+            null,
+            null,
+            'campusCollection'
+        );
+
         $this->hasJoin('role', array(
             'mapper'    => '\\Schoolbox\\Calendar\\Relation\\RoleMapper',
             'this_key'  => 'id',
@@ -191,7 +199,7 @@ class EventMapper extends Schoolbox\Mapper
         $eventTypeMapper = $this->getJoinMapper('eventType');
         $personalMapper = $this->getJoinMapper('personal');
         $categoryMapper = $this->getJoinMapper('category');
-        $campusMapper = $this->getJoinMapper('campus');
+        $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
 
         $query = "
@@ -210,7 +218,7 @@ class EventMapper extends Schoolbox\Mapper
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
 			LEFT JOIN {$this->getJoinSql('personal', 'e', 'p')}
 			LEFT JOIN {$this->getJoinSql('category', 'e', 'c')}
-			LEFT JOIN {$this->getJoinSql('campus', 'e', 'ca')}
+			LEFT JOIN {$this->getJoinSql('event_campus', 'e', 'ca')}
 			LEFT JOIN {$this->getJoinSql('role', 'e', 'r')}
 			WHERE e.id = :eventId
 		";
@@ -231,16 +239,19 @@ class EventMapper extends Schoolbox\Mapper
 
             /* Owner
 			 */
+            /** @var User $ownerItem */
             $ownerItem = $ownerMapper->hydrate($row, 'o');
             $eventItem->setOwner($ownerItem);
 
             /* Author
 			 */
+            /** @var User $authorItem */
             $authorItem = $authorMapper->hydrate($row, 'a');
             $eventItem->setAuthor($authorItem);
 
             /* Event Type
 			 */
+            /** @var EventType $eventTypeItem */
             $eventTypeItem = $eventTypeMapper->hydrate($row, 't');
             $eventItem->setType($eventTypeItem);
 
@@ -257,7 +268,7 @@ class EventMapper extends Schoolbox\Mapper
             /* Campus de-dupe
  			 */
             $campus = $campusMapper->hydrate($row, 'ca');
-            $campusCollection->setOffset($campus->getCampusId(), $campus);
+            $campusCollection->setOffset($campus->getId(), $campus);
 
             /* Role de-dupe
  			 */
