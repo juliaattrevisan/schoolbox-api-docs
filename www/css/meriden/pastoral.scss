@@ -139,6 +139,8 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
         }
     }
 
+
+
     /** Subject list gets pushed down **/
     .subject-list {
         margin-top: 1.5rem;
@@ -148,6 +150,7 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
     /* Teacher list */
     .teacher-list {
         padding-top: 0.5rem;
+        text-align: right;
 
         .teacher-image {
             display: none;
@@ -168,12 +171,19 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
         }
     }
 
+    #learning-approaches{
+        table th:first-child,
+        table td:first-child{
+            text-align: left;
+        }
+    }
+
     #assessments{
         table tr th{
-            width: 9.5rem;
+            width: 15%;
         }
-        .fixed-5{
-            width: 5rem;
+        .fixed-40{
+            width: 40%;
         }
     }
 
