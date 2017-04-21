@@ -345,7 +345,7 @@ ul.tileList {
             @include vertical-align;
             // This usually exists in cards but not H1, this is a once off.
             text-overflow: ellipsis;
-            overflow-x: hidden;
+            overflow: hidden;
             white-space: nowrap;
         }
     }
