@@ -12,6 +12,7 @@ use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Eportfolio\ShowcaseMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Mark;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
@@ -24,6 +25,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Statistics;
 use Schoolbox\Learning\Classes\ClassList;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -296,13 +298,15 @@ class Controller extends Base
      * Displays a list of classes for the current logged in user
      *
      * If the term includes now (ie is current) then we use current enrollment.
-     * Else term is historical, so we display classes for which the user has LMS activity.
+     * Else term is historical, so we display classes where a student has submitted responses or received feedback
      *
      * @api GET /learning/classes{/term}
      * @level 165
      *
      * @param Term $term
-     * @throws ServiceNotFound
+     * @throws ServiceNotFound If unable to find HTML builder
+     * @throws DefinitionException
+     * @throws MapperException
      */
     public function getClasses(Term $term)
     {
@@ -348,48 +352,52 @@ class Controller extends Base
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
      * @param User $viewee
-     * @param Collection|null $assessments
-     * @param null $year
-     * @param Term|null $term
+     * @param Term $term
+     * @throws ServiceNotFound If unable to find mail handler service
+     * @throws DefinitionException
+     * @throws MapperException
      */
-    public function getGrades(User $viewee, Collection $assessments = null, $year = null, Term $term = null)
+    public function getGrades(User $viewee, Term $term)
     {
-        // Storage for each folders markbook
-        $markbooks = [];
-        $markbooksFolders = [];
+        // Regardless of whether the term is current, only show folders where the student
+        // has responses or feedback
 
-        // Keep a collection of all folders student has an assessment in for use in the dropdown
+        // Add folders with response or feedback
+        /** @var GenericCollection|Folder[] $folders */
+        $folders = $this->folderMapper->createCollection()
+            ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term), 'id')
+            ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id')
+            ->sortBy('name', 'ASC');
 
-        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
-
-        /** @var IAssessable $assessment */
-        foreach ($assessments as $assessment) {
-            $folder = $assessment->getContext()->getFolder();
-
-            if ($folder instanceof Folder) {
-                if (!isset($foldersFound[$folder->getId()])) {
-
-                    if (!isset($markbooksFolders[$folder->getId()])) {
-                        $markbooksFolders[$folder->getId()] = new Collection();
-                    }
-
-                    $markbooksFolders[$folder->getId()]->add($assessment);
-                }
-            }
+        // Load Teachers
+        foreach ($folders as $folder) {
+            $folder->loadTeachers();
         }
 
-        $folders = $this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term);
-        $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
+        // Get all assessments for this user in the specified term, grouped by folder
+        $assessmentsPerFolder = $this->getAssessmentMapperProxy()
+                                     ->findAllByStudent($viewee, $term)
+                                     ->groupByCallback(function (IAssessable $assessment) {
+                                         return $assessment->getBaseContext()->getFolder()->getId();
+                                     });
+
+        // Generate markbooks for these assessments
+        /** @var GenericCollection|Markbook[] Indexed by folder.id */
+        $markbooks = new GenericCollection(Markbook::class);
+
+        foreach ($assessmentsPerFolder as $folderId => $assessments) {
+            $markbooks->setOffset($folderId, new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()));
+        }
 
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
-            'student'       => $viewee,
-            'term'          => $term,
-            'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'       => $folders,
-            'markbooks'     => $markbooks,
-            'mailHandle'    => $this->getSession()->get('mailhandle'),
+            'student'    => $viewee,
+            'term'       => $term,
+            'terms'      => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
+            'folders'    => $folders,
+            'markbooks'  => $markbooks,
+            'mailHandle' => $this->getSession()->get('mailhandle'),
         ])->setTab('grade'));
     }
 
@@ -401,6 +409,10 @@ class Controller extends Base
      * @param User $viewee
      * @param Term $term
      * @param Folder $subject
+     * @throws DefinitionException
+     * @throws MapperException
+     * @throws ServiceNotFound
+     * @throws \InvalidArgumentException
      */
     public function getGradesForSubject(User $viewee, Term $term, Folder $subject)
     {
@@ -416,52 +428,35 @@ class Controller extends Base
             ]
         );
 
+        /** @var GenericCollection|IAssessable[] $assessments */
         $assessments = $assessments->filter( function(IAssessable $activity) {
             return $activity->isPublished();
         });
 
-        /* If you're an Instructor/superuser, you can see the graph regardless of
-         * the config settings. getFolderAccess() seems to do a lot of stuff,
-         * maybe there is a faster or at least, less costly, way of doing this
-         */
-        $isInstructor = false;
+        // Instructors can see the graph regardless of the config settings.
+        $isInstructor = $this->getAccess()->isInstructor($this->getUser(), $subject);
 
-        $perms = $this->getAccess()->getFolderAccess($this->getUser(), [$subject->getId()]);
+        // Show the box/whisker plot for instructors and for students if the config var is on
+        $canSeeBoxPlot = $isInstructor || $this->getConfigLoader()->get('display_grade_average');
 
-        if ($perms >= UserAccess::ACCESS_WRITE) {
-            $isInstructor = true;
-        }
-
-        /* Show the box/whisker plot on the graph for instructors
-         * and for students if the config var is on
-         */
-        $canSeeBoxplot = $isInstructor || $this->getConfigLoader()->get('display_grade_average');
-
-        /* Show the graph for instructors
-         * and for students if the config var is on
-         */
+        // Show the graph for instructors and for students if the config var is on
         $canSeeGraph = $isInstructor || $this->getConfigLoader()->get('display_grade_graph');
 
-        /* Show the Current Grade Average for instructors
-         * and for students if the config var is on
-         */
+        // Show the Current Grade Average for instructors and for students if the config var is on
         $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Let markbook calculate the statistics
-
         $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
         $statistics = $markbook->getAssessmentStatistics();
 
         // Get the data for the graph
-
-        $graphInfo = [];
+        $graphInfo        = [];
         $graphAssessments = [];
-        $graphData = [];
-        $graphScatter = [];
-        $graphFeedback = [];
-        $quizzes = [];
+        $graphData        = [];
+        $graphScatter     = [];
+        $graphFeedback    = [];
+        $quizzes          = [];
 
-        /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
 
             // If this is a quiz we need to find out if the student has made any attempts so we can display a link to view them
@@ -484,10 +479,9 @@ class Controller extends Base
 
             $graphAssessments[] = $assessment->getTitle();
 
+            $feedback = null;
             if ($assessment->isParticipant($viewee)) {
                 $feedback = $assessment->getParticipant($viewee)->findMostRecentVisibleFeedback($this->getUser());
-            } else {
-                $feedback = null;
             }
 
             if ($feedback) {
@@ -497,7 +491,7 @@ class Controller extends Base
                     $graphInfo[] = [
                         'displayMark' => $feedback->getHumanReadableMark(),
                         'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
-                        'info' => $feedback->getComment() == null ? '' : $feedback->getComment(),
+                        'info' => null === $feedback->getComment() ? '' : $feedback->getComment(),
                     ];
                 } else {
                     $graphInfo[] = [];
@@ -509,7 +503,7 @@ class Controller extends Base
 
             $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()->isQuantitative();
 
-            if ($hasStats && $canSeeBoxplot) {
+            if ($hasStats && $canSeeBoxPlot) {
                 $graphData[] = [
                     // Minimum
                     [
@@ -551,16 +545,16 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
-        $folders = $this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term);
-        $folders = $folders->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
+        $folders = $this->folderMapper
+            ->findFoldersWithFeedbackToStudent($viewee, $term)
+            ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
 
-        // Grab the students conversation history
-
+        // Grab the students conversation history (this also implicitly loads teachers)
         $conversation = new Conversation($this->getConfigLoader(), $viewee, $subject);
 
         // Squeeze it on out
 
-        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER["REQUEST_URI"]);
+        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($_SERVER['REQUEST_URI']);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
             'student'            => $viewee,

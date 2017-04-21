@@ -11,15 +11,14 @@ use Alaress_Date_Format;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 use Timetable_ColourMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 
 /**
  * Generates a list of classes, along with the courses imported to those classes, suitable
@@ -39,26 +38,26 @@ class ClassList
     /** @var Timetable_ColourMapper */
     private $timetableColourMapper;
 
-    /** @var CourseSpecificationMapper */
+    /** @var CourseSpecification\Mapper */
     private $courseSpecMapper;
 
-    /** @var CourseImplementationMapper */
+    /** @var CourseImplementation\Mapper */
     private $courseImplMapper;
 
 
     /**
-     * @param User                       $user
-     * @param FolderMapper               $folderMapper
-     * @param Timetable_ColourMapper     $timetableColourMapper
-     * @param CourseSpecificationMapper  $courseSpecMapper
-     * @param CourseImplementationMapper $courseImplMapper
+     * @param User                        $user
+     * @param FolderMapper                $folderMapper
+     * @param Timetable_ColourMapper      $timetableColourMapper
+     * @param CourseSpecification\Mapper  $courseSpecMapper
+     * @param CourseImplementation\Mapper $courseImplMapper
      */
     public function __construct(
         User $user,
         FolderMapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
-        CourseSpecificationMapper $courseSpecMapper,
-        CourseImplementationMapper $courseImplMapper
+        CourseSpecification\Mapper $courseSpecMapper,
+        CourseImplementation\Mapper $courseImplMapper
     ) {
         $this->user                  = $user;
         $this->folderMapper          = $folderMapper;
@@ -75,10 +74,12 @@ class ClassList
      * @param Term                $term
      * @param Alaress_Date_Format $now
      * @return array
-     * @var Term                    return['term']
-     * @var Collection|Folder[]     return['classList']
-     * @var string[]                return['classTypes'] Indexed by folder.id
-     * @var CourseSpecification[][] return['courses'] Grouped by folder.id
+     * @var Term                          return['term']
+     * @var Collection|Folder[]           return['classList']
+     * @var string[]                      return['classTypes'] Indexed by folder.id
+     * @var CourseSpecification\Model[][] return['courses'] Grouped by folder.id
+     * @throws DefinitionException
+     * @throws MapperException
      */
     public function getClassList(Term $term, Alaress_Date_Format $now)
     {
@@ -91,8 +92,8 @@ class ClassList
             /* Convert external subjects to folders */
             foreach ($this->user->getSubjectCollection() as $subject) {
                 try {
-                    $folder = $this->folderMapper->findByCode($subject['code']);
-                    $folderList = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]),'id');
+                    $folder                       = $this->folderMapper->findByCode($subject['code']);
+                    $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]), 'id');
                     $classTypes[$folder->getId()] = $subject['classType'];
                 } catch (MapperException $e) {
                     //not found
@@ -103,7 +104,9 @@ class ClassList
             if ($this->user->getRole()->isStaff()) {
                 $folderList = $this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term);
             } elseif ($this->user->getRole()->isStudent()) {
-                $folderList = $this->folderMapper->findFoldersWithResponses($this->user, $term);
+                $folderList = $this->folderMapper
+                    ->findFoldersWithResponses($this->user, $term)
+                    ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id');
             }
         }
 
@@ -128,7 +131,7 @@ class ClassList
      *
      * @param GenericCollection|Folder[] $folderList
      * @param Term                       $term
-     * @return Collection|CourseSpecification[][] Grouped by folder.id
+     * @return Collection|CourseSpecification\Model[][] Grouped by folder.id
      */
     protected function getCourseSpecsHavingUnitsInTerm(GenericCollection $folderList, Term $term)
     {
@@ -137,15 +140,15 @@ class ClassList
         // Get CourseImpls, then group by Folder
         $courseImpls = $this->courseImplMapper->findByFolderId($folderList->getColumnValues('id'));
 
-        /** @var CourseImplementation[][] $courseImplsPerClass */
-        $courseImplsPerClass = $courseImpls->groupByCallback(function (CourseImplementation $courseImpl) {
+        /** @var CourseImplementation\Model[][] $courseImplsPerClass */
+        $courseImplsPerClass = $courseImpls->groupByCallback(function (CourseImplementation\Model $courseImpl) {
             return $courseImpl->getFolder()->getId();
         });
 
         // If a course import has unit implementations that are within the specified
         // term, add the course spec to the folder.
         /**
-         * @var CourseImplementation[] $courseImpls
+         * @var CourseImplementation\Model[] $courseImpls
          */
         foreach ($courseImplsPerClass as $folderId => $courseImpls) {
             $courseSpecsPerFolder[$folderId] = $this->courseSpecMapper->createCollection();

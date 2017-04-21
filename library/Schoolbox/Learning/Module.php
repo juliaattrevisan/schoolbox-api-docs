@@ -9,7 +9,10 @@ namespace Schoolbox\Learning;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Container;
+use Aura\Di\Exception\ServiceNotFound;
 use Eportfolio\ShowcaseMapper;
+use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -40,6 +43,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
+        /** @var string[][] $routes */
         $routes = [
             'GET' => [
                 '/pending'                                => 'getPendingAssessments',        // (no preload)
@@ -62,6 +66,7 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -93,6 +98,8 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @throws ApplicationException\Exception If Invalid user id specified
+     * @throws \InvalidArgumentException If mapper definition not found
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
@@ -140,6 +147,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @throws \Twig_Error_Loader If template directory not found
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
@@ -148,9 +156,12 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException If mapper class not found
+     * @throws ServiceNotFound If cannot fetch service from DI
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
+        /** @var Container $injector */
         $injector->params[Controller::class] = [
             'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
@@ -182,6 +193,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getUserMapper()
     {
@@ -190,6 +202,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getFolderMapper()
     {
@@ -198,6 +211,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|TermMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getTermMapper()
     {
@@ -206,6 +220,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|ErrorMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getErrorMapper()
     {

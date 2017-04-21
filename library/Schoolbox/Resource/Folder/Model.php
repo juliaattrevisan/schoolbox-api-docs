@@ -53,9 +53,12 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * A collection of FolderCode() instances
      *
+     * You must index these by folder_code.code to enable efficient de-duplication
+     * when building collection (array key lookup vs array value traversal)
+     *
      * @var Collection|FolderCode[]
      */
-    protected $codes;
+    private $codes;
 
     /**
      * A group instance
