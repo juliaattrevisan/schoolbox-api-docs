@@ -664,6 +664,7 @@
     font-weight: bold;
     display: block;
     white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
     margin: 0 0 3px 0;
     line-height: 12px;
@@ -675,6 +676,7 @@
     margin: 3px 0 4px 0;
     display: block;
     white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
 }
 
