@@ -355,14 +355,15 @@ class EventMapper extends Schoolbox\Mapper
         }
 
         return $this->findByColumnList(
-            array(
+            [
                 'series_id' => $seriesId,
-            ),
-            array(
+            ],
+            [
+                'cache' => false,
                 'order' => array(
                     'start_datetime' => 'ASC'
                 )
-            )
+            ]
         );
     }
 

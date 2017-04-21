@@ -187,8 +187,6 @@ class EventRecurrenceMapper
         /* Update details of an already-existing set of recurring event incidents
          * (Change details of each instance of a recurring event, for example)
          */
-        $selectedCampuses = $event->getCampusCollection();
-
         $series = $this->getEventMapper()->getAllInSeries($event);
 
         if ($series->count() == 0) {
@@ -210,7 +208,6 @@ class EventRecurrenceMapper
         )->getAsDateInterval();
 
         foreach ($series as $seriesEvent) {
-            $event->setCampusCollection($selectedCampuses);
             $this->setSeriesEventData($seriesEvent, $event);
 
             // Adjust each event's start and end individually
