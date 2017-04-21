@@ -138,7 +138,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     function loadingResponse(target) {
         var pickerResponse = $('#' + target + 'Response' + twigVars.id);
         pickerResponse.html('');
-        pickerResponse.append('<img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;">');
+        pickerResponse.append('<img src="/images/foundation/preloader.gif" alt="preloader.gif">');
 
         if (target == 'timetable') {
             $timetable.submit.addClass('disabled');
