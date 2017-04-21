@@ -1,0 +1,20 @@
+{#
+    Renders a checkbox and label, suitable for the filter panel.
+
+    Usage:
+        userSelection: Selection\Model  - This user's current selection (used if we 'clear' filters)
+        roleSelection: Selection\Model  - The default selections for user's role (if we 'reset' filters)
+        label:         string           - Label to render out
+#}
+<input type="hidden" name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]" value="0">
+<input
+        id="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}"
+        type="checkbox"
+        name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]"
+        value="1"
+        data-value-original="{% if userSelection.selected %}1{% else %}0{% endif %}"
+        data-value-default="{% if roleSelection.selected %}1{% else %}0{% endif %}"
+        {% if userSelection.selected %}checked{% endif %}
+        {{ block('extraAttrs') }}
+>
+<label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}">{{ label }}</label>
