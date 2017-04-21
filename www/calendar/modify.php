@@ -66,7 +66,7 @@ if (is_numeric($_GET['eventID'])) {
     $allCampuses      = $event->getCampusCollection();
 
     foreach ($allCampuses as $currentCampus) {
-        $selectedCampuses[] = $currentCampus->getCampusId();
+        $selectedCampuses[] = $currentCampus->getId();
     }
 
     /* Preselected roles
