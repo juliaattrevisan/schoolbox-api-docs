@@ -185,14 +185,7 @@ class EventMapper extends Schoolbox\Mapper
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
-    /**
-    * Custom findById
-    *
-    * @param mixed $identifier
-    * @return Event
-    * @throws \Exception
-    */
-    public function findById($identifier)
+    protected function getSelectString()
     {
         $ownerMapper = $this->getJoinMapper('owner');
         $authorMapper = $this->getJoinMapper('author');
@@ -202,9 +195,9 @@ class EventMapper extends Schoolbox\Mapper
         $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
 
-        $query = "
+        return "
 			SELECT
-				{$this->getColumnString('e')},
+				{$this->getColumnString()},
 				{$ownerMapper->getColumnString('o')},
 				{$authorMapper->getColumnString('a')},
 				{$eventTypeMapper->getColumnString('t')},
@@ -212,20 +205,32 @@ class EventMapper extends Schoolbox\Mapper
 				{$categoryMapper->getColumnString('c')},
 				{$campusMapper->getColumnString('ca')},
 				{$roleMapper->getColumnString('r')}
-			FROM `{$this->table}` e
-			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
-			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			LEFT JOIN {$this->getJoinSql('personal', 'e', 'p')}
-			LEFT JOIN {$this->getJoinSql('category', 'e', 'c')}
-			LEFT JOIN {$this->getJoinSql('event_campus', 'e', 'ca')}
-			LEFT JOIN {$this->getJoinSql('role', 'e', 'r')}
-			WHERE e.id = :eventId
-		";
+        ";
+    }
 
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $identifier);
-        $statement->execute();
+    protected function getFromString()
+    {
+        return "
+            FROM `{$this->table}` 
+			LEFT JOIN {$this->getJoinSql('owner', '', 'o')}
+			LEFT JOIN {$this->getJoinSql('author', '', 'a')}
+			LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
+			LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
+			LEFT JOIN {$this->getJoinSql('category', '', 'c')}
+			LEFT JOIN {$this->getJoinSql('event_campus', '', 'ca')}
+			LEFT JOIN {$this->getJoinSql('role', '', 'r')}
+        ";
+    }
+
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        $ownerMapper = $this->getJoinMapper('owner');
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $personalMapper = $this->getJoinMapper('personal');
+        $categoryMapper = $this->getJoinMapper('category');
+        $campusMapper = $this->getJoinMapper('event_campus');
+        $roleMapper = $this->getJoinMapper('role');
 
         /* Hydrate or die
 		 */
@@ -233,9 +238,19 @@ class EventMapper extends Schoolbox\Mapper
         $categoryCollection = new Collection();
         $campusCollection = new Collection();
         $roleCollection = new Collection();
+        $allEvents = [];
 
         while ($row = $statement->fetch()) {
-            $eventItem = $this->hydrate($row, 'e');
+
+            /* Assemble event pieces
+             */
+            if (!isset($allEvents[$row['id']])) {
+                $allEvents[$row['id']] = $this->hydrate($row);
+
+                $allEvents[$row['id']]->setCampusCollection(new Collection());
+            }
+
+            $eventItem = $allEvents[$row['id']];
 
             /* Owner
 			 */
@@ -276,25 +291,7 @@ class EventMapper extends Schoolbox\Mapper
             $roleCollection->setOffset($role->getRoleId(), $role);
         }
 
-        /* If an event was found matching this id
-		 */
-        if (isset($eventItem)) {
-            $personalCollection->reindex();
-            $eventItem->setUserCollection($personalCollection);
-
-            $categoryCollection->reindex();
-            $eventItem->setCategoryCollection($categoryCollection);
-
-            $campusCollection->reindex();
-            $eventItem->setCampusCollection($campusCollection);
-
-            $roleCollection->reindex();
-            $eventItem->setRoleCollection($roleCollection);
-
-            return $eventItem;
-        }
-
-        throw new Exception('Instance of object not found');
+        return new Collection($allEvents);
     }
 
     /**
@@ -377,7 +374,7 @@ class EventMapper extends Schoolbox\Mapper
 			DELETE FROM event_campus
 			WHERE event_id = :eventId
 		";
-
+new \Alaress_Probe($event->getId());
         $statement = $this->database->prepare($query);
         $statement->bindParam(":eventId", $event->getId());
         $statement->execute();

@@ -193,6 +193,7 @@ class EventRecurrenceMapper
 
         // Use start and end deltas to set time of each series event
         $originalEvent = $this->getEventMapper()->findById($event->getId());
+
         $startDelta    = Interval::createFromDateTimeDifference(
             $originalEvent->getStartDateTime()->getDateTimeObject(),
             $startDate->getDateTimeObject()
@@ -204,6 +205,7 @@ class EventRecurrenceMapper
 
         foreach ($series as $seriesEvent) {
             $this->setSeriesEventData($seriesEvent, $event);
+
             // Adjust each event's start and end individually
             $seriesEvent->getStartDateTime()->getDateTimeObject()->add($startDelta);
             $seriesEvent->getEndDateTime()->getDateTimeObject()->add($endDelta);
