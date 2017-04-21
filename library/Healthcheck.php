@@ -674,4 +674,34 @@ class Healthcheck
          * }
          */
     }
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function schooledgeTest()
+    {
+        $tables = [
+            'Contact',
+            'Staff',
+            'Student',
+            'StudentContact',
+            'vw_Contact_Addresses',
+            "fc.TimetableSubject",
+            "fc.TimetableSubjectChoice",
+            "fc.Timetable",
+            "fc.TimetableClass",
+            "fc.YearLevelSub",
+            "fc.YearLevelSubStudent",
+            "fc.TimetableClassInstance",
+            "fc.TimetableClassStaff",
+            "fc.TimetableClassInstanceStaff",
+            "fc.TimetableClassRoom",
+            "fc.Room",
+            "fc.TimetableClassInstanceRoom",
+            "fc.TimetableDay",
+            "fc.TimetablePeriod",
+            "fc.TimetableDate",
+            "fc.TimetableBlockInstance",
+        ];
+
+        $this->selectTest($tables);
+    }
 }
