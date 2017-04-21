@@ -171,7 +171,8 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
         }
     }
 
-    #learning-approaches{
+    #learning-approaches,
+    #assessments{
         table th:first-child,
         table td:first-child{
             text-align: left;
