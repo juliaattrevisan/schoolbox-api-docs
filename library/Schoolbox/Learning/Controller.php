@@ -359,17 +359,12 @@ class Controller extends Base
      */
     public function getGrades(User $viewee, Term $term)
     {
-        $folders = $this->folderMapper->createCollection();
-
-        // Are we viewing current term?
-        if ($term->contains(Alaress_Date_Format::now())) {
-            // Add current enrollment
-            $folders = $folders->mergeUnique($this->folderMapper->findForUser($viewee, true), 'id');
-        }
+        // Regardless of whether the term is current, only show folders where the student
+        // has responses or feedback
 
         // Add folders with response or feedback
         /** @var GenericCollection|Folder[] $folders */
-        $folders = $folders
+        $folders = $this->folderMapper->createCollection()
             ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term), 'id')
             ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id')
             ->sortBy('name', 'ASC');
