@@ -444,6 +444,11 @@ class SitePage extends Page
         $this->setBlock($this->responsive ? TEMPLATE_body : 'bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
 
         if ($_SESSION['user'] instanceof User) {
+
+            if (!$this->user instanceof User) {
+                $this->user = $_SESSION['user'];
+            }
+
             // quasi-localisation
             $this->localise();
 
