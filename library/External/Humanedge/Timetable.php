@@ -55,8 +55,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
         $result   = $db->getAll("
             SELECT
                 p.Name,
-                CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
-                CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
+                CONVERT(varchar(15),CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME),100) as StartTime,
+                CONVERT(varchar(15),CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME),100) as EndTime,
                 p.SortOrder AS PeriodNumber,
                 ISNULL(d.SortOrder, 0) AS DayNumber
             FROM tblPeriod p
@@ -84,11 +84,9 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             'dayCount'    => $dayCount,
         ];
         foreach ($periods as $period) {
-            $startTime = new Alaress_Date_Format($period['StartTime'], 'H:i:s+');
-            $endTime   = new Alaress_Date_Format($period['EndTime'], 'H:i:s+');
             $definition['desc'][]     = $period['Name'];
-            $definition['start'][]    = $startTime->getUsingFormat('H:i');
-            $definition['end'][]      = $endTime->getUsingFormat('H:i');
+            $definition['start'][]    = $period['StartTime'];
+            $definition['end'][]      = $period['EndTime'];
             $definition['number'][]   = intval($period['PeriodNumber']);
             $definition['sequence'][] = 1;
         }
