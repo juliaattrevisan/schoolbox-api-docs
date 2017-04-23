@@ -28,7 +28,6 @@ use Database;
 use DeprecatedDatabase;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
 
@@ -48,11 +47,7 @@ use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
-use Schoolbox\WebDav\NameGenerator as WebDavNameGenerator;
-use Schoolbox\WebDav\SubjectServer\Server as WebDavSubjectList;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
@@ -81,8 +76,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
-     * @throws Di\Exception\ContainerLocked
-     * @throws Di\Exception\ServiceNotObject
      * @return void
      */
     public function installDependencies()
@@ -584,66 +577,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 \Calendar_Api_Factory::class,
                 ['assessmentDataSource' => $di->lazyGet('assessmentDataSource'),]
             )
-        );
-
-
-        // Schoolbox WebDAV file server
-        $di->set(
-            'webdav:fileServer',
-            $di->lazy(function() use ($di, $mapperFactory) {
-                // Add subject server as well
-                // Inject $_SESSION[subjects], $_SESSION[user], current term, assessment mapper proxy
-
-                $user = $di->get('user');
-                return new WebDavFolder(
-                    '',
-                    $user,
-                    $mapperFactory->get(\Schoolbox\Resource\Folder\Mapper::class),
-                    $mapperFactory->get(\Schoolbox\Resource\File\Mapper::class),
-                    $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
-                    $mapperFactory->get(\Schoolbox\Permission\Access\Access::class)
-                );
-            })
-        );
-
-        // Schoolbox WebDAV subject server
-        $di->set(
-            'webdav:subjectServer',
-            $di->lazy(function() use ($di, $mapperFactory) {
-                /**
-                 * @var User                                                          $user
-                 * @var TermMapper                                                    $termMapper
-                 * @var AssessmentMapperProxy                                         $assessmentDataSource
-                 * @var \Schoolbox\Resource\Storage\Mapper                            $storageDataSource
-                 * @var \Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy $dueWorkResponseDataSource
-                 */
-                $user                      = $di->get('user');
-                $termMapper                = $mapperFactory->get(TermMapper::class);
-                $assessmentDataSource      = $di->get('assessmentDataSource');
-                $storageDataSource         = $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class);
-                $dueWorkResponseDataSource = $di->get('submissionDataSource');
-                return new WebDavSubjectList(
-                    'My Subjects',
-                    $user,
-                    $assessmentDataSource,
-                    $storageDataSource,
-                    $dueWorkResponseDataSource,
-                    $termMapper->findForToday(),
-                    new WebDavNameGenerator()
-                );
-            })
-        );
-
-        // Schoolbox WebDAV server
-        $di->set(
-            'webdav:server',
-            $di->lazy(function() use ($di, $mapperFactory) {
-                /** @var WebDavFolder $server */
-                $server = $di->get('webdav:fileServer');
-                $server->addSubjectList($di->get('webdav:subjectServer'));
-                // Inject subject server
-                return $server;
-            })
         );
 
 

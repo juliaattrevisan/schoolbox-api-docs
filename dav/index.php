@@ -7,13 +7,36 @@
  */
 
 use Alaress\Application\Kernel;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\MapperFactory;
 use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
+use Schoolbox\WebDav\NameGenerator as WebDavNameGenerator;
+use Schoolbox\WebDav\SubjectServer\Server as WebDavSubjectList;
 
 /** @var Kernel $kernel */
 $kernel = require_once __DIR__ . '/../library/Bootstrap.php';
 
 /** @var WebDavFolder $publicdir */
-$publicdir = $kernel->get('webdav:server');
+/** @var MapperFactory $mapperFactory */
+$mapperFactory = $kernel->get('mapperFactory');
+$publicdir = (new WebDavFolder(
+    '',
+    $kernel->get('user'),
+    $mapperFactory->get(\Schoolbox\Resource\Folder\Mapper::class),
+    $mapperFactory->get(\Schoolbox\Resource\File\Mapper::class),
+    $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
+    $mapperFactory->get(\Schoolbox\Permission\Access\Access::class)
+))->addSubjectList(
+    new WebDavSubjectList(
+        'My Subjects',
+        $kernel->get('user'),
+        $kernel->get('assessmentDataSource'),
+        $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
+        $kernel->get('submissionDataSource'),
+        $mapperFactory->get(TermMapper::class)->findForToday(),
+        new WebDavNameGenerator()
+    )
+);
 
 $server = new Sabre\DAV\Server($publicdir);
 $plugin = new Sabre\DAV\Browser\Plugin();
