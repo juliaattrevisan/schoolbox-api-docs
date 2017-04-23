@@ -69,7 +69,7 @@ abstract class Component_Config_Abstract
      *                                                  If a config template has sub-blocks, then
      *                                                  they are set into this block.
      *                                                  Is always set to the same value as $key.
-     * @param mixed $configValue The value of this config
+     * @param string $configValue The value of this config
      * @param Component_ControllerAbstract $component The component this config is part of
      */
     abstract public function parse(

@@ -6,6 +6,7 @@
  * @version     SVN: $Id$
  */
 
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use \Schoolbox\GenericCollection;
@@ -36,6 +37,8 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
+     * @throws ServiceNotFound
+     * @throws RuntimeException
      */
     public function execute()
     {
@@ -46,7 +49,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         $dayLimit = $this->getConfig('days');
 
-        if (self::DAY_LIMIT_ALL == $dayLimit) {
+        if (self::DAY_LIMIT_ALL === $dayLimit) {
             $cutoffDate = null;
         } else {
             $cutoffDate = Alaress_Date_Format::now();
@@ -58,7 +61,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $studentSubmissionDataSource = $this->getSitePage()->getDi()->get('submissionDataSource');
         $pb = $studentSubmissionDataSource->getPredicateBuilder();
         $pb->equals('b.owner', $this->getUser()->getId());
-        if(self::DAY_LIMIT_ALL == $dayLimit){
+        if(self::DAY_LIMIT_ALL === $dayLimit){
             $pb->notNull('submitted_at');
         } else {
             $pb->greaterThan('submitted_at', $cutoffDate->getDatabase());
@@ -71,7 +74,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $pb = $quizAttemptDataSource->getPredicateBuilder();
         $pb->equals('a.user_id', $this->getUser()->getId());
         $pb->equals('a.availability', Quiz::AVAILABILITY_ASSESS);
-        if(self::DAY_LIMIT_ALL == $dayLimit) {
+        if(self::DAY_LIMIT_ALL === $dayLimit) {
             $pb->notNull('finish');
         } else {
             $pb->greaterThan('finish', $cutoffDate->getDatabase());
@@ -79,12 +82,12 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $quizAttempts = $quizAttemptDataSource->findByPredicates($pb);
 
         /** @var GenericCollection|IResponse[] $responses */
-        $responses = (new GenericCollection(IResponse::class))->merge($studentSubmissions)->merge($quizAttempts);
-
-        // Sort said list by first most recent, because we're only showing x responses
-        $responses = $responses->sortByCallback(function(IResponse $a, IResponse $b) {
-            return $a->getSubmittedAt()->compare($b->getSubmittedAt());
-        });
+        $responses = (new GenericCollection(IResponse::class))
+            ->merge($studentSubmissions)
+            ->merge($quizAttempts)
+            ->sortByCallback(function(IResponse $a, IResponse $b) {
+                return $b->getSubmittedAt()->compare($a->getSubmittedAt());
+            });
 
         // Group IResponses by IAssessable
 
@@ -92,14 +95,11 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $assessmentMapperProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
         $assessmentIds = [];
-        $limit         = $this->getConfig('size');
+        $limit         = $this->getConfig('sizeNoAll');
 
-        // Hard-code limit to max of 30 for now - showing every assessment can still break stuff
-        if ($limit <= 0) {
-            $limit = 30;
-        }
         foreach($responses as $response){
-            $assessmentIds[$response->getAssessable()->getId()] = $response->getAssessable()->getId();
+            $assessmentId = $response->getAssessable()->getId();
+            $assessmentIds[$assessmentId] = $assessmentId;
             if (count($assessmentIds) >= $limit) {
                 break;
             }
@@ -113,11 +113,6 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
             if (isset($assessables[$assessmentId])) {
                 $assessables[$assessmentId]->getResponses()->add($response);
             }
-        }
-
-        // Sort responses most recent first
-        foreach($assessables as $assessable){
-            $assessable->getResponses()->sortBy('submittedAt', 'DESC');
         }
 
         // Sort by most recent first, in most recent first
@@ -136,6 +131,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
     /**
      * @param String $templateHandle
      * @return bool
+     * @throws Exception
      */
     public function renderTemplate($templateHandle)
     {
