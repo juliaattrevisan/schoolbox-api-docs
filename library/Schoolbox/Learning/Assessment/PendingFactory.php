@@ -178,7 +178,6 @@ class PendingFactory
 
 
     /**
-     * Not yet authenticated!! TODO - consider authenticating before inserting into this factory to avoid re-lookup
      * @var Collection|int[]
      */
     private $selectedUnitSpecIds;
