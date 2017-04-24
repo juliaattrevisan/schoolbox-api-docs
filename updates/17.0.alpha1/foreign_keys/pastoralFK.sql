@@ -1,3 +1,7 @@
+DELETE pastoral FROM pastoral
+  LEFT JOIN user ON user.id = pastoral.student_id
+WHERE user.id is null;
+
 ALTER TABLE `pastoral`
   CHANGE COLUMN `owner_id` `owner_id` INT(11) UNSIGNED NULL DEFAULT NULL ,
   CHANGE COLUMN `student_id` `student_id` INT(11) UNSIGNED NOT NULL ;
@@ -9,6 +13,11 @@ FOREIGN KEY (`student_id`)
 REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+UPDATE pastoral
+  LEFT JOIN `user` ON `owner_id` = `user`.id
+SET owner_id = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
+WHERE `user`.id is null;
 
 ALTER TABLE `pastoral`
   ADD INDEX `fk_pastoral_owner_id_idx` (`owner_id` ASC);
