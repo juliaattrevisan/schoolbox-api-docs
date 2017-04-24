@@ -115,8 +115,10 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
             AND   (s.Code + ISNULL(b.Suffix, '')) IN ($classQuery)
         ";
         $result = [];
-        foreach ($db->getAll($query) as $row) {
-            $result[] = $row['Code'];
+        if($statement = $db->query($query)) {
+            while ($row = $statement->fetch()) {
+                $result[] = $row['Code'];
+            }
         }
         return $result;
     }
