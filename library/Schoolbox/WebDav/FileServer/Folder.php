@@ -16,7 +16,7 @@ use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\User;
+use Schoolbox\WebDav\HasUserSource;
 use Schoolbox\WebDav\SubjectServer\Server as SubjectList;
 
 /**
@@ -24,15 +24,7 @@ use Schoolbox\WebDav\SubjectServer\Server as SubjectList;
  */
 class Folder extends DAV\Collection
 {
-    /**
-     * An object which returns the currently logged-in user.
-     *
-     * The user can't be passed directly, because they haven't been loaded at
-     * the time this object was created.
-     *
-     * @var callable
-     */
-    private $userSource;
+    use HasUserSource;
 
     /** @var FolderModel */
     private $folder;
@@ -348,16 +340,6 @@ class Folder extends DAV\Collection
     }
 
     /**
-     * Convenience method for getting user out of its source.
-     *
-     * @return User
-     */
-    private function getUser()
-    {
-        return call_user_func($this->getUserSource());
-    }
-
-    /**
      * Determine if $name is a folder
      *
      * @param string $name
@@ -494,24 +476,6 @@ class Folder extends DAV\Collection
     private function setAccessor($accessor)
     {
         $this->accessor = $accessor;
-    }
-
-    /**
-     * @return callable
-     */
-    private function getUserSource()
-    {
-        return $this->userSource;
-    }
-
-    /**
-     * @param callable $userSource
-     * @return static
-     */
-    private function setUserSource($userSource)
-    {
-        $this->userSource = $userSource;
-        return $this;
     }
 
     /**
