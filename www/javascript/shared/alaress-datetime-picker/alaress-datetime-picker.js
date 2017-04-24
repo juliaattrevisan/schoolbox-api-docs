@@ -31,8 +31,7 @@ convertFormat = function (format) {
             P: 'Z'
         },
 
-        formatEx = /[dDjJlNKSwWFmMnoYyaAgGhHisOP]/g,
-        that = this;
+        formatEx = /[dDjJlNKSwWFmMnoYyaAgGhHisOP]/g;
 
     // Just return the converted format
     return format.replace(formatEx, function (format) {

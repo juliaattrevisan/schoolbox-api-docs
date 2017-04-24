@@ -84,7 +84,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         element.attr('data-selected', 1);
         $('.day-' + day).addClass('period-selected');
         $('.description-' + period).addClass('period-selected');
-        periodClicked = 'period' + day + '_' + period;
+        var periodClicked = 'period' + day + '_' + period;
 
         var campus = $timetable.campus.val(),
             term = $timetable.term.val(),
@@ -340,7 +340,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // Highlight day and period
         function showPeriod() {
-            var campusId = $timetable.campus.find(':selected').val();
+            var campusId = $timetable.campus.find(':selected').val(),
                 selectedCampus = 'campus_'+campusId,
                 daysInCycle = $timetable.campus.find(':selected').attr('data-days');
             if (daysInCycle !== undefined && daysInCycle > 0) {
