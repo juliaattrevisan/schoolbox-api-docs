@@ -16,6 +16,8 @@ use Alaress\Redis;
 use OutOfBoundsException;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
+use Schoolbox\Realtime\Routing\Subscription;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -52,7 +54,7 @@ abstract class AbstractNotificationTest extends AbstractTest
 
 
     /** @var \Predis\ClientInterface */
-    private $redis;
+    protected $redis;
 
     /** @var User[] */
     private $userCache;
@@ -121,6 +123,65 @@ abstract class AbstractNotificationTest extends AbstractTest
             throw new OutOfBoundsException("Message $messageId does not exist");
         }
 
-        return Instance::jsonUnserialize(gzuncompress($compressed));
+        return unserialize(gzuncompress($compressed));
     }
+
+
+    /**
+     * @param string $daemon
+     * @param string $signal
+     * @param string $payload
+     */
+    protected function sendSignal($daemon, $signal, $payload = '')
+    {
+        $this->redis->publish(sprintf('%s.%s.%s', $daemon, INSTANCE_ID, $signal), $payload);
+    }
+
+
+    /**
+     * @return void
+     */
+    protected function weaponsToMaximum()
+    {
+        `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
+        $this->log->notice('Weapons to maximum');
+    }
+
+
+    /**
+     * @return void
+     */
+    protected function clearRedis()
+    {
+        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
+    }
+
+
+    /**
+     * @return void
+     */
+    protected function clearRabbit()
+    {
+        $queuesToClear = [ INSTANCE_ID.'.sb.sched', 'sb.schedule' ];
+
+        foreach ($queuesToClear as $q) {
+            `rabbitmqadmin get queue=$q count=10000 requeue=false`;
+        }
+
+        $this->log->notice('Rabbit schedule queue cleared');
+    }
+
+
+    /**
+     * @throws \UnderflowException
+     * @return void
+     */
+    protected function cacheSubscriptions()
+    {
+        $loaderFactory = new Subscription\Loader\Factory($this->redis, $this->log);
+
+        $cache = new WriteCache($this->redis, $this->log, $loaderFactory);
+        $cache->cacheAllUsers(INSTANCE_ID);
+    }
+
 }
