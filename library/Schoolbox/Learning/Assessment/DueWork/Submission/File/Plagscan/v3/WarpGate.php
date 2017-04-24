@@ -374,6 +374,39 @@ class WarpGate
         return $response;
     }
 
+    /**
+     * Delete a document from the plagscan account
+     *
+     * This prevents it being used to compare against future documents
+     * Used when resubmitting one's own file again
+     *
+     * @param $plagscanId
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function delete($plagscanId)
+    {
+        $postData = [
+            'access_token' => $this->getAccessToken(),
+        ];
+
+        $client = new Client([
+            "base_uri" => $this->getApiUrl(),
+            "timeout" => 20.0,
+            "http_errors" => false
+        ]);
+
+        try {
+            $response = $client->delete("documents/{$plagscanId}", [
+                'query' => $postData
+            ]);
+        }
+        catch (TransferException $e) {
+            throw new \RuntimeException('Error: Plagscan unavailable. Could not delete document.');
+        }
+
+        return $response;
+    }
+
     /* Getters/Setters
      */
 
