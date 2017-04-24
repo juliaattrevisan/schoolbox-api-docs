@@ -67,13 +67,13 @@
                         <label for="startDate">
                             From
                         </label>
-                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-allday data-datepicker-alldayext="allday" data-datepicker-call="event" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                     </div>
                     <div class="small-6 columns">
                         <label for="endDate">
                             Until
                         </label>
-                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-allday data-datepicker-alldayext="allday" data-datepicker-call="event" data-datepicker-endofperiod type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-endofperiod type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
                     </div>
                 </fieldset>
 
@@ -158,7 +158,7 @@
                         <label>
                             Publish Date
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
-                            <input id="publishDate" name="publishDate" data-datepicker data-datepicker-allday data-datepicker-time data-datepicker-format="datetime" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
+                            <input id="publishDate" name="publishDate" data-datepicker data-datepicker-alldayswitch data-datepicker-time data-datepicker-format="datetime" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
                         </label>
                     </div>
                     <div class="small-12 columns">

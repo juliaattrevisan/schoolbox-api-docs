@@ -16,8 +16,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // All the rest
         altFormat: getValue($picker, 'data-datepicker-format'), // false|date|datetime
-        allDay: getValue($picker, 'data-datepicker-allday'), // Show All Day switch
-        allDayExt: getValue($picker, 'data-datepicker-alldayext'),
+        allDaySwitch: getValue($picker, 'data-datepicker-alldayswitch'), // Show All Day switch
+        allDayInput: getValue($picker, 'data-datepicker-alldayinput'),
         type: getValue($picker, 'data-datepicker-call'), // Ajax call type: events, duework or nothing
         endDay: getValue($picker, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
         endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
@@ -449,13 +449,13 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     // Setup calendar
     var newDate, latestDate;
 
-    function renderAllday(instance) {
+    function renderAllDaySwitch(instance) {
         var timeDiv = $('#pickerCalendar' + twigVars.id).closest('#picker' + twigVars.id).find('.flatpickr-time');
 
         var html = '';
 
         // Build an All Day switch if it's been set in the options
-        if (pickerOptions.allDay === true) {
+        if (pickerOptions.allDaySwitch === true) {
             html += '<div class="time-switch"><input id="hideTime' + twigVars.id + '" type="checkbox" value="1" checked>' +
                 '<label for="hideTime' + twigVars.id + '" class="checkbox-label">All Day</label></div>' +
                 '</div>';
@@ -480,29 +480,29 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         enableTime: pickerOptions.enableTime,
 
         onReady: function (selectedDates, dateStr, instance) {
-            renderAllday(instance);
+            renderAllDaySwitch(instance);
 
             // Hide time picker if allday hidden field is set to 1
-            if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 1) {
-                checkAllday(true, twigVars.id);
+            if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 1) {
+                checkAllDaySwitch(true, twigVars.id);
             }
-            else if (pickerOptions.allDayExt !== false && $('#' + pickerOptions.allDayExt).val() == 0) {
-                checkAllday(false, twigVars.id);
+            else if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 0) {
+                checkAllDaySwitch(false, twigVars.id);
             }
             else if (hasTime(instance.input.value) === false) {
-                checkAllday(true, twigVars.id);
+                checkAllDaySwitch(true, twigVars.id);
             }
             else {
-                checkAllday(false, twigVars.id);
+                checkAllDaySwitch(false, twigVars.id);
             }
 
-            if (pickerOptions.allDay === true) {
+            if (pickerOptions.allDaySwitch === true) {
                 $('#hideTime' + twigVars.id).click(function () {
                     if ($('#hideTime' + twigVars.id).is(':checked')) {
-                        checkAllday(true, twigVars.id);
+                        checkAllDaySwitch(true, twigVars.id);
                     }
                     else {
-                        checkAllday(false, twigVars.id);
+                        checkAllDaySwitch(false, twigVars.id);
                     }
                 });
             }

@@ -71,11 +71,9 @@ function getOptions(element) {
         displayFormatDate: 'd/m/Y',
         databaseFormat: 'Y-m-d H:i:s',
         enableTime: getValue(element, 'data-datepicker-time'),
-        // bothFormats: false, //Can use both displayFormat and displayFormatDate
-        allDay: getValue(element, 'data-datepicker-allday'), //Show All Day switch
-        allDayExt: getValue(element, 'data-datepicker-alldayext'), //Sync with external AllDay input hidden field
+        allDaySwitch: getValue(element, 'data-datepicker-alldayswitch'), //Show All Day switch
+        allDayInput: getValue(element, 'data-datepicker-alldayinput'), //Sync with external AllDay input hidden field
         altFormat: getValue(element, 'data-datepicker-format'), // false|date|datetime
-        // allDateTime: 'start', //Set time to start or end of the day: start, finish
         type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
         endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
         endPeriod: getValue(element, 'data-datepicker-endofperiod')// It will use end of the period to set time through timetable picker
@@ -104,9 +102,9 @@ function getPickerFormats(allDayState, options) {
             to = options.displayFormatDate;
         }
         else {
-            // Or... looking at the allDay option
-            if (options.allDay === true) {
-                // Ok, the allDay changed, changing the format accordingly
+            // Or... looking at the allDaySwitch option
+            if (options.allDaySwitch === true) {
+                // Ok, the allDaySwitch changed, changing the format accordingly
                 if (allDayState) {
                     from = options.displayFormat;
                     to = options.displayFormatDate;
@@ -131,7 +129,7 @@ function getPickerFormats(allDayState, options) {
 
 function getLinkedElements(element, options) {
     // Get all linked inputs, e.g. startDate, endDate
-    var elements = $('[data-datepicker-alldayext = ' + options.allDayExt + ']');
+    var elements = $('[data-datepicker-alldayinput = ' + options.allDayInput + ']');
     var linkedElements = [];
     elements.each(function () {
         if ($(this)[0] !== element[0]) {
@@ -187,13 +185,12 @@ function setValue(element, options, state, trigger, date) {
     if (trigger === true) {
         element.trigger('change');
     }
-    if (options.allDayExt !== false) {
-        $('#' + options.allDayExt).val(state ? 1 : 0);
+    if (options.allDayInput !== false) {
+        $('#' + options.allDayInput).val(state ? 1 : 0);
     }
-
 }
 
-function checkAllday(state, pickerId) {
+function checkAllDaySwitch (state, pickerId) {
 
     var $timeDiv = $('#pickerCalendar' + pickerId).closest('#picker' + pickerId).find('.flatpickr-time');
 
@@ -254,7 +251,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         else {
             originalValue = moment().format(convertFormat(options.displayFormat));
         }
-        if (options.allDayExt !== false && $('#' + options.allDayExt).val() == 1) {
+        if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
             originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat));
         }
 
@@ -280,13 +277,13 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 // Capture open of modal
                 $(document).on('opened.fndtn.reveal', '#picker' + pickerId, function () {
 
-                    // Check and refresh visibility of time and allDay state
+                    // Check and refresh visibility of time and allDaySwitch state
                     // Hide time picker if allday hidden field is set to 1
-                    if (options.allDayExt !== false && $('#' + options.allDayExt).val() == 1) {
-                        checkAllday(true, pickerId);
+                    if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
+                        checkAllDaySwitch(true, pickerId);
                     }
-                    else if (options.allDayExt !== false && $('#' + options.allDayExt).val() == 0) {
-                        checkAllday(false, pickerId);
+                    else if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 0) {
+                        checkAllDaySwitch(false, pickerId);
                     }
 
                 });
@@ -314,7 +311,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         setValue(element, options, false, true);
                     }
 
-                    if (options.allDayExt !== false) {
+                    if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
                             setValue(item, getOptions(item), $('#hideTime' + pickerId).is(':checked'), false);
@@ -334,7 +331,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     setValue(element, options, false, true, newDate);
 
-                    if (options.allDayExt !== false) {
+                    if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
                             setValue(item, getOptions(item), false, false);
