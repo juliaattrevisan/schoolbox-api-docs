@@ -46,7 +46,7 @@ $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$
 
 if ($assessHandler->isExpired($section['assess_id'])) {
     // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
-    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->getBaseContext() instanceof UnitSpecification)) {
+    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->isSpecification())) {
         error(120);
     }
 }
