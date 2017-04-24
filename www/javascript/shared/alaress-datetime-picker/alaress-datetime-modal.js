@@ -264,7 +264,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         pickerResponse.append(html);
         if (template == 'duework' && data.students.length > 0) {
-            $('[data-collapser]').collapsable();
+            $('#picker'+twigVars.id).find('[data-collapser]').collapsable();
         }
     }
 
