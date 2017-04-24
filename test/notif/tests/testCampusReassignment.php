@@ -15,7 +15,7 @@ use Schoolbox\RoleMapper;
 
 
 /**
- * This class tests whether the rerouter respects users moving from one campus to another.
+ * This class tests whether routed respects users moving from one campus to another.
  */
 class CampusReassignment extends AbstractNotificationTest
 {
@@ -59,12 +59,9 @@ class CampusReassignment extends AbstractNotificationTest
      */
     public function prepare()
     {
-        // fear not - you are sudo
-        `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
-        $this->log->notice('Weapons to maximum');
-        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
-        `rabbitmqadmin get queue=vagrantx.sb.sched count=10000 requeue=false`;
-        $this->log->notice("Rabbit schedule queue cleared");
+        $this->weaponsToMaximum();
+        $this->clearRedis();
+        $this->clearRabbit();
 
         // fix email addresses
         Database::getInstance()->query("UPDATE `user` SET alt_email = CONCAT(LOWER(firstname), '.', LOWER(lastname), '@school.box')");
@@ -78,12 +75,14 @@ class CampusReassignment extends AbstractNotificationTest
 
         // put everyone in senior campus
         $this->moveCampus(self::CAMPUS_ONE);
+
+        $this->cacheSubscriptions();
     }
 
 
     /**
-     * @rerouted  Added \d+ subscriptions
-     * @scheduled Connected to STOMP
+     * @routed    Listening on redis://routed.\w+.*
+     * @scheduled Listening on redis://scheduled.\w+.*
      */
     public function onReady()
     {
@@ -98,7 +97,7 @@ class CampusReassignment extends AbstractNotificationTest
 
 
     /**
-     * @rerouted Tasking \d+ with reroute
+     * @routed Tasking \d+ with route
      */
     public function onWorkerTasked()
     {
@@ -107,7 +106,7 @@ class CampusReassignment extends AbstractNotificationTest
 
 
     /**
-     * @rerouted Task Complete
+     * @routed Task Complete
      */
     public function onWorkerComplete()
     {
@@ -137,14 +136,18 @@ class CampusReassignment extends AbstractNotificationTest
         $this->log->warning("All roles processed; moving to new campus");
         $this->moveCampus(self::CAMPUS_TWO);
 
-        // signal rerouted to drop the cache and
-        // TODO implement REDIS publish
+        // perform a recache
+        $this->cacheSubscriptions();
+
+        // signal routed to drop the cache and reload
+        $this->sendSignal('routed', 'reload');
     }
 
 
     /**
-     * @rerouted Dropped \d+ subscriptions
-     * @rerouted Reload complete
+     * @routed Received signal to reload
+     * @routed \d+ routes installed from cache
+     * @routed \d+ routes installed from cache
      */
     public function onReloadComplete()
     {
@@ -154,7 +157,7 @@ class CampusReassignment extends AbstractNotificationTest
 
 
     /**
-     * @rerouted SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<recipientId>\d+)
+     * @routed SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<recipientId>\d+)
      *
      * @param string $messageId
      * @param string $recipientId
@@ -177,13 +180,14 @@ class CampusReassignment extends AbstractNotificationTest
 
 
     /**
-     * @rerouted DROP (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40})
+     * @routed User not a member of any given campus; expected  one of \[(?P<expected>\d+)\], got \[(?P<actual>\d+)\]
      *
-     * @param string $messageId
+     * @param int $expected
+     * @param int $actual
      */
-    public function onDrop($messageId)
+    public function onDrop($expected, $actual)
     {
-
+        $this->assertEquals(self::CAMPUS_ONE, $expected);
     }
 
 

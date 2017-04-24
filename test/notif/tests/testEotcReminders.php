@@ -185,7 +185,7 @@ class EotcReminders extends AbstractNotificationTest
     /**
      * When both daemons are ready to go, 
      *
-     * @rerouted  Added (?P<count>\d+) subscriptions
+     * @routed    Added (?P<count>\d+) subscriptions
      * @scheduled Connected to STOMP
      */
     public function onReady()
@@ -389,7 +389,7 @@ class EotcReminders extends AbstractNotificationTest
 
     /**
      *
-     * @rerouted ^SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<userId>\d+)
+     * @routed ^SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<userId>\d+)
      *
      * @param string $messageId
      * @param int    $userId
