@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -30,6 +31,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException
      */
     public function registerRoutes()
     {
@@ -66,6 +68,8 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException If class not found
+     * @throws ServiceNotFound
      */
     public function initControllers(ContainerInterface $injector)
     {
