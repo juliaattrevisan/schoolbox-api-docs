@@ -70,7 +70,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:' . $this->basename,
+            'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
                 'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
@@ -87,6 +87,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If class not found
      */
     protected function getUserMapper()
     {
@@ -95,6 +96,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
+     * @throws \InvalidArgumentException If class not found
      */
     protected function getFolderMapper()
     {
@@ -103,6 +105,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|TermMapper
+     * @throws \InvalidArgumentException If class not found
      */
     protected function getTermMapper()
     {
@@ -111,6 +114,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|ErrorMapper
+     * @throws \InvalidArgumentException If class not found
      */
     protected function getErrorMapper()
     {
