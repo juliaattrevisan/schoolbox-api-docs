@@ -49,10 +49,10 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getItem($key)
     {
-        $this->assertValidKey($key);
         if(Definition::KEY_ON_FOLDER === $key){
             return null;
         }
+        $this->assertValidKey($key);
         return $this->unitSpecIds[$key];
     }
 

@@ -30,12 +30,12 @@ class KeyConverter extends AbstractKeyConverter
 
     /**
      * @param Filter\Model $filter
-     * @param Collection   $unitSpecIds
+     * @param Collection   $folderIds
      */
-    public function __construct(Filter\Model $filter, Collection $unitSpecIds)
+    public function __construct(Filter\Model $filter, Collection $folderIds)
     {
         parent::__construct($filter);
-        $this->folderIds = $unitSpecIds->shallowClone();
+        $this->folderIds = $folderIds->shallowClone();
     }
 
 

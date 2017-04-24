@@ -84,7 +84,7 @@ class Component extends AbstractFilterComponent
                     $key = (string)$folder->getId();
 
                     if (!$availableSelections->offsetExists($key)) {
-                        // Does the unit spec not yet exist in selections ?
+                        // Does the folder not yet exist in selections ?
                         $availableSelections[$key] = $this->createSelection($key, $selected);
                     } elseif ($selected) {
                         // Does it exist, ensure it is selected if abstract option is selected
