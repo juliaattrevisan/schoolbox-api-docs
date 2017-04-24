@@ -27,7 +27,7 @@ ALTER TABLE `student_submission_file`
 
 
 ALTER TABLE `submission_return_file`
-  ADD CONSTRAINT `submission_return_file_ibfk_1`
+  ADD CONSTRAINT `submission_return_file_return_id`
 FOREIGN KEY (`submission_return_id`)
 REFERENCES `submission_return` (`id`);
 
