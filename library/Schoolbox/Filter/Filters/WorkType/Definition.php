@@ -66,6 +66,14 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
+    public static function getQueryKey()
+    {
+        return 'wk';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function getPages()
     {
         return [

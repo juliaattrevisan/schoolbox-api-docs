@@ -68,6 +68,13 @@ class Definition extends AbstractFilterDefinition
         $this->previousTerm = $previousTerm;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function getQueryKey()
+    {
+        return 't';
+    }
 
     /**
      * @inheritdoc

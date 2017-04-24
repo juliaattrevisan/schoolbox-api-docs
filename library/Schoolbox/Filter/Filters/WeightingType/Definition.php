@@ -47,6 +47,13 @@ class Definition extends AbstractFilterDefinition
         $this->weightingTypes = $weightingTypes->shallowClone();
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function getQueryKey()
+    {
+        return 'wt';
+    }
 
     /**
      * @inheritdoc

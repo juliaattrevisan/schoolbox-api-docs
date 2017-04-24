@@ -58,9 +58,9 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    public static function getQueryKey()
     {
-        return $this->assessmentTypes->getAll();
+        return 'a';
     }
 
 
@@ -75,30 +75,6 @@ class Definition extends AbstractFilterDefinition
             Option\Model::PAGE_MARK_BOOK,
             Option\Model::PAGE_DUE_WORK_CALENDAR,
         ];
-    }
-
-
-    /**
-     * @param GenericCollection|Option\Model[] $options
-     * @return GenericCollection
-     */
-    protected function sortFilterOptions(GenericCollection $options)
-    {
-        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
-            $leftKey  = $left->getKey();
-            $rightKey = $right->getKey();
-            if (self::KEY_PROJECT === $leftKey) {
-                return -1;
-            }
-            if (self::KEY_QUIZ === $leftKey) {
-                return self::KEY_PROJECT === $right->getKey() ? +1 : -1;
-            }
-            if (self::KEY_DUE_WORK === $leftKey) {
-                return in_array($rightKey, [self::KEY_PROJECT, self::KEY_QUIZ], true) ? +1 : -1;
-            }
-            // left key must be TASK, which should be placed after other keys
-            return self::KEY_TASK === $rightKey ? 0 : +1;
-        });
     }
 
 
@@ -132,6 +108,49 @@ class Definition extends AbstractFilterDefinition
         }
         throw new \InvalidArgumentException("Unknown AssessmentType key: $key");
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getInitialAvailability($customAbstractKey, $page)
+    {
+        // by default, all AssessmentTypes are available
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getCustomKeys()
+    {
+        return $this->assessmentTypes->getAll();
+    }
+
+
+    /**
+     * @param GenericCollection|Option\Model[] $options
+     * @return GenericCollection
+     */
+    protected function sortFilterOptions(GenericCollection $options)
+    {
+        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
+            $leftKey  = $left->getKey();
+            $rightKey = $right->getKey();
+            if (self::KEY_PROJECT === $leftKey) {
+                return -1;
+            }
+            if (self::KEY_QUIZ === $leftKey) {
+                return self::KEY_PROJECT === $right->getKey() ? +1 : -1;
+            }
+            if (self::KEY_DUE_WORK === $leftKey) {
+                return in_array($rightKey, [self::KEY_PROJECT, self::KEY_QUIZ], true) ? +1 : -1;
+            }
+            // left key must be TASK, which should be placed after other keys
+            return self::KEY_TASK === $rightKey ? 0 : +1;
+        });
+    }
+
+
 
 
     /**
@@ -168,13 +187,4 @@ class Definition extends AbstractFilterDefinition
         return false;
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getInitialAvailability($customAbstractKey, $page)
-    {
-        // by default, all AssessmentTypes are available
-        return true;
-    }
 }

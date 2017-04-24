@@ -43,6 +43,13 @@ class Definition extends AbstractFilterDefinition
     const KEY_IMPORTED_TO_CLASS = 'to_classes';
     const KEY_IMPORTED_TO_GROUP = 'to_groups';
 
+    /**
+     * @inheritdoc
+     */
+    public static function getQueryKey()
+    {
+        return 'u';
+    }
 
 
     /**

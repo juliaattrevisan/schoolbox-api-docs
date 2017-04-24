@@ -91,6 +91,10 @@ class Definition extends AbstractFilterDefinition
         return true;
     }
 
+    public static function getQueryKey()
+    {
+        return 'f';
+    }
 
     /**
      * @inheritdoc
