@@ -14,7 +14,6 @@ use Aura\Di\Exception\ServiceNotFound;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Filter\FactoryFactory;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -32,6 +31,7 @@ use \Timetable_ColourMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Filter\Selection as FilterSelection;
+use Schoolbox\Filter;
 
 class Module extends BaseModule
 {
@@ -114,9 +114,9 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
-            function ($params) {
+            function () {
                 return [
-                    'filterFactoryFactory' => new FactoryFactory($this->getMapperFactory()),
+                    'filterFactoryFactory' => new Filter\FactoryFactory($this->getMapperFactory()),
                 ];
             }
         );
