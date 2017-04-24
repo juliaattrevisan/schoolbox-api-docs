@@ -134,6 +134,7 @@ $this->setFile(TEMPLATE_content, 'assess/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
 $this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
+$this->setBlock(TEMPLATE_content, 'has_assess_due', 'has_assess_due_block');
 
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
@@ -154,6 +155,12 @@ $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
     'READ_ONLY' => $readOnly,
 ));
+
+if ($assessment->isImplementation()) {
+    $this->parse('has_assess_due_block', 'has_assess_due');
+} else {
+    $this->setVar('has_assess_due_block', '');
+}
 
 $assess['description'] = trim($assess['description']);
 
