@@ -10,26 +10,26 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
+use Schoolbox\Assessment\Term;
 use Alaress\Csv\Writer AS CsvWriter;
 use DueWork_ErrorMapper;
 
 class Controller extends Base
 {
+
     /**
-     * @var ErrorMapper
+     * @var Error\Mapper
      */
     private $errorMapper;
 
@@ -39,17 +39,17 @@ class Controller extends Base
     private $assessmentMapperProxy;
 
     /**
-     * @var GradeGroup
+     * @var GradeGroup\Model
      */
     private $defaultGradeGroup;
 
     /**
-     * @var CourseImplementationMapper
+     * @var CourseImpl\Mapper
      */
-    private $courseImplementationMapper;
+    private $courseImplMapper;
 
     /**
-     * @var TermMapper
+     * @var Term\Mapper
      */
     private $termMapper;
 
@@ -58,41 +58,43 @@ class Controller extends Base
      */
     private $dueWorkErrorMapper;
 
+
     /**
      * Constructor
      *
-     * @param ErrorMapper                $errorMapper
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param GradeGroup                 $defaultGradeGroup
-     * @param CourseImplementationMapper $courseImplementationMapper
-     * @param TermMapper                 $termMapper
-     * @param DueWork_ErrorMapper        $dueWorkErrorMapper
+     * @param Error\Mapper          $errorMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param GradeGroup\Model      $defaultGradeGroup
+     * @param CourseImpl\Mapper     $courseImplMapper
+     * @param Term\Mapper           $termMapper
+     * @param DueWork_ErrorMapper   $dueWorkErrorMapper
      */
     public function __construct(
-        ErrorMapper $errorMapper,
+        Error\Mapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
-        GradeGroup $defaultGradeGroup,
-        CourseImplementationMapper $courseImplementationMapper,
-        TermMapper $termMapper,
+        GradeGroup\Model $defaultGradeGroup,
+        CourseImpl\Mapper $courseImplMapper,
+        Term\Mapper $termMapper,
         DueWork_ErrorMapper $dueWorkErrorMapper
     ) {
-        $this->errorMapper = $errorMapper;
+        $this->errorMapper           = $errorMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->defaultGradeGroup = $defaultGradeGroup;
-        $this->courseImplementationMapper = $courseImplementationMapper;
-        $this->termMapper = $termMapper;
-        $this->dueWorkErrorMapper = $dueWorkErrorMapper;
+        $this->defaultGradeGroup     = $defaultGradeGroup;
+        $this->courseImplMapper      = $courseImplMapper;
+        $this->termMapper            = $termMapper;
+        $this->dueWorkErrorMapper    = $dueWorkErrorMapper;
     }
+
 
     /**
      * Displays a list of marks for students in the specified class
      *
      * @api   GET /learning/markbook/:classId
      * @level 165
-     * @param Folder $class
+     * @param Folder\Model $class
      * @throws RouteNotFound
      */
-    public function getMarkbook(Folder $class)
+    public function getMarkbook(Folder\Model $class)
     {
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate(
@@ -105,16 +107,17 @@ class Controller extends Base
         );
     }
 
+
     /**
      * Displays a list of marks for students in the specified class for the given term
      *
      * @api   GET /learning/markbook/:classId/term/:termCode
-     * @param Folder $class
-     * @param Term   $term
+     * @param Folder\Model $class
+     * @param Term\Model   $term
      * @throws ServiceNotFound
-     * @throws ApplicationException
+     * @throws ApplicationException\Exception
      */
-    public function getMarkbookForTerm(Folder $class, Term $term)
+    public function getMarkbookForTerm(Folder\Model $class, Term\Model $term)
     {
         // Replaces /submission/listSubmission/{termSlug}/{folderId}
         //       eg /submission/listSubmission/{termSlug}/{folderId}
@@ -123,7 +126,7 @@ class Controller extends Base
 
         // Does this class exist ?
         if (!$class->getId()) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
         // Generate data: assessments and their Participants
@@ -132,13 +135,13 @@ class Controller extends Base
 
         // Build a markbook
         $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
-        $markbook->getAssessments()->sortBy(['dueAt','sequence'], ['asc','asc']);
+        $markbook->getAssessments()->sortBy(['dueAt', 'sequence'], ['asc', 'asc']);
 
         // And what is required for a context selector
         $terms = $this->termMapper->findAll(['order' => ['start' => 'desc']]);
 
         // Also show the courses/units that are on this homepage
-        $courses = $this->courseImplementationMapper->findByFolderId($class->getId());
+        $courses = $this->courseImplMapper->findByFolderId($class->getId());
 
         // And the previous and next term
         $previousTerm = null;
@@ -161,7 +164,7 @@ class Controller extends Base
         // What text should we display if student has submitted but not been marked?
         try {
             $pendingLabel = $this->dueWorkErrorMapper->findDefaultForNewSubmissions()->getDisplayAs();
-        } catch (MapperException $e) {
+        } catch (Mapper\Exception $e) {
             // Let Twig figure it out
             $pendingLabel = null;
         }
@@ -182,20 +185,21 @@ class Controller extends Base
                     'contextTypes' => AssessmentContextType::getInstance(),
                     'pendingLabel' => $pendingLabel,
                 ]
-            )->setTitle('Markbook for '.$class->getTitle())
+            )->setTitle('Markbook for ' . $class->getTitle())
         );
     }
+
 
     /**
      * Return the markbook in CSV format
      *
      * @api   GET /learning/markbook/:classId/term/:termCode/export
-     * @param Folder $class
-     * @param Term   $term
-     * @throws ApplicationException
+     * @param Folder\Model $class
+     * @param Term\Model   $term
+     * @throws ApplicationException\Exception
      * @throws \UnexpectedValueException
      */
-    public function getMarkbookExport(Folder $class, Term $term)
+    public function getMarkbookExport(Folder\Model $class, Term\Model $term)
     {
         // Replaces /submission/listSubmission/{termSlug}/{folderId}
         //       eg /submission/listSubmission/{termSlug}/{folderId}
@@ -204,7 +208,7 @@ class Controller extends Base
 
         // Does this class exist ?
         if (!$class->getId()) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
         // Generate data: assessments and their Participants
@@ -218,10 +222,10 @@ class Controller extends Base
 
         $export = [];
 
-        $data['Student Id'] = 'Class Average';
+        $data['Student Id']         = 'Class Average';
         $data['Student First Name'] = '';
-        $data['Student Last Name'] = '';
-        $data['Student Average'] = $markbook->getWeightedMean();
+        $data['Student Last Name']  = '';
+        $data['Student Average']    = $markbook->getWeightedMean();
 
         // This is an ugly hack to get duplicate task names to appear as is the case in demo data
         // Just prepending spaces to the end of the assessment name
@@ -236,20 +240,20 @@ class Controller extends Base
                 $title .= ' ';
             }
 
-            $titlesFound[$title] = true;
-            $data[$title] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
+            $titlesFound[$title]            = true;
+            $data[$title]                   = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
             $data[$title . ' (Normalized)'] = '';
-            $data[$title . ' (Comment)'] = '';
+            $data[$title . ' (Comment)']    = '';
         }
 
         $export[] = $data;
 
         foreach ($markbook->getStudents() as $student) {
 
-            $data['Student Id'] = $student->getExternalId();
+            $data['Student Id']         = $student->getExternalId();
             $data['Student First Name'] = $student->getFirstname();
-            $data['Student Last Name'] = $student->getLastname();
-            $data['Student Average'] = $markbook->getStudentStatistics()[$student->getId()]['weightedMean'];
+            $data['Student Last Name']  = $student->getLastname();
+            $data['Student Average']    = $markbook->getStudentStatistics()[$student->getId()]['weightedMean'];
 
             $titlesFound = [];
 
@@ -265,20 +269,18 @@ class Controller extends Base
 
                 if ($assessment->isParticipant($student)) {
 
-                    $participant = $assessment->getParticipant($student);
+                    $participant        = $assessment->getParticipant($student);
                     $mostRecentFeedback = $participant->findMostRecentFeedback();
 
                     $comment = $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
 
-                    $data[$title] = $assessment->getHumanReadableMark($student, true);
+                    $data[$title]                   = $assessment->getHumanReadableMark($student, true);
                     $data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
-                    $data[$title . ' (Comment)'] = $comment;
-                }
-                else
-                {
-                    $data[$title] = '';
+                    $data[$title . ' (Comment)']    = $comment;
+                } else {
+                    $data[$title]                   = '';
                     $data[$title . ' (Normalized)'] = '';
-                    $data[$title . ' (Comment)'] = '';
+                    $data[$title . ' (Comment)']    = '';
                 }
 
             }
@@ -287,13 +289,13 @@ class Controller extends Base
 
 
         //TODO This could probably be rewritten with a resource stream output object and using fputcsv to wrap up this code
-        $file = tmpfile();
+        $file   = tmpfile();
         $writer = new CsvWriter($file, $export);
         $writer->write();
 
         $filename = preg_replace('/[^\w-(),]/', '_', 'Markbook_' . $class->getFolder()->getNameWithCodes());
 
-        header('Content-Disposition: attachment; filename="'.$filename.'.csv";');
+        header('Content-Disposition: attachment; filename="' . $filename . '.csv";');
         header('Content-Type: application/csv; charset=UTF-8');
         rewind($file);
         echo stream_get_contents($file);
