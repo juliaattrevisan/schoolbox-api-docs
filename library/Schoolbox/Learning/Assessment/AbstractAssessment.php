@@ -566,7 +566,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isSpecification()
     {
-        return $this->getBaseContext() instanceof UnitSpecification;
+        return $this->getContext()->isSpecificationContext();
     }
 
     /**
@@ -574,7 +574,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isImplementation()
     {
-        return !$this->isImplementation();
+        return $this->getContext()->isImplementationContext();
     }
 
     /**
