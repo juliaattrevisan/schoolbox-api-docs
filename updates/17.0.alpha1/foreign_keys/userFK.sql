@@ -94,6 +94,13 @@ REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+DELETE user_link FROM user_link
+  LEFT JOIN `user` ON `user_id` = `user`.id
+WHERE `user`.id is null;
+
+DELETE user_link FROM user_link
+  LEFT JOIN `user` ON `linked_user_id` = `user`.id
+WHERE `user`.id is null;
 
 ALTER TABLE `user_link`
   ADD CONSTRAINT `fk_user_link_user_id`
