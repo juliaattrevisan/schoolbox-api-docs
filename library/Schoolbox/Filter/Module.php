@@ -26,7 +26,7 @@ class Module extends AlaressModule
      */
     public function __construct(ContainerInterface $injector, $basename = '')
     {
-        parent::__construct($injector, 'filters');
+        parent::__construct($injector, '' === $basename ? 'filters' : $basename);
     }
 
 
