@@ -325,6 +325,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             // Nothing set? set it to now
             return LaravelDate::now($timezone ?: $this->getDefaultTimezone());
         } elseif ($dateTime instanceof DateTimeInterface) {
+
+            if ($dateTime instanceof DateTimeImmutable) {
+                // compensate for Carbon's inept reliance on \DateTime rather than \DateTimeInterface
+                $dateTime = DateTime::createFromFormat('U', $dateTime->getTimestamp());
+            }
+
             // Build out of timestamp and timezone
             if(!is_null($timezone)) {
                 $dateTime->setTimezone($timezone);
