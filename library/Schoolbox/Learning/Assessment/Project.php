@@ -67,6 +67,26 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
+     * This project is a specification if the context it's within is one.
+     *
+     * @return bool
+     */
+    public function isSpecificationContext()
+    {
+        return $this->getContext()->isSpecificationContext();
+    }
+
+    /**
+     * This project is an implementation if the context it's within is one.
+     *
+     * @return bool
+     */
+    public function isImplementationContext()
+    {
+        return $this->getContext()->isImplementationContext();
+    }
+
+    /**
      * Does this have assessments at all?
      *
      * @return bool
