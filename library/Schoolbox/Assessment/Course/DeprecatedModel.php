@@ -43,4 +43,23 @@ class DeprecatedModel extends \Schoolbox\Resource\Folder\Model
         return $this;
     }
 
+    /**
+     * This is a specification context, not that it matters anymore
+     *
+     * @return true
+     */
+    public function isSpecificationContext()
+    {
+        return true;
+    }
+
+    /**
+     * This is a specification context, not that it matters anymore
+     *
+     * @return false
+     */
+    public function isImplementationContext()
+    {
+        return false;
+    }
 }
