@@ -14,6 +14,7 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
@@ -156,11 +157,19 @@ class EventMapper extends Schoolbox\Mapper
             'this_key'  => 'id',
             'other_key' => 'event_id',
         ));
-        $this->hasJoin('campus', array(
-            'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CampusMapper',
-            'this_key'  => 'id',
-            'other_key' => 'event_id',
-        ));
+
+        $this->joinsVia(
+            'event_campus',
+            CampusMapper::class,
+            'id',
+            'campus_id',
+            'event_id',
+            'id',
+            null,
+            null,
+            'campusCollection'
+        );
+
         $this->hasJoin('role', array(
             'mapper'    => '\\Schoolbox\\Calendar\\Relation\\RoleMapper',
             'this_key'  => 'id',
@@ -176,26 +185,19 @@ class EventMapper extends Schoolbox\Mapper
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
-    /**
-    * Custom findById
-    *
-    * @param mixed $identifier
-    * @return Event
-    * @throws \Exception
-    */
-    public function findById($identifier)
+    protected function getSelectString()
     {
         $ownerMapper = $this->getJoinMapper('owner');
         $authorMapper = $this->getJoinMapper('author');
         $eventTypeMapper = $this->getJoinMapper('eventType');
         $personalMapper = $this->getJoinMapper('personal');
         $categoryMapper = $this->getJoinMapper('category');
-        $campusMapper = $this->getJoinMapper('campus');
+        $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
 
-        $query = "
+        return "
 			SELECT
-				{$this->getColumnString('e')},
+				{$this->getColumnString()},
 				{$ownerMapper->getColumnString('o')},
 				{$authorMapper->getColumnString('a')},
 				{$eventTypeMapper->getColumnString('t')},
@@ -203,86 +205,104 @@ class EventMapper extends Schoolbox\Mapper
 				{$categoryMapper->getColumnString('c')},
 				{$campusMapper->getColumnString('ca')},
 				{$roleMapper->getColumnString('r')}
-			FROM `{$this->table}` e
-			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
-			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			LEFT JOIN {$this->getJoinSql('personal', 'e', 'p')}
-			LEFT JOIN {$this->getJoinSql('category', 'e', 'c')}
-			LEFT JOIN {$this->getJoinSql('campus', 'e', 'ca')}
-			LEFT JOIN {$this->getJoinSql('role', 'e', 'r')}
-			WHERE e.id = :eventId
-		";
+        ";
+    }
 
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $identifier);
-        $statement->execute();
+    protected function getFromString()
+    {
+        return "
+            FROM `{$this->table}` 
+			LEFT JOIN {$this->getJoinSql('owner', '', 'o')}
+			LEFT JOIN {$this->getJoinSql('author', '', 'a')}
+			LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
+			LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
+			LEFT JOIN {$this->getJoinSql('category', '', 'c')}
+			LEFT JOIN {$this->getJoinSql('event_campus', '', 'ca')}
+			LEFT JOIN {$this->getJoinSql('role', '', 'r')}
+        ";
+    }
+
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        $ownerMapper = $this->getJoinMapper('owner');
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $personalMapper = $this->getJoinMapper('personal');
+        $categoryMapper = $this->getJoinMapper('category');
+        $campusMapper = $this->getJoinMapper('event_campus');
+        $roleMapper = $this->getJoinMapper('role');
 
         /* Hydrate or die
 		 */
-        $personalCollection = new Collection();
-        $categoryCollection = new Collection();
-        $campusCollection = new Collection();
-        $roleCollection = new Collection();
+        $allEvents = [];
 
-        while ($row = $statement->fetch()) {
-            $eventItem = $this->hydrate($row, 'e');
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            /* Assemble event pieces
+             */
+            if (!isset($allEvents[$row['id']])) {
+                $allEvents[$row['id']] = $this->hydrate($row);
+
+                $allEvents[$row['id']]->setUserCollection(new Collection());
+                $allEvents[$row['id']]->setCategoryCollection(new Collection());
+                $allEvents[$row['id']]->setCampusCollection(new Collection());
+                $allEvents[$row['id']]->setRoleCollection(new Collection());
+            }
+
+            $eventItem = $allEvents[$row['id']];
 
             /* Owner
-			 */
+             */
+            /** @var User $ownerItem */
             $ownerItem = $ownerMapper->hydrate($row, 'o');
             $eventItem->setOwner($ownerItem);
 
             /* Author
-			 */
+             */
+            /** @var User $authorItem */
             $authorItem = $authorMapper->hydrate($row, 'a');
             $eventItem->setAuthor($authorItem);
 
             /* Event Type
-			 */
+             */
+            /** @var EventType $eventTypeItem */
             $eventTypeItem = $eventTypeMapper->hydrate($row, 't');
             $eventItem->setType($eventTypeItem);
 
             /* Personal de-dupe
-			 */
+             */
             $personal = $personalMapper->hydrate($row, 'p');
-            $personalCollection->setOffset($personal->getUserId(), $personal);
+
+            if ($personal instanceof Relation\Personal && $personal->getUserId()) {
+                $eventItem->getUserCollection()->setOffset($personal->getUserId(), $personal);
+            }
 
             /* Category de-dupe
-			 */
+             */
             $category = $categoryMapper->hydrate($row, 'c');
-            $categoryCollection->setOffset($category->getCategoryId(), $category);
+
+            if ($category instanceof Relation\Category && $category->getCategoryId()) {
+                $eventItem->getCategoryCollection()->setOffset($category->getCategoryId(), $category);
+            }
 
             /* Campus de-dupe
- 			 */
+             */
             $campus = $campusMapper->hydrate($row, 'ca');
-            $campusCollection->setOffset($campus->getCampusId(), $campus);
+
+            if ($campus instanceof Campus && $campus->getId()) {
+                $eventItem->getCampusCollection()->setOffset($campus->getId(), $campus);
+            }
 
             /* Role de-dupe
- 			 */
+             */
             $role = $roleMapper->hydrate($row, 'r');
-            $roleCollection->setOffset($role->getRoleId(), $role);
+
+            if ($role instanceof Relation\Role && $role->getRoleId()) {
+                $eventItem->getRoleCollection()->setOffset($role->getRoleId(), $role);
+            }
         }
 
-        /* If an event was found matching this id
-		 */
-        if (isset($eventItem)) {
-            $personalCollection->reindex();
-            $eventItem->setUserCollection($personalCollection);
-
-            $categoryCollection->reindex();
-            $eventItem->setCategoryCollection($categoryCollection);
-
-            $campusCollection->reindex();
-            $eventItem->setCampusCollection($campusCollection);
-
-            $roleCollection->reindex();
-            $eventItem->setRoleCollection($roleCollection);
-
-            return $eventItem;
-        }
-
-        throw new Exception('Instance of object not found');
+        return new Collection($allEvents);
     }
 
     /**
@@ -329,18 +349,21 @@ class EventMapper extends Schoolbox\Mapper
     public function getAllInSeries($event)
     {
         $seriesId = $event->getSeriesId();
+
         if (!isset($seriesId)) {
             return new Collection();
         }
+
         return $this->findByColumnList(
-            array(
+            [
                 'series_id' => $seriesId,
-            ),
-            array(
+            ],
+            [
+                'cache' => false,
                 'order' => array(
                     'start_datetime' => 'ASC'
                 )
-            )
+            ]
         );
     }
 
@@ -408,8 +431,21 @@ class EventMapper extends Schoolbox\Mapper
     private function createCampus($event)
     {
         foreach ($event->getCampusCollection() as $campus) {
+
             if ($campus instanceof Campus) {
-                $campus = $campus->getId();
+                // CampusCollection is a collection of Schoolbox\Campus instances
+                // when importing events from csv or vcal
+                $campusId = $campus->getId();
+            }
+            elseif ($campus instanceof RelationCampus) {
+                // CampusCollection is a collection of Calendar\Relation\Campus instances
+                // when modifying a series of events
+                $campusId = $campus->getCampusId();
+            }
+            else {
+                // CampusCollection is a collection of campus ID's
+                // when editing a single event
+                $campusId = $campus;
             }
 
             $query = "
@@ -420,7 +456,7 @@ class EventMapper extends Schoolbox\Mapper
 
             $statement = $this->database->prepare($query);
             $statement->bindParam(":eventId", $event->getId());
-            $statement->bindParam(":campusId", $campus);
+            $statement->bindParam(":campusId", $campusId);
             $statement->execute();
         }
     }
