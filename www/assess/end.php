@@ -61,18 +61,20 @@ $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
 
-if ($assessHandler->isExpired($assess['assess_id'])) {
-    // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
-    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->isSpecification())) {
+if ($accessLevel < UserAccess::ACCESS_WRITE) {
+
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
         error(120);
     }
-}
 
-/* Participants should be blocked from attempting if it hasn't started,
- * but authors should be able to test out their content
- */
-if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessHandler->isOpen($assess)) {
-    error(143);
+    // I can't attempt this if it isn't open
+    if (!$assessHandler->isOpen($assess)) {
+        error(143);
+    }
+
+} else {
+    // I can do whatever I want
 }
 
 $this->setFile(TEMPLATE_content, 'assess/end.html');

@@ -54,72 +54,67 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
+$readOnly         = false;
 
-if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessment->isParticipant($_SESSION['user'])) {
-    // Show quiz preview to someone who's none of above, but has read access to the folder
-    if ($accessLevel == UserAccess::ACCESS_READ) {
-        $readOnly = true;
-    } else {
-        error(19);
-    }
-}
-
-/* Check if this assessment can be started
- */
-if ($assessHandler->isExpired($assess['assess_id'])) {
-    // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
-    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->isSpecification())) {
+if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
         error(120);
     }
-}
 
-/* Participants should be blocked from attempting if it hasn't started,
- * but authors should be able to test out their content
- */
-if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessHandler->isOpen($assess)) {
-    error(143);
-}
-
-/* Check if you have completed an assessment already
- *
- * Set up Attempt vars
- */
-$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
-
-$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
-$attemptStartTime = strtotime($attempt['start']);
-$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
-$attemptEndTime = $attemptStartTime + $assess['duration'];
-
-/* If there is a resumable attempt, resume it.
- * Otherwise start a new attempt if there is a limit
- */
-if (!$attempt) {
-    /* Clear and exit when you attempt to make more than is allowed
-     * (Teachers may preview this quiz as many attempts as they want)
-     */
-    if ($accessLevel < UserAccess::ACCESS_WRITE
-        && ($assess['max_attempts'] > 0)
-        && ($numAttempts + 1 > $assess['max_attempts'])
-    ) {
-        error(146);
+    // Show quiz preview to someone who's not participating, but has read access to the folder
+    if (!$assessment->isParticipant($_SESSION['user'])) {
+        if ($accessLevel == UserAccess::ACCESS_READ) {
+            $readOnly = true;
+        } else {
+            error(19);
+        }
     }
-}
 
-/* Check if Attempt ran out of time
- * If it did, give the student another attempt, if they have one.
- */
-if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
-    // Close off the last attempt first (at the time it would have ended naturally)
-    $closeTime = new Alaress_Date_Format($attemptEndTime, 'U');
-    $attemptHandler->update(array(
-        'attempt_id' => $attempt['attempt_id'],
-        'finish'     => $closeTime->getDatabase(),
-    ));
-    $numAttempts++;
-    if (($assess['max_attempts'] > 0) && ($numAttempts > $assess['max_attempts'])) {
-        error(122);
+    // I can't attempt this if it has expired
+    if ($assessHandler->isExpired($assess['assess_id'])) {
+        error(120);
     }
+
+    // I can't attempt this if it isn't open
+    if (!$assessHandler->isOpen($assess)) {
+        error(143);
+    }
+
+    // I can't start this if I have too many attempts
+    $numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
+    $attempt     = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
+    if ($attempt) {
+        // Check if Attempt ran out of time
+        // If it did, give the student another attempt, if they have one.
+        $attemptStartTime     = strtotime($attempt['start']);
+        $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
+        $attemptEndTime       = $attemptStartTime + $assess['duration'];
+        if (($attemptTimeRemaining < 0)
+            && ($attemptStartTime > 0)
+            && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)
+        ) {
+            // Close off the last attempt first (at the time it would have ended naturally)
+            $closeTime = new Alaress_Date_Format($attemptEndTime, 'U');
+            $attemptHandler->update(array(
+                'attempt_id' => $attempt['attempt_id'],
+                'finish'     => $closeTime->getDatabase(),
+            ));
+
+            // Now am I out of attempts?
+            if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
+                error(122);
+            }
+        }
+    } else {
+        // Am I already out of attempts?
+        if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
+            error(146);
+        }
+    }
+
+} else {
+    // I can do whatever I want
 }
 
 /* Continue once you get past checks
