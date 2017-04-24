@@ -78,6 +78,7 @@ if (strlen($userKey)) {
         /* Remove dupes
          */
         foreach ($allNews as $currentNews) {
+            /** @var $currentNews Schoolbox\News\Article */
             if (!in_array($currentNews->getId(), $processedIds)) {
 
                 /* Image detection (category news has no images)
@@ -93,6 +94,7 @@ if (strlen($userKey)) {
                 $page->setVar(
                     array(
                         'ITEM_TITLE' => Scrub::xml($currentNews->getHeading()),
+                        'ITEM_TOPIC' => Scrub::xml($currentNews->getTopic()->getName()),
                         'ITEM_DESCRIPTION' => "<![CDATA[" . Scrub::html($imageStr . $currentNews->getBody()) . "]]>",
                         'ITEM_DATE' => Scrub::xml($currentNews->getPostDate()->getUsingFormat(datetime::RFC2822)),
                         'ITEM_LINK' => Scrub::xml(

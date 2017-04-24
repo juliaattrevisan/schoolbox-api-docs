@@ -454,23 +454,6 @@ class News extends DeprecatedModel
         );
     }
 
-    public function getDailyNotice($limit = 1, $campus = '')
-    {
-        $query = "SELECT item_heading, UNIX_TIMESTAMP(item_datetime_posted) item_datetime_posted, UNIX_TIMESTAMP(item_datetime_modified) item_datetime_modified, item_body
-				  FROM news_items n ";
-
-        if (is_array($campus)) {
-            $query .= "JOIN newsCampus c ON c.id = n.item_id AND c.campus IN (" . implode(',', $campus) . ") ";
-        }
-
-        $query .= "WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC ";
-
-        if ($limit) {
-            $query .= "LIMIT $limit";
-        }
-        return $this->db->getAll($query);
-    }
-
     public function getAllByGroup($groupList, $campusList)
     {
         $query = "SELECT `" . $this->_index . "`, item_heading, UNIX_TIMESTAMP(item_datetime_posted) item_datetime_posted, UNIX_TIMESTAMP(item_datetime_modified) item_datetime_modified, item_body, newsTopic.name topicName, item_image

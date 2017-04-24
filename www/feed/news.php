@@ -28,6 +28,7 @@ if (is_array($newsList)) {
             : '';
         $output = array(
             'ITEM_TITLE'       => Scrub::xml($news['item_heading']),
+            'ITEM_TOPIC'       => Scrub::xml($news['topicName']),
             'ITEM_DESCRIPTION' => "<![CDATA[" . Scrub::html($image . $news['item_body']) . "]]>",
             'ITEM_DATE'        => Scrub::xml($itemDate->toRssString()),
             'ITEM_LINK'        => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . '/news/item/' . $news['item_id']),

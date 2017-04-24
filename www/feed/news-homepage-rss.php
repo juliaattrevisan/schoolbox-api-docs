@@ -55,7 +55,7 @@ if (strlen($userKey)) {
 
     $page->setVar(
         array(
-            'TITLE' => Scrub::xml(Cfg::get('school_name') . ' - News'),
+            'TITLE' => Scrub::xml(Cfg::get('school_name') . '  - '.$category->getTitle().' News'),
             'DESCRIPTION' => Scrub::xml('Recent news items from Schoolbox'),
             'DATE' => Scrub::xml(date('r')),
             'LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']),
@@ -80,6 +80,7 @@ if (strlen($userKey)) {
             $page->setVar(
                 array(
                     'ITEM_TITLE' => Scrub::xml($currentNews->getHeading()),
+                    'ITEM_TOPIC' => Scrub::xml($category->getTitle()),
                     'ITEM_DESCRIPTION' => "<![CDATA[" . Scrub::html($imageStr . $currentNews->getBody()) . "]]>",
                     'ITEM_DATE' => Scrub::xml($currentNews->getPostDate()->getUsingFormat(datetime::RFC2822)),
                     'ITEM_LINK' => Scrub::xml(
