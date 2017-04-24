@@ -151,6 +151,30 @@ interface IAssessable extends ISoftDeletable
     public function setSpecificationAssessment(IAssessable $specification = null);
 
     /**
+     * Is this assessment a specification?
+     *
+     * A specification assessment exists within a unit specification.
+     *
+     * Currently an assessment may only be an implementation or specification, not
+     * both or neither.
+     *
+     * @return bool
+     */
+    public function isSpecification();
+
+    /**
+     * Is this assessment an implementation?
+     *
+     * An implementation assessment exists within a folder or a unit implementation.
+     *
+     * Currently an assessment may only be an implementation or specification, not
+     * both or neither.
+     *
+     * @return bool
+     */
+    public function isImplementation();
+
+    /**
      * Gets the user role types which may view this assessment's marks and feedback.
      *
      * The user must still have permission to view the assessment for the given student.

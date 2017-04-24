@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
@@ -560,6 +561,21 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function isSpecification()
+    {
+        return $this->getBaseContext() instanceof UnitSpecification;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isImplementation()
+    {
+        return !$this->isImplementation();
+    }
 
     /**
      * Verify the given dates are all non-null and all in the given sequence
