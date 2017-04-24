@@ -21,7 +21,6 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
-use Schoolbox\Realtime\Routing\Cache\RedisCache;
 use Schoolbox\Realtime\Routing\Subscription;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
