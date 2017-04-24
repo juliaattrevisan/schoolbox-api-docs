@@ -300,6 +300,7 @@ class Controller extends Base
         $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentTypeFilter\Definition::class);
         $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderFilter\Definition::class);
         $selectedWeightings      = $selectionTransformer->getSelectedItems(WeightingFilter\Definition::class);
+        $selectedUnitIds         = $selectionTransformer->getSelectedItems(UnitFilter\Definition::class);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
@@ -317,6 +318,7 @@ class Controller extends Base
             $selectedWorkTypes,
             $selectedWeightings,
             $selectedFolderIds,
+            $selectedUnitIds,
             $toChaseLimit,
             $selectedAssessmentTypes,
             $this->folderMapper

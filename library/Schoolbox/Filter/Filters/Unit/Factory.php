@@ -60,9 +60,9 @@ class Factory extends AbstractFilterFactory
         UnitSpec\Mapper $unitSpecMapper
     ) {
         parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
-        $this->folderMapper = $folderMapper;
+        $this->folderMapper     = $folderMapper;
         $this->courseImplMapper = $courseImplMapper;
-        $this->unitSpecMapper = $unitSpecMapper;
+        $this->unitSpecMapper   = $unitSpecMapper;
     }
 
 

@@ -10,7 +10,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder;
 
 /**
  * No conversion. A int is converted to the same int (representing a unitSpec.id)
@@ -31,8 +30,8 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @param Filter\Model $filter
-     * @param Collection   $unitSpecIds
+     * @param Filter\Model     $filter
+     * @param Collection|int[] $unitSpecIds
      */
     public function __construct(Filter\Model $filter, Collection $unitSpecIds)
     {
@@ -45,12 +44,15 @@ class KeyConverter extends AbstractKeyConverter
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *
      * @param string $key
-     * @return mixed|Folder\Model
+     * @return null|int
      * @throws \InvalidArgumentException
      */
     public function getItem($key)
     {
         $this->assertValidKey($key);
+        if(Definition::KEY_ON_FOLDER === $key){
+            return null;
+        }
         return $this->unitSpecIds[$key];
     }
 
@@ -71,6 +73,9 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function sanitiseKey($key)
     {
+        if(Definition::KEY_ON_FOLDER === $key){
+            return $key;
+        }
         $this->assertValidKey($key);
         return (string)(int)$key;
     }
@@ -81,6 +86,9 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
+        if(Definition::KEY_ON_FOLDER === $key){
+            return;
+        }
         if (!$this->unitSpecIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No UnitSpec ID found for key: $key");
         }
