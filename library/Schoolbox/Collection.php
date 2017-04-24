@@ -442,7 +442,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *                                                  'dob'       => 'desc',   ]
      * @var   string|array $fields[]                 If value is string: Direction to sort. {'asc'|'desc'}
      * @var   string       $fields[][1]              If value is array:  1st item is direction,
-     * @var   callable     $fields[][2]              nd item is a compare function (optional)
+     * @var   callable     $fields[][2]              2nd item is a compare function (optional)
      * @param bool         $maintainIndexAssociation Should we maintain key association?
      * @return $this
      */
