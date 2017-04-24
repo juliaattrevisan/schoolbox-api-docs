@@ -42,6 +42,10 @@ class ImplementationTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($impl->getCreatedAt());
         $this->assertNull($impl->getUpdatedAt());
         $this->assertNull($impl->getDeletedAt());
+
+        // This is an impl and not a spec
+        $this->assertTrue($impl->isImplementationContext());
+        $this->assertFalse($impl->isSpecificationContext());
     }
 
     /**
