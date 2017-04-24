@@ -20,6 +20,7 @@ $sectionHandler = new Assess_Section();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
+$assess = $assessHandler->getByID($section['assess_id']);
 
 /* TODO: Check if this test is for your category
  */
@@ -44,11 +45,24 @@ $assessment       = $assessmentDataSource->findByQuizId($section['assess_id'], $
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
 
-if ($assessHandler->isExpired($section['assess_id'])) {
-    // If I'm an instructor, I should be allowed to attempt anything that is in a course spec.
-    if (!($accessLevel >= UserAccess::ACCESS_WRITE && $assessment->isSpecification())) {
+if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    // I can't do this if not a participant
+    if (!$assessment->isParticipant($_SESSION['user'])) {
+        error(19);
+    }
+
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
         error(120);
     }
+
+    // I can't attempt this if it isn't open
+    if (!$assessHandler->isOpen($assess)) {
+        error(143);
+    }
+
+} else {
+    // I can do whatever I want
 }
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
@@ -62,10 +76,6 @@ $assess = $assessHandler->getByID($section['assess_id']);
 
 if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
     $this->pageNotFound();
-}
-
-if ($accessLevel < UserAccess::ACCESS_WRITE && !$assessHandler->isOpen($assess)) {
-	error(143);
 }
 
 if (!$question) {
