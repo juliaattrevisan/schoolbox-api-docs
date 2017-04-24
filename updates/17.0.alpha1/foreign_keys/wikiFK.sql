@@ -4,15 +4,15 @@ DELETE wiki FROM wiki
 LEFT JOIN folder ON categoryID = folder.id
 WHERE folder.id IS NULL;
 
-ALTER TABLE `schoolbox`.`wiki`
+ALTER TABLE `wiki`
   CHANGE COLUMN `wikiID` `wikiID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
   CHANGE COLUMN `categoryID` `categoryID` INT(11) UNSIGNED NULL DEFAULT NULL ,
   CHANGE COLUMN `latestRevision` `latestRevision` INT(11) UNSIGNED NOT NULL ;
 
-ALTER TABLE `schoolbox`.`wiki`
+ALTER TABLE `wiki`
   ADD CONSTRAINT `fk_wiki_folder_id`
 FOREIGN KEY (`categoryID`)
-REFERENCES `schoolbox`.`folder` (`id`)
+REFERENCES `folder` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
@@ -25,19 +25,19 @@ UPDATE wikiRevision
 SET userID = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
 WHERE `user`.id is null;
 
-ALTER TABLE `schoolbox`.`wikiRevision`
+ALTER TABLE `wikiRevision`
   CHANGE COLUMN `revisionID` `revisionID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
   CHANGE COLUMN `wikiID` `wikiID` INT(11) UNSIGNED NULL DEFAULT NULL ,
   CHANGE COLUMN `userID` `userID` INT(11) UNSIGNED NULL DEFAULT NULL ;
 
-ALTER TABLE `schoolbox`.`wikiRevision`
+ALTER TABLE `wikiRevision`
   ADD CONSTRAINT `fk_wikiRevision_wiki_id`
 FOREIGN KEY (`wikiID`)
-REFERENCES `schoolbox`.`wiki` (`wikiID`)
+REFERENCES `wiki` (`wikiID`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_wikiRevision_user_id`
 FOREIGN KEY (`userID`)
-REFERENCES `schoolbox`.`user` (`id`)
+REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
