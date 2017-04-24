@@ -13,7 +13,7 @@ WHERE `user`.id is null;
 ALTER TABLE `userAccess`
   ADD CONSTRAINT `fk_userAccess_user_id`
 FOREIGN KEY (`uid`)
-REFERENCES `schoolbox`.`user` (`id`)
+REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
@@ -21,7 +21,7 @@ REFERENCES `schoolbox`.`user` (`id`)
 ALTER TABLE `userAccess`
   ADD CONSTRAINT `fk_userAccess_service_id`
 FOREIGN KEY (`service`)
-REFERENCES `schoolbox`.`lu_service` (`id`)
+REFERENCES `lu_service` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
