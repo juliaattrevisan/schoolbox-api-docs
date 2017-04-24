@@ -30,7 +30,7 @@ $publicdir = (new WebDavFolder(
 ))->addSubjectList(
     new WebDavSubjectList(
         'My Subjects',
-        $kernel->get('user'),
+        $userSource,
         $kernel->get('assessmentDataSource'),
         $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
         $kernel->get('submissionDataSource'),

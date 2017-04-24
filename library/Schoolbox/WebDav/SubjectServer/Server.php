@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\User;
+use Schoolbox\WebDav\HasUserSource;
 use Schoolbox\WebDav\NameGenerator;
 
 /**
@@ -25,15 +26,12 @@ use Schoolbox\WebDav\NameGenerator;
  */
 class Server extends DAV\Collection
 {
+    use HasUserSource;
+
     /**
      * @var string
      */
     private $name;
-
-    /**
-     * @var User
-     */
-    private $user;
 
     /**
      * @var AssessmentDataSource
@@ -73,7 +71,7 @@ class Server extends DAV\Collection
      * Constructor
      *
      * @param                           $name
-     * @param User                      $user
+     * @param callable                  $userSource
      * @param AssessmentDataSource      $assessmentDataSource
      * @param StorageDataSource         $storageDataSource
      * @param DueWorkResponseDataSource $dueWorkResponseDataSource
@@ -82,7 +80,7 @@ class Server extends DAV\Collection
      */
     public function __construct(
         $name,
-        User $user,
+        callable $userSource,
         AssessmentDataSource $assessmentDataSource,
         StorageDataSource $storageDataSource,
         DueWorkResponseDataSource $dueWorkResponseDataSource,
@@ -90,7 +88,7 @@ class Server extends DAV\Collection
         NameGenerator $nameGenerator
     ) {
         $this->name                      = $name;
-        $this->user                      = $user;
+        $this->setUserSource($userSource);
         $this->assessmentDataSource      = $assessmentDataSource;
         $this->currentTerm               = $currentTerm;
         $this->storageDataSource         = $storageDataSource;
@@ -108,7 +106,7 @@ class Server extends DAV\Collection
      */
     public function isSubjectListShown($path)
     {
-        return $this->user->getSubjectCollection()->count() > 0 && $this->isThisDirectChildOfPath($path);
+        return $this->getUser()->getSubjectCollection()->count() > 0 && $this->isThisDirectChildOfPath($path);
     }
 
     /**
@@ -156,7 +154,7 @@ class Server extends DAV\Collection
         // Only due works due this term
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
         $groupedAssessments = $this->assessmentDataSource->findAllByStudent(
-            $this->user,
+            $this->getUser(),
             $this->currentTerm,
             ['type'  => AssessmentType::TYPE_DUE_WORK,]
         )->groupByCallback(function(IAssessable $assessment) {
@@ -194,7 +192,7 @@ class Server extends DAV\Collection
                             $folderNode,
                             $this->nameGenerator->sanitiseName($assessment->getTitle())
                         ),
-                        $this->user,
+                        $this->getUser(),
                         $assessment,
                         $this->storageDataSource,
                         $this->dueWorkResponseDataSource
@@ -204,7 +202,7 @@ class Server extends DAV\Collection
                     continue;
                 }
 
-                $participant = $assessment->getParticipantIfExtant($this->user);
+                $participant = $assessment->getParticipantIfExtant($this->getUser());
                 if ($participant instanceof Participant) {
                     foreach ($participant->getAllResponses() as $response) {
 
