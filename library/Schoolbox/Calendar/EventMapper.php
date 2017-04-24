@@ -252,52 +252,52 @@ class EventMapper extends Schoolbox\Mapper
             $eventItem = $allEvents[$row['id']];
 
             /* Owner
-			 */
+             */
             /** @var User $ownerItem */
             $ownerItem = $ownerMapper->hydrate($row, 'o');
             $eventItem->setOwner($ownerItem);
 
             /* Author
-			 */
+             */
             /** @var User $authorItem */
             $authorItem = $authorMapper->hydrate($row, 'a');
             $eventItem->setAuthor($authorItem);
 
             /* Event Type
-			 */
+             */
             /** @var EventType $eventTypeItem */
             $eventTypeItem = $eventTypeMapper->hydrate($row, 't');
             $eventItem->setType($eventTypeItem);
 
             /* Personal de-dupe
-			 */
+             */
             $personal = $personalMapper->hydrate($row, 'p');
 
-            if ($personal->getUserId()) {
+            if ($personal instanceof Relation\Personal && $personal->getUserId()) {
                 $eventItem->getUserCollection()->setOffset($personal->getUserId(), $personal);
             }
 
             /* Category de-dupe
-			 */
+             */
             $category = $categoryMapper->hydrate($row, 'c');
 
-            if ($category->getCategoryId()) {
+            if ($category instanceof Relation\Category && $category->getCategoryId()) {
                 $eventItem->getCategoryCollection()->setOffset($category->getCategoryId(), $category);
             }
 
             /* Campus de-dupe
- 			 */
+             */
             $campus = $campusMapper->hydrate($row, 'ca');
 
-            if ($campus->getId()) {
+            if ($campus instanceof Campus && $campus->getId()) {
                 $eventItem->getCampusCollection()->setOffset($campus->getId(), $campus);
             }
 
             /* Role de-dupe
- 			 */
+             */
             $role = $roleMapper->hydrate($row, 'r');
 
-            if ($role->getRoleId()) {
+            if ($role instanceof Relation\Role && $role->getRoleId()) {
                 $eventItem->getRoleCollection()->setOffset($role->getRoleId(), $role);
             }
         }
