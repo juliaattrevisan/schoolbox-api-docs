@@ -155,20 +155,4 @@ class Component extends AbstractFilterComponent
         ]);
     }
 
-
-    /**
-     * Converts a unitSpec.id to the unitSpec.folder.name
-     *
-     * @param string $key
-     * @return string
-     * @throws \InvalidArgumentException If no unitSpec found with the specified ID
-     */
-    public function getLabel($key)
-    {
-        if ($this->unitSpecsImportedToClasses->offsetExists($key)) {
-            return $this->unitSpecsImportedToClasses[$key]->getTitle();
-        }
-        throw new \InvalidArgumentException("Unknown 'UnitSpec' filter key: $key");
-    }
-
 }
