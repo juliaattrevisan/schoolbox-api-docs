@@ -25,9 +25,14 @@ use Schoolbox\WebDav\SubjectServer\Server as SubjectList;
 class Folder extends DAV\Collection
 {
     /**
-     * @var User
+     * An object which returns the currently logged-in user.
+     *
+     * The user can't be passed directly, because they haven't been loaded at
+     * the time this object was created.
+     *
+     * @var callable
      */
-    private $user;
+    private $userSource;
 
     /** @var FolderModel */
     private $folder;
@@ -63,16 +68,16 @@ class Folder extends DAV\Collection
     /**
      * Constructor
      *
-     * @param              $path
-     * @param User         $user
-     * @param FolderMapper $folderMapper
-     * @param FileMapper   $fileMapper
+     * @param               $path
+     * @param callable      $userSource
+     * @param FolderMapper  $folderMapper
+     * @param FileMapper    $fileMapper
      * @param StorageMapper $storageMapper
      * @param Access        $accessor
      */
     public function __construct(
         $path,
-        User $user,
+        callable $userSource,
         FolderMapper $folderMapper,
         FileMapper $fileMapper,
         StorageMapper $storageMapper,
@@ -82,7 +87,7 @@ class Folder extends DAV\Collection
         $this->setFileMapper($fileMapper);
         $this->setStorageMapper($storageMapper);
         $this->setAccessor($accessor);
-        $this->setUser($user);
+        $this->setUserSource($userSource);
         $this->setPath($path);
         $this->setFolderFromPath($path);
 
@@ -342,6 +347,15 @@ class Folder extends DAV\Collection
         }
     }
 
+    /**
+     * Convenience method for getting user out of its source.
+     *
+     * @return User
+     */
+    private function getUser()
+    {
+        return call_user_func($this->getUserSource());
+    }
 
     /**
      * Determine if $name is a folder
@@ -483,20 +497,20 @@ class Folder extends DAV\Collection
     }
 
     /**
-     * @return User
+     * @return callable
      */
-    private function getUser()
+    private function getUserSource()
     {
-        return $this->user;
+        return $this->userSource;
     }
 
     /**
-     * @param User $user
+     * @param callable $userSource
      * @return static
      */
-    private function setUser($user)
+    private function setUserSource($userSource)
     {
-        $this->user = $user;
+        $this->userSource = $userSource;
         return $this;
     }
 

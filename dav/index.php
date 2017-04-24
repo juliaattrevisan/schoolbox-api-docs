@@ -19,9 +19,10 @@ $kernel = require_once __DIR__ . '/../library/Bootstrap.php';
 /** @var WebDavFolder $publicdir */
 /** @var MapperFactory $mapperFactory */
 $mapperFactory = $kernel->get('mapperFactory');
+$userSource    = $kernel->getDependencyInjector()->lazyGet('user');
 $publicdir = (new WebDavFolder(
     '',
-    $kernel->get('user'),
+    $userSource,
     $mapperFactory->get(\Schoolbox\Resource\Folder\Mapper::class),
     $mapperFactory->get(\Schoolbox\Resource\File\Mapper::class),
     $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
