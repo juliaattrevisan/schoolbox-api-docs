@@ -142,3 +142,28 @@ FOREIGN KEY (`user_id`)
 REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+DELETE event_attendance FROM event_attendance
+ LEFT JOIN event ON event.id = event_id
+WHERE event.id IS NULL;
+
+DELETE event_attendance FROM event_attendance
+  LEFT JOIN user ON user.id = user_id
+WHERE user.id IS NULL;
+
+ALTER TABLE `schoolbox`.`event_attendance`
+  CHANGE COLUMN `event_id` `event_id` INT(11) UNSIGNED NOT NULL ,
+  CHANGE COLUMN `user_id` `user_id` INT(11) UNSIGNED NOT NULL ;
+
+ALTER TABLE `schoolbox`.`event_attendance`
+  ADD CONSTRAINT `fk_event_attendance_event_id`
+FOREIGN KEY (`event_id`)
+REFERENCES `schoolbox`.`event` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_event_attendance_user_id`
+FOREIGN KEY (`user_id`)
+REFERENCES `schoolbox`.`user` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
