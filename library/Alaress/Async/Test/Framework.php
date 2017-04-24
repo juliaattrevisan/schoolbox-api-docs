@@ -106,7 +106,7 @@ class Framework
 
         $this->log->warning("Freezing hell over");
 
-        foreach (['schedule','reroute','socket','digest','bell'] as $d) {
+        foreach (['schedule','route','socket','digest','bell'] as $d) {
             $killswitch = "service $service-{$d}d stop 2>&1";
             $log->debug("Stop $d daemon: " . trim(`$killswitch`));
         }
@@ -128,7 +128,7 @@ class Framework
             throw new UnderflowException("No tests available to run.");
         }
 
-        $prompt  = "Choose a test to run:\n\n";
+        $prompt  = "Choose a test to run: (alternatively you can specify this via --testcase={classname})\n\n";
 
         $classes = array_map(
             function ($file)
@@ -330,7 +330,7 @@ class Framework
 
         $map = [
             TestCase::DAEMON_SCHEDULE => "$root/mq/scheduled.php",
-            TestCase::DAEMON_ROUTE  => "$root/notif/reroute/rerouted.php",
+            TestCase::DAEMON_ROUTE    => "$root/notif/route/routed.php",
             TestCase::DAEMON_DIGEST   => "$root/digest/digestd.php",
             TestCase::DAEMON_SOCKET   => "$root/socket/socketd.php"
         ];

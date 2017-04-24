@@ -47,23 +47,23 @@ class TestFramework extends AbstractNotificationTest
      *
      * Actions in this method will trigger other `$this->on*` methods.
      *
-     * @rerouted  Added (?P<count>\d+) (?P<subscriptions>subscriptions)
+     * @routed    \d+ routes (?P<installed>installed) from cache
      * @scheduled Connected to (?P<stomp>STOMP)
      * @digestd   Scheduling (?P<trigger>trigger)
      * @socketd   Listening for incoming (?P<websockets>websockets)
      *
-     * @param int    $subscriptions
+     * @param string $installed
      * @param string $stomp
      * @param string $trigger
      * @param string $websockets
      * @param null   $blah
      */
-    public function onAllDaemonsReady($subscriptions = null, $stomp = null, $trigger = null, $websockets = null, $blah = null)
+    public function onAllDaemonsReady($installed = null, $stomp = null, $trigger = null, $websockets = null, $blah = null)
     {
         // If I got here that means that this test is a success,
         // as long as vars are parsed properly.
-        $this->log->notice("All daemons are ready", [ 'char' => '>' ]);
-        $this->assertEquals('subscriptions', $subscriptions);
+        $this->log->notice('All daemons are ready', [ 'char' => '>' ]);
+        $this->assertEquals('installed', $installed);
         $this->assertEquals('STOMP', $stomp);
         $this->assertEquals('trigger', $trigger);
         $this->assertEquals('websockets', $websockets);
@@ -71,5 +71,6 @@ class TestFramework extends AbstractNotificationTest
 
         // I should be able to signal that this is the end of the test.
         // Any on* methods that haven't been called must fail.
+        $this->markTestComplete();
     }
 }
