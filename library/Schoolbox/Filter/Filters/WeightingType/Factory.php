@@ -11,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\User;
-use Schoolbox\Mapper;
 use Schoolbox\Filter;
 
 /**
@@ -23,14 +22,31 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    public function buildDefinition(Filter\Model $filter)
+    protected function buildDefinitionArgs(Filter\Model $filter)
     {
-        return new Definition(
-            $filter,
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultMapper(),
-            $this->getWeightingTypes()
-        );
+        return array_merge(parent::buildDefinitionArgs($filter), [
+            'weightingTypes' => $this->getWeightingTypes(),
+        ]);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function buildExtraComponentArgs(User $user, $page, IRunTimeOptions $runTimeOptions = null, Filter\IFilterDefinition $definition)
+    {
+        return [];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function buildKeyConverterArgs(Filter\Model $filter)
+    {
+        return array_merge(parent::buildKeyConverterArgs($filter), [
+            'weightingTypes' => $this->getWeightingTypes(),
+        ]);
     }
 
 
@@ -43,30 +59,6 @@ class Factory extends AbstractFilterFactory
             Definition::KEY_UNWEIGHTED,
             Definition::KEY_WEIGHTED,
         ]);
-    }
-
-
-    /**
-     * @inheritdoc
-     * @throws Mapper\Exception
-     */
-    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
-    {
-        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
-        $definition      = $this->buildDefinition($filter);
-        $savedSelections = $this->getSavedSelections($filter, $user, $page);
-
-        return new Component($definition, $user, $page, $savedSelections, $this->getFilterSelectionMapper());
-    }
-
-
-    /**
-     * @inheritdoc
-     * @return KeyConverter
-     */
-    public function buildKeyConverter(Filter\Model $filter)
-    {
-        return new KeyConverter($filter, $this->getWeightingTypes());
     }
 
 }

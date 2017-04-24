@@ -18,4 +18,17 @@ namespace Schoolbox\Filter;
 interface IRunTimeOptions
 {
 
+    /**
+     * Should we ignore the user's saved selections, and use the controller's injected selections instead?
+     *
+     * The Controller can override any filter component to enable jumping to a specific data set.
+     *
+     * @return bool
+     */
+    public function isSelectionOverride();
+
+    /**
+     * @return null|string[]
+     */
+    public function getOverrideKeys();
 }

@@ -7,26 +7,34 @@
 
 namespace Schoolbox\Filter\Filters\Folder;
 
-use Schoolbox\Filter\IRunTimeOptions;
+use Schoolbox\Filter\AbstractRunTimeOptions;
 use Schoolbox\User;
 
 /**
  * For now, folder lists are generated at run-time
  */
-class RunTimeOptions implements IRunTimeOptions
+class RunTimeOptions extends AbstractRunTimeOptions
 {
+
     /**
      * @var User $viewee
      */
     private $viewee;
 
+
     /**
-     * @param User $viewee
+     * @param User          $viewee
+     * @param string[]|null $folderIds
      */
-    public function __construct(User $viewee)
+    public function __construct(User $viewee, array $folderIds = null)
     {
+        parent::__construct($folderIds);
         $this->viewee = $viewee;
     }
+
+
+    /* Getters
+     */
 
 
     /**
@@ -36,4 +44,5 @@ class RunTimeOptions implements IRunTimeOptions
     {
         return $this->viewee;
     }
+
 }

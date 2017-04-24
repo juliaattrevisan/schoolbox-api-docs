@@ -33,12 +33,13 @@ interface IFilterFactory
     /**
      * Build a filter component, ready to inject into a filter panel
      *
+     * @param string               $definitionClass  They type of filter we are building
      * @param User                 $user
      * @param string               $page
      * @param null|IRunTimeOptions $runTimeOptions
-     * @return IFilterDefinition
+     * @return IFilterComponent
      */
-    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null);
+    public function buildComponent($definitionClass, User $user, $page, IRunTimeOptions $runTimeOptions = null);
 
 
     /**

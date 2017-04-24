@@ -19,7 +19,7 @@
         {% set selection = userSelections[keyOnFolder] %}
         {% include '@filters/_selectionCheckbox.twig' with {
             userSelection: selection,
-            roleSelection: defaultSelections[keyOnFolder],
+            roleSelection: roleSelections[keyOnFolder],
             label:         'On Folder'
         } only %}
 

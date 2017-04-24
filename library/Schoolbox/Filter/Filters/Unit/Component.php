@@ -43,57 +43,61 @@ class Component extends AbstractFilterComponent
 
 
     /**
-     * @param IFilterDefinition                   $definition
-     * @param User                                $user
-     * @param string                              $page
-     * @param GenericCollection|Selection\Model[] $savedSelections
-     * @param Selection\Mapper                    $filterSelectionMapper
-     * @param GenericCollection|UnitSpec\Model[]  $unitSpecsImportedToClasses
-     * @param GenericCollection|UnitSpec\Model[]  $unitSpecsImportedToGroups
+     * @param IFilterDefinition                        $definition
+     * @param User                                     $user
+     * @param string                                   $page
+     * @param null|GenericCollection|Selection\Model[] $savedSelections
+     * @param null|string[]                            $selectionOverrides
+     * @param Selection\Mapper                         $filterSelectionMapper
+     * @param GenericCollection|UnitSpec\Model[]       $unitSpecsImportedToClasses
+     * @param GenericCollection|UnitSpec\Model[]       $unitSpecsImportedToGroups
+     * @throws \DomainException If both saved selections and override selections are null
      */
     public function __construct(
         IFilterDefinition $definition,
         User $user,
         $page,
-        GenericCollection $savedSelections,
+        GenericCollection $savedSelections = null,
+        array $selectionOverrides = null,
         Selection\Mapper $filterSelectionMapper,
         GenericCollection $unitSpecsImportedToClasses,
         GenericCollection $unitSpecsImportedToGroups
     ) {
-        parent::__construct($definition, $user, $page, $savedSelections, $filterSelectionMapper);
+        parent::__construct($definition, $user, $page, $savedSelections, $selectionOverrides, $filterSelectionMapper);
         $this->unitSpecsImportedToClasses = $unitSpecsImportedToClasses;
         $this->unitSpecsImportedToGroups  = $unitSpecsImportedToGroups;
 
         /** @var UnitSpec\Model[] $unitSpecs */
-        $unitSpecs = $unitSpecsImportedToClasses->mergeUnique($unitSpecsImportedToGroups, 'id');
-        $this->courseSpecs    = CourseSpec\Mapper::getInstance()->createCollection();
+        $unitSpecs         = $unitSpecsImportedToClasses->mergeUnique($unitSpecsImportedToGroups, 'id');
+        $this->courseSpecs = CourseSpec\Mapper::getInstance()->createCollection();
 
         // Build indexed collection of course specs
-        foreach($unitSpecs as $unitSpec){
+        foreach ($unitSpecs as $unitSpec) {
             $courseSpec = $unitSpec->getCourse();
-            if(!$this->courseSpecs->offsetExists($courseSpec->getId())){
+            if (!$this->courseSpecs->offsetExists($courseSpec->getId())) {
                 $this->courseSpecs->setOffset($courseSpec->getId(), $courseSpec);
             }
         }
 
         // Ensure course unit lists are empty (eg, we may be only interested in class units, but they already contain group units)
-        foreach($this->courseSpecs as $courseSpec){
+        foreach ($this->courseSpecs as $courseSpec) {
             $courseSpec->setUnits($courseSpec->getUnits()->emptyClone());
         }
 
         // Add unitSpecs to courseSpecs
-        foreach($unitSpecs as $unitSpec){
+        foreach ($unitSpecs as $unitSpec) {
             $unitSpec->getCourse()->getUnits()->setOffset($unitSpec->getId(), $unitSpec);
         }
 
         // Sort unitSpecs inside courseSpecs by unitSpec.folder.name
-        foreach($this->courseSpecs as $courseSpec){
+        foreach ($this->courseSpecs as $courseSpec) {
             $courseSpec->getUnits()->sortBy('title', 'ASC', null, true);
         }
 
         // Sort Courses by title
         $this->courseSpecs->sortBy('title', 'ASC', null, true);
     }
+
 
     /**
      * Generate a list of available options, selected as per role defaults.
@@ -114,25 +118,22 @@ class Component extends AbstractFilterComponent
             $selected = $option->getDefaults()[$roleType]->getSelected();
 
             // Is this the 'On Folder' abstract option?
-            if(Definition::KEY_ON_FOLDER === $option->getKey()){
-                $key      = $option->getKey();
+            if (Definition::KEY_ON_FOLDER === $option->getKey()) {
+                $key                       = $option->getKey();
                 $availableSelections[$key] = $this->createSelection($key, $selected);
-            }
-
-            elseif(Definition::KEY_IMPORTED_TO_CLASS === $option->getKey()){
-                foreach($this->unitSpecsImportedToClasses as $unitSpec){
-                    $key = (string)$unitSpec->getId();
+            } elseif (Definition::KEY_IMPORTED_TO_CLASS === $option->getKey()) {
+                foreach ($this->unitSpecsImportedToClasses as $unitSpec) {
+                    $key                       = (string)$unitSpec->getId();
                     $availableSelections[$key] = $this->createSelection($key, $selected);
                 }
-            }
-            elseif(Definition::KEY_IMPORTED_TO_GROUP === $option->getKey()){
-                foreach($this->unitSpecsImportedToGroups as $unitSpec){
+            } elseif (Definition::KEY_IMPORTED_TO_GROUP === $option->getKey()) {
+                foreach ($this->unitSpecsImportedToGroups as $unitSpec) {
                     $key = (string)$unitSpec->getId();
 
-                    if(!$availableSelections->offsetExists($key)){
+                    if (!$availableSelections->offsetExists($key)) {
                         // Does the unit spec not yet exist in selections ?
                         $availableSelections[$key] = $this->createSelection($key, $selected);
-                    } elseif($selected) {
+                    } elseif ($selected) {
                         // Does it exist, ensure it is selected if abstract option is selected
                         $availableSelections[$key]->setSelected(true);
                     }
@@ -144,14 +145,15 @@ class Component extends AbstractFilterComponent
         return $availableSelections;
     }
 
+
     /**
      * @inheritdoc
      */
     public function toContext()
     {
         return array_merge(parent::toContext(), [
-            'courseSpecs'       => $this->courseSpecs,
-            'keyOnFolder'       => Definition::KEY_ON_FOLDER,
+            'courseSpecs' => $this->courseSpecs,
+            'keyOnFolder' => Definition::KEY_ON_FOLDER,
         ]);
     }
 

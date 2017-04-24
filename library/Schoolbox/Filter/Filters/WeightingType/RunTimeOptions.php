@@ -7,12 +7,12 @@
 
 namespace Schoolbox\Filter\Filters\WeightingType;
 
-use Schoolbox\Filter\IRunTimeOptions;
+use Schoolbox\Filter\AbstractRunTimeOptions;
 
 /**
  * No implementation. All options are pre-defined
  */
-class RunTimeOptions implements IRunTimeOptions
+class RunTimeOptions extends AbstractRunTimeOptions
 {
 
 }

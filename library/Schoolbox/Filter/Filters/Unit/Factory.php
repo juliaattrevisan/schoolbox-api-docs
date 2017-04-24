@@ -17,7 +17,6 @@ use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -39,16 +38,14 @@ class Factory extends AbstractFilterFactory
     private $unitSpecMapper;
 
 
-
-
     /**
-     * @param Filter\Mapper    $filterMapper
-     * @param Option\Mapper    $optionMapper
-     * @param Defaults\Mapper  $defaultMapper
-     * @param Selection\Mapper $selectionMapper
-     * @param Folder\Mapper    $folderMapper
+     * @param Filter\Mapper     $filterMapper
+     * @param Option\Mapper     $optionMapper
+     * @param Defaults\Mapper   $defaultMapper
+     * @param Selection\Mapper  $selectionMapper
+     * @param Folder\Mapper     $folderMapper
      * @param CourseImpl\Mapper $courseImplMapper
-     * @param UnitSpec\Mapper $unitSpecMapper
+     * @param UnitSpec\Mapper   $unitSpecMapper
      */
     public function __construct(
         Filter\Mapper $filterMapper,
@@ -67,30 +64,10 @@ class Factory extends AbstractFilterFactory
 
 
     /**
-     * Build a filter definition, ready to use in the admin pages
-     *
-     * No run-time options or user-selections relevant.
-     *
-     * @param Filter\Model $filter
-     * @return IFilterDefinition
-     */
-    public function buildDefinition(Filter\Model $filter)
-    {
-        return new Definition(
-            $filter,
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultMapper()
-        );
-    }
-
-
-    /**
      * @inheritdoc
-     * @param RunTimeOptions $runTimeOptions
-     * @throws Mapper\Exception
-     * @throws \InvalidArgumentException If wrong run-time options passed
+     * @throws \InvalidArgumentException If RunTime options are of wrong class
      */
-    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
+    protected function buildExtraComponentArgs(User $user, $page, IRunTimeOptions $runTimeOptions = null, Filter\IFilterDefinition $definition)
     {
         if (!$runTimeOptions instanceof RunTimeOptions) {
             $type  = gettype($runTimeOptions);
@@ -99,15 +76,10 @@ class Factory extends AbstractFilterFactory
             throw new \InvalidArgumentException($msg);
         }
 
-        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
-        $definition      = $this->buildDefinition($filter);
-        $savedSelections = $this->getSavedSelections($filter, $user, $page);
-
-        $viewee = $runTimeOptions->getViewee();
 
         // Should this role type see classes for this page?
         /** @var Option\Model[][] $options */
-        $options = $definition->getOptions($page);
+        $options     = $definition->getOptions($page);
         $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS][$page];
         $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP][$page];
 
@@ -117,7 +89,7 @@ class Factory extends AbstractFilterFactory
             ? UserAccess::ACCESS_WRITE
             : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
 
-        $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
+        $folders = $this->folderMapper->findForUser($runTimeOptions->getViewee(), $getSubjects, $groupAccessLevel, true);
 
 
         // Get all courses imported to these folders
@@ -139,8 +111,8 @@ class Factory extends AbstractFilterFactory
 
         // Get all unitSpecs imported to classes
         $unitSpecsImportedToClasses = $this->unitSpecMapper->createCollection();
-        foreach($courseImplsOnClasses as $courseImpl){
-            foreach($courseImpl->getUnits() as $unitImpl){
+        foreach ($courseImplsOnClasses as $courseImpl) {
+            foreach ($courseImpl->getUnits() as $unitImpl) {
                 $unitSpec = $unitImpl->getSpecification();
                 $unitSpecsImportedToClasses->setOffset($unitSpec->getId(), $unitSpec);
             }
@@ -148,36 +120,32 @@ class Factory extends AbstractFilterFactory
 
         // Get all unitSpecs imported to groups
         $unitSpecsImportedToGroups = $this->unitSpecMapper->createCollection();
-        foreach($courseImplsOnGroups as $courseImpl){
-            foreach($courseImpl->getUnits() as $unitImpl){
+        foreach ($courseImplsOnGroups as $courseImpl) {
+            foreach ($courseImpl->getUnits() as $unitImpl) {
                 $unitSpec = $unitImpl->getSpecification();
                 $unitSpecsImportedToGroups->setOffset($unitSpec->getId(), $unitSpec);
             }
         }
 
-
-        return new Component(
-            $definition,
-            $user,
-            $page,
-            $savedSelections,
-            $this->getFilterSelectionMapper(),
-            $unitSpecsImportedToClasses,
-            $unitSpecsImportedToGroups
-        );
+        return [
+            'unitSpecsImportedToClasses' => $unitSpecsImportedToClasses,
+            'unitSpecsImportedToGroups'  => $unitSpecsImportedToGroups,
+        ];
     }
 
 
     /**
      * @inheritdoc
-     * @return KeyConverter
      */
-    public function buildKeyConverter(Filter\Model $filter)
+    protected function buildKeyConverterArgs(Filter\Model $filter)
     {
         $unitSpecIds = (new Collection($this->unitSpecMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($unitSpecId) {
             return $unitSpecId;
         });
 
-        return new KeyConverter($filter, $unitSpecIds);
+        return array_merge(parent::buildKeyConverterArgs($filter), [
+            'unitSpecIds' => $unitSpecIds,
+        ]);
     }
+
 }

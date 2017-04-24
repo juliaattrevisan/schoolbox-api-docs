@@ -32,26 +32,39 @@ class Component extends AbstractFilterComponent
      */
     private $groups;
 
+    /**
+     * If non-null, override user's saved selections.
+     *
+     * This enables us to jump to page with filters and select filter options
+     *
+     * @var GenericCollection|Folder\Model[]|null
+     */
+    private $selectedFolders;
+
 
     /**
      * @param IFilterDefinition                           $definition
      * @param User                                        $user
      * @param string                                      $page
-     * @param GenericCollection|Selection\Model[]         $savedSelections
+     * @param null|GenericCollection|Selection\Model[]    $savedSelections
+     * @param string[]|null                               $selectionOverrides
      * @param Selection\Mapper                            $filterSelectionMapper
      * @param Collection|GenericCollection|Folder\Model[] $classes
      * @param Collection|GenericCollection|Folder\Model[] $groups
+     *
+     * @throws \DomainException If both saved selections and override selections are null
      */
     public function __construct(
         IFilterDefinition $definition,
         User $user,
         $page,
-        GenericCollection $savedSelections,
+        GenericCollection $savedSelections = null,
+        array $selectionOverrides = null,
         Selection\Mapper $filterSelectionMapper,
         GenericCollection $classes,
         GenericCollection $groups
     ) {
-        parent::__construct($definition, $user, $page, $savedSelections, $filterSelectionMapper);
+        parent::__construct($definition, $user, $page, $savedSelections, $selectionOverrides, $filterSelectionMapper);
         $this->classes = $classes;
         $this->groups  = $groups;
     }
@@ -95,6 +108,30 @@ class Component extends AbstractFilterComponent
                 throw new \InvalidArgumentException("Unknown option key: {$option->getKey()}");
             }
         }
+        return $availableSelections;
+    }
+
+
+    /**
+     * If a specific folder is specified, select just that folder.
+     * Otherwise, fall back to user's saved settings.
+     *
+     * @param GenericCollection|Selection\Model[] $availableSelections
+     * @return GenericCollection|Selection\Model[]
+     */
+    protected function overlayUserSelections(GenericCollection $availableSelections)
+    {
+        // Use user's saved settings
+        if (null === $this->selectedFolders) {
+            return parent::overlayUserSelections($availableSelections);
+        }
+
+        // Just select the specified folder
+        $selectedKey = (string)$this->selectedFolder->getId();
+        foreach ($availableSelections as $key => $availableSelection) {
+            $availableSelection->setSelected($key === $selectedKey);
+        }
+
         return $availableSelections;
     }
 

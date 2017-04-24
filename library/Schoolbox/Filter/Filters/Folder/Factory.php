@@ -17,7 +17,6 @@ use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 
 
@@ -53,30 +52,14 @@ class Factory extends AbstractFilterFactory
 
 
     /**
-     * Build a filter definition, ready to use in the admin pages
-     *
-     * No run-time options or user-selections relevant.
-     *
-     * @param Filter\Model $filter
-     * @return IFilterDefinition
+     * @param User|null            $user
+     * @param null                 $page
+     * @param IRunTimeOptions|null $runTimeOptions
+     * @param IFilterDefinition    $definition
+     * @return mixed[]
+     * @throws \InvalidArgumentException If RuntTime Options are of wrong type
      */
-    public function buildDefinition(Filter\Model $filter)
-    {
-        return new Definition(
-            $filter,
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultMapper()
-        );
-    }
-
-
-    /**
-     * @inheritdoc
-     * @param RunTimeOptions $runTimeOptions
-     * @throws Mapper\Exception
-     * @throws \InvalidArgumentException If wrong run-time options passed
-     */
-    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
+    protected function buildExtraComponentArgs(User $user = null, $page = null, IRunTimeOptions $runTimeOptions = null, IFilterDefinition $definition)
     {
         if (!$runTimeOptions instanceof RunTimeOptions) {
             $type  = gettype($runTimeOptions);
@@ -84,12 +67,6 @@ class Factory extends AbstractFilterFactory
             $msg   = 'Options must be an instance of ' . RunTimeOptions::class . ". Found: $found";
             throw new \InvalidArgumentException($msg);
         }
-
-        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
-        $definition      = $this->buildDefinition($filter);
-        $savedSelections = $this->getSavedSelections($filter, $user, $page);
-
-        $viewee = $runTimeOptions->getViewee();
 
         // Should this role type see classes for this page?
         /** @var Option\Model[][] $options */
@@ -101,7 +78,7 @@ class Factory extends AbstractFilterFactory
             ? UserAccess::ACCESS_WRITE
             : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
 
-        $folders          = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
+        $folders = $this->folderMapper->findForUser($runTimeOptions->getViewee(), $getSubjects, $groupAccessLevel, true);
 
         // Divide folders into Classes and Groups (not mutually exclusive!)
 
@@ -115,29 +92,24 @@ class Factory extends AbstractFilterFactory
             return $folder->getGroup();
         })->indexBy('id');
 
-
-        return new Component(
-            $definition,
-            $user,
-            $page,
-            $savedSelections,
-            $this->getFilterSelectionMapper(),
-            $classes,
-            $groups
-        );
+        return [
+            'classes' => $classes,
+            'groups'  => $groups,
+        ];
     }
 
 
     /**
      * @inheritdoc
-     * @return KeyConverter
      */
-    public function buildKeyConverter(Filter\Model $filter)
+    protected function buildKeyConverterArgs(Filter\Model $filter)
     {
         $folderIds = (new Collection($this->folderMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($folderId) {
             return $folderId;
         });
 
-        return new KeyConverter($filter, $folderIds);
+        return array_merge(parent::buildKeyConverterArgs($filter), [
+            'folderIds' => $folderIds,
+        ]);
     }
 }

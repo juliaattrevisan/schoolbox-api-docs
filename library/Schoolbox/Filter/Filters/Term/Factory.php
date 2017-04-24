@@ -12,7 +12,6 @@ use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Schoolbox\Mapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
@@ -52,45 +51,35 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    public function buildDefinition(Filter\Model $filter)
+    protected function buildDefinitionArgs(Filter\Model $filter)
     {
         $sortedTerms = $this->getSortedTerms();
 
-        return new Definition(
-            $filter,
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultMapper(),
-            $sortedTerms,
-            $this->getCurrentTerm($sortedTerms),
-            $this->getPreviousTerm($sortedTerms)
-        );
+        return array_merge(parent::buildDefinitionArgs($filter), [
+            'terms'        => $sortedTerms,
+            'currentTerm'  => $this->getCurrentTerm($sortedTerms),
+            'previousTerm' => $this->getPreviousTerm($sortedTerms),
+        ]);
     }
 
 
     /**
      * @inheritdoc
-     * @throws Mapper\Exception
      */
-    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
+    protected function buildExtraComponentArgs(User $user, $page, IRunTimeOptions $runTimeOptions = null, Filter\IFilterDefinition $definition)
     {
-        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
-        $definition      = $this->buildDefinition($filter);
-        $savedSelections = $this->getSavedSelections($filter, $user, $page);
-
-        return new Component($definition, $user, $page, $savedSelections, $this->getFilterSelectionMapper());
+        return [];
     }
 
 
     /**
-     * Returns a key converter, able to convert between keys (term.id) and the entities they represent (terms)
-     *
      * @inheritdoc
-     * @return KeyConverter
      */
-    public function buildKeyConverter(Filter\Model $filter)
+    protected function buildKeyConverterArgs(Filter\Model $filter)
     {
-        $terms  = $this->getSortedTerms();
-        return new KeyConverter($filter, $terms);
+        return array_merge(parent::buildKeyConverterArgs($filter), [
+            'terms' => $this->getSortedTerms(),
+        ]);
     }
 
 

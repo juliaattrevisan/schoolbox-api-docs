@@ -14,7 +14,6 @@ use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 use Schoolbox\User;
-use Schoolbox\Mapper;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\WorkType;
 
@@ -46,40 +45,31 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    public function buildDefinition(Filter\Model $filter)
+    protected function buildDefinitionArgs(Filter\Model $filter)
     {
-        return new Definition(
-            $filter,
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultMapper(),
-            $this->getWorkTypes()
-        );
+        return array_merge(parent::buildDefinitionArgs($filter), [
+            'workTypes' => $this->getWorkTypes(),
+        ]);
     }
 
 
     /**
      * @inheritdoc
-     * @throws Mapper\Exception
      */
-    public function buildComponent(User $user, $page, IRunTimeOptions $runTimeOptions = null)
+    protected function buildExtraComponentArgs(User $user, $page, IRunTimeOptions $runTimeOptions = null, Filter\IFilterDefinition $definition)
     {
-        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
-        $definition      = $this->buildDefinition($filter);
-        $savedSelections = $this->getSavedSelections($filter, $user, $page);
-
-        return new Component($definition, $user, $page, $savedSelections, $this->getFilterSelectionMapper());
+        return [];
     }
 
 
     /**
-     * Returns a key converter, able to convert between keys (workType.id) and the entities they represent (WorkTypes)
-     *
      * @inheritdoc
-     * @return KeyConverter
      */
-    public function buildKeyConverter(Filter\Model $filter)
+    protected function buildKeyConverterArgs(Filter\Model $filter)
     {
-        return new KeyConverter($filter, $this->getWorkTypes());
+        return array_merge(parent::buildKeyConverterArgs($filter), [
+            'workTypes' => $this->getWorkTypes(),
+        ]);
     }
 
 
@@ -88,7 +78,7 @@ class Factory extends AbstractFilterFactory
      *
      * @return Collection|WorkType\Model[]
      */
-    protected function getWorkTypes()
+    private function getWorkTypes()
     {
         $genericCollection = $this->workTypeMapper->findAll();
         $collection        = new Collection();

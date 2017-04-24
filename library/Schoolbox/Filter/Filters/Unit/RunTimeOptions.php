@@ -7,26 +7,33 @@
 
 namespace Schoolbox\Filter\Filters\Unit;
 
-use Schoolbox\Filter\IRunTimeOptions;
+use Schoolbox\Filter\AbstractRunTimeOptions;
 use Schoolbox\User;
 
 /**
  * For now, unit-spec lists are generated at run-time
  */
-class RunTimeOptions implements IRunTimeOptions
+class RunTimeOptions extends AbstractRunTimeOptions
 {
+
     /**
      * @var User $viewee
      */
     private $viewee;
 
+
     /**
-     * @param User $viewee
+     * @param User          $viewee
+     * @param string[]|null $unitSpecKeys
      */
-    public function __construct(User $viewee)
+    public function __construct(User $viewee, array $unitSpecKeys = null)
     {
+        parent::__construct($unitSpecKeys);
         $this->viewee = $viewee;
     }
+
+    /* Getters
+     */
 
 
     /**
