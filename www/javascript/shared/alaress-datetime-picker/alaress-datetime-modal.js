@@ -168,7 +168,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 .css('display', 'block')
                 .find('.displayDate').empty().append(displayDate);
 
-            if (periodSelected) {
+            if (periodSelected && pickerOptions.enableTime) {
                 var periodStart = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-start'),
                     periodEnd = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-end');
 
