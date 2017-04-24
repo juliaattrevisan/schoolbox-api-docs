@@ -41,10 +41,18 @@ REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+DELETE blog_image FROM blog_image
+  LEFT JOIN `blog` ON blog_id = `blog`.id
+WHERE `blog`.id is null;
+
+DELETE blog_image FROM blog_image
+  LEFT JOIN `storage` ON blog_image.hash = `storage`.hash
+WHERE `storage`.hash is null;
+
 ALTER TABLE `blog_image`
   CHANGE COLUMN `blog_id` `blog_id` INT(11) UNSIGNED NOT NULL ,
   CHANGE COLUMN `hash` `hash` VARCHAR(50) NOT NULL ;
-
 
 ALTER TABLE `blog_image`
   ADD INDEX `fk_blog_image_blog_id_idx` (`blog_id` ASC),

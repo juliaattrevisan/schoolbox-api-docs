@@ -1,5 +1,10 @@
 SET foreign_key_checks = 0;
 
+DELETE menu_side_campus FROM menu_side_campus
+LEFT JOIN luCampus ON luCampus.id = menu_side_campus.campus_id
+WHERE luCampus.id is null;
+
+
 ALTER TABLE `menu_side_campus`
   CHANGE COLUMN `menu_side_id` `menu_side_id` INT(11) NOT NULL ,
   CHANGE COLUMN `campus_id` `campus_id` TINYINT(2) UNSIGNED NOT NULL ;
@@ -12,6 +17,10 @@ FOREIGN KEY (`campus_id`)
 REFERENCES `luCampus` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+DELETE menu_side_role FROM menu_side_role
+  LEFT JOIN groups ON groups.id = menu_side_role.role_id
+WHERE groups.id is null;
 
 ALTER TABLE `menu_side_role`
   CHANGE COLUMN `menu_side_id` `menu_side_id` INT(11) NOT NULL ,
@@ -26,10 +35,13 @@ REFERENCES `groups` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+DELETE menu_top_campus FROM menu_top_campus
+  LEFT JOIN luCampus ON luCampus.id = menu_top_campus.campus_id
+WHERE luCampus.id is null;
+
 ALTER TABLE `menu_top_campus`
   CHANGE COLUMN `menu_top_id` `menu_top_id` INT(11) NOT NULL ,
   CHANGE COLUMN `campus_id` `campus_id` TINYINT(2) UNSIGNED NOT NULL ;
-
 
 ALTER TABLE `menu_top_campus`
   ADD INDEX `fk_menu_top_campus_campus_id_idx` (`campus_id` ASC);
@@ -39,6 +51,10 @@ FOREIGN KEY (`campus_id`)
 REFERENCES `luCampus` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+DELETE menu_top_role FROM menu_top_role
+  LEFT JOIN groups ON groups.id = menu_top_role.role_id
+WHERE groups.id is null;
 
 ALTER TABLE `menu_top_role`
   CHANGE COLUMN `menu_top_id` `menu_top_id` INT(11) NOT NULL ,

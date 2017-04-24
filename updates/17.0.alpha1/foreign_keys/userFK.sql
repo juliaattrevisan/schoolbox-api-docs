@@ -20,6 +20,11 @@ REFERENCES `luCampus` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+UPDATE `user`
+  LEFT JOIN `groups` ON `group_id` = `groups`.id
+SET group_id = (SELECT `id` FROM `groups` LIMIT 1)
+WHERE `groups`.id is null;
+
 ALTER TABLE `user`
   ADD CONSTRAINT `fk_user_role_id`
 FOREIGN KEY (`group_id`)
@@ -32,11 +37,9 @@ ALTER TABLE `house`
 ALTER TABLE `luResidentialHouse`
   CHANGE COLUMN `id` `id` INT(20) UNSIGNED NOT NULL AUTO_INCREMENT ;
 
-
 ALTER TABLE `user`
   CHANGE COLUMN `house` `house` INT(11) UNSIGNED NULL DEFAULT NULL ,
   CHANGE COLUMN `residential_house_id` `residential_house_id` INT(11) UNSIGNED NULL DEFAULT NULL ;
-
 
 ALTER TABLE `user`
   ADD INDEX `fk_user_residential_house_id_idx` (`residential_house_id` ASC);
@@ -61,6 +64,11 @@ FOREIGN KEY (`residential_house_id`)
 REFERENCES `luResidentialHouse` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+
+DELETE superusers FROM superusers
+  LEFT JOIN `user` ON superusers.`id` = `user`.id
+WHERE `user`.id is null;
 
 ALTER TABLE `superusers`
   CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL DEFAULT '0' ;
@@ -98,6 +106,10 @@ FOREIGN KEY (`linked_user_id`)
 REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+DELETE user_password_reset_request FROM user_password_reset_request
+LEFT JOIN user ON user_id = user.id
+WHERE user.id is NULL;
 
 ALTER TABLE `user_password_reset_request`
   CHANGE COLUMN `user_id` `user_id` INT(11) UNSIGNED NOT NULL ;

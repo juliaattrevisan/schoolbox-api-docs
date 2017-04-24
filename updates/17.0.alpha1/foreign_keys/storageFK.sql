@@ -12,6 +12,10 @@ REFERENCES `allowedFileTypes` (`fileTypeID`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+DELETE submission_box_file FROM submission_box_file
+ LEFT JOIN storage ON storage.hash = submission_box_file.storage_id
+WHERE storage.hash is NULL;
+
 ALTER TABLE `submission_box_file`
   ADD CONSTRAINT `fk_submission_box_file_storage_hash`
 FOREIGN KEY (`storage_id`)

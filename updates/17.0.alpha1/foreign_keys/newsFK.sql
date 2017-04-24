@@ -34,6 +34,15 @@ REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+DELETE newsUser FROM newsUser
+  LEFT JOIN `user` ON `userID` = `user`.id
+WHERE `user`.id is null;
+
+DELETE newsUser FROM newsUser
+  LEFT JOIN `news_items` ON `newsID` = `news_items`.item_id
+WHERE `news_items`.item_id is null;
+
 ALTER TABLE `newsUser`
   ADD INDEX `fk_newsUser_user_id_idx` (`userID` ASC);
 ALTER TABLE `newsUser`
