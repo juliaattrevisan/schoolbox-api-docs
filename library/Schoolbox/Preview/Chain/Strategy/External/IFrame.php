@@ -12,17 +12,7 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\External;
 
-
 class IFrame extends Base {
-
-    /**
-     * Content Types for this strategy
-     *
-     * @var array
-     */
-    private $allowedUrls = [
-        'https://reports.lauriston.vic.edu.au/',
-    ];
 
     /**
      * Test the Content-Types
@@ -46,22 +36,12 @@ class IFrame extends Base {
      */
 
     /**
-     * Set content types
-     *
-     * @param array $allowedUrls
-     */
-    private function setAllowedURLs($allowedUrls)
-    {
-        $this->allowedUrls = $allowedUrls;
-    }
-
-    /**
-     * Get content types
+     * Get allowed URLS
      *
      * @return array
      */
     private function getAllowedURLs()
     {
-        return $this->allowedUrls;
+        return $this->getConfig();
     }
 }

@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Preview\Chain;
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Preview\Chain\Strategy\External\IFrame;
 use Schoolbox\Preview\Chain\Strategy\External\Image;
 use Schoolbox\Preview\Chain\Strategy\External\Embed;
@@ -29,63 +30,11 @@ class External extends Base
     {
         $decodedUrl = urldecode($url);
 
-        /* Temporarily disabled
-         * $headers = $this->findHeaders($decodedUrl);
-         */
-        $headers = [];
-
         $this->start([
-            new Image($decodedUrl, $headers),
-            new Embed($decodedUrl, $headers),
-            new IFrame($decodedUrl, $headers),
-            new Redirect($decodedUrl, $headers),
+            new Image($decodedUrl, ''),
+            new Embed($decodedUrl, ''),
+            new IFrame($decodedUrl, explode("\n", ConfigMapper::getInstance()->get('safe_iframe_source_list'))),
+            new Redirect($decodedUrl, ''),
         ]);
-    }
-
-
-    /**
-     * Decode url and format header output
-     *
-     * Keept his in case you add strats which check for other
-     * content-types
-     */
-    private function findHeaders($url)
-    {
-        $headers = get_headers($url, 1);
-
-        /* Rebuild array if you got redirected around the place
-         */
-        $numRedirects = count($headers['Content-Type']);
-
-        if ($numRedirects > 1) {
-            $newHeaders = [];
-
-            /* Just get the destination, ignore all the intermediary redirect locations
-             */
-            foreach ($headers as $key => $val) {
-                if (is_array($val)) {
-                    $newHeaders[$key] = $headers[$key][$numRedirects - 1];
-                } else {
-                    $newHeaders[0] = $headers[$numRedirects - 1];
-                }
-            }
-
-            $headers = $newHeaders;
-        }
-
-        /* Lowercase all the array keys, because of places like twitter
-         * which are not camelcased
-         */
-        $temp = [];
-
-        foreach ($headers as $key => $val) {
-            $temp[strtolower($key)] = $val;
-        }
-
-        $headers = $temp;
-
-        /* Finally
-         */
-        return $headers;
     }
 }
