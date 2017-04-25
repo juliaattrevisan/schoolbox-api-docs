@@ -76,7 +76,8 @@ class Broker extends Base implements IBroker
 
         /** @noinspection PhpUndefinedClassConstantInspection */
 
-        $this->databaseAttributes = [PDO::ATTR_PERSISTENT => isset($options['debug']) ? $options['debug'] : false];
+        $this->databaseAttributes = [PDO::ATTR_PERSISTENT         => isset($options['debug']) ? $options['debug'] : false,
+                                     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'];
 
         return parent::connect($options);
     }
