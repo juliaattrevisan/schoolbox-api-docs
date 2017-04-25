@@ -31,10 +31,6 @@ class Module extends BaseModule
     {
         $importModule = new Import\Module($injector);
         $importModule->init($basePath.'/import');
-        $areaModule = new LearningArea\Module($injector);
-        $areaModule->init($basePath.'/area');
-        $levelModule = new LearningLevel\Module($injector);
-        $levelModule->init($basePath.'/level');
     }
 
     /**
@@ -109,10 +105,6 @@ class Module extends BaseModule
         );
         $injector->setters[Controller::class]['setNodeMapper']
             = $this->getMapperFactory()->getLazy(NodeMapper::class);
-        $injector->setters[Controller::class]['setAreaMapper']
-            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
-        $injector->setters[Controller::class]['setLevelMapper']
-            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
     }
 
     /* Getters / Setters

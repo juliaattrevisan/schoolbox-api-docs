@@ -15,7 +15,6 @@
     {
         this.configure(element, options);
         this.initTree();
-        this.initDialogs();
         this.initResize();
         this.initEvents();
     };
@@ -30,14 +29,6 @@
     {
         var defaults = {
             element: element,
-            areas: {
-                data: [],
-                dialog: $()
-            },
-            levels: {
-                data: [],
-                dialog: $()
-            },
             view: {
                 readonly: false,
                 selector: '[data-role="curriculum-editor"]',
@@ -131,8 +122,6 @@
 
         // Update data
         data.actions = actions;
-        data.areas   = self.config.areas.data;
-        data.levels  = self.config.levels.data;
 
         var viewPanel = self.updateViewPanel(self.config.view.templates.edit(data));
 
@@ -243,53 +232,6 @@
     };
 
     /**
-     * Sets up dialog boxes
-     */
-    CurriculumBrowser.prototype.initDialogs = function()
-    {
-        var self = this;
-        // Create new level/area submit event
-        var allDialogs = $(self.config.areas.dialog).add(self.config.levels.dialog);
-        allDialogs.on('submit', 'form', function(event) {
-            event.preventDefault();
-            self.viewPanel.addClass('loading');
-            var form     = $(this);
-            var selector = form.data('relation');
-            var submit   = form.find(':submit').prop('disabled', true);
-            var ajax     = $.ajax({
-                method: this.method,
-                url:    this.action,
-                data:   form.serializeArray()
-            });
-            ajax
-                .done(function(data) {
-                    // Update what gets chosen
-                    self.viewPanel.addClass('loaded');
-                    var nameInput = form.find('input[name="name"]');
-                    var name      = nameInput.val();
-                    nameInput.val('');
-                    self.viewPanel.find(self.config.view.editFormSelector).find(selector).append(
-                        $('<option />')
-                            .attr('value', data.item.id)
-                            .attr('label', name)
-                            .prop('selected', true)
-                            .text(name)
-                    );
-                    allDialogs.foundation('reveal', 'close');
-                })
-                .fail(function() {
-                    // Not sure?
-                    self.viewPanel.addClass('failed');
-                })
-                .always(function() {
-                    // Re-enable submit button no matter what
-                    self.viewPanel.removeClass('loading');
-                    submit.prop('disabled', false);
-                });
-        });
-    };
-
-    /**
      * Sets up events on the curriculum browser
      */
     CurriculumBrowser.prototype.initEvents = function()
@@ -297,24 +239,6 @@
         var self = this;
 
         var viewPanels = $().add(self.viewPanel).add(self.config.view.dialog);
-
-        // Triggers for adding new levels or areas
-        viewPanels.on('change', self.config.view.editFormSelector+' select', function(event) {
-            var option      = $(this).find(':selected');
-            var interaction = option.data('interaction');
-            switch (interaction) {
-                case 'add-level-dialog-open':
-                    event.preventDefault();
-                    self.config.levels.dialog.foundation('reveal', 'open');
-                    break;
-                case 'add-area-dialog-open':
-                    event.preventDefault();
-                    self.config.areas.dialog.foundation('reveal', 'open');
-                    break;
-                default:
-                    break;
-            }
-        });
 
         // Node save form submission
         viewPanels.on('submit', self.config.view.editFormSelector, function(event) {
