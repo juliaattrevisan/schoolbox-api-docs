@@ -58,12 +58,15 @@ class Controller extends Base
             $this->processRubric($participant, $post);
         }
         catch (\RangeException $e) {
-            $this->sendError('Invalid mark given');
+            $this->sendError('Invalid mark provided');
             return;
         }
         catch (MapperException $e) {
-            $this->sendError('Invalid mark given');
+            $this->sendError('Invalid mark provided');
             return;
+        }
+        catch (\PDOException $e) {
+            $this->sendError('Unable to save results');
         }
     }
 
@@ -111,12 +114,15 @@ class Controller extends Base
             $this->processRubric($participant, $this->getRequest()->post);
         }
         catch (\RangeException $e) {
-            $this->sendError('Invalid mark given');
+            $this->sendError('Invalid mark provided');
             return;
         }
         catch (\Schoolbox\Mapper\Exception $e) {
-            $this->sendError('Invalid mark given');
+            $this->sendError('Invalid mark provided');
             return;
+        }
+        catch (\PDOException $e) {
+            $this->sendError('Unable to save results');
         }
     }
 
