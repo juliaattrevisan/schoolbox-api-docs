@@ -35,7 +35,7 @@ trait HasUserSource
      * @return User
      * @throws \InvalidArgumentException if the user source didn't return a user
      */
-    private function getUser()
+    private function retrieveUserFromSource()
     {
         if (!isset($this->user)) {
             $this->user = call_user_func($this->getUserSource());

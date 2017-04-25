@@ -106,7 +106,7 @@ class File extends DAV\File
      */
     public function setName($newName)
     {
-        if ($this->getAccessor()->getFolderAccess($this->getUser(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
             $this->getFile()->setFilename(pathinfo($newName, PATHINFO_FILENAME));
             $this->getFileMapper()->save($this->getFile());
         }
@@ -132,7 +132,7 @@ class File extends DAV\File
      */
     public function put($data)
     {
-        if ($this->getAccessor()->getFolderAccess($this->getUser(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
 
             try {
                 // accept the data as a new storage
@@ -180,7 +180,7 @@ class File extends DAV\File
      */
     public function delete()
     {
-        if ($this->getAccessor()->getFolderAccess($this->getUser(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
             $this->getFileMapper()->delete($this->getFile());
         }
         else {

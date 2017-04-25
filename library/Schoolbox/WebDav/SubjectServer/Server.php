@@ -106,7 +106,7 @@ class Server extends DAV\Collection
      */
     public function isSubjectListShown($path)
     {
-        return $this->getUser()->getSubjectCollection()->count() > 0 && $this->isThisDirectChildOfPath($path);
+        return $this->retrieveUserFromSource()->getSubjectCollection()->count() > 0 && $this->isThisDirectChildOfPath($path);
     }
 
     /**
@@ -154,7 +154,7 @@ class Server extends DAV\Collection
         // Only due works due this term
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
         $groupedAssessments = $this->assessmentDataSource->findAllByStudent(
-            $this->getUser(),
+            $this->retrieveUserFromSource(),
             $this->currentTerm,
             ['type'  => AssessmentType::TYPE_DUE_WORK,]
         )->groupByCallback(function(IAssessable $assessment) {
@@ -192,7 +192,7 @@ class Server extends DAV\Collection
                             $folderNode,
                             $this->nameGenerator->sanitiseName($assessment->getTitle())
                         ),
-                        $this->getUser(),
+                        $this->retrieveUserFromSource(),
                         $assessment,
                         $this->storageDataSource,
                         $this->dueWorkResponseDataSource
@@ -202,7 +202,7 @@ class Server extends DAV\Collection
                     continue;
                 }
 
-                $participant = $assessment->getParticipantIfExtant($this->getUser());
+                $participant = $assessment->getParticipantIfExtant($this->retrieveUserFromSource());
                 if ($participant instanceof Participant) {
                     foreach ($participant->getAllResponses() as $response) {
 

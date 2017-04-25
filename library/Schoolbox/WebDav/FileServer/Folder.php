@@ -110,7 +110,7 @@ class Folder extends DAV\Collection
         // Loop through the directory, and create objects for each node that the user has permission to access
         $folders = array();
         foreach ($allFolders as $currentFolder) {
-            if ($this->getAccessor()->getFolderAccess($this->getUser(), array($currentFolder->getId())) >= UserAccess::ACCESS_READ) {
+            if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($currentFolder->getId())) >= UserAccess::ACCESS_READ) {
                 $folders[] = new Folder(
                     $this->getPath().'/'.$currentFolder->getName(),
                     $this->getUserSource(),
@@ -125,7 +125,7 @@ class Folder extends DAV\Collection
         // Loop through all the files and output them if the user has access
         $files = array();
 
-        if ($this->getAccessor()->getFolderAccess($this->getUser(),array($this->getFolderID())) >= UserAccess::ACCESS_READ) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(),array($this->getFolderID())) >= UserAccess::ACCESS_READ) {
             /** @var Collection|FileModel[] $fileList */
             $fileList = $this->getFileMapper()->findByColumn('category', $this->getFolderID());
 
@@ -182,7 +182,7 @@ class Folder extends DAV\Collection
     {
         //Prevent queries if permission is not allowed
         if ($this->getFolderID() > 0) {
-            if ($this->getAccessor()->getFolderAccess($this->getUser(), array($this->getFolderID())) < UserAccess::ACCESS_READ) {
+            if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolderID())) < UserAccess::ACCESS_READ) {
                 throw new DAV\Exception\Forbidden('Permission denied');
             }
         }
@@ -266,8 +266,8 @@ class Folder extends DAV\Collection
      */
     public function delete()
     {
-        if ($this->getAccessor()->getFolderAccess($this->getUser(), array($this->getFolderID())) >= UserAccess::ACCESS_WRITE) {
-            $this->getFolderMapper()->deleteFolder($this->getFolder()->getId(), $this->getUser());
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolderID())) >= UserAccess::ACCESS_WRITE) {
+            $this->getFolderMapper()->deleteFolder($this->getFolder()->getId(), $this->retrieveUserFromSource());
         }
         else {
             throw new DAV\Exception\Forbidden('Permission denied to delete folder');
@@ -283,7 +283,7 @@ class Folder extends DAV\Collection
      */
     public function createFile($name, $data = null)
     {
-        if ($this->getAccessor()->getFolderAccess($this->getUser(), array($this->getFolderID())) >= UserAccess::ACCESS_WRITE) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolderID())) >= UserAccess::ACCESS_WRITE) {
             $storage = $this->getFileMapper()->getStorageMapper()->acceptStream($name, $data, false);
 
             $file = $this->fileMapper->createModel()
@@ -291,7 +291,7 @@ class Folder extends DAV\Collection
                                      ->setTitle($name)
                                      ->setFilename(pathinfo($name,PATHINFO_FILENAME))
                                      ->setFolder($this->folder)
-                                     ->setOwner($this->getUser());
+                                     ->setOwner($this->retrieveUserFromSource());
 
             $this->getFileMapper()->save($file);
 
@@ -329,7 +329,7 @@ class Folder extends DAV\Collection
      */
     public function setName($newName)
     {
-        if ($this->getAccessor()->getFolderAccess($this->getUser(), array($this->getFolder()->getParent()->getId())) >= UserAccess::ACCESS_WRITE) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolder()->getParent()->getId())) >= UserAccess::ACCESS_WRITE) {
 
             $this->getFolder()->setName($newName);
             $this->getFolderMapper()->save($this->getFolder());
