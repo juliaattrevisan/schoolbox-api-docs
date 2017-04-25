@@ -20,20 +20,6 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     protected $requireClassTeachersHaveRooms = true;
 
-//    /**
-//     * @var External_UserInterface
-//     */
-//    private $externalUser;
-//
-//    /**
-//     * Constructor
-//     */
-//    public function __construct()
-//    {
-//        $this->setDatabase(MSSQL::getInstance());
-////        $this->externalUser = new External_User('humanedge');
-//    }
-
     /**
      * Gets the class code part of a query.
      *
@@ -138,21 +124,5 @@ class External_Humanedge_Class implements External_ClassInterface
             }
         }
         return $result;
-    }
-
-    /**
-     * @param MSSQL $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    private function getDatabase()
-    {
-        return $this->database;
     }
 }

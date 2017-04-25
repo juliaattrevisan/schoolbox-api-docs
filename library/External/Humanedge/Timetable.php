@@ -12,11 +12,6 @@ class External_Humanedge_Timetable implements External_TimetableInterface
 {
     use External_Humanedge_APlusDatabaseTrait;
 
-    /**
-     * @var MSSQL $database
-     */
-    private $database;
-
 //    /**
 //     * Constructor
 //     */
@@ -510,21 +505,5 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     public function getRoomTimetable($roomCodes)
     {
         // TODO: Implement getRoomTimetable() method.
-    }
-
-    /**
-     * @param MSSQL $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    private function getDatabase()
-    {
-        return $this->database;
     }
 }
