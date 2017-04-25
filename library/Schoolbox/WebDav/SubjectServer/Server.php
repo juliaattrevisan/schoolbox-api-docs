@@ -10,6 +10,7 @@ namespace Schoolbox\WebDav\SubjectServer;
 use Sabre\DAV;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -18,7 +19,6 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
-use Schoolbox\User;
 use Schoolbox\WebDav\HasUserSource;
 use Schoolbox\WebDav\NameGenerator;
 
@@ -55,6 +55,11 @@ class Server extends DAV\Collection
     private $dueWorkResponseDataSource;
 
     /**
+     * @var ErrorMapper
+     */
+    private $errorMapper;
+
+    /**
      * A list of child nodes, cached whenever getChildren() is called.
      *
      * @var DAV\INode[]
@@ -76,6 +81,7 @@ class Server extends DAV\Collection
      * @param AssessmentDataSource      $assessmentDataSource
      * @param StorageDataSource         $storageDataSource
      * @param DueWorkResponseDataSource $dueWorkResponseDataSource
+     * @param ErrorMapper               $errorMapper
      * @param Term                      $currentTerm
      * @param NameGenerator             $nameGenerator
      */
@@ -85,6 +91,7 @@ class Server extends DAV\Collection
         AssessmentDataSource $assessmentDataSource,
         StorageDataSource $storageDataSource,
         DueWorkResponseDataSource $dueWorkResponseDataSource,
+        ErrorMapper $errorMapper,
         Term $currentTerm,
         NameGenerator $nameGenerator
     ) {
@@ -94,6 +101,7 @@ class Server extends DAV\Collection
         $this->currentTerm               = $currentTerm;
         $this->storageDataSource         = $storageDataSource;
         $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
+        $this->errorMapper               = $errorMapper;
         $this->nameGenerator             = $nameGenerator;
     }
 
@@ -202,7 +210,8 @@ class Server extends DAV\Collection
                         $this->retrieveUserFromSource(),
                         $assessment,
                         $this->storageDataSource,
-                        $this->dueWorkResponseDataSource
+                        $this->dueWorkResponseDataSource,
+                        $this->errorMapper
                     );
                 } catch (DAV\Exception $e) {
                     // can do nothing

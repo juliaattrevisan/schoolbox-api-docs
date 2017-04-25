@@ -51,6 +51,11 @@ class Assessment extends DAV\Collection
     private $dueWorkResponseDataSource;
 
     /**
+     * @var ErrorMapper
+     */
+    private $errorMapper;
+
+    /**
      * @var DAV\INode[]
      */
     private $children;
@@ -63,6 +68,7 @@ class Assessment extends DAV\Collection
      * @param IAssessable               $assessment
      * @param StorageDataSource         $storageDataSource
      * @param DueWorkResponseDataSource $dueWorkResponseDataSource
+     * @param ErrorMapper               $errorMapper
      * @param DAV\INode[]               $children
      */
     public function __construct(
@@ -71,6 +77,7 @@ class Assessment extends DAV\Collection
         IAssessable $assessment,
         StorageDataSource $storageDataSource,
         DueWorkResponseDataSource $dueWorkResponseDataSource,
+        ErrorMapper $errorMapper,
         array $children = []
     ) {
         $this->name                      = $name;
@@ -78,6 +85,7 @@ class Assessment extends DAV\Collection
         $this->assessment                = $assessment;
         $this->storageDataSource         = $storageDataSource;
         $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
+        $this->errorMapper               = $errorMapper;
         $this->children                  = $children;
     }
 
@@ -133,9 +141,8 @@ class Assessment extends DAV\Collection
                 try {
                     $this->assessment->assertAcceptSubmission($allResponses);
                 } catch (\DomainException $e) {
-                    // TODO use injected error mapper
                     throw new DAV\Exception\Forbidden(
-                        ErrorMapper::getInstance()->getMessageById($e->getCode()),
+                        $this->errorMapper->getMessageById($e->getCode()),
                         $e->getCode(),
                         $e
                     );
