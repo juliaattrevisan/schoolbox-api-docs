@@ -258,23 +258,25 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function logPageView(Model $category) {
 
-        // new mechanism for storing pageviews
-        // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
-        // shoved into a date field, but it can be safely ignored: the data inserts correctly
-        $query = "
-            INSERT INTO homepage_visits (`date`, `user_group_id`, `category_id`)
-            VALUES (NOW(), :gid, :cid)
-            ON DUPLICATE KEY
-            UPDATE `hitcount` = `hitcount` + 1
-        ";
+        if(!$category->isRootNode()) {
+            // new mechanism for storing pageviews
+            // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
+            // shoved into a date field, but it can be safely ignored: the data inserts correctly
+            $query = "
+                INSERT INTO homepage_visits (`date`, `user_group_id`, `category_id`)
+                VALUES (NOW(), :gid, :cid)
+                ON DUPLICATE KEY
+                UPDATE `hitcount` = `hitcount` + 1
+            ";
 
-        $params = array(
-            'cid' => $category->getId(),
-            'gid' => $_SESSION['gid']
-        );
+            $params = array(
+                'cid' => $category->getId(),
+                'gid' => $_SESSION['gid']
+            );
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
+            $statement = $this->database->prepare($query);
+            $statement->execute($params);
+        }
     }
 
     /**
