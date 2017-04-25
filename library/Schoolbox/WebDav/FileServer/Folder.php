@@ -113,7 +113,7 @@ class Folder extends DAV\Collection
             if ($this->getAccessor()->getFolderAccess($this->getUser(), array($currentFolder->getId())) >= UserAccess::ACCESS_READ) {
                 $folders[] = new Folder(
                     $this->getPath().'/'.$currentFolder->getName(),
-                    $this->getUser(),
+                    $this->getUserSource(),
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
                     $this->getStorageMapper(),
@@ -132,7 +132,7 @@ class Folder extends DAV\Collection
             foreach ($fileList as $file) {
                 $files[] = new File(
                     $this->getPath().'/'.$file->getBasename(),
-                    $this->getUser(),
+                    $this->getUserSource(),
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
                     $this->getStorageMapper(),
@@ -200,7 +200,7 @@ class Folder extends DAV\Collection
         if ($this->isFolder($name, $this->getFolderID())) {
             return new Folder(
                 $this_folder,
-                $this->getUser(),
+                $this->getUserSource(),
                 $this->getFolderMapper(),
                 $this->getFileMapper(),
                 $this->getStorageMapper(),
@@ -221,7 +221,7 @@ class Folder extends DAV\Collection
             if ($result->count()) {
                 return new File(
                     $this->getPath().'/'.$result->first()->getBasename(),
-                    $this->getUser(),
+                    $this->getUserSource(),
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
                     $this->getStorageMapper(),

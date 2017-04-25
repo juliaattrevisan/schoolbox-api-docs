@@ -54,7 +54,7 @@ trait HasUserSource
      * @param callable $userSource
      * @return static
      */
-    private function setUserSource($userSource)
+    private function setUserSource(callable $userSource)
     {
         $this->userSource = $userSource;
         return $this;

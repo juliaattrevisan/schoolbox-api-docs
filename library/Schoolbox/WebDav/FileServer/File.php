@@ -17,12 +17,15 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
+use Schoolbox\WebDav\HasUserSource;
 
 /**
  * A WebDAV node that represents a file within the Schoolbox file system.
  */
 class File extends DAV\File
 {
+    use HasUserSource;
+
     /** @var FileModel */
     private $file;
 
@@ -53,13 +56,6 @@ class File extends DAV\File
     private $folder;
 
     /**
-     * Current user
-     *
-     * @var User
-     */
-    private $user;
-
-    /**
      * Permissions mapper for determining access rights
      *
      * @var \Schoolbox\Permission\Access\Access
@@ -70,7 +66,7 @@ class File extends DAV\File
      * Constructor
      *
      * @param               $path
-     * @param User          $user
+     * @param callable      $userSource
      * @param FolderMapper  $folderMapper
      * @param FileMapper    $fileMapper
      * @param StorageMapper $storageMapper
@@ -78,7 +74,7 @@ class File extends DAV\File
      */
     public function __construct(
         $path,
-        User $user,
+        callable $userSource,
         FolderMapper $folderMapper,
         FileMapper $fileMapper,
         StorageMapper $storageMapper,
@@ -88,7 +84,7 @@ class File extends DAV\File
         $this->setFileMapper($fileMapper);
         $this->setStorageMapper($storageMapper);
         $this->setAccessor($accessor);
-        $this->setUser($user);
+        $this->setUserSource($userSource);
         $this->setFileFromPath($path);
     }
 
@@ -329,24 +325,6 @@ class File extends DAV\File
     private function setAccessor($accessor)
     {
         $this->accessor = $accessor;
-    }
-
-    /**
-     * @return User
-     */
-    private function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param User $user
-     * @return static
-     */
-    private function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
     }
 
     /**
