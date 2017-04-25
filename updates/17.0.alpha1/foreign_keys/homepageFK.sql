@@ -41,9 +41,10 @@ WHERE folder.id IS NULL;
 
 ALTER TABLE `userGroups`
   CHANGE COLUMN `cid` `cid` INT(6) UNSIGNED NOT NULL DEFAULT '0' ;
+
 ALTER TABLE `userGroups`
   ADD CONSTRAINT `fk_userGroups_folder_id`
 FOREIGN KEY (`cid`)
-REFERENCES `folder` (`parent`)
+REFERENCES `folder` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
