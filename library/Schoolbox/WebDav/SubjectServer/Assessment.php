@@ -9,6 +9,7 @@ namespace Schoolbox\WebDav\SubjectServer;
 
 use Alaress_Date_Format;
 use Sabre\DAV;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
@@ -129,7 +130,16 @@ class Assessment extends DAV\Collection
                 $allResponses = $participant->getAllResponses();
 
                 // This could error out, that's intentional
-                $this->assessment->assertAcceptSubmission($allResponses);
+                try {
+                    $this->assessment->assertAcceptSubmission($allResponses);
+                } catch (\DomainException $e) {
+                    // TODO use injected error mapper
+                    throw new DAV\Exception\Forbidden(
+                        ErrorMapper::getInstance()->getMessageById($e->getCode()),
+                        $e->getCode(),
+                        $e
+                    );
+                }
 
                 // Get whatever was uploaded.
                 // A 1-byte file will be rejected completely:
