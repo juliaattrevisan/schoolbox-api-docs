@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -151,15 +152,21 @@ class Server extends DAV\Collection
         // Build an entire list of children
         $rootNode = new DAV\SimpleCollection('');
 
-        // Only due works due this term
+        // Only due works due this term, and that accept submissions
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
-        $groupedAssessments = $this->assessmentDataSource->findAllByStudent(
-            $this->retrieveUserFromSource(),
-            $this->currentTerm,
-            ['type'  => AssessmentType::TYPE_DUE_WORK,]
-        )->groupByCallback(function(IAssessable $assessment) {
-            return $assessment->getBaseContext()->getFolder()->getId();
-        });
+        $groupedAssessments = $this->assessmentDataSource
+            ->findAllByStudent(
+                $this->retrieveUserFromSource(),
+                $this->currentTerm,
+                ['type'  => AssessmentType::TYPE_DUE_WORK,]
+            )
+            ->filter(function(IAssessable $assessment) {
+                return $assessment instanceof DueWork
+                    && ($assessment->isAcceptMulti() || $assessment->isAcceptSingle());
+            })
+            ->groupByCallback(function(IAssessable $assessment) {
+                return $assessment->getBaseContext()->getFolder()->getId();
+            });
 
         foreach ($groupedAssessments as $folderId => $assessments) {
 
