@@ -33,11 +33,17 @@ trait HasUserSource
      * Convenience method for getting user out of its source.
      *
      * @return User
+     * @throws \InvalidArgumentException if the user source didn't return a user
      */
     private function getUser()
     {
         if (!isset($this->user)) {
             $this->user = call_user_func($this->getUserSource());
+        }
+
+        // This MUST return a user object
+        if (!$this->user instanceof User) {
+            throw new \InvalidArgumentException("User source did not return a \\Schoolbox\\User object when invoked");
         }
         return $this->user;
     }
