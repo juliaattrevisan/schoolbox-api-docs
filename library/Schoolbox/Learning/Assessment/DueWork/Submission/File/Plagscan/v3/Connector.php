@@ -306,7 +306,7 @@ class Connector
     }
 
     /**
-     * Have to et the score separately -_-
+     * Have to get the score separately -_-
      *
      * @param $plagscanId
      * @return string
