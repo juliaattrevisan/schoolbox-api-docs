@@ -165,11 +165,6 @@ class DeleteOrphanAssessments
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
-        // curriculum_node_for_assess_deprecated
-        $statement = $this->db->prepare("
-            DELETE FROM curriculum_node_for_assess_deprecated WHERE assess_id IN ($quizIdPlaceholders)
-        ");
-        $this->executeDeleteQuery($statement, $parameters);
 
         // quiz
         $statement = $this->db->prepare("
@@ -189,14 +184,6 @@ class DeleteOrphanAssessments
         $prefix                = 'dueWork_id';
         $dueWorkIdPlaceholders = $this->getPlaceHoldersString($dueWorkIds, $prefix);
         $parameters            = $this->getArrayParameters($dueWorkIds, $prefix);
-
-
-        // curriculum_node_for_submission_box_deprecated
-        $statement = $this->db->prepare("
-            DELETE FROM curriculum_node_for_submission_box_deprecated
-            WHERE submission_box_id IN ($dueWorkIdPlaceholders)
-        ");
-        $this->executeDeleteQuery($statement, $parameters);
 
 
         // eportfolio showcase items
@@ -287,11 +274,6 @@ class DeleteOrphanAssessments
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
-        // submission_notification
-        $statement = $this->db->prepare("
-            DELETE FROM submission_notification WHERE box_id IN ($dueWorkIdPlaceholders)
-        ");
-        $this->executeDeleteQuery($statement, $parameters);
 
         // submission boxes
         $statement = $this->db->prepare("
