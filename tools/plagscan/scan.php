@@ -118,7 +118,6 @@ foreach ($allDocuments as $currentDocument) {
             $log->error("{$prefix} unscannable - {$e->getMessage()}");
         }
         catch (\RuntimeException $e) {
-            $currentDocument->setStatus(Plagscan::STATUS_UNSCANNABLE);
             $mapper->save($currentDocument);
 
             $log->error("{$prefix} unscannable - {$e->getMessage()}");
