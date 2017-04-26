@@ -153,7 +153,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Clear out any old response display
         pickerResponse.html('');
         var html = '';
-console.log(data);
+
         // Ajax returned date
         displayDate = moment(data.date).format('MMMM DD, YYYY');
 
