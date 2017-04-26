@@ -49,7 +49,7 @@ class Callback
     {
         /* Plagscan not configured - nothing to do
          */
-        if (!$this->getMapper()->getGateway()) {
+        if (!$this->getMapper()->getConnector()) {
             return false;
         }
 
@@ -68,9 +68,9 @@ class Callback
             /* Make a somewhat infamous assumption that plagscan completed its stuff
              * which is the only reason we'd be running this Callback
              */
-            $interactiveReportUrl = $this->getMapper()->getGateway()->fetchInteractiveReportUrl($currentDocument->getPlagscanId());
-            $reportContents = $this->getMapper()->getGateway()->fetchReport($currentDocument->getPlagscanId());
-            $score = $this->getMapper()->getGateway()->fetchScore($currentDocument->getPlagscanId());
+            $interactiveReportUrl = $this->getMapper()->getConnector()->fetchInteractiveReportUrl($currentDocument->getPlagscanId());
+            $reportContents = $this->getMapper()->getConnector()->fetchReport($currentDocument->getPlagscanId());
+            $score = $this->getMapper()->getConnector()->fetchScore($currentDocument->getPlagscanId());
 
             /* Update the db with the report contents for this document
              */

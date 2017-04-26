@@ -25,7 +25,7 @@ $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();
 
-if (!$mapper->getGateway()) {
+if (!$mapper->getConnector()) {
 
     /* Plagscan not configured - nothing to do
      */
@@ -56,7 +56,7 @@ foreach ($allDocuments as $currentDocument) {
          */
         $log->info("{$prefix}: transmitting student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
-        $plagscanId = $mapper->getGateway()->transmit($submissionFile);
+        $plagscanId = $mapper->getConnector()->transmit($submissionFile);
 
         /* Update the db with this new plagscan id
          */

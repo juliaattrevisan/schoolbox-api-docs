@@ -24,7 +24,7 @@ $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();
 
-if (!$mapper->getGateway()) {
+if (!$mapper->getConnector()) {
 
     /* Plagscan not configured - nothing to do
      */
@@ -80,12 +80,12 @@ foreach ($allDocuments as $currentDocument) {
              * Plagscan will do it in its own time, whenever it wants to
              * We have to poll it to find out its actual status
              */
-            $reportReady = $mapper->getGateway()->analyse($currentDocument->getPlagscanId());
+            $reportReady = $mapper->getConnector()->analyse($currentDocument->getPlagscanId());
 
             if ($reportReady) {
-                $interactiveReportUrl = $mapper->getGateway()->fetchInteractiveReportUrl($currentDocument->getPlagscanId());
-                $reportContents = $mapper->getGateway()->fetchReport($currentDocument->getPlagscanId());
-                $score = $mapper->getGateway()->fetchScore($currentDocument->getPlagscanId());
+                $interactiveReportUrl = $mapper->getConnector()->fetchInteractiveReportUrl($currentDocument->getPlagscanId());
+                $reportContents = $mapper->getConnector()->fetchReport($currentDocument->getPlagscanId());
+                $score = $mapper->getConnector()->fetchScore($currentDocument->getPlagscanId());
 
                 /* Update the db with the report contents for this document
                  * only when we have all three pieces (each seems to generated

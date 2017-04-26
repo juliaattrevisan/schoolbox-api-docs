@@ -1,8 +1,8 @@
 <?php
 /**
- * WarpGateway
+ * Connector
  *
- * API v3.0 Gateay for Plagscan
+ * API v3.0 Connector for Plagscan
  * https://api.plagscan.com/v3/
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -20,7 +20,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFil
 use GuzzleHttp\Client;
 use Zend\Stdlib\Exception\DomainException;
 
-class WarpGate
+class Connector
 {
 
     /* Sorry, Plagscan does not have any names for these reports.
@@ -78,7 +78,7 @@ class WarpGate
     private $configLoader;
 
     /**
-     * WarpGate constructor.
+     * Connector constructor.
      *
      * @param IConfigLoader $configLoader
      * @param int $plagscanClientId
