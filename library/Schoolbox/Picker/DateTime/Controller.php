@@ -21,6 +21,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Config;
 use Alaress_Date_Format;
 use Schoolbox\Role;
+use \Schoolbox\Config\Loader as ConfigLoader;
 
 class Controller extends Base
 {
@@ -53,7 +54,7 @@ class Controller extends Base
         $this->setUserAccessMapper($userAccessMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setTimetableHandler();
-
+        $this->setConfigureLoader();
     }
 
     /**
@@ -124,7 +125,7 @@ class Controller extends Base
                     'type' => $type,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
                     'displayFormatDate' => $this->convertFormat($displayFormatDate),
-                    'weekStartDay' => Config::get('calendar_start_day'),
+                    'weekStartDay' => $this->getConfigureLoader()->get('calendar_start_day'),
                     'terms' => $terms,
                     // If the connector is offline, pass FALSE
                     'timetable' => $timetable,
@@ -140,17 +141,28 @@ class Controller extends Base
      * @param string $format
      * @return string
      */
-    public function convertFormat($format){
-        $formatMap = array(
-            '/S/' => '', // not supported
-            '/h/' => 'h', // 01-12 not supported, use 1-12 hours
-            '/g/' => 'h', // 1-12 hours
-            '/a/' => 'K', // no lowercase am/pm supported unfortunately
-            '/A/' => 'K', // AM/PM
-            '/G/' => 'H', // 00 - 23 hours
-            '/s/' => 'S', // 00 - 59 seconds
+    public function convertFormat($format) {
+        return strtr(
+            $format,
+            array(
+                'd' => 'd', // day of month
+                'S' => '', // not supported
+                'D' => 'D', // Suffix for day of month
+                'l' => 'l', // Day name in full
+                'M' => 'M', // Month number with leading zero
+                'n' => 'n', // Month number no leading zero
+                'y' => 'y', // Year two digits
+                'Y' => 'Y', // Year four digits
+                'h' => 'h', // 01-12 not supported, use 1-12 hours
+                'g' => 'h', // 1-12 hours
+                'a' => 'K', // no lowercase am/pm supported unfortunately
+                'A' => 'K', // AM/PM
+                'H' => 'H', // 00 - 23 hours
+                'G' => 'H', // 00 - 23 hours, no support for hour with no leading zero
+                'i' => 'i', // minutes leading zero
+                's' => 'S', // 00 - 59 seconds
+            )
         );
-        return preg_replace(array_keys($formatMap), array_values($formatMap), trim($format));
     }
 
     /**
@@ -567,4 +579,23 @@ class Controller extends Base
     public function getTimetableHandler() {
         return $this->timetableHandler;
     }
+
+    /** @var ConfigureLoader */
+    private $configureLoader;
+
+    /**
+     * @return mixed $this
+     */
+    public function setConfigureLoader() {
+        $this->configureLoader = new ConfigLoader();
+        return $this;
+    }
+
+    /**
+     * @return ConfigureLoader
+     */
+    public function getConfigureLoader() {
+        return $this->configureLoader;
+    }
+
 }
