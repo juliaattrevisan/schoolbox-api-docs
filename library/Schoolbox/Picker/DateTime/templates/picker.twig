@@ -81,6 +81,8 @@
                             <div class="card small-12">
                                 <p class="meta">Selected date</p>
                                 <span class="displayDate"></span>
+                                <input id="hideTime1" type="checkbox" value="1" checked="">
+                                <label for="hideTime1" class="checkbox-label">All Day</label>
                             </div>
 
                             <div class="card small-12 hide">
@@ -113,7 +115,7 @@
 
 <script>
     var twigVars = {
-        date: new Date({{ value }}),
+        date: new Date('{{ value }}'),
         element: '{{ element }}',
         id: '{{ id }}',
         displayFormat: '{{ displayFormat }}',

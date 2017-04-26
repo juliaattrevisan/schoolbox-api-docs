@@ -245,14 +245,14 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var originalValue;
 
         if (element.val().length > 0) {
-            originalValue = element.val();
+            originalValue = moment( element.val(), convertFormat(options.displayFormat));
         }
         // if no value has been passed, use today
         else {
-            originalValue = moment().format(convertFormat(options.displayFormat));
+            originalValue = moment();
         }
         if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
-            originalValue = moment(originalValue, convertFormat(options.displayFormatDate)).format(convertFormat(options.displayFormat));
+            originalValue = moment(originalValue, convertFormat(options.displayFormatDate));
         }
 
         var picker = $('#picker' + pickerId);
@@ -272,7 +272,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue), function () {
+            picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD')), function () {
 
                 // Capture open of modal
                 $(document).on('opened.fndtn.reveal', '#picker' + pickerId, function () {

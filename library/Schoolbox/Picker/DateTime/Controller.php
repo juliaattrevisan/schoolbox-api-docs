@@ -63,7 +63,7 @@ class Controller extends Base
         $timetable = $this->getUserTimetable();
         $terms = $this->getTerms();
         try {
-            $date = new Alaress_Date_Format($value, array('d/m/Y g:ia', 'd/m/Y'));
+            $date = new Alaress_Date_Format($value, array('Y-m-d g:ia', 'Y-m-d'));
         }
         catch (\Exception $e) {
             var_dump($e->getMessage());
@@ -113,7 +113,7 @@ class Controller extends Base
                 'data' => [
                     'id' => $id,
                     //Pass unix timestamp to flatpicker, it misinterprets day and month in d/m/Y format
-                    'value' => $date->getJSDate(),
+                    'value' => $date->toIso8601String(),
                     'element' => $element,
                     'type' => $type,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
@@ -239,7 +239,7 @@ class Controller extends Base
                 array(
                     'format' => 'json',
                     'data' => [
-                        'date' => $date
+                        'date' => $date->toIso8601String()
                     ]
                 )
             );
@@ -256,6 +256,7 @@ class Controller extends Base
 
     /**
      * Converting timetable cycle and day into a calendar date
+     * @return Alaress_Date_Format
      */
     public function getDateForTimetableDay($campus, $term, $cycle, $day) {
 
@@ -266,21 +267,22 @@ class Controller extends Base
 
         // Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
         $shiftTimetableDays = $daysInCycle*($cycle-1)+$day-$termActualStart['day'];
-        $date = $termActualStart['date']->addWeekdays($shiftTimetableDays)->getLocalShort();
+        $date = $termActualStart['date']->addWeekdays($shiftTimetableDays);
         return $date;
     }
 
     /**
      * Return JSON list of all appointments for a given date
-     * @param string $date
+     * @param Alaress_Date_Format $date
      */
-    public function getByDate($date)
+    public function getByDate(Alaress_Date_Format $date)
     {
         $appointments = [];
 
         // Get start/end of the date
-        $start = \Alaress_Date_Format::newLocalShort($date);
-        $end = \Alaress_Date_Format::newLocalShort($date)->addDays(1);
+        $start = $date;
+        $end = clone $start;
+        $end = $end->addDays(1);
 
         $factory = $this->getDi()->get('calendarApiFactory');
         $api = $factory->produceForUser($this->getUser());
@@ -288,16 +290,8 @@ class Controller extends Base
         try {
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
             foreach ($events as $event) {
-                if($event->getAllDay()) {
-                    $displayDateTime = 'All day event';
-                }
-                else {
-                    $displayDateTime = $event->getStartTime()->getDateOnly() != $event->getEndTime()->getDateOnly() ?
-                        $event->getStartTime() . ' - ' . $event->getEndTime() :
-                        $event->getStartTime()->getTimeOnly() . ' - ' . $event->getEndTime()->getTimeOnly();
-                }
                 $appointments[] = [
-                    'displayDateTime' => $displayDateTime,
+                    'displayDateTime' => $event->getEventSpan(),
                     'title' => $event->getTitle()
                 ];
             }
@@ -319,10 +313,10 @@ class Controller extends Base
 
     /**
      * Return JSON list of students and how much due work that have for a given date and class code(s)
-     * @param string $date (Date we are interested in)
+     * @param Alaress_Date_Format $date (Date we are interested in)
      * @param string $classCode (CSV list of class codes)
      */
-    public function getDueByDate($date, $folder)
+    public function getDueByDate(Alaress_Date_Format $date, $folder)
     {
         // Test URL with assignments due:
         // http://192.168.36.10/picker/datetime/date/01-07-2018/class/CH123
@@ -363,13 +357,11 @@ class Controller extends Base
         $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
         // Iterate each student in the class
 
-        $from = new Alaress_Date_Format($date, 'd/m/Y');
-        $to = new Alaress_Date_Format($date, 'd/m/Y');
 
         foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
-            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $from->startOfDay(), $to->endOfDay());
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $date->startOfDay(), $date->endOfDay());
 
             // Count how many assessments are due on the specified date
             $assessmentsDue = count($assessments);
@@ -412,7 +404,7 @@ class Controller extends Base
                 'format' => 'json',
                 'data' => [
                     'students' => $students,
-                    'date' => $date
+                    'date' => $date->toIso8601String()
                 ]
             )
         );

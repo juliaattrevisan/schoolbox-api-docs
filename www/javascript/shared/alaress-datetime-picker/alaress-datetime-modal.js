@@ -153,9 +153,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Clear out any old response display
         pickerResponse.html('');
         var html = '';
-
+console.log(data);
         // Ajax returned date
-        displayDate = moment(data.date, convertFormat(twigVars.displayFormat)).format(convertFormat('F d, Y'));
+        displayDate = moment(data.date).format('MMMM DD, YYYY');
 
         if (target == 'timetable') {
             $timetable.submit.removeClass('disabled');
@@ -403,7 +403,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         showPeriod();
         revealTimetable();
         // On first load request data by date for the timetable
-        requestDataByDate(encodeURIComponent(twigVars.date.getDate() + '/' + (twigVars.date.getMonth() + 1) + '/' + twigVars.date.getFullYear()), 'timetable');
+        requestDataByDate(encodeURIComponent( twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate() ), 'timetable');
 
         // Update cycles on Campus or Term change
         $timetable.campus.change(function () {
@@ -469,9 +469,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     Flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
 
     window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, {
-
         defaultDate: twigVars.date,
-        dateFormat: pickerOptions.enableTime ? twigVars.displayFormat : twigVars.displayFormatDate,
+        // dateFormat: 'U',
+        // dateFormat: pickerOptions.enableTime ? twigVars.displayFormat : twigVars.displayFormatDate,
         inline: true,
         altInput: false,
         allowInput: true,
@@ -507,7 +507,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 });
             }
 
-            requestDataByDate(encodeURIComponent(twigVars.date.getDate() + '/' + (twigVars.date.getMonth() + 1) + '/' + twigVars.date.getFullYear()), 'calendar');
+            requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -519,7 +519,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
             // Check if selected date has changed and don't send an ajax on time change
             var selectedObj = new Date(selectedDates);
-            newDate = selectedObj.getDate() + '/' + (selectedObj.getMonth() + 1) + '/' + selectedObj.getFullYear();
+            newDate = selectedObj.getFullYear() + '-' + (selectedObj.getMonth() + 1) + '-' + selectedObj.getDate();
             if (newDate !== latestDate) {
 
                 requestDataByDate(encodeURIComponent(dateSplit[0]), 'calendar');

@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
@@ -73,6 +74,22 @@ class Module extends BaseModule
     {
         $this->addRoutePermission($authorizer, '.*',
             new Rule\All(new Rule\IsLoggedIn())
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload($matcher,
+            '(?:getByDate|getDueByDate)',
+            function ($params) {
+                if (array_key_exists('date', $params)) {
+                    $args['date'] = new \Alaress_Date_Format($params['date'], 'Y-m-d');
+                }
+                return $args;
+            }
         );
     }
 
