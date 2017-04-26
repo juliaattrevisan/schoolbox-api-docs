@@ -63,9 +63,19 @@ class Model
     protected $score;
 
     /**
+     * The html contents of the old Mode 6 Report that was in Plagscan < v3.0
+     * We cache this anyway in case the interactive report url is unavailable
+     *
      * @var string
      */
     protected $html;
+
+    /**
+     * A url to the Mode 7 Interactive Report that was introduced in Plagscan v3.0
+     *
+     * @var string
+     */
+    protected $interactiveUrl;
 
     /**
      * @var int
@@ -223,6 +233,24 @@ class Model
     public function setHtml($html)
     {
         $this->html = $html;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInteractiveUrl()
+    {
+        return $this->interactiveUrl;
+    }
+
+    /**
+     * @param string $interactiveUrl
+     * @return $this
+     */
+    public function setInteractiveUrl($interactiveUrl)
+    {
+        $this->interactiveUrl = $interactiveUrl;
         return $this;
     }
 

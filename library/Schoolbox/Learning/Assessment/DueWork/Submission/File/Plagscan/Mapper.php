@@ -11,20 +11,22 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use Schoolbox\User;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Mapper extends \Schoolbox\Mapper
 {
 
     /**
-     * An instance of the Plagscan Gateway
+     * An instance of the Plagscan Connector
      * which is where files end up
      * 
-     * @var Gateway
+     * @var Connector
      */
-    private $gateway;
+    private $connector;
 
     /**
      * A registry of allowed extension-mime tuples
@@ -45,9 +47,10 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
         $this->uses('html', self::TYPE_STRING);
+        $this->uses('interactive_url', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
     }
 
     /**
@@ -57,13 +60,35 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->setValidFiles(new ValidFiles());
 
-        $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
-        $plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
-
         /* If plagscan credentials exist, set up all the other stuff
          */
-        if (strlen($plagscanApiKey) && strlen($plagscanUsername)) {
-            $this->setGateway(new Gateway($plagscanUsername, $plagscanApiKey));
+        $plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
+        $plagscanClientId = $this->getConfigLoader()->get('plagscan_client_id');
+        $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
+
+        /* All three data pieces are required to have existed
+         * This is the build order for plagscan to work
+         *
+         * Username + password = plagscan account admin
+         * plagscan account admin = generate api key + find out your client id
+         * api key + client id = access token
+         * access token + api url = plagscan data
+         */
+        if (strlen($plagscanApiKey) && strlen($plagscanClientId) && strlen($plagscanUsername)) {
+            try {
+                $this->setConnector(new Connector($this->getConfigLoader(), $plagscanClientId, $plagscanApiKey));
+            }
+            catch (\DomainException $e) {
+
+                /* Could not spawn for some reason, but due to mapper usage
+                 * we don't want to detonate - just quietly not use plagscan
+                 */
+            }
+            catch (\RuntimeException $e) {
+
+                /* Could not spawn because plagscan api is down
+                 */
+            }
         }
     }
 
@@ -82,7 +107,7 @@ class Mapper extends \Schoolbox\Mapper
         /* Did the Gateway spawn properly
          * If so, there is a functioning username/apikey
          */
-        if ($this->getGateway()) {
+        if ($this->getConnector()) {
 
             /* Staffs and super can always see plagscan results
              */
@@ -112,7 +137,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* If gateway never spawned, plagscan not configured
          */
-        if (!$this->getGateway()) {
+        if (!$this->getConnector()) {
             return [];
         }
 
@@ -143,7 +168,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* If gateway never spawned, plagscan not configured
          */
-        if (!$this->getGateway()) {
+        if (!$this->getConnector()) {
             return [];
         }
 
@@ -155,21 +180,11 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Send it to plag
          */
-        $documentId = $this->getGateway()->submit($file);
+        $plagscanId = $this->getConnector()->transmit($file);
 
         /* Plagscan death
          */
-        if (empty($documentId)) {
-            return [];
-        }
-
-        /* Otherwise, proceed normally
-         */
-        $this->getGateway()->check($documentId);
-
-        /* plagscan returned adocumentId that isn't useful?
-         */
-        if (!$documentId) {
+        if (empty($plagscanId)) {
             return [];
         }
 
@@ -183,7 +198,7 @@ class Mapper extends \Schoolbox\Mapper
         try {
             $plagscan = $this->findOneByColumn('student_submission_file_id', $file->getId(), ['cache' => false]);
         }
-        catch (\Schoolbox\Mapper\Exception $e) {
+        catch (MapperException $e) {
 
             /* No plagscan stub existed for this file
              * Spawn one and continue
@@ -193,7 +208,7 @@ class Mapper extends \Schoolbox\Mapper
             $plagscan->setCreatedAt(\Alaress_Date_Format::now());
         }
 
-        $plagscan->setPlagscanId($documentId);
+        $plagscan->setPlagscanId($plagscanId);
         $plagscan->setStatus(Plagscan::STATUS_QUEUED);
         $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
 
@@ -204,20 +219,20 @@ class Mapper extends \Schoolbox\Mapper
      */
 
     /**
-     * @return Gateway
+     * @return Connector
      */
-    public function getGateway()
+    public function getConnector()
     {
-        return $this->gateway;
+        return $this->connector;
     }
 
     /**
-     * @param Gateway $gateway
+     * @param Connector $connector
      * @return $this
      */
-    private function setGateway($gateway)
+    private function setConnector($connector)
     {
-        $this->gateway = $gateway;
+        $this->connector = $connector;
         return $this;
     }
 
