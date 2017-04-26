@@ -41,6 +41,21 @@ DELETE sr FROM submission_return sr
 LEFT JOIN submission_box sb ON sb.id = sr.box_id
 WHERE sb.id IS NULL;
 
+-- Delete files linked to missing submissions
+DELETE ssf FROM student_submission_file ssf
+LEFT JOIN student_submission ss ON ss.id = ssf.student_submission_id
+WHERE ss.id IS NULL;
+
+-- Delete files linked to submissions linked to missing boxes
+DELETE ssf FROM student_submission_file ssf
+JOIN student_submission ss ON ss.id = ssf.student_submission_id
+LEFT JOIN submission_box sb ON sb.id = ss.box_id
+WHERE sb.id IS NULL;
+
+-- Delete submissions linked to missing boxes
+DELETE ss FROM student_submission ss
+LEFT JOIN submission_box sb ON sb.id = ss.box_id
+WHERE sb.id IS NULL;
 
 ALTER TABLE `submission_return_file`
   ADD CONSTRAINT `submission_return_file_return_id`
