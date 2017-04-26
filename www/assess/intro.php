@@ -59,7 +59,7 @@ $readOnly         = false;
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
-        error(120);
+        error(19);
     }
 
     // Show quiz preview to someone who's not participating, but has read access to the folder

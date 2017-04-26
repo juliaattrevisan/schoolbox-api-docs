@@ -69,7 +69,7 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
-        error(120);
+        error(19);
     }
 
     // I can't attempt this if it isn't open
