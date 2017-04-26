@@ -56,11 +56,12 @@ class WarpGate
 
     /**
      * A secret hash that Plagscan generates from your
-     * Plagscan account somehow
+     * Plagscan account somehow. AccessTokenGenerator
+     * instances spawns it
      *
-     * @var string
+     * @var AccessTokenGenerator
      */
-    private $accessToken = '';
+    private $accessTokenGenerator;
 
     /**
      * A registry of allowed extension-mime tuples
@@ -80,14 +81,15 @@ class WarpGate
      * WarpGate constructor.
      *
      * @param IConfigLoader $configLoader
-     * @param string $accessToken
-     * @throws DomainException
+     * @param int $plagscanClientId
+     * @param string $plagscanApiKey
      */
-    public function __construct(IConfigLoader $configLoader, $accessToken)
+    public function __construct(IConfigLoader $configLoader, $plagscanClientId, $plagscanApiKey)
     {
         $this->setConfigLoader($configLoader);
-        $this->setAccessToken($accessToken);
         $this->setValidFiles(new ValidFiles());
+
+        $this->setAccessTokenGenerator(new AccessTokenGenerator($plagscanClientId, $plagscanApiKey));
     }
 
     /**
@@ -132,7 +134,7 @@ class WarpGate
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
 
-        $response = $client->post("documents/?access_token={$this->getAccessToken()}", [
+        $response = $client->post("documents/?access_token={$this->getAccessTokenGenerator()->generate()}", [
             "multipart" => $postData
         ]);
 
@@ -194,7 +196,7 @@ class WarpGate
         }
 
         $postData = [
-            'access_token' => $this->getAccessToken(),
+            'access_token' => $this->getAccessTokenGenerator()->generate(),
         ];
 
         $client = new Client([
@@ -352,7 +354,7 @@ class WarpGate
     private function retrieve($plagscanId, $mode)
     {
         $postData = [
-            'access_token' => $this->getAccessToken(),
+            'access_token' => $this->getAccessTokenGenerator()->generate(),
             'mode' => $mode
         ];
 
@@ -386,7 +388,7 @@ class WarpGate
     public function delete($plagscanId)
     {
         $postData = [
-            'access_token' => $this->getAccessToken(),
+            'access_token' => $this->getAccessTokenGenerator()->generate(),
         ];
 
         $client = new Client([
@@ -443,22 +445,6 @@ class WarpGate
     }
 
     /**
-     * @return string
-     */
-    private function getAccessToken()
-    {
-        return $this->accessToken;
-    }
-
-    /**
-     * @param string $accessToken
-     */
-    private function setAccessToken($accessToken)
-    {
-        $this->accessToken = $accessToken;
-    }
-
-    /**
      * @return ValidFiles
      */
     private function getValidFiles()
@@ -473,6 +459,24 @@ class WarpGate
     private function setValidFiles($validFiles)
     {
         $this->validFiles = $validFiles;
+        return $this;
+    }
+
+    /**
+     * @return AccessTokenGenerator
+     */
+    private function getAccessTokenGenerator()
+    {
+        return $this->accessTokenGenerator;
+    }
+
+    /**
+     * @param AccessTokenGenerator $accessTokenGenerator
+     * @return $this
+     */
+    private function setAccessTokenGenerator($accessTokenGenerator)
+    {
+        $this->accessTokenGenerator = $accessTokenGenerator;
         return $this;
     }
 }

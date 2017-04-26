@@ -63,24 +63,33 @@ class Mapper extends \Schoolbox\Mapper
 
         /* If plagscan credentials exist, set up all the other stuff
          */
-        $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
+        $plagscanUsername = $this->getConfigLoader()->get('plagscan_api_username');
         $plagscanClientId = $this->getConfigLoader()->get('plagscan_client_id');
+        $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
 
-        try {
-            $accessToken = (new AccessTokenGenerator($plagscanClientId, $plagscanApiKey))->generate();
+        /* All three data pieces are required to have existed
+         * This is the build order for plagscan to work
+         *
+         * Username + password = plagscan account admin
+         * plagscan account admin = generate api key + find out your client id
+         * api key + client id = access token
+         * access token + api url = plagscan data
+         */
+        if (strlen($plagscanApiKey) && strlen($plagscanClientId) && strlen($plagscanUsername)) {
+            try {
+                $this->setGateway(new WarpGate($this->getConfigLoader(), $plagscanClientId, $plagscanApiKey));
+            }
+            catch (\DomainException $e) {
 
-            $this->setGateway(new WarpGate($this->getConfigLoader(), $accessToken));
-        }
-        catch (\DomainException $e) {
+                /* Could not spawn for some reason, but due to mapper usage
+                 * we don't want to detonate - just quietly not use plagscan
+                 */
+            }
+            catch (\RuntimeException $e) {
 
-            /* Could not spawn for some reason, but due to mapper usage
-             * we don't want to detonate - just quietly not use plagscan
-             */
-        }
-        catch (\RuntimeException $e) {
-
-            /* Could not spawn because plagscan api is down
-             */
+                /* Could not spawn because plagscan api is down
+                 */
+            }
         }
     }
 
