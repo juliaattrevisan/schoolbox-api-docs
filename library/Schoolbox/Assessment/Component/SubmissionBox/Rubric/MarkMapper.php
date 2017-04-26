@@ -116,17 +116,13 @@ class MarkMapper extends Mapper
     public function deleteDraftMarks(User $user, IAssessable $dueWork)
     {
         $query = "
-            DELETE FROM rubric_mark WHERE id IN (
-              SELECT * FROM (
-                SELECT rm.id FROM rubric_mark rm
+            DELETE rm FROM rubric_mark rm 
                 JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
                 JOIN rubric_level   rl ON rl.id = rd.level_id
                 JOIN submission_box sb ON sb.id = rl.box_id
                 WHERE rm.student_id = :student_id
                 AND sb.assessment_id = :assessment_id
                 AND rm.published_at IS NULL
-              ) t
-            )
         ";
 
         $statement = $this->database->prepare($query);
