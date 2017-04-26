@@ -401,11 +401,13 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      */
     public function isOpen($assess)
     {
-        if (strtotime($assess['start']) <= time()) {
-            return true;
-        } else {
+        if (!isset($assess['start'])) {
             return false;
         }
+        if (strtotime($assess['start']) <= time()) {
+            return true;
+        }
+        return false;
     }
 
     /**
