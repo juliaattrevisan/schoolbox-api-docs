@@ -1,4 +1,4 @@
-DROP TABLE wikiOpens;
+DROP TABLE IF EXISTS wikiOpens;
 
 DELETE wiki FROM wiki
 LEFT JOIN folder ON categoryID = folder.id
