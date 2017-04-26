@@ -61,30 +61,33 @@ abstract class AbstractFilterFactory implements IFilterFactory
 
 
     /**
+     * Build a filter component, ready to inject into a filter panel
+     *
      * @param string               $definitionClass  They type of filter we are building
      * @param User                 $user
      * @param string               $page
-     * @param IRunTimeOptions|null $runTimeOptions
+     * @param null|User            $viewee
+     * @param null|string[]        $selectionOverrides
      * @return IFilterComponent|object
-     * @throws Mapper\Exception If a mapper column name is invalid
+     * @throws Mapper\Exception
      */
-    public function buildComponent($definitionClass, User $user, $page, IRunTimeOptions $runTimeOptions = null)
+    public function buildComponent($definitionClass, User $user, $page, User $viewee = null, array $selectionOverrides = null)
     {
         $filter     = $this->filterMapper->findByClass($definitionClass);
         $definition = $this->buildDefinition($filter);
 
-        $overrideUserSelections = $runTimeOptions && $runTimeOptions->isSelectionOverride();
+        $overrideUserSelections = null !== $selectionOverrides;
 
         $baseArgs = [
             'definition'            => $definition,
             'user'                  => $user,
             'page'                  => $page,
             'savedSelections'       => $overrideUserSelections ? null : $this->getSavedSelections($filter, $user, $page),
-            'selectionOverrides'    => $overrideUserSelections ? $runTimeOptions->getOverrideKeys() : null,
+            'selectionOverrides'    => $selectionOverrides,
             'filterSelectionMapper' => $this->filterSelectionMapper,
         ];
 
-        $extraArgs = $this->buildExtraComponentArgs($user, $page, $runTimeOptions, $definition);
+        $extraArgs = $this->buildExtraComponentArgs($user, $page, $definition, $viewee);
 
         $componentClass = $this->getAdjacentClass($definitionClass, 'Component');
 
@@ -119,13 +122,13 @@ abstract class AbstractFilterFactory implements IFilterFactory
     }
 
     /**
-     * @param User                 $user
-     * @param string               $page
-     * @param IRunTimeOptions|null $runTimeOptions
-     * @param IFilterDefinition    $definition
+     * @param User              $user
+     * @param string            $page
+     * @param IFilterDefinition $definition
+     * @param null|User         $viewee
      * @return mixed[]
      */
-    protected abstract function buildExtraComponentArgs(User $user, $page, IRunTimeOptions $runTimeOptions = null, IFilterDefinition $definition);
+    protected abstract function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null);
 
 
     /**

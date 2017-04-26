@@ -56,7 +56,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
      * @param User                                     $user
      * @param string                                   $page
      * @param null|GenericCollection|Selection\Model[] $savedSelections Existing selections for this filter, user and page
-     * @param null|string[]                            $selectionOverrides
+     * @param null|string[]                            $overrides
      * @param Selection\Mapper                         $filterSelectionMapper
      * @throws \DomainException If both saved selections and override selections are null
      */
@@ -65,11 +65,11 @@ abstract class AbstractFilterComponent implements IFilterComponent
         User $user,
         $page,
         GenericCollection $savedSelections = null,
-        array $selectionOverrides = null,
+        array $overrides = null,
         Selection\Mapper $filterSelectionMapper
     ) {
         // Ensure we have either saved user selections (even if empty) or override selections
-        if(null === $savedSelections && null === $selectionOverrides){
+        if(null === $savedSelections && null === $overrides){
             throw new \DomainException('saved selections and override selections cannot both be null');
         }
 
@@ -77,7 +77,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
         $this->user                  = $user;
         $this->page                  = $page;
         $this->savedSelections       = $savedSelections;
-        $this->selectionOverrides    = $selectionOverrides;
+        $this->selectionOverrides    = is_array($overrides) ? array_combine($overrides, $overrides) : null;
         $this->filterSelectionMapper = $filterSelectionMapper;
     }
 

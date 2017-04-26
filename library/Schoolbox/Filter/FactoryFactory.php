@@ -119,23 +119,28 @@ class FactoryFactory
         return $keyConverters;
     }
 
+
     /**
      * Builds a filter panel for the specified user and page, which submits selections to the specified route
      *
-     * @param User   $user
-     * @param string $page
-     * @param string $route
-     * @param array  $runTimeOptions Indexed by filter definition class
+     * @param User      $user
+     * @param string    $page
+     * @param string    $route
+     * @param null|User $viewee
+     * @param array     $query
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      */
-    public function buildPanel(User $user, $page, $route, array $runTimeOptions = [])
+    public function buildPanel(User $user, $page, $route, User $viewee = null, array $query = [])
     {
         $filterComponents = $this->createFilterComponentCollection();
+        unset($query['page']);
 
         foreach ($this->getDefinitions($page) as $className) {
             $filterFactory = $this->buildFilterFactoryForFilter($className);
-            $component     = $filterFactory->buildComponent($className, $user, $page, $runTimeOptions[$className]);
+            $queryKey      = $className::getQueryKey();
+            $overrides     = array_key_exists($queryKey, $query) ? explode(',', $query[$queryKey]) : null;
+            $component     = $filterFactory->buildComponent($className, $user, $page, $viewee, $overrides);
             $filterComponents->setOffset($className, $component);
         }
 
@@ -207,7 +212,6 @@ class FactoryFactory
         $reflector = new \ReflectionClass($factoryClass);
         return $reflector->newInstanceArgs($args);
     }
-
 
 
     /**

@@ -55,6 +55,7 @@ use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
 
 class Controller extends Base
 {
+
     /**
      * @var QuizMapper
      */
@@ -219,19 +220,18 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
-        // All run-time (as opposed to hard-coded and dynamic) options, indexed by filter definition class
-        $runTimeOptions= [
-            FolderFilter\Definition::class => new FolderFilter\RunTimeOptions($viewee),
-            UnitFilter\Definition::class   => new UnitFilter\RunTimeOptions($viewee),
-        ];
+        $page      = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
+        $route     = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
+        $queryArgs = $this->getRequest()->query->getArrayCopy();
 
-        $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
-        $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), FilterOption\Model::PAGE_PENDING_ASSESSMENTS, $route, $runTimeOptions);
+        $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
-            'viewee'      => $viewee,
-            'filterPanel' => $filterPanel,
-        ])->setTab('submission'));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
+                'viewee'      => $viewee,
+                'filterPanel' => $filterPanel,
+            ])->setTab('submission')->setTitle('Pending Assessments')
+        );
     }
 
 
@@ -240,9 +240,9 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User                 $viewee The user whose pending assessments we are viewing.
+     * @param User                  $viewee The user whose pending assessments we are viewing.
      * @param Filter\FactoryFactory $filterFactoryFactory
-     * @var  string[][]            $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
+     * @var  string[][]             $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
      * @throws \LogicException
      * @throws \DomainException
      * @throws \OutOfRangeException
@@ -262,10 +262,10 @@ class Controller extends Base
                 'content' => $content,
             ]));
 
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             // TODO - can remove this block when we abandon PHP 5 support
             $this->returnJsonError($e);
-        } catch (\Throwable $e){
+        } catch (\Throwable $e) {
             $this->returnJsonError($e);
         }
     }
@@ -368,11 +368,11 @@ class Controller extends Base
     protected function returnJsonError($e)
     {
         $this->getResponse()->content->set($this->buildJsonOutput([
-            'status'    => 500,
-            'code'      => $e->getCode(),
-            'message'   => $e->getMessage(),
-            'line'      => $e->getLine(),
-            'file'      => $e->getFile(),
+            'status'  => 500,
+            'code'    => $e->getCode(),
+            'message' => $e->getMessage(),
+            'line'    => $e->getLine(),
+            'file'    => $e->getFile(),
         ]));
     }
 
@@ -433,7 +433,7 @@ class Controller extends Base
      *
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
-     * @param User $viewee
+     * @param User  $viewee
      * @param  Term $term
      * @throws ServiceNotFound If unable to find mail handler service
      * @throws DefinitionException
@@ -447,9 +447,9 @@ class Controller extends Base
         // Add folders with response or feedback
         /** @var GenericCollection|Folder[] $folders */
         $folders = $this->folderMapper->createCollection()
-            ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term), 'id')
-            ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id')
-            ->sortBy('name', 'ASC');
+                                      ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term), 'id')
+                                      ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id')
+                                      ->sortBy('name', 'ASC');
 
         // Load Teachers
         foreach ($folders as $folder) {

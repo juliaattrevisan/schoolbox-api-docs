@@ -10,7 +10,6 @@ namespace Schoolbox\Filter\Filters\AssessmentType;
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IFilterDefinition;
-use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\User;
 use Schoolbox\Filter;
 
@@ -34,7 +33,7 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IRunTimeOptions $runTimeOptions = null, IFilterDefinition $definition)
+    protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
     {
         return [];
     }

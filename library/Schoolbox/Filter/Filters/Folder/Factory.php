@@ -11,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFilterFactory;
 use Schoolbox\Filter\IFilterDefinition;
-use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
@@ -52,22 +51,10 @@ class Factory extends AbstractFilterFactory
 
 
     /**
-     * @param User|null            $user
-     * @param null                 $page
-     * @param IRunTimeOptions|null $runTimeOptions
-     * @param IFilterDefinition    $definition
-     * @return mixed[]
-     * @throws \InvalidArgumentException If RuntTime Options are of wrong type
+     * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user = null, $page = null, IRunTimeOptions $runTimeOptions = null, IFilterDefinition $definition)
+    protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
     {
-        if (!$runTimeOptions instanceof RunTimeOptions) {
-            $type  = gettype($runTimeOptions);
-            $found = 'object' === $type ? get_class($runTimeOptions) : $type;
-            $msg   = 'Options must be an instance of ' . RunTimeOptions::class . ". Found: $found";
-            throw new \InvalidArgumentException($msg);
-        }
-
         // Should this role type see classes for this page?
         /** @var Option\Model[][] $options */
         $options = $definition->getOptions($page);
@@ -78,7 +65,7 @@ class Factory extends AbstractFilterFactory
             ? UserAccess::ACCESS_WRITE
             : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
 
-        $folders = $this->folderMapper->findForUser($runTimeOptions->getViewee(), $getSubjects, $groupAccessLevel, true);
+        $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
 
         // Divide folders into Classes and Groups (not mutually exclusive!)
 

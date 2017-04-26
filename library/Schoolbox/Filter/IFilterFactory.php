@@ -36,10 +36,11 @@ interface IFilterFactory
      * @param string               $definitionClass  They type of filter we are building
      * @param User                 $user
      * @param string               $page
-     * @param null|IRunTimeOptions $runTimeOptions
+     * @param null|User            $viewee
+     * @param null|string[]        $selectionOverrides
      * @return IFilterComponent
      */
-    public function buildComponent($definitionClass, User $user, $page, IRunTimeOptions $runTimeOptions = null);
+    public function buildComponent($definitionClass, User $user, $page, User $viewee = null, array $selectionOverrides = null);
 
 
     /**

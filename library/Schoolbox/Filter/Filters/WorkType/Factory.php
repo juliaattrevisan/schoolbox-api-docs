@@ -9,7 +9,6 @@ namespace Schoolbox\Filter\Filters\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterFactory;
-use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
@@ -56,7 +55,7 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IRunTimeOptions $runTimeOptions = null, Filter\IFilterDefinition $definition)
+    protected function buildExtraComponentArgs(User $user, $page, Filter\IFilterDefinition $definition, User $viewee = null)
     {
         return [];
     }
