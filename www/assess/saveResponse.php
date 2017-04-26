@@ -46,14 +46,19 @@ $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
+        error(19);
+    }
+
     // I can't do this if not a participant
     if (!$assessment->isParticipant($_SESSION['user'])) {
         error(19);
     }
 
-    // I can't attempt a spec assessment
-    if ($assessment->isSpecification()) {
-        error(19);
+    // I can't attempt this if it has expired
+    if ($assessHandler->isExpired($assess['assess_id'])) {
+        error(120);
     }
 
     // I can't attempt this if it isn't open

@@ -62,7 +62,8 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
-    // Show quiz preview to someone who's not participating, but has read access to the folder
+    // I can't do this if not a participant
+    // However, I can see a preview if I can read this folder
     if (!$assessment->isParticipant($_SESSION['user'])) {
         if ($accessLevel == UserAccess::ACCESS_READ) {
             $readOnly = true;
