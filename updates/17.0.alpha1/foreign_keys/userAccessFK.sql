@@ -7,14 +7,9 @@ LEFT JOIN luServices luS ON luS.id = uA.service
 SET service = 0
 WHERE luS.id IS NULL;
 
-UPDATE userAccess
-SET sid = 0
-WHERE sid IS NULL;
-
 ALTER TABLE `userAccess`
   CHANGE COLUMN `uid` `uid` INT(11) UNSIGNED NOT NULL,
-  CHANGE COLUMN `service` `service` INT(11) UNSIGNED NOT NULL,
-  CHANGE COLUMN `sid` `sid` INT(11) UNSIGNED NOT NULL;
+  CHANGE COLUMN `service` `service` INT(11) UNSIGNED NOT NULL;
 
 ALTER TABLE `luServices`
   RENAME TO  `lu_service`,
