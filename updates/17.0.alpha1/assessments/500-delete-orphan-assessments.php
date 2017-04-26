@@ -32,6 +32,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
  * Encapsulates all the deletion logic to solve the scoping issue
  *
  * Will exit out with code=1 if any errors encountered during execution
+ *
  */
 class DeleteOrphanAssessments
 {
@@ -118,12 +119,18 @@ class DeleteOrphanAssessments
         $quizIdPlaceholders = $this->getPlaceHoldersString($quizIds, $prefix);
         $parameters         = $this->getArrayParameters($quizIds, $prefix);
 
-        // quiz answers (fka responses)
+        // delete quiz answers (fka responses) if either attempt, section, or question belongs to orphan Quiz
+        // We need the convoluted WHERE clause as eg STK has 35 instances where response.section.quiz != response.attempt.quiz
+        // NORMALISATION FTW!!!
         $statement = $this->db->prepare("
             DELETE response FROM assess_response response
-            JOIN assess_attempt attempt ON attempt.attempt_id = response.attempt_id
+            LEFT JOIN assess_attempt   attempt ON   attempt.attempt_id  = response.attempt_id
+            LEFT JOIN assess_section   section ON   section.section_id  = response.section_id
+            LEFT JOIN assess_question question ON  question.question_id = response.question_id
+            LEFT JOIN assess_section q_section ON q_section.section_id  = question.section_id
             WHERE attempt.assess_id IN ($quizIdPlaceholders)
-
+            OR    section.assess_id IN ($quizIdPlaceholders)
+            OR  q_section.assess_id IN ($quizIdPlaceholders)
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
@@ -468,7 +475,7 @@ class DeleteOrphanAssessments
     private function executeDeleteQuery(PDOStatement $statement, $parameters)
     {
         // Get the name of the table we are deleting from
-        $pattern = '/DELETE\s+FROM\s+(?:[^\s\.]+\.)?([^\s\.]+)/i';
+        $pattern = '/DELETE\s+(?:\S+\s+)?FROM\s+(?:[^\s\.]+\.)?([^\s\.]+)/i';
 
         if (!preg_match($pattern, $statement->queryString, $matches)) {
             $this->log->error('Unable to parse table name from query string');
