@@ -7,7 +7,7 @@ ALTER TABLE `newsTopic`
   CHANGE COLUMN `newsTopicID` `newsTopicID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
 
 ALTER TABLE `news_items`
-  CHANGE COLUMN `item_topic_id` `item_topic_id` INT(11) UNSIGNED NULL DEFAULT '0' ;
+  CHANGE COLUMN `item_topic_id` `item_topic_id` INT(11) UNSIGNED NULL;
 
 
 ALTER TABLE `news_items`
@@ -99,7 +99,7 @@ REFERENCES `news_items` (`item_id`)
   ON UPDATE NO ACTION;
 
 ALTER TABLE `newsCampus`
-  CHANGE COLUMN `campus` `campus` TINYINT(4) UNSIGNED NOT NULL DEFAULT '0' ;
+  CHANGE COLUMN `campus` `campus` TINYINT(4) UNSIGNED NOT NULL;
 
 ALTER TABLE `newsCampus`
   ADD CONSTRAINT `fk_newsCampus_campus_id`

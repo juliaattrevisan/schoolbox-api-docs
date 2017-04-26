@@ -71,7 +71,7 @@ DELETE superusers FROM superusers
 WHERE `user`.id is null;
 
 ALTER TABLE `superusers`
-  CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL DEFAULT '0' ;
+  CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
 
 ALTER TABLE `superusers`
   ADD CONSTRAINT `fk_superusers_user_id`
@@ -80,12 +80,12 @@ REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-ALTER TABLE `bookmarks`
-  CHANGE COLUMN `owner` `owner` INT(11) UNSIGNED NOT NULL DEFAULT '0' ;
-
 DELETE bookmarks FROM bookmarks
   LEFT JOIN `user` ON `owner` = `user`.id
 WHERE `user`.id is null;
+
+ALTER TABLE `bookmarks`
+  CHANGE COLUMN `owner` `owner` INT(11) UNSIGNED NOT NULL;
 
 ALTER TABLE `bookmarks`
   ADD CONSTRAINT `fk_bookmarks_user_id`

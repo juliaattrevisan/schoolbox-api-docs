@@ -40,7 +40,7 @@ DELETE userGroups FROM userGroups
 WHERE folder.id IS NULL;
 
 ALTER TABLE `userGroups`
-  CHANGE COLUMN `cid` `cid` INT(6) UNSIGNED NOT NULL DEFAULT '0' ;
+  CHANGE COLUMN `cid` `cid` INT(6) UNSIGNED NOT NULL;
 
 ALTER TABLE `userGroups`
   ADD CONSTRAINT `fk_userGroups_folder_id`

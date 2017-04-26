@@ -1,6 +1,3 @@
-ALTER TABLE `perms`
-  CHANGE COLUMN `gid` `gid` INT(11) UNSIGNED NOT NULL DEFAULT '0' ;
-
 DELETE perms FROM perms
   LEFT JOIN `folder` ON cid = `folder`.id
 WHERE `folder`.id is null;
@@ -8,6 +5,9 @@ WHERE `folder`.id is null;
 DELETE perms FROM perms
   LEFT JOIN `groups` ON gid = `groups`.id
 WHERE `groups`.id is null;
+
+ALTER TABLE `perms`
+  CHANGE COLUMN `gid` `gid` INT(11) UNSIGNED NOT NULL;
 
 
 DELETE userCampus FROM userCampus
