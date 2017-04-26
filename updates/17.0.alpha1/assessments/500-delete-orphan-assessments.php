@@ -120,14 +120,10 @@ class DeleteOrphanAssessments
 
         // quiz answers (fka responses)
         $statement = $this->db->prepare("
-            DELETE FROM assess_response
-            WHERE response_id IN (
-              SELECT * FROM (
-                SELECT answer.response_id FROM assess_response answer
-                JOIN assess_attempt attempt ON attempt.attempt_id = answer.attempt_id
-                WHERE attempt.assess_id IN ($quizIdPlaceholders)
-              ) t
-            )
+            DELETE response FROM assess_response response
+            JOIN assess_attempt attempt ON attempt.attempt_id = response.attempt_id
+            WHERE attempt.assess_id IN ($quizIdPlaceholders)
+
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
@@ -140,28 +136,19 @@ class DeleteOrphanAssessments
 
         // quiz solutions (fka answers)
         $statement = $this->db->prepare("
-            DELETE FROM assess_answer 
-            WHERE answer_id IN (
-              SELECT * FROM (
-                SELECT solution.answer_id FROM assess_answer solution
-                JOIN assess_question question ON question.question_id = solution.question_id
-                JOIN assess_section section ON question.section_id = question.section_id
-                WHERE section.assess_id IN ($quizIdPlaceholders)
-              ) t
-            )
+            DELETE answer FROM assess_answer answer
+            JOIN assess_question question ON question.question_id = answer.question_id
+            JOIN assess_section section ON  section.section_id  = question.section_id
+            WHERE section.assess_id IN ($quizIdPlaceholders)
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
         // quiz questions
         $statement = $this->db->prepare("
-            DELETE FROM assess_question
-            WHERE question_id IN (
-              SELECT * FROM (
-                SELECT question.question_id FROM assess_question question
-                JOIN assess_section section ON question.section_id = question.section_id
-                WHERE section.assess_id IN ($quizIdPlaceholders)
-              ) t
-            )
+            DELETE question FROM assess_question question
+            JOIN assess_section section ON section.section_id = question.section_id
+            WHERE section.assess_id IN ($quizIdPlaceholders)
+
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
@@ -214,29 +201,19 @@ class DeleteOrphanAssessments
 
         // rubric_mark
         $statement = $this->db->prepare("
-            DELETE FROM rubric_mark
-            WHERE id IN (
-              SELECT * FROM (
-                SELECT rm.id FROM rubric_mark rm
-                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-                JOIN rubric_level rl ON rl.id = rd.level_id
-                WHERE rl.box_id IN ($dueWorkIdPlaceholders)
-              ) t
-            )
+            DELETE rm FROM rubric_mark rm
+            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+            JOIN rubric_level rl      ON rl.id = rd.level_id
+            WHERE rl.box_id IN ($dueWorkIdPlaceholders)
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
 
         // rubric_descriptor
         $statement = $this->db->prepare("
-            DELETE FROM rubric_descriptor
-            WHERE id IN (
-              SELECT * FROM (
-                SELECT rd.id FROM rubric_descriptor rd
-                JOIN rubric_level rl ON rl.id = rd.level_id
-                WHERE rl.box_id IN ($dueWorkIdPlaceholders)
-              ) t
-            )
+            DELETE rd FROM rubric_descriptor rd
+            JOIN rubric_level rl ON rl.id = rd.level_id
+            WHERE rl.box_id IN ($dueWorkIdPlaceholders)
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
@@ -257,14 +234,9 @@ class DeleteOrphanAssessments
 
         // submission return files
         $statement = $this->db->prepare("
-            DELETE FROM submission_return_file 
-            WHERE id IN (
-              SELECT * FROM (
-                SELECT srf.id FROM submission_return_file srf
-                JOIN submission_return sr ON srf.submission_return_id = sr.id
-                WHERE sr.box_id IN ($dueWorkIdPlaceholders)
-              ) t
-            )
+            DELETE srf FROM submission_return_file srf
+            JOIN submission_return sr ON srf.submission_return_id = sr.id
+            WHERE sr.box_id IN ($dueWorkIdPlaceholders)
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
@@ -278,29 +250,19 @@ class DeleteOrphanAssessments
 
         // Plagscans
         $statement = $this->db->prepare("
-            DELETE FROM plagscan_document 
-            WHERE id IN (
-              SELECT * FROM (
-                SELECT pd.id FROM plagscan_document pd 
-                JOIN student_submission_file ssf ON ssf.id = pd.student_submission_file_id
-                JOIN student_submission ss ON ss.id = ssf.student_submission_id
-                WHERE ss.box_id IN ($dueWorkIdPlaceholders)
-              ) t
-            )
+            DELETE pd FROM plagscan_document pd
+            JOIN student_submission_file ssf ON ssf.id = pd.student_submission_file_id
+            JOIN student_submission ss       ON ss.id = ssf.student_submission_id
+            WHERE ss.box_id IN ($dueWorkIdPlaceholders)
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
 
         // student submission files
         $statement = $this->db->prepare("
-            DELETE FROM student_submission_file 
-            WHERE id IN (
-              SELECT * FROM (
-                SELECT ssf.id FROM student_submission_file ssf
-                JOIN student_submission ss ON ss.id = ssf.student_submission_id
-                WHERE ss.box_id IN ($dueWorkIdPlaceholders)
-              ) t
-            )
+            DELETE ssf FROM student_submission_file ssf
+            JOIN student_submission ss ON ss.id = ssf.student_submission_id
+            WHERE ss.box_id IN ($dueWorkIdPlaceholders)
         ");
         $this->executeDeleteQuery($statement, $parameters);
 
