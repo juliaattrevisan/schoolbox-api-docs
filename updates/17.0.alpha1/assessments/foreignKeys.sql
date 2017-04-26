@@ -25,6 +25,22 @@ ALTER TABLE `submission_return`
 ALTER TABLE `student_submission_file`
   CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
 
+-- Delete files linked to missing returns
+DELETE srf FROM submission_return_file srf
+LEFT JOIN submission_return sr ON sr.id = srf.id
+WHERE sr.id IS NULL;
+
+-- Delete files linked to returns linked to missing boxes
+DELETE srf FROM submission_return_file srf
+JOIN submission_return sr ON sr.id = srf.submission_return_id
+LEFT JOIN submission_box sb ON sb.id = sr.box_id
+WHERE sb.id IS NULL;
+
+-- Delete returns linked to missing boxes
+DELETE sr FROM submission_return sr
+LEFT JOIN submission_box sb ON sb.id = sr.box_id
+WHERE sb.id IS NULL;
+
 
 ALTER TABLE `submission_return_file`
   ADD CONSTRAINT `submission_return_file_return_id`
