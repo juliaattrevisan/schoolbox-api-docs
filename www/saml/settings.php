@@ -20,7 +20,7 @@
 
 require_once __DIR__.'/../../library/Bootstrap.php';
 
-$idp = idp_metadata();
+$idp = idpMetadata();
 
 $settings = new OneLogin_Saml_Settings();
 
@@ -55,26 +55,24 @@ $settings->authncontextComparison = Config::get('saml_auth_comparison');
 *
 * @return array
 */
-function idp_metadata() {
+function idpMetadata() {
     $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
-    $idp_metadata_url = $url->toString();
+    $idpMetadataUrl = $url->toString();
 
-    // TODO - Add daily or similar caching
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $idp_metadata_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/'.Cfg::get('site_version'));
-    $idpmetadataraw = curl_exec($ch);
-    curl_close($ch);
+    $cache = new Alaress_Cache_Locker_Abstract();
 
-    $idpmetadata = simplexml_load_string($idpmetadataraw);
+    $idpMetadata_raw = $cache->setCachedTime(86400)
+                                ->setCacheFilePrefix('samlIdpMetadata')
+                                ->init($idpMetadataUrl)
+                                ->getStreamContents();
+
+    $idpMetadata = simplexml_load_string($idpMetadata_raw);
     $idp['SigningKeys'] = array();
     $idp['SingleSignOnService'] = array();
     $idp['SingleLogoutService'] = array();
-    if ($idpmetadata) {
+    if ($idpMetadata) {
         $x = 0;
-        foreach ($idpmetadata->IDPSSODescriptor->KeyDescriptor as $key) {
+        foreach ($idpMetadata->IDPSSODescriptor->KeyDescriptor as $key) {
             foreach ($key->attributes() as $keytype => $keytypevalue) {
                 if ((string)$keytypevalue == "signing") {
                     $cert = "-----BEGIN CERTIFICATE-----\n";
@@ -96,7 +94,7 @@ function idp_metadata() {
         }
 
         $x = 0;
-        foreach ($idpmetadata->IDPSSODescriptor->SingleSignOnService as $SSO) {
+        foreach ($idpMetadata->IDPSSODescriptor->SingleSignOnService as $SSO) {
         foreach ($SSO->attributes() as $key => $value) {
             $idp['SingleSignOnService'][$x][$key] = (string)$value;
         }
@@ -104,7 +102,7 @@ function idp_metadata() {
         }
 
         $x = 0;
-        foreach ($idpmetadata->IDPSSODescriptor->SingleLogoutService as $SLO) {
+        foreach ($idpMetadata->IDPSSODescriptor->SingleLogoutService as $SLO) {
             foreach ($SLO->attributes() as $key => $value) {
                 $idp['SingleLogoutService'][$x][$key] = (string)$value;
             }
