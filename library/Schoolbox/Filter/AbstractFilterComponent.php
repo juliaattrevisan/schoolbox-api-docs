@@ -210,11 +210,14 @@ abstract class AbstractFilterComponent implements IFilterComponent
         /** @var GenericCollection|Option\Model[] $availableOptions */
         $availableOptions = $this->getDefinition()->getAvailableOptions($this->page, $roleType)[$this->page];
 
+        $roleSelections = $this->getRoleSelections($availableOptions);
+        $userSelections = $this->getUserSelections($availableOptions);
+
         return [
-            'isAvailable'    => (bool)$availableOptions->count(),
+            'isAvailable'    => (bool)$userSelections->count(),
             'definition'     => $this->getDefinition(),
-            'roleSelections' => $this->getRoleSelections($availableOptions),
-            'userSelections' => $this->getUserSelections($availableOptions),
+            'roleSelections' => $roleSelections,
+            'userSelections' => $userSelections,
         ];
     }
 
