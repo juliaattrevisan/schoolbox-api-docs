@@ -43,7 +43,7 @@ class KeyConverter extends AbstractKeyConverter
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *
      * @param string $key
-     * @return mixed|Folder\Model
+     * @return int
      * @throws \InvalidArgumentException
      */
     public function getItem($key)
