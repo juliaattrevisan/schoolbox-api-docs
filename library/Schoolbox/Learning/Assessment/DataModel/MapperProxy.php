@@ -768,7 +768,15 @@ class MapperProxy
     {
         $newCollection = $this->createCollection();
         foreach ($collection as $model) {
-            $newCollection->add($this->translateToDomainModel($model));
+            if ($model instanceof Model) {
+                try {
+                    $newCollection->add($this->translateToDomainModel($model));
+                } catch (\UnexpectedValueException $e) {
+                    // Broken object from database - not much I can do but...
+                    newrelic_notice_error(null, $e);
+                    continue;
+                }
+            }
         }
         return $newCollection;
     }
