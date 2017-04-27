@@ -31,24 +31,32 @@
 
         {% if moderator %}
             {% if record.revisions | length > 0 %}
-                <h2 class="subheader" id="accordion">Revision History</h2>
-                <dl class="accordion" data-accordion>
-                    {% set bodyPrevious = '' %}
-                    {% for revision in record.revisions %}
-                        {% if revision.body != bodyPrevious %}
-                            {% set bodyPrevious = revision.body %}
-                            <dd class="accordion-navigation">
-                                <a href="#revision-{{ revision.id }}">
-                                    Revision By {{ revision.owner.fullName }}
-                                    <span class="right">{{ revision.createdAt.long }}</span>
-                                </a>
-                                <div id="revision-{{ revision.id }}" class="content">
-                                    {{ revision.body | purify }}
-                                </div>
-                            </dd>
+                {% set bodyPrevious = '' %}
+                {% set headingPrevious = '' %}
+                {% for revision in record.revisions %}
+                    {# Only division revisions if they are different #}
+                    {% if revision.body != bodyPrevious and revision.body != record.body or
+                          revision.heading != headingPrevious and revision.heading != record.heading %}
+                        {% if loop.first %}
+                            <h2 class="subheader" id="accordion">Revision History</h2>
+                            <dl class="accordion" data-accordion>
                         {% endif %}
-                    {% endfor %}
-                </dl>
+                        {% set bodyPrevious = revision.body %}
+                        {% set headingPrevious = revision.heading %}
+                        <dd class="accordion-navigation">
+                            <a href="#revision-{{ loop.index }}">
+                                {{ revision.heading }}
+                                <span class="right">Edited by {{ revision.modifiedBy.fullName }} - {{ revision.updatedAt.long }}</span>
+                            </a>
+                            <div id="revision-{{ loop.index }}" class="content">
+                                {{ revision.body | purify }}
+                            </div>
+                        </dd>
+                    {% endif %}
+                {% endfor %}
+                {% if bodyPrevious is not empty %}
+                    </dl>
+                {% endif %}
             {% endif %}
         {% endif %}
 

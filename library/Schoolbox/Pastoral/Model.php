@@ -58,6 +58,9 @@ class Model implements ISoftDeletable
     /** @var User */
     protected $owner;
 
+    /** @var User */
+    protected $modifiedBy;
+
     /** @var Collection */
     protected $access;
 
@@ -345,6 +348,24 @@ class Model implements ISoftDeletable
     {
         return $this->owner;
     }
+
+    /**
+     * @param User $modifiedBy
+     * @return self
+     */
+    public function setModifiedBy($modifiedBy)
+    {
+        $this->modifiedBy = $modifiedBy;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getModifiedBy()
+    {
+        return $this->modifiedBy;
+    }    
 
     /**
      * @param Collection|Model

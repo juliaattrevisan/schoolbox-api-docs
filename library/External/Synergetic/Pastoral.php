@@ -330,7 +330,23 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $pastoralRecord->setSeverity($severity);
                 }
 
-                $this->getPastoralMapper()->save($pastoralRecord);
+                // Only create public record if its not blank
+
+                if (!empty(trim($record["Details"]))) {
+                    $this->getPastoralMapper()->save($pastoralRecord);
+                } else {
+                    // Public record blank, skip it
+
+                    $log = new PastoralLog();
+                    $log->setImportId($importId);
+                    $log->setUserId($user->getId());
+                    $log->setPastoralId($pastoralRecord->getId());
+                    $log->setCreatorName($owner->getFullName());
+                    $log->setStudentName($student->getFullName());
+                    $log->setHeading("*** SKIPPING BLANK PUBLIC PASTORAL - PastoralCareSeq #{$record["PastoralCareSeq"]} ***");
+                    $log->setResult('OK');
+                    $this->getPastoralLogMapper()->save($log);
+                }
 
                 // Retrieve anybody that was listed as a contact in Synergetic and give them access to the record
 
@@ -347,33 +363,36 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     $audienceUser = $this->getSchoolboxUser($audience["ID"]);
 
-                    if ($audienceUser instanceof User)
-                    {
+                    if ($audienceUser instanceof User) {
                         // If the school does not want parents given access to pastoral records, then don't add them
 
-                        if ($importParentAccess || $audienceUser->getRole()->isStaff()) {
+                        if (!empty(trim($record["Details"]))) {
 
-                            $accessRecord = new PastoralAccess();
-                            $accessRecord->setPastoral($pastoralRecord);
-                            $accessRecord->setUser($audienceUser);
-                            $this->getPastoralAccessMapper()->save($accessRecord);
+                            if ($importParentAccess || $audienceUser->getRole()->isStaff()) {
 
-                            $log = new PastoralLog();
-                            $log->setImportId($importId);
-                            $log->setUserId($user->getId());
-                            $log->setPastoralId($pastoralRecord->getId());
-                            $log->setCreatorName($owner->getFullName());
-                            $log->setStudentName($student->getFullName());
-                            $log->setHeading("*** GRANTING ACCESS - {$audienceUser->getFullName()} ***");
-                            $accessRecords[] = $accessRecord;
-                        } else {
-                            $log->setHeading("**** SKIPPING ACCESS - {$audienceUser->getFullName()} ***");
+                                $accessRecord = new PastoralAccess();
+                                $accessRecord->setPastoral($pastoralRecord);
+                                $accessRecord->setUser($audienceUser);
+                                $this->getPastoralAccessMapper()->save($accessRecord);
+
+                                $log = new PastoralLog();
+                                $log->setImportId($importId);
+                                $log->setUserId($user->getId());
+                                $log->setPastoralId($pastoralRecord->getId());
+                                $log->setCreatorName($owner->getFullName());
+                                $log->setStudentName($student->getFullName());
+                                $log->setHeading("*** GRANTING ACCESS - {$audienceUser->getFullName()} ***");
+                                $accessRecords[] = $accessRecord;
+                            } else {
+                                $log->setHeading("**** SKIPPING ACCESS - {$audienceUser->getFullName()} ***");
+                            }
+
+                            $log->setResult('OK');
+                            $this->getPastoralLogMapper()->save($log);
                         }
-
-                        $log->setResult('OK');
-                        $this->getPastoralLogMapper()->save($log);
                     }
                 }
+
 
                 // Check if the Synergetic pastoral record had private content that was different to its public content
 
@@ -393,6 +412,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     /** @var PastoralAccess $accessRecord */
                     foreach ($accessRecords as $accessRecord) {
                         $accessRecord->setId(null);
+                        $accessRecord->setPastoral($pastoralRecord);
                         $this->getPastoralAccessMapper()->save($accessRecord);
                     }
                 }
@@ -719,9 +739,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $result = $this->connector->executeQuery($query, $data);
 
-        $this->getPastoralMapper()->save($pastoral);
         $this->updatePastoralCareContacts($pastoral);
-
 
         return $result;
     }
@@ -1137,7 +1155,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Save the file into to the database
 
-        $document = '0x' . bin2hex($storage->read());
         $externalId = $upload->getExternalId();
         $studentExternalId = $upload->getStudentExternalId();
         $date = date("Y-m-d H:i:s");

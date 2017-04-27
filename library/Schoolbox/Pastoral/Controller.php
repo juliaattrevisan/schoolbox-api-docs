@@ -33,6 +33,7 @@ use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
 use Schoolbox\Pastoral\Category\Model as PastoralCategoryModel;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
+use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Permission\Access\UserAccess;
@@ -85,6 +86,9 @@ class Controller extends Base
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
     protected $pastoralSeverityMapper;
 
+    /** @var PastoralRevisionMapper $pastoralRevisionMapper */
+    protected $pastoralRevisionMapper;
+
     /** @var PastoralTagMapper $pastoralTagMapper */
     protected $pastoralTagMapper;
 
@@ -115,6 +119,7 @@ class Controller extends Base
      * @param PastoralTypeMapper $pastoralTypeMapper
      * @param PastoralUploadQueueMapper $pastoralUploadQueueMapper
      * @param PastoralSeverityMapper $pastoralSeverityMapper
+     * @param PastoralRevisionMapper $pastoralRevisionMapper
      * @param PastoralTagMapper $pastoralTagMapper
      * @param PastoralCommentMapper $pastoralCommentMapper
      * @param PastoralGroupMapper $pastoralGroupMapper
@@ -134,6 +139,7 @@ class Controller extends Base
         PastoralTypeMapper $pastoralTypeMapper,
         PastoralUploadQueueMapper $pastoralUploadQueueMapper,
         PastoralSeverityMapper $pastoralSeverityMapper,
+        PastoralRevisionMapper $pastoralRevisionMapper,
         PastoralTagMapper $pastoralTagMapper,
         PastoralCommentMapper $pastoralCommentMapper,
         PastoralAttachmentMapper $pastoralAttachmentMapper,
@@ -154,6 +160,7 @@ class Controller extends Base
         $this->pastoralCommentMapper = $pastoralCommentMapper;
         $this->pastoralMapper = $pastoralMapper;
         $this->pastoralSeverityMapper = $pastoralSeverityMapper;
+        $this->pastoralRevisionMapper = $pastoralRevisionMapper;
         $this->pastoralTagMapper = $pastoralTagMapper;
         $this->pastoralTypeMapper = $pastoralTypeMapper;
         $this->pastoralUploadQueueMapper = $pastoralUploadQueueMapper;
@@ -289,7 +296,9 @@ class Controller extends Base
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
 
         if ($moderator) {
-            $record = $this->pastoralMapper->hydrateRevisions($record);
+            $record->setRevisions(
+                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId())
+            );
         }
 
         // Lets render this thing
@@ -538,6 +547,7 @@ class Controller extends Base
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
 
+            $record->setModifiedBy($this->getUser());
             $record->setStudent($student);
             $record->setHeading($post["heading"]);
             $record->setType($type);
@@ -599,21 +609,25 @@ class Controller extends Base
                 }
             }
 
-            foreach ($post["group"] as $group_id => $checked) {
-                if ($checked) {
-                    try {
-                        /** @var Group $group */
-                        $group = $this->pastoralGroupMapper->findById($group_id);
-                    } catch (MapperException $e) {
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                    }
+            if (is_array($post["group"])) {
+                foreach ($post["group"] as $group_id => $checked) {
+                    if ($checked) {
+                        try {
+                            /** @var Group $group */
+                            $group = $this->pastoralGroupMapper->findById($group_id);
+                        } catch (MapperException $e) {
+                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                        }
 
-                    $access = new PastoralAccessModel();
-                    $access->setPastoral($record);
-                    $access->setGroup($group);
-                    $this->pastoralAccessMapper->save($access);
+                        $access = new PastoralAccessModel();
+                        $access->setPastoral($record);
+                        $access->setGroup($group);
+                        $this->pastoralAccessMapper->save($access);
+                    }
                 }
             }
+
+            // Save record in external database, and set pastoral external_id in Schoolbox database
 
             $pastoralExternal->createPastoral($record);
         }
@@ -716,6 +730,7 @@ class Controller extends Base
             $severity = null;
         }
 
+        $record->setModifiedBy($this->getUser());
         $record->setHeading($post["heading"]);
         $record->setType($type);
         $record->setCategory($category);

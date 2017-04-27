@@ -18,6 +18,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Pastoral\Access\Model as Access;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
+use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -47,6 +48,7 @@ class Mapper extends BaseMapper
         $this->joins('category_id', CategoryMapper::class, 'id', null, null, 'category', 'category');
         $this->joins('severity_id', SeverityMapper::class, 'id', null, null, 'severity', 'severity');
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->joins('modified_by_user_id', UserMapper::class, 'id', null, null, 'modifiedBy', 'modifiedBy');
         $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('external_id', self::TYPE_INTEGER);
@@ -121,86 +123,35 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Prior to saving changes to a record, we cover out butts and keep a revision history
+     * Prior to saving changes to a record, we cover out butts and keep a backup in the revision table for posterity
      *
      * @param Model $model
      */
-    public function saveRevision(Model $model) {
-
-        // This is only applicable if we are updating a record
+    public function saveRevision(Model $model)
+    {
+        // Only save the revision if we are updating an existing record
 
         if (!empty($model->getId())) {
-
-            $this->getDatabase()->query("
-                INSERT INTO `pastoral_revision` (
-                    user_id,
-                    root_id, 
-                    parent_id, 
-                    owner_id, 
-                    severity_id, 
-                    student_id, 
-                    type_id, 
-                    external_id, 
-                    private, 
-                    heading, 
-                    body, 
-                    created_at, 
-                    updated_at,
-                    category_id, 
-                    points 
-                ) 
-                SELECT 
-                    owner_id,
-                    id, 
-                    parent_id, 
-                    '{$this->getSessionUser()->getId()}', 
-                    severity_id, 
-                    student_id, 
-                    type_id, 
-                    external_id, 
-                    private, 
-                    heading, 
-                    body, 
-                    created_at, 
-                    updated_at,
-                    category_id, 
-                    points 
-                FROM `pastoral` 
-                WHERE `id` = '{$model->getId()}'
-            ");
+            $pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
+            $pastoralRevision = $pastoralRevisionMapper->createRevision($model);
+            $pastoralRevisionMapper->save($pastoralRevision);
         }
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSelectString($revisions = false)
+    protected function getSelectString()
     {
-        $tableName = $revisions ? '`pastoral_revision`' : $this->getTable();
-
         return
         "
-            SELECT      `pastoral`.`parent_id`, 
-                        `pastoral`.`type_id`, 
-                        `pastoral`.`category_id`, 
-                        `pastoral`.`severity_id`, 
-                        `pastoral`.`owner_id`, 
-                        `pastoral`.`student_id`, 
-                        `pastoral`.`id`, 
-                        `pastoral`.`external_id`, 
-                        `pastoral`.`body`, 
-                        `pastoral`.`heading`, 
-                        `pastoral`.`private`, 
-                        `pastoral`.`points`, 
-                        `pastoral`.`created_at`, 
-                        `pastoral`.`updated_at`, 
-                        `pastoral`.`deleted_at`, 
+            SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('student', 's')},
                         {$this->getJoinColumnString('severity', 'sv')},
                         {$this->getJoinColumnString('owner', 'o')},
                         {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('category', 'c')}
-            FROM        {$tableName} `pastoral`
+            FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('student', '', 's')}
             LEFT JOIN   {$this->getJoinSql('severity', '', 'sv')}
             LEFT JOIN   {$this->getJoinSql('owner', '', 'o')}
@@ -226,136 +177,135 @@ class Mapper extends BaseMapper
      * @param bool $hydrateRelatedRecords
      * @return Collection
      */
-    private function hydrateSelectInternal(PDOStatement $statement, $hydrateRelatedRecords = true)
+    protected function hydrateSelectInternal(PDOStatement $statement, $hydrateRelatedRecords = true)
     {
         // Return pastoral records fully hydrated by default
 
         $collection = new Collection();
 
         foreach ($statement as $row) {
+            $model = $this->hydrateRow($row, $hydrateRelatedRecords);
 
-            // Shortcut hydration if it is a private record and the user is a parent
-
-            if ($row['private'] && $this->getSessionUser()->getRole()->isParent()) {
-                continue;
+            if ($model instanceof Model) {
+                $collection->add($model);
             }
-
-            /** @var Model $model */
-            $model = $this->hydrate($row);
-
-            /** @var User $owner */
-            $owner = $this->hydrateJoin($row, 'owner', 'o');
-            $model->setOwner($owner);
-
-            if ($this->getConfigLoader()->get('pastoral_severity')) {
-                /** @var Severity $severity */
-                $severity = $this->hydrateJoin($row, 'severity', 'sv');
-                $model->setSeverity($severity);
-            }
-
-            /** @var Type $type */
-            $type = $this->hydrateJoin($row, 'type', 't');
-            $model->setType($type);
-
-            /** @var Category $category */
-            $category = $this->hydrateJoin($row, 'category', 'c');
-            $model->setCategory($category);
-
-            /** @var User $student */
-            $student = $this->hydrateJoin($row, 'student', 's');
-            $student->loadParents();
-            $student->loadTeachers();
-            $model->setStudent($student);
-
-            $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
-
-            // If the user is not in the audience- and is not the owner, they can't see the record
-
-            $inAudience = false;
-
-            /** @var Access $access */
-            foreach ($model->getAccess() as $access) {
-                if ($access->hasAccess($this->getSessionUser())) {
-                    $inAudience = true;
-                    break;
-                }
-            }
-
-            if (!$inAudience && $model->getOwner()->getId() != $this->getSessionUser()->getId()) {
-                continue;
-            }
-
-            // If the record is marked as private we may need to blank out its contents if the user does not have sufficent access
-
-            $accessGranted = false;
-
-            if ($model->getPrivate()) {
-
-                if ($model->getOwner()->getId() == $this->getSessionUser()->getId()) {
-
-                    // Owners can see their own records
-
-                    $accessGranted = true;
-
-                } else {
-
-                    // Otherwise, only individually audienced users, or members of audienced groups get access
-                    // to private records
-
-                    foreach ($model->getAccess() as $access) {
-                        if ($access->hasAccess($this->getSessionUser(), false)) {
-                            $accessGranted = true;
-                            break;
-                        }
-                    }
-
-                }
-            } else {
-                $accessGranted = true;
-            }
-
-            if ($accessGranted) {
-                $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
-                $model->setAttachments($this->getJoinMapper('attachments')->findByColumn('pastoral_id', $model->getId()));
-            } else {
-                $model->setBody($this->getConfigLoader()->get('pastoral_private_body'));
-            }
-
-            // Only hydrate related records if we're specifically told to
-
-            if ($hydrateRelatedRecords) {
-                $model->setRelatedRecords($this->getRelatedRecords($model));
-            }
-
-            // Add to collection
-
-            $collection->add($model);
         }
 
         return $collection;
     }
 
     /**
-     * Load revision history for record
+     * This is also used by the PastoralRevision class to hydrate a record
      *
-     * @param Model $model
+     * @param $row
+     * @param $hydrateRelatedRecords
      * @return Model
      */
-    public function hydrateRevisions($model)
-    {
-        // Load revision history
+    protected function hydrateRow($row, $hydrateRelatedRecords) {
 
-        $sql = $this->getSelectString(true) . "
-                WHERE `pastoral`.`root_id` = :root_id
-                ORDER BY `updated_at` DESC
-            ";
+        // This method gets called before checking authorization- so if the session timed out this might be blank
 
-        $revisionsStatement = $this->getDatabase()->prepare($sql);
-        $revisionsStatement->execute([
-            ':root_id' => $model->getId()
-        ]);
+        if (!$this->getSessionUser() instanceof User) {
+            return false;
+        }
 
-        return $model->setRevisions($this->hydrateSelectInternal($revisionsStatement, false));
+        // Shortcut hydration if it is a private record and the user is a parent
+
+        if ($row['private'] && $this->getSessionUser()->getRole()->isParent()) {
+            return false;
+        }
+
+        /** @var Model $model */
+        $model = $this->hydrate($row);
+
+        /** @var User $owner */
+        $owner = $this->hydrateJoin($row, 'owner', 'o');
+        $model->setOwner($owner);
+
+        if ($this->getConfigLoader()->get('pastoral_severity')) {
+            /** @var Severity $severity */
+            $severity = $this->hydrateJoin($row, 'severity', 'sv');
+            $model->setSeverity($severity);
+        }
+
+        /** @var Type $type */
+        $type = $this->hydrateJoin($row, 'type', 't');
+        $model->setType($type);
+
+        /** @var Category $category */
+        $category = $this->hydrateJoin($row, 'category', 'c');
+        $model->setCategory($category);
+
+        /** @var User $student */
+        $student = $this->hydrateJoin($row, 'student', 's');
+        $student->loadParents();
+        $student->loadTeachers();
+        $model->setStudent($student);
+
+        $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
+
+        // If the user is not in the audience- and is not the owner, they can't see the record
+
+        $inAudience = false;
+
+        /** @var Access $access */
+        foreach ($model->getAccess() as $access) {
+            if ($access->hasAccess($this->getSessionUser())) {
+                $inAudience = true;
+                break;
+            }
+        }
+
+
+        if (!$inAudience && $model->getOwner()->getId() != $this->getSessionUser()->getId()) {
+            return false;
+        }
+
+        // If the record is marked as private we may need to blank out its contents if the user does not have sufficent access
+
+        $accessGranted = false;
+
+        if ($model->getPrivate()) {
+
+            if ($model->getOwner()->getId() == $this->getSessionUser()->getId()) {
+
+                // Owners can see their own records
+
+                $accessGranted = true;
+
+            } else {
+
+                // Otherwise, only individually audienced users, or members of audienced groups get access
+                // to private records
+
+                foreach ($model->getAccess() as $access) {
+                    if ($access->hasAccess($this->getSessionUser(), false)) {
+                        $accessGranted = true;
+                        break;
+                    }
+                }
+
+            }
+        } else {
+            $accessGranted = true;
+        }
+
+        if ($accessGranted) {
+            $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
+            $model->setAttachments($this->getJoinMapper('attachments')->findByColumn('pastoral_id', $model->getId()));
+        } else {
+            $model->setBody($this->getConfigLoader()->get('pastoral_private_body'));
+        }
+
+        // Only hydrate related records if we're specifically told to
+
+        if ($hydrateRelatedRecords) {
+            $model->setRelatedRecords($this->getRelatedRecords($model));
+        }
+
+        // Reeturn hydrated model
+
+        return $model;
     }
 
     /**

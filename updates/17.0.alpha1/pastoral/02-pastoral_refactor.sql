@@ -13,8 +13,8 @@ ALTER TABLE `lu_pastoral_type` MODIFY COLUMN `pastoral_document_classification_i
 
 -- Dates might be needed at some point for auditing...
 
-ALTER TABLE `pastoral_access` ADD created_at DATETIME NULL;
-ALTER TABLE `pastoral_access` MODIFY COLUMN deleted_at DATETIME AFTER created_at;
+ALTER TABLE `pastoral_access` ADD `created_at` DATETIME NULL;
+ALTER TABLE `pastoral_access` MODIFY COLUMN `deleted_at` DATETIME AFTER created_at;
 ALTER TABLE `pastoral_access` ADD `group_id` INT NULL;
 ALTER TABLE `pastoral_access` MODIFY COLUMN `group_id` INT AFTER `pastoral_id`;
 
@@ -99,13 +99,15 @@ CREATE TABLE pastoral_revision
   deleted_at DATETIME NULL,
   category_id INT(11),
   points INT(11) DEFAULT '0',
-  user_id INT(11),
+  modified_by_user_id INT(11),
   CONSTRAINT fk_pastoral_revision_severity FOREIGN KEY (severity_id) REFERENCES lu_pastoral_severity (id),
   CONSTRAINT fk_pastoral_revision_type FOREIGN KEY (type_id) REFERENCES lu_pastoral_type (id)
 );
 
 CREATE INDEX fk_revision_student ON pastoral_revision (student_id);
 CREATE INDEX fk_revision_type ON pastoral_revision (type_id);
+
+ALTER TABLE `pastoral` ADD `modified_by_user_id` INT NULL;
 
 -- Private pastoral record text moved to config variable
 
@@ -178,3 +180,5 @@ INSERT INTO `config` (
 -- Make pastoral severity a non mandatory field
 
 ALTER TABLE `pastoral` MODIFY `severity_id` INT(11);
+
+

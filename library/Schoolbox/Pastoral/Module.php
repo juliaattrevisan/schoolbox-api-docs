@@ -178,6 +178,7 @@ class Module extends BaseModule
         // The only exception is write permissions where the moderator is not a write level moderator
 
         $permissionPastoralModerator = new Rule\All(
+            new Rule\IsLoggedIn(),
             new IsPastoralModerator(),
             new Rule\HasRole(Role::STAFF)
         );
@@ -284,5 +285,6 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, 'getStudentRecordUpdate|postRecordUpdate|postRecordDelete', $permissionRecordUpdate);
         $this->addRoutePermission($authorizer, 'postCommentDelete', $permissionCommentDelete);
         $this->addRoutePermission($authorizer, 'postCommentInsert', $permissionCommentInsert);
+
     }
 }
