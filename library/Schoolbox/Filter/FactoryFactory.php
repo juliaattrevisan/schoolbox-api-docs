@@ -7,17 +7,12 @@
 
 namespace Schoolbox\Filter;
 
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Filter\Filters\Assessment\AssessmentType as AssessmentTypeFilter;
-use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
-use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
-use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
-use Schoolbox\Filter\Filters\Assessment\WeightingType as WeightingTypeFilter;
-use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitSpecFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -25,6 +20,15 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\User;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Assessment\DataModel\Project;
+use Schoolbox\Filter\Filters\Assessment\AssessmentType as AssessmentTypeFilter;
+use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
+use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
+use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
+use Schoolbox\Filter\Filters\Assessment\WeightingType as WeightingTypeFilter;
+use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitSpecFilter;
+use Schoolbox\Filter\Filters\Assessment\Project as ProjectFilter;
 
 
 /**
@@ -37,7 +41,6 @@ class FactoryFactory
 
     /** @var MapperFactory */
     private $mapperFactory;
-
 
     /**
      * @param MapperFactory $mapperFactory
@@ -88,6 +91,12 @@ class FactoryFactory
                     'courseImplMapper' => $this->mapperFactory->get(CourseImpl\Mapper::class),
                     'unitSpecMapper'   => $this->mapperFactory->get(UnitSpec\Mapper::class),
                 ]);
+            case ProjectFilter\Definition::class:
+                return $this->buildFactory(ProjectFilter\Factory::class, [
+                    'folderMapper'          => $this->mapperFactory->get(Folder\Mapper::class),
+                    'unitImplMapper'        => $this->mapperFactory->get(UnitImpl\Mapper::class),
+                    'projectMapper'         => $this->mapperFactory->get(Project\Mapper::class),
+                ]);
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
@@ -99,6 +108,7 @@ class FactoryFactory
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
      * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
      */
     public function buildKeyConverters($page)
     {
