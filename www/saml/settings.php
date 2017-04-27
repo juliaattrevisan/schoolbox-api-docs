@@ -17,13 +17,23 @@
  *    The URL that the IdP should redirect to once the authorization is complete.
  *    You must provide this, and it should point to the consume.php script or its equivalent.
  */
+use \Alaress\Saml;
 
 require_once __DIR__.'/../../library/Bootstrap.php';
+
+$idp = idpMetadata();
 
 $settings = new OneLogin_Saml_Settings();
 
 // When using Service Provider Initiated SSO (starting at index.php), this URL asks the IdP to authenticate the user.
 $settings->idpSingleSignOnUrl = Config::get('saml_sso_url');
+if ($idp) {
+    foreach ($idp['SingleSignOnService'] as $attribute) {
+        if ($attribute['Binding'] == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" && strlen(trim($attribute['Location'])) > 0) {
+            $settings->idpSingleSignOnUrl = trim($attribute['Location']);
+        }
+    }
+}
 
 // The certificate for the users account in the IdP
 $settings->idpPublicCertificate = preg_replace("/\r/m", "", Config::get('saml_idp_certificate'));
@@ -40,6 +50,75 @@ $settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_TRANSIENT;
 
 // Define the Authncontext comparison type
 $settings->authncontextComparison = Config::get('saml_auth_comparison');
+
+/**
+* Retrieve metadata from the identity provider
+*
+* @return array
+*/
+function idpMetadata() {
+    try {
+        $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
+        $idpMetadataUrl = $url->toString();
+    } catch (Exception $e) {
+        /*
+         * Unable to use URL provided, ignore IDP metadata
+         */
+        return false;
+    }
+
+    $cache = new Alaress_Saml_Cache();
+
+    $idpMetadata_raw = $cache->init($idpMetadataUrl)
+                                ->getStreamContents();
+
+    $idpMetadata = simplexml_load_string($idpMetadata_raw);
+    $idp['SigningKeys'] = array();
+    $idp['SingleSignOnService'] = array();
+    $idp['SingleLogoutService'] = array();
+    if ($idpMetadata) {
+        $x = 0;
+        foreach ($idpMetadata->IDPSSODescriptor->KeyDescriptor as $key) {
+            foreach ($key->attributes() as $keytype => $keytypevalue) {
+                if ((string)$keytypevalue == "signing") {
+                    $cert = "-----BEGIN CERTIFICATE-----\n";
+                    $cert .= implode("\n",str_split((string)$key->KeyInfo->X509Data->X509Certificate, 64));
+                    $cert .= "\n-----END CERTIFICATE-----";
+                    $certData = openssl_x509_parse($cert);
+                    if (is_array($certData)) {
+                        $idp['SigningKeys'][$x]['X509Cert'] = $cert;
+                        if (array_key_exists('validFrom', $certData)) {
+                            $idp['SigningKeys'][$x]['Dates']['validFrom'] = (new \Alaress_Date_Format($certData['validFrom'],'ymdHise'))->getDatabase();
+                        }
+                        if (array_key_exists('validTo', $certData)) {
+                            $idp['SigningKeys'][$x]['Dates']['validTo'] = (new \Alaress_Date_Format($certData['validTo'],'ymdHise'))->getDatabase();
+                        }
+                }
+                $x++;
+                }
+            }
+        }
+
+        $x = 0;
+        foreach ($idpMetadata->IDPSSODescriptor->SingleSignOnService as $SSO) {
+        foreach ($SSO->attributes() as $key => $value) {
+            $idp['SingleSignOnService'][$x][$key] = (string)$value;
+        }
+        $x++;
+        }
+
+        $x = 0;
+        foreach ($idpMetadata->IDPSSODescriptor->SingleLogoutService as $SLO) {
+            foreach ($SLO->attributes() as $key => $value) {
+                $idp['SingleLogoutService'][$x][$key] = (string)$value;
+            }
+            $x++;
+        }
+    } else {
+        return false;
+    }
+    return $idp;
+}
 
 /**
 * Checks an if an IP address is in a CIDR range or matches an individual address
