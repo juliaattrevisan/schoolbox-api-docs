@@ -114,6 +114,9 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
         // Convert to ordered by abstract key
         $optionsPerKey = new Collection();
+        foreach($customKeys as $customKey){
+            $optionsPerKey->setOffset($customKey, $this->getFilterOptionMapper()->createCollection());
+        }
 
         // Ensure page order is same as getPages()
         foreach ($validPages as $page) {
