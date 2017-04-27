@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
 use Schoolbox\Mapper;
@@ -42,6 +43,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use UnexpectedValueException;
 
 class Module extends BaseModule
@@ -91,6 +93,23 @@ class Module extends BaseModule
                 return $ctx;
             },
             $this->getAccess()
+        );
+
+        $canRead = new Rule\HasHomepageAccess (
+                UserAccess::ACCESS_READ,
+                function (array $params)
+                {
+                    if (isset($params['assessment'])) {
+                        $ctx = $params['assessment']->getContext()->getFolder()->getId();
+                    } elseif (isset($params['context'])) {
+                        $ctx = $params['context']->getFolder()->getId();
+                    } else {
+                        throw new NotFound("No assessment or context preloaded");
+                    }
+
+                    return $ctx;
+                },
+                $this->getAccess()
         );
 
         $participantView = new Rule\All(
@@ -158,6 +177,7 @@ class Module extends BaseModule
         $this->register('GET',      "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,              $preloadAssessment); // a || c
 
         $this->register('GET',      "$assRoute/$studentParam",          'getSummary',               $participantView,       $preloadParticipant); // s || p
+        $this->register('GET',      "$assRoute/preview",                'getPreview',               $canRead,               $preloadAssessment); // s || p
         $this->register('GET',      "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,             $preloadParticipant); // p
         $this->register('POST',     "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,             $preloadParticipant); // p
     }
@@ -208,14 +228,32 @@ class Module extends BaseModule
              */
             if ($access >= UserAccess::ACCESS_WRITE) {
                 $participant = new Participant($student, $assessment);
+
+                /* Suck down all the responses from $assessment and put them into $participant
+                 */
+                /** @var Participant $currentParticipant */
+                foreach ($assessment->getAllParticipants() as $currentParticipant) {
+                    if ($currentParticipant->getUser()->getId() == $student->getId()) {
+
+                        $participant->setAllResponses($currentParticipant->getAllResponses());
+
+                        break;
+                    }
+                }
             }
             /* Allow read-accessors to see Summary
              */
-            else {
+            elseif ($access == UserAccess::ACCESS_READ) {
                 /** @var IAssessable $assessment */
                 $participant = $assessment->getParticipant($student);
             }
+            /* Nobody else allowed
+             */
+            else {
+                throw new Forbidden();
+            }
         } catch (UnexpectedValueException $e) {
+
             // Student isn't a participant
             throw new Forbidden();
 
@@ -320,12 +358,13 @@ class Module extends BaseModule
         $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
             'router' => $injector->lazyGet('router')
         ]);
+        $ac['workTypeMapper']           = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
         $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
         $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
-        $dc['workTypeMapper']           = $this->getMapperFactory()->getLazy(SubmissionBox\WorkTypeMapper::class);
+
         // TODO get this out of DI
         $dc['dueWorkResponseMapper']    = $injector->lazyNew(
             DueWorkResponseMapper::class,

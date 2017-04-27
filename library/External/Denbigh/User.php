@@ -211,6 +211,7 @@ class External_Denbigh_User implements External_UserInterface {
             'StudentSpecialNeedsFlag' => 0,
             'AlertMessage' => '',
             'StudentBoarder' => '',
+            'Comment' => '',
             'StudentStudiesCode' => '',
         );
 

@@ -88,15 +88,15 @@ class Mapper extends BaseMapper
             )
         );
 
-        $this->hasJoin(
-            'tags',
-            array(
-                'mapper' => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
-                'other_key' => 'pastoral_id',
-                'this_key' => 'id',
-                'multiple' => true,
-            )
-        );
+//        $this->hasJoin(
+//            'tags',
+//            array(
+//                'mapper' => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
+//                'other_key' => 'pastoral_id',
+//                'this_key' => 'id',
+//                'multiple' => true,
+//            )
+//        );
 
         $this->hasJoin(
             'comments',
@@ -294,16 +294,16 @@ class Mapper extends BaseMapper
 
         if ($before_date != '') {
             $before_date = \Alaress_Date_Format::newLocal($before_date . " 12:00AM");
-            $criteria[] = "created_at <= '" . $before_date->toIso8601String() . "'";
+            $criteria[] = "created_at <= '" . $before_date->getDatabase() . "'";
         }
 
         if ($after_date != '') {
             $after_date = \Alaress_Date_Format::newLocal($after_date . " 11:59PM");
-            $criteria[] = "created_at >= '" . $after_date->toIso8601String() . "'";
+            $criteria[] = "created_at >= '" . $after_date->getDatabase() . "'";
         }
 
         if ($severity != '') {
-            $criteria[] = "sv.order >= {$severity}";
+            $criteria[] = "sv.order >= '{$severity}'";
         }
         if ($students != '') {
             $criteria[] = "student_id IN ({$students})";
@@ -314,13 +314,15 @@ class Mapper extends BaseMapper
         if ($types != '') {
             $criteria[] = "type_id IN ({$types})";
         }
+        else {
+            throw new \InvalidArgumentException('Record type required');
+        }
 
         $array_years = explode(",", $years);
 
         $years_sql = '';
 
         if ($years != '') {
-
             $years_sql .= "";
 
             foreach ($array_years as $year) {
@@ -331,19 +333,17 @@ class Mapper extends BaseMapper
             }
 
             $years_sql = "`s`.year IN ({$years_sql})";
+            $criteria[] = $years_sql;
+        }
+        else {
+            throw new \InvalidArgumentException('Year level required');
         }
 
-        $criteria[] = $years_sql;
 
-        $criteria_sql = "";
+        $criteria_sql = 'WHERE 1=1';
 
         foreach ($criteria as $criterion) {
-            if ($criteria_sql != "") {
-                $criteria_sql .= " AND ";
-            } else {
-                $criteria_sql = "WHERE ";
-            }
-            $criteria_sql .= $criterion;
+            $criteria_sql .= ' AND '.$criterion;
         }
 
         $order_sql = "";
@@ -388,9 +388,9 @@ class Mapper extends BaseMapper
 
             $involved_sql = "
                 AND (
-                    (SELECT COUNT(*) FROM pastoral_access WHERE role_id = {$role_id} AND pastoral_id = `r`.id) > 0 OR
-                    (SELECT COUNT(*) FROM pastoral_access WHERE user_id = {$user_id} AND pastoral_id = `r`.id) > 0 OR
-                    `r`.owner_id = {$user_id}
+                    (SELECT COUNT(*) FROM pastoral_access WHERE role_id = '{$role_id}' AND pastoral_id = `r`.id) > 0 OR
+                    (SELECT COUNT(*) FROM pastoral_access WHERE user_id = '{$user_id}' AND pastoral_id = `r`.id) > 0 OR
+                    `r`.owner_id = '{$user_id}'
                 )
             ";
 
@@ -416,8 +416,10 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             {$criteria_sql}
             {$involved_sql}
-            ORDER BY {$order_sql}
         ";
+        if($order_sql) {
+            $query .= "ORDER BY {$order_sql}";
+        }
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
@@ -439,26 +441,12 @@ class Mapper extends BaseMapper
             // Check tags
 
             if (trim($tags) != '') {
+                $tagsArray = explode(",", trim($tags));
 
-                $tagsArray = explode(",", strtolower(trim($tags)));
-                $tagsList = $this->getPastoralTagsMapper()->findByColumn('pastoral_id', $record->getId());
-
-                $found = false;
-
-                foreach ($tagsArray as $tagCurrent) {
-                    foreach ($tagsList as $tag) {
-                        if (strtolower($tag->getName()) == $tagCurrent) {
-                            $found = true;
-                            break;
-                        }
-                    }
-
-                    if ($found) {
-                        break;
-                    }
-                }
-
-                if (!$found) {
+                /* TODO: Can probably make tags hydrate with pastoral records instead
+                 * but I'll keep doing it this way so the refactor is more familiar
+                 */
+                if (!$this->getPastoralTagsMapper()->isAssociatedWith($record, $tagsArray)) {
                     continue;
                 }
             }
@@ -564,7 +552,7 @@ class Mapper extends BaseMapper
 
         // Don't know if this is right for the one-to-many joins, but it works
 
-        $record->setTagsList($this->getPastoralTagsMapper()->findByColumn("pastoral_id", $record->getId()));
+        $record->setTagsList($this->getPastoralTagsMapper()->findForRecord($record->getId()));
         $record->setCommentList($this->getPastoralCommentMapper()->findByColumn("pastoral_id", $record->getId()));
         $record->setAttachmentList($this->getPastoralAttachmentMapper()->findByColumn("pastoral_id", $record->getId()));
 

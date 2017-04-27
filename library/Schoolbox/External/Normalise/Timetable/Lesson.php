@@ -1,12 +1,11 @@
 <?php
 
 /**
- * Lesson
+ * Lesson (aka. Class- because 'class' is a keyword... #sadface)
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 namespace Schoolbox\External\Normalise\Timetable;
 
@@ -15,61 +14,71 @@ use Schoolbox\Campus;
 
 class Lesson
 {
-
     /**
-     * Lesson name
+     * Unique identifier
+     *
+     * @var int
+     */
+    private $id = '';    
+    
+    /**
+     * Lesson/class name
      *
      * @var string
      */
     private $name = '';
 
     /**
-     * Lesson Code
+     * Lesson/class code
      *
      * @var string
      */
     private $code = '';
-
+    
     /**
-     * The type of Lesson
-     * a.k.a. FileType in Synergetic
+     * The subject this lesson relates to
+     * 
+     * @var Subject $subject
+     */
+    private $subject;
+    
+    /**
+     * The type of Lesson (aka. FileType)
      *
      * @var string
      */
     private $type = '';
 
     /**
-     * The room in which this Lesson occurs
+     * The room in which this class occurs
      *
      * @var string
      */
     private $room = '';
 
     /**
-     * A campus for which this Lesson exists
+     * A campus for which this class exists
      *
      * @var Campus
      */
     private $campus = null;
 
     /**
-     * A Collection of Student instances who are participants
-     * of this Lesson
+     * A collection of students who are participants
      *
      * @var Collection
      */
     private $allStudents = null;
 
     /**
-     * A Collection of Staff instances who are participants
-     * of this Lesson
+     * A collection of staff who are participants
      *
      * @var Collection
      */
     private $allStaff = null;
 
     /**
-     * Lesson constructor.
+     * Constructor
      */
     public function __construct()
     {
@@ -120,6 +129,29 @@ class Lesson
      */
 
     /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set id
+     *
+     * @param int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * Get name
      *
      * @return string
@@ -140,7 +172,7 @@ class Lesson
         $this->name = $name;
 
         return $this;
-    }
+    }    
 
     /**
      * Get code
@@ -164,6 +196,29 @@ class Lesson
 
         return $this;
     }
+
+    /**
+     * Get subject
+     *
+     * @return Subject
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+
+    /**
+     * Set subject
+     *
+     * @param Subject $subject
+     * @return $this
+     */
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }    
 
     /**
      * Get type

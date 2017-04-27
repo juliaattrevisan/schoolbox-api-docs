@@ -24,7 +24,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('UPS', [
     'verbose'  => isset($options['v']) ? $options['v'] : null,
     'perform'  => isset($options['perform-update']),
     'roleType' => (isset($options['r']) && in_array($options['r'], [ 'staff', 'student', 'parent' ])) ? $options['r'] : null,
-    'instance' => $options['instance']
+    'instance' => isset($options['instance']) ? $options['instance'] : null
 ]);
 
 // Signal handling unique to the provisioner

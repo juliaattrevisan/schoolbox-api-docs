@@ -26,6 +26,7 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 /**
  * Class Controller
@@ -60,6 +61,7 @@ class Controller extends Assessment\Controller
      * @param UserMapper             $userMapper
      * @param ErrorMapper            $errorMapper
      * @param DataModel\MapperProxy  $assessmentMapper
+     * @param WorkTypeMapper         $workTypeMapper
      * @param Access                 $access
      * @param Transactor             $transactor
      * @param BreadcrumbFactory      $bakery
@@ -71,6 +73,7 @@ class Controller extends Assessment\Controller
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
         DataModel\MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
@@ -78,7 +81,7 @@ class Controller extends Assessment\Controller
         QuizSectionMapper $quizSectionMapper,
         QuizAttemptMapper $quizAttemptMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
         $this->quizMapper = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;
@@ -119,6 +122,22 @@ class Controller extends Assessment\Controller
         );
     }
 
+    /**
+     * In cases where no Participant is available a User will get an intro of a quiz with no Begin Quiz button
+     *
+     * @api GET /learning/assessment/:assessmentId/preview
+     * @level 165
+     * @param IAssessable $assessment
+     */
+    public function getPreview(IAssessable $assessment)
+    {
+        $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
+        // TODO: remove buttons from intro.html if the user is not participant
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
+        );
+    }
+
 
     /**
      * Redirect method
@@ -140,7 +159,6 @@ class Controller extends Assessment\Controller
 
         // Has user not yet attempted the quiz
         if ($participant->getAllResponses()->count() == 0) {
-
             $this->redirectToSummaryOrIntro($this->getUser(), $participant->getUser(), $assessment);
             return;
         }
@@ -188,7 +206,26 @@ class Controller extends Assessment\Controller
     {
         $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
 
-        if ($sessionUser->getId() == $participantUser->getId() && $assessment->isOpen()) {
+        /* Attempts List for this user
+         */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+        $attemptsListUrl = "/assess/attempts/{$quiz->getId()}/{$participantUser->getId()}" . $returnUrlSuffix;
+
+        /* If you're a teacher viewing the summary screen for your own attempts
+         * you should end up at the attempts list rather than be magically prompted
+         * to attempt the quiz
+         */
+        $access = $this->getAccess()->getFolderAccess($sessionUser, [$assessment->getContext()->getFolder()->getId()]);
+
+        if ($access >= UserAccess::ACCESS_WRITE) {
+            $this->getResponse()->redirect->to($attemptsListUrl);
+        }
+        elseif ($sessionUser->getId() == $participantUser->getId() && $assessment->isOpen()) {
+
+            /* If you're a participant, and the quiz is available for attemptation
+             * go to the intro screen so you can begin
+             */
+
             // this is the special case: redirect to intro
             $this->getResponse()->redirect->afterPost(
                 $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
@@ -196,9 +233,7 @@ class Controller extends Assessment\Controller
             return;
         }
 
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-
-        $this->getResponse()->redirect->to("/assess/attempts/{$quiz->getId()}/{$participantUser->getId()}" . $returnUrlSuffix);
+        $this->getResponse()->redirect->to($attemptsListUrl);
     }
 
 

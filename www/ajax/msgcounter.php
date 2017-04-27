@@ -29,10 +29,10 @@ $valid =
 
 
 if(!$valid) {
-	header(':', true, '400');
+	http_response_code(400);
 	die('');
 }
 
 $_SESSION['msg-count'] = $_POST['c'];
-header(':', true, 202);
+http_response_code(202);
 die('');

@@ -66,6 +66,10 @@ class Factory
      */
     protected $title;
 
+
+    /** @var null|int */
+    private $workType;
+
     /**
      * @var string
      */
@@ -125,6 +129,7 @@ class Factory
         $this->setAssessmentType(trim($post['assessmentType']));
         $this->setContext($post['context']);
         $this->setTitle(trim($post['title']));
+        $this->setWorkType(trim($post['workType']));
         $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
         $this->setWeight(intval($post['weight']));
@@ -238,7 +243,6 @@ class Factory
         } elseif ($assessment instanceof DueWork) {
             $decorator = new DueWorkDecorator(
                 $this->getAcceptOnline(),
-                $this->getWorkType(),
                 $this->getMarkType(),
                 $this->getGradingScheme(),
                 $this->getUseRubric(),
@@ -289,6 +293,12 @@ class Factory
             ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
+
+        if($this->workType){
+            $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
+        } else {
+            $assessment->setWorkType(null);
+        }
 
         // find out if the dates are all g - if not, a mage-friendly exception will be thrown
         $assessment->assertValidDates();
@@ -369,6 +379,24 @@ class Factory
     protected function setTitle($title)
     {
         $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return null|int
+     */
+    protected function getWorkType()
+    {
+        return $this->workType;
+    }
+
+    /**
+     * @param null|int $workType
+     * @return static
+     */
+    protected function setWorkType($workType)
+    {
+        $this->workType = $workType;
         return $this;
     }
 

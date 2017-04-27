@@ -22,6 +22,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 /**
  * Class Model
@@ -92,6 +93,14 @@ class Model implements ISoftDeletable
      * @var int
      */
     protected $sequence = 0;
+
+    /**
+     * It is valid to be null. This means 'None' - and would be the only possible value if
+     * the WorkType list has not been populated in the Admin
+     *
+     * @var null|WorkType
+     */
+    private $workType;
 
     /**
      * @var int
@@ -522,6 +531,25 @@ class Model implements ISoftDeletable
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
+     * @return null|WorkType
+     */
+    public function getWorkType()
+    {
+        return $this->workType;
+    }
+
+
+    /**
+     * @param null|WorkType $workType
+     * @return static
+     */
+    public function setWorkType(WorkType $workType = null)
+    {
+        $this->workType = $workType;
         return $this;
     }
 

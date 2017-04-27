@@ -75,6 +75,10 @@ class EventRecurrenceMapper
             return array();
         }
 
+        /* This collection was indexed by event id
+         */
+        $series->reindex();
+
         /** @var Alaress_Date_Format $dateFirst */
         $dateFirst = $series->first()->getStartDateTime();
         $dateFirst->startOfDay();
@@ -179,6 +183,7 @@ class EventRecurrenceMapper
      */
     protected function persistSeries(Event $event, EventRelations $eventRelations, $access, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate)
     {
+
         /* Update details of an already-existing set of recurring event incidents
          * (Change details of each instance of a recurring event, for example)
          */
@@ -204,6 +209,7 @@ class EventRecurrenceMapper
 
         foreach ($series as $seriesEvent) {
             $this->setSeriesEventData($seriesEvent, $event);
+
             // Adjust each event's start and end individually
             $seriesEvent->getStartDateTime()->getDateTimeObject()->add($startDelta);
             $seriesEvent->getEndDateTime()->getDateTimeObject()->add($endDelta);
@@ -287,6 +293,7 @@ class EventRecurrenceMapper
      * @param Event  $object
      * @param string $verb
      * @param Event  $previous
+     * @throws Schoolbox\Mapper\Exception
      * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)
@@ -301,9 +308,7 @@ class EventRecurrenceMapper
 
         $diff = $previous && ($verb != Schoolbox\Mapper::METHOD_DELETE) ? $em->diff($object, $previous) : null;
 
-        $event = new Schoolbox\Realtime\Schedule\Event($sess['user'], $verb, $object, $em, $diff);
-
-        $this->notif->setTopic(Schoolbox\Notif\Notif::TOPIC_APPLICATION)->notice(serialize($event));
+        $em->getEventPropagator()->propagate($sess['user'], $verb, $object, $em, $diff);
 
         return true;
     }

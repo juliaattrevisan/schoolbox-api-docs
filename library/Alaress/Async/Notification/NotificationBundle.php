@@ -12,6 +12,7 @@ namespace Alaress\Async\Notification;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use InvalidArgumentException;
 
 class NotificationBundle {
 
@@ -29,7 +30,8 @@ class NotificationBundle {
 
 	/**
 	 * @param Instance[] $instances
-	 * @return self
+     * @throws InvalidArgumentException
+	 * @return $this
 	 */
 	public function appendInstances($instances) {
 		foreach($instances as $instance) {
@@ -39,10 +41,11 @@ class NotificationBundle {
 	}
 
 
-	/**
-	 * @param Instance $instance
-	 * @return self
-	 */
+    /**
+     * @param Instance $instance
+     * @throws InvalidArgumentException
+     * @return $this
+     */
 	public function appendInstance($instance) {
 		$hash = $instance->getBaseHash();
 
@@ -58,7 +61,7 @@ class NotificationBundle {
 
 	/**
 	 * @param Notification[] $notifications
-	 * @return self
+	 * @return $this
 	 */
 	public function appendNotifications($notifications) {
 		foreach($notifications as $n) {
@@ -70,7 +73,7 @@ class NotificationBundle {
 
 	/**
 	 * @param Notification $notification
-	 * @return self
+	 * @return $this
 	 */
 	public function appendNotification($notification) {
 		// no duplicates
@@ -103,6 +106,7 @@ class NotificationBundle {
 	 * Sort the contained notifications
 	 *
 	 * @param int $dir
+     * @return $this
 	 */
 	protected function sort($dir = SORT_DESC) {
 		usort($this->notifications, function($a, $b) use ($dir) {
@@ -116,8 +120,14 @@ class NotificationBundle {
 
 			return $dir * ($atime == $btime ? 0 : $atime > $btime ? 1 : -1);
 		});
+
+		return $this;
 	}
 
+    /**
+     * @param int $limit
+     * @param int $offset
+     */
     protected function limit($limit, $offset = 0)
     {
         $this->notifications = array_slice($this->notifications, $offset, $limit, false);

@@ -16,42 +16,12 @@
 
 namespace Schoolbox\External\Connector\Doublefirst\Base;
 
-use External_User;
-use MSSQL;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\Base;
+use Schoolbox\External\Connector\ISync;
 use Schoolbox\Sync\Iterator;
 
-class Sync implements SyncInterface
+class Sync extends Base implements ISync
 {
-    /**
-     * @var \MSSQL
-     */
-    protected $database;
-
-    /**
-     * @var string
-     */
-    protected $year;
-
-    /**
-     * @var string
-     */
-    protected $semester;
-
-    /**
-     * Sync constructor
-     */
-    public function __construct()
-    {
-        $this->database = \MSSQL::getInstance();
-
-        // Figure out the current year and semester
-
-        $externalUser = new \External_User();
-        $this->year     = $externalUser->getCurrentYear();
-        $this->semester = $externalUser->getCurrentSemester();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -81,7 +51,9 @@ class Sync implements SyncInterface
             AND p.PupilID <> ''
         ";
 
-        return new Iterator\Student($this->database->getIterator($query));
+        return new Iterator\Student(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -120,7 +92,9 @@ class Sync implements SyncInterface
             AND         pc.ContactID <> ''            
         ";
 
-        return new Iterator\Guardian($this->database->getIterator($query));
+        return new Iterator\Guardian(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 
     /**
@@ -162,15 +136,17 @@ class Sync implements SyncInterface
             FROM        StaffPersonalDetails  spd
             JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
             LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
-            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = '2'
-            LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = 'D321'
+            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = 'D321'
+            LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = '2'
             LEFT JOIN   LookupDetails cat ON cat.LookupID = '1203' AND cat.LookupDetailsID = spd.StaffCategory
             LEFT JOIN   LookupDetails title ON title.LookupID = '3012' AND title.LookupDetailsID = spd.Title
             ORDER BY    spd.SurName, 
                         spd.ForeName
         ";
 
-        return new Iterator\Staff($this->database->getIterator($query));
+        return new Iterator\Staff(
+            $this->databaseExternal->executeQueryIterator($query)
+        );
     }
 }
 

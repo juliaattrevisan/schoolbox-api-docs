@@ -310,9 +310,9 @@ class External_Doublefirst_User implements External_UserInterface
             AND               cei.EmailID <> ''
         ";
 
-        $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
-        while ($row = $this->getDatabase()->getNextArray()) {
+        while ($row = $statement->fetch()) {
             if (!isset($emailList[$row['RelatedID']])) {
                 $emailList[$row['RelatedID']] = $row['DefaultEmail'];
             }
@@ -389,6 +389,7 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS StudentStudiesCode,
                 UrgentNotes                                         AS AlertMessage,
                 ''                                                  AS StudentBoarder,
+                ''                                                  AS Comment,
                 pca.CustodyAlert                                    AS CustodyAlert,
                 pca.CustodyNotes                                    AS CustodyNotes,
                 pcad.Description                                    AS CustodyResponsiblePerson
@@ -914,10 +915,10 @@ class External_Doublefirst_User implements External_UserInterface
             return [];
         }
 
-        $this->getDatabase()->query($sql);
+        $statement = $this->getDatabase()->query($sql);
         $subjectList = array();
 
-        while ($subject = $this->getDatabase()->getNextArray()) {
+        while ($subject = $statement->fetch()) {
             $subjectList[] = array(
                 'code' => $subject['ClassCode'],
                 'name' => $subject['name'],
@@ -1068,7 +1069,7 @@ class External_Doublefirst_User implements External_UserInterface
                         CASE WHEN spd.PreferredForeName <> '' AND spd.PreferredForeName IS NOT NULL THEN spd.PreferredForeName ELSE spd.ForeName END AS StaffPreferredName,
                         spd.SurName           AS StaffSurname,
                         'o'                   AS DefaultEmailCode,
-                        seiw.EmailAddress     AS OccupEmail,
+                        CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS OccupEmail,
                         ''                    AS Email,
                         ''                    AS StaffCampus,
                         CASE WHEN IsStaffPartTime = 1 THEN 'Part Time' ELSE 'Full Time' END AS StaffCategoryType,
@@ -1076,8 +1077,9 @@ class External_Doublefirst_User implements External_UserInterface
                         ''                    AS StaffDepartment
             FROM        StaffPersonalDetails spd
             JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
-            LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
-            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID AND seiw.PrimaryEmail = 1 AND seiw.EmailType = '2'
+            LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'            
+            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = 'D321'
+            LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = '2'                        
             LEFT JOIN   LookupDetails cat ON cat.LookupID = '1203' AND cat.LookupDetailsID = spd.StaffCategory
             LEFT JOIN   LookupDetails title ON title.LookupID = '3012' AND title.LookupDetailsID = spd.Title
             ORDER BY    spd.SurName, 
@@ -1106,7 +1108,7 @@ class External_Doublefirst_User implements External_UserInterface
                         CASE WHEN spd.PreferredForeName <> '' THEN spd.PreferredForeName ELSE spd.ForeName END AS StaffPreferredName,
                         spd.SurName           AS StaffSurname,
                         stw.TelephoneNumber   AS StaffOccupPhone,
-                        seiw.EmailAddress     AS StaffOccupEmail,
+                        CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS StaffOccupEmail,
                         ''                    AS StaffExtension,
                         ''                    AS StaffCampusDescription,
                         CASE WHEN IsTeacher = 1 THEN 'Teaching' ELSE 'Non Teaching' END AS StaffCategory,
@@ -1120,7 +1122,8 @@ class External_Doublefirst_User implements External_UserInterface
             FROM        StaffPersonalDetails spd
 	        JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
             LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
-            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID AND seiw.PrimaryEmail = 1 AND seiw.EmailType = '2'
+            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = 'D321'
+            LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = '2'                        
             LEFT JOIN   LookupDetails cat ON cat.LookupID = '1203' AND cat.LookupDetailsID = spd.StaffCategory
             LEFT JOIN   LookupDetails title ON title.LookupID = '3012' AND title.LookupDetailsID = spd.Title
             ORDER BY    spd.SurName, 

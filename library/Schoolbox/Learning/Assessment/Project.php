@@ -28,6 +28,11 @@ use Schoolbox\Resource\Folder\Model as Folder;
 class Project extends AbstractAssessment implements AssessmentContext
 {
     /**
+     * @var string
+     */
+    protected $defaultTypeName = 'Project';
+
+    /**
      * @var GenericCollection|IAssessable[]
      */
     protected $assessables;
@@ -59,6 +64,26 @@ class Project extends AbstractAssessment implements AssessmentContext
 
         $this->assessables = new GenericCollection(IAssessable::class);
         $this->setSummator($summator);
+    }
+
+    /**
+     * This project is a specification if the context it's within is one.
+     *
+     * @return bool
+     */
+    public function isSpecificationContext()
+    {
+        return $this->getContext()->isSpecificationContext();
+    }
+
+    /**
+     * This project is an implementation if the context it's within is one.
+     *
+     * @return bool
+     */
+    public function isImplementationContext()
+    {
+        return $this->getContext()->isImplementationContext();
     }
 
     /**
@@ -164,6 +189,7 @@ class Project extends AbstractAssessment implements AssessmentContext
      * If a student requires marking on ANY project sub-assessment, the project requires marking (Orange Diamond)
      *
      * @inheritdoc
+     * @throws \DomainException if user is not found in any project sub-assessments
      */
     public function isFeedbackRequired(Participant $participant)
     {
@@ -439,13 +465,23 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
-     * @inheritdoc
+     * Override: open is always aliased to publish
      *
-     * @return string
+     * @return \Alaress_Date_Format
      */
-    public function getTypeName()
+    public function getOpenAt()
     {
-        return 'Project';
+        return $this->getPublishAt();
+    }
+
+    /**
+     * Override: close is always aliased to due
+     *
+     * @return \Alaress_Date_Format
+     */
+    public function getCloseAt()
+    {
+        return $this->getDueAt();
     }
 
     /**

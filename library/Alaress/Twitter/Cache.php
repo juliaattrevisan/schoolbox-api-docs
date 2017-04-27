@@ -33,7 +33,12 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 		$this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
 	}
 
-	public function init($url, $params) {
+    /**
+     * @param string $url
+     * @param string $params
+     * @return $this
+     */
+	public function init($url, $params="") {
 		$this->setParameters($params);
 		parent::init($url);
 		return $this;

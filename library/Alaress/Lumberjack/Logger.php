@@ -101,14 +101,14 @@ class Logger implements LoggerInterface {
         // attach STDOUT
         if(is_resource($this->out)) {
             $handler = new StreamHandler($this->out, $level);
-            $handler->setFormatter(new CliFormatter($this->porcelain));
+            $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain));
             $this->handlers[] = $handler;
         }
 
         // attach STDERR
         if(is_resource($this->err)) {
             $handler = new StreamHandler($this->err, max(Monologger::CRITICAL, $level));
-            $handler->setFormatter(new CliFormatter($this->porcelain, true));
+            $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain, true));
             $this->handlers[] = $handler;
         }
 

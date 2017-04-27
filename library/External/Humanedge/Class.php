@@ -20,20 +20,6 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     protected $requireClassTeachersHaveRooms = true;
 
-//    /**
-//     * @var External_UserInterface
-//     */
-//    private $externalUser;
-//
-//    /**
-//     * Constructor
-//     */
-//    public function __construct()
-//    {
-//        $this->setDatabase(MSSQL::getInstance());
-////        $this->externalUser = new External_User('humanedge');
-//    }
-
     /**
      * Gets the class code part of a query.
      *
@@ -132,25 +118,11 @@ class External_Humanedge_Class implements External_ClassInterface
             AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
         ";
         $result = [];
-        foreach ($db->getAll($query) as $row) {
-            $result[] = $row['Code'];
+        if($statement = $db->query($query)) {
+            while ($row = $statement->fetch()) {
+                $result[] = $row['Code'];
+            }
         }
         return $result;
-    }
-
-    /**
-     * @param MSSQL $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    private function getDatabase()
-    {
-        return $this->database;
     }
 }

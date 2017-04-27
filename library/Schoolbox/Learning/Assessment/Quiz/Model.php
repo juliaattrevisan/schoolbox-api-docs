@@ -17,6 +17,7 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 use InvalidArgumentException;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
@@ -25,6 +26,10 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class Model extends AbstractAssessment
 {
+    /**
+     * @var string
+     */
+    protected $defaultTypeName = 'Quiz';
 
     /**
      * Possible value for `$this->maxAttempts`.
@@ -75,6 +80,19 @@ class Model extends AbstractAssessment
             throw new \InvalidArgumentException('Quiz cannot currently have mark type of Letter Grade.');
         }
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isFeedbackRequired(Participant $participant)
+    {
+        $this->assertSameAssessment($participant);
+
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
+
+        // Does quiz have most recent response and it is not reviewed ?
+        return $latestSubmittedResponse && !$latestSubmittedResponse->hasPublishedFeedback();
     }
 
     /**
@@ -209,16 +227,6 @@ class Model extends AbstractAssessment
     public function getFamilyName()
     {
         return 'quiz';
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function getTypeName()
-    {
-        return 'Quiz';
     }
 
     /**

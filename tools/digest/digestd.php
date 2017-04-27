@@ -1,14 +1,21 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Date\Clock;
+use Alaress\Redis\Async;
 use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Notifactory;
+use Schoolbox\RoleMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Digest\DigestScheduler;
+use Schoolbox\Realtime\Digest\MailNotifier;
+use Schoolbox\Realtime\MessageList\ListFactory;
+use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
+use Schoolbox\UserMapper;
+
 
 /**
  * The Digest Daemon.
@@ -19,7 +26,11 @@ use Schoolbox\Realtime\Digest\DigestScheduler;
  * @version     SVN: $Id$
  */
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+/**
+ * Shut UP, storm!
+ * @var array $fields
+ */
+$fields = [ 'porcelain', 'mem', 'truemem', 'pid', 'debug-interval:' ];
 
 $opts = getopt('v', $fields);
 
@@ -34,51 +45,39 @@ $flags = implode(' ', array_slice($argv, 1));
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Digest', array(
-	'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'fields'  => array_values($fields),
-    'flags'   => $flags
-));
+$kernel = new Schoolbox\Application\Daemon\Kernel('Digest', [
+	'verbose'        => isset($opts['v']) ? $opts['v'] : null,
+    'fields'         => array_values($fields),
+    'flags'          => $flags,
+    'debug-interval' => isset($opts['debug-interval']) ? $opts['debug-interval'] : null
+]);
 
 
 
 // CREATE DIGEST APP
-$kernel->run(function($di, $loop, $log, $opts) {
-	/**
-	 * @var Di\Container $di
-	 * @var LoopInterface $loop
-	 * @var LoggerInterface $log
-	 * @var array $opts
-	 */
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
-	try {
+    $instance = INSTANCE_ID;
+    $topic    = "digestd.$instance.*";
 
-        // make sure our endpoint exists
-        $mqc = \Schoolbox\Notif\MQ\Connector::getInstance();
-        $q   = INSTANCE_ID . DigestScheduler::QUEUE_COMMAND;
+    /** @var IConfigLoader $conf */
+    $conf = $di->get('config');
 
-        $mqc->declareQueue($q)
-            ->bindQueue($q, '*.' . Notif::TOPIC_CMD_DIGEST);
+    /** @var ClientInterface $redis */
+    $redis = $di->get('redis');
 
-        $conf = new \Schoolbox\Config\Loader();
+    $clock = new Clock();
 
-        $stompFactory = new \React\Stomp\Factory($loop);
-        $client = $stompFactory->createClient(array(
-            'host'      => $conf->get('amqp_host'),
-            'port'      => $conf->get('amqp_stomp_port'),
-            'vhost'     => $conf->get('amqp_vhost'),
-            'login'     => $conf->get('amqp_user'),
-            'passcode'  => $conf->get('amqp_pass'),
-        ));
+    $roleMapper = $di->get('mapperFactory')->get(RoleMapper::class);
+    $userMapper = $di->get('mapperFactory')->get(UserMapper::class);
+    $asyncRedis = new Async\Client($di->get('config')->get('redis_url'), $loop);
+    $strat      = new DefaultDispatchStrategy($opts['flags']);
+    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper);
+    $factory    = new DigestTriggerFactory($notifier, $clock, $opts['debug-interval']);
 
-        new DigestScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $client, $log, $conf);
-	}
-	catch(AMQPRuntimeException $e) {
-		$log->alert("Unable to connect to RabbitMQ: server is offline.");
-		/** @var Notif $n */
-		$n = $di->get('notif');
-		$n->setTopic(Notif::TOPIC_NOTIFICATION)->alert('RabbitMQ is offline');
-		throw $e;
-	}
+    $scheduler  = new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);
 
+    $asyncRedis->psubscribe($topic, $scheduler);
+
+    $log->info("Listening on redis://$topic");
 });

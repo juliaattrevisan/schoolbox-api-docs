@@ -91,13 +91,8 @@ class Scrub
         $text = strip_tags($text);
         // 2: all recurring whitespaces (including &nbsp;) to be trimmed
         $text = preg_replace('/(\s|&nbsp;)+/i', ' ', $text);
-        // 3: convert all entites, including quotes, into UTF-8
-        // Apparently ENT_IGNORE can be unsafe
-        // (@see http://unicode.org/reports/tr36/#Deletion_of_Noncharacters)
-        // but tags have already been stripped, so this should be fine.
-        $text = htmlentities($text, ENT_IGNORE | ENT_QUOTES, "UTF-8");
-        // 4: unconvert entities (3 -> 4 is just for normalising any rogue characters)
-        return html_entity_decode($text);
+        // 3: unconvert entities (3 -> 4 is just for normalising any rogue characters)
+        return html_entity_decode($text, ENT_QUOTES);
     }
 
     /**

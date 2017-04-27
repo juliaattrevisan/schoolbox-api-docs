@@ -9,19 +9,14 @@
  */
 namespace Schoolbox\Assessment\Course;
 
-use Component_Homepage_CourseBuilderController;
-use Config\Modules\Course;
+use Alaress\Database\Predicate\Builder;
+use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as Component_Homepage_CourseBuilderController;
 use PDO;
 use PDOStatement;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\PredicateBuilder;
-use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  * Class Mapper
@@ -141,15 +136,15 @@ class DeprecatedMapper extends FolderMapper
     /**
      * Builds a where part and params for this query out of a column list
      *
-     * @param PredicateBuilder $predicate
-     * @param  array           $columnList
-     * @param  array           $options
+     * @param Builder $predicate
+     * @param  array  $columnList
+     * @param  array  $options
      *
      * @return array where:  The where parts of the query
      *               params: the parameters
      * @throws \UnderflowException
      */
-    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    protected function buildWherePart(Builder $predicate, $columnList, $options)
     {
         $predicate->equals('cd.class', Component_Homepage_CourseBuilderController::class);
 

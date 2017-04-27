@@ -1,7 +1,5 @@
 <?php
 /**
- * AllRubrics
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -11,48 +9,31 @@
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
 use DueWork_Rubric_Handler;
-use Schoolbox\LearningAnalytics\Metadata;
-use Schoolbox\LearningAnalytics\Registry;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\User;
 
 class AllRubrics {
-
-    /**
-     * An instance of Metadata from Module
-     *
-     * @var Metadata
-     */
-    private $metadata;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
 
     /**
      * An array of rubric data to plot
      *
      * @var array
      */
-    private $allRubrics = [];
+    private $allRubrics;
+
 
     /**
-     * A rubric handler instance
-     *
-     * @var DueWork_Rubric_Handler
+     * @param GenericCollection|UnitImplementation[] $unitImplementations
+     * @param Collection|User[][] $unitImplStudents Grouped by unitImpl.id,
      */
-    private $rubricHandler;
-
-    /**
-     * @param Registry $registry
-     * @param Metadata $metadata
-     */
-    public function __construct(Registry $registry, Metadata $metadata)
+    public function __construct(GenericCollection $unitImplementations, Collection $unitImplStudents)
     {
-        $this->setMetadata($metadata);
-        $this->setRegistry($registry);
-        $this->setRubricHandler(new DueWork_Rubric_Handler());
+        $rubricHandler = new DueWork_Rubric_Handler();
 
+        /** @var array[] $indicators */
         $indicators = [];
 
         /* All the students' values
@@ -61,17 +42,17 @@ class AllRubrics {
 
         /* A list of all the criteria for this folder
          */
-        foreach ($this->getMetadata()->getUnitImplementations()->getColumnValues('folder') as $folder) {
-            /** @var Folder\Model $folder */
-
-            foreach ($this->getRegistry()->getStudents() as $unitImplementationId => $unitStudents) {
+        /** @var Folder $folder */
+        foreach ($unitImplementations->getColumnValues('folder') as $folder) {
+            /** @var User[] $unitStudents */
+            foreach ($unitImplStudents as $unitImplementationId => $unitStudents) {
                 foreach ($unitStudents as $student) {
 
                     /* Oddly enough this method gets the students' marks for a
                      * criterion spanning across the entire course, which is
                      * nice and convenient
                      */
-                    $markData = $this->getRubricHandler()->getStudentMarksByCriteriaInCategory($student->getId(), $folder->getId());
+                    $markData = $rubricHandler->getStudentMarksByCriteriaInCategory($student->getId(), $folder->getId());
 
                     foreach ($markData as $indicator) {
                         $groupedMarks[$indicator['name']][] = [
@@ -82,7 +63,7 @@ class AllRubrics {
                 }
             }
 
-            $indicators = $indicators + $this->getRubricHandler()->getAvailableCriteria($folder->getId());
+            $indicators = $indicators + $rubricHandler->getAvailableCriteria($folder->getId());
         }
 
         /* Recombine and preserve criterion grouping
@@ -128,61 +109,11 @@ class AllRubrics {
             asort($rubricData[$criteriaGroup]);
         }
 
-        $this->setRubricData($rubricData);
+        $this->allRubrics = $rubricData;
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * Set metadata
-     *
-     * @param Metadata $metadata
-     */
-    private function setMetadata(Metadata $metadata)
-    {
-        $this->metadata = $metadata;
-    }
-
-    /**
-     * Get metadata
-     *
-     * @return Metadata
-     */
-    private function getMetadata()
-    {
-        return $this->metadata;
-    }
-
-    /**
-     * Set registry
-     *
-     * @param Registry $registry
-     */
-    private function setRegistry(Registry $registry)
-    {
-        $this->registry = $registry;
-    }
-
-    /**
-     * Get registry
-     *
-     * @return Registry
-     */
-    private function getRegistry()
-    {
-        return $this->registry;
-    }
-
-    /**
-     * Set all rubrics
-     *
-     * @param array $rubricData
-     */
-    private function setRubricData(array $rubricData)
-    {
-        $this->allRubrics = $rubricData;
-    }
 
     /**
      * Get all rubrics
@@ -192,25 +123,5 @@ class AllRubrics {
     public function getRubricData()
     {
         return $this->allRubrics;
-    }
-
-    /**
-     * Set rubric handler
-     *
-     * @param DueWork_Rubric_Handler $rubricHandler
-     */
-    private function setRubricHandler($rubricHandler)
-    {
-        $this->rubricHandler = $rubricHandler;
-    }
-
-    /**
-     * Get rubric handler
-     *
-     * @return DueWork_Rubric_Handler
-     */
-    private function getRubricHandler()
-    {
-        return $this->rubricHandler;
     }
 }

@@ -319,7 +319,7 @@ class SitePage extends Page
     {
         header('Content-Type: application/json');
         if (isset($responseCode)) {
-            header(':', true, $responseCode);
+            http_response_code($responseCode);
         }
         $jsonOutput = json_encode($output);
         if (!$keepProcessing) {
@@ -443,7 +443,11 @@ class SitePage extends Page
 
         $this->setBlock($this->responsive ? TEMPLATE_body : 'bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
 
-        if ($_SESSION['id']) {
+        if ($_SESSION['user'] instanceof User) {
+
+            if (!$this->user instanceof User) {
+                $this->user = $_SESSION['user'];
+            }
 
             // quasi-localisation
             $this->localise();
@@ -578,7 +582,7 @@ class SitePage extends Page
             $this->goLoginPage();
         }
 
-        if (!isset($_SESSION['id']) || //If session does not exist
+        if (!$_SESSION['user'] instanceof User || //If session does not exist ||
             (($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
             ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
@@ -734,7 +738,7 @@ class SitePage extends Page
          */
         $error->setMessage(str_replace("%MESSAGE%", $args['message'], $error->getMessage()));
 
-        header(':', true, $code);
+        http_response_code($code);
 
         // if we're in ajax mode, spit out in ajax-friendly (ie JSON) format
         if ($this->ajax) {
@@ -1155,7 +1159,7 @@ class SitePage extends Page
         // is SAML enabled?
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
-        if ($this->config->get('saml_enabled') == '1' && strlen($this->config->get('saml_sso_url')) && $_GET['samlAuth'] !== '0') {
+        if ($this->config->get('saml_enabled') == '1' && (strlen($this->config->get('saml_sso_url')) || strlen($this->config->get('saml_idp_metadata_url'))) && $_GET['samlAuth'] !== '0') {
             $redirectUrl = '/saml/index.php';
             if (isset($_GET['page'])) {
                 $redirectUrl .= '?page=' . urlencode($_GET['page']);
@@ -1172,7 +1176,7 @@ class SitePage extends Page
      */
     public function pageNotFound()
     {
-        header("HTTP/1.0 404 Not Found");
+        http_response_code(404);
 
         $errorContents = $this->getTwig()->render('common/error/404.twig', []);
 

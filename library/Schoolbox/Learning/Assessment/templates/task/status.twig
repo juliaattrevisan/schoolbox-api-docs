@@ -29,15 +29,9 @@
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
-
-    {% if not assessment.acceptOnline %}
-        {% set pStatusClass = '' %}
-        {% set pTooltip     = '' %}
-    {% else %}
-        {% set pStatusClass = not latestResponse.markedComplete ? statusIncomplete : (latestResponse.selfAssessed ? statusPending : statusReviewed) %}
-        {% set pTooltip     = not latestResponse.markedComplete ? labelIncomplete : (latestResponse.selfAssessed ? labelPending : labelReviewed) %}
-        {% set pStatusText = pTooltip %}
-    {% endif %}
+    {% set pStatusClass = not latestResponse.markedComplete ? statusIncomplete : (latestResponse.selfAssessed ? statusPending : statusReviewed) %}
+    {% set pTooltip     = not latestResponse.markedComplete ? labelIncomplete : (latestResponse.selfAssessed ? labelPending : labelReviewed) %}
+    {% set pStatusText = pTooltip %}
 
     <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
         <div>
@@ -49,8 +43,9 @@
                 statusTip:   pTooltip,
                 cardSize:    "small-9 medium-10 xlarge-11"
             } only %}
+
             <div class="small-1">
-                {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+                {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme, writable: writable } %}
             </div>
         </div>
         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="user-completions-{{ participant.user.id }}">

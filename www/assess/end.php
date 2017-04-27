@@ -8,9 +8,13 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Breadcrumbs;
 
 $assessHandler   = new Assess_Main();
@@ -18,7 +22,6 @@ $attemptHandler  = new Assess_Attempt();
 $questionHandler = new Assess_Question();
 $responseHandler = new Assess_Response();
 $sectionHandler  = new Assess_Section();
-$groupHandler    = new Group();
 
 $assess    = $assessHandler->getByID($this->arg[0]);
 $attempt   = $attemptHandler->getByID($this->arg[1]);
@@ -48,15 +51,36 @@ if ($assessHandler->isOwner($this->arg[0])) {
 }
 */
 
-if ($assessHandler->isExpired($assess['assess_id'])) {
-    error(120);
-}
-
-/* Participants should be blocked from attempting if it hasn't started,
- * but authors should be able to test out their content
+/**
+ * @var SitePage $this
+ * @var AssessmentDataSource $assessmentDataSource
  */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-    error(143);
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
+$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+$assessmentFolder = $assessment->getBaseContext()->getFolder();
+$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
+
+if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
+        error(19);
+    }
+
+    // I can't do this if not a participant
+    if (!$assessment->isParticipant($_SESSION['user'])) {
+        error(19);
+    }
+
+    // I can end this quiz if it has expired
+
+    // I can't attempt this if it isn't open
+    if (!$assessHandler->isOpen($assess)) {
+        error(143);
+    }
+
+} else {
+    // I can do whatever I want
 }
 
 $this->setFile(TEMPLATE_content, 'assess/end.html');
@@ -175,29 +199,21 @@ $this->setVar(
 
 /* Visibility
  */
-$visibility = new \Assess\Visibility();
-$visibility->setId($assess['mark_visibility']);
+$visibility = new Visibility(Access::getInstance());
 
-if ($visibility->isStaff() && $groupHandler->isStaff()) {
+/** @var \Schoolbox\User $currentUser */
+$currentUser = $_SESSION['user'];
+if ($visibility->isVisibleToUser($assessment, $currentUser, true)) {
     $this->parse('has_marks_block', 'has_marks');
     $this->parse('view_attempt_block', 'view_attempt');
+
 } else {
-    if ($visibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-        $this->parse('has_marks_block', 'has_marks');
-        $this->parse('view_attempt_block', 'view_attempt');
-    } else {
-        if ($visibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-            $this->parse('has_marks_block', 'has_marks');
-            $this->parse('view_attempt_block', 'view_attempt');
-        } else {
-            $this->setVar(
-                array(
-                    'view_attempt_block' => '',
-                    'has_marks_block'    => '',
-                )
-            );
-        }
-    }
+    $this->setVar(
+        array(
+            'view_attempt_block' => '',
+            'has_marks_block'    => '',
+        )
+    );
 }
 
 $folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();

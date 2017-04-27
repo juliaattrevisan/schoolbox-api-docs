@@ -370,6 +370,24 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
+     * Builds a breadcrumb trail for this curriculum node.
+     *
+     * @param string $delimiter
+     * @return string
+     */
+    public function buildBreadcrumb($delimiter)
+    {
+        $parts   = [];
+        $current = $this;
+        while ($current->getParent() instanceof Model) {
+            array_unshift($parts, $current->getName());
+            $current = $current->getParent();
+        }
+        array_pop($parts);
+        return implode($delimiter, $parts);
+    }
+
+    /**
      * (PHP 5 &gt;= 5.4.0)<br/>
      * Specify data which should be serialized to JSON
      *
@@ -379,7 +397,7 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     public function jsonSerialize()
     {
-        return array(
+        return [
             'id'          => $this->getId(),
             'name'        => $this->getName(),
             'code'        => $this->getCode(),
@@ -388,6 +406,7 @@ class Model implements ISoftDeletable, JsonSerializable
             'children'    => $this->getChildren(),
             'area'        => $this->getLearningArea(),
             'level'       => $this->getLearningLevel(),
-        );
+            'breadcrumb'  => $this->buildBreadcrumb(' > '),
+        ];
     }
 }

@@ -27,35 +27,49 @@ if (isset($_POST['SAMLRequest'])) {
 if(isset($_POST['SAMLResponse'])) {
     SAMLDebugLog(base64_decode($_POST['SAMLResponse']));
 
-    try {
-        $samlResponse = new OneLogin_Saml_Response($settings, $_POST['SAMLResponse']);
+    $token_signing_keys = array();
+    if (strlen(trim($settings->idpPublicCertificate)) > 0) {
+        $token_signing_keys[] = $settings->idpPublicCertificate;
+    }
+    if ($idp) {
+        foreach ($idp['SigningKeys'] as $key) {
+            $token_signing_keys[] = $key['X509Cert'];
+        }
+    }
+    $errorTracker = array();
+    foreach ($token_signing_keys as $token_key) {
+        $settings->idpPublicCertificate = preg_replace("/\r/m", "", $token_key);
+        try {
+            $samlResponse = new OneLogin_Saml_Response($settings, $_POST['SAMLResponse']);
 
-        if ($samlResponse->isValid()) {
-            $sessionHandler = new Session();
-            if ($sessionHandler->create($samlResponse->getNameId())) {
-                $page = '/';
-                if (isset($_POST['RelayState']) && preg_match('|^/|', $_POST['RelayState']) && substr($_POST['RelayState'], 0, 6) != '/login') {
-                    $page = $_POST['RelayState'];
+            if ($samlResponse->isValid()) {
+                $sessionHandler = new Session();
+                if ($sessionHandler->create($samlResponse->getNameId())) {
+                    $page = '/';
+                    if (isset($_POST['RelayState']) && preg_match('|^/|', $_POST['RelayState']) && substr($_POST['RelayState'], 0, 6) != '/login') {
+                        $page = $_POST['RelayState'];
+                    }
+
+                    SAMLDebugLog("SAML auth successful");
+                    SitePage::localRedir($page);
+
+                } else {
+                    $msg = 'Invalid SAML user.';
+                    $errorTracker[] = $msg;
+                    SAMLDebugLog($msg);
                 }
-
-                SAMLDebugLog("SAML auth successful");
-                SitePage::localRedir($page);
-
             } else {
-                $msg = 'Invalid SAML user.';
-                error(ErrorMapper::ERROR_PROCESSING, $msg);
+                $msg = 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
+                $errorTracker[] = $msg;
                 SAMLDebugLog($msg);
             }
-        } else {
-            $msg = 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
-            error(ErrorMapper::ERROR_PROCESSING, $msg);
+        } catch (Exception $e) {
+            $msg = 'Invalid SAML response: ' . Scrub::text($e->getMessage());
+            $errorTracker[] = $msg;
             SAMLDebugLog($msg);
         }
-    } catch (Exception $e) {
-        $msg = 'Invalid SAML response: ' . Scrub::text($e->getMessage());
-        error(ErrorMapper::ERROR_PROCESSING, $msg);
-        SAMLDebugLog($msg);
     }
+    error(ErrorMapper::ERROR_PROCESSING, implode("\n" . $errorTracker));
 }
 else {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);

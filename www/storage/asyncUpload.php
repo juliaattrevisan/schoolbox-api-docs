@@ -62,7 +62,7 @@ if (!$_SESSION['id']) {
     }
 }
 
-header(':', true, $result['error']);
+http_response_code($result['error']);
 header('Content-Type: application/json');
 
 die(json_encode($result));

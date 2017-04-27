@@ -3,8 +3,8 @@
 {% block details_tutorTeacher %}
 {% if showClasses %}
     {% if tutorTeacher %}
-    <dt class="no-margin small-6 medium-3">Pastoral Care Teacher</dt>
-    <dd class="no-margin small-6 medium-9">
+    <dt class="small-12 medium-3">Pastoral Care Teacher:</dt>
+    <dd class="small-12 medium-9">
         {% if tutorTeacher.getId() %}
             <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
         {% else %}
@@ -18,8 +18,8 @@
 {% block details_tutorGroup %}
 {% if showClasses %}
     {% if externalUser.StudentTutorDescription %}
-    <dt class="no-margin small-6 medium-3">Pastoral Care Group</dt>
-    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
+    <dt class="small-12 medium-3">Pastoral Care Group:</dt>
+    <dd class="small-12 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
     {% endif %}
 {% endif %}
 {% endblock details_tutorGroup %}

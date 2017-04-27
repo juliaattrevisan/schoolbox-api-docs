@@ -14,12 +14,12 @@ use DueWork_ErrorMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as File;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -49,9 +49,6 @@ class Controller extends Assessment\Controller
     /** @var Rubric\RubricMapper */
     private $rubricMapper;
 
-    /** @var WorkTypeMapper */
-    private $workTypeMapper;
-
     /** @var DueWorkResponseMapper */
     private $dueWorkResponseMapper;
 
@@ -62,12 +59,12 @@ class Controller extends Assessment\Controller
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
      * @param MapperProxy                   $assessmentMapper
+     * @param WorkTypeMapper                $workTypeMapper
      * @param Access                        $access
      * @param Transactor                    $transactor
      * @param Assessment\Breadcrumb\Factory $bakery
      * @param Rubric\RubricMapper           $rubricMapper
      * @param Rubric\ResultMapper           $resultSetMapper
-     * @param WorkTypeMapper                $workTypeMapper
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
      * @param ParticipantMapper             $participantMapper
      */
@@ -75,19 +72,18 @@ class Controller extends Assessment\Controller
         UserMapper $userMapper,
         Error\Mapper $errorMapper,
         MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
-        WorkTypeMapper $workTypeMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
-        $this->workTypeMapper        = $workTypeMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
         $this->participantMapper     = $participantMapper;
     }
@@ -139,13 +135,53 @@ class Controller extends Assessment\Controller
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
-            'download'    => $this->hasDownloadableSubmissionFiles($assessment)
+            'download'    => $this->hasDownloadableSubmissionFiles($assessment),
+            'rubricMarks' =>  Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
         ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 "@learningAssessment/dueWork/status.twig",
                 $twigData, "Status of {$assessment->getTitle()}", 'submission'
+            )
+        );
+    }
+
+    /**
+     * Display appropriate landing page based on role
+     *
+     * @api   GET /learning/assessments/:assessmentId/:userId
+     * @level 165
+     *
+     * @param Participant $participant
+     * @throws NotFound
+     */
+    public function getPreview(IAssessable $assessment)
+    {
+
+        if($assessment->getUseRubric()){
+            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+        }
+
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+
+        $twigData = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+
+            /* Rubrics data
+             */
+            'rubricContext' => (new RubricContext($this->rubricMapper))->generateBasic($assessment, $this->getUser()),
+            'assessment'   => $assessment,
+
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/dueWork/summary/preview.twig",
+                $twigData, "{$assessment->getTitle()}", 'submission'
             )
         );
     }
@@ -178,7 +214,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var File $submission */
+        /** @var SubmissionFile $submission */
         $allResponses = $participant->getAllResponses();
 
         $twigData = [
@@ -192,7 +228,7 @@ class Controller extends Assessment\Controller
 
             /* Rubrics data
              */
-            'rubricContext' => (new RubricContext($this->rubricMapper))->generate($assessment, $student, $this->getUser()),
+            'rubricContext' => (new RubricContext($this->rubricMapper))->generate($assessment, $student, $this->getUser(), $this->getAccess()),
         ];
 
         try {
@@ -302,7 +338,7 @@ class Controller extends Assessment\Controller
 
                     $files = $response->getAllFiles();
 
-                    /** @var File $file */
+                    /** @var SubmissionFile $file */
                     foreach ($files as $file)
                     {
                         $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
@@ -526,7 +562,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var File $submission */
+        /** @var SubmissionFile $submission */
         $allResponses = $participant->getAllResponses();
 
         /* Work out if we are going to accept responses
@@ -630,7 +666,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var File $submission */
+        /** @var SubmissionFile $submission */
         $allResponses = $participant->getAllResponses();
 
         /* Work out if we are going to accept responses
@@ -824,7 +860,6 @@ class Controller extends Assessment\Controller
         $data = [
             'acceptingResponses'=> true,
             'attachzone'      => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
-            'allWorkTypes'    => $this->getWorkTypeMapper()->findAll(),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
@@ -980,25 +1015,6 @@ class Controller extends Assessment\Controller
         return $this;
     }
 
-
-    /**
-     * @return WorkTypeMapper
-     */
-    protected function getWorkTypeMapper()
-    {
-        return $this->workTypeMapper;
-    }
-
-
-    /**
-     * @param WorkTypeMapper $workTypeMapper
-     * @return static
-     */
-    protected function setWorkTypeMapper($workTypeMapper)
-    {
-        $this->workTypeMapper = $workTypeMapper;
-        return $this;
-    }
 
 
     /**

@@ -17,7 +17,7 @@ if (isset($this)) {
 session_start();
 
 if (empty($_POST['key'])) {
-    header(':', true, 400);
+    http_response_code(400);
     die("How did you even get here?");
 } else {
     $key = $_POST['key'];
@@ -42,7 +42,7 @@ if (isset($_POST['part-1'])) {
 
     // example of server-side validation
     if (empty($_POST['part-2-text'])) {
-        header(':', true, 400);
+        http_response_code(400);
         die("Yes. I lied to you: the textbox is a required field. But this is an example of server-side validation for when you need things like DB checks. Enter some text and try again.");
     }
 

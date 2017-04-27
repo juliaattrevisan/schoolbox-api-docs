@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\StudentReportCard;
 
 
 use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -42,35 +43,37 @@ class Conversation
     /**
      * Generate a conversation based on student and subject
      *
+     * @param IConfigLoader $config
      * @param User $student
      * @param FolderModel $category
      * @throws \InvalidArgumentException
      */
-    public function __construct($student, $category)
+    public function __construct(IConfigLoader $config, User $student, FolderModel $category)
     {
-        if (!($student instanceof User && $category instanceof FolderModel)) {
-            throw new \InvalidArgumentException("Invalid conversation");
+        $this->participants = new Collection();
+
+        if($config->get('grade_comments_enable')) {
+            /* Find the parents of this particular student
+             */
+            $this->student = $student;
+            $this->student->loadParents();
+
+            /* FInd the teachers of this particular category
+             */
+            $this->category = $category;
+            $this->category->loadTeachers(true);
+
+            /* Generate participants: the student, their parent(s), and the category teacher(s)
+             *
+             * Email recipients are not necessarily participants in the conversation,
+             * merely acting as observers of the dialog, so they are excluded from this
+             * list of participants
+             */
+            
+            $this->participants = $this->participants->add($student)
+                ->merge($student->getParents())
+                ->merge($category->getTeachers());
         }
-
-        /* Find the parents of this particular student
-         */
-        $this->student = $student;
-        $this->student->loadParents();
-
-        /* FInd the teachers of this particular category
-         */
-        $this->category = $category;
-        $this->category->loadTeachers(true);
-
-        /* Generate participants: the student, their parent(s), and the category teacher(s)
-         *
-         * Email recipients are not necessarily participants in the conversation,
-         * merely acting as observers of the dialog, so they are excluded from this
-         * list of participants
-         */
-        $this->participants = (new Collection([$student]))
-            ->merge($student->getParents())
-            ->merge($category->getTeachers());
 
         // retrieve the comments in this conversation
         $this->comments = CommentMapper::getInstance()->findByStudentAndCategory($student->getId(), $category->getId());

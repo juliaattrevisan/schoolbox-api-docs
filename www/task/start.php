@@ -42,7 +42,7 @@ $user = $_SESSION['user'];
 $isAjax = SitePage::detectAjax();
 if ($isAjax && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['error' => 'POST requests only']);
-    header(':', true, 400);
+    http_response_code(400);
     exit;
 }
 

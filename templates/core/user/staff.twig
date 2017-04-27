@@ -89,8 +89,7 @@
                             {% block buttons_eportfolio %}
                                 <li>
                                     <a href="/eportfolio/{{ user.getId() }}/profile"
-                                       class="no-margin icon-eportfolio"
-                                    >ePortfolio</a>
+                                       class="icon-eportfolio">ePortfolio</a>
                                 </li>
                             {% endblock buttons_eportfolio %}
                         {% endif %}
@@ -99,8 +98,7 @@
                             {% block buttons_calendar %}
                                 <li>
                                     <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                       class="no-margin icon-calendar"
-                                    >Calendar</a>
+                                       class="icon-calendar">Calendar</a>
                                 </li>
                             {% endblock buttons_calendar %}
                         {% endif %}
@@ -109,8 +107,7 @@
                             {% block buttons_timetable %}
                                 <li>
                                     <a href="/timetable/{{ user.getId() }}"
-                                       class="no-margin icon-timetable"
-                                    >Timetable</a>
+                                       class="icon-timetable">Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
                         {% endif %}

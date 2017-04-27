@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric;
 
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 
 abstract class DescriptorList implements Twiggable, Calculable
 {
@@ -84,7 +85,7 @@ abstract class DescriptorList implements Twiggable, Calculable
      * @param int        $crossReferenceId
      * @return static
      */
-    public function putDescriptor($descriptor, $crossReferenceId)
+    public function putDescriptor(Descriptor $descriptor, $crossReferenceId)
     {
         if (!$this->descriptors->contains($descriptor)) {
             $this->descriptors->attach($descriptor, $crossReferenceId);
@@ -153,13 +154,13 @@ abstract class DescriptorList implements Twiggable, Calculable
 
 
     /**
-     * Returns a collection containing all the descriptors in this container, for DB persistence.
+     * Returns a collection containing all the descriptors in this container, for conversion to ORM and subsequent DB persistence.
      *
      * @return Collection|Descriptor[]
      */
     public function getAllDescriptors()
     {
-        $c = new Collection();
+        $c = new GenericCollection(Descriptor::class);
 
         foreach ($this->descriptors as $descriptor) {
             $c->add($descriptor);

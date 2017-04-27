@@ -323,7 +323,6 @@ class Controller extends AbstractController
 
     /**
      * Marks an attempt as completed
-     * @param $attemptId
      */
     public function postQuizSubmit()
     {
@@ -461,6 +460,20 @@ class Controller extends AbstractController
     {
         // TODO: Remove method to revert to abstract implementation
         throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+    /**
+     * @api   POST /quiz/attempts/delete
+     */
+    public function postAttemptDelete()
+    {
+        try {
+            $attempt = $this->quizAttemptMapper->findById($this->getRequest()->post['attemptId']);
+            $this->quizAttemptMapper->delete($attempt);
+        }
+        catch (MapperException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
+        }
     }
 
     /* Getters / Setters

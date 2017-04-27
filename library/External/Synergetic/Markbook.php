@@ -145,10 +145,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                           '100',
                           '{$assessmentFieldValues["WeightingFactor"]}'
                         )";
-                $result = $this->getDatabase()->query($query);
+                $statement = $this->getDatabase()->query($query);
             }
         }
-        return $result;
+        return $statement;
     }
 
 
@@ -372,9 +372,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 }
             }
 
-          $success = $this->getDatabase()->query($query);
+            $statement = $this->getDatabase()->query($query);
         }
-        return $success;
+        return $statement;
     }
 
     /**

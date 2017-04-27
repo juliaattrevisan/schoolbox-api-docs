@@ -29,7 +29,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $definition = array();
         $periodCount = 0;
 
-        $stmt = $this->getDatabase()->prepare('
+        $stmt = $this->getConnection()->prepareQuery('
             SELECT period "desc", start_time "start", end_time "end", period_number "number", 1 "sequence"
             FROM db2inst1.schoolbox_timetable_definition td
             WHERE td.day_number = :day
@@ -44,7 +44,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             'campus' => $campusCode[0]
         ));
 
-        while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $definition['desc'][] = $r['desc'];
             $definition['start'][] = $this->parseTime($r['start']);
             $definition['end'][] = $this->parseTime($r['end']);
@@ -83,7 +83,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     protected function getCycleLength(\Schoolbox\Campus $campus)
     {
-        $stmt = $this->getDatabase()->prepare('
+        $stmt = $this->getConnection()->prepareQuery('
             SELECT days_in_cycle
             FROM db2inst1.schoolbox_timetable_days
             WHERE timetable_id = :campus
@@ -111,7 +111,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-        $stmt = $this->getDatabase()->prepare('
+        $stmt = $this->getConnection()->prepareQuery('
             SELECT start_date, cycle_start_day, days_in_cycle
             FROM db2inst1.schoolbox_timetable_days
             WHERE start_date <= :date
@@ -121,11 +121,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FETCH FIRST 1 ROW ONLY
         ');
 
-        if ($time == 0) {
-            $date = time();
-        } else {
-            $date = $time;
-        }
+        $date = time();
 
         $campusCode = explode(',', $campus->getExtTimetableCode());
         $params = array(
@@ -135,7 +131,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt->execute($params);
 
-        if ($row = $stmt->fetch(DB2::FETCH_ASSOC)) {
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $start = strtotime($row['START_DATE']);
 
             $days = ceil(($date - $start) / (60 * 60 * 24));
@@ -244,7 +240,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             $campus = "campus = :campus";
         }
 
-        $stmt = $this->getDatabase()->prepare(
+        $stmt = $this->getConnection()->prepareQuery(
             "
             SELECT period_number, t.class_code AS code, c.{$type}_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
@@ -357,7 +353,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             $campusSql = "campus = :campus";
         }
 
-        $stmt = $this->getDatabase()->prepare(
+        $stmt = $this->getConnection()->prepareQuery(
             "
             SELECT period_number, t.day_number, t.class_code AS code, t.staff_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
@@ -430,7 +426,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             }
             return $result;
         }
-        $statement = $this->getDatabase()->prepare('
+        $statement = $this->getConnection()->prepareQuery('
             SELECT
                 t.ROOM AS "RoomCode",
                 cl.CLASS AS "Description",
@@ -459,7 +455,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $campus = new \Schoolbox\Campus;
         $campusTimetable = $this->getTimetableDefinition(null, $campus);
         $result = array();
-        foreach ($statement->fetchAll(DB2::FETCH_ASSOC) as $row) {
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
 // Match day and period against a start and end.
             for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
                 $periodNumber = $campusTimetable['number'][$i];

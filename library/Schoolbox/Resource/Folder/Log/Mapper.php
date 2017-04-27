@@ -12,46 +12,20 @@ namespace Schoolbox\Resource\Folder\Log;
 use Schoolbox;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Mapper extends Schoolbox\Mapper
 {
     protected function mapping()
     {
-        $this->hasModel('\\Schoolbox\\Resource\\Folder\\Log\\Model');
+        $this->hasModel(Model::class);
         $this->hasTable('homepage_log');
-        $this->hasMap(array(
-            'column'   => 'cid',
-            'property' => 'category',
-            'type'     => self::TYPE_MODEL,
-            'join'     => 'category',
-        ));
-        $this->hasMap(array(
-            'column'   => 'user',
-            'property' => 'user',
-            'type'     => self::TYPE_MODEL,
-            'join'     => 'user',
-        ));
-        $this->hasMap(array(
-            'column'            => 'datetime',
-            'property'          => 'lastAccessTime',
-            'type'              => self::TYPE_DATETIME,
-            'updated_timestamp' => true,
-        ));
-        $this->hasMap(array(
-            'column'   => 'hitcount',
-            'property' => 'hitcount',
-            'type'     => self::TYPE_INTEGER,
-        ));
-        $this->hasJoin('category', array(
-            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-            'this_key'  => 'cid',
-            'other_key' => 'id',
-        ));
-        $this->hasJoin('user', array(
-            'mapper'    => '\\Schoolbox\\UserMapper',
-            'this_key'  => 'user',
-            'other_key' => 'id',
-        ));
+
+        $this->uses('datetime', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'lastAccessTime');
+        $this->joins('user', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
+        $this->joins('cid', FolderMapper::class, 'id', self::TYPE_MODEL, null, 'category', 'category');
+        $this->uses('hitcount', self::TYPE_INTEGER);
     }
 
     /**
@@ -119,7 +93,7 @@ class Mapper extends Schoolbox\Mapper
 
         /* Manually construct hierarchy of items
          */
-        $collection = new Schoolbox\Collection();
+        $collection = $this->createCollection();
 
         $categoryMapper = $this->getJoinMapper('category');
         $userMapper     = $this->getJoinMapper('user');

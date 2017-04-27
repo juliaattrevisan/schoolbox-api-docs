@@ -12,17 +12,7 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\External;
 
-
 class IFrame extends Base {
-
-    /**
-     * Content Types for this strategy
-     *
-     * @var array
-     */
-    private $contentTypes = [
-        'text/html',
-    ];
 
     /**
      * Test the Content-Types
@@ -30,8 +20,8 @@ class IFrame extends Base {
      * @return string
      */
     public function test() {
-        foreach ($this->getContentTypes() as $currentContentType) {
-            if (strstr($this->findContentType(), $currentContentType)) {
+        foreach ($this->getAllowedURLs() as $allowedURL) {
+            if (false !== stripos($this->getUrl(), $allowedURL)) {
                 return [
                     'type' => 'iframe',
                     'src' => $this->getUrl(),
@@ -46,22 +36,12 @@ class IFrame extends Base {
      */
 
     /**
-     * Set content types
-     *
-     * @param array $contentTypes
-     */
-    private function setContentTypes($contentTypes)
-    {
-        $this->contentTypes = $contentTypes;
-    }
-
-    /**
-     * Get content types
+     * Get allowed URLS
      *
      * @return array
      */
-    private function getContentTypes()
+    private function getAllowedURLs()
     {
-        return $this->contentTypes;
+        return $this->getConfig();
     }
 }

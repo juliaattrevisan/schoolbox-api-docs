@@ -18,9 +18,6 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
      */
     public function getStudents($classCode) {
 
-
-
-
         // fully qualified table names
         $studentClass = 'db2inst1.schoolbox_studentclass';
         $students = 'db2inst1.schoolbox_students';
@@ -31,14 +28,15 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         if (empty($codes)) {
             return false;
         }
-        $db = $this->getDatabase();
+
+        $db = $this->getConnection();
         array_walk($codes, function(&$n) use($db) {
-            $n = "'".$db->quote($n)."'";
+            $n = "'".$this->quote($n)."'";
         });
 
 
         // prepare
-        $stmt = $this->getDatabase()->prepare("
+        $stmt = $this->getConnection()->prepareQuery("
             SELECT firstname, surname AS lastname, $studentClass.student_number AS synergy_id, year_level AS yearlevel, house
             FROM  $studentClass
             LEFT JOIN $students ON $studentClass.student_number = $students.student_number
@@ -75,14 +73,14 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         if (empty($codes)) {
             return false;
         }
-        $db = $this->getDatabase();
+        $db = $this->getConnection();
         array_walk($codes, function(&$n) use($db) {
-            $n = "'".$db->quote($n)."'";
+            $n = "'".$this->quote($n)."'";
         });
 
 
         // prepare
-        $stmt = $this->getDatabase()->prepare("
+        $stmt = $this->getConnection()->prepareQuery("
             SELECT staff_number AS StaffID
                 FROM db2inst1.schoolbox_teacherclass
                 WHERE class_code IN (".implode(',',$codes).")

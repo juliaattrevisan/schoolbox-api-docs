@@ -59,7 +59,7 @@ class EotcReminders extends AbstractNotificationTest
      */
     public function requiredDaemons()
     {
-        return [ self::DAEMON_SCHEDULE, self::DAEMON_REROUTE ];
+        return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
     }
 
 

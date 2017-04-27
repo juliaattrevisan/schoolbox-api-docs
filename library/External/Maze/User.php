@@ -339,6 +339,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentSpecialNeedsFlag,
 				'' AS AlertMessage,
 				'' AS StudentBoarder,
+				'' AS Comment,
 				ST.ROLL_GROUP
 			FROM ST
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE

@@ -7,44 +7,38 @@
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
-        {% if not assessable.acceptOnline %}
-            {% set pStatusClass = '' %}
-            {% set pTooltip     = '' %}
-        {% else %}
+    {% set pStatusClass = participant.isResponseRequired ? 'incomplete' : (participant.isFeedbackRequired ? 'pending' : 'reviewed') %}
+    {% set pTooltip     = participant.isResponseRequired ? 'Submission Required' : (participant.isFeedbackRequired ? 'Mark required' : 'Reviewed') %}
 
-            {% set pStatusClass = participant.isResponseRequired ? 'incomplete' : (participant.isFeedbackRequired ? 'pending' : 'reviewed') %}
-            {% set pTooltip     = participant.isResponseRequired ? 'Submission Required' : (participant.isFeedbackRequired ? 'Mark required' : 'Reviewed') %}
+    {% set pStatusText %}
+        {%- spaceless %}
+            {% if not latestResponse %}
+                Not submitted
+            {% else %}
 
-        {% set pStatusText %}
-            {%- spaceless %}
-                {% if not latestResponse %}
-                    Not submitted
-                {% else %}
-
-                    {% if assessable is task %}
-                        {% if not latestResponse.isMarkedComplete %}
-                            Incomplete
-                        {% elseif latestResponse.isSelfAssessed %}
-                            Self-Assessed
-                        {% else %}
-                            Teacher-Assessed
-                        {% endif %}
+                {% if assessable is task %}
+                    {% if not latestResponse.isMarkedComplete %}
+                        Incomplete
+                    {% elseif latestResponse.isSelfAssessed %}
+                        Self-Assessed
                     {% else %}
-                        {% if multipleResponses %}
-                            Resubmitted
-                        {% else %}
-                            Submitted
-                        {% endif %}
-                        {% if latestResponse.submittedOnTime %}
-                            on time
-                        {% else %}
-                            late
-                        {% endif %}
+                        Teacher-Assessed
+                    {% endif %}
+                {% else %}
+                    {% if multipleResponses %}
+                        Resubmitted
+                    {% else %}
+                        Submitted
+                    {% endif %}
+                    {% if latestResponse.submittedOnTime %}
+                        on time
+                    {% else %}
+                        late
                     {% endif %}
                 {% endif %}
-            {% endspaceless -%}
-        {% endset %}
-    {%  endif %}
+            {% endif %}
+        {% endspaceless -%}
+    {% endset %}
 
     <span class="progress-tick no-text tiny {{ pStatusClass }}" title="{{ pTooltip }}"></span> {{ pStatusText }}
 

@@ -52,6 +52,7 @@ use \Schoolbox\Resource\Folder\Code\Model as FolderCode;
  * @method Model createModel($idValue = null)
  * @method Collection|Model[] findByColumnList($columnList, $options = []);
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
  */
 class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 {
@@ -257,23 +258,25 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function logPageView(Model $category) {
 
-        // new mechanism for storing pageviews
-        // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
-        // shoved into a date field, but it can be safely ignored: the data inserts correctly
-        $query = "
-            INSERT INTO homepage_visits (`date`, `user_group_id`, `category_id`)
-            VALUES (NOW(), :gid, :cid)
-            ON DUPLICATE KEY
-            UPDATE `hitcount` = `hitcount` + 1
-        ";
+        if(!$category->isRootNode()) {
+            // new mechanism for storing pageviews
+            // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
+            // shoved into a date field, but it can be safely ignored: the data inserts correctly
+            $query = "
+                INSERT INTO homepage_visits (`date`, `user_group_id`, `category_id`)
+                VALUES (NOW(), :gid, :cid)
+                ON DUPLICATE KEY
+                UPDATE `hitcount` = `hitcount` + 1
+            ";
 
-        $params = array(
-            'cid' => $category->getId(),
-            'gid' => $_SESSION['gid']
-        );
+            $params = array(
+                'cid' => $category->getId(),
+                'gid' => $_SESSION['gid']
+            );
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
+            $statement = $this->database->prepare($query);
+            $statement->execute($params);
+        }
     }
 
     /**
@@ -554,7 +557,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
                 /** @var \Schoolbox\Resource\Folder\Code\Model $code */
                 $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getFolder()->getId()) {
+                if ($code->getFolder() instanceof Model) {
                     $category->addCode($code);
                 }
                 $collection->add($category);
@@ -840,12 +843,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $category->setGroup($group);
 
                 $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
-                if($courseSpec->getId()){
+                if($courseSpec){
                     $category->setCourseSpecification($courseSpec);
                 }
 
                 $unitSpec = $unitSpecMapper->hydrate($row, 'us');
-                if($unitSpec->getId()){
+                if($unitSpec){
                     $category->setUnitSpecification($unitSpec);
                 }
             }
@@ -853,7 +856,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Hydrate class codes (avoiding duplicates) and cache
             $code = $code_mapper->hydrate($row, 'cc');
 
-            if ($code->getFolder()->getId()) {
+            if ($code->getFolder() instanceof Model) {
                 $addedClassCodes[$testId][$code->getCode()] = $code;
             }
 
@@ -864,7 +867,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             /** @var Node\Mapper $joinMapper */
             $joinMapper = $this->getJoinMapper('curriculum_node_for_category');
             $curriculumNode = $joinMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-            if ($curriculumNode->getId()) {
+            if ($curriculumNode) {
                 $addedCurriculumNodes[$testId][$curriculumNode->getId()] = $curriculumNode;
             }
         }
@@ -1064,11 +1067,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 			SELECT
 				{$this->getColumnString('c')},
 				{$this->getJoinColumnString('homepages', 'h')},
-				{$this->getJoinColumnString('codes', 'cc')}
+				{$this->getJoinColumnString('codes', 'cc')},
+				{$this->getJoinColumnString('groups', 'g')}
 			FROM {$this->getTable()} c
 			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
 			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
 			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
+			LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
 			WHERE c.deleted_at IS NULL AND a.uid = :user
 		";
         if ($exactAccess) {
@@ -1118,29 +1123,38 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement->execute($params);
 
         /** @var Collection|Model[] $collection */
-        $collection = new Collection();
-        foreach ($statement as $row) {
+        $collection = $this->createCollection();
+        while($row = $statement->fetch(PDO::FETCH_ASSOC)){
             $id = $row['c.id'];
+
+            // First time we've seen folder?
             if (!isset($collection[$id])) {
-                $collection[$id] = $this->hydrate(
-                    $row,
-                    'c',
-                    function ($mapper, $model, $row) {
-                        /**
-                         * @var self $mapper
-                         * @var Model $model
-                         * @var array $row
-                         */
-                        $model->setHomepage($mapper->hydrateJoin($row, 'homepages', 'h'));
-                        return $model;
-                    }
-                );
+                $collection[$id] = $this->hydrate($row, 'c');
             }
 
-            // Add code only if it's not empty
-            $code = $row['cc.code'];
-            if (isset($code)) {
-                $collection[$id]->addCode($this->hydrateJoin($row, 'codes', 'cc'));
+            $folder = $collection[$id];
+
+            // Does this folder have a homepage, and we've not attached it yet?
+            $homepageId = $row['h.cid'];
+            if(!$folder->getHomepage() && isset($homepageId)){
+                /** @var HomepageConfig $homePage */
+                $homePage = $this->hydrateJoin($row, 'homepages', 'h');
+                $folder->setHomepage($homePage);
+            }
+
+            // Does folder have a group, and we haven't attached it yet?
+            $groupId = $row['g.cid'];
+            if(!$folder->getGroup() && isset($groupId)){
+                /** @var Group $group */
+                $group = $this->hydrateJoin($row, 'groups', 'g');
+                $folder->setGroup($group);
+            }
+
+            // Ensure the codes exists on the folder if present in row
+            $code           = $row['cc.code'];
+            $codeCollection = $collection[$id]->getCodes();
+            if (isset($code) && !isset($codeCollection[$code])) {
+                $codeCollection[$code] = $this->hydrateJoin($row, 'codes', 'cc');
             }
         }
         $collection->reindex();
@@ -1653,12 +1667,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param User $student
      * @param Term $term
      * @return Collection|Model[]
+     * @throws DefinitionException
+     * @throws MapperException
      */
     public function findFoldersWithResponses(User $student, Term $term)
     {
-        $code_mapper = $this->getJoinMapper('codes');
-        $homepageConfig_mapper = $this->getJoinMapper('homepages');
-        $group_mapper = $this->getJoinMapper('groups');
+        $codeMapper           = $this->getJoinMapper('codes');
 
         $whereParams = [
             ':studentId' => $student->getId(),
@@ -1667,64 +1681,64 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $query = "
             SELECT
-                {$this->getColumnString('c')},
-                {$code_mapper->getColumnString('cc')},
-                {$homepageConfig_mapper->getColumnString('hp')},
-                {$group_mapper->getColumnString('ug')}
-            FROM {$this->getTable()} c
-            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
-            LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
-            WHERE c.deleted_at IS NULL AND c.id IN 
+                {$this->getColumnString('f')},
+                {$codeMapper->getColumnString('fc')}
+            FROM {$this->getTable()} f
+            LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
+            WHERE f.deleted_at IS NULL AND f.id IN
             ( 
               SELECT DISTINCT COALESCE(`af`.`folder_id`, `ci`.`folder_id`) AS `folder_id`
               FROM `assessment` AS `a`
-              LEFT JOIN `assessment_folder` AS `af` ON `af`.`assessment_id` = `a`.`id`
-              LEFT JOIN `assessment_course_unit_implementation` AS `acui` ON `a`.`id` = `acui`.`assessment_id`
-              LEFT JOIN `course_unit_implementation` AS `cui` ON `acui`.`course_unit_implementation_id` = `cui`.`id`
-              LEFT JOIN `course_implementation` AS `ci` ON `cui`.`course_implementation_id` = `ci`.`id`
-              LEFT JOIN `task` AS `t` ON `a`.`id` = `t`.`assessment_id`
-              LEFT JOIN `assess` AS `q` ON `q`.`assessment_id` = `a`.`id`              
-              LEFT JOIN `submission_box` AS `d` ON `a`.`id` = `d`.`assessment_id`
-              LEFT JOIN `task_completion` AS `tc` ON `t`.`id` = `tc`.`task_id`
-              LEFT JOIN `assess_attempt` AS `qa` ON `q`.`assess_id` = `qa`.`assess_id`
-              LEFT JOIN `student_submission` AS `ss` ON `ss`.`box_id` = `d`.id
+              LEFT JOIN `assessment_folder`                     AS `af`   ON `a`.`id`        = `af`.`assessment_id`
+              LEFT JOIN `assessment_course_unit_implementation` AS `acui` ON `a`.`id`        = `acui`.`assessment_id`
+              LEFT JOIN `course_unit_implementation`            AS `cui`  ON `cui`.`id`      = `acui`.`course_unit_implementation_id`
+              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id`       = `cui`.`course_implementation_id`
+              LEFT JOIN `task`                                  AS `t`    ON `a`.`id`        = `t`.`assessment_id`
+              LEFT JOIN `assess`                                AS `q`    ON `a`.`id`        = `q`.`assessment_id`
+              LEFT JOIN `submission_box`                        AS `d`    ON `a`.`id`        = `d`.`assessment_id`
+              LEFT JOIN `task_completion`                       AS `tc`   ON `t`.`id`        = `tc`.`task_id`
+              LEFT JOIN `assess_attempt`                        AS `qa`   ON `q`.`assess_id` = `qa`.`assess_id`
+              LEFT JOIN `student_submission`                    AS `ss`   ON `ss`.`box_id`   = `d`.id
               WHERE 
                 (`tc`.`student_id` = :studentId OR `ss`.`owner` = :studentId OR `qa`.`user_id` = :studentId)
                 {$this->buildWherePartForTerm($term)}
             )
-            ORDER BY c.name
+            ORDER BY f.name
         ";
 
         $statement = $this->database->prepare($query);
-
         $statement->execute($whereParams);
 
-        $collection = new Collection();
-        $category = null;
+        /** @var GenericCollection|Model[] $folders Sorted by query order */
+        $folders = $this->createCollection();
 
-        foreach ($statement as $row) {
-            $category = $this->hydrate($row, 'c');
+        /** @var Model[] $folderCache - Indexed by folder.id */
+        $folderCache = [];
 
-            /** @var HomepageConfig $homepageConfig */
-            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
-            $category->setHomepage($homepageConfig);
+        while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
-            /** @var \Schoolbox\Resource\Group $group */
-            $group = $group_mapper->hydrate($row, 'ug');
-            $category->setGroup($group);
+            $folderId = $row["f.{$this->getIdentifierColumn()}"];
 
-            /** @var \Schoolbox\Resource\Folder\Code\Model $code */
-            $code = $code_mapper->hydrate($row, 'cc');
-            if ($code->getFolder()->getId()) {
-                $category->addCode($code);
+            if (!$folderCache[$folderId] instanceof Model) {
+                $folderCache[$folderId] = $this->hydrate($row, 'f');
+                $folders->add($folderCache[$folderId]);
             }
-            $collection->add($category);
+            $folder = $folderCache[$folderId];
 
-            $category->loadTeachers();
+            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
+            $codeCollection = $folder->getCodes();
+            $code = $row['fc.code'];
+            if($code && !$codeCollection->offsetExists($code)){
+                /** @var FolderCode $folderCode */
+                $folderCode = $this->hydrateJoin($row, 'codes', 'fc');
+                $codeCollection->setOffset($code, $folderCode);
+                $folderCode->setFolder($folder);
+            }
+
+            $folders->add($folder);
         }
 
-        return $collection;
+        return $folders;
     }
 
 
@@ -1734,6 +1748,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param User $student
      * @param Term|null $term
      * @return GenericCollection
+     * @throws DefinitionException
      */
     public function findFoldersWithFeedbackToStudent(User $student, Term $term = null) {
 
@@ -1786,8 +1801,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param $whereClause
      * @param $whereParams
      * @return GenericCollection
+     * @throws DefinitionException
      */
-    private function findFoldersWithFeedbacks($whereClause, $whereParams) {
+    private function findFoldersWithFeedbacks($whereClause, $whereParams)
+    {
         $codeMapper = $this->getJoinMapper('codes');
 
         $query = "
@@ -1822,6 +1839,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               LEFT JOIN `task`                                  AS `tk`   ON `tk`.`assessment_id` = `a`.`id`
               LEFT JOIN `assess`                                AS `qz`   ON `qz`.`assessment_id` = `a`.`id`
               LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id`
+
               LEFT JOIN `task_completion`                       AS `tkc`  ON `tkc`.`task_id` = `tk`.`id`
               LEFT JOIN `assess_attempt`                        AS `qza`  ON `qza`.`assess_id` = `qz`.`assess_id`
               LEFT JOIN `submission_return`                     AS `dwr`  ON `dwr`.`box_id` = `dw`.id
@@ -1834,26 +1852,29 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement->execute($whereParams);
 
         // Maintain separate cache so we can preserve query result ordering
+        /** @var Model[] $folderCache - Indexed by folder.id */
         $folderCache = [];
-        $folders = $this->createCollection();
+        $folders     = $this->createCollection();
 
-        foreach ($statement as $row) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             $folderId = $row["f.{$this->getIdentifierColumn()}"];
 
-            if(!$folderCache[$folderId] instanceof Model){
+            if (!$folderCache[$folderId] instanceof Model) {
                 $folderCache[$folderId] = $this->hydrate($row, 'f');
                 $folders->add($folderCache[$folderId]);
             }
 
             $folder = $folderCache[$folderId];
 
-            /** @var FolderCode $code */
-            $code = $codeMapper->hydrate($row, 'fc');
-            // TODO the second part of this check should not be required. Hydrating a null row should return null
-            if($code instanceof FolderCode && $code->getCode()){
-                $folder->addCode($code);
-                $code->setFolder($folder);
+            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
+            $codeCollection = $folder->getCodes();
+            $code           = $row['fc.code'];
+            if ($code && !$codeCollection->offsetExists($code)) {
+                /** @var FolderCode $folderCode */
+                $folderCode            = $this->hydrateJoin($row, 'codes', 'fc');
+                $codeCollection[$code] = $folderCode;
+                $folderCode->setFolder($folder);
             }
         }
         return $folders;

@@ -15,6 +15,8 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
+use \Schoolbox\Permission\Access\Access;
+use \Schoolbox\Permission\Access\UserAccess;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -61,9 +63,13 @@ catch (\Exception $e) {
 }
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
-$this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+$this->setBlock(TEMPLATE_content, 'has_preview_action', 'has_preview_action_block');
+$this->setBlock(TEMPLATE_content, 'has_preview_link', 'has_preview_link_block');
+$this->setBlock(TEMPLATE_content, 'has_attempts', 'has_attempts_block');
+$this->setBlock('has_attempts', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_review', 'attempt_review_block');
 $this->setBlock('attempt', 'attempt_resume', 'attempt_resume_block');
+$this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 
 /* Generic details
  */
@@ -76,7 +82,30 @@ $this->setVar(array(
 
 /* Default
  */
-$this->setVar('attempt_block', '');
+$this->setVar([
+    'CURRENT_USER' => $user->getFullName(),
+    'attempt_block' => '',
+    'has_attempts_block' => '',
+    'has_preview_action_block' => '',
+    'has_preview_link_block' => '',
+]);
+
+/* Only Instructors can delete attempts
+ */
+$canDeleteAttempt = false;
+
+$perm = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assess['category_id']]);
+
+if ($perm >= UserAccess::ACCESS_WRITE) {
+    $canDeleteAttempt = true;
+
+    $this->setVar([
+        'ASSESS_ID' => $assess['assess_id']
+    ]);
+
+    $this->parse('has_preview_action_block', 'has_preview_action');
+    $this->parse('has_preview_link_block', 'has_preview_link');
+}
 
 /* Iterate
  */
@@ -155,12 +184,13 @@ if (is_array($allAttempts) && count($allAttempts)) {
         /* Misc details
          */
         $available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
+        $reviewed = '';
 
         if ($currentAttempt['reviewed_at'] != null) {
             $reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'Y-m-d H:i:s');
             $reviewed = $reviewedAt->getShort();
 
-            if ($available && ($canReview || $canStudentReview)) {
+            if (($available > 0) && ($canReview || $canStudentReview)) {
                 $marks = round($currentAttempt['totalMarks'],2).' / '.round($available);
             }
             else {
@@ -172,10 +202,15 @@ if (is_array($allAttempts) && count($allAttempts)) {
             $numUnmarkedQuestions = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
             $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($currentAttempt['attempt_id']);
 
-            $reviewed = 'Not reviewed ('.(100 - round(($valueUnmarkedQuestions / $available ) * 100)).'% graded)';
+            if ($available > 0) {
+                $reviewed = 'Not reviewed (' . (100 - round(($valueUnmarkedQuestions / $available) * 100)) . '% graded)';
 
-            if($canReview || $canStudentReview) {
-                $marks = round($currentAttempt['totalMarks']).'/'.round($available);
+                if($canReview || $canStudentReview) {
+                    $marks = round($currentAttempt['totalMarks']).'/'.round($available);
+                }
+            }
+            else {
+                $marks = 'N/A';
             }
         }
 
@@ -219,6 +254,17 @@ if (is_array($allAttempts) && count($allAttempts)) {
             $this->parse('attempt_resume_block', 'attempt_resume');
         }
 
+        /* Only instructors can delete attempts
+         */
+        if ($canDeleteAttempt) {
+            $this->parse('attempt_delete_block', 'attempt_delete');
+        }
+        else {
+            $this->setVar([
+                'attempt_delete_block' => ''
+            ]);
+        }
+
         $this->parse('attempt_block', 'attempt', true);
 
         /* Clear children after parsing out the parent
@@ -227,8 +273,20 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			'respondent_name_block' => '',
             'attempt_review_block' => '',
 			'attempt_resume_block' => '',
+            'attempt_delete_block' => '',
 		));
     }
+
+    $this->parse('has_attempts_block', 'has_attempts');
+
+    $this->setVar([
+        'EMPTY_STATE_CSS' => 'hide'
+    ]);
+}
+else {
+    $this->setVar([
+        'EMPTY_STATE_CSS' => ''
+    ]);
 }
 
 $trail = new Breadcrumbs();

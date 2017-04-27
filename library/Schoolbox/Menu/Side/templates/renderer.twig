@@ -12,7 +12,7 @@
                                     <span>{{ node.title }}</span>
                                 </a>
                                 {% if node.children | length %}
-                                    {% include "@menuSide/includes/treeLevel.twig" with {'nodes': node.children } %}
+                                    {% include "@menuSide/includes/treeLevel.twig" with {'node': node } %}
                                 {% endif %}
                             </li>
                         {% endfor %}

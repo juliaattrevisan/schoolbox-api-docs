@@ -15,34 +15,21 @@ use Schoolbox\Campus;
 
 class TriggerFactory
 {
-    /** @var IClock */
-    protected $clock;
 
     /** @var callable[] */
-    protected $strats;
-
-
-    /**
-     * TriggerFactory constructor.
-     */
-    public function __construct()
-    {
-        $this->strats = [
-            TimetableTrigger::TARGET_START => function (Campus $campus) { return new StartTrigger($campus, $this->clock); },
-            TimetableTrigger::TARGET_WARN  => function (Campus $campus) { return new WarnTrigger($campus, $this->clock);  },
-            TimetableTrigger::TARGET_END   => function (Campus $campus) { return new EndTrigger($campus, $this->clock);   },
-        ];
-    }
+    private $strats;
 
 
     /**
      * @param IClock $clock
-     * @return static
      */
-    public function setClock($clock)
+    public function __construct(IClock $clock)
     {
-        $this->clock = $clock;
-        return $this;
+        $this->strats = [
+            TimetableTrigger::TARGET_START => function (Campus $campus) use ($clock) { return new StartTrigger($campus, $clock); },
+            TimetableTrigger::TARGET_WARN  => function (Campus $campus) use ($clock) { return new WarnTrigger($campus, $clock);  },
+            TimetableTrigger::TARGET_END   => function (Campus $campus) use ($clock) { return new EndTrigger($campus, $clock);   },
+        ];
     }
 
 
@@ -54,7 +41,6 @@ class TriggerFactory
      */
     public function buildTrigger($label, Campus $campus)
     {
-
         if (array_key_exists($label, $this->strats)) {
             return $this->strats[$label]($campus);
         }

@@ -1,6 +1,5 @@
 {#
 Generic Term (aka Semester) selector.
-
 Usage: include 'sub/semesterSelector.twig
     currentTerm: Term                    - (optional) the current selected Term
     terms:       Collection|Term[]       - all Terms to render in dropdown
@@ -10,24 +9,17 @@ Usage: include 'sub/semesterSelector.twig
 
 <script type="text/javascript">
     $(function() {
-
         var $semesterSelector = $('#context-selector-semester');
         var $options = $semesterSelector.find('option');
-
         {# Wire up context selector #}
-
         $semesterSelector.change(function () {
             window.location.href = $semesterSelector.find(':selected').data('href');
         });
-
         {# Wire up next/previous term buttons #}
-
         $("[data-semester-switch]").click(function (e) {
             e.preventDefault();
-
             var index = $semesterSelector.prop('selectedIndex');
-            var newIndex = 'next' == $(this).data('semester-switch') ? index - 1 : index + 1;
-
+            var newIndex = 'next' === $(this).data('semester-switch') ? index - 1 : index + 1;
             if (newIndex >= 1 && newIndex < $options.length){
                 var term = $options.eq(newIndex);
                 window.location.href = term.data('href');
@@ -37,36 +29,18 @@ Usage: include 'sub/semesterSelector.twig
 </script>
 
 <nav>
-    {% if year is not empty %}
-        <a data-semester-switch="previous" href="#"></a>
-    {% else %}
-        <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
-    {% endif %}
+    <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
 </nav>
 <div class="semester">
-    <select id="context-selector-semester" title="Select a {% if year is not empty %}Year/{% endif %}Term">
-        <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select a {% if year is not empty %}year/{% endif %}term">Select a {% if year is not empty %}year/{% endif %}term</option>
-        {% set foundYear = {} %}
-        {% set selected = false %}
+    <select id="context-selector-semester" title="Select a Term">
+        <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select a term">Select a term</option>
         {% for term in terms %}
-            {% if routeYear is not empty %}
-                {% if not foundYear['_'~term.displayFinish.year] %}
-                    {% set foundYear = foundYear|merge({('_'~term.displayFinish.year):true}) %}
-                    <option data-href="{{ routeLookup(routeYear, routeArgs|merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
-                        {#- dessicate -#}{{ term.displayFinish.year }} Grades Summary{#- dessicate -#}
-                    </option>
-                {% endif %}
-            {% endif %}
-            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected%}selected{% endif %}>
+            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code %}selected{% endif %}>
                 {#- dessicate -#}{{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }}){#- dessicate -#}
             </option>
         {% endfor %}
     </select>
 </div>
 <nav>
-    {% if year is not empty %}
-        <a data-semester-switch="next" href="#"></a>
-    {% else %}
-        <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
-    {% endif %}
+    <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
 </nav>

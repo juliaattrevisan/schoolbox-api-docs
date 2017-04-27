@@ -9,17 +9,14 @@
 namespace Schoolbox\Notif;
 
 
-use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Lumberjack;
 use ConfigFallback;
 use Database;
 use Mailer;
 use PDOException;
-use PhpAmqpLib\Exception\AMQPExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Swift_Transport;
 
 class Notifactory
@@ -27,10 +24,10 @@ class Notifactory
 
     /** @var IConfigLoader */
     protected $conf;
-    /** @var AMQPInterface */
-    protected $mqc;
+
     /** @var Swift_Transport */
     protected $swift;
+
     /** @var LoggerInterface */
     protected $log;
 
@@ -40,7 +37,7 @@ class Notifactory
      *
      * @param string        $topic
      * @param IConfigLoader $configLoader
-     * @return Notif
+     * @return NotifInterface
      */
     public static function create($topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
     {
@@ -51,17 +48,13 @@ class Notifactory
 
 
     /**
-     * Notifactory constructor.
-     *
      * @param IConfigLoader   $configLoader
-     * @param AMQPInterface   $mqc
      * @param Swift_Transport $swift
      * @param LoggerInterface $log
      */
-    public function __construct(IConfigLoader $configLoader = null, AMQPInterface $mqc = null, Swift_Transport $swift = null, LoggerInterface $log = null)
+    public function __construct(IConfigLoader $configLoader = null, Swift_Transport $swift = null, LoggerInterface $log = null)
     {
         $this->setConfigLoader($configLoader);
-        $this->setAMQP($mqc);
         $this->setSwiftTransport($swift);
         $this->setLogger($log);
     }
@@ -82,7 +75,7 @@ class Notifactory
      */
     public function generateHandlerFactory()
     {
-        return new HandlerFactory($this->conf, $this->swift, $this->log, $this->mqc);
+        return new HandlerFactory($this->conf, $this->swift, $this->log);
     }
 
 
@@ -112,30 +105,6 @@ class Notifactory
         } else {
             // fallback to hardcoded config vars
             $this->conf = new ConfigFallback();
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @param AMQPInterface $mqc
-     * @return self
-     */
-    public function setAMQP(AMQPInterface $mqc = null)
-    {
-        if ($mqc) {
-            $this->mqc = $mqc;
-
-        } else {
-            try {
-                // if the rabbit cannot be contacted, this will throw an exception
-                $this->mqc = MQConnector::getInstance();
-
-            } catch (AMQPExceptionInterface $e) {
-                // we're ok with suppressing this: it will be dealt with appropriately in the handler factory
-                $this->mqc = null;
-            }
         }
 
         return $this;

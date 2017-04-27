@@ -6,32 +6,32 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 
-use Schoolbox\Assessment\Term\Model as Term;
-use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Alaress\Database\Predicate\Builder;
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use \Alaress_Date_Format;
 use UnderflowException;
 
 /**
@@ -138,7 +138,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByIds($ids, $options = [])
+    public function findAllByIds($ids, array $options = [])
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('id', $ids, $options));
     }
@@ -234,7 +234,7 @@ class MapperProxy
      * @param array $options
      * @return IAssessable[]
      */
-    public function findAllImplementationsBySpecificationId($assessmentId, $options = [])
+    public function findAllImplementationsBySpecificationId($assessmentId, array $options = [])
     {
         try {
             // Get all assessables which have this assessment as a spec
@@ -258,7 +258,7 @@ class MapperProxy
      * @param array             $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByContext(AssessmentContext $context, $options = [])
+    public function findAllByContext(AssessmentContext $context, array $options = [])
     {
         if ($context instanceof Folder) {
             return $this->findAllByFolderIdExclusively($context->getId(), $options);
@@ -287,7 +287,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByUnitSpecificationId($unitSpecId, $options = [])
+    public function findAllByUnitSpecificationId($unitSpecId, array $options = [])
     {
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options)
@@ -307,7 +307,7 @@ class MapperProxy
      * @param array     $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByUnitImplementationId($unitImplId, $options = [])
+    public function findAllByUnitImplementationId($unitImplId, array $options = [])
     {
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options)
@@ -328,7 +328,7 @@ class MapperProxy
      * @param array     $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByUnitImplementationIdForCourseOutline($unitImplId, User $student = null, $options = [])
+    public function findAllByUnitImplementationIdForCourseOutline($unitImplId, User $student = null, array $options = [])
     {
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->findAllByUnitImplementationId($unitImplId, $options),
@@ -349,7 +349,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByFolderId($folderId, $options = [])
+    public function findAllByFolderId($folderId, array $options = [])
     {
         return $this->translateToDomainModelCollection(
             $this->baseMapper->findAllForFolderId(
@@ -396,7 +396,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByFolderIdExclusively($folderId, $options = [])
+    public function findAllByFolderIdExclusively($folderId, array $options = [])
     {
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options)
@@ -420,7 +420,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByCourseImplementationFolderId($folderId, $options = [])
+    public function findAllByCourseImplementationFolderId($folderId, array $options = [])
     {
         try {
             // uicf.id = Unit Implementation Course Folder ID
@@ -442,7 +442,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByProjectId($projectId, $options = [])
+    public function findAllByProjectId($projectId, array $options = [])
     {
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options)
@@ -462,7 +462,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByProjectIdForReview($projectId, User $student = null, $options = [])
+    public function findAllByProjectIdForReview($projectId, User $student = null, array $options = [])
     {
         $assessments = $this->findAllByProjectId($projectId, $options);
         return $this->loadParticipantsIntoAssessmentCollection($assessments, $student);
@@ -794,7 +794,7 @@ class MapperProxy
      *   (see AssessmentType::TYPE_* constants)
      *
      * @param array $options
-     * @return PredicateBuilder
+     * @return Builder
      * @throws \InvalidArgumentException
      */
     protected function convertOptionsToPredicateBuilder($options)

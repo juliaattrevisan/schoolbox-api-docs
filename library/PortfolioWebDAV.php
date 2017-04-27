@@ -569,7 +569,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
             if ($groupHandler->isParent()) {
                 $paths = array(
-                    $settings['baseUri'] . '/reports/'. $_SESSION['year'] . '/',
+                    $settings['baseUri'] . '/reports/'. $_SESSION['username'] . '/',
                 );
             }
         } elseif ($site_location == 'sicol') {
@@ -647,6 +647,44 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             } elseif ($groupHandler->isStudent()) {
                 $paths = [
                     $settings['baseUri'] . 'student_data/' . $_SESSION['username'] . '/',
+                ];
+            }
+
+        } elseif ($site_location == 'scsb') {
+            $settings = array(
+                'baseUri'  => 'https://scr-fs02.scr.vic.edu.au/',
+                'userName' => 'SCR\\'.$_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+            if ($groupHandler->isStaff()) {
+                $paths = [
+                    $settings['baseUri'] . 'staff/' . $_SESSION['username'] . '/',
+                ];
+            } elseif ($groupHandler->isStudent()) {
+                $paths = [
+                    $settings['baseUri'] . 'students/year_12_of_' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
+                ];
+            }
+
+        } elseif ($site_location == 'agsbot') {
+            $settings = array(
+                'baseUri' => 'http://webdav.ags.school.nz/',
+                'userName' => 'AKGRAMMAR/'.$_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = [
+                    $settings['baseUri'] . 'staff/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'] . 'departments/',
+//                    $settings['baseUri'] . 'submission/',
+                    $settings['baseUri'] . 'distribution/',
+                ];
+            } elseif ($groupHandler->isStudent()) {
+                $paths = [
+                    $settings['baseUri'] . 'students/' . $_SESSION['username'] . '/',
+//                    $settings['baseUri'] . 'submission/',
+                    $settings['baseUri'] . 'distribution/',
                 ];
             }
 

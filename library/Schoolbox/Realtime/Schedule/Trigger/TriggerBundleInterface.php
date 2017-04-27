@@ -10,7 +10,7 @@
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 
 interface TriggerBundleInterface {
 

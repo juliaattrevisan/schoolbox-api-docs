@@ -11,96 +11,169 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use Alaress\DebugBar\Instance as DebugBar;
-use MSSQL;
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\External\Connector\ICommunityPortal;
 use UnexpectedValueException;
 
-class CommunityPortal implements CommunityPortalInterface
+class CommunityPortal implements ICommunityPortal
 {
-    /**
-     * @var MSSQL
-     */
-    private $database;
+    /** @var IConnector $databaseExternal */
+    private $databaseExternal;
 
-    /**
-     * The password encryption key. This must be secret and not stored in code.
-     *
-     * @var string
-     */
+    /** @var string $key The password encryption key. This must be secret and not stored in code. */
     private $key;
 
-    /**
-     * The hard-coded IV for the password. This does not need to be secret.
-     *
-     * @var string
-     */
+    /** @var string $initializationVector The hard-coded IV for the password. This does not need to be secret. */
     private $initializationVector;
 
+    /** @var bool $allowCreateUser */
+    private $allowCreateUser;
+
     /**
-     * Constructor
-     *
-     * @param string $key
-     * @param string $initializationVector
+     * @inheritdoc
      */
-    public function __construct($key, $initializationVector)
+    public function __construct($config, $databaseExternal)
     {
-        $this->key                  = $key;
+        $this->allowCreateUser = $config['synergetic_portal_create_account'];
+        $this->databaseExternal = $databaseExternal;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSecrets($key, $initializationVector)
+    {
+        $this->key = $key;
         $this->initializationVector = $initializationVector;
-        $this->database             = MSSQL::getInstance();
-        if (DebugBar::isEnabled()) {
-            $this->database->installCollector();
-            /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
-            $collector = $this->database->getCollector();
-            if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
-                DebugBar::getInstance()->addCollector($collector);
-            }
-        }
     }
 
     /**
      * Updates the community portal password for this user.
      *
-     * @param  string $communityId
-     * @param  string $newPassword
+     * @param string $communityId
+     * @param string $newPassword
      * @return bool
      * @throws UnexpectedValueException if either key or IV was not set
      */
     public function changePassword($communityId, $newPassword)
     {
         $encryptedPassword = $this->encryptPassword($newPassword);
-        $query = "
-            UPDATE CommunityLogins
-            SET    Password = {$this->database->smartQuote($encryptedPassword)}
-            WHERE  ID = {$this->database->smartQuote($communityId)}
-        ";
-        $this->database->query($query);
-        return intval($this->database->getOne('SELECT @@ROWCOUNT')) > 0;
+
+        // Check to see if they have an existing record in the 'CommunityLogins' table
+
+        $query = $this->databaseExternal->executeQuery(
+            "
+                SELECT    * 
+                FROM      dbo.communityLogins 
+                WHERE     ID = :externalId
+            ", 
+            ['externalId' => $communityId]
+        );
+
+        if ($query->fetch()) {
+
+            // Existing community login record, just update the password
+
+            $query = "
+                UPDATE    dbo.communityLogins
+                SET       password = :password
+                WHERE     ID = :externalId
+            ";
+
+            $result = $this->databaseExternal->executeQuery($query, [
+                'password' => $encryptedPassword,
+                'externalId' => $communityId
+            ]);
+
+        } elseif ($this->allowCreateUser) {
+
+            // No existing community login record, need to insert one for this to have any chance of doing something
+
+            // This adds the Schools default page permissions to the users
+
+            $query =
+            "
+                INSERT INTO dbo.CommunityLoginsPage
+                (
+                    ID,
+                    ConfigSeq,
+                    EnabledFlag
+                )
+                SELECT  :externalId,
+                        ConfigSeq,
+                        CASE WHEN DefaultValue = 'TRUE' THEN 1 ELSE 0 END AS Enabled
+                FROM    dbo.config
+                WHERE   dbo.config.Key1 = 'CommunityPortal' AND
+                        dbo.config.Key2 = 'Pages' AND
+                        dbo.config.Key4 = 'EnabledFlag' AND
+                        dbo.config.Type = 'BIT' AND
+                        dbo.config.Value = 'True'
+            ";
+
+            $this->databaseExternal->executeQuery($query, [
+                'externalId' => $communityId
+            ]);
+
+            // This sets the password
+
+            $query = "
+                INSERT INTO dbo.communityLogins
+                (
+                    ID,
+                    Type,
+                    password,
+                    LastLoginDate,
+                    LoginType,
+                    SecurityTokenGuid,
+                    SecurityTokenIssueDateTime,
+                    PasswordHashed
+                )
+                VALUES
+                (
+                    :externalId,
+                    'CP',
+                    :password,
+                    NOW(),
+                    '',
+                    NULL,
+                    NULL,
+                    ''
+                )
+            ";
+
+            $result = $this->databaseExternal->executeQuery($query, [
+                'externalId' => $communityId,
+                'password' => $encryptedPassword
+            ]);
+
+        } else {
+
+            // There was no community portal password to reset, and automatic creation is disabled- so just return true
+            // and exit out of this happily.
+
+            return true;
+        }
+
+        return $result;
     }
 
     /**
      * Encrypts this plaintext password.
      *
-     * @param  string $plaintext
+     * @param string $plaintext
      * @return string
      * @throws UnexpectedValueException if either key or IV was not set
      */
     protected function encryptPassword($plaintext)
     {
         $this->assertKeyAndIvSet();
-        // Pad converted text to a block with chr(bytes to pad)
-        // @see https://php.net/manual/en/function.mcrypt-encrypt.php#47973
-        $blockSize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-        // Because this is the encoding their DB uses
-        $convText  = mb_convert_encoding($plaintext, 'UCS-2LE');
-        $padding   = $blockSize - (strlen($convText) % $blockSize);
-        $convText  .= str_repeat(chr($padding), $padding);
+
         return base64_encode(
-            mcrypt_encrypt(
-                MCRYPT_RIJNDAEL_128,
+            openssl_encrypt(
+                mb_convert_encoding($plaintext, 'UCS-2LE'),
+                'AES-256-CBC',
                 $this->key,
-                $convText,
-                MCRYPT_MODE_CBC,
+                OPENSSL_RAW_DATA,
                 $this->initializationVector
             )
         );
@@ -117,11 +190,11 @@ class CommunityPortal implements CommunityPortalInterface
     {
         $this->assertKeyAndIvSet();
         return mb_convert_encoding(
-            mcrypt_decrypt(
-                MCRYPT_RIJNDAEL_128,
+            openssl_decrypt(
+                $encrypted,
+                'AES-256-CBC',
                 $this->key,
-                base64_decode($encrypted),
-                MCRYPT_MODE_CBC,
+                OPENSSL_RAW_DATA,
                 $this->initializationVector
             ),
             'UTF-8'
@@ -138,6 +211,7 @@ class CommunityPortal implements CommunityPortalInterface
         if (empty($this->key)) {
             throw new UnexpectedValueException('Key was not set in constructor');
         }
+
         if (empty($this->initializationVector)) {
             throw new UnexpectedValueException('Initialization vector was not set in constructor');
         }

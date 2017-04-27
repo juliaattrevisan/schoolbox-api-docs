@@ -19,7 +19,7 @@ class Sync extends BaseSync
      */
     public function findAllStudents()
     {
-        $query = "
+        $iterator = $this->databaseExternal->executeQueryIterator("
             SELECT
                 vStudents.StudentID            AS student_id,
                 ca.AttributeValue              AS network_login,
@@ -44,10 +44,10 @@ class Sync extends BaseSync
             LEFT JOIN CommunityAttributes ca ON ca.ID = vStudents.StudentID
                 AND ca.AttributeCode = '10'
             WHERE
-            FileSemester = '" . $this->database->quote($this->semester) . "'
-            AND FileYear = '" . $this->database->quote($this->year) . "'
+            FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1)
+            AND FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
             ORDER BY vStudents.StudentID ASC
-        ";
-        return new Iterator\Student($this->database->getIterator($query));
+        ");
+        return new Iterator\Student($iterator);
     }
 }

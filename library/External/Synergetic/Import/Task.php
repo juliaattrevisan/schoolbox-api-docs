@@ -10,6 +10,7 @@
 
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 class External_Synergetic_Import_Task {
 
@@ -40,7 +41,7 @@ class External_Synergetic_Import_Task {
 	public function import() {
 		$taskMapper = new External_Synergetic_Import_TaskMapper();
 		$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-		$workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+		$workTypeMapper = WorkTypeMapper::getInstance();
 		$markTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper();
 		$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 		$userMapper = new \Schoolbox\UserMapper();
@@ -112,7 +113,7 @@ class External_Synergetic_Import_Task {
 				$workType = $workTypeMapper->findByColumn('name', $this->getTaskKey());
 
 				if ($workType->count()) {
-					$submissionBox->setWorkType($workType->first());
+					$submissionBox->getAssessmentModel()->setWorkType($workType->first());
 				}
 				else {
 					echo "-  Skipping {$synergeticTask->getTaskId()} {$synergeticTask->getTask()}: work Type not found \n";

@@ -163,10 +163,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
-        $dataModels = new GenericCollection(DataObject::class);
+        $dataModels = $this->getMapper()->createCollection();
 
         foreach ($domainObjects as $domainObject) {
-            $dataModel = (new DataObject())
+            $dataModel = $this->getMapper()->createModel()
                 ->setId($domainObject->getId())
                 ->setQuiz(
                     (new QuizDataObject())

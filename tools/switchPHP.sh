@@ -18,7 +18,7 @@ then
     update-alternatives --set php /usr/bin/php5
     service apache2 restart;
     service schoolbox-scheduled restart;
-    service schoolbox-rerouted  restart;
+    service schoolbox-routed  restart;
     service schoolbox-socketd   restart;
     service schoolbox-digestd   restart;
     echo "Switched PHP version to: 5.5";
@@ -29,7 +29,7 @@ then
     update-alternatives --set php /usr/bin/php7.1
     service apache2 restart;
     service schoolbox-scheduled restart;
-    service schoolbox-rerouted  restart;
+    service schoolbox-routed  restart;
     service schoolbox-socketd   restart;
     service schoolbox-digestd   restart;
     echo "Switched PHP version to: 7.1";

@@ -34,6 +34,13 @@ class Markbook
     protected $assessments;
 
     /**
+     * Assessments part of this markbook on the top level (not including assessments inside projects)
+     *
+     * @var Collection|IAssessable[]
+     */
+    protected $topLevelAssessments;
+
+    /**
      * The grade group to use when summarising a student's overall grade for these assessments.
      *
      * @var GradeGroup
@@ -48,11 +55,23 @@ class Markbook
     protected $viewingUser;
 
     /**
-     * Statistics for the whole markbook.
-     *
-     * @var array Currently, only contains weightedMean
+     * @var int
      */
-    protected $markbookStatistics = [];
+    private $totalWeight;
+
+    /**
+     * Normalised (0.0 - 100.0) average mark for all assessments in this markbook
+     *
+     * @var float
+     */
+    private $normalisedMean;
+
+    /**
+     * Human readable weighted average mark for all assessments in this markbook
+     *
+     * @var string
+     */
+    private $weightedMean;
 
     /**
      * Statistics for each assessment.
@@ -88,6 +107,10 @@ class Markbook
         $this->assessments = $assessments;
         $this->gradeGroup  = $gradeGroup;
         $this->viewingUser = $viewingUser;
+        $this->topLevelAssessments = $assessments->filter(function(IAssessable $assessment) {
+            return !$assessment->getContext() instanceof Project;
+        });
+
         $this->collateStatistics();
     }
 
@@ -99,6 +122,16 @@ class Markbook
     public function getAssessments()
     {
         return $this->assessments;
+    }
+
+    /**
+     * Get all top level assessments in this collection.
+     *
+     * @return Collection|IAssessable[]
+     */
+    public function getTopLevelAssessments()
+    {
+        return $this->topLevelAssessments;
     }
 
     /**
@@ -117,16 +150,6 @@ class Markbook
         }
         // Sort by name?
         return $participants;
-    }
-
-    /**
-     * Gets all stats that span the entire markbook.
-     *
-     * @return array
-     */
-    public function getMarkbookStatistics()
-    {
-        return $this->markbookStatistics;
     }
 
     /**
@@ -155,16 +178,16 @@ class Markbook
     protected function collateStatistics()
     {
         // Collate assessments and weight
-        foreach ($this->getAssessments() as $assessment) {
+        foreach ($this->getTopLevelAssessments() as $assessment) {
             $this->collateAssessmentStatistics($assessment);
-            $this->markbookStatistics['totalWeight'] += $assessment->getWeight();
+            $this->totalWeight += $assessment->getWeight();
         }
 
         // Collate weight percent for each assessment
-        if ($this->markbookStatistics['totalWeight'] > 0) {
-            foreach ($this->getAssessments() as $assessment) {
+        if ($this->totalWeight > 0) {
+            foreach ($this->getTopLevelAssessments() as $assessment) {
                 $this->assessmentStatistics[$assessment->getId()]['weightPercent'] =
-                    $this->assessmentStatistics[$assessment->getId()]['weight'] / $this->markbookStatistics['totalWeight'] * 100;
+                    $this->assessmentStatistics[$assessment->getId()]['weight'] / $this->totalWeight * 100;
             }
         }
 
@@ -193,12 +216,30 @@ class Markbook
         // Then, summate the result as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
 
-        $this->markbookStatistics['normalisedMean'] = $weightedSummator->summateAllAssessables(
+        $this->normalisedMean = $weightedSummator->summateAllAssessables(
             $this->getAssessments(),
             true,
             new Average()
         );
-        $this->markbookStatistics['weightedMean'] = $overallMarkScheme->getHumanReadableMark($this->markbookStatistics['normalisedMean']);
+        $this->weightedMean = $overallMarkScheme->getHumanReadableMark($this->normalisedMean);
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getNormalisedMean()
+    {
+        return $this->normalisedMean;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getWeightedMean()
+    {
+        return $this->weightedMean;
     }
 
     /**
@@ -280,8 +321,11 @@ class Markbook
      */
     public function getAssessmentsWithProjectContents()
     {
-        foreach ($this->getAssessments() as $assessment) {
+        foreach ($this->getTopLevelAssessments() as $assessment) {
+
             yield $assessment;
+
+            // If this is a project - loop through assessments inside it
             if ($assessment instanceof Project) {
                 foreach ($assessment->getAssessables() as $projectAssessment) {
                     yield $projectAssessment;

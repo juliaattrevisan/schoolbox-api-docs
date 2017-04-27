@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\User;
 
 /**
  * Calendar_Api_EventType_Abstract
@@ -55,7 +56,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
     /**
      * Set user
      *
-     * @param  Schoolbox\User $user
+     * @param User $user
      *
      * @return $this
      */
@@ -66,7 +67,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
     }
 
     /**
-     * @return Schoolbox\User
+     * @return User
      */
     protected function getUser()
     {

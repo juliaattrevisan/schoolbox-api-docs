@@ -17,15 +17,14 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\AbstractAssessment;
-use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use \DomainException;
@@ -38,8 +37,6 @@ class Model implements ISoftDeletable, IAssessableDataModel
     // use CreatedAtDate;
 
     use HasCurriculumNodes;
-    use AssessmentModelTrait;
-
 
     const AVAILABILITY_ASSESS = 'assess';
     const AVAILABILITY_SURVEY = 'survey';
@@ -237,7 +234,35 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /* Getters/Setters
-	 */
+     */
+
+    /**
+     * The base assessable model that is a part of this model.
+     *
+     * @var Model
+     */
+    protected $assessmentModel;
+
+    /**
+     * @return Model
+     */
+    public function getAssessmentModel()
+    {
+        return $this->assessmentModel;
+    }
+
+    /**
+     * The assessment model must be allowed to be NULL, because this can be used
+     * to hydrate surveys.
+     *
+     * @param AssessmentModel $assessmentModel
+     * @return static
+     */
+    public function setAssessmentModel(AssessmentModel $assessmentModel = null)
+    {
+        $this->assessmentModel = $assessmentModel;
+        return $this;
+    }
 
     /**
     * @param  boolean $anonymous_result
@@ -524,7 +549,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  \Schoolbox\Assessment\Component\SubmissionBox\WorkType $work_type
+    * @param  WorkType $work_type
     *
     * @return $this
     */
@@ -535,7 +560,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @return \Schoolbox\Assessment\Component\SubmissionBox\WorkType
+    * @return WorkType
     */
     public function getWorkType()
     {

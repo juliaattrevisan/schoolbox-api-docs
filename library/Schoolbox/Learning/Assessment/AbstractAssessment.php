@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
@@ -26,6 +27,7 @@ use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -33,6 +35,13 @@ abstract class AbstractAssessment implements IAssessable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+
+    /**
+     * Default type name for this assessment.
+     *
+     * @var string
+     */
+    protected $defaultTypeName = 'Assessment';
 
     /**
      * @var string
@@ -155,6 +164,14 @@ abstract class AbstractAssessment implements IAssessable
     private $sequence;
 
     /**
+     * The "type" of the Due Work (Essay, Homework, etc)
+     * NULL is a valid value, and means 'None'
+     *
+     * @var null|WorkType
+     */
+    private $workType;
+
+    /**
      * A collection of Curriculum Nodes
      *
      * @var Collection
@@ -258,13 +275,15 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @return Participant|null
      */
-    protected function findParticipantIfExtant(User $user)
+    protected function findParticipantIfExtant(User $user )
     {
         $userId = $user->getId();
 
         /** @var Participant $currentParticipant */
         foreach ($this->getAllParticipants() as $i => $currentParticipant) {
-            if ($currentParticipant->getUser()->getId() == $userId) {
+            if ($currentParticipant->getUser()
+                                   ->getId() == $userId
+            ) {
                 $this->participantCache[$userId] = $i;
                 return $currentParticipant;
             }
@@ -279,7 +298,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isPublished(Alaress_Date_Format $now = null)
     {
-        if (is_null($now) || $now->isNull()) {
+        if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -293,7 +312,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isOpen(Alaress_Date_Format $now = null)
     {
-        if (is_null($now) || $now->isNull()) {
+        if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -307,7 +326,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isOverdue(Alaress_Date_Format $now = null)
     {
-        if (is_null($now) || $now->isNull()) {
+        if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -321,7 +340,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isPastClose(Alaress_Date_Format $now = null)
     {
-        if (is_null($now) || $now->isNull()) {
+        if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -339,6 +358,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @param bool $publishedOnly
      * @return string|null
+     * @throws \UnexpectedValueException
      */
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
@@ -382,6 +402,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @param bool $publishedOnly
      * @return float|null
+     * @throws \UnexpectedValueException
      */
     public function getNormalisedMark(User $user, $publishedOnly)
     {
@@ -399,6 +420,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param $publishedOnly
      * @param $normalised
      * @return float|null|string
+     * @throws \UnexpectedValueException
      */
     protected function getMark(User $user, $publishedOnly, $normalised)
     {
@@ -446,28 +468,6 @@ abstract class AbstractAssessment implements IAssessable
         return !$latestSubmittedResponse && !$latestPublishedFeedback;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isFeedbackRequired(Participant $participant)
-    {
-        $this->assertSameAssessment($participant);
-
-        // No responses, or latest response has published feedback already ?
-        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
-        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
-            return false;
-        }
-
-        // One or more responses and no feedback ?
-        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
-        if (!$latestPublishedFeedback) {
-            return true;
-        }
-
-        // Was the latest student response submitted after the latest mark was published?
-        return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
-    }
 
     /**
      * @inheritdoc
@@ -561,6 +561,21 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function isSpecification()
+    {
+        return $this->getContext()->isSpecificationContext();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isImplementation()
+    {
+        return $this->getContext()->isImplementationContext();
+    }
 
     /**
      * Verify the given dates are all non-null and all in the given sequence
@@ -590,6 +605,14 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getTypeName()
+    {
+        $subTypeName = $this->getWorkType() ? $this->getWorkType()->getName() : '';
+        return $subTypeName ?: $this->defaultTypeName;
+    }
 
     /* Getters/Setters
      */
@@ -703,7 +726,7 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return float
+     * @return int
      */
     public function getWeight()
     {
@@ -944,6 +967,25 @@ abstract class AbstractAssessment implements IAssessable
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
+     * @return null|WorkType
+     */
+    public function getWorkType()
+    {
+        return $this->workType;
+    }
+
+
+    /**
+     * @param null|WorkType $workType
+     * @return static
+     */
+    public function setWorkType(WorkType $workType = null)
+    {
+        $this->workType = $workType;
         return $this;
     }
 

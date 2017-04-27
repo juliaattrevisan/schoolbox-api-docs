@@ -12,7 +12,10 @@
  */
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Gateway as PlagscanGateway;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
+
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
@@ -21,11 +24,11 @@ $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();
 
-if (!$mapper->getGateway()) {
+if (!$mapper->getConnector()) {
 
     /* Plagscan not configured - nothing to do
      */
-    $log->warning("Plagscan scan did not run: username/api key is not configured correctly");
+    $log->warning("Plagscan scan did not run: username, api key and/or access token is not configured correctly");
     exit();
 }
 
@@ -37,13 +40,13 @@ $reRetrieveMode = isset($opts['re-retrieve']);
 /* Re-scan plagscan records
  */
 if ($reRetrieveMode) {
-    $log->info("Scanner running in re-retrieve mode.");
+    $log->info("Scanner running in re-retrieve mode");
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_COMPLETE);
 }
 /* Scan currently-pending plagscan records
  */
 else {
-    $log->info("Scanner running in scan mode.");
+    $log->info("Scanner running in scan mode");
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED);
 }
 
@@ -53,6 +56,7 @@ $numUpdated = 0;
 
 /** @var Plagscan $currentDocument */
 foreach ($allDocuments as $currentDocument) {
+    $prefix = "Plagscan Record {$currentDocument->getId()}";
 
     /* Sometimes plagscan gives you back -1 as the plagscan_id
      * In this case, just skip it, so the daemon doesn't get
@@ -62,57 +66,71 @@ foreach ($allDocuments as $currentDocument) {
      *  has to be greater than zero. I can't think of why zero would be valid.
      */
     if ($currentDocument->getPlagscanId() > 0) {
-        $stats = $mapper->getGateway()->retrieve($currentDocument->getPlagscanId(), PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
+        try {
 
-        if (!$stats) {
-            $log->error("Plagscan failed at Gateway retrieval. Check API key and username?");
-            exit(2);
-        }
+            /** @var StudentSubmissionFile $studentSubmissionFile */
+            $studentSubmissionFile = StudentSubmissionFileMapper::getInstance()->findById($currentDocument->getStudentSubmissionFileId());
 
-        // Is this document scannable? If not, mark as such and don't scan again.
-        if ((string)$stats->MSG === 'ERR') {
-            if (!$reRetrieveMode) {
-                $currentDocument->setStatus(Plagscan::STATUS_UNSCANNABLE);
-                $mapper->save($currentDocument);
+            /* Convert to new format
+             */
+            $submissionFile = new SubmissionFile();
+            $submissionFile->setStorage($studentSubmissionFile->getStorage());
+
+            /* Tells plagscan to analyse the document
+             * Plagscan will do it in its own time, whenever it wants to
+             * We have to poll it to find out its actual status
+             */
+            $reportReady = $mapper->getConnector()->analyse($currentDocument->getPlagscanId());
+
+            if ($reportReady) {
+                $interactiveReportUrl = $mapper->getConnector()->fetchInteractiveReportUrl($currentDocument->getPlagscanId());
+                $reportContents = $mapper->getConnector()->fetchReport($currentDocument->getPlagscanId());
+                $score = $mapper->getConnector()->fetchScore($currentDocument->getPlagscanId());
+
+                /* Update the db with the report contents for this document
+                 * only when we have all three pieces (each seems to generated
+                 * independently of each other on plagscan's end, so one might
+                 * be available before the others etc.)
+                 */
+                if (strlen($interactiveReportUrl) && strlen($reportContents) && strlen($score)) {
+                    $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
+                    $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
+                    $currentDocument->setScore($score);
+                    $currentDocument->setHtml($reportContents);
+                    $currentDocument->setInteractiveUrl($interactiveReportUrl);
+                    $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+                    $mapper->save($currentDocument);
+
+                    $numUpdated++;
+                }
+                else {
+                    $log->warning("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");
+                }
             }
-
-            $log->error("Document {$currentDocument->getId()} unscannable: ". print_r($stats, true));
-
-            continue;
-        }
-
-        // Has a level been retrieved yet? How can I tell?
-        $level = (string)$stats->LEVEL;
-
-        if (strlen($level) > 0) {
-            if (!$reRetrieveMode) {
-                $currentDocument->setScore($level / 10)->setStatus(Plagscan::STATUS_COMPLETE);
+            else {
+                $log->warning("{$prefix}: report not yet analysed");
             }
-
-            $currentDocument->setHtml($mapper->getGateway()->retrieve(
-                $currentDocument->getPlagscanId(),
-                PlagscanGateway::MODE_RETRIEVE_HTML_INTERACTIVE
-            ));
-
+        }
+        catch (\DomainException $e) {
+            $currentDocument->setStatus(Plagscan::STATUS_UNSCANNABLE);
             $mapper->save($currentDocument);
-            $numUpdated++;
 
-            $log->info("Retrieved scan status for {$currentDocument->getPlagscanId()}");
+            $log->error("{$prefix} unscannable - {$e->getMessage()}");
         }
-        else {
-            $response = $mapper->getGateway()->check($currentDocument->getPlagscanId());
+        catch (\RuntimeException $e) {
+            $mapper->save($currentDocument);
 
-            $log->warning("Bad level for document, still pending result: ".print_r($stats,true).print_r($response,true));
+            $log->error("{$prefix} unscannable - {$e->getMessage()}");
         }
     }
 }
 
-$log->info("Plagscan scan completed. $numUpdated documents were scanned");
+$log->notice("Plagscan scan completed. $numUpdated documents were scanned");
 
 /* Also tell me how many died
  */
 $numFailed = $allDocuments->count() - $numUpdated;
 
 if ($numFailed) {
-    $log->info("$numFailed documents failed scanning");
+    $log->notice("$numFailed documents failed scanning or analysis is still in progress");
 }

@@ -23,14 +23,8 @@ class Queue extends ResourceVideo
     /** @var string */
     protected $message;
 
-    /** @var Storage */
-    protected $file;
-
     /** @var string */
     private $type;
-
-    /** @var int */
-    protected $fileId;
 
     /** @var string */
     private $audioBitrate;
@@ -82,11 +76,11 @@ class Queue extends ResourceVideo
      */
     public function process()
     {
-        if ($this->getFile()->getMimetype()->isAudio()){
-            return $this->processAudio($this->getSourceLocation($this->getFile()));
+        if ($this->getStorage()->getMimetype()->isAudio()){
+            return $this->processAudio($this->getSourceLocation($this->getStorage()));
         }
-        else if($this->getFile()->getMimeType()->isVideo()){
-            return $this->processVideo($this->getSourceLocation($this->getFile()));
+        else if($this->getStorage()->getMimeType()->isVideo()){
+            return $this->processVideo($this->getSourceLocation($this->getStorage()));
         }
 
         return false;
@@ -423,19 +417,5 @@ class Queue extends ResourceVideo
         return $this;
     }    
 
-    /**
-     * @return int
-     */
-    public function getFileId() {
-        return $this->fileId;
-    }
 
-    /**
-     * @param int
-     * @return $this
-     */
-    public function setFileId($fileId) {
-        $this->fileId = $fileId;
-        return $this;
-    }    
 }

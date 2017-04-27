@@ -34,12 +34,13 @@ foreach($_POST['role'] as $roleId => $data) {
 	\Schoolbox\RoleMapper::getInstance()->save($role);
 }
 
+$redis    = \Alaress\Redis::getClientInstance();
+$instance = INSTANCE_ID;
+
 // advise digest daemon to reload
-$cmdr = new \Schoolbox\Realtime\Digest\DigestCommander();
-$cmdr->adviseReload();
+$redis->publish("digestd.$instance.reload", '');
 
 // advise schedule daemon to reload as well
-$cmdr = new \Schoolbox\Realtime\Rerouter\RerouterCommander(\Schoolbox\UserMapper::getInstance());
-$cmdr->adviseReload();
+$redis->publish("scheduled.$instance.reload", '');
 
 SitePage::localRedir('/adminv2/messages');

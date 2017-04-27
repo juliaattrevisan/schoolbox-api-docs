@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Timetable;
 
 use Alaress\Date\IClock;
 use Alaress\Scheduler\CronScheduler;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
@@ -25,16 +26,18 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TriggerFactory;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 
-class TimetableScheduler extends CronScheduler {
-
-    /** @var TimetableTrigger[] */
-    protected $triggers = array();
+class TimetableScheduler extends CronScheduler
+{
 
     /** @var Collection|Campus[] */
     protected $campuses;
 
     /** @var TriggerFactory */
     protected $factory;
+
+    /** @var IConfigLoader */
+    private $conf;
+
 
     /**
      * @param LoopInterface $loop
@@ -46,15 +49,21 @@ class TimetableScheduler extends CronScheduler {
      * @param IConfigLoader $conf
      * @param IClock $clock
      */
-    public function __construct($loop, $dispatchStrategy, $client, $log, $campuses, $factory, $conf = null, $clock = null) {
-        parent::__construct($loop, $dispatchStrategy, $log, $conf, $clock);
-        $this->method = DefaultDispatchStrategy::TASK_TIMETABLE;
-        $this->factory = $factory;
-        $this->factory->setClock($this->clock);
+    public function __construct(
+        LoopInterface $loop,
+        DispatchStrategyInterface $dispatchStrategy,
+        Client $client,
+        LoggerInterface $log,
+        Collection $campuses,
+        TriggerFactory $factory,
+        IConfigLoader $conf,
+        IClock $clock
+    ) {
+        parent::__construct($loop, $dispatchStrategy, $log, $clock);
 
+        $this->factory  = $factory;
         $this->campuses = $campuses;
-
-        $this->on(SIGHUP, array($this, 'onReload'));
+        $this->conf     = $conf;
 
         // instantiate schedule
         $this->reload();
@@ -62,25 +71,13 @@ class TimetableScheduler extends CronScheduler {
 
 
     /**
-     * Callback executed when SIGHUP received by process
-     */
-    public function onReload() {
-        $this->conf->dropCache();
-        $this->reload();
-    }
-
-
-    /**
-     * Drop existing schedule and reinitialise
+     * (Re)compute the triggers for this particular scheduler
      *
-     * @return bool
+     * @return TriggerInterface[]
      */
-    public function reload() {
-        // drop existing
-        foreach($this->triggers as $k => $t) {
-            $this->unschedule($t);
-            unset($this->triggers[$k]);
-        }
+    protected function computeTriggers()
+    {
+        $triggers = [];
 
         $labels = [
             TimetableTrigger::TARGET_START,
@@ -89,46 +86,53 @@ class TimetableScheduler extends CronScheduler {
         ];
 
         // read each campus, and schedule the next event based on it
-        foreach($this->campuses as $campus) {
+        foreach ($this->campuses as $campus) {
             // one each for start, start warning, end
             $id = $campus->getId();
+
             try {
                 foreach ($labels as $label) {
-                    $this->triggers["$id.$label"] = $this->factory->buildTrigger($label, $campus);
+                    $triggers["$id.$label"] = $this->factory->buildTrigger($label, $campus);
                 }
-            }
-            catch(InvalidArgumentException $e) {
-                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
-            }
-            catch(RuntimeException $e) {
-                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
+            } catch (InvalidArgumentException $e) {
+                $this->logException($e);
+
+            } catch (RuntimeException $e) {
+                $this->logException($e);
             }
         }
 
-        foreach ($this->triggers as $id => $trigger) {
-            try {
-                $this->scheduleNotification($trigger);
-            }
-            catch(InvalidArgumentException $e) {
-                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
-            }
-            catch(RuntimeException $e) {
-                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
-            }
-
-        }
+        return $triggers;
     }
 
 
     /**
      * Report in an appropriate way, based on the data returned by the worker
      *
-     * @param $data
-     * @return mixed
+     * @param array $data
+     * @return void
      */
     protected function report($data)
     {
-        $this->log->notice("Timetable alerts sent: ".unserialize($data[0]));
+        $this->log->notice('Timetable alerts sent: ' . unserialize($data[0]));
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getMethod()
+    {
+        return DefaultDispatchStrategy::TASK_TIMETABLE;
+    }
+
+
+    /**
+     * @return void
+     */
+    protected function dropCache()
+    {
+        $this->conf->dropCache();
     }
 
 }

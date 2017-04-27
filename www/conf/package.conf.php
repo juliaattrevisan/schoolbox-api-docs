@@ -21,7 +21,8 @@ define("SQL_db", "schoolbox");
 define("SQL_dsn", "mysql:host=".SQL_host.";dbname=".SQL_db);
 
 //Instance ID
-define('INSTANCE_ID', 'xxxxxxxx');
-
+if (!defined('INSTANCE_ID')) {
+    define('INSTANCE_ID', 'xxxxxxxx');
+}
 
 ?>

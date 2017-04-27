@@ -186,14 +186,12 @@ class Generator implements GeneratorInterface
     /**
      * @param User $user
      * @throws Mapper\Exception
-     * @return array
+     * @return string[][]
      */
     public function generateBindingsForUser(User $user)
     {
         $bindings = [
-            'user' => [
-                'id' => "{$user->getId()}.#"
-            ]
+            'user' => [ "{$user->getId()}.#" ]
         ];
 
         // superuser bindings
@@ -206,43 +204,47 @@ class Generator implements GeneratorInterface
         foreach ($user->getCampusCollection() as $campus) {
             // *.notify.campus.{id}.#
             /** @var Campus $campus */
-            $bindings['campus'][] = $campus->getId() . ".#";
+            $bindings['campus'][] = $campus->getId() . '.#';
         }
 
         // house bindings
-        if ($house = $user->getSchoolHouse()->getId()) {
+        $house = $user->getSchoolHouse();
+        if ($house) {
             // *.notify.house.{id}.#
             $bindings['house'] = array(
-                "$house.#"
+                "{$house->getId()}.#"
             );
         }
 
         // residential house bindings
-        if ($resHouse = $user->getResidentialHouse()->getId()) {
+        $resHouse = $user->getResidentialHouse();
+        if ($resHouse) {
             // *.notify.reshouse.{id}.#
             $bindings['reshouse'] = array(
-                "$resHouse.#"
+                "{$resHouse->getId()}.#"
             );
         }
 
         $roleType = $user->getRole()->getType();
 
         // parental bindings TODO can this be more lightweight
-        if ($roleType == Role::PARENT && strlen(trim($user->getExternalId())) > 0) {
-            $childrenArray = $this->getExternalUserHandler()
-                                  ->getEnrolledStudents($user->getExternalId());
+        if ($roleType === Role::PARENT && strlen(trim($user->getExternalId())) > 0) {
+            $childrenArray = $this->getExternalUserHandler()->getEnrolledStudents($user->getExternalId());
 
             if (is_array($childrenArray)) {
                 $childIds = array();
                 foreach ($childrenArray as $childArray) {
                     $childIds[] = $childArray['RelatedID'];
                 }
+
                 $roles = $this->getRoleCache();
+
                 if (array_key_exists(Role::STUDENT, $roles)) {
                     $childCollection = $this->getUserMapper()->findByColumnList(array(
                         'synergy_id' => $childIds,
                         'group_id'   => $roles[Role::STUDENT]
                     ));
+
                     // parent bindings
                     // *.notify.parent.{childId}.#
                     foreach ($childCollection->getColumnValues('id') as $id) {
@@ -255,7 +257,7 @@ class Generator implements GeneratorInterface
         // role bindings
         // *.notify.role.{id}.#
         $bindings['role'] = array(
-            $user->getRole()->getId() . ".#"
+            $user->getRole()->getId() . '.#'
         );
 
         // role-type bindings

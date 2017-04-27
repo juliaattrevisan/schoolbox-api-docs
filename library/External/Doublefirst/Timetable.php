@@ -576,7 +576,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             ";
         }
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         $timetable = array();
 
@@ -593,7 +593,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         // Add classes into it
 
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
@@ -799,7 +799,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             ";
         }
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         $dayCount = $timetabledef['dayCount'];
 
@@ -821,7 +821,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         // Add classes for each day into it
 
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber'] && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])) {
 

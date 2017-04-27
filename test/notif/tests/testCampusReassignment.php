@@ -9,11 +9,9 @@
 use Schoolbox\CampusMapper;
 use Schoolbox\News\Article;
 use Schoolbox\News\ArticleMapper;
-use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\UserMapper;
 
 
 /**
@@ -50,7 +48,7 @@ class CampusReassignment extends AbstractNotificationTest
      */
     public function requiredDaemons()
     {
-        return [ self::DAEMON_SCHEDULE, self::DAEMON_REROUTE ];
+        return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
     }
 
 
@@ -140,9 +138,7 @@ class CampusReassignment extends AbstractNotificationTest
         $this->moveCampus(self::CAMPUS_TWO);
 
         // signal rerouted to drop the cache and
-        $rc = new RerouterCommander(UserMapper::getInstance());
-
-        $rc->adviseReload();
+        // TODO implement REDIS publish
     }
 
 

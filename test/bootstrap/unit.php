@@ -9,5 +9,8 @@
 
 require_once __DIR__ . '/../../www/conf/conf.php';
 require_once __DIR__ . '/../../www/include/stdfuncs.php';
-require_once dirname(__FILE__) . '/../../library/Autoloader.php';
+require_once __DIR__ . '/../../library/Autoloader.php';
 Autoloader::initialise();
+
+// sorry.
+Schoolbox\Mapper::di(new Aura\Di\Container(new Aura\Di\Factory()));

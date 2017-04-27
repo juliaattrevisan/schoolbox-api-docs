@@ -1,11 +1,15 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Redis;
+
+
 if (count($argv) < 2) {
     die('Need one or more hash arguments, got ' . ($argc - 1) . "\n");
 }
 
-require_once __DIR__ . '/../../www/conf/conf.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 for ($i = 1; $i < $argc; ++$i) {
     if (!preg_match('`^([0-9a-f]{40}):([0-9a-f]{40})$`', $argv[$i], $matches)) {
@@ -15,7 +19,10 @@ for ($i = 1; $i < $argc; ++$i) {
 
     $key = sprintf('msg:%s:m:%s', INSTANCE_ID, $matches[0]);
 
-    $output[$matches[1]][$matches[2]] = json_decode(gzuncompress(`redis-cli get $key`), true);
+    /** @var Instance $instance */
+    $instance = unserialize(gzuncompress(Redis::getClientInstance()->get($key)));
+
+    $output[$matches[1]][$matches[2]] = $instance->jsonSerialize();
 }
 
 if (empty($output)) {

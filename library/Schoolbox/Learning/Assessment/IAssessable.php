@@ -20,6 +20,7 @@ use \Schoolbox\User;
 use \Schoolbox\Collection;
 use Alaress_Date_Format;
 use \DomainException;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 interface IAssessable extends ISoftDeletable
 {
@@ -148,6 +149,30 @@ interface IAssessable extends ISoftDeletable
      * @return static
      */
     public function setSpecificationAssessment(IAssessable $specification = null);
+
+    /**
+     * Is this assessment a specification?
+     *
+     * A specification assessment exists within a unit specification.
+     *
+     * Currently an assessment may only be an implementation or specification, not
+     * both or neither.
+     *
+     * @return bool
+     */
+    public function isSpecification();
+
+    /**
+     * Is this assessment an implementation?
+     *
+     * An implementation assessment exists within a folder or a unit implementation.
+     *
+     * Currently an assessment may only be an implementation or specification, not
+     * both or neither.
+     *
+     * @return bool
+     */
+    public function isImplementation();
 
     /**
      * Gets the user role types which may view this assessment's marks and feedback.
@@ -482,7 +507,7 @@ interface IAssessable extends ISoftDeletable
      * other elements in the same set.
      *      -- https://en.wikipedia.org/wiki/Weight_function
      *
-     * @return float
+     * @return int
      */
     public function getWeight();
 
@@ -515,6 +540,18 @@ interface IAssessable extends ISoftDeletable
      * @return static
      */
     public function setSequence($sequence);
+
+    /**
+     * @return null|WorkType
+     */
+    public function getWorkType();
+
+
+    /**
+     * @param null|WorkType $workType
+     * @return static
+     */
+    public function setWorkType(WorkType $workType = null);
 
     /**
      * @return GradeGroup|null

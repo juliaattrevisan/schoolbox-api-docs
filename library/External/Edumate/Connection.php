@@ -5,99 +5,82 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-class External_Edumate_Connection {
 
-    /**
-     * @var Group
-     */
+use Alaress\Database\Connector\Base as Connector;
+use Alaress\Database\Factory as DatabaseFactory;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+
+class External_Edumate_Connection
+{
+    /** @var Group $groupHandler */
     private $groupHandler;
 
-    /**
-     * @var User
-     */
+    /** @var User $userHandler */
     private $userHandler;
 
-    /**
-     * @var DB2
-     */
-    private $database;
+    /** @var Connector $connector */
+    protected $connector;
+
+    /** @var IConfigLoader $config */
+    protected $config;
 
     /**
-     * Build a generic connection to an Edumate db
+     * Constructor
      */
-    public function __construct () {
-        // build a DSN from the config vars
-        $host = Cfg::get('external_db_host');
-        $db = Cfg::get('external_db_db');
-        $un = Cfg::get('external_db_user');
-        $pw = Cfg::get('external_db_passwd');
+    public function __construct()
+    {
+        $factory = new DatabaseFactory();
+        $this->connector = $factory->createSqlsrv();
+        $this->config = ConfigMapper::getInstance();
 
-        $dsn = "DATABASE=$db;";
-        $hosts = explode(':', $host);
+        $this->connector->connect(
+            $this->config->get('external_db_host'),
+            $this->config->get('external_db_db'),
+            $this->config->get('external_db_user'),
+            $this->config->get('external_db_passwd')
+        );
 
-        if(count($hosts) == 2) {
-            $dsn .= "HOSTNAME={$hosts[0]};PORT={$hosts[1]};";
-        }
-        elseif(count($hosts) == 1) {
-            $dsn .= "HOSTNAME={$hosts[0]};";
-        }
-
-	    try {
-	        $this->setDatabase(new DB2($dsn, $un, $pw));
-	        $this->setGroupHandler(new Group());
-	        $this->setUserHandler(new User());
-	    } catch(PDOException $e) {
-		    /// chain off the PDO exception and throw an External instead to be caught by the interface class
-		    throw new \Schoolbox\External\Exception($e->getMessage(), $e->getCode(), $e);
-	    }
-    }
-
-
-	/**
-	 * Internal DB2-specific code to turn CAPITALISEDFIELDS into NotCapitalisedFields
-	 *
-	 * @param array $record
-	 * @param array $fieldNames
-	 * @return array
-	 */
-	protected function normaliseFields(array $record, array $fieldNames) {
-		foreach($fieldNames as $field) {
-			$upper = strtoupper($field);
-			if(array_key_exists($upper, $record)) {
-				$record[$field] = $record[$upper];
-				unset($record[$upper]);
-			}
-		}
-		return $record;
-	}
-
-	/* Getters/Setters
-	 */
-
-    /**
-     * Set the database connector
-     * @param $database
-     */
-    protected function setDatabase ($database) {
-        $this->database = $database;
+        $this->setGroupHandler(new Group());
+        $this->setUserHandler(new User());
     }
 
     /**
-     * Retrieve the database connector. Dirty and hacky.
+     * Internal DB2-specific code to turn CAPITALISEDFIELDS into NotCapitalisedFields
      *
-     * @return DB2
+     * @param array $record
+     * @param array $fieldNames
+     * @return array
      */
-    public function getDatabase() {
-        return $this->database;
+    protected function normaliseFields(array $record, array $fieldNames)
+    {
+        foreach ($fieldNames as $field) {
+            $upper = strtoupper($field);
+            if (array_key_exists($upper, $record)) {
+                $record[$field] = $record[$upper];
+                unset($record[$upper]);
+            }
+        }
+        return $record;
+    }
+
+    // Getters & Setters
+
+    /**
+     * @return Connector
+     */
+    protected function getConnection()
+    {
+        return $this->getConnection();
     }
 
     /**
      * Set the group handler
      * @param Group $group
      */
-    protected function setGroupHandler($group) {
+    protected function setGroupHandler($group)
+    {
         $this->groupHandler = $group;
     }
 
@@ -105,7 +88,8 @@ class External_Edumate_Connection {
      * Retrieve the group handler
      * @return Group
      */
-    protected function getGroupHandler() {
+    protected function getGroupHandler()
+    {
         return $this->groupHandler;
     }
 
@@ -113,7 +97,8 @@ class External_Edumate_Connection {
      * Set the user handler
      * @param $user
      */
-    protected function setUserHandler($user) {
+    protected function setUserHandler($user)
+    {
         $this->userHandler = $user;
     }
 
@@ -121,7 +106,18 @@ class External_Edumate_Connection {
      * Retrieve the user handler
      * @return User
      */
-    protected function getUserHandler() {
+    protected function getUserHandler()
+    {
         return $this->userHandler;
+    }
+
+    /**
+     * Quote input for safety
+     *
+     * @param $value string
+     * @return string
+     */
+    public function quote($value) {
+        return db2_escape_string($value);
     }
 }

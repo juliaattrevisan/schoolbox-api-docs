@@ -1,0 +1,150 @@
+{#
+Displays all possible options for a Filter and enables the admin to configure
+which options should be available to users.
+
+Usage:
+    filter       Filter
+    definition   IFilter
+    options      FilterOption[]
+#}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Home', routeLookup('adminHome.getIndex') ],
+    [ 'Filters', routeLookup('filters.getIndex') ],
+    [ 'Available ' ~ filter.name ~ ' Options' ]
+) }}
+
+
+
+{% set saveButtonId = 'save_button' %}
+{% set optionsTableId = 'options_table' %}
+
+<script type="text/javascript">
+    $(function() {
+
+        var $saveButton = $('#{{ saveButtonId }}');
+        var $optionsTable = $('#{{ optionsTableId }}');
+
+        $saveButton.on('click', function(event){
+            event.preventDefault();
+            $saveButton.attr('disabled', true);
+
+            var data = $optionsTable.find('input[type=checkbox]').serialize();
+            var href = $saveButton.data('href');
+
+            // TODO display a toast
+            $.post(href, data)
+                .done(function() {
+                    $saveButton.attr('disabled', false);
+                });
+        });
+
+        // Listen for changes to checkboxes
+        $optionsTable.find('input[type=checkbox]').on('change', function(){
+            checkAllOptionsDisabled($(this).data('page'));
+        });
+
+
+        /**
+         * If admin deselects all options to be available for a page, update column header
+         * @param {string} page
+         */
+        function checkAllOptionsDisabled(page)
+        {
+            var $pageCheckboxes  = $optionsTable.find('input:checked[type=checkbox][data-page='+page+']');
+            var $rowHeader       = $optionsTable.find('th[data-page='+page+']');
+
+            if(0 === $pageCheckboxes.length){
+                $rowHeader.css({
+                    'text-decoration': 'line-through',
+                    'color': '#9a9a9a'
+                });
+                $rowHeader.attr('title', 'Filter will not be available for this page');
+            } else {
+                $rowHeader.css({
+                    'text-decoration': 'none',
+                    'color': 'inherit'
+                });
+                $rowHeader.attr('title', '');
+            }
+        }
+
+        // Check if any pages are disabled
+        $optionsTable.find('th[data-page]').each(function(idx, elem){
+            checkAllOptionsDisabled($(elem).data('page'));
+        });
+    });
+</script>
+
+
+<div class="row">
+    <div class="small-12">
+        <h1>Available {% block title %}{% endblock %} options</h1>
+        <p>Select which options should be displayed for this filter.</p>
+        <p>{% block description %}{% endblock %}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        <div data-alert="" class="alert-box warning">
+            Deselecting all filter options for a page will remove the filter from that page.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        <dl class="tabs">
+            <dd class="active">
+                <a href="#">Available {{ filter.name }} Options</a>
+            </dd>
+            <dd class="">
+                <a href="{{ routeLookup('filters.getDefaultsSelections', {filter: filter.id}) }}">Default {{ filter.name }} Selections</a>
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        {% block optionsTable %}
+        <table id="{{ optionsTableId }}">
+            <tr>
+                <th></th>
+                {% for page in definition.pages %}
+                    <th data-page="{{ page }}" >{{ page | capitalize }}</th>
+                {% endfor %}
+            </tr>
+            {% for key, option in options %}
+            <tr>
+                <td>{{ definition.label(key) }}</td>
+                {% for page in definition.pages %}
+                    {% if options[key][page] %}
+                        <td>
+                            <input
+                                    id="checkbox_{{ key }}_{{ page }}"
+                                    type="checkbox"
+                                    name="filter_option[{{ key }}][{{ page }}]"
+                                    {% if options[key][page].available %}checked{% endif %}
+                                    data-page="{{ page }}">
+                            <label for="checkbox_{{ key }}_{{ page }}" class="checkbox-label"></label>
+                        </td>
+                    {% else %}
+                        <td>NA</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        {% endblock %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12">
+        <section class="content">
+            <input type="submit" id="{{ saveButtonId }}" value="Save Options" data-href="{{ routeLookup('filters.postSaveOptions', { filter: filter.id }) }}">
+        </section>
+    </div>
+</div>

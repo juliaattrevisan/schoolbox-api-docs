@@ -1,4 +1,45 @@
+<script type="text/javascript">
+    $(function() {
+        $('#attempts').find('[data-delete]').click(function (event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this attempt?',
+                confirmEvent: function () {
+                    var attemptList = $('#attempts');
+                    var listItem = $(element).parents('[data-attempt]');
+
+                    var toast = $('#attempt-toast');
+                    toast.toastActivate({text: 'Deleting attempt...'});
+
+                    $.post(element.attr('href'), {attemptId: element.attr('data-delete')})
+                        .success(function() {
+                            toast.toastTimeout({text: 'Attempt deleted.', css: 'success'});
+
+                            listItem.fadeOut({
+                                done: function() {
+                                    listItem.remove();
+
+                                    if (!attemptList.find('tbody tr').length) {
+                                        $('#attempts').hide();
+                                        $('#attempt-list-empty-state').removeClass('hide');
+                                    }
+                                }
+                            });
+                        })
+                        .error(function() {
+                            toast.toastTimeout({text: 'Could not delete attempt', css: 'alert'});
+                        });
+                }
+            });
+        });
+    });
+</script>
+
 {BREADCRUMB}
+
 <div class="row">
     <div class="small-12 columns">
         <h1>{ASSESS_NAME}</h1>
@@ -7,42 +48,67 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Attempts by {ATTEMPT_USER_NAME}</h2>
-        <section>
-            <div class="scrollable">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Start</th>
-                            <th>Finish</th>
-                            <th>Time Taken</th>
-                            <th>Reviewed</th>
-                            <th>Grade</th>
-                            <th>&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- BEGIN attempt -->
-                        <tr>
-                            <td>{ATTEMPT_START}</td>
-                            <td>{ATTEMPT_FINISH}</td>
-                            <td>{ATTEMPT_TIME_TAKEN}</td>
-                            <td>{ATTEMPT_REVIEWED_AT}</td>
-                            <td>{ATTEMPT_MARKS}</td>
-                            <td>
-                                <!-- BEGIN attempt_review -->
-                                <a href='/assess/{ATTEMPT_REVIEW_URL}/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}{RETURN_URL_SUFFIX}' class="icon-view no-text" title="Review"></a>
-                                <!-- END attempt_review -->
-                                <!-- BEGIN attempt_resume -->
-                                <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}{RETURN_URL_SUFFIX}' class="icon-next no-text" title="Resume"></a>
-                                <!-- END attempt_resume -->
-                            </td>
-                        </tr>
-                        <!-- END attempt -->
-                    </tbody>
-                </table>
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Attempts by {ATTEMPT_USER_NAME}</h2>
+                </div>
             </div>
-        </section>
+            <!-- BEGIN has_preview_action -->
+            <nav>
+                <a class="icon-add" href="/assess/intro/{ASSESS_ID}" title="Preview Quiz"></a>
+            </nav>
+            <!-- END has_preview_action -->
+        </div>
+
+        <!-- BEGIN has_attempts -->
+        <table id="attempts">
+            <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>Finish</th>
+                    <th>Time Taken</th>
+                    <th>Reviewed</th>
+                    <th>Grade</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN attempt -->
+                <tr data-attempt>
+                    <td>{ATTEMPT_START}</td>
+                    <td>{ATTEMPT_FINISH}</td>
+                    <td>{ATTEMPT_TIME_TAKEN}</td>
+                    <td>{ATTEMPT_REVIEWED_AT}</td>
+                    <td>{ATTEMPT_MARKS}</td>
+                    <td class="actions-small-3">
+                        <nav>
+                            <!-- BEGIN attempt_delete -->
+                            <a href='/learning/quiz/attempts/delete' class="icon-delete" title="Delete Attempt" data-delete="{ATTEMPT_ATTEMPT_ID}"></a>
+                            <!-- END attempt_delete -->
+                            <!-- BEGIN attempt_review -->
+                            <a href='/assess/{ATTEMPT_REVIEW_URL}/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}{RETURN_URL_SUFFIX}' class="icon-view" title="Review"></a>
+                            <!-- END attempt_review -->
+                            <!-- BEGIN attempt_resume -->
+                            <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}{RETURN_URL_SUFFIX}' class="icon-next" title="Resume"></a>
+                            <!-- END attempt_resume -->
+                        </nav>
+                    </td>
+                </tr>
+                <!-- END attempt -->
+            </tbody>
+        </table>
+        <!-- END has_attempts -->
+
+        <div id='attempt-list-empty-state' class="empty-state {EMPTY_STATE_CSS}">
+            <i class="icon-quiz"></i>
+            <p>{CURRENT_USER} does not have any attempts for this quiz.</p>
+
+            <!-- BEGIN has_preview_link -->
+            <p>You can <a href="/assess/intro/{ASSESS_ID}" title="Preview Quiz">preview this quiz</a>.</p>
+            <!-- END has_preview_link -->
+        </div>
     </div>
 </div>
 
+<div id="attempt-toast" class="toast"></div>

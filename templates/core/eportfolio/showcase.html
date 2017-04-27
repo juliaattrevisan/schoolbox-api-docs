@@ -26,11 +26,11 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 island" id="showcased-items">
         <!-- BEGIN no_showcased_work -->
         <div class="empty-state">
             <i class="icon-due-work"></i>
-            <p>Visit your <a href='/learning/grades/{USER_ID}'>grades page</a> to publish items to your showcase.</p>
+            <p>Visit your <a href='/learning/grades/{EPORTFOLIO_PAGE_USER_ID}'>grades page</a> to publish items to your showcase.</p>
         </div>
         <!-- END no_showcased_work -->
 
@@ -38,7 +38,7 @@
 
         <!-- BEGIN has_intro -->
         <section class=" content">
-            <p>Visit your <a href="/learning/grades/{USER_ID}">grades page</a> to publish items to your showcase.</p>
+            <p>Visit your <a href="/learning/grades/{EPORTFOLIO_PAGE_USER_ID}">grades page</a> to publish items to your showcase.</p>
         </section>
 
         <!-- END has_intro -->
@@ -46,7 +46,7 @@
         <!-- BEGIN showcased_work_subject -->
         <h2 class="subheader">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
         <section>
-            <ul class="information-list" id="showcased-items">
+            <ul class="information-list">
                 <!-- BEGIN showcased_work -->
                 <li class="actions-small-1">
                     <div class="list-item">

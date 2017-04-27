@@ -9,8 +9,12 @@ namespace Schoolbox\Learning;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Container;
+use Aura\Di\Exception\ServiceNotFound;
 use Eportfolio\ShowcaseMapper;
+use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Filter\FactoryFactory;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -26,6 +30,8 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Filter\Selection as FilterSelection;
 
 class Module extends BaseModule
 {
@@ -39,6 +45,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
+        /** @var string[][] $routes */
         $routes = [
             'GET' => [
                 '/pending'                                => 'getPendingAssessments',        // (no preload)
@@ -47,7 +54,9 @@ class Module extends BaseModule
                 '/grades/{userId}{/termCode}'             => 'getGrades',                    // student && term && subject
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',          // student && term && subject
             ],
-            'POST' => []
+            'POST' => [
+                '/pending/{userId}'                       => 'postPendingAssessmentsForUser', // viewee
+            ]
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
@@ -61,17 +70,22 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this->addRoutePermission($authorizer, '(?:getPendingAssessments|getClasses)', new Rule\IsLoggedIn());
 
+        // Either a SU or staff viewing their own assessments
         $this->addRoutePermission(
                 $authorizer,
-                '(?:getPendingAssessmentsForUser)',
+                '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\IsUser('userId')
+                    new Rule\All(
+                        new Rule\IsUser('userId'),
+                        new Rule\HasRole(Role::STAFF)
+                    )
                 )
             );
 
@@ -92,12 +106,24 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @throws ApplicationException\Exception If Invalid user id specified
+     * @throws \InvalidArgumentException If mapper definition not found
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getPendingAssessmentsForUser|getClasses|getGrades|getGradesYear|getGradesForSubject)',
+            '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
+            function ($params) {
+                return [
+                    'filterFactoryFactory' => new FactoryFactory($this->getMapperFactory()),
+                ];
+            }
+        );
+
+        $this->addRoutePreload(
+            $matcher,
+            '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser|getClasses|getGrades|getGradesYear|getGradesForSubject)',
             function ($params) {
                 if (array_key_exists('userId', $params)) {
                     try {
@@ -139,6 +165,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @throws \Twig_Error_Loader If template directory not found
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
@@ -147,9 +174,12 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException If mapper class not found
+     * @throws ServiceNotFound If cannot fetch service from DI
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
+        /** @var Container $injector */
         $injector->params[Controller::class] = [
             'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
@@ -162,8 +192,10 @@ class Module extends BaseModule
             'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
             'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
             'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+            'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
+            'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
             'externalClass'              => $this->getInjector()->get('externalClass'),
-            'database'                   => $this->getInjector()->get('database'),
+            'database'                   => $this->getInjector()->get('databaseInternal'),
         ];
     }
 
@@ -180,6 +212,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getUserMapper()
     {
@@ -188,6 +221,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getFolderMapper()
     {
@@ -196,6 +230,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|TermMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getTermMapper()
     {
@@ -204,6 +239,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|ErrorMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getErrorMapper()
     {

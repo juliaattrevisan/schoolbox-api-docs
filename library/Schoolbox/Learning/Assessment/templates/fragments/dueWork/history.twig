@@ -28,6 +28,11 @@
                 confirmLabel: 'Delete',
                 cancelLabel: 'Cancel',
                 confirmEvent: function () {
+
+                    {# A toast #}
+                    var $toast = $history.find('[data-alert]');
+                    $toast.toastActivate({text: 'Deleting interaction...'});
+
                     $.ajax($a.data('delete'), {
                         headers: {
                             'X-HTTP-Method-Override': 'DELETE'
@@ -41,7 +46,7 @@
                     })
                     .fail(function () {
                         {# i'll drink to that! -#}
-                        $history.find('[data-alert]').toastTimeout({
+                        $toast.toastTimeout({
                             text: 'Could not delete this interaction',
                             css: 'pop alert'
                         });

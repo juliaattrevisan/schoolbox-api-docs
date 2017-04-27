@@ -11,9 +11,11 @@ namespace Alaress\Async\Queue;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\NotificationBundle;
+use InvalidArgumentException;
 use Predis\ClientInterface;
 
-class RedisQueue implements QueueInterface
+abstract class RedisQueue implements QueueInterface
 {
 
     const TTL = 1209600; // 2 weeks
@@ -21,68 +23,13 @@ class RedisQueue implements QueueInterface
     /** @var ClientInterface */
     protected $redis;
 
-    /** @var string */
-    protected $name;
-
-    /** @var int */
-    protected $ttl;
-
 
     /**
      * @param ClientInterface $redis
-     * @param string          $name
-     * @param int             $ttl
      */
-    public function __construct(ClientInterface $redis, $name, $ttl = self::TTL)
+    public function __construct(ClientInterface $redis)
     {
         $this->redis = $redis;
-        $this->name  = $name;
-        $this->ttl   = $ttl;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-
-    /**
-     *
-     * @return Instance[]
-     */
-    public function fetch()
-    {
-        $instances = array();
-
-        $idList = $this->fetchIdList();
-
-        if (empty($idList)) {
-            return $instances;
-        }
-
-        $result = $this->exec("MGET", $idList);
-
-        $count = count($idList);
-
-        for ($i = 0; $i < $count; ++$i) {
-            $key  = $idList[$i];
-            $data = $result[$i];
-
-            // attempt to unserialize the message
-            if (is_null($data)) {
-                // the thing we're pointing at doesn't exist? remove the reference
-                 $this->exec('SREM', $this->getRedisSetKey(), $key);
-                continue;
-            }
-
-            $instances[] = $this->inflate($data);
-        }
-
-        return $instances;
     }
 
 
@@ -96,12 +43,12 @@ class RedisQueue implements QueueInterface
     {
         $id = $this->getRedisMsgKey($instance);
 
-        $exists = !!$this->exec('EXISTS', $id);
-        $listed = !!$this->exec('SISMEMBER', $this->getRedisSetKey(), $id);
+        $exists = (bool)$this->redis->exists($id);
+        $listed = (bool)$this->redis->sismember($this->getRedisSetKey(), $id);
 
         // a little housekeeping: if the 'queue' contains the reference, but the msg has expired, drop the reference
         if ($listed && !$exists) {
-            $this->exec('SREM', $this->getRedisSetKey(), $id);
+            $this->redis->srem($this->getRedisSetKey(), $id);
         }
 
         return $exists && $listed;
@@ -116,13 +63,12 @@ class RedisQueue implements QueueInterface
     public function drain()
     {
         // delete the list, which is a user's reference to the messages. they will be expired automatically (and other users may still be attached)
-        $this->exec("DEL", $this->getRedisSetKey());
+        $this->redis->del([ $this->getRedisSetKey() ]);
     }
 
 
     /**
-     * Push a message instance into this 'queue'
-     * Note: this isn't an interfaced method; AMQP doesn't support this concept
+     * Push the given instance onto this queue
      *
      * @param Instance $instance
      * @return void
@@ -132,76 +78,101 @@ class RedisQueue implements QueueInterface
         $id    = $this->getRedisMsgKey($instance);
         $data  = $this->deflate($instance);
 
-        // insert the msg body into storage, with expiry automatically set
-        $this->exec("SET", $id, $data);
-        $this->exec("EXPIRE", $id, $this->ttl);
+        // insert the msg payload ONLY if it doesn't already exist
+        $this->redis->setnx($id, $data);
+
+        // set the expiry; if the key already existed, this has the effect of resetting the TTL
+        $this->redis->expire($id, $this->getMessageExpiry());
 
         // insert the msg reference into this 'queue'
-        $this->exec("SADD", $this->getRedisSetKey(), $id);
+        $this->redis->sadd($this->getRedisSetKey(), [ $id ]);
     }
 
 
     /**
-     * Simple wrapper to encapsulate Predis interfaces
-     *
-     * @param string $cmd
-     * @param mixed $_args
-     * @return mixed
+     * @param NotificationBundle $bundle
+     * @param bool $dropCache
+     * @throws InvalidArgumentException
+     * @return void
      */
-    protected function exec($cmd, $_args = null)
+    public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false)
     {
-        // if the args just got put in this var, use that; otherwise, read func_args
-        if (!is_array($_args)) {
-            $_args = func_get_args();
-            array_shift($_args);
+        $bundle->appendInstances($this->fetch());
+    }
+
+
+    /**
+     * @return Instance[]
+     */
+    private function fetch()
+    {
+        $instances = [];
+
+        $idList = $this->fetchIdList();
+
+        if (empty($idList)) {
+            return $instances;
         }
 
-        $cmd = $this->redis->createCommand($cmd, $_args);
+        $result = $this->redis->mget($idList);
 
-        return $this->redis->executeCommand($cmd);
-    }
+        $count = count($idList);
 
+        for ($i = 0; $i < $count; ++$i) {
+            $key  = $idList[$i];
+            $data = $result[$i];
 
-    /**
-     * Returns the index hash name
-     *
-     * @return string
-     */
-    protected function getInstanceHash()
-    {
-        return "msg:" . INSTANCE_ID;
+            try {
+                $instances[] = $this->inflate($data);
+
+            } catch (InvalidArgumentException $e) {
+                // the thing we're pointing at doesn't exist or payload invalid? remove the reference
+                $this->redis->srem($this->getRedisSetKey(), $key);
+            }
+        }
+
+        return $instances;
     }
 
 
     /**
      * @return array
      */
-    protected function fetchIdList()
+    private function fetchIdList()
     {
-        return $this->exec("SMEMBERS", $this->getRedisSetKey()) ? : array();
+        return $this->redis->smembers($this->getRedisSetKey()) ?: [];
     }
 
 
     /**
-     * The key in Redis for the given Instance, in the form 'msg:vagrantx:m:hash'
+     * The key in Redis for the given Instance, in the form 'msg:INSTANCE:m:hash'
      *
      * @param Instance $instance
      * @return string
      */
-    protected function getRedisMsgKey(Instance $instance)
+    private function getRedisMsgKey(Instance $instance)
     {
-        return $this->getInstanceHash() . ':m:' . $instance->getBaseHash() . ':' . $instance->getParamHash();
+        return sprintf(
+            $this->getMessageKeyPattern(),
+            $this->getNamespace(),
+            $instance->getBaseHash(),
+            $instance->getParamHash()
+        );
     }
 
 
     /**
-     * The key for the Redis SET that holds this queue's data, in the form 'msg:vagrantx:q:name'
+     * The key for the Redis SET that holds this queue's data, in the form 'msg:INSTANCE:q:USER:TYPE'
      *
      * @return string
      */
-    protected function getRedisSetKey()
+    private function getRedisSetKey()
     {
-        return $this->getInstanceHash() . ':q:' . $this->getName();
+        return sprintf(
+            $this->getSetKeyPattern(),
+            $this->getNamespace(),
+            $this->getName()
+        );
     }
 
     /**
@@ -211,9 +182,9 @@ class RedisQueue implements QueueInterface
      * @param Instance $instance
      * @return string
      */
-    protected function deflate(Instance $instance)
+    private function deflate(Instance $instance)
     {
-        return gzcompress("$instance", 9);
+        return gzcompress(serialize($instance), 9);
     }
 
 
@@ -222,10 +193,48 @@ class RedisQueue implements QueueInterface
      * Inverse of deflate()
      *
      * @param string $data
+     * @throws InvalidArgumentException if the given payload is unable to be restored into an Instance
      * @return Instance
      */
-    protected function inflate($data)
+    private function inflate($data)
     {
-        return Instance::jsonUnserialize(gzuncompress($data));
+        $unserial = unserialize(gzuncompress($data));
+        if (!$unserial instanceof Instance) {
+            throw new InvalidArgumentException('Could not inflate and unserialize payload');
+        }
+        return $unserial;
     }
+
+
+    /**
+     * Returns the overall namespace for this queue's data
+     *
+     * @return string
+     */
+    protected abstract function getNamespace();
+
+
+    /**
+     * Return a pattern containing 2 string placeholders: namespace, and set identifier
+     *
+     * @return string
+     */
+    protected abstract function getSetKeyPattern();
+
+
+    /**
+     * Return a pattern containing 3 string placeholders: namespace, msg base-hash, and msg param-hash
+     *
+     * @return string
+     */
+    protected abstract function getMessageKeyPattern();
+
+
+    /**
+     * Return, in seconds, the TTL of any message held by this set
+     *
+     * @return int
+     */
+    protected abstract function getMessageExpiry();
+
 }

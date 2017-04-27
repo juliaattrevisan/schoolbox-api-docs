@@ -11,24 +11,24 @@ namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
 use Alaress\Scheduler\Trigger\RecurringTrigger;
-use Schoolbox\Realtime\Digest\MailNotifier;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 
 class DigestTrigger extends RecurringTrigger {
 
-	/**
-	 * @param string $schedule
-	 * @param Role $role
-	 */
-	function __construct($schedule, $role) {
+    /**
+     * @param WorkNotifier $notifier
+     * @param string       $schedule
+     * @param Role         $role
+     */
+	public function __construct(WorkNotifier $notifier, $schedule, $role) {
 		parent::__construct(
             $role->getName(),
             $schedule,
             new Event(null, '', $role, null),
-            new MailNotifier()
+            $notifier
         );
-	}
+    }
 
-} 
+}

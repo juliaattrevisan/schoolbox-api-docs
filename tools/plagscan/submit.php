@@ -9,6 +9,7 @@
  *
  */
 
+
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 
@@ -24,23 +25,23 @@ $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();
 
-if (!$mapper->getGateway()) {
+if (!$mapper->getConnector()) {
 
     /* Plagscan not configured - nothing to do
      */
-    $log->warning("Plagscan scan did not run: username/api key is not configured correctly");
+    $log->warning("Plagscan scan did not run: username, api key and/or access token is not configured correctly");
     exit();
 }
 
+/** @var Plagscan $currentDocument */
 $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
 
 $log->info("Plagscan now re-processing {$allDocuments->count()} documents");
 
 $numUpdated = 0;
 
-/** @var Plagscan $currentDocument */
 foreach ($allDocuments as $currentDocument) {
-    $prefix = "Plagscan_id {$currentDocument->getPlagscanId()}";
+    $prefix = "Plagscan Record {$currentDocument->getId()}";
 
     try {
         /** @var StudentSubmissionFile $studentSubmissionFile */
@@ -51,34 +52,26 @@ foreach ($allDocuments as $currentDocument) {
         $submissionFile = new SubmissionFile();
         $submissionFile->setStorage($studentSubmissionFile->getStorage());
 
-        /* Send it back to plag which returns some other int
-         * that we don't seem to keep anywhere - it's some kind
-         * of internal id for Plagscan itself
+        /* This returns a plagscan id upon transmission
          */
-        $log->info("{$prefix}: resubmitting student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
+        $log->info("{$prefix}: transmitting student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
-        $documentId = $mapper->getGateway()->submit($submissionFile);
+        $plagscanId = $mapper->getConnector()->transmit($submissionFile);
 
-        if (!empty($documentId)) {
+        /* Update the db with this new plagscan id
+         */
+        if ($plagscanId) {
+            $log->info("{$prefix}: queueing student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
-            $log->info("{$prefix}: checking that plagscan has {$currentDocument->getStudentSubmissionFileId()}");
-            $response = $mapper->getGateway()->check($documentId);
+            $currentDocument->setPlagscanId($plagscanId);
+            $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
+            $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+            $mapper->save($currentDocument);
 
-            if ($response) {
-                $currentDocument->setPlagscanId($documentId);
-                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
-                $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
-                $mapper->save($currentDocument);
-
-                $log->info("{$prefix}: set document {$currentDocument->getId()} to pending status");
-                $numUpdated++;
-            }
-            else {
-                $log->warning("{$prefix}: check of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
-            }
-        }
-        else {
-            $log->warning("{$prefix}: submission of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
+            $log->info("{$prefix}: set to pending status");
+            $numUpdated++;
+        } else {
+            $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
         }
     }
     catch (Schoolbox\Mapper\Exception $e) {
@@ -89,14 +82,27 @@ foreach ($allDocuments as $currentDocument) {
          */
         continue;
     }
+    catch (\DomainException $e) {
+
+        /* Could not transmit this file to plagscan for some reason
+         */
+        $log->warning("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
+    }
+    catch (\RuntimeException $e) {
+
+        /* Could not transmit this file to plagscan for some reason
+         */
+        $log->warning("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
+    }
 }
 
-$log->info("Plagscan scan completed. $numUpdated documents were scanned");
+$log->info("Plagscan transmission completed. {$numUpdated} document(s) were resent and queued");
 
 /* Also tell me how many died
  */
 $numFailed = $allDocuments->count() - $numUpdated;
 
 if ($numFailed) {
-    $log->info("$numFailed documents failed scanning");
+    $log->info("{$numFailed} document(s) failed transmitting");
 }
+

@@ -48,6 +48,11 @@ class Controller extends Component_Homepage_ControllerAbstract
     private $readOnly;
 
     /**
+     * @var bool
+     */
+    private $canWrite;
+
+    /**
      * @var CourseImplementationMapper
      */
     private $courseImplementationMapper;
@@ -92,7 +97,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function execute()
     {
         $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
-
+        $this->canWrite = $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
 
@@ -171,6 +176,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         $data = [
             'readOnly'             => $this->readOnly,
+            'canWrite'             => $this->canWrite,
             'context'              => $this->getContext(),
             'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
             'courseImplementation' => $this->courseImplementation,

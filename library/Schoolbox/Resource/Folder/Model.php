@@ -24,6 +24,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
+use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -52,9 +53,12 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * A collection of FolderCode() instances
      *
+     * You must index these by folder_code.code to enable efficient de-duplication
+     * when building collection (array key lookup vs array value traversal)
+     *
      * @var Collection|FolderCode[]
      */
-    protected $codes;
+    private $codes;
 
     /**
      * A group instance
@@ -113,7 +117,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function hasHomepage()
     {
-        return ($this->homepage instanceof HomepageConfig && $this->homepage->getTemplate()->getId());
+        return ($this->homepage instanceof HomepageConfig && $this->homepage->getTemplate() instanceof HomepageTemplate);
     }
 
     /**
@@ -453,7 +457,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @param CourseSpecification $courseSpecification
      * @return static
      */
-    public function setCourseSpecification(CourseSpecification $courseSpecification)
+    public function setCourseSpecification(CourseSpecification $courseSpecification = null)
     {
         $this->courseSpecification = $courseSpecification;
         return $this;
@@ -549,5 +553,25 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         $this->assessables->replaceWith($assessables);
         return $this;
+    }
+
+    /**
+     * Folders are an implementation context
+     *
+     * @return false
+     */
+    public function isSpecificationContext()
+    {
+        return false;
+    }
+
+    /**
+     * Folders are an implementation context
+     *
+     * @return true
+     */
+    public function isImplementationContext()
+    {
+        return true;
     }
 }

@@ -250,9 +250,9 @@ class Controller extends BaseController
     }
 
     /**
-     * Download a csv of asessment results for Accellerus
+     * Download a csv of assessment results for Accellerus
      *
-     * @api GET /learning/export/assessment/getCSV
+     * @api GET /learning/export/assessment/csv
      * @level 160
      *
      */
@@ -261,7 +261,7 @@ class Controller extends BaseController
         // Generate an updated csv
         $filename = sb_tempnam();
         $file = fopen($filename, 'w');
-        $exporter = new Exporter($this->getDi()->get('database'));
+        $exporter = new Exporter($this->getDi()->get('databaseInternal'));
         $exporter->generate($file);
         fclose($file);
 

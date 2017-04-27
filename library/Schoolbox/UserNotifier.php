@@ -12,7 +12,9 @@ namespace Schoolbox;
 
 use DomainException;
 use Exception;
-use Schoolbox\Realtime\Rerouter\RerouterCommander;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 
@@ -60,13 +62,14 @@ class UserNotifier extends AbstractModuleNotifier
      */
     public function retrieveCallbacks($label)
     {
-        return array(
-            array($this, 'notify' . ucfirst($label))
-        );
+        return [
+            [ $this, 'notifySystem' ]
+        ];
     }
 
 
     /**
+     * @deprecated
      * Manual trigger for when a user is created.
      *
      * This and manualTriggerUpdated() are intended for use by handlers, so that
@@ -85,16 +88,18 @@ class UserNotifier extends AbstractModuleNotifier
             if (is_null($currentUser)) {
                 throw new DomainException("No effector specified");
             }
+            /** @var User $user */
             $user = $this->mapper->findById($userId);
         } catch (Exception $e) {
             return false;
         }
-        $this->notifyCreated($user, $currentUser);
+        $this->notifySystem($user, $currentUser);
         return true;
     }
 
 
     /**
+     * @deprecated
      * Manual trigger for when a user is updated.
      *
      * @param int  $userId      The ID of the user who was updated
@@ -109,11 +114,12 @@ class UserNotifier extends AbstractModuleNotifier
             if (is_null($currentUser)) {
                 throw new DomainException("No effector specified");
             }
+            /** @var User $user */
             $user = $this->mapper->findById($userId);
         } catch (Exception $e) {
             return false;
         }
-        $this->notifyUpdated($user, $currentUser);
+        $this->notifySystem($user, $currentUser);
         return true;
     }
 
@@ -123,24 +129,24 @@ class UserNotifier extends AbstractModuleNotifier
      * @param User  $effector
      * @param array $diff
      */
-    public function notifyCreated($user, $effector, $diff = null)
+    public function notifySystem($user, $effector, $diff = null)
     {
-        $cmdr = new RerouterCommander($this->mapper);
-        $cmdr->adviseBindUser($user->getId());
-        $cmdr->adviseSubscribeUser($user->getId());
+        try {
+            $uam = UserAccessMapper::getInstance();
+
+            // recalculate this user
+            $uam->calculateUserSubscription(
+                $uam->createModel()
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setUser($user)
+            );
+
+            \Alaress\Redis::getClientInstance()->publish('routed.'.INSTANCE_ID.'.reload', $user->getId());
+
+        } catch (DefinitionException $e) {
+            // ur access mapper be broked, homeslice.
+        }
     }
 
-
-    /**
-     * @param User  $user
-     * @param User  $effector
-     * @param array $diff
-     */
-    public function notifyUpdated($user, $effector, $diff = null)
-    {
-        // as above, only executed if externalId changed
-        $cmdr = new RerouterCommander($this->mapper);
-        $cmdr->adviseBindUser($user->getId());
-    }
 
 }

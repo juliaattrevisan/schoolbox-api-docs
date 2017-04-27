@@ -43,6 +43,9 @@ then
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
+echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
+find $cachedir -type f -empty -delete;
+
 # function to retrieve latest files from S3, needs $S3file set first
 S3file_short='';
 getS3file() {
@@ -53,29 +56,42 @@ getS3file() {
         predir=`pwd`;
         cd $cachedir;
 
-        etag=`curl -I $data_source/$S3file 2>/dev/null | grep ETag | cut -d'"' -f2`;
+        curletag=`curl -I $data_source/$S3file 2>/dev/null`;
         if [ $? -eq 0 ];
         then
-            # If S3file_short is not set, assume same as S3file for simplicity
-            if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
-            # Auto cleanup etag cache file if actual file is missing
-            if [ ! -f $S3file_short ]; then rm -f $S3file_short.etag.cache; fi;
-            checketag=`grep $etag $S3file_short.etag.cache 2>/dev/null | wc -l`;
-            if [ $checketag -eq 0 ];
+            responsecode=`echo "$curletag" | egrep 'HTTP/(1.0|1.1|2)' | cut -d' ' -f2`;
+            if [ "$responsecode" != "200" ];
             then
-                # New/updated version available - download it
-                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file_short";
-                wget --no-verbose $data_source/$S3file -O $S3file_short 2>&1;
-                if [ $? -eq 0 ];
-                then
-                    # This is a new file, so remove old references
-                    sed -i "/$S3file_short/d" $S3file_short.etag.cache 2>/dev/null;
-                    # Add new file to etag cache
-                    echo "$etag $S3file_short" >> $S3file_short.etag.cache;
-                fi
+                echo "[SB][`date +%Y-%m-%d\ %X`] File unable to be retrieved (code $responsecode), using cache: $S3file";
             else
-                echo "[SB][`date +%Y-%m-%d\ %X`] File up to date: $S3file_short";
+                etag=`echo "$curletag" | grep ETag | cut -d'"' -f2`;
+                # If S3file_short is not set, assume same as S3file for simplicity
+                if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
+                # Auto cleanup etag cache file if actual file is missing
+                if [ ! -f $S3file_short ]; then rm -f $S3file_short.etag.cache; fi;
+                checketag=`grep $etag $S3file_short.etag.cache 2>/dev/null | wc -l`;
+                if [ $checketag -eq 0 ];
+                then
+                    # New/updated version available - download it
+                    echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file_short";
+                    wget --no-verbose $data_source/$S3file -O $S3file_short 2>&1;
+                    if [ $? -eq 0 ];
+                    then
+                        # This is a new file, so remove old references
+                        sed -i "/$S3file_short/d" $S3file_short.etag.cache 2>/dev/null;
+                        # Add new file to etag cache
+                        echo "$etag $S3file_short" >> $S3file_short.etag.cache;
+                    else
+                        # when download fails, remove bad download
+                        echo "[SB][`date +%Y-%m-%d\ %X`] Download failed of: $S3file_short";
+                        rm -vf $S3file_short;
+                    fi
+                else
+                    echo "[SB][`date +%Y-%m-%d\ %X`] File up to date: $S3file_short";
+                fi
             fi
+        else
+            echo "[SB][`date +%Y-%m-%d\ %X`] File unable to be retrieved, using cache: $S3file";
         fi
 
         cd $predir;
@@ -85,7 +101,7 @@ getS3file() {
 S3file='vagrant.sql'
 S3file_short='vagrant.sql'
 getS3file;
-if [ ! -f $cachedir/$S3file ];
+if [ ! -f $cachedir/$S3file_short ];
 then
     echo "Error: file missing $S3file";
     exit 1;
@@ -94,7 +110,7 @@ fi
 S3file='vagrant-cleanup.sql'
 S3file_short='vagrant-cleanup.sql'
 getS3file;
-if [ ! -f $cachedir/$S3file ];
+if [ ! -f $cachedir/$S3file_short ];
 then
     echo "Error: file missing $S3file";
     exit 1;
@@ -103,7 +119,7 @@ fi
 S3file="$data_filename";
 S3file_short="$data_filename_short";
 getS3file;
-if [ ! -f $cachedir/$S3file ];
+if [ ! -f $cachedir/$S3file_short ];
 then
     echo "Error: file missing $S3file";
     exit 1;
@@ -479,14 +495,13 @@ cd /vagrant;
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed (a second time)";
 /vagrant/tools/grunt.sh;
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Building JS files via UglifyJS";
+grunt build.js;
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS";
 /vagrant/tools/pkg-build-sass.sh --sass;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Run Notifications binder (in background)";
-cd /vagrant/tools/mq;
-./binder.php &
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-scheduled";
 cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
@@ -500,9 +515,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-digestd";
 cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
 cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-rerouted";
-cp -f /vagrant/tools/init/upstart-rerouted.conf /etc/init/schoolbox-rerouted.conf;
-cp -f /vagrant/tools/init/upstart-rerouted.override /etc/init/schoolbox-rerouted.override;
+echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-routed";
+cp -f /vagrant/tools/init/upstart-routed.conf /etc/init/schoolbox-routed.conf;
+cp -f /vagrant/tools/init/upstart-routed.override /etc/init/schoolbox-routed.override;
 
 #echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-belld";
 #cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
@@ -528,7 +543,7 @@ service nginx restart > /dev/null 2>&1;
 service schoolbox-scheduled restart > /dev/null 2>/dev/null &
 service schoolbox-socketd restart > /dev/null 2>/dev/null &
 service schoolbox-digestd restart > /dev/null 2>/dev/null &
-service schoolbox-rerouted restart > /dev/null 2>/dev/null &
+service schoolbox-routed restart > /dev/null 2>/dev/null &
 #service schoolbox-belld restart > /dev/null 2>/dev/null &
 
 # call custom provisioning

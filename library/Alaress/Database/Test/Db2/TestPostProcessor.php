@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * IBM DB2 driver statement tests
+ *
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Alaress\Database\Test\Db2;
+
+use Alaress\Database\Factory;
+use Alaress\Database\Test\TestConnectorTrait;
+use Database;
+use PHPUnit_Framework_TestCase;
+
+class TestPostProcessor extends PHPUnit_Framework_TestCase
+{
+    use TestConnectorTrait;
+
+    /**
+     * Test function to trim whitespace from array/value
+     *
+     * @param array|string $input
+     * @return array|string $input
+     */
+    public function trimWhitespace($input)
+    {
+        if (is_array($input)) {
+            $output = [];
+            foreach ($input as $key => $value) {
+                $output[$key] = trim($value);
+            }
+            return $output;
+        } else {
+            return trim($input);
+        }
+    }
+
+    /**
+     * Test plain old boring statements
+     */
+    public function testPostProcessor()
+    {
+        $database = Database::getInstance();
+        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
+
+        $factory = new Factory();
+
+        $db2Test = $factory->createDb2();
+        $db2Test->connect(
+            'ec2-13-54-248-74.ap-southeast-2.compute.amazonaws.com:50000',
+            'SBOXTEST',
+            'sbox',
+            'tnp879'
+        );
+
+        $db2Test->addPostProcessor([$this, 'trimWhitespace']);
+
+        // ----------------------------------------------------------------------------------------------------------------
+        // Add post-processor to trim whitespace from results
+        // ----------------------------------------------------------------------------------------------------------------
+
+        $statement = $db2Test->executeQuery("
+            VALUES '     douglas' UNION 
+            VALUES '  damian' UNION 
+            VALUES '  doctor    ' UNION 
+            VALUES '  steve' UNION 
+            VALUES ' andy    ' UNION 
+            VALUES ' nat    ' UNION 
+            VALUES 'amri    ' UNION 
+            VALUES 'stu ' UNION
+            VALUES 'zfuturedevs' 
+        ");
+
+        $count = 0;
+        $expectedResult = ['douglas', 'damian', 'doctor', 'steve', 'andy', 'nat', 'amri', 'stu', 'zfuturedevs'];
+
+        while ($row = $statement->fetch()) {
+            $this->assertSame(strtolower($row[1]), $expectedResult[$count]);
+            $count++;
+        }
+
+        $this->assertSame(9, $count);
+    }
+}
+

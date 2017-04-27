@@ -6,14 +6,12 @@
 <script type="text/javascript" src="/learninganalytics/js/effort/scatter.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
 
-{% set selectedFolder = metadata.selectedClassFolder %}
-{% set courseSpec     = metadata.courseSpecification %}
-{% set routeUsed      = metadata.routeUsed %}
-{% set route          = metadata.route %}
-{% set taskTypeId     = metadata.selectedTaskIdFilter %}
-{% set term           = metadata.term %}
-{% set folders        = metadata.unitImplementationFolders %}
-{% set routeArgs      = { courseSpecId: courseSpec.id, folderId: selectedFolder.id, taskTypeId: taskTypeId, termCode: metadata.term.code } %}
+{% set routeArgs = {
+    courseSpecId:     courseSpec.id,
+    folderId:         classFolder.id,
+    submissionTypeId: submissionType.Id,
+    termCode:         term.code
+} %}
 
 <script type="text/javascript">
     $(function () {
@@ -27,11 +25,11 @@
             title: '',
             mostAdvancedStudent: {{ overallProgress.mostAdvancedStudent }},
             classCompletions: {{ overallProgress.classCompletions }},
-            clusterName: '{{ selectedFolder ? 'Class' : 'Cohort' }}'
+            clusterName: '{{ classFolder ? 'Class' : 'Cohort' }}'
         });
 
         /**
-         *  Boxplots for each Task in the Unit
+         *  Boxplots for each Assessment in the Unit
          */
         $.fn.boxPlotRender({
             element: '[data-graph=boxplots]',
@@ -48,18 +46,18 @@
              * These correspond to a series of data and their respective
              * five-point summaries
              */
-            allAssessments: {{ results.activities.all | column('title') | json_encode | raw }},
+            allAssessments: {{ results.assessments | column('title') | json_encode | raw }},
 
             /* All the raw data
              */
             allData: $.fn.boxPlotCalculateAllSeriesData([
-                {% for activity in results.activities.all -%}
+                {% for grades in results.grades -%}
                 [
-                    {% for feedback in results.all[activity.id] -%}
+                    {% for userGrade in grades -%}
                     {
-                        info: "{{ feedback.reviewee.fullName }}",
-                        uid: '{{ feedback.reviewee.id }}',
-                        value: {{ feedback.normalisedMark ?: 'null' }}
+                        info: "{{ userGrade.user.fullName }}",
+                        uid: '{{ userGrade.user.id }}',
+                        value: {{ userGrade.grade }}
                     }{% if not loop.last %}, {% endif -%}
                     {% else %}{# Highcharts won't render without at least one data point -#}
                     {
@@ -80,7 +78,7 @@
         $.fn.unitProgressRender({
             element: '[data-graph=unit-progress]',
             title: '',
-            clusterName: '{{ selectedFolder ? 'Class' : 'Cohort' }}',
+            clusterName: '{{ classFolder ? 'Class' : 'Cohort' }}',
             units: [
                 {% for currentUnit in progress.allUnits %}"{{ currentUnit.unit.title }}"{% if not loop.last %},{% endif %}{% endfor %}
 
@@ -189,11 +187,11 @@
     [ 'Learning' ],
     [ 'Courses', routeLookup('course.courseList') ],
     [ courseSpec.title, '/homepage/' ~ courseSpec.folder.id ],
-    [ 'Analytics', routeLookup('learningAnalytics.' ~ routeUsed | replace({'folder': 'course'}), routeArgs) ],
+    [ 'Analytics', routeLookup(currentRoute | replace({'folder': 'course'}), routeArgs) ],
 ] %}
 
-{% if selectedFolder %}
-    {% set trail = trail | merge([ [ selectedFolder.nameWithCodes ] ]) %}
+{% if classFolder %}
+    {% set trail = trail | merge([ [ classFolder.nameWithCodes ] ]) %}
 {% endif %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -203,14 +201,14 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
-        {% if folders | length %}
+        {% if classFolders | length %}
         <dl class="sub-nav">
-            <dd{% if not selectedFolder %} class="active"{% endif %}>
-                <a href="{{ routeLookup('learningAnalytics.' ~ routeUsed | replace({'folder': 'course'}), routeArgs) }}" class="button">All classes</a>
+            <dd{% if not classFolder %} class="active"{% endif %}>
+                <a href="{{ routeLookup(currentRoute | replace({'folder': 'course'}), routeArgs) }}" class="button">All classes</a>
             </dd>
-            {% for folder in folders %}
-                {% set active = (folder.id == selectedFolder.id) and (route == 'folder') %}
-                {% set href   = routeLookup('learningAnalytics.' ~ routeUsed | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
+            {% for folder in classFolders %}
+                {% set active = (folder.id == classFolder.id) and (route == 'folder') %}
+                {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
 
                 <dd class="{% if active %}active{% endif %}">
                     <a href="{{ href }}" class="button">{{ folder.nameWithCodes }}</a>
@@ -222,10 +220,10 @@
         <ul class="meta">
             <li class="icon-course-builder" title="Course"><a href="/homepage/{{ courseSpec.folder.id }}" title="Course Page">{{ courseSpec.title }}</a></li>
 
-            {% if selectedFolder %}
-            <li class="icon-home" title="Class"><a href="/homepage/{{ selectedFolder.id }}" title="Class Page">{{ selectedFolder.nameWithCodes }}</a></li>
+            {% if classFolder %}
+            <li class="icon-home" title="Class"><a href="/homepage/{{ classFolder.id }}" title="Class Page">{{ classFolder.nameWithCodes }}</a></li>
             {% endif %}
-            <li class="icon-staff-students" title="Students">{{ effort.allEffort | length }} students</li>
+            <li class="icon-staff-students" title="Students">{{ students | length }} students</li>
         </ul>
     </div>
 </div>
@@ -236,12 +234,23 @@
         {% include 'sub/semesterSelector.twig' with {
             currentTerm: term,
             terms:       terms,
-            route:       'learningAnalytics.' ~ routeUsed,
+            route:       currentRoute,
             routeArgs:   routeArgs
         } only %}
         </div>
     </div>
 </div>
+
+{% if 0 == (dueAssessments | length) %}
+<div class="row">
+    <div class="small-12">
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>There are no activities due in this term, maybe try selecting a different term.</p>
+        </div>
+    </div>
+</div>
+{% else %}
 
 
 <div class="row">
@@ -256,9 +265,9 @@
         <h3 class="subheader">Top Students</h3>
 
         <section>
-            {% if results.ranking.top | length > 0 %}
+            {% if ranking.top | length > 0 %}
             <ul class="information-list">
-                {% for currentStudent in results.ranking.top | slice(0,3) %}
+                {% for currentStudent in ranking.top | slice(0,3) %}
                 <li>
                     <div class="card small-12">
                         <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
@@ -273,7 +282,7 @@
             {% else %}
             <div class="content">
                 <p>
-                    Nobody has attempted these tasks yet.
+                    Nobody has attempted these activities yet.
                 </p>
             </div>
             {% endif %}
@@ -283,9 +292,9 @@
         <h3 class="subheader">Bottom Students</h3>
 
         <section>
-            {% if results.ranking.bottom | length > 0 %}
+            {% if ranking.bottom | length > 0 %}
             <ul class="information-list">
-                {% for currentStudent in results.ranking.bottom | slice(0,3) %}
+                {% for currentStudent in ranking.bottom | slice(0,3) %}
                 <li>
                     <div class="card small-12">
                         <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
@@ -300,7 +309,7 @@
             {% else %}
             <div class="content">
                 <p>
-                    Nobody has attempted these tasks yet.
+                    Nobody has attempted these activities yet.
                 </p>
             </div>
             {% endif %}
@@ -313,9 +322,9 @@
         <div class="small-12 columns">
             <h2 class="subheader">Results</h2>
 
-            {% if results.tasks.types.selected.id > 0 %}
+            {% if submissionType %}
             <ul class="meta">
-                <li class="icon-due-work">{{ results.tasks.types.selected.name }}</li>
+                <li class="icon-due-work">{{ submissionType.name }}</li>
             </ul>
             {% endif %}
         </div>
@@ -324,26 +333,32 @@
         <a class="icon-more" title="Filter Options" data-dropdown="result-filter-options"></a>
     </nav>
     <ul id="result-filter-options" class="f-dropdown" data-dropdown-content>
-
-        {% if route == 'course' %}
-            <li><a href="{{ routeLookup('learningAnalytics.course', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
-            {% for currentTaskType in results.tasks.types.all %}
-            <li><a href="{{ routeLookup('learningAnalytics.courseWithTask', routeArgs) }}/task/{{ currentTaskType.id }}" class="icon-due-work" title="{{ currentTaskType.name }}">{{ currentTaskType.name }}</a></li>
-            {% endfor %}
-        {% elseif route == 'folder' %}
-            <li><a href="{{ routeLookup('learningAnalytics.folder', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
-            {% for currentTaskType in results.tasks.types.all %}
-            <li><a href="{{ routeLookup('learningAnalytics.folderWithTask', routeArgs) }}/task/{{ currentTaskType.id }}" class='icon-due-work' title="{{ currentTaskType.name }}">{{ currentTaskType.name }}</a></li>
-            {% endfor %}
-        {% endif %}
+        <li><a href="{{ routeLookup('learningAnalytics.'~route~'WithTerm', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
+        {% for submissionType in submissionTypes %}
+        <li><a href="{{ routeLookup('learningAnalytics.'~route~'WithSubmissionTypeAndTerm', routeArgs|merge({submissionTypeId: submissionType.id})) }}" class='icon-due-work' title="{{ submissionType.name }}">{{ submissionType.name }}</a></li>
+        {% endfor %}
     </ul>
 </div>
 
 <div class="row">
     <div class="small-12 island">
+        {% if results.assessments | length %}
         <section class="content">
             <div data-graph="boxplots"></div>
         </section>
+        {% elseif 0 == (gradableAssessments | length) %}
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>There are no gradable activities due in this term, maybe try selecting a different term.</p>
+            <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>There are no activity results that match current submission type filter.</p>
+            <p><a href="{{ routeLookup('learningAnalytics.'~route~'WithTerm', routeArgs) }}">Remove filter</a></p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -374,8 +389,17 @@
             <span class='hint has-tip tip-top' title="The Effort Graph aggregates data across all terms/semesters" data-tooltip>?</span>
         </h2>
 
+        {% if results.assessments | length %}
         <section class="content">
             <div data-graph="effort"></div>
         </section>
+        {% elseif 0 == (gradableAssessments | length) %}
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>There are no gradable activities due in this term, maybe try selecting a different term.</p>
+            <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
+{% endif %}

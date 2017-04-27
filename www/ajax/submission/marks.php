@@ -23,7 +23,7 @@ new SitePage();
 
 // no request method, this didn't come via apache
 if(!isset($_SERVER['REQUEST_METHOD'])) {
-	respond('Not a server request', '400 Bad Request');
+	respond('Not a server request', 400);
 }
 
 switch($_SERVER['REQUEST_METHOD']) {
@@ -36,22 +36,22 @@ switch($_SERVER['REQUEST_METHOD']) {
 			$output = getMarks((int)$_GET['user'], (int)$_GET['category'], (int)$_SESSION['id']);
 		}
 
-		respond($output, '200 OK', 'application/json');
+		respond($output, 200, 'application/json');
 		break;
 
 	case 'POST':
 		if(isset($_POST['weight'])) {
 			$output = setAssessmentWeight($_POST['weight']);
 			if(!is_null($output)) {
-				respond($output, '200 OK', 'application/json');
+				respond($output, 200, 'application/json');
 				break;
 			}
 		}
-		respond('Not a valid request.', '400 Bad Request');
+		respond('Not a valid request.', 400);
 		break;
 
 	default:
-		respond('Can only GET or POST marks.', '405 Method Not Allowed');
+		respond('Can only GET or POST marks.', 405);
 }
 
 /**
@@ -70,7 +70,7 @@ function getMarks($userId, $catId, $sessionUserId, $year = 0, $semester = 0) {
 		// test permissions on sessionUser
 		$sessionUser = UserMapper::getInstance()->findById($sessionUserId);
 		if($sessionUser->getRole()->getType() != \Schoolbox\Role::STAFF) {
-			respond('Access denied', '403 Forbidden');
+			respond('Access denied', 403);
 			exit;
 		}
 
@@ -85,7 +85,7 @@ function getMarks($userId, $catId, $sessionUserId, $year = 0, $semester = 0) {
 
 	}
 	catch(MapperException $e) {
-		respond($e->getMessage(), '400 Bad Request');
+		respond($e->getMessage(), 400);
 		exit;
 	}
 
@@ -178,10 +178,10 @@ function setAssessmentWeight($weights) {
 }
 
 
-function respond($body, $code = '200 OK', $contentType = 'text/plain') {
+function respond($body, $code = 200, $contentType = 'text/plain') {
 	// clear any extraneous output
 	ob_clean();
-	header("HTTP/1.1 $code");
+	http_response_code($code);
 	header("Content-Type: $contentType");
 	die($body);
 }

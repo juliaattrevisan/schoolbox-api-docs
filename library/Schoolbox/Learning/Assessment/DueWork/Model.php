@@ -20,9 +20,15 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\Participant;
 
 class Model extends AbstractAssessment
 {
+    /**
+     * @var string
+     */
+    protected $defaultTypeName = 'Due Work';
+
     /**
      * Accept zero submissions online
      */
@@ -46,14 +52,6 @@ class Model extends AbstractAssessment
      * @var Collection|File[]
      */
     protected $attachedFiles;
-
-    /**
-     * The "type" of the Due Work
-     * (Essay, Homework, etc)
-     *
-     * @var WorkType
-     */
-    protected $workType;
 
     /**
      * An enum for accepting submissions online
@@ -109,7 +107,6 @@ class Model extends AbstractAssessment
         parent::__construct();
 
         $this->setAttachedFiles(new Collection());
-        $this->setWorkType(new WorkType());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         $this->setAttachedFiles(new Collection());
     }
@@ -133,6 +130,29 @@ class Model extends AbstractAssessment
          */
         $clone->setRubric(null);
         return $clone;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isFeedbackRequired(Participant $participant)
+    {
+        $this->assertSameAssessment($participant);
+
+        // No responses, or latest response has published feedback already ?
+        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
+        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
+            return false;
+        }
+
+        // One or more responses and no feedback ?
+        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
+        if (!$latestPublishedFeedback) {
+            return true;
+        }
+
+        // Was the latest student response submitted after the latest mark was published?
+        return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
     }
 
 
@@ -226,17 +246,6 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function getTypeName()
-    {
-        $subTypeName = $this->getWorkType()->getName();
-        return $subTypeName ?: 'Due Work';
-    }
-
-    /**
      * DueWork does not use the MarkScheme. It merely returns the cached value.
      *
      * @param User $user
@@ -249,18 +258,6 @@ class Model extends AbstractAssessment
         return $this->getMark($user, $publishedOnly, $normalised);
     }
 
-    /**
-     * DueWork does not use the MarkScheme. It merely returns the cached value.
-     *
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return float|null
-     */
-    public function getNormalisedMark(User $user, $publishedOnly)
-    {
-        $normalised = true;
-        return $this->getMark($user, $publishedOnly, $normalised);
-    }
 
     /**
      * @inheritdoc
@@ -459,24 +456,6 @@ class Model extends AbstractAssessment
     public function setRubric(Rubric $rubric = null)
     {
         $this->rubric = $rubric;
-        return $this;
-    }
-
-    /**
-     * @return WorkType
-     */
-    public function getWorkType()
-    {
-        return $this->workType;
-    }
-
-    /**
-     * @param WorkType $workType
-     * @return self
-     */
-    public function setWorkType($workType)
-    {
-        $this->workType = $workType;
         return $this;
     }
 

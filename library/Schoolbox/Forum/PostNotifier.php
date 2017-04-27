@@ -200,9 +200,10 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
         /** @var Post $parent */
         $quotedId = 0;
-        if (($parentId = $post->getParent()->getId()) !== null) {
+        $parent = $post->getParent();
+        if ($parent instanceof Post) {
             try {
-                $parent   = $this->mapper->findById($parentId);
+                $parent   = $this->mapper->findById($parent->getId());
                 $quotedId = $parent->getOwner()->getId();
             } catch (Mapper\Exception $e) {
                 // leave quoted ID at zero

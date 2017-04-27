@@ -56,10 +56,10 @@ function httpError($code, $message) {
         '405' => 'Method Not Allowed',
     );
     if(isset($codes[$code])) {
-        header('HTTP/1.1 '.$code.' '.$codes[$code]);
+        http_response_code($code);
     }
     else {
-        header('HTTP/1.1 400 Bad Request');
+        http_response_code(400);
     }
     die($msg);
 }
@@ -164,4 +164,15 @@ REGEXP;
 function sb_tempnam($prefix = '', $dir = '')
 {
     return tempnam($dir ?: sys_get_temp_dir(), 'sb-' . INSTANCE_ID . ($prefix ? "-$prefix" : ''));
+}
+
+/**
+ * Get the number of file descriptors this process is currently holding open
+ *
+ * @return int
+ */
+function open_fd_count()
+{
+    $pid = getmypid();
+    return (int)`lsof -ap $pid | wc -l`;
 }

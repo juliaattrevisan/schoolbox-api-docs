@@ -7,14 +7,20 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $questionHandler = new Assess_Question();
 $sectionHandler = new Assess_Section();
-$groupHandler = new Group();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
+$assess = $assessHandler->getByID($section['assess_id']);
 
 /* TODO: Check if this test is for your category
  */
@@ -29,8 +35,39 @@ if ($assessHandler->isOwner($section['assess_id'])) {
 
  */
 
-if ($assessHandler->isExpired($section['assess_id'])) {
-    error(120);
+/**
+ * @var SitePage $this
+ * @var AssessmentDataSource $assessmentDataSource
+ */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
+$assessment       = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
+$assessmentFolder = $assessment->getBaseContext()->getFolder();
+$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
+
+if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
+        error(19);
+    }
+
+    // I can't do this if not a participant
+    if (!$assessment->isParticipant($_SESSION['user'])) {
+        error(19);
+    }
+
+    // I can't attempt this if it has expired
+    if ($assessHandler->isExpired($assess['assess_id'])) {
+        error(120);
+    }
+
+    // I can't attempt this if it isn't open
+    if (!$assessHandler->isOpen($assess)) {
+        error(143);
+    }
+
+} else {
+    // I can do whatever I want
 }
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
@@ -44,10 +81,6 @@ $assess = $assessHandler->getByID($section['assess_id']);
 
 if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
     $this->pageNotFound();
-}
-
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	error(143);
 }
 
 if (!$question) {
@@ -72,7 +105,7 @@ if($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']
     echo json_encode($result);
 }
 else {
-    header('HTTP/1.1 403 Forbidden, invalid attempt');
+    http_response_code(403);
 }
 
 /* Prevent rendering of template

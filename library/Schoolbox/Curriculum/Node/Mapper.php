@@ -10,7 +10,8 @@
 namespace Schoolbox\Curriculum\Node;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Curriculum\LearningArea;
+use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper implements BaseMapper\Searchable
@@ -19,112 +20,19 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     {
         $this->hasTable('curriculum_node');
         $this->hasModel(Model::class);
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'curriculum_node_parent_id',
-                'property' => 'parent',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'parent',
-                'join_def' => array(
-                    'other_key' => 'id',
-                    'mapper'    => '\\Schoolbox\\Curriculum\\Node\\Mapper',
-                ),
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'curriculum_learning_level_id',
-                'property' => 'learningLevel',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'level',
-                'join_def' => array(
-                    'other_key' => 'id',
-                    'mapper'    => '\\Schoolbox\\Curriculum\\LearningLevel\\Mapper',
-                ),
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'curriculum_learning_area_id',
-                'property' => 'learningArea',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'area',
-                'join_def' => array(
-                    'other_key' => 'id',
-                    'mapper'    => '\\Schoolbox\\Curriculum\\LearningArea\\Mapper',
-                ),
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'code',
-                'property' => 'code',
-                'type'     => self::TYPE_STRING
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'order',
-                'property' => 'order',
-                'type'     => self::TYPE_INTEGER
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'description',
-                'property' => 'description',
-                'type'     => self::TYPE_STRING
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'reference',
-                'property' => 'reference',
-                'type'     => self::TYPE_STRING
-            )
-        );
-
-        // Created/Modified/Deleted
-        $this->hasMap(
-            array(
-                'column'            => 'created_at',
-                'property'          => 'createdAt',
-                'type'              => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'            => 'modified_at',
-                'property'          => 'modifiedAt',
-                'type'              => self::TYPE_DATETIME,
-                'updated_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasSoftDeleteDateField('deleted_at');
-        $this->registerCallback('postSoftDelete', array($this, 'deleteChildren'));
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('curriculum_node_parent_id', self::class, 'id', null, null, 'parent', 'parent');
+        $this->joins('curriculum_learning_level_id', LearningLevel\Mapper::class, 'id', null, null, 'learningLevel', 'level');
+        $this->joins('curriculum_learning_area_id', LearningArea\Mapper::class, 'id', null, null, 'learningArea', 'area');
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('code', self::TYPE_STRING);
+        $this->uses('order', self::TYPE_INTEGER);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('reference', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteChildren'));
     }
 
     /**
@@ -192,16 +100,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     ) {
         $query = "
             SELECT
-                {$this->getColumnString('n')},
-                {$this->getJoinColumnString('level', 'nl')},
-                {$this->getJoinColumnString('level.source', 'nls')},
-                {$this->getJoinColumnString('area', 'na')},
-                {$this->getJoinColumnString('area.source', 'nas')}
+                {$this->getColumnString('n')}
             FROM {$this->getTable()} n
-            INNER JOIN {$this->getJoinSql('level', 'n', 'nl')}
-            INNER JOIN {$this->getJoinSql('level.source', 'nl', 'nls')}
-            INNER JOIN {$this->getJoinSql('area', 'n', 'na')}
-            INNER JOIN {$this->getJoinSql('area.source', 'na', 'nas')}
             WHERE n.deleted_at IS NULL
             AND   (n.code LIKE :codeLike OR (n.code != '' AND n.name LIKE :nameLike))
         ";
@@ -228,15 +128,11 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
 
         $statement->execute();
-        return $this->hydrateList(
-            $statement,
-            'n',
-            function ($mapper, $model, $row) {
-                /** @var self $mapper */
-                /** @var Model $model */
-                return $mapper->hydrateWithRelatedJoins($row, 'n', 'na', 'nas', 'nl', 'nls');
-            }
-        );
+        $result = $this->hydrateList($statement, 'n')
+            ->map(function (Model $model) {
+                return $this->loadAncestors($model, 'parent');
+            });
+        return $result;
     }
 
     /**
@@ -261,7 +157,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     ) {
         /** @var Model $curriculumNode */
         $curriculumNode = $this->hydrate($row, $alias);
-        if ($curriculumNode->getId()) {
+        if ($curriculumNode) {
             $curriculumNode->setLearningArea(
                 $this->getJoinMapper('area')->hydrate($row, $areaAlias)
                     ->setSource(

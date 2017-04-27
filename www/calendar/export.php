@@ -12,6 +12,7 @@
 
 $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
@@ -136,7 +137,9 @@ try {
             break;
 
         case 'external':
-            $api = new Calendar_Api_EventType_Event_External_Default($user, array());
+            /** @var IConnector $databaseExternal */
+            $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
+            $api = new Calendar_Api_EventType_Event_External_Default($user, $databaseExternal, array());
             $filename =  'external';
             break;
 
@@ -196,25 +199,16 @@ try {
 
     $exporter->renderAll();
 } catch (SchoolboxException $e) {
-    //
-    // I wish I could use http_response_code() method here!
     $code = $e->getCode();
-    $text = '';
     switch ($code) {
         case 400:
-            $text = 'Bad Request';
-            break;
-
         case 401:
-            $text = 'Unauthorized';
             break;
 
         default:
             $code = 500;
-            $text = 'Internal Server Error';
             break;
     }
-    $protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
-    header($protocol . ' ' . $code . ' ' . $text);
+    http_response_code($code);
     echo $e->getMessage();
 }

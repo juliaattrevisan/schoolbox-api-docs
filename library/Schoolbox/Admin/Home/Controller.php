@@ -9,7 +9,9 @@
 
 namespace Schoolbox\Admin\Home;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
@@ -255,7 +257,15 @@ class Controller extends Base
      * Provides a view of the current external DB health, linked from the admin dashboard
      */
     public function getHealthcheck() {
-        $healthCheck = new Healthcheck();
+
+        /** @var IConnector $databaseExternal */
+        $databaseExternal = $this->getDi()->get('databaseExternal');
+
+        /** @var IConfigLoader $configMapper */
+        $configMapper = $this->getDi()->get('config');
+
+        $healthCheck = new Healthcheck($databaseExternal, $configMapper);
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminHome/healthcheck.twig',

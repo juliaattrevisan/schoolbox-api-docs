@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * CLI-facing object to perform a health check on external database permissions
  *
  * Notes: hacked from the sync->diagnose() configuration by Matt Day
@@ -10,26 +9,46 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\Base as BaseStatement;
+use Schoolbox\IConfigLoader;
+
 class Healthcheck
 {
-    /**
-     * @var resource Contains DB connection string
-     */
-    private $db;
+    /** @var string $db External database connector type */
+    private $externalType;
+
+    /** @var string $log Contains log of check output */
+    private $log = '';
+
+    /** @var string $errors */
+    private $errors = [];
+
+    /** @var IConnector */
+    private $connector;
+    
+    /** @var IConnector[] $secondaryConnectors Array of secondary database connectors */
+    private $secondaryConnectors = [];
+
+    /** @var array This is an array used to hold the output parameters of procedure calls */
+    private $outputParameters = [];
+
+    /** @var IConfigLoader  */
+    private $configMapper;
 
     /**
-     * @var string Contains log of check output
+     * Constructor
+     *
+     * @param IConnector $databaseExternal
+     * @param IConfigLoader $configMapper
+     * @throws Exception
      */
-    private $log;
-
-    public function __construct($db = '')
+    public function __construct($databaseExternal, $configMapper)
     {
-        $this->db = ($db) ? $db : ucfirst(strtolower(Config::get('external_type')));
-
-        // check for remapping the Schoolbox db type to be External (which refers to CSV digestion)
-        if ($this->db == 'Schoolbox') {
-            $this->db = 'External';
-        }
+        $this->connector = $databaseExternal;
+        $this->configMapper = $configMapper;
+        $this->externalType = $configMapper->get('external_type');
     }
 
     /**
@@ -37,742 +56,579 @@ class Healthcheck
      */
     public function run()
     {
-        // for the sake of modularity, this is split out into subordinate methods
-        $refl = new ReflectionObject($this);
-        foreach ($refl->getMethods(ReflectionMethod::IS_PRIVATE) as $m) {
-            $meth = $m->name;
-            if (strpos($meth, $this->db) !== false || strpos($meth, 'Schoolbox') !== false) {
-                $this->$meth();
+        // Make sure databases connected correctly
+
+        if ($this->connector == null) {
+            $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
+        }
+
+        /** @var IConnector $connector */
+        foreach ($this->secondaryConnectors as $connector) {
+            if ($connector == null) {
+                $this->log .= "ERROR: Unable to connect to database '{$connector->getDatabase()}' (Hostname: {$connector->getHostname()})\n";
             }
-        }
-        return $this->log;
-    }
+        };
 
-    /* all private methods with 'Schoolbox' or the current db name will be picked up by the reflection in run() */
+        $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
+        $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
 
-    private function MssqlConnection()
-    {
-        $this->log .= "  MSSQL : ";
-        $db = new MSSQL();
-        $db->debug = true;
-        $result = $db->query("SELECT @@VERSION");
-        if ($result) {
-            $this->log .= "OK\n";
-        } else {
-            $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-        }
-        unset($db,$result);
+        $testFunctionName = "{$this->externalType}Test";
+
+        $this->$testFunctionName();
+
+        return [
+            'log' => trim($this->log) . "\n",
+            'errors' => $this->errors,
+            'externalType' => $this->externalType
+        ];
     }
 
     /**
-     * Gets connection to A+ database.
+     * Test a query against each database object in the supplied array
      *
-     * @return MSSQL
+     * @param array $objects
+     * @param string $query
      */
-    private function getMssqlAPlusConnection()
+    private function selectTest($objects, $query = "SELECT TOP 1 * FROM :object")
     {
-        $db = new MSSQL(
-            Config::get('external_humanedge_aplus_db_db'),
+        sort($objects);
+
+        $method = (explode(' ', trim($query)))[0];
+
+        foreach ($objects as $object) {
+
+            $this->log .= str_pad(str_pad($method, 15) . $object, 50);
+
+            $sql = str_replace(':object', $object, $query);
+            $statement = $this->connector->prepareQuery($sql);
+
+            if ($statement->execute()) {
+                $this->log .= "OK\n";
+            } else {
+                $this->log .= "FAILED\n";
+                $this->errors[] = "$sql\n{$statement->errorInfo()}";
+            }
+        }
+    }
+
+    /**
+     * Test a list of database functions
+     *
+     * @param array $objects
+     */
+    private function functionTest($objects)
+    {
+        foreach ($objects as $name => $parameters) {
+
+            $this->log .= str_pad(str_pad('FUNCTION', 15). $name, 50);
+
+            $statement = $this->connector->prepareFunctionCall($name);
+
+            if (is_array($parameters)) {
+                $statement->bindInputs($parameters);
+            }
+
+            if ($statement->execute()) {
+                $this->log .= "OK\n";
+            } else {
+                $this->log .= "FAILED\n";
+                $this->errors[] = "EXEC {$name}\n{$statement->errorInfo()}";
+            }
+
+            unset($outputValues);
+        }
+    }
+
+    /**
+     * Test procedure execution against each database object in the supplied array
+     *
+     * @param array $objects
+     */
+    private function procedureTest($objects)
+    {
+        sort($objects);
+
+        $outputValues = [];
+
+        foreach ($objects as $object) {
+
+            $this->log .= str_pad(str_pad('EXECUTE', 15). $object["name"], 50);
+
+            $statement = $this->connector->prepareStoredProcedure($object['name']);
+
+            if (is_array($object['inputParameters'])) {
+                $statement->bindInputs($object['inputParameters']);
+            }
+
+            if (is_array($object['outputParameters'])) {
+                foreach ($object['outputParameters'] as $name => $parameter) {
+                    $this->outputParameters[$name] = null;
+                    $parameter['value'] = &$this->outputParameters[$name];
+                }
+
+                $statement->bindOutputs($object['outputParameters']);
+            }
+
+            if ($statement->execute()) {
+                $this->log .= "OK\n";
+            } else {
+                $this->log .= "FAILED\n";
+
+                $error = "EXECUTE {$object['name']}\n{$statement->errorInfo()}\n";
+
+                $error .= "\n{$statement->getSql()}\n";
+
+                foreach ($object['inputParameters'] as $key => $value) {
+
+                    if ($value == null) {
+                        $result = 'NULL';
+                    } else {
+                        $result = "'{$value}'";
+                    }
+
+                    $error .= "\n" . str_pad(str_pad("INPUT", 15) . "" . $key, 50) . str_pad(BaseStatement::getDataTypeName($value), 15) . $result;
+                }
+
+                if (is_array($object['outputParameters'])) {
+                    foreach ($object['outputParameters'] as $parameterName => $optionArray) {
+                        $error .= "\n" . str_pad(str_pad("OUTPUT", 15) . $parameterName, 50);
+
+                        if ($outputValues[$object['name']][$parameterName] == null) {
+                            $result = 'NULL';
+                        } else {
+                            $result = "'{$outputValues[$object['name']][$parameterName]}'";
+                        }
+
+                        $error .= str_pad(BaseStatement::getDataTypeName($optionArray['type']) . "(" . $optionArray['length'] . ")", 15) . $result;
+
+                    }
+                }
+
+                $this->errors[] = $error;
+            }
+        }
+
+        unset($outputValues);
+    }
+
+    // Connector specific test functions, ignore any unused function warnings as these are called dynamically
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    public function edumateTest()
+    {
+        $tables = [
+            'studsub',
+            'student',
+            'tchsub',
+            'subtab',
+            'ttperiod',
+            'ttdays',
+            'ttcalendar',
+            'ttmast',
+            'paraddress',
+            'house',
+            'teacher',
+            'parent',
+            'pia_sfaccess',
+            'tchdept',
+            'portalusers',
+            'studboard',
+            'tel_vw_telemf',
+            'ttparms',
+            'family',
+            'persondefs',
+            'studcommrules',
+            'db2inst1.schoolbox_classes',
+            'db2inst1.schoolbox_parents',
+            'db2inst1.schoolbox_report_periods',
+            'db2inst1.schoolbox_studentclass',
+            'db2inst1.schoolbox_students',
+            'db2inst1.schoolbox_teacherclass',
+            'db2inst1.schoolbox_parent_student',
+            'db2inst1.schoolbox_staff',
+            'db2inst1.schoolbox_timetable',
+            'db2inst1.schoolbox_timetable_definition'
+        ];
+
+        $this->selectTest($tables, "SELECT * FROM :TABLE FETCH FIRST 1 ROWS ONLY");
+    }
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function mazeTest()
+    {
+        $tables = [
+            'DF',
+            'KCT',
+            'KCY',
+            'KGC',
+            'KGH',
+            'KSC',
+            'SF',
+            'ST',
+            'STMA',
+            'SU',
+            'TCTD',
+            'TCTQ',
+            'TH',
+            'THTQ',
+            'TT',
+            'TTTG',
+            'UM'
+        ];
+
+        $this->selectTest($tables);
+    }
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function pcschoolsTest()
+    {
+        $tables = [
+            'TIMEFILE',
+            'SUB',
+            'SUBJECT',
+            'STUDENT',
+            'TIMEPDHD',
+            'CALENDAR',
+            'CODEMAST',
+            'TEACHER',
+            'FAMILY',
+            'SYSFILE',
+            'IDENTITY'
+        ];
+
+        $this->selectTest($tables);
+
+        $procedures = [
             [
-                'host'     => Config::get('external_humanedge_aplus_db_host'),
-                'user'     => Config::get('external_humanedge_aplus_db_user'),
-                'passwd'   => Config::get('external_humanedge_aplus_db_passwd'),
-                'db'       => Config::get('external_humanedge_aplus_db_db'),
-                'encoding' => Config::get('external_db_encoding'),
+                'name' => 'spSelTimetable',
+                'inputParameters' => [
+                    'DATE' => date('Ymd'),
+                    'TIMEPERIOD' => '',
+                    'STUDKEY' => '',
+                    'TEACHERCODE' => ''
+                ]
             ]
-        );
-        $db->debug = true;
-        return $db;
+        ];
+
+        $this->procedureTest($procedures);
     }
 
-    private function Db2Connection()
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function synergeticTest()
     {
-        $this->log .= "  DB2 : ";
-        $eec = new External_Edumate_Connection();
-        $db = $eec->getDatabase();
-        $result = $db->query("SELECT * FROM TABLE(SYSPROC.ENV_GET_INST_INFO());");
+        $tables = [
+            'Addresses',
+            'CalendarEvents',
+            'Community',
+            'CommunityAlerts',
+            'Constituencies',
+            'FileSemesters',
+            'luBoarder',
+            'luBuilding',
+            'luCountry',
+            'luDepartment',
+            'luFileType',
+            'luForm',
+            'luHouse',
+            'luTutor',
+            'luYearLevel',
+            'Relationships',
+            'StudentClasses',
+            'SubjectClasses',
+            'SubjectClassStaff',
+            'Timetable',
+            'TimetableDefinition',
+            'TimetableSubstitutes',
+            'luTimetableGroup',
+            'luDays',
+            'StaffSchedule',
+            'StaffScheduleStudentClasses',
+            'vCommunityAddresses',
+            'vPhotos',
+            'vStaff',
+            'vStaffJobPositions',
+            'vStudentContactAllAddress',
+            'vStudents',
+            'vSubjectClassesStaff',
+            'vStudentClasses',
+            'StaffAssessmentMarkBook',
+            'StudentAssessmentMarkBook',
+            'StaffAssessmentMarkBook',
+            'StudentAssessmentMarkBook',
+            'luAbsenceReason',
+            'luAbsenceType',
+            'TimetableSubstitutes',
+            'wkAttendances',
+            'AttendanceMaster',
+            'tAttendances'
+        ];
 
-        $this->log .= $result ? "OK\n" : "\n    Failed - ".db2_conn_errormsg()."\n";
-    }
+        // Pastoral Care Tables (Only If Module Enabled)
 
-    private function EdumateCheckConnection()
-    {
-        $this->log .= "\nEdumate Connection Check\n";
-        $this->Db2Connection();
-    }
-
-    private function TassCheckConnection()
-    {
-        $this->log .= "\nTass Connection Check\n";
-        $this->MssqlConnection();
-    }
-
-    private function SynergeticCheckConnection()
-    {
-        $this->log .= "\nSynergetic Connection Check\n";
-        $this->MssqlConnection();
-    }
-
-    private function SchoolproCheckConnection()
-    {
-        $this->log .= "\nSchoolpro Connection Check\n";
-        $this->MssqlConnection();
-    }
-
-    private function MazeCheckConnection()
-    {
-        $this->log .= "\nMaze Connection Check\n";
-        $this->MssqlConnection();
-    }
-
-    private function PcschoolsCheckConnection()
-    {
-        $this->log .= "\nPC School Connection Check\n";
-        $this->MssqlConnection();
-    }
-
-    private function HumanedgeCheckConnection()
-    {
-        $this->log .= "\nHumanedge Connection Check\n";
-        $this->log .= "  MSSQL (SAS connection) : ";
-        $this->MssqlConnection();
-        $this->log .= "  MSSQL (A+ connection) : ";
-        $db = $this->getMssqlAPlusConnection();
-        $result = $db->query("SELECT @@VERSION");
-        if ($result) {
-            $this->log .= "OK\n";
-        } else {
-            $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-        }
-        unset($db,$result);
-    }
-
-    /**
-     * Check the Denbigh2 API method access and see if anything snaps
-     */
-    private function Denbigh2CheckConnection()
-    {
-        $this->log .= "\nDenbigh2 Connnection Check\n";
-
-        $list[] = 'Enrolments';
-        $list[] = 'Students';
-        $list[] = 'Classes';
-        $list[] = 'PeriodTimes';
-        $list[] = 'StudentTimetable';
-        $list[] = 'TimetableLessons';
-
-        foreach($list as $currentApi) {
-            $api = new External_Denbigh2_Api($currentApi, array());
-
-            if (!$api->hasErrors()) {
-                $this->log .= "OK\n";
-            } else {
-                $error = $api->getErrors();
-                $firstError = $error[0];
-
-                $this->log .= "\n    Failed - {$firstError}\n";
-            }
-        }
-    }
-
-    private function TassCheckTables()
-    {
-        $this->log .= "\nTass Permission Check - Tables\n";
-        $list[] = 'studsub';
-        $list[] = 'student';
-        $list[] = 'tchsub';
-        $list[] = 'subtab';
-        $list[] = 'ttperiod';
-        $list[] = 'ttdays';
-        $list[] = 'ttcalendar';
-        $list[] = 'ttmast';
-        $list[] = 'paraddress';
-        $list[] = 'house';
-        $list[] = 'teacher';
-        $list[] = 'parent';
-        $list[] = 'pia_sfaccess';
-        $list[] = 'tchdept';
-        $list[] = 'portalusers';
-        $list[] = 'studboard';
-        $list[] = 'tel_vw_telemf';
-	$list[] = 'ttparms';
-	$list[] = 'family';
-	$list[] = 'persondefs';
-	$list[] = 'studcommrules'; // Optional
-        sort($list);
-
-        foreach ($list as $table) {
-            $this->log .= "  $table : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $table");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
-    }
-
-    private function MazeCheckTables()
-    {
-        $this->log .= "\nMaze Permission Check - Tables\n";
-        $list[] = 'DF';
-        $list[] = 'KCT';
-        $list[] = 'KCY';
-        $list[] = 'KGC';
-        $list[] = 'KGH';
-        $list[] = 'KSC';
-        $list[] = 'SF';
-        $list[] = 'ST';
-        $list[] = 'STMA';
-        $list[] = 'SU';
-        $list[] = 'TCTD';
-        $list[] = 'TCTQ';
-        $list[] = 'TH';
-        $list[] = 'THTQ';
-        $list[] = 'TT';
-        $list[] = 'TTTG';
-        $list[] = 'UM';
-        sort($list);
-
-        foreach ($list as $table) {
-            $this->log .= "  $table : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $table");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
-    }
-
-    private function PcschoolsCheckTables()
-    {
-        $this->log .= "\nPC School Permission Check - Tables\n";
-        $list[] = 'TIMEFILE';
-        $list[] = 'SUB';
-        $list[] = 'SUBJECT';
-        $list[] = 'STUDENT';
-        $list[] = 'TIMEPDHD';
-        $list[] = 'CALENDAR';
-        $list[] = 'CODEMAST';
-        $list[] = 'TEACHER';
-        $list[] = 'FAMILY';
-        $list[] = 'SYSFILE';
-        $list[] = 'IDENTITY';
-        sort($list);
-
-        foreach ($list as $table) {
-            $this->log .= "  $table : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM [$table]");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
-    }
-
-    private function PcschoolsCheckStoredProcedures()
-    {
-        $this->log .= "\nPC School Permission Check - Stored Procedures\n";
-        $db = new MSSQL();
-        $db->debug = true;
-        $splist[] = array(
-            'spSelTimetable',
-            array(
-                array('@DATE',           date('Ymd'),          SQLVARCHAR, false, false, -1),
-                array('@TIMEPERIOD',     '',                   SQLVARCHAR, false, false, -1),
-                array('@STUDKEY',        '',                   SQLVARCHAR, false, false, -1),
-                array('@TEACHERCODE',    '',                   SQLVARCHAR, false, false, -1),
-            )
-        );
-
-        foreach ($splist as $sp) {
-            $this->executeProcedure($db, $sp[0], $sp[1]);
-        }
-    }
-
-    private function SynergeticCheckTables()
-    {
-        $this->log .= "\nSynergetic Permission Check - Tables\n";
-        $list[] = 'Addresses';
-        $list[] = 'CalendarEvents';
-        $list[] = 'Community';
-        $list[] = 'CommunityAlerts';
-        $list[] = 'Constituencies';
-        $list[] = 'FileSemesters';
-        $list[] = 'luBoarder';
-        $list[] = 'luBuilding';
-        $list[] = 'luCountry';
-        $list[] = 'luDepartment';
-        $list[] = 'luFileType';
-        $list[] = 'luForm';
-        $list[] = 'luHouse';
-        $list[] = 'luTutor';
-        $list[] = 'luYearLevel';
-        $list[] = 'Relationships';
-        $list[] = 'StudentClasses';
-        $list[] = 'SubjectClasses';
-        $list[] = 'SubjectClassStaff';
-        $list[] = 'Timetable';
-        $list[] = 'TimetableDefinition';
-        $list[] = 'TimetableSubstitutes';
-        $list[] = 'luTimetableGroup';
-        $list[] = 'luDays';
-        $list[] = 'StaffSchedule';
-        $list[] = 'StaffScheduleStudentClasses';
-
-        // Pastoral Care Tables
-
-        if (Config::get('pastoral_enabled')) {
-            $list[] = 'luPastoralCareCategory';
-            $list[] = 'luPastoralCareType';
-            $list[] = 'PastoralCareComments';
-            $list[] = 'PastoralCareContacts';
-            $list[] = 'PastoralCareActions';
-            $list[] = 'tPastoralCare';
+        if ($this->configMapper->get('pastoral_enabled')) {
+            $tables = array_merge($tables, [
+                'luPastoralCareCategory',
+                'luPastoralCareType',
+                'PastoralCareComments',
+                'PastoralCareContacts',
+                'PastoralCareActions',
+                'tPastoralCare'
+            ]);
         }
 
-        sort($list);
+        $this->selectTest($tables);
 
-        foreach ($list as $table) {
-            $this->log .= "  $table : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $table");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
+        // Community Portal Password Update
+
+        $this->selectTest(['CommunityLogins'], "UPDATE :object SET Password = '' WHERE 1 = 0");
+
+        // Stored Procedures
+
+        $procedures = [
+            [
+                'name' => 'spgTimetableDay',
+                'inputParameters' => [
+                    'TimetableGroup' => 'SEN',
+                    'Date' => Alaress_Date_Format::now()->getDatabase()
+                ],
+                'outputParameters' => [
+                    'CurrentDay' => [
+                        'type' => PDO::PARAM_INT,
+                        'length' => 11
+                    ]
+                ]
+            ],
+            [
+                'name' => 'spsConfigUserDefaultYearSemester',
+                'inputParameters' => [
+                    'ID' => 1
+                ]
+            ],
+            [
+                'name' => 'spsTimetable',
+                'inputParameters' => [
+                    'FileYear' => Alaress_Date_Format::now()->getYear(),
+                    'FileSemester' => Alaress_Date_Format::now()->getYearHalf(),
+                    'ID' => 1,
+                    'Date' => Alaress_Date_Format::now()->getDatabase(),
+                    'IncludeStaffScheduleFlag' => 1,
+                    'CheckAttendancesExistFlag' => 1,
+                    'IncludeSparesFlag' => 0,
+                    'IncludeRecessFlag' => 0
+                ]
+            ],
+            [
+                'name' => 'spiwkAttendances',
+                'inputParameters' => [
+                    'FileType' => 'A',
+                    'FileYear' => 2010,
+                    'FileSemester' => 1,
+                    'ClassCampus' => 'S',
+                    'ClassCode' => 'FREA1',
+                    'AttendanceDate' => '2010-04-07',
+                    'AttendancePeriod' => 1,
+                    'AttendanceDayNumber' => 1,
+                    'StaffID' => 1,
+                    'AttendedFlag' => 1,
+                    'TimeTableGroup' => 'SEN',
+                    'SynWebFlag' => 1
+                ],
+                'outputParameters' => [
+                    'wkAttendanceMasterSeq' => [
+                        'type' => PDO::PARAM_INT,
+                        'length' => 11
+                    ]
+                ]
+            ],
+            [
+                'name' => 'spswkAttendances',
+                'inputParameters' => [
+                    'wkAttendanceMasterSeq' => 1,
+                    'FillActualAbsenceColumnsFlag' => 1,
+                    'CheckPossibleNonAttendFlag' => 1,
+                    'CalculateTodaysAttendanceStringFlag' => 1
+                ]
+            ],
+            [
+                'name' => 'sptwkAttendances',
+                'inputParameters' => [
+                    'wkAttendanceMasterSeq' => 1,
+                    'AttendanceSeq' => null,
+                    'HoldFlag' => 0,
+                    'ClassCancelledFlag' => 0,
+                    'SystemProcessNumber' => 0,
+                    'AllowMultiPeriodFlag' => 0,
+                    'DebugPrintFlag' => 0,
+                ],
+                'outputParameters' => [
+                    'AttendanceMasterSeq' => [
+                        'type' => PDO::PARAM_INT,
+                        'length' => 11
+                    ],
+                    'GroupCount' => [
+                        'type' => PDO::PARAM_INT,
+                        'length' => 11
+                    ]
+                ]
+            ]
+        ];
+
+        $this->procedureTest($procedures);
+
+        $functions = [
+            'dbo.fnTimeStr' => [
+                'ADateTime' => date('Y-m-d')
+            ]
+        ];
+
+        $this->functionTest($functions);
     }
 
-    private function SynergeticCheckViews()
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function schoolproTest()
     {
-        $this->log .= "\nSynergetic Permission Check - Views\n";
-        $list[] = 'vCommunityAddresses';
-        $list[] = 'vPhotos';
-        $list[] = 'vStaff';
-        $list[] = 'vStaffJobPositions';
-        $list[] = 'vStudentContactAllAddress';
-        $list[] = 'vStudents';
-        $list[] = 'vSubjectClassesStaff';
-        $list[] = 'vStudentClasses';
-        sort($list);
-
-        foreach ($list as $view) {
-            $this->log .= "  $view : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $view");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
-    }
-
-    private function SynergeticCheckStoredProcedures()
-    {
-        $this->log .= "\nSynergetic Permission Check - Stored Procedures\n";
-        $date = new Alaress_Date_Format();
-        $db = new MSSQL();
-        $db->debug = true;
-        $splist[] = array(
-            'spgTimetableDay',
-            array(
-                array('@TimeTableGroup', 'SEN',                SQLVARCHAR, false, false, -1),
-                array('@Date',           $date->getDatabase(), SQLVARCHAR, false, false, -1),
-                array('@CurrentDay',     'day',                SQLINT4,    true,  false, -1),
-            )
-        );
-        $splist[] = array(
-            'spsConfigUserDefaultYearSemester',
-            array(
-                array('@ID','1',SQLINT4,false,false, -1),
-            )
-        );
-        $splist[] = array(
-            'spsTimetable',
-            array(
-                array('@FileYear', $date->getYear(), SQLINT4),
-                array('@FileSemester', $date->getYearHalf(), SQLINT4),
-                array('@ID', '1', SQLINT4),
-                array('@Date', $date->getDatabaseDate(), SQLVARCHAR),
-                array('@IncludeStaffScheduleFlag',1, SQLINT4),
-                array('@CheckAttendancesExistFlag',1, SQLINT4),
-                array('@IncludeSparesFlag', 0, SQLINT4),
-                array('@IncludeRecessFlag', 0, SQLINT4),
-            )
-        );
-
-        foreach ($splist as $sp) {
-            $this->executeProcedure($db, $sp[0], $sp[1]);
-        }
-    }
-
-    private function SynergeticCheckMarkbook()
-    {
-        // Attendance Specifc (Optional)
-        $this->log .= "\nSynergetic Permission Check - Markbook - Tables (Optional)\n";
-        $list[] = 'StaffAssessmentMarkBook';
-        $list[] = 'StudentAssessmentMarkBook';
-        sort($list);
-
-        foreach ($list as $table) {
-            $this->log .= "  $table : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $table");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
-        unset($list);
-    }
-
-    private function SynergeticCheckCommunityPortal()
-    {
-        $this->log .= "\nSynergetic Permission Check - Community Portal - Tables (Optional)\n";
-        $this->log .= "  CommunityLogins : ";
-        $db = new MSSQL();
-        $db->debug = true;
-        $result = $db->query("UPDATE CommunityLogins SET Password = '' WHERE 1 = 0");
-        if ($result) {
-            $this->log .= "OK\n";
-        } else {
-            $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-        }
-        unset($db,$result);
-    }
-
-    private function SynergeticCheckAttendance()
-    {
-        // Attendance Specifc (Optional)
-        $this->log .= "\nSynergetic Permission Check - Attendance - Tables (Optional)\n";
-        $list[] = 'luAbsenceReason';
-        $list[] = 'luAbsenceType';
-        $list[] = 'TimetableSubstitutes';
-        $list[] = 'wkAttendances';
-        $list[] = 'AttendanceMaster'; // not listed on wiki - not sure if required
-        $list[] = 'tAttendances'; // not listed on wiki - not sure if required
-        sort($list);
-
-        foreach ($list as $table) {
-            $this->log .= "  $table : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $table");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
-        unset($list);
-
-        $this->log .= "\nSynergetic Permission Check - Attendance - Views (Optional)\n";
-        $list[] = 'pvTimetableDefinitionAll';
-        sort($list);
-
-        foreach ($list as $view) {
-            $this->log .= "  $view : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $view");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
-        unset($list);
-
-        $this->log .= "\nSynergetic Permission Check - Attendance - Stored Procedures (Optional)\n";
-        $db = new MSSQL();
-        $db->debug = true;
-        $list[] = array(
-            'spiwkAttendances',
-            array(
-                array('@FileType', '', SQLVARCHAR, false, false, -1),
-                array('@FileYear', 1, SQLINT4, false, false, -1),
-                array('@FileSemester', 1, SQLINT4, false, false, -1),
-                array('@ClassCampus', '', SQLVARCHAR, false, false, -1),
-                array('@ClassCode', '', SQLVARCHAR, false, false, -1),
-                array('@AttendanceDate', date('Y-m-d'), SQLVARCHAR, false, false, -1),
-                array('@AttendancePeriod', 1, SQLINT4, false, false, -1),
-                array('@AttendanceDayNumber', 1, SQLINT4, false, false, -1),
-                array('@StaffID', 1, SQLINT4, false, false, -1),
-                array('@AttendedFlag', 1, SQLINT4, false, false, -1),
-                array('@TimeTableGroup', '', SQLVARCHAR, false, false, -1),
-                array('@SynWebFlag', 1, SQLINT4, false, false, -1),
-                array('@wkAttendanceMasterSeq', 1, SQLINT4, true, true, -1 ),
-            )
-        );
-        $list[] = array(
-            'spswkAttendances',
-            array(
-                array('@wkAttendanceMasterSeq', 1, SQLINT4, false, false, -1),
-                array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
-                array('@CheckPossibleNonAttendFlag', 1, SQLINT4),
-                array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
-            )
-        );
-        $list[] = array(
-            'sptwkAttendances',
-            array(
-                array('@wkAttendanceMasterSeq', 1, SQLINT4, false, false, -1),
-                array('@AttendanceSeq', '', SQLINT4, false, false, -1),
-                array('@AttendanceMasterSeq', 'seq', SQLINT4, true, true, -1),
-                array('@HoldFlag', 0, SQLINT1, false, false, -1),
-                array('@ClassCancelledFlag', 0, SQLINT1, false, false, -1),
-                array('@SystemProcessNumber', 0, SQLINT1, false, false, -1),
-                array('@AllowMultiPeriodFlag', 0, SQLINT1, false, false, -1),
-                array('@DebugPrintFlag', 0, SQLINT1, false, false, -1),
-                array('@GroupCount', 0, SQLINT4, true, true, -1)
-            )
-        );
-        $list[] = array(
-            'fnTimeStr',
-            array(
-                array('@ADateTime', date('Y-m-d'), SQLVARCHAR, false, false, -1),
-            )
-        );
-
-        foreach ($list as $sp) {
-            $this->executeProcedure($db, $sp[0], $sp[1]);
-        }
-        unset($list);
-    }
-
-    private function SynergeticCheckSchedulerEvents()
-    {
-        //Scheduler Specific
-        $this->log .= "\nSynergetic Permission Check - Scheduler Events - Tables\n";
-        $list[] = 'StaffSchedule';
-        $list[] = 'StaffScheduleStudentClasses';
-        $list[] = 'SubjectClasses';
-        $list[] = 'luLocation';
-        $list[] = 'luTeam';
-        $list[] = 'luRoom';
-        sort($list);
-
-        foreach ($list as $table) {
-            $this->log .= "  $table : ";
-            $db = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $table");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db,$result);
-        }
-        unset($list);
-    }
-
-    /**
-    * Test chub
-    */
-    private function SchoolproCheckStoredProcedures()
-    {
+        /*
         $this->log .= "\nSchoolpro Permission Check - Stored Procedures\n";
-        $db = new MSSQL();
-        $db->debug = true;
+
         $splist[] = array(
-         'sbGetParent',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetParent',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetStudent',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetStudent',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetStudentSubjectList',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetStudentSubjectList',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetStaffSubjectList',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetStaffSubjectList',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetEnrolledStudents',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetEnrolledStudents',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetTimetableDefinition',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pCampusID', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetTimetableDefinition',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pCampusID', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetDayNumber',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pCampusID', 1, SQLINT4, false, false, -1),
-             array('@pDateToUse', '2013-12-02 12:12:12', SQLVARCHAR, false, false, -1),
-         )
+            'sbGetDayNumber',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pCampusID', 1, SQLINT4, false, false, -1),
+                array('@pDateToUse', '2013-12-02 12:12:12', SQLVARCHAR, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetPeriodNumber',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pCampusID', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetPeriodNumber',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pCampusID', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetStaffDayTimetable',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-             array('@pCampusID', 1, SQLINT4, false, false, -1),
-             array('@pDayNumber', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetStaffDayTimetable',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+                array('@pCampusID', 1, SQLINT4, false, false, -1),
+                array('@pDayNumber', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetStudentDayTimetable',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-             array('@pCampusID', 1, SQLINT4, false, false, -1),
-             array('@pDayNumber', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetStudentDayTimetable',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+                array('@pCampusID', 1, SQLINT4, false, false, -1),
+                array('@pDayNumber', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetStudents',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pClassID', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetStudents',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pClassID', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetTeacherName',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pClassID', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetTeacherName',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pClassID', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetTimetableDefinition',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pCampusID', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetTimetableDefinition',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pCampusID', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetStudentContact',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetStudentContact',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetPortraitLastUpdated',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetPortraitLastUpdated',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+            )
         );
         $splist[] = array(
-         'sbGetPortraitFile',
-         array(
-             array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-             array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-         )
+            'sbGetPortraitFile',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+            )
         );
-        foreach ($splist as $sp) {
-            $this->executeProcedure($db, $sp[0], $sp[1]);
-        }
+        */
     }
 
-    private function EdumateCheckViews()
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function humanedgeTest()
     {
-        $this->log .= "\nEdumate Permission Check - Views\n";
-        $list[] = 'classes';
-        $list[] = 'parents';
-        $list[] = 'report_periods';
-        $list[] = 'studentclass';
-        $list[] = 'students';
-        $list[] = 'teacherclass';
-        $list[] = 'parent_student';
-        $list[] = 'staff';
-        $list[] = 'timetable';
-        $list[] = 'timetable_definition';
-        sort($list);
-
-        $eec = new External_Edumate_Connection();
-        $db = $eec->getDatabase();
-
-        foreach ($list as $view) {
-            $viewname = "db2inst1.schoolbox_$view";
-            $this->log .= "  $viewname : ";
-            $result = $db->query("SELECT * FROM $viewname FETCH FIRST 1 ROWS ONLY");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".db2_stmt_errormsg()."\n";
-            }
-        }
-
-    }
-
-    /**
-     * Check HumanEdge SAS2000 tables
-     */
-    private function HumanedgeCheckSasTables()
-    {
-        $this->log .= "\nHumanedge Permission Check - SAS Tables\n";
         $tables = [
             'Contact',
             'Staff',
@@ -780,73 +636,73 @@ class Healthcheck
             'StudentContact',
             'vw_Contact_Addresses',
         ];
-        foreach ($tables as $table) {
-            $this->log .= "  $table : ";
-            $db        = new MSSQL();
-            $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $table");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db, $result);
-        }
+
+        $this->selectTest($tables);
+
+        /**
+         * Check HumanEdge A+ tables
+         *
+         * private
+         * function HumanedgeCheckAPlusTables()
+         * {
+         * $this->log .= "\nHumanedge Permission Check - SAS Tables\n";
+         * $tables = [
+         * 'tblAllocation',
+         * 'tblBlockItem',
+         * 'tblCalendarDay',
+         * 'tblDay',
+         * 'tblPeriod',
+         * 'tblPeriodTimesByDay',
+         * 'tblRoom',
+         * 'tblStudent',
+         * 'tblSubject',
+         * 'tblSubjectChoice',
+         * 'tblTeacher',
+         * ];
+         * foreach ($tables as $table) {
+         * $this->log .= "  $table : ";
+         *
+         * $result = $this->secondaryConnectors[$this->configMapper->get('external_humanedge_aplus_db_db')]->query("SELECT TOP 1 * FROM $table");
+         *
+         * if ($result) {
+         * $this->log .= "OK\n";
+         * } else {
+         * $this->log .= "\n    Failed - " . mssql_get_last_message() . "\n";
+         * }
+         * unset($db, $result);
+         * }
+         * }
+         */
     }
 
-    /**
-     * Check HumanEdge A+ tables
-     */
-    private function HumanedgeCheckAPlusTables()
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function schooledgeTest()
     {
-        $this->log .= "\nHumanedge Permission Check - SAS Tables\n";
         $tables = [
-            'tblAllocation',
-            'tblBlockItem',
-            'tblCalendarDay',
-            'tblDay',
-            'tblPeriod',
-            'tblPeriodTimesByDay',
-            'tblRoom',
-            'tblStudent',
-            'tblSubject',
-            'tblSubjectChoice',
-            'tblTeacher',
+            'Contact',
+            'Staff',
+            'Student',
+            'StudentContact',
+            'vw_Contact_Addresses',
+            "fc.TimetableSubject",
+            "fc.TimetableSubjectChoice",
+            "fc.Timetable",
+            "fc.TimetableClass",
+            "fc.YearLevelSub",
+            "fc.YearLevelSubStudent",
+            "fc.TimetableClassInstance",
+            "fc.TimetableClassStaff",
+            "fc.TimetableClassInstanceStaff",
+            "fc.TimetableClassRoom",
+            "fc.Room",
+            "fc.TimetableClassInstanceRoom",
+            "fc.TimetableDay",
+            "fc.TimetablePeriod",
+            "fc.TimetableDate",
+            "fc.TimetableBlockInstance",
+            "fc.TimetableBlockInstance tbi CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe"
         ];
-        foreach ($tables as $table) {
-            $this->log .= "  $table : ";
-            $db     = $this->getMssqlAPlusConnection();
-            $result = $db->query("SELECT TOP 1 * FROM $table");
-            if ($result) {
-                $this->log .= "OK\n";
-            } else {
-                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-            }
-            unset($db, $result);
-        }
-    }
 
-    /**
-     * Runs a stored proc, outputting relevant output
-     *
-     * @param MSSQL $db
-     * @param       $proc
-     * @param       $params
-     *
-     * @return void
-     */
-    private function executeProcedure(MSSQL $db, $proc, $params)
-    {
-        $result = $db->executeProcedure($proc, $params);
-        $this->log .= "  ".$proc." : ";
-        if ($result['success']) {
-            if ($result['message']) {
-                $this->log .= "OK - {$result['message']}\n";
-            } else {
-                $this->log .= "OK\n";
-            }
-        } else {
-            $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
-        }
+        $this->selectTest($tables);
     }
 }

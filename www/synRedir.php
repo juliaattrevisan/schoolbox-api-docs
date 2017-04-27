@@ -18,6 +18,9 @@ if($_SESSION['communityLogin']) {
 	if ($_GET['id']) {
 		$query['id'] = $_GET['id'];
 	}
+	if ($_GET['sn']) {
+		$query['sn'] = $_GET['sn'];
+	}
 
 	/* If no menu requested turn it off */
 	if ($_GET['menu']) {

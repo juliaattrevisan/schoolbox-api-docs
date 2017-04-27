@@ -11,11 +11,10 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Assessment\IActivityMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
-use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -25,7 +24,7 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -34,6 +33,13 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface
 {
+
+    /**
+     * @const WORK_TYPE_QUIZ
+     * @deprecated 17.0 - too fragile. You cannot reliably imply semantics from the ID. It is user configurable.
+     */
+    const WORK_TYPE_QUIZ = 11;
+
     /**
      * SQL map definition
      */
@@ -157,7 +163,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      */
     protected function setWorkType(Model $object)
     {
-        $object->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT));
+        $object->setWorkType((new WorkType())->setId(self::WORK_TYPE_QUIZ));
         return true;
     }
 

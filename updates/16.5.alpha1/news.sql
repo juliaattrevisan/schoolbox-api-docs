@@ -1,2 +1,2 @@
-UPDATE `component_definition` SET `class` = 'Schoolbox\\News\\Component\\Dashboard\\Controller' WHERE name = 'News' and module = 'dashboard';
-UPDATE `component_definition` SET `class` = 'Schoolbox\\News\\Component\\Homepage\\Controller' WHERE name = 'News' and module = 'homepage';
+UPDATE `component_definition` SET `class` = 'Schoolbox\\News\\Component\\Dashboard\\Controller' WHERE class = 'Component_Dashboard_NewsController';
+UPDATE `component_definition` SET `class` = 'Schoolbox\\News\\Component\\Homepage\\Controller' WHERE class = 'Component_Homepage_NewsController';

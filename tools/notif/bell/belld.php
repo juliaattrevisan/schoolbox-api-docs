@@ -1,11 +1,14 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Date\Clock;
 use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\Stomp\Client;
+use Schoolbox\CampusMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -21,7 +24,7 @@ use Schoolbox\Realtime\Timetable\TimetableScheduler;
  * @version     SVN: $Id$
  */
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
 $opts   = getopt('v', $fields);
 
 foreach ($fields as $k => $name) {
@@ -35,46 +38,37 @@ $flags = implode(' ', array_slice($argv, 1));
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Bell', array(
+$kernel = new Schoolbox\Application\Daemon\Kernel('Bell', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'fields'  => array_values($fields),
     'flags'   => $flags
-));
+]);
 
 
 
 // CREATE BELL APP
-$kernel->run(function ($di, $loop, $log, $opts) {
-    /**
-     * @var Di\Container $di
-     * @var LoopInterface $loop
-     * @var LoggerInterface $log
-     * @var array $opts
-     */
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     try {
         /** @var IConfigLoader $conf */
         $conf = $di->get('config');
 
-        $clock = new \Alaress\Date\Clock();
+        /** @var Client $stomp */
+        $stomp = $di->get('stomp');
 
-        $stompFactory = new \React\Stomp\Factory($loop);
-        $client = $stompFactory->createClient(array(
-            'host'      => $conf->get('amqp_host'),
-            'port'      => $conf->get('amqp_stomp_port'),
-            'vhost'     => $conf->get('amqp_vhost'),
-            'login'     => $conf->get('amqp_user'),
-            'passcode'  => $conf->get('amqp_pass'),
-        ));
-
-        $factory = new TriggerFactory();
+        /** @var CampusMapper $campusMapper */
+        $campusMapper = $di->get('mapperFactory')->get(CampusMapper::class);
 
         // TODO: for now, this is just hardcoded to Senior for MGGS: the scheduler will accept any Collection of Campuses to schedule
-        $campusList = \Schoolbox\CampusMapper::getInstance()->findByColumn('ext_timetable_code', 'SEN');
-        new TimetableScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $client, $log, $campusList, $factory, $conf, $clock);
-    }
-    catch(AMQPRuntimeException $e) {
-        $log->alert("Unable to connect to RabbitMQ: server is offline.");
+        $campusList = $campusMapper->findByColumn('ext_timetable_code', 'SEN');
+        $clock      = new Clock();
+        $factory    = new TriggerFactory($clock);
+        $strat      = new DefaultDispatchStrategy($opts['flags']);
+
+        new TimetableScheduler($loop, $strat, $stomp, $log, $campusList, $factory, $conf, $clock);
+
+    } catch (AMQPRuntimeException $e) {
+        $log->alert('Unable to connect to RabbitMQ: server is offline.');
         $n = Notifactory::create(Notif::TOPIC_NOTIFICATION);
         $n->alert('RabbitMQ is offline');
         throw $e;

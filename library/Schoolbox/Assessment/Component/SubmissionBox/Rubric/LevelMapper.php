@@ -94,7 +94,7 @@ class LevelMapper extends Mapper
      */
     public function copyFromCopiedSubmissionBox($fromId, $toId)
     {
-        $levels = new Collection();
+        $levels = $this->createCollection();
         foreach ($this->findByColumn('box_id', $fromId) as $level) {
             // Don't recopy a level that already exists in $toId
             $levelCount = $this->countByColumnList([

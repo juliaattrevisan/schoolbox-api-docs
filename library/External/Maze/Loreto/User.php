@@ -69,6 +69,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS StudentSpecialNeedsFlag,
 				'' AS AlertMessage,
 				'' AS StudentBoarder,
+				'' AS Comment,
 				ST.ROLL_GROUP
 			FROM ST
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE

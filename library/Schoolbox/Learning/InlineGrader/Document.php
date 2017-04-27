@@ -52,6 +52,13 @@ class Document
     {
         $this->setFile($file);
         $this->setAuthenticator(new Authenticator());
+    }
+
+    /**
+     * Upload file to crocodoc
+     */
+    public function upload()
+    {
 
         /** @var Storage $storage */
         $storage     = $this->getFile()->getStorage();
@@ -67,13 +74,19 @@ class Document
             $this->setUrl($destination);
             fclose($fp);
         }
-    }
+        /* If the storage file didn't exist or it couldn't be opened (for whatever reason)
+         * Then just die, there's nothing else to do
+         */
+        else {
+            return [
+                'result'       => null,
+                'errors'       => 'Missing file',
+                'responseCode' => 500,
+            ];
+        }
 
-    /**
-     * Upload file to crocodoc
-     */
-    public function upload()
-    {
+        /* Otherwise continue as intended
+         */
         $curl = new \Alaress_Curl_Url($this->getUploadUrl());
 
         $postfields = array(
@@ -93,8 +106,6 @@ class Document
 
         $curl->exec();
 
-        /* Unlink copied file after uploading
-         */
         unlink($this->getUrl());
 
         // Crocodoc-related errors, when a file dies in crocodoc

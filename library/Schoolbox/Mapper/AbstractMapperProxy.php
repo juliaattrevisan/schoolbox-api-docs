@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Mapper;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -81,11 +82,11 @@ abstract class AbstractMapperProxy
     /**
      * Gets a typed Collection of objects that match the specified predicates
      *
-     * @param PredicateBuilder $pb
-     * @param array $options
+     * @param Builder $pb
+     * @param array   $options
      * @return GenericCollection
      */
-    public function findByPredicates(PredicateBuilder $pb, $options = array())
+    public function findByPredicates(Builder $pb, $options = array())
     {
         if($this->isPredicatesTranslationRequired($pb)){
             // TODO. For now, you cannot find by Predicates on columns that require translation.
@@ -178,10 +179,10 @@ abstract class AbstractMapperProxy
      * Determines if the specified predicates requires translation before being
      * submitted to the Mapper
      *
-     * @param PredicateBuilder $pb
+     * @param Builder $pb
      * @return bool
      */
-    protected function isPredicatesTranslationRequired(PredicateBuilder $pb)
+    protected function isPredicatesTranslationRequired(Builder $pb)
     {
         $pattern = $pb->getTable()
             ? "/^`{$pb->getTable()}`.`{$this->getExternalColumnName()}`/"
@@ -250,14 +251,14 @@ abstract class AbstractMapperProxy
             $externalValues = [$externalValues];
         }
 
-        $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($externalValues);
+        $placeholders = Builder::getArrayPlaceholders($externalValues);
 
         $query = "
             {$this->getSelectString()}
             WHERE {$this->getDatabase()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
         ";
 
-        $statement = $this->getDatabase()->query($query, Mapper\PredicateBuilder::getArrayParameters($externalValues));
+        $statement = $this->getDatabase()->query($query, Builder::getArrayParameters($externalValues));
         return $statement->fetchAll(\PDO::FETCH_COLUMN) ?: [];
     }
 
@@ -300,11 +301,11 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function getPredicateBuilder()
     {
-        return new PredicateBuilder($this->database, $this->mapper->getTable());
+        return new Builder($this->database, $this->mapper->getTable());
     }
 
     /* Getters / Setters

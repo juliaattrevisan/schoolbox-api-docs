@@ -60,6 +60,9 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         return (!$this->isUsingAltSource() || !$this->getSource()->isDeleted());
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getTemplate($templateName = '', $templatePath = '')
     {
 
@@ -88,7 +91,7 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
      * @param Folder|null $source
      * @return static
      */
-    public function setSource( $source = null)
+    public function setSource($source = null)
     {
         parent::setSource($source);
         return $this;

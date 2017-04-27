@@ -25,6 +25,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Alaress\Csv\Writer AS CsvWriter;
+use DueWork_ErrorMapper;
 
 class Controller extends Base
 {
@@ -54,6 +55,11 @@ class Controller extends Base
     protected $termMapper;
 
     /**
+     * @var DueWork_ErrorMapper
+     */
+    private $dueWorkErrorMapper;
+
+    /**
      * Constructor
      *
      * @param ErrorMapper                $errorMapper
@@ -61,19 +67,22 @@ class Controller extends Base
      * @param GradeGroup                 $defaultGradeGroup
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param TermMapper                 $termMapper
+     * @param DueWork_ErrorMapper        $dueWorkErrorMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         GradeGroup $defaultGradeGroup,
         CourseImplementationMapper $courseImplementationMapper,
-        TermMapper $termMapper
+        TermMapper $termMapper,
+        DueWork_ErrorMapper $dueWorkErrorMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setCourseImplementationMapper($courseImplementationMapper);
         $this->setTermMapper($termMapper);
+        $this->dueWorkErrorMapper = $dueWorkErrorMapper;
     }
 
     /**
@@ -150,6 +159,14 @@ class Controller extends Base
         // Can the viewee mark Assessments in for this class ?
         $writable = !$term->getArchived() && Access::getInstance()->isInstructor($this->getUser(), $class);
 
+        // What text should we display if student has submitted but not been marked?
+        try {
+            $pendingLabel = $this->dueWorkErrorMapper->findDefaultForNewSubmissions()->getDisplayAs();
+        } catch (MapperException $e) {
+            // Let Twig figure it out
+            $pendingLabel = null;
+        }
+
         // And output
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -164,6 +181,7 @@ class Controller extends Base
                     'courses'      => $courses,
                     'writable'     => $writable,
                     'contextTypes' => AssessmentContextType::getInstance(),
+                    'pendingLabel' => $pendingLabel,
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );
@@ -204,7 +222,7 @@ class Controller extends Base
         $data['Student Id'] = 'Class Average';
         $data['Student First Name'] = '';
         $data['Student Last Name'] = '';
-        $data['Student Average'] = $markbook->getMarkbookStatistics()['weightedMean'];
+        $data['Student Average'] = $markbook->getWeightedMean();
 
         // This is an ugly hack to get duplicate task names to appear as is the case in demo data
         // Just prepending spaces to the end of the assessment name
@@ -274,9 +292,9 @@ class Controller extends Base
         $writer = new CsvWriter($file, $export);
         $writer->write();
 
-        $filename = strtolower(str_replace(' ', '_', 'markbookexport-' . $class->getFolder()->getNameWithCodes()));
+        $filename = preg_replace('/[^\w-(),]/', '_', 'Markbook_' . $class->getFolder()->getNameWithCodes());
 
-        header("Content-Disposition: attachment;filename={$filename}.csv;");
+        header('Content-Disposition: attachment; filename="'.$filename.'.csv";');
         header('Content-Type: application/csv; charset=UTF-8');
         rewind($file);
         echo stream_get_contents($file);

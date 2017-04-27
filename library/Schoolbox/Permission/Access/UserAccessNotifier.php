@@ -20,7 +20,6 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
-use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -93,22 +92,6 @@ class UserAccessNotifier extends AbstractModuleNotifier
             // access level changed (usually moderation)
             $bundle->attach(self::TRIGGER_APPROVED, self::IMMEDIATELY);
         }
-    }
-
-
-    /**
-     * @param string $label
-     * @return array
-     */
-    public function retrieveCallbacks($label)
-    {
-        $callbacks = parent::retrieveCallbacks($label);
-        // append system one too
-        $method = 'notifySystem' . ucfirst($label);
-        if (method_exists($this, $method)) {
-            $callbacks[] = [$this, $method];
-        }
-        return $callbacks;
     }
 
 
@@ -390,75 +373,6 @@ class UserAccessNotifier extends AbstractModuleNotifier
     public function notifyParentApproved($userAccess, $user, $diff = null)
     {
         return $this->notifyApproved($userAccess, $user, $diff);
-    }
-
-
-    /**
-     * Tells the scheduler commander that the user in $userAccess needs to be
-     * rebound.
-     *
-     * @param UserAccess $userAccess
-     */
-    protected function adviseRerouterCommander($userAccess)
-    {
-        $cmdr = new RerouterCommander(UserMapper::getInstance());
-        $cmdr->adviseBindUser($userAccess->getUser()->getId());
-    }
-
-
-    /**
-     * System notifiers intentionally don't return a Messenger - instead, they
-     * tell the scheduler commander to rebind the user whose access was changed.
-     *
-     * @param UserAccess $userAccess
-     * @param User       $user
-     * @param array      $diff
-     */
-    public function notifySystemJoined($userAccess, $user, $diff = null)
-    {
-        $this->adviseRerouterCommander($userAccess);
-    }
-
-
-    /**
-     * System notifiers intentionally don't return a Messenger - instead, they
-     * tell the scheduler commander to rebind the user whose access was changed.
-     *
-     * @param UserAccess $userAccess
-     * @param User       $user
-     * @param array      $diff
-     */
-    public function notifySystemLeft($userAccess, $user, $diff = null)
-    {
-        $this->adviseRerouterCommander($userAccess);
-    }
-
-
-    /**
-     * System notifiers intentionally don't return a Messenger - instead, they
-     * tell the scheduler commander to rebind the user whose access was changed.
-     *
-     * @param UserAccess $userAccess
-     * @param User       $user
-     * @param array      $diff
-     */
-    public function notifySystemApproved($userAccess, $user, $diff = null)
-    {
-        $this->adviseRerouterCommander($userAccess);
-    }
-
-
-    /**
-     * System notifiers intentionally don't return a Messenger - instead, they
-     * tell the scheduler commander to rebind the user whose access was changed.
-     *
-     * @param UserAccess $userAccess
-     * @param User       $user
-     * @param array      $diff
-     */
-    public function notifySystemRejected($userAccess, $user, $diff = null)
-    {
-        $this->adviseRerouterCommander($userAccess);
     }
 
 }

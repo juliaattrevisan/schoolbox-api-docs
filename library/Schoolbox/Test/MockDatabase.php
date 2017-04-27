@@ -15,6 +15,7 @@
 
 namespace Schoolbox\Test;
 
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\IDatabase;
 use PDO;
 use PDOStatement;
@@ -22,7 +23,7 @@ use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use Traversable;
 
-class MockDatabase implements IDatabase
+class MockDatabase implements IDatabase, IQuoter
 {
 
     /**

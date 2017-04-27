@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -25,6 +24,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 
 class Controller extends Assessment\Controller
@@ -40,6 +40,7 @@ class Controller extends Assessment\Controller
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
      * @param MapperProxy                   $assessmentMapper
+     * @param WorkTypeMapper                $workTypeMapper
      * @param Access                        $access
      * @param Transactor                    $transactor
      * @param Assessment\Breadcrumb\Factory $bakery
@@ -49,12 +50,13 @@ class Controller extends Assessment\Controller
         UserMapper $userMapper,
         Error\Mapper $errorMapper,
         MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
         TaskResponseDataSource $taskResponseDataSource
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
 
@@ -82,12 +84,77 @@ class Controller extends Assessment\Controller
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
+            'writable'    => Access::getInstance()->isInstructor($this->getUser(), $assessment->getContext()->getFolder()),
         ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 "@learningAssessment/task/status.twig",
                 $twigData, "Status of {$assessment->getTitle()}", 'submission'
+            )
+        );
+    }
+
+    public function getPreview(IAssessable $assessment)
+    {
+        /** @var Task $task */
+        $task = $assessment;
+        $previewFragment = [];
+
+        /* If there was a specified url, it could be to some external location
+         * or even to a storage file on this server - use the PreviewFactory to
+         * decide which one it is
+         */
+        if ($task->getUrl()) {
+            $previewFragment = (new PreviewFactory())->urlFragment($task->getUrl(), $this->getUser());
+
+            if ($previewFragment['type'] == 'redirect' && !$task->getDescription()) {
+
+                /* Just forward if we only have a URL
+                 */
+                $this->getResponse()->redirect->temporaryRedirect($task->getUrl());
+                return;
+            }
+            elseif ($previewFragment['type'] == 'image') {
+
+                /* The specified url is actually an image
+                 *
+                 * This actually has the same url structure as any other regular file
+                 * so we need to check for image-ness first
+                 *
+                 * In this case $previewFragment['fragment'] already contains the url
+                 * and we don't need to do anything more
+                 */
+
+            }
+            elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches)) {
+
+                /* Other regular files
+                 *
+                 * Download them as some kind of attachment
+                 */
+                $previewFragment['type'] = 'file';
+                $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
+            }
+            elseif ($previewFragment['type'] == 'inline') {
+
+                /* Embedded content like youtube videos etc
+                 */
+                $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
+            }
+        }
+
+        $twigData = [
+            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
+            'assessment'   => $task,
+            'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $task->getBaseContext()->getFolder()),
+            'preview'      => $previewFragment,
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/task/summary/preview.twig",
+                $twigData
             )
         );
     }

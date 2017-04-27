@@ -63,6 +63,8 @@ class SoftLinks implements Check
         'term',
         'user_password_reset_request',
         'blog_image',
+        'tile',
+        'ups_log',
         'eportfolio_component_blog_image',
     ];
 

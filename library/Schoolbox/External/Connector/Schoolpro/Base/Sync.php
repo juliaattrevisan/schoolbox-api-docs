@@ -9,40 +9,21 @@
 
 namespace Schoolbox\External\Connector\Schoolpro\Base;
 
-use MSSQL;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\Base;
+use Schoolbox\External\Connector\ISync;
 
-class Sync implements SyncInterface
+class Sync extends Base implements ISync
 {
-    /**
-     * @var MSSQL
-     */
-    protected $database;
-
-    /**
-     * Sync constructor
-     */
-    public function __construct()
-    {
-        $this->database = MSSQL::getInstance();
-    }
-
     /**
      * {@inheritdoc}
      */
     public function findAllStudents()
     {
-        // This might work!
-        $vars = array(
-            'sbGetStudentAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
-
         return new StudentIterator(
-            $this->database->getProcedureIterator($vars[0], $vars[1])
+            $this->databaseExternal->executeStoredProcedureIterator(
+                'sbGetStudentAccounts',
+                ['pUserName' => 'alaress', 'pUserPass' => 'alaress']
+            )
         );
     }
 
@@ -51,18 +32,11 @@ class Sync implements SyncInterface
      */
     public function findAllParents()
     {
-        // This might work!
-        // It probably returns both parents in one row though.
-        $vars = array(
-            'sbGetGuardianAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
-
         return new GuardianIterator(
-            $this->database->getProcedureIterator($vars[0], $vars[1])
+            $this->databaseExternal->executeStoredProcedureIterator(
+                'sbGetGuardianAccounts',
+                ['pUserName' => 'alaress', 'pUserPass' => 'alaress']
+            )
         );
     }
 
@@ -71,16 +45,11 @@ class Sync implements SyncInterface
      */
     public function findAllStaff()
     {
-        // This might work!
-        $vars = array(
-            'sbGetStaffAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
         return new StaffIterator(
-            $this->database->getProcedureIterator($vars[0], $vars[1])
+            $this->databaseExternal->executeStoredProcedureIterator(
+                'sbGetStaffAccounts',
+                ['pUserName' => 'alaress', 'pUserPass' => 'alaress']
+            )
         );
     }
 }

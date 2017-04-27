@@ -10,8 +10,7 @@ use Alaress_Date_Format;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -30,12 +29,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /** @var BreadcrumbFactory */
     protected $bakery;
 
+    /** @var WorkTypeMapper */
+    private $workTypeMapper;
+
     /**
      * Controller constructor.
      *
      * @param UserMapper            $userMapper
      * @param ErrorMapper           $errorMapper
      * @param DataModel\MapperProxy $assessmentMapper
+     * @param WorkTypeMapper        $workTypeMapper
      * @param Access                $access
      * @param Transactor            $transactor
      * @param BreadcrumbFactory     $bakery
@@ -44,12 +47,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
         DataModel\MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor);
-        $this->bakery = $bakery;
+        $this->bakery          = $bakery;
+        $this->workTypeMapper  = $workTypeMapper;
     }
 
     /**
@@ -73,6 +78,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['curriculumNodes'] = $context->getFolder()->getCurriculumNodes();
 
+        /* Default Visibility comes from an LMS Policy setting in config
+         */
+        $data['markVisibility'] = $this->getConfigLoader()->get('submission_access');
+
         // Did the caller request a returnUrl?
         $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
@@ -83,7 +92,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
             $content = $this->buildUnthemedHtmlOutput("@learningAssessment/fragments/$type/create.twig", $data);
-
         } else {
             $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
         }
@@ -245,8 +253,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* If you're a student, get redirected to the summary
          */
         else if ($perms >= UserAccess::ACCESS_READ) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
-
+            if ($assessment->isParticipant($this->getUser())) {
+                $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
+            }
+            else {
+                $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
+            }
             $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
             if ($redirOverride) {
@@ -300,6 +312,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessmentType'        => AssessmentType::objectToString($assessment),
             'visibility'            => $assessment->getMarkVisibility(),
             'availableVisibilities' => $this->getAvailableVisibilities(),
+            'allWorkTypes'          => $this->workTypeMapper->findAll(),
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
@@ -375,18 +388,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getAllMarkTypes(IAssessable $assessable)
     {
         return MarkSchemeFactory::getAvailableMarkTypes($assessable);
-    }
-
-    /**
-     * Gets all work types for due work.
-     *
-     * TODO DI this if you feel like it
-     *
-     * @return WorkType[]|Collection
-     */
-    protected function getAllWorkTypes()
-    {
-        return WorkTypeMapper::getInstance()->findAll();
     }
 
     /**

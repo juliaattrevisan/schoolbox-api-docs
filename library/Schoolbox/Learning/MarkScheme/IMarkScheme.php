@@ -50,7 +50,7 @@ interface IMarkScheme
      * If a Participant has no Response and/or Feedback, $normalisedMark and $humanReadable will be null
      *
      * @param float|null     $normalisedMark
-     * @param IResponse|null $response
+     * @param IResponse|null $response          Most recent submitted response
      * @return string|null
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null);
@@ -61,7 +61,7 @@ interface IMarkScheme
      * If a Participant has no Response and/or Feedback, $normalisedMark and $humanReadable will be null
      *
      * @param string|null $humanReadableMark
-     * @param IResponse|null $response
+     * @param IResponse|null $response          Most recent submitted response
      * @return float|null
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null);
@@ -73,6 +73,13 @@ interface IMarkScheme
      */
     public static function getTitle();
 
+    /**
+     * Return the published normalised mark for the specified participant
+     *
+     * @param Participant $participant
+     * @return int|null
+     */
+    public function getPublishedNormalisedMark(Participant $participant);
 
     /**
      * Return the published human-readable mark for the specified participant

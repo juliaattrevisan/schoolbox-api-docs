@@ -63,7 +63,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE); // TODO deprecated, lives on `assessment` table now
 
         $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
-        $this->joins('type', SubmissionBox\WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
@@ -196,20 +195,17 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     {
         /** @var Storage\Mapper $attach_mapper */
         $attach_mapper   = $this->getJoinMapper('submission_box_file');
-        $worktype_mapper = $this->getJoinMapper('work_type');
         $marktype_mapper = $this->getJoinMapper('mark_type');
 
         // This is how you get ants!
         $query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$worktype_mapper->getColumnString('wt')},
 				{$marktype_mapper->getColumnString('mt')},
 				{$this->getJoinColumnString('category', 'cat')},
 				{$attach_mapper->getColumnString('at')},
 				{$attach_mapper->getJoinColumnString('allowedFileExtension', 'mime')}
 			FROM {$this->getTable()} sb
-			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
 			LEFT JOIN {$this->getJoinSql('submission_box_file', 'sb', 'at')}
@@ -224,7 +220,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         foreach ($statement as $row) {
             if (!($submission_box instanceof SubmissionBox)) {
                 $submission_box = $this->hydrate($row, 'sb');
-                $submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
                 $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
                 $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
@@ -405,7 +400,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			c.name AS categoryName,
 			b.name,
 			b.description,
-			f.name AS type,
 			r.mark,
 			r.norm_mark,
 			r.comment,
@@ -415,7 +409,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			LEFT JOIN folder c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
 			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
-			LEFT JOIN lu_submission_type f ON b.type = f.id
 			WHERE $wherePart
 			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted_at DESC, r.published_at DESC
@@ -854,12 +847,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			SELECT
 				{$this->getColumnString('sb')},
 				{$this->getJoinColumnString('category', 'c')},
-				{$this->getJoinColumnString('work_type', 't')},
 				{$this->getJoinColumnString('owner', 'u')}
 			FROM
 				`{$this->getTable()}` `sb`
 				LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-				LEFT JOIN {$this->getJoinSql('work_type', 'sb', 't')}
 				LEFT JOIN {$this->getJoinSql('owner', 'sb', 'u')}
 			WHERE
 				`sb`.`category` = :cat_id
@@ -882,7 +873,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             $box = $this->hydrate($r, 'sb');
             $box->setCategory($this->hydrateJoin($r, 'category', 'c'));
             $box->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-            $box->setWorkType($this->hydrateJoin($r, 'work_type', 't'));
             $c->add($box);
         }
 

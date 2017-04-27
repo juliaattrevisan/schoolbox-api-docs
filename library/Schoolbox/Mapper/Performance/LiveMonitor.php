@@ -9,6 +9,7 @@
 namespace Schoolbox\Mapper\Performance;
 
 
+use Alaress\Database\Predicate\Builder;
 use Psr\Log\AbstractLogger;
 use Schoolbox\Mapper;
 
@@ -26,33 +27,33 @@ class LiveMonitor extends AbstractLogger implements IMonitor
 
 
     /**
-     * @param Mapper\PredicateBuilder $predicate
-     * @param string                  $selectFrom
+     * @param Builder $predicate
+     * @param string  $selectFrom
      * @return void
      */
-    public function assessPredicate(Mapper\PredicateBuilder $predicate, $selectFrom)
+    public function assessPredicate(Builder $predicate, $selectFrom)
     {
         // noop
     }
 
 
     /**
-     * @param Mapper                  $mapper
-     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @param Mapper  $mapper
+     * @param Builder $predicateBuilder
      * @return void
      */
-    public function startExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    public function startExecuteSelectTimer(Mapper $mapper, Builder $predicateBuilder)
     {
         // noop
     }
 
 
     /**
-     * @param Mapper                  $mapper
-     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @param Mapper  $mapper
+     * @param Builder $predicateBuilder
      * @return void
      */
-    public function stopExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    public function stopExecuteSelectTimer(Mapper $mapper, Builder $predicateBuilder)
     {
         // noop
     }

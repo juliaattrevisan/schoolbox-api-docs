@@ -22,13 +22,14 @@ class SubmissionBoxMapperTest extends TestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->object = new SubmissionBoxMapper();
+		$this->object = SubmissionBoxMapper::getInstance();
 		$this->object->setConfigLoader(new TestLoader());
 	}
 
 	public function testHydrate() {
 		$data = array(
 			'id'                => 3,
+            'assessment_id'     => 3,
 			'category'          => 11,
 			'name'              => 'Some test',
 			'description'       => 'no description',

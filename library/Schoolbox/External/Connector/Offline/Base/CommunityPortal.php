@@ -1,6 +1,6 @@
 <?php
 /**
- * Offline stub implementation of community portal connector.
+ * Stub implementation of Community Portal connector
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
@@ -9,16 +9,23 @@
 
 namespace Schoolbox\External\Connector\Offline\Base;
 
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Schoolbox\External\Connector\Base;
+use Schoolbox\External\Connector\ICommunityPortal;
 
-class CommunityPortal implements CommunityPortalInterface
+class CommunityPortal extends Base implements ICommunityPortal
 {
     /**
      * @inheritDoc
      */
     public function changePassword($communityId, $newPassword)
     {
-        // If there's nothing here, nothing went wrong, so...
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSecrets($key, $initializationVector)
+    {
     }
 }

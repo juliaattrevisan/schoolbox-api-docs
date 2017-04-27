@@ -38,7 +38,12 @@
                     }
                 }
             },
-            value: [{% for tag in record.tagsList %}'{{ tag.getName | escape('js') }}',{% endfor %}]
+            value: [
+                {% for tag in record.tagsList %}
+                {% set tagName = tag.getName | escape('js') %}
+                {'id':'{{ tagName }}','name':'{{ tagName }}'}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
         });
 
         {% if record.getId != '' %}

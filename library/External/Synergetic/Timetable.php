@@ -7,8 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Alaress\DebugBar\Instance as DebugBar;
-
 class External_Synergetic_Timetable implements External_TimetableInterface
 {
     use External_Synergetic_ValidateExternalIdTrait;
@@ -39,9 +37,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         if ($date != null)
         {
-            $this->getDatabase()->query("SELECT CalendarType FROM CalendarEvents WHERE CalendarDate = '{$date}' AND CalendarType LIKE 'D=D%'");
+            $statement = $this->getDatabase()->query("SELECT CalendarType FROM CalendarEvents WHERE CalendarDate = '{$date}' AND CalendarType LIKE 'D=D%'");
 
-            if ($row = $this->getDatabase()->getNextArray()) {
+            if ($row = $statement->fetch()) {
                 $overrideDay = trim(substr($row["CalendarType"], 3));
                 if (!empty($overrideDay) && is_numeric($overrideDay)) {
 
@@ -63,23 +61,16 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						(TimetableDefinition.DayNumber = '$day' )
 					ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 					";
-        $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         $periodCount = 0;
 
-        while ($period = $this->getDatabase()->getNextArray()) {
-            preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeTo'], $TimeToMatches);
-            preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeFrom'], $TimeFromMatches);
+        while ($period = $statement->fetch()) {
+
 
             $timetableDef['desc'][]     = $period['Description'];
-            $timetableDef['start'][]    =
-                (int)$TimeFromMatches[1]
-                . ':' . $TimeFromMatches[2]
-                . strtolower($TimeFromMatches[3]);
-            $timetableDef['end'][]      =
-                (int)$TimeToMatches[1]
-                . ':' . $TimeToMatches[2]
-                . strtolower($TimeToMatches[3]);
+            $timetableDef['start'][]    = date("g:ia", strtotime($period['TimeFrom']));
+            $timetableDef['end'][]      = date("g:ia", strtotime($period['TimeTo']));
             $timetableDef['number'][]   = $period['PeriodNumber'];
             $timetableDef['sequence'][] = $period['PeriodNumberSeq'];
             $periodCount++;
@@ -98,23 +89,32 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     //gets current day number
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-
         $days = $this->getTotalDays($campus);
 
         if (!$date) {
             $date = time();
         }
 
-        $result = $this->getDatabase()->executeProcedure(
-            'spgTimetableDay',
-            array(
-                array('@TimeTableGroup', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1),
-                array('@Date', date('Y-m-d', $date), SQLVARCHAR, false, false, -1),
-                array('@CurrentDay', 'day', SQLINT4, true, false, -1),
-            )
-        );
-        if ($result['success'] && isset($result['output']['@CurrentDay'])) {
-            return $result['output']['@CurrentDay'];
+        $statement = $this->getDatabase()->prepareProcedure('spgTimetableDay');
+
+        $statement->bindInputs([
+            'TimetableGroup' => $campus->getExtTimetableCode(),
+            'Date' => date('Y-m-d', $date)
+        ]);
+
+        $currentDay = null;
+
+        $outputs['CurrentDay'] = [
+            'value' => &$currentDay,
+            'type' => PDO::PARAM_INT,
+            'length' => 4
+        ];
+
+        $statement->bindOutputs($outputs);
+        $statement->execute();
+
+        if (isset($currentDay)) {
+            return $currentDay;
         }
 
         if (date('w', $date) == 0 || date('w', $date) == 6) {
@@ -259,9 +259,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 			WHERE (CalendarEvents.CalendarType LIKE '" . $campus->getExtTimetableCode() . "_D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
 			ORDER BY CalendarEvents.CalendarDate DESC";
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
         //Cache all date and days into variable
-        while ($day = $this->getDatabase()->getNextArray($result)) {
+        while ($day = $statement->fetch()) {
             //cut out d from CalenderType string
             preg_match('/d([0-9]+)/i', $day['type'], $match);
             if ($match[1] > 0 and $match[1] <= $days) {
@@ -281,9 +281,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 WHERE (CalendarEvents.CalendarType LIKE 'D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
                 ORDER BY CalendarEvents.CalendarDate DESC";
 
-            $result = $this->getDatabase()->query($query);
+            $statement = $this->getDatabase()->query($query);
             //Cache all date and days into variable
-            while ($day = $this->getDatabase()->getNextArray($result)) {
+            while ($day = $statement->fetch()) {
                 //cut out d from CalenderType string
                 preg_match('/d([0-9]+)/i', $day['type'], $match);
                 if ($match[1] > 0 and $match[1] <= $days) {
@@ -384,6 +384,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
+
+        $periodList = [];
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
         if (!is_array($timetabledef)) {
@@ -395,41 +397,43 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
 
-        $result = $this->getDatabase()->executeProcedure('dbo.spsTimetable',
-            array(
-                array('@FileYear', $fileYear, SQLINT4),
-                array('@FileSemester', $fileSemester, SQLINT4),
-                array('@ID', $externalUserId, SQLINT4),
-                array('@Date', $date->getDatabaseDate(), SQLVARCHAR),
-                array('@IncludeStaffScheduleFlag',1, SQLINT4),
-                array('@CheckAttendancesExistFlag',1, SQLINT4),
-                array('@IncludeSparesFlag', 0, SQLINT4),
-                array('@IncludeRecessFlag', 0, SQLINT4),
-            )
+        $statement = $this->database->prepareProcedure('dbo.spsTimetable');
+        $statement->bindInputs(
+            [
+                'FileYear' => $fileYear,
+                'FileSemester' => $fileSemester,
+                'ID' => $externalUserId,
+                'Date' => $date->getDatabaseDate(),
+                'IncludeStaffScheduleFlag' => 1,
+                'CheckAttendancesExistFlag' => 1,
+                'IncludeSparesFlag' => 0,
+                'IncludeRecessFlag' => 0
+            ]
         );
 
-        $periodList = array();
+        $iterator = $statement->executeIterator();
 
-        if($result['success']) {
-            foreach($result['result'] as $spRow) {
-                if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
-                    $periodList[] = array(
-                        'Room'              => $spRow['Room'],
-                        'Description'       => $spRow['ClassDescription'],
-                        'PeriodNumber'      => $spRow['Period'],
-                        'ClassCampus'       => $spRow['ClassCampus'],
-                        'ClassCode'         => $spRow['ClassCode'],
-                        'SubstituteFlag'    => $spRow['SubstituteFlag'],
-                        'SubstitutedFlag'   => $spRow['SubstitutedFlag'],
-                        'AttendanceMarked'  => $spRow['IsMarkedFlag'],
-                        'AttendanceEnabled' => $spRow['AttendanceEntryEnabledFlag'],
+        $count = 0;
 
-                    );
+        foreach ($iterator as $spRow) {
+            if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
+                $periodList[] = array(
+                    'Room' => $spRow['Room'],
+                    'Description' => $spRow['ClassDescription'],
+                    'PeriodNumber' => $spRow['Period'],
+                    'ClassCampus' => $spRow['ClassCampus'],
+                    'ClassCode' => $spRow['ClassCode'],
+                    'SubstituteFlag' => $spRow['SubstituteFlag'],
+                    'SubstitutedFlag' => $spRow['SubstitutedFlag'],
+                    'AttendanceMarked' => $spRow['IsMarkedFlag'],
+                    'AttendanceEnabled' => $spRow['AttendanceEntryEnabledFlag'],
 
-                }
-
+                );
             }
-        } else {
+            $count++;
+        }
+
+        if ($count == 0) {
             // Fall back to getDayTimetable()
             return $this->getDayTimetable(
                 $externalUserId,
@@ -543,7 +547,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				ORDER BY Timetable.PeriodNumber";
         }
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         //for each period
         $timetable = array();
@@ -561,7 +565,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         // Add classes into it
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
@@ -600,7 +604,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         $campusString = $campus->getExtTimetableCode();
-
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
@@ -662,7 +665,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $dayCount = $timetabledef['dayCount'];
 
-        $result = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
 
         // Build the timetable
         $timetable = array();
@@ -677,7 +680,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         // Add classes for each day into it
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+
+        while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2

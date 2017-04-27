@@ -22,7 +22,6 @@ if (empty($this) || $_SERVER['REQUEST_METHOD'] != 'POST') {
 
 /** @var IConfigLoader $conf */
 $conf    = $this->getDi()->get('config');
-$headers = apache_request_headers();
 if (function_exists('apache_request_headers')) {
     $headers = apache_request_headers();
 } else {

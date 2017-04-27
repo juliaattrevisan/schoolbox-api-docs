@@ -42,7 +42,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 *
 	 * @param $exchange
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function declareExchange($exchange, $channelId = null) {
 		return $this;
@@ -54,7 +54,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 *
 	 * @param string $name
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function declareQueue($name, $channelId = null) {
 		return $this;
@@ -67,7 +67,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 * @param string $exchangeName
 	 * @param string $routingKey
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function bindExchange($exchangeName, $routingKey, $channelId = null) {
 		return $this;
@@ -81,7 +81,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 * @param string $routingKey
 	 * @param string $exchangeName
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function bindQueue($queueName, $routingKey, $exchangeName = '', $channelId = null) {
 		return $this;
@@ -95,7 +95,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 * @param string $routingKey
 	 * @param string $exchangeName
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function unbindQueue($queueName, $routingKey, $exchangeName = '', $channelId = null) {
 		return $this;
@@ -108,7 +108,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 * @param string $exchangeName
 	 * @param string $routingKey
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function unbindExchange($exchangeName, $routingKey, $channelId = null) {
 		return $this;
@@ -120,7 +120,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 *
 	 * @param AMQPMessage $message
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function acceptMessage($message, $channelId = null) {
 		return $this;
@@ -132,7 +132,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 *
 	 * @param AMQPMessage[] $messages
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function acceptMessages($messages, $channelId = null) {
 		return $this;
@@ -145,7 +145,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 * @param AMQPMessage[] $messages
 	 * @param bool $requeue
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function rejectMessages($messages, $requeue = true, $channelId = null) {
 		foreach($messages as $m) {
@@ -161,7 +161,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 * @param AMQPMessage $message
 	 * @param bool $requeue
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function rejectMessage($message, $requeue = true, $channelId = null) {
 		if($requeue) {
@@ -194,7 +194,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 * @param string $routingKey
      * @param array  $properties
 	 * @param string $channelId
-	 * @return self
+	 * @return $this
 	 */
 	public function publish($message, $routingKey, $properties = array(), $channelId = null) {
 		return $this;
@@ -206,7 +206,7 @@ class MockAMQPConnector implements AMQPInterface {
      *
      * @param string $queueName
      * @param string $channelId
-     * @return self
+     * @return $this
      */
     public function deleteQueue($queueName, $channelId = null)
     {
@@ -219,7 +219,7 @@ class MockAMQPConnector implements AMQPInterface {
      *
      * @param string $exchangeName
      * @param string $channelId
-     * @return self
+     * @return $this
      */
     public function deleteExchange($exchangeName, $channelId = null)
     {
@@ -234,14 +234,4 @@ class MockAMQPConnector implements AMQPInterface {
 		return new AMQPExchange('mock','mock');
 	}
 
-
-	/**
-	 * @param string $name
-	 * @return AMQPExchange
-	 */
-	public function getSecondaryExchange($name) {
-		return new AMQPExchange("mock.$name",'mock');
-	}
-
-
-} 
+}

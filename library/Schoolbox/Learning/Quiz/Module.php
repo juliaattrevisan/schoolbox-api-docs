@@ -58,10 +58,10 @@ class Module extends RestfulModule
                 '/quiz/intro/{assessmentId}'                                => 'getQuizIntro',
                 '/quiz/{assessmentId}/attempts/export'                      => 'getExportAttempts',
                 '/quiz/section/create/{assessmentId}'                       => 'getQuizSectionCreate',
-
             ],
             'POST' => [
                 '/quiz/submit'                                              => 'postQuizSubmit',
+                '/quiz/attempts/delete'                                     => 'postAttemptDelete',
             ]
         ];
 
@@ -79,7 +79,7 @@ class Module extends RestfulModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getQuizSummary)';
+        $ruleRegexp = '(getQuizSummary|postAttemptDelete)';
         $this->addRoutePermission($authorizer, $ruleRegexp,
             new Rule\All(
                 new Rule\IsLoggedIn(),

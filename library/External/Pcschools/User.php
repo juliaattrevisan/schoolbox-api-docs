@@ -89,6 +89,7 @@ class External_Pcschools_User implements External_UserInterface
                 '' AS HeadOfHouseID,
                 '' AS StudentHeadOfHouse,
                 S.STATUS AS StudentBoarder,
+                '' AS Comment,
                 S.HOME_CLASS AS StudentForm,
                 S_CLASS.DESCRIPTION AS FormDescription,
                 S_HOME_TEACHER.NAME_FOR_REPORT AS StudentFormStaffName,
@@ -854,15 +855,19 @@ class External_Pcschools_User implements External_UserInterface
             } else {
                 return [];
             }
-            $params = [
-                ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
-                ['@TIMEPERIOD', $timePeriod, SQLVARCHAR, false, false, -1],
-                ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
-                ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
-//                ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
-            ];
-            $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params, true);
-            list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $response['result'];
+
+            $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+            $statement->bindInputs([
+                ['name' => 'DATE', 'value' => date('Ymd')],
+                ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
+                ['name' => 'STUDKEY', 'value' => $studentExternalId],
+                ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+            ]);
+
+            $statement->execute();
+            $row = $statement->fetch();
+
+            list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
 
             // Add classes for each day into it
             foreach ($dayClasses as $dayClass) {

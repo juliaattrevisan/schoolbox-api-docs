@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif\Formatter;
 
 
+use ErrorException;
 use Monolog\Formatter\FormatterInterface;
 
 class CompressedFormatter implements FormatterInterface {
@@ -62,21 +63,27 @@ class CompressedFormatter implements FormatterInterface {
      * @return mixed
      */
     public static function uncompress($data) {
-        // base64-decode the data
-        if(($decoded = base64_decode($data)) === false) {
-            throw new CompressionException("Could not decode data");
+        try {
+            // base64-decode the data
+            if(($decoded = base64_decode($data)) === false) {
+                throw new CompressionException("Could not decode data");
+            }
+
+            // uncompress the resultant binary
+            if(($uncompressed = gzuncompress($decoded)) === false) {
+                throw new CompressionException("Could not uncompress data");
+            }
+
+            // unserialize the resultant string
+            $unserialized = unserialize($uncompressed);
+
+            // return the result
+            return $unserialized;
+
+        } catch (ErrorException $e) {
+            // cast error exceptions to compression exceptions
+            throw new CompressionException($e->getMessage(), $e->getCode(), $e);
         }
-
-        // uncompress the resultant binary
-        if(($uncompressed = gzuncompress($decoded)) === false) {
-            throw new CompressionException("Could not uncompress data");
-        }
-
-        // unserialize the resultant string
-        $unserialized = unserialize($uncompressed);
-
-        // return the result
-        return $unserialized;
     }
 
 } 

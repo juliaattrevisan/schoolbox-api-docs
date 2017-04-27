@@ -115,7 +115,7 @@
         $('#download-calendar-export').click(function(event) {
             event.preventDefault();
             var form = $(event.target).closest('form');
-            window.location = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+            window.location = $.fn.getExportCalendarLink('{CALENDAR_USER_TOKEN}', form.serializeArray())+'&format=csv';
         });
 
         /* Export calendar
@@ -124,7 +124,7 @@
             exportActivator: '#open-calendar-export-dialog',
             onReady: function() {
                 var form = $('#calendar-export-form');
-                var url = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
+                var url = $.fn.getExportCalendarLink('{CALENDAR_USER_TOKEN}', form.serializeArray());
 
                 var dialog = $('#calendar-export-dialog');
                 var dialogUrl = $('#calendar-export-dialog-url');
@@ -270,14 +270,14 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>{TPL_LOCAL_CALENDAR_PC} for {USER_FULLNAME}</h1>
+        <h1>{TPL_LOCAL_CALENDAR_PC} for {CALENDAR_USER_FULLNAME}</h1>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
         <form data-type='calendar-controls' action="/calendar/list" method="post">
-            <input type="hidden" name='userKey' value='{USER_ID}' />
+            <input type="hidden" name='userKey' value='{CALENDAR_USER_ID}' />
             <section class="content">
                 <fieldset>
                     <div class="small-12 large-6 column">

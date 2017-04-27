@@ -14,18 +14,6 @@ namespace Schoolbox\Preview\Chain\Strategy\External;
 class Image extends Base {
 
     /**
-     * Content Types for this strategy
-     *
-     * @var array
-     */
-    private $contentTypes = [
-        'image/jpeg',
-        'image/pjpeg',
-        'image/gif',
-        'image/png',
-    ];
-
-    /**
      * A list of all the file extensions checked here
      *
      * This is a massive pipe assumption that urls end in this set of
@@ -57,29 +45,9 @@ class Image extends Base {
      */
 
     /**
-     * Set content types
-     *
-     * @param array $contentTypes
-     */
-    private function setContentTypes($contentTypes)
-    {
-        $this->contentTypes = $contentTypes;
-    }
-
-    /**
      * Get content types
      *
-     * @return array
-     */
-    private function getContentTypes()
-    {
-        return $this->contentTypes;
-    }
-
-    /**
-     * Get content types
-     *
-     * @return array
+     * @return string
      */
     private function getExtensions()
     {

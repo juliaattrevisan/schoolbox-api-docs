@@ -50,8 +50,6 @@ class Controller extends Base
                 'template' => '@curriculum/browse.twig',
                 'data'     => array(
                     'tree'   => $tree,
-                    'areas'  => $this->getAsGroupedList($this->getAreaMapper()->findAllWithSource()),
-                    'levels' => $this->getAsGroupedList($this->getLevelMapper()->findAllWithSource()),
                     // Readonly check - for now, check without any parameters
                     'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
                         'curriculum.edit',
@@ -115,7 +113,7 @@ class Controller extends Base
      */
     protected function getAsJsTree(Node\Model $node)
     {
-        $nodeId = intval($node->getId());
+        $nodeId = (int)$node->getId();
         $name   = $node->getName();
         $isCode = strlen($node->getCode()) > 0;
         if ($isCode) {
@@ -123,7 +121,7 @@ class Controller extends Base
         }
         return array(
             'id'     => $nodeId,
-            'parent' => intval($node->getParent()->getId()) ?: '#',
+            'parent' => (int)$node->getParent()->getId() ?: '#',
             'text'   => $name,
             'a_attr' => array(
                 'href' => $this->getRouter()->generate(
@@ -169,6 +167,7 @@ class Controller extends Base
      */
     public function create()
     {
+        /** @var $item Node\Model */
         $item = $this->getNodeMapper()->createModel();
 
         // Default learning area and level, or a preselected one?
@@ -189,14 +188,10 @@ class Controller extends Base
         if ($post['parent']) {
             $parent = $this->getNodeMapper()->findById($post['parent']);
             $item
-                ->setParent($parent)
-                ->setLearningArea($parent->getLearningArea())
-                ->setLearningLevel($parent->getLearningLevel());
+                ->setParent($parent);
         } else {
             $item
-                ->setParent($this->getNodeMapper()->createModel())
-                ->setLearningArea($this->getAreaMapper()->findById($post['learningArea']))
-                ->setLearningLevel($this->getLevelMapper()->findById($post['learningLevel']));
+                ->setParent($this->getNodeMapper()->createModel());
         }
 
         // Save the item
@@ -328,42 +323,6 @@ class Controller extends Base
     public function setNodeMapper($nodeMapper)
     {
         $this->nodeMapper = $nodeMapper;
-        return $this;
-    }
-
-    /**
-     * @return LearningArea\Mapper
-     */
-    public function getAreaMapper()
-    {
-        return $this->areaMapper;
-    }
-
-    /**
-     * @param  LearningArea\Mapper $areaMapper
-     * @return $this
-     */
-    public function setAreaMapper($areaMapper)
-    {
-        $this->areaMapper = $areaMapper;
-        return $this;
-    }
-
-    /**
-     * @return LearningLevel\Mapper
-     */
-    public function getLevelMapper()
-    {
-        return $this->levelMapper;
-    }
-
-    /**
-     * @param  LearningLevel\Mapper $levelMapper
-     * @return $this
-     */
-    public function setLevelMapper($levelMapper)
-    {
-        $this->levelMapper = $levelMapper;
         return $this;
     }
 }

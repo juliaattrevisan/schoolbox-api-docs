@@ -7,19 +7,18 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
+use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
-use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Folder\Model as Folder;
-use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\HomepageConfig;
 
 /**
@@ -27,7 +26,7 @@ use Schoolbox\Resource\HomepageConfig;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method GenericCollection|Model[] findByPredicates(PredicateBuilder $pb, array $options = [])
+ * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */
 class Mapper extends AbstractUnitMapper
 {

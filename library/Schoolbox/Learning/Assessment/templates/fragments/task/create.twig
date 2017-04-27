@@ -17,7 +17,15 @@
     Title
     <input type="text" name="title" value="{{ assessment.title }}" required />
 </label>
-
+<label>
+    Work Type
+    <select name="workType">
+        <option value="" selected>None</option>
+        {% for workType in allWorkTypes %}
+            <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
+        {% endfor %}
+    </select>
+</label>
 <label>
     Description
     <textarea name="description">{{ assessment.description }}</textarea>

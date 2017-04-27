@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Rubric\Calculable;
 use Schoolbox\Assessment\Rubric\CalculableAggregator;
 use Schoolbox\Assessment\Rubric\Twiggable;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 
 class Group implements Twiggable, Calculable
 {
@@ -129,12 +130,8 @@ class Group implements Twiggable, Calculable
      * @param Criterion $criterion
      * @return $this
      */
-    public function putCriterion($criterion)
+    public function putCriterion(Criterion $criterion)
     {
-        if (!$criterion instanceof Criterion) {
-            throw new InvalidArgumentException("Invalid Criterion given");
-        }
-
         if (!$this->contains($criterion)) {
             $this->criteria->attach($criterion);
         }
@@ -147,7 +144,7 @@ class Group implements Twiggable, Calculable
      * @param Criterion $criterion
      * @return bool
      */
-    public function contains($criterion)
+    public function contains(Criterion $criterion)
     {
         return $this->criteria->contains($criterion);
     }
@@ -235,13 +232,13 @@ class Group implements Twiggable, Calculable
 
 
     /**
-     * Returns a collection containing all the criteria in this grid, for DB persistence.
+     * Returns a collection containing all the criteria in this grid, for conversion to ORMs for subsequent DB persistence.
      *
      * @return Collection|Criterion[]
      */
     public function getAllCriteria()
     {
-        $c = new Collection();
+        $c = new GenericCollection(Criterion::class);
 
         foreach ($this->criteria as $crit) {
             $c->add($crit);

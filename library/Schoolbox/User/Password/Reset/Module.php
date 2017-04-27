@@ -7,17 +7,16 @@
 
 namespace Schoolbox\User\Password\Reset;
 
-use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Psr\Log\NullLogger;
 use Schoolbox\External\Connector\CommunityPortalFactory;
 use Schoolbox\Mail;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\UserMapper;
-use \Schoolbox\User;
 use Twig_Loader_Chain;
 
 /**
@@ -86,14 +85,15 @@ class Module extends BaseModule
                     'passwordService'        => $injector->lazyNew(PasswordService::class),
                     'userMapper'             => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'resetMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'communityPortalFactory' => $injector->lazyNew(CommunityPortalFactory::class),
+                    'communityPortalFactory' => $injector->lazyGet('externalCommunityPortal'),
                     'mailFactory'            => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
                         [
                             'context' => $injector->lazyNew(
                                 Mail\CoreContext::class,
                                 ['conf' => $injector->lazyGet('config')]
-                            )
+                            ),
+                            'log' => $injector->lazyNew(NullLogger::class),
                         ]
                     ),
                 ]
@@ -109,7 +109,9 @@ class Module extends BaseModule
      */
     protected function getMapper()
     {
-        return $this->getMapperFactory()->get(Mapper::class);
+        /** @var Mapper $mapper */
+        $mapper = $this->getMapperFactory()->get(Mapper::class);
+        return $mapper;
     }
 
     /**
@@ -117,8 +119,8 @@ class Module extends BaseModule
      */
     protected function getUserMapper()
     {
-        return $this->getMapperFactory()->get(UserMapper::class);
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+        return $userMapper;
     }
-
-
 }

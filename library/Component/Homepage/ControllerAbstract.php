@@ -196,7 +196,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      * @param Folder|null $source
      * @return static
      */
-    public function setSource( $source = null)
+    public function setSource($source = null)
     {
         parent::setSource($source);
         return $this;

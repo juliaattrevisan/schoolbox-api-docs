@@ -10,8 +10,10 @@
 namespace Schoolbox;
 
 use Alaress\Cache;
+use Alaress\Database\Predicate\Builder;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
+use Aura\Di;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -19,16 +21,21 @@ use PDOStatement;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
+use Schoolbox\Column\Model as ModelColumn;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
 use Schoolbox\Mapper\Performance\IMonitor;
 use Schoolbox\Mapper\Performance\LiveMonitor;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\NotifInterface;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Broker;
+use Schoolbox\Realtime\Schedule\Event\Splitter;
+use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
+use Schoolbox\Realtime\Schedule\Trigger\Propagator;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Serializable;
 use Traversable;
 use UnderflowException;
@@ -166,10 +173,13 @@ abstract class Mapper implements IMapper, Serializable
     static protected $instance;
 
     /** @var IFactory */
-    static private $columnFactory;
+    protected static $columnFactory;
 
     /** @var IMonitor */
     protected static $perfmon;
+
+    /** @var IPropagator */
+    protected static $prop;
 
     /**
      * Factory for building column hydrators.
@@ -210,6 +220,9 @@ abstract class Mapper implements IMapper, Serializable
     /** @var IMonitor */
     protected $monitor;
 
+    /** @var Propagator */
+    protected $propagator;
+
     /** @var bool */
     private $localBodyCacheBypass = false;
 
@@ -220,6 +233,48 @@ abstract class Mapper implements IMapper, Serializable
      * @var bool
      */
     protected $cacheEnabled = true;
+
+    /**
+     * @param Di\ContainerInterface $di
+     * @throws Di\Exception
+     */
+    public static function di(Di\ContainerInterface $di)
+    {
+        self::$columnFactory = new ColumnFactory();
+
+        // only functional in development
+
+        self::$perfmon = (INSTANCE_ID === 'vagrantx' && self::isWithinWebRequest())
+            ? new DevMonitor(DebugBar::getInstance())
+            : new LiveMonitor()
+        ;
+
+        try {
+
+            self::$prop = $di->newInstance(Propagator::class, [
+                'splitter'   => $di->lazyNew(Splitter::class, [
+                    'conf'        => $di->lazyGet('config'),
+                    'di'          => $di,
+                    'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
+                ]),
+                'redis'      => $di->lazyGet('redis'),
+                'broker'     => $di->lazyNew(Broker::class, [
+                    'instanceId' => INSTANCE_ID,
+                    'amqp'       => $di->lazyGet('amqp'),
+                    'redis'      => $di->lazyGet('redis'),
+                    // no 'stomp'
+                ]),
+                'instanceId' => INSTANCE_ID,
+            ]);
+
+        } catch (Di\Exception\ServiceNotFound $e) {
+
+            // in PHPUnit land, we do not have external services.
+            // this catch is merely to accommodate that case, it should not be
+            // relied upon in development
+            self::$prop = new MockPropagator();
+        }
+    }
 
     /**
      * Is this mapper being instantiated within a web request?
@@ -246,19 +301,6 @@ abstract class Mapper implements IMapper, Serializable
      */
     public static function getInstance()
     {
-        if (empty(self::$columnFactory)) {
-            // we want this to exist once ever
-            self::$columnFactory = new ColumnFactory();
-        }
-
-        if (empty(self::$perfmon)) {
-            // we want this to exist once ever, and only functional in development
-            self::$perfmon = (INSTANCE_ID == 'vagrantx' && self::isWithinWebRequest())
-                ? new DevMonitor(DebugBar::getInstance())
-                : new LiveMonitor()
-            ;
-        }
-
         $class_name = get_called_class();
         if (!isset(self::$instance[$class_name])) {
             self::$instance[$class_name] = new static();
@@ -276,7 +318,6 @@ abstract class Mapper implements IMapper, Serializable
         $this->database = \Database::getInstance();
         $this->map      = new MappingCollection();
 
-
         $this->initCaches();
         // Switch on the cache if this is a web request: otherwise switch off
         if (self::isWithinWebRequest()) {
@@ -288,6 +329,7 @@ abstract class Mapper implements IMapper, Serializable
         $this->setup();
         $this->setColumnFactory(self::$columnFactory);
         $this->setMonitor(self::$perfmon);
+        $this->setEventPropagator(self::$prop);
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
 
@@ -394,6 +436,11 @@ abstract class Mapper implements IMapper, Serializable
 
             if (array_key_exists($key, $row) && $this->localBodyCacheBypass == false) {
                 $id = $row[$key];
+
+                // If the identifier is null, just return scalar NULL.
+                if (null === $id) {
+                    return null;
+                }
                 $model = $mapper->createModel($id);
             } else {
                 $model = $mapper->createModel();
@@ -407,7 +454,6 @@ abstract class Mapper implements IMapper, Serializable
                     if (!(isset($map['join']) && isset($mapper->joins[$map['join']]['multi']))) {
                         throw new Exception("Column must be declared if no multijoin set for it: " . json_encode($map));
                     }
-
                 } else {
                     $columnName = $map['column'];
 
@@ -555,6 +601,25 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * @return IPropagator
+     */
+    public function getEventPropagator()
+    {
+        return $this->propagator;
+    }
+
+    /**
+     * @param IPropagator $propagator
+     * @return static
+     */
+    protected function setEventPropagator(IPropagator $propagator = null)
+    {
+        $this->propagator = $propagator;
+        return $this;
+    }
+
+
+    /**
      * Gets a single object as a collection, if it isn't one already.
      *
      * Different possible actions based on $object:
@@ -636,7 +701,7 @@ abstract class Mapper implements IMapper, Serializable
         $currentDepth = 1
     ) {
         // Recursive relation protection
-        if ($currentDepth <= 50) {
+        if ($currentDepth >= 50) {
             return $object;
         }
         $collection = $this->getModelAsCollection($object);
@@ -647,7 +712,11 @@ abstract class Mapper implements IMapper, Serializable
         // Get parent ID of each $object
         $parentIds = [];
         foreach ($collection as $node) {
-            $parentId = $node->$getParent()->$getId();
+            $parent = $node->$getParent();
+            if (!is_object($parent)) {
+                break;
+            }
+            $parentId = $parent->$getId();
             if ($parentId) {
                 $parentIds[] = $parentId;
             }
@@ -829,8 +898,14 @@ abstract class Mapper implements IMapper, Serializable
         $set_method  = $this->getSetMethodName($property);
         $map         = $this->map->getOffset($property);
         $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
-        if ($map['hydrator'] instanceof IColumnType) {
-            $value = $map['hydrator']->hydrate($value, $join_mapper);
+        $hydrator    = $map['hydrator'];
+        if ($hydrator instanceof IColumnType) {
+            $value = $hydrator->hydrate($value, $join_mapper);
+            // Attempting to set a model value to NULL will likely break,
+            // and won't do anything because it will be NULL on hydrate anyway.
+            if (!isset($value) && $hydrator instanceof ModelColumn) {
+                return $this;
+            }
         }
         $model->$set_method($value);
         return $this;
@@ -928,24 +1003,42 @@ abstract class Mapper implements IMapper, Serializable
         return $this->hasMap($map);
     }
 
-
     /**
      * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
      *
-     * @param string      $foreignKey
+     * Use this when a parent object has 0|1 relationship to a child object, where
+     * the join is defined on the child's table.
+     *
+     * @param string      $foreignKey      The foreign key on the other table
      * @param string      $foreignMapper
-     * @param string      $localColumn
-     * @param IColumnType $hydrator
-     * @param int         $options
      * @param string      $property
      * @param string      $name
      * @return bool
      */
-    protected function joinsReverse($foreignKey, $foreignMapper, $localColumn = 'id', $hydrator = null, $options = null, $property = null, $name = null)
+    protected function joinsReverseSingle($foreignKey, $foreignMapper, $property = null, $name = null)
     {
-        // enforce reverse joining
-        $options = $options | self::COLUMN_JOIN_REVERSE;
-        return $this->joins($localColumn, $foreignMapper, $foreignKey, $hydrator, $options, $property, $name);
+        $localColumn = $this->getIdentifierColumn();
+        $options = self::COLUMN_JOIN_REVERSE;
+        return $this->joins($localColumn, $foreignMapper, $foreignKey, self::TYPE_MODEL, $options, $property, $name);
+    }
+
+    /**
+     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE | self::COLUMN_JOIN_MULTI)
+     *
+     * Use this when a parent object has a Collection of 0:N children objects associated with it, where
+     * the join is defined on the children's table.
+     *
+     * @param string      $foreignKey      The foreign key on the other table
+     * @param string      $foreignMapper
+     * @param string      $property
+     * @param string      $name
+     * @return bool
+     */
+    protected function joinsReverseMulti($foreignKey, $foreignMapper, $property = null, $name = null)
+    {
+        $localColumn = $this->getIdentifierColumn();
+        $options = self::COLUMN_JOIN_REVERSE | self::COLUMN_JOIN_MULTI;
+        return $this->joins($localColumn, $foreignMapper, $foreignKey, self::TYPE_COLLECTION, $options, $property, $name);
     }
 
 
@@ -1039,6 +1132,15 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty($map['hydrator'])) {
             $map['hydrator'] = $this->column_factory->build($map['type']);
+
+        } elseif (empty($map['type'])) {
+            // hydrator specified, but no type: assume model
+            $map['type'] = self::TYPE_MODEL;
+        }
+
+        if (empty($map['type'])) {
+            // both hydrator and type cannot be empty
+            return false;
         }
 
         // if property is empty, derive it from the column, converting snake_case to camelCase
@@ -1259,7 +1361,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList, array $options = [])
     {
-        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList,  $options);
+        return $this->executeDelete($this->getDeleteString(), new Builder($this->getDatabase(), $this->getTable()), $columnList,  $options);
     }
 
 
@@ -1267,13 +1369,13 @@ abstract class Mapper implements IMapper, Serializable
      * Deletes (whether hard or soft) all records that match the given set of column values
      * Returns the number of records deleted.
      *
-     * @param string           $deleteString
-     * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param string  $deleteString
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @return int
      */
-    protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList, array $options = [])
+    protected function executeDelete($deleteString, Builder $predicate, array $columnList, array $options = [])
     {
         // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
         if (empty($columnList) && empty($predicate->getWhere())) {
@@ -1454,12 +1556,12 @@ abstract class Mapper implements IMapper, Serializable
      * This is used in `updateAll` and `hardDelete`.
      *
      * @param Collection $collection A collection of models
-     * @return PredicateBuilder[]
+     * @return Builder[]
      */
     protected function buildPredicateBuildersForCollection(Collection $collection)
     {
         // Build a WHERE part using the predicate builder.
-        /** @var PredicateBuilder[] $pbs */
+        /** @var Builder[] $pbs */
         $pbs = [];
         if ($this->hasIdentifier()) {
             // Building the query is easy, just set where any identifier matches
@@ -1754,17 +1856,17 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findByColumnList($columnList, $options = array())
     {
-        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
     }
 
     /**
      * Generates a custom query
      *
-     * @param PredicateBuilder $pb
-     * @param array $options
+     * @param Builder $pb
+     * @param array   $options
      * @return GenericCollection
      */
-    public function findByPredicates(PredicateBuilder $pb, array $options = [])
+    public function findByPredicates(Builder $pb, array $options = [])
     {
         return $this->executeSelect($this->getSelectString(), $this->getFromString(), $pb, [], $options);
     }
@@ -1773,12 +1875,12 @@ abstract class Mapper implements IMapper, Serializable
      * Deletes (whether hard or soft) all records that match the given Predicates
      * Returns the number of records deleted.
      *
-     * @param PredicateBuilder $pb
-     * @param  array $options
+     * @param Builder $pb
+     * @param  array  $options
      * @see $this->findByColumnList()
      * @return int
      */
-    public function countByPredicates(PredicateBuilder $pb, array $options = [])
+    public function countByPredicates(Builder $pb, array $options = [])
     {
         try {
             $stmt = $this->selectScalarByPredicates('COUNT(*)', $pb, $options);
@@ -1792,10 +1894,10 @@ abstract class Mapper implements IMapper, Serializable
      * Deletes (whether hard or soft) all records that match the given Predicates
      * Returns the number of records deleted.
      *
-     * @param PredicateBuilder $pb
+     * @param Builder $pb
      * @return int
      */
-    public function deleteByPredicates(PredicateBuilder $pb)
+    public function deleteByPredicates(Builder $pb)
     {
         return $this->executeDelete($this->getDeleteString(), $pb, []);
     }
@@ -1803,22 +1905,22 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Create a PredicateBuilder for this Mapper's table.
      *
-     * @return PredicateBuilder
+     * @return Builder
      */
     public function getPredicateBuilder()
     {
-        return new PredicateBuilder($this->getDatabase(), $this->getTable());
+        return new Builder($this->getDatabase(), $this->getTable());
     }
 
     /**
-     * @param string           $select
-     * @param string           $from
-     * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param string  $select
+     * @param string  $from
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @return GenericCollection
      */
-    protected function executeSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
+    protected function executeSelect($select, $from, Builder $predicate, array $columnList, array $options = [])
     {
         try {
             // fold the column list into the predicate builder
@@ -1857,15 +1959,15 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * @param string           $select
-     * @param string           $from
-     * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param string  $select
+     * @param string  $from
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @throws UnderflowException
      * @return PDOStatement
      */
-    protected function prepareSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
+    protected function prepareSelect($select, $from, Builder $predicate, array $columnList, array $options = [])
     {
         $query = "$select $from";
 
@@ -2119,7 +2221,7 @@ abstract class Mapper implements IMapper, Serializable
             $from = "FROM {$this->getTable()}";
         }
 
-        $statement = $this->prepareSelect($select, $from, new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
 
@@ -2129,14 +2231,14 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Returns a statement that attempts to select the scalar given by $selection
      *
-     * @param  string $selection
-     * @param  PredicateBuilder $pb
-     * @param  array  $options
+     * @param  string  $selection
+     * @param  Builder $pb
+     * @param  array   $options
      *
      * @throws UnderflowException YOU MUST CATCH THIS. Thrown if the query could not possibly return any results.
      * @return PDOStatement
      */
-    protected function selectScalarByPredicates($selection, PredicateBuilder $pb, array $options = [])
+    protected function selectScalarByPredicates($selection, Builder $pb, array $options = [])
     {
         $select = "SELECT $selection";
 
@@ -2195,15 +2297,15 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Builds a where part and params for this query out of a column list
      *
-     * @param PredicateBuilder $predicate
-     * @param  array $columnList
-     * @param  array $options
+     * @param Builder $predicate
+     * @param  array  $columnList
+     * @param  array  $options
      *
      * @return array where:  The where parts of the query
      *               params: the parameters
      * @throws \UnderflowException
      */
-    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    protected function buildWherePart(Builder $predicate, $columnList, $options)
     {
         return $predicate->addColumnList($columnList)->getPredicates();
     }
@@ -2388,62 +2490,12 @@ abstract class Mapper implements IMapper, Serializable
                         }
                         $affectedIDs[] = $this->getModelProperty($model, $id_property);
                     }
-                    // also update n:n relation tables if they exist
-                    foreach ($this->getMap() as $map) {
-                        if (empty($map['join'])
-                            || empty($this->joins[$map['join']]['multi'])
-                            || (isset($this->joins[$map['join']]['multi']['read_only']) && $this->joins[$map['join']]['multi']['read_only'])
-                        ) {
-                            // not interested
-                            continue;
-                        }
-                        $joinSchema = $this->joins[$map['join']];
-                        $joinMulti  = $joinSchema['multi'];
-                        $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
-                        // step 1: delete existing relations in join table
-                        $deleteRelationStatement = $this->database->prepare("
-                            DELETE FROM `{$joinMulti['via_table']}`
-                            WHERE `{$joinMulti['this_key']}` = :this_key
-                        ");
-                        $deleteRelationStatement->bindValue(':this_key', $thisKey);
-                        if (!$deleteRelationStatement->execute()) {
-                            $this->database->rollBack();
-                            return false;
-                        }
-                        // step 2: insert new relations in join table
-                        $insertRelationStatement = $this->database->prepare("
-                            INSERT IGNORE INTO `{$joinMulti['via_table']}`
-                                (`{$joinMulti['this_key']}`,`{$joinMulti['other_key']}`)
-                            VALUES
-                                (:this_key, :other_key)
-                        ");
-                        // should dehydrate to an array
-                        $propertyValue = (array)$this->getModelProperty($model, $map['property']);
-                        // iterate the values given and insert into join table
-                        $otherMapper       = $this->getJoinMapper($map['join']);
-                        $otherModelExample = $otherMapper->createModel();
-                        foreach ($propertyValue as $value) {
-                            // Is $otherKey a model? If so I need its identifier.
-                            if ($value instanceof $otherModelExample) {
-                                $otherKey = $otherMapper->getModelProperty(
-                                    $value,
-                                    $this->getIdentifierProperty()
-                                );
-                            } else {
-                                $otherKey = $value;
-                            }
-                            $success = $insertRelationStatement->execute(
-                                array(
-                                    'this_key'  => $thisKey,
-                                    'other_key' => $otherKey
-                                )
-                            );
-                            if (!$success) {
-                                $this->database->rollBack();
-                                return false;
-                            }
-                        }
+
+                    if (!$this->savePolyJoins($model)) {
+                        $this->database->rollBack();
+                        return false;
                     }
+
                 } else {
                     $this->database->rollBack();
                     return false;
@@ -2455,16 +2507,122 @@ abstract class Mapper implements IMapper, Serializable
         }
         $this->database->commit();
         foreach ($collection as $i => $model) {
+
             $previous = null;
-            if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
-                $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
-                $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
+
+            if ($id_property) {
+                // this mapper defines a primary key, so providing a diff is possible (if this is an UPDATE)
+                $id = $this->getModelProperty($model, $id_property);
+
+                if ($id) {
+                    $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
+                    $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
+                }
+
+            } else {
+                // this mapper does not define primary key: we cannot supply a diff, but we *can* still call the POSTSAVE hook
+                $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model);
             }
+
             $this->raiseNotification($model, $pdoMethods[$i], $previous);
         }
         return $affectedIDs;
     }
 
+
+    /**
+     * Update any n:n relations that exist
+     *
+     * @param object $model
+     * @throws PDOException
+     * @return bool
+     */
+    private function savePolyJoins($model)
+    {
+        $deletePattern = 'DELETE FROM `%s` WHERE `%s` = :this_key';
+        $insertPattern = 'INSERT IGNORE INTO `%s` (`%s`, `%s`) VALUES (:this_key, :other_key)';
+
+        try {
+            foreach ($this->getMap() as $map) {
+                if (!$this->polyJoinExists($map)) {
+                    // not interested
+                    continue;
+                }
+
+                $joinSchema = $this->joins[$map['join']];
+                $joinMulti  = $joinSchema['multi'];
+                $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
+
+                $viaTable   = $joinMulti['via_table'];
+                $viaLocal   = $joinMulti['this_key'];
+                $viaForeign = $joinMulti['other_key'];
+
+                // step 1: delete existing relations in join table
+                $deleteRelationStatement = $this->database->prepare(sprintf($deletePattern, $viaTable, $viaLocal));
+
+                $deleteRelationStatement->bindValue(':this_key', $thisKey);
+
+                if (!$deleteRelationStatement->execute()) {
+                    return false;
+                }
+
+                // step 2: insert new relations in join table
+                $insertRelationStatement = $this->database->prepare(sprintf($insertPattern, $viaTable, $viaLocal, $viaForeign));
+
+                // should dehydrate to an array
+                $propertyValue = (array)$this->getModelProperty($model, $map['property']);
+
+                // iterate the values given and insert into join table
+                $otherMapper       = $this->getJoinMapper($map['join']);
+                $otherModelExample = $otherMapper->createModel();
+
+                foreach ($propertyValue as $value) {
+
+                    $otherKey = $value;
+
+                    // Is $otherKey a model? If so I need its identifier.
+                    if ($value instanceof $otherModelExample) {
+                        $otherKey = $otherMapper->getModelProperty($value, $this->getIdentifierProperty());
+                    }
+
+                    $success = $insertRelationStatement->execute([
+                        'this_key'  => $thisKey,
+                        'other_key' => $otherKey
+                    ]);
+
+                    if (!$success) {
+                        return false;
+                    }
+                }
+            }
+        } catch (InvalidArgumentException $e) {
+            // in all exceptional cases except PDOException, we return false
+            return false;
+        } catch (Exception $e) {
+            return false;
+        } catch (Mapper\DefinitionException $e) {
+            return false;
+        }
+
+        // even if we did nothing, nothing is still a success
+        return true;
+    }
+
+
+    /**
+     * Does this specific mapping have a n:n join?
+     *
+     * @param array $map
+     * @return bool
+     */
+    private function polyJoinExists(array $map)
+    {
+        return !(
+            empty($map['join'])
+            || empty($this->joins[$map['join']]['multi'])
+            || (isset($this->joins[$map['join']]['multi']['read_only']) && $this->joins[$map['join']]['multi']['read_only'])
+        );
+    }
 
     /**
      * Setup method. Implementing classes to define their SQL map here.
@@ -2641,7 +2799,10 @@ abstract class Mapper implements IMapper, Serializable
     {
         $modelList = $this->createCollection();
         foreach ($rowList as $row) {
-            $modelList->add($this->hydrate($row, $alias, $callback));
+            $model = $this->hydrate($row, $alias, $callback);
+            if($model){
+                $modelList->add($model);
+            }
         }
         return $modelList;
     }
@@ -2909,7 +3070,7 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty($this->model)) {
             // no model is defined; explode
-            throw new Exception("Model is undefined, cannot instantiate.");
+            throw new Exception('Model is undefined, cannot instantiate.');
         }
 
         if (!class_exists($this->model)) {
@@ -2917,7 +3078,16 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // create a new, blank model
-        return new $this->model;
+        $model = new $this->model;
+
+        // Ensure any model Collections are instantiated
+        foreach ($this->map as $map){
+            if($map['hydrator'] instanceof Column\Collection){
+                $this->setModelProperty($model, $map['property'], null);
+            }
+        }
+
+        return $model;
     }
 
     /**
@@ -3011,7 +3181,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getArrayPlaceholders($input, $prefix = null)
     {
-        return PredicateBuilder::getArrayPlaceholders($input, $prefix);
+        return Builder::getArrayPlaceholders($input, $prefix);
     }
 
     /**
@@ -3030,7 +3200,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getArrayParameters($input, $prefix = null)
     {
-        return PredicateBuilder::getArrayParameters($input, $prefix);
+        return Builder::getArrayParameters($input, $prefix);
     }
 
     /**
@@ -3175,7 +3345,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param object $object
      * @param string $verb
      * @param object $previous
-     *
+     * @throws Exception
      * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)
@@ -3183,10 +3353,12 @@ abstract class Mapper implements IMapper, Serializable
         if (!isset($this->sessionData['user'])) {
             return false;
         }
+
         $diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diff($object, $previous) : null;
+
         // create a new event, and send it to the scheduler
-        $event = new Event($this->sessionData['user'], $verb, $object, $this, $diff);
-        $this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
+        $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
+
         return true;
     }
 

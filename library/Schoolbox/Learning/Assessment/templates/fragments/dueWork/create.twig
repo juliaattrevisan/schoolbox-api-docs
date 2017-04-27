@@ -48,8 +48,9 @@
     <input type="text" name="title" value="{{ assessment.title }}" required/>
 </label>
 <label>
-    Type
+    Work Type
     <select name="workType">
+            <option value="" selected>None</option>
         {% for workType in allWorkTypes %}
             <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
         {% endfor %}
@@ -97,7 +98,7 @@
 </label>
 
 {% import 'sub/visibility.twig' as visibility %}
-{{ visibility.dropdown(assessment.markVisibility, availableVisibilities) }}
+{{ visibility.dropdown(markVisibility, availableVisibilities) }}
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 

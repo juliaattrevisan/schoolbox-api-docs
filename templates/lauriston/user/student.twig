@@ -1,39 +1,46 @@
 {% extends '@core/user/student.twig' %}
 
+
 {% block details_studiesCode %}
     {% if externalUser.StudentStudiesCode %}
-    <dt class="no-margin small-6 medium-3">Studies Code:</dt>
-    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
+    <dt class="small-12 medium-3">Studies Code:</dt>
+    <dd class="small-12 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
     {% endif %}
 {% endblock details_studiesCode %}
 
 {% block buttons_island %}
+    <script type="text/javascript">
+        $(function() {
+            // Preview
+            $('[data-plugin="preview"]').preview();
+        });
+    </script>
     {{ parent() }}
     {% if isStaff %}
-        <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-4" data-equalizer>
-            <li class="no-pad">
+        <ul class="flex-list flex-wrap buttons">
+            <li>
                 <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Assessment%20Data&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class="no-margin button fat icon-fat size-32 icon-due-work"
-                   rel="external"
-                   data-equalizer-watch>Assessment Data</a>
+                   class=" icon-due-work"
+                   data-plugin="preview"
+                   >Assessment Data</a>
             </li>
-            <li class="no-pad">
+            <li>
                 <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Reporting%20Grades&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class="no-margin button fat icon-fat size-32 icon-progress"
-                   rel="external"
-                   data-equalizer-watch>Reporting Grades</a>
+                   class=" icon-progress"
+                   data-plugin="preview"
+                   >Reporting Grades</a>
             </li>
-            <li class="no-pad">
+            <li>
                 <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Learning%20Support&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class="no-margin button fat icon-fat size-32 icon-staff"
-                   rel="external"
-                   data-equalizer-watch>Learning Support</a>
+                   class=" icon-staff"
+                   data-plugin="preview"
+                   >Learning Support</a>
             </li>
-            <li class="no-pad">
+            <li>
                 <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Student%20Notes&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class="no-margin button fat icon-fat size-32 icon-forms"
-                   rel="external"
-                   data-equalizer-watch>Student Notes</a>
+                   class=" icon-forms"
+                   data-plugin="preview"
+                   >Student Notes</a>
             </li>
         </ul>
     {% endif %}

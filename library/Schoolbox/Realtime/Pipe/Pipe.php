@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Pipe;
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\Message\Header;
 use Ratchet\ConnectionInterface;
+use Ratchet\WebSocket\Version\RFC6455;
 
 
 /**
@@ -20,17 +21,26 @@ use Ratchet\ConnectionInterface;
  * Class Pipe
  * @package Schoolbox\Realtime
  */
-class Pipe implements PipeInterface {
-
-	/**
+class Pipe implements PipeInterface
+{
+    /**
 	 * @param ConnectionInterface $conn
 	 * @return string
 	 */
-	public static function getSocketKeyForConnection($conn) {
-		return static::getHeader($conn, 'sec-websocket-key');
+	public static function getSocketKeyForConnection(ConnectionInterface $conn)
+    {
+        if ($conn instanceof RFC6455\Connection) {
+            return static::getHeader($conn, 'sec-websocket-key');
+        }
+        // don't attempt to handle non-RFC6455 sockets
+        return '';
 	}
 
-	/** @var \Ratchet\ConnectionInterface */
+
+    /** @var string */
+    private $commandLock;
+
+    /** @var \Ratchet\ConnectionInterface */
 	protected $socketConnection;
 
 	/** @var int */
@@ -40,18 +50,18 @@ class Pipe implements PipeInterface {
 	protected $cookies;
 
 	/**
-	 * @param ConnectionInterface $conn
+	 * @param RFC6455\Connection $conn
 	 */
-	public function __construct($conn) {
+	public function __construct(RFC6455\Connection $conn) {
 		$this->socketConnection = $conn;
-		$this->user = null;
 	}
 
 	/**
 	 * Returns the Sec-Websocket-Key header of this websocket (unique connection identifier)
 	 * @return string
 	 */
-	public function getSocketKey() {
+	public function getSocketKey()
+    {
 		return self::getSocketKeyForConnection($this->socketConnection);
 	}
 
@@ -63,7 +73,6 @@ class Pipe implements PipeInterface {
 	 */
 	public function getCookie($name)
     {
-
 		// only do this once
 		if (!$this->cookies) {
 			$cookieString = static::getHeader($this->socketConnection, 'cookie');
@@ -94,13 +103,16 @@ class Pipe implements PipeInterface {
 		return $this->socketConnection->remoteAddress ?: '0.0.0.0';
 	}
 
+    /**
+     * @return void
+     */
 	public function close() {
 		$this->socketConnection->close();
 	}
 
 	/**
 	 * @param string $data
-	 * @return self
+	 * @return $this
 	 */
 	public function send($data) {
 		$this->socketConnection->send($data);
@@ -122,15 +134,64 @@ class Pipe implements PipeInterface {
 		$this->userId = $id;
 	}
 
-	protected static function getHeader($conn, $header) {
-		/** @var EntityEnclosingRequest $rq */
-		$rq = $conn->WebSocket->request;
-		if(($value = $rq->getHeader($header)) instanceof Header) {
-			$token = reset($value->toArray());
-			return (string)$token;
+    /**
+     * @param RFC6455\Connection $conn
+     * @param string $header
+     * @return string
+     */
+	protected static function getHeader(RFC6455\Connection $conn, $header)
+    {
+		$rq = self::extractWebSocketRequest($conn);
+
+        $value = $rq->getHeader($header);
+
+        if ($value instanceof Header) {
+            $value = $value->toArray();
+			return (string)reset($value);
 		}
 		// otherwise header not found
 		return '';
 	}
+
+    /**
+     * @param RFC6455\Connection $conn
+     * @return EntityEnclosingRequest
+     */
+	protected static function extractWebSocketRequest(RFC6455\Connection $conn)
+    {
+        return $conn->WebSocket->request;
+    }
+
+    /**
+     * Prevent additional commands being executed by this pipe until it releases
+     *
+     * @param $command
+     * @return void
+     */
+    public function lock($command)
+    {
+        $this->commandLock = $command;
+    }
+
+    /**
+     * Is this pipe currently locked?
+     *
+     * @return bool
+     */
+    public function isLocked()
+    {
+        return isset($this->commandLock);
+    }
+
+    /**
+     * Release the command lock on this pipe
+     *
+     * @return void
+     */
+    public function unlock()
+    {
+        $this->commandLock = null;
+    }
+
 
 } 

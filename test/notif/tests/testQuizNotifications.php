@@ -9,8 +9,8 @@
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
@@ -45,7 +45,7 @@ class QuizNotifications extends AbstractNotificationTest
      */
     public function requiredDaemons()
     {
-        return [ self::DAEMON_SCHEDULE, self::DAEMON_REROUTE ];
+        return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
     }
 
 

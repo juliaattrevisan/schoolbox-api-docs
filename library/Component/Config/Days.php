@@ -9,6 +9,8 @@
  */
 class Component_Config_Days extends Component_Config_Size {
 
-    protected $options       = array(0,1,2,3,4,5,10,15,25,30,60,180,365);
-    protected $showAllOption = true;
+    protected function getOptions()
+    {
+        return [0,1,2,3,4,5,10,15,25,30,60,180,365];
+    }
 }

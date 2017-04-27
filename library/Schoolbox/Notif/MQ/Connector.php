@@ -15,11 +15,12 @@ use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use InvalidArgumentException;
-use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
-class Connector extends AMQPConnector {
+class Connector extends AMQPConnector
+{
 
 	/** @var AMQPInterface */
 	protected static $instance;
@@ -27,7 +28,8 @@ class Connector extends AMQPConnector {
 	/**
 	 * @return Connector
 	 */
-	public static function getInstance() {
+	public static function getInstance()
+    {
 		if(!self::$instance instanceof self) {
 			self::$instance = new self();
 		}
@@ -38,9 +40,6 @@ class Connector extends AMQPConnector {
 	const PRIMARY_EXCHANGE = 'sb.%s.tx';
 	const PRIMARY_TYPE     = 'topic';
 
-	const SECONDARY_NAME   = 'sb.%s.ux.%s';
-	const SECONDARY_TYPE   = 'topic';
-
 	/** @var IConfigLoader */
 	protected $conf;
 
@@ -48,7 +47,8 @@ class Connector extends AMQPConnector {
 	/**
 	 * @param array $settings
 	 */
-	public function __construct($settings = array()) {
+	public function __construct($settings = [])
+    {
 		parent::__construct($settings);
 		$this->conf = ConfigMapper::getInstance();
 		$this->connect();
@@ -59,9 +59,10 @@ class Connector extends AMQPConnector {
 	 * Establishes a new AMQP connection if it doesn't already exist.
 	 * @return void
 	 */
-	protected function connect() {
-		if(!$this->conn instanceof AMQPConnection) {
-			$this->conn = new AMQPConnection(
+	protected function connect()
+    {
+		if(!$this->conn instanceof AMQPStreamConnection) {
+			$this->conn = new AMQPStreamConnection(
 				$this->conf->get('amqp_host'),
 				$this->conf->get('amqp_port'),
 				$this->conf->get('amqp_user'),
@@ -75,17 +76,9 @@ class Connector extends AMQPConnector {
 	/**
 	 * @return AMQPExchange
 	 */
-	public function getPrimaryExchange() {
+	public function getPrimaryExchange()
+    {
 		return new AMQPExchange(sprintf(self::PRIMARY_EXCHANGE, INSTANCE_ID), self::PRIMARY_TYPE);
-	}
-
-
-	/**
-	 * @param string $name
-	 * @return AMQPExchange
-	 */
-	public function getSecondaryExchange($name) {
-		return new AMQPExchange(sprintf(self::SECONDARY_NAME, INSTANCE_ID, $name), self::SECONDARY_TYPE);
 	}
 
 
@@ -96,24 +89,25 @@ class Connector extends AMQPConnector {
 	 * @param string $channelId
 	 * @return string
 	 */
-	protected function hashMessage($message, $channelId) {
+	protected function hashMessage($message, $channelId)
+    {
 		$instance = null;
 
 		// attempt to extract the message body, so as to efficiently de-dupe resent messages
-		if($data = json_decode($message, true)) {
+		if ($data = json_decode($message, true)) {
 			try {
 				$instance = Instance::jsonUnserialize($data['message']);
-			}
-			catch(InvalidArgumentException $e) {
+			} catch (InvalidArgumentException $e) {
                 // noop
 			}
-			if($instance instanceof Instance) {
+
+			if ($instance instanceof Instance) {
 				return $instance->getBaseHash();
 			}
 		}
 
 		// couldn't decode, so let's just hash what we got
-		$bits = array(is_null($channelId) ? 0 : $channelId);
+		$bits = [ is_null($channelId) ? 0 : $channelId ];
 		$bits[] = $message;
 		return sha1(implode('.', $bits));
 	}

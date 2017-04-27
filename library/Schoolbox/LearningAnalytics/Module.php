@@ -14,26 +14,40 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Course\DataModel\Implementation;
-use Schoolbox\Learning\Course\DataModel\Specification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Assessment\Term\Model as TermModel;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
 
 class Module extends BaseModule
 {
+
     /** @var string */
     protected $basename = 'learningAnalytics';
+
 
     /**
      * Basic routes for this module
@@ -44,16 +58,16 @@ class Module extends BaseModule
     {
         $get = [
             // For a Course - aggregating all Classes which have imported Course
-            'course'                 => "/course/{courseSpecId}",
-            'courseWithTerms'        => "/course/{courseSpecId}/term/{termCode}",
-            'courseWithTask'         => "/course/{courseSpecId}/task/{taskTypeId}",
-            'courseWithTaskAndTerms' => "/course/{courseSpecId}/task/{taskTypeId}/term/{termCode}",
+            'course'                          => '/course/{courseSpecId}',
+            'courseWithTerm'                  => '/course/{courseSpecId}/term/{termCode}',
+            'courseWithSubmissionType'        => '/course/{courseSpecId}/submissionType/{submissionTypeId}',
+            'courseWithSubmissionTypeAndTerm' => '/course/{courseSpecId}/submissionType/{submissionTypeId}/term/{termCode}',
 
             // Per Class that uses a particular Course
-            'folder'                 => "/course/{courseSpecId}/class/{folderId}",
-            'folderWithTerms'        => "/course/{courseSpecId}/class/{folderId}/term/{termCode}",
-            'folderWithTask'         => "/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}",
-            'folderWithTaskAndTerms' => "/course/{courseSpecId}/class/{folderId}/task/{taskTypeId}/term/{termCode}",
+            'folder'                          => '/course/{courseSpecId}/class/{folderId}',
+            'folderWithTerm'                  => '/course/{courseSpecId}/class/{folderId}/term/{termCode}',
+            'folderWithSubmissionType'        => '/course/{courseSpecId}/class/{folderId}/submissionType/{submissionTypeId}',
+            'folderWithSubmissionTypeAndTerm' => '/course/{courseSpecId}/class/{folderId}/submissionType/{submissionTypeId}/term/{termCode}',
         ];
 
         foreach ($get as $method => $route) {
@@ -61,10 +75,15 @@ class Module extends BaseModule
         }
     }
 
+
     /**
      * Inject params into controller
      *
      * {@inheritdoc}
+     * @throws Mapper\Exception
+     * @throws ApplicationException
+     * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
@@ -72,182 +91,198 @@ class Module extends BaseModule
          * will receive scalars and redirect to current term equivalent
          */
         $this->addRoutePreload(
-            $matcher, 'courseWith.*Terms',
-            function($params) {
-                return $this->courseDependencies($params);
-            }
-        );
-
-        $this->addRoutePreload(
-            $matcher, 'folderWith.*Terms',
-            function($params) {
-                return $this->folderDependencies($params);
+            $matcher, '.*With.*Term',
+            function ($params) {
+                return $this->loadDependencies($params);
             }
         );
     }
 
+
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, '.*', new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
-        );
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            );
     }
 
+
     /**
-     * Pass params when using course view
+     * Loads model graph.
      *
      * @param array $params
-     * @var int $params['courseSpecId']
-     * @var int $params['termCode']
+     * @var int     $params ['courseSpecId']
+     * @var int     $params ['termCode']
+     * @var int     $params ['folderId']                Optional
+     * @var int     $params ['submissionType']          Optional
      *
      * @return array
+     * @var string[]                               return['params']
+     * @var CourseSpecification                    return['courseSpecification']
+     * @var GenericCollection|UnitImplementation[] return['unitImplementations']
+     * @var Term                                   return['term']
+     * @var null|Folder                            return['selectedClassFolder']
      * @throws MapperException
+     * @throws ApplicationException
+     * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
      */
-    private function courseDependencies(array $params)
+    private function loadDependencies(array $params)
     {
         try {
-            $courseSpecification = $this->getCourseSpecificationMapper()->findById($params['courseSpecId']);
-
-            foreach ($courseSpecification->getUnits() as $unit) {
-                // link up the other way around
-                $unit->setAssessables($this->getAssessmentDataSource()->findAllByContext($unit));
-            }
-
+            $term = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
         } catch (MapperException $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
         }
 
-        $term = $this->findTerm($params['termCode']);
-
-        /* No acrobatics required
-         */
         try {
-
-            /* All the unit instances associated with the specified folder which used the same
-             * $courseFolder as a source. Filter it based due dates between $from and $to
-             */
-            $from = $term->getStart();
-            $to   = $term->getActualFinish();
-
-            $pb = $this->getUnitImplementationMapper()->getPredicateBuilder()
-                       ->equals('s.course_specification_id', $courseSpecification->getId())
-                       ->notLessThan('open_date', $from->getDatabaseDate());
-
-            if (!$to->isNull()) {
-                $pb->notGreaterThan('due_date', $to->getDatabaseDate());
-            }
-
-            $unitImplementations = $this->getUnitImplementationMapper()->findByPredicates($pb);
-
-            $everyInteraction = [];
-
-            foreach ($unitImplementations as $unit) {
-                // load up some hydrations
-                $unit->setFolder($this->getFolderMapper()->findById($unit->getFolder()->getId()));
-
-                if (isset($params['folderId']) && $unit->getFolder()->getId() != $params['folderId']) {
-                    // filtering to a specific folder, and it's not this one
-                    continue;
-                }
-
-                foreach ($this->getAssessmentDataSource()->findAllByContext($unit) as $activity) {
-                    $this->getParticipantDataSource()->loadParticipationIntoAssessment($activity);
-                    foreach ($activity->getAllParticipants() as $participant) {
-                        foreach ($participant->getAllFeedbacks() as $feedback) {
-                            $activity->getFeedbacks()->add($feedback);
-                            $everyInteraction[] = $feedback;
-                        }
-                        foreach ($participant->getAllResponses() as $response) {
-                            $activity->getResponses()->add($response);
-                            $everyInteraction[] = $response;
-                        }
-                    }
-
-                    $unit->getAssessables()->add($activity);
-                }
-            }
-
+            $courseSpecification = $this->getCourseSpecificationMapper()->findById($params['courseSpecId']);
         } catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SUBJECT_NO_TASKS);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        /* Inject (this is used in twig)
+        $submissionType = null;
+        if (isset($params['submissionTypeId'])) {
+            try {
+                $submissionType = $this->getSubmissionTypeMapper()->findById($params['submissionTypeId']);
+            } catch (MapperException $e) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            }
+        }
+
+        $classFolder = null;
+        if (isset($params['folderId'])) {
+            try {
+                $classFolder = $this->getFolderMapper()->findById($params['folderId']);
+            } catch (MapperException $e) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            }
+        }
+
+        // Load CourseImpls imported from specified CourseSpec
+        /** @var GenericCollection|CourseImplementation[] $courseImplementations */
+        $courseImplementations = $this->getCourseImplementationMapper()->findByColumnList([
+            'course_specification_id' => $courseSpecification->getId(),
+        ])->indexBy('id');
+        $courseSpecification->setCourseImplementations($courseImplementations);
+
+        // Load UnitImpls (filtering by class if a class is selected) inside CourseImpls,
+
+        $columnList = [
+            'course_implementation_id' => $courseImplementations->getColumnValues('id'),
+        ];
+        if ($classFolder) {
+            $columnList['c.folder_id'] = $classFolder->getId();
+        }
+
+        /** @var GenericCollection|UnitImplementation[] $unitImplementations */
+        $unitImplementations = $this->getUnitImplementationMapper()->findByColumnList($columnList)->indexBy('id');
+        foreach ($unitImplementations as $unitImplementation) {
+            $courseImplementation = $courseImplementations[$unitImplementation->getCourse()->getId()];
+            $courseImplementation->getUnits()->setOffset($unitImplementation->getId(), $unitImplementation);
+            $unitImplementation->setCourse($courseImplementation);
+        }
+
+        // Load Assessments in Unit Impls (regardless of due date - as we need them for navigation)
+        /** @var GenericCollection|IAssessable[] $assessmentImpls */
+        $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationId($unitImplementations->getColumnValues('id'))->indexBy('id');
+        foreach ($assessmentImpls as $assessmentImpl) {
+            $unitImplementation = $unitImplementations[$assessmentImpl->getContext()->getId()];
+            $unitImplementation->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);
+            $assessmentImpl->setContext($unitImplementation);
+        }
+
+        // Get the assessments that are due in currently selected term, and match the class if a class filter is applied
+        /** @var GenericCollection|IAssessable[] $dueAssessments */
+        $dueAssessments = $assessmentImpls->filter(function (IAssessable $assessment) use ($term, $classFolder) {
+
+            // If filtering to class, ensure assessment belongs to class
+            /** @param Folder $classFolder */
+            if ($classFolder && $classFolder->getId() !== $assessment->getBaseContext()->getFolder()->getId()){
+                return false;
+            }
+
+            // Ensure Assessment is due in term
+            $dueAfterTermStart = $assessment->getDueAt()->gte($term->getStart());
+            $dueBeforeTermEnd  = $term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($term->getActualFinish());
+            return $dueAfterTermStart && $dueBeforeTermEnd;
+        });
+
+        // Should never have got to this page the course was not imported
+        if (0 === $unitImplementations->count()) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_NO_ANALYTICS_DATA);
+        }
+
+        /**
+         * UnitImpls that contain assessments due in selected Term
+         *
+         * @var GenericCollection|UnitImplementation[] $unitImplsInTerm
          */
-        $params['route'] = 'folder';
+        $unitImplsInTerm = $this->getUnitImplementationMapper()->createCollection();
+
+        // Load Participants into relevant Assessments
+        $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($dueAssessments);
+        foreach ($dueAssessments as $assessment) {
+
+            $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getContext());
+
+            foreach ($assessment->getAllParticipants() as $participant) {
+                foreach ($participant->getAllFeedbacks() as $feedback) {
+                    $assessment->getFeedbacks()->setOffset($feedback->getId(), $feedback);
+                }
+                foreach ($participant->getAllResponses() as $response) {
+                    $assessment->getResponses()->setOffset($response->getId(), $response);
+                }
+            }
+        }
+
 
         return [
-            'params'                       => $params,
-            'courseSpecification'          => $courseSpecification,
-            'unitImplementations'          => $unitImplementations,
-            'term'                         => $term,
+            'courseSpecification' => $courseSpecification,
+            'unitImplsInTerm'     => $unitImplsInTerm,
+            'dueAssessments'      => $dueAssessments,
+            'term'                => $term,
+            'classFolder'         => $classFolder,
+            'submissionType'      => $submissionType,
         ];
     }
 
-    /**
-     * Pass params when using folder view
-     *
-     * @param $params
-     * @return array
-     * @throws MapperException
-     */
-    private function folderDependencies($params)
-    {
-        $preload = $this->courseDependencies($params);
-
-        // overlay folder selection
-        try {
-            $preload['selectedClassFolder'] = $this->getFolderMapper()->findById($params['folderId']);
-
-        } catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SUBJECT_NO_TASKS);
-        }
-
-        return $preload;
-    }
-
-
-    /**
-     * @param string $termCode
-     * @return TermModel
-     * @throws MapperException
-     */
-    private function findTerm($termCode)
-    {
-        try {
-            return $this->getTermMapper()->findOneByColumn('code', $termCode);
-
-        } catch (\Exception $e) {
-            throw new MapperException('Invalid date range.');
-        }
-    }
 
     /**
      * Template locations for this module
      *
      * {@inheritdoc}
+     * @throws \Twig_Error_Loader
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
     /**
      * Set up controllers
      *
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            'controller:' . $this->basename,
+            $injector->lazyNew(Controller::class, [
+                'termMapper'           => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'submissionTypeMapper' => $this->getMapperFactory()->getLazy(SubmissionTypeMapper::class),
+            ])
         );
     }
 
@@ -256,14 +291,17 @@ class Module extends BaseModule
 
     /**
      * @return object|Access
+     * @throws \InvalidArgumentException
      */
     protected function getAccess()
     {
         return $this->getMapperFactory()->get(Access::class);
     }
 
+
     /**
      * @return Mapper|FolderMapper
+     * @throws \InvalidArgumentException
      */
     protected function getFolderMapper()
     {
@@ -273,40 +311,47 @@ class Module extends BaseModule
 
     /**
      * @return object|MapperProxy
+     * @throws ServiceNotFound
      */
     protected function getAssessmentDataSource()
     {
         return $this->getInjector()->get('assessmentDataSource');
     }
 
+
     /**
-     * @return Mapper|Implementation\Mapper
+     * @return Mapper|CourseImplementationMapper
+     * @throws \InvalidArgumentException
      */
     protected function getCourseImplementationMapper()
     {
-        return $this->getMapperFactory()->get(Implementation\Mapper::class);
+        return $this->getMapperFactory()->get(CourseImplementationMapper::class);
     }
 
 
     /**
-     * @return Mapper|Specification\Mapper
+     * @return Mapper|CourseSpecificationMapper
+     * @throws \InvalidArgumentException
      */
     protected function getCourseSpecificationMapper()
     {
-        return $this->getMapperFactory()->get(Specification\Mapper::class);
+        return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
     }
 
 
     /**
-     * @return Mapper|Implementation\Unit\Mapper
+     * @return Mapper|UnitImplementationMapper
+     * @throws \InvalidArgumentException
      */
     protected function getUnitImplementationMapper()
     {
-        return $this->getMapperFactory()->get(Implementation\Unit\Mapper::class);
+        return $this->getMapperFactory()->get(UnitImplementationMapper::class);
     }
+
 
     /**
      * @return Mapper|TermMapper
+     * @throws \InvalidArgumentException
      */
     protected function getTermMapper()
     {
@@ -315,7 +360,18 @@ class Module extends BaseModule
 
 
     /**
+     * @return Mapper|SubmissionTypeMapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getSubmissionTypeMapper()
+    {
+        return $this->getMapperFactory()->get(SubmissionTypeMapper::class);
+    }
+
+
+    /**
      * @return object|Participant\DataSource
+     * @throws ServiceNotFound
      */
     protected function getParticipantDataSource()
     {

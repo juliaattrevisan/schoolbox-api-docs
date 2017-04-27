@@ -1,0 +1,21 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<script type="text/javascript">
+    $(function() {
+        $('[data-plugin="preview"]').preview();
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+        {% include '@learningAssessment/meta.twig' with {assessment: assessment, user: USER, icon: 'icon-task'} %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% include '@learningAssessment/fragments/task/summary/description.twig' with {assessment: assessment, user: USER, preview: preview} %}
+    </div>
+</div>

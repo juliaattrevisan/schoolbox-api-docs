@@ -20,11 +20,17 @@ class TimestampTest extends DatetimeTest {
 	 */
 	protected $object;
 
-	public function setupObject() {
+    /**
+     * @inheritdoc
+     */
+    public function setupObject() {
 		$this->object = new Timestamp();
 	}
 
-	public function getTestHydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestHydrate() {
 		//
 		// Only Y-m-d format results are able to be hydrated.
 		return array(
@@ -41,7 +47,10 @@ class TimestampTest extends DatetimeTest {
 		);
 	}
 
-	public function getTestDehydrate() {
+    /**
+     * @inheritdoc
+     */
+    public function getTestDehydrate() {
 		//
 		// I think that most code that uses timestamps is timezone ignorant,
 		// so preset timezone.

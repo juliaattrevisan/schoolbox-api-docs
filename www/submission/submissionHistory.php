@@ -4,6 +4,8 @@
  * redirect to Redirection to 16.5 url
  *
  */
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+
 $url = '/learning/assessments/';
 if ((isset($this->arg[0]) && is_numeric($this->arg[0])) && (isset($this->arg[1]) && is_numeric($this->arg[1]))){
     $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
@@ -105,7 +107,7 @@ if ($this->arg[0] == false) {
 
 $boxMapper = new Component\SubmissionBoxMapper();
 $submissionMapper = new Component\SubmissionBox\Submission\SubmissionMapper();
-$work_mapper = new Component\SubmissionBox\WorkTypeMapper();
+$workTypeMapper = WorkTypeMapper::getInstance();
 $return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $conf = ConfigMapper::getInstance();
@@ -253,6 +255,7 @@ $submission_history->sortBy('date', 'desc');
 
 $gradient = $box->getGradientIndex();
 
+$workType = $box->getAssessmentModel()->getWorkType();
 $this->setVar(
     array(
         'CATEGORY_NAME' => Scrub::text($box->getCategory()->getName()),
@@ -267,7 +270,7 @@ $this->setVar(
         'BOX_OWNER' => $userHandler->formatName($user),
         'BOX_OWNER_ID' => $userID,
         'BOX_DESCRIPTION' => Scrub::html($box->getDescription()),
-        'BOX_TYPE' => $work_mapper->getNameFromId($box->getWorkType()->getId()),
+        'BOX_TYPE' => $workType ? $workTypeMapper->findNameById($workType->getId()) : '',
         'BOX_CREATED' => $createdDate->getRelativeTime(),
         'BOX_CREATED_EXACT' => $createdDate->getLong()
     )

@@ -7,8 +7,6 @@
  *                                                           *
  ************************************************************/
 
-use Alaress\DebugBar\Instance as DebugBar;
-
 class External_Synergetic_Class implements External_ClassInterface
 {
 
@@ -23,10 +21,8 @@ class External_Synergetic_Class implements External_ClassInterface
     private $externalUser;
 
     /**
-     * @var \Schoolbox\User
+     * Constructor
      */
-    private $viewingUser;
-
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
@@ -78,6 +74,9 @@ class External_Synergetic_Class implements External_ClassInterface
         return $this->getDatabase()->getRow($query);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getStudents($subCode)
     {
         if (!$subCode) {
@@ -88,8 +87,10 @@ class External_Synergetic_Class implements External_ClassInterface
         $classQuery   = $this->getClassCodeQuery($subCode);
         //TODO: Inject $_SESSION['user'], short term to get this working without arch changes
         if (isset($_SESSION['user']) && $_SESSION['user'] instanceof \Schoolbox\User) {
-            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($_SESSION['user']->getExternalId()));
-            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($_SESSION['user']->getExternalId()));
+            /** @var \Schoolbox\User $user */
+            $user = $_SESSION['user'];
+            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($user->getExternalId()));
+            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($user->getExternalId()));
         } else {
             $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
             $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
@@ -116,6 +117,9 @@ class External_Synergetic_Class implements External_ClassInterface
         return $this->getDatabase()->getAll($query);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTeacherName($subCode)
     {
         $teachers = array();
@@ -129,9 +133,9 @@ class External_Synergetic_Class implements External_ClassInterface
                     AND FileSemester='{$fileSemester}'
                     ORDER BY StaffSeq";
 
-        $this->getDatabase()->query($msQuery);
+        $statement = $this->getDatabase()->query($msQuery);
 
-        while ($synrow = $this->getDatabase()->getNextArray()) {
+        while ($synrow = $statement->fetch()) {
             if (is_numeric($synrow['StaffID'])) {
                 $teachers[] = $synrow['StaffID'];
             }
@@ -140,6 +144,9 @@ class External_Synergetic_Class implements External_ClassInterface
         return array_unique($teachers);
     }
 
+    /**
+     * @param $database
+     */
     private function setDatabase($database)
     {
         $this->database = $database;

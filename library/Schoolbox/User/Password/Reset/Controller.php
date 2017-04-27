@@ -9,10 +9,10 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
+use Schoolbox\External\Connector\CommunityPortalInterface;
 use Schoolbox\Mail\TwigEmailFactory;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\External\Connector\CommunityPortalFactory;
+use UnexpectedValueException;
 
 /**
  * Controller for password resets
@@ -42,9 +42,9 @@ class Controller extends Base
     protected $passwordService;
 
     /**
-     * @var CommunityPortalFactory
+     * @var CommunityPortalInterface
      */
-    protected $communityPortalFactory;
+    protected $communityPortal;
 
     /**
      * Constructor
@@ -53,20 +53,20 @@ class Controller extends Base
      * @param Mapper $resetMapper
      * @param TwigEmailFactory $mailFactory
      * @param PasswordService $passwordService
-     * @param CommunityPortalFactory $communityPortalFactory
+     * @param CommunityPortalInterface $communityPortal
      */
     public function __construct(
         UserMapper $userMapper,
         Mapper $resetMapper,
         TwigEmailFactory $mailFactory,
         PasswordService $passwordService,
-        CommunityPortalFactory $communityPortalFactory
+        CommunityPortalInterface $communityPortal
     ) {
         $this->userMapper = $userMapper;
         $this->resetMapper = $resetMapper;
         $this->mailFactory = $mailFactory;
         $this->passwordService = $passwordService;
-        $this->communityPortalFactory = $communityPortalFactory;
+        $this->communityPortal = $communityPortal;
     }
 
     /**
@@ -259,10 +259,9 @@ class Controller extends Base
 
             // Reset their password in SCP too
             if ($user->getRole()->isParent()) {
-                $communityPortal = $this->communityPortalFactory->build();
                 try {
-                    $communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
-                } catch (\UnexpectedValueException $e) {
+                    $this->communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
+                } catch (UnexpectedValueException $e) {
                     // Portal integration wasn't set up properly?
                     // Warn the user
                     $this->getSessionSegment()->setFlash('isCommunityPortalPasswordSet', false);

@@ -49,54 +49,53 @@
         {% set pActionSummary    = '' %}
     {% endif %}
 
-    {% if not assessment.acceptOnline %}
-        {% set pStatusClass = '' %}
-        {% set pTooltip     = '' %}
-    {% else %}
-        {% if latestResponse %}
-            {% if latestResponse.isSubmitted %}
-                {% if latestFeedback %}
-                    {% if latestFeedback.publishedAt.lt(latestResponse.submittedAt) %}
-                        {# Feedback Required
-                         # Published feedback is outdated - attempt was finished more recently
-                         #}
-                        {% set pStatusClass = statusPending %}
-                        {% set pTooltip     = labelPending %}
-                    {% else %}
-                        {# No feedback required
-                         # Published feedback is more recent than latest finished attempt
-                         #}
-                        {% set pStatusClass = statusReviewed %}
-                        {% set pTooltip = labelReviewed %}
-                    {% endif %}
-                {% else %}
+    {% if latestResponse %}
+        {% if latestResponse.isSubmitted %}
+            {% if latestFeedback %}
+                {% if latestFeedback.publishedAt.lt(latestResponse.submittedAt) %}
                     {# Feedback Required
-                     # No published feedback ever existed
+                     # Published feedback is outdated - attempt was finished more recently
                      #}
                     {% set pStatusClass = statusPending %}
-                    {% set pTooltip = labelPending %}
+                    {% set pTooltip     = labelPending %}
+                {% else %}
+                    {# No feedback required
+                     # Published feedback is more recent than latest finished attempt
+                     #}
+                    {% set pStatusClass = statusReviewed %}
+                    {% set pTooltip = labelReviewed %}
                 {% endif %}
             {% else %}
                 {# Feedback Required
-                 # Current attempt is being undertaken, and -will- require feedback or other kind
-                 # of teacher intervention (this situation is not Reviewed or Not Attempted which is
-                 # where Bagius' light turns green)
+                 # No published feedback ever existed
                  #}
                 {% set pStatusClass = statusPending %}
-                {% set pTooltip = 'Review will be required when this attempt is finished' %}
+                {% set pTooltip = labelPending %}
             {% endif %}
         {% else %}
-            {# No Feedback Required
-             # Not Attempted yet
+            {# Feedback Required
+             # Current attempt is being undertaken, and -will- require feedback or other kind
+             # of teacher intervention (this situation is not Reviewed or Not Attempted which is
+             # where Bagius' light turns green)
              #}
-            {% set pStatusClass = statusIncomplete %}
-            {% set pTooltip = 'Not attempted' %}
+            {% set pStatusClass = statusPending %}
+            {% set pTooltip = 'Review will be required when this attempt is finished' %}
         {% endif %}
+    {% else %}
+        {# No Feedback Required
+         # Not Attempted yet
+         #}
+        {% set pStatusClass = statusIncomplete %}
+        {% set pTooltip = 'Not attempted' %}
+    {% endif %}
 
-        {% set pStatusText %}
-            {%- spaceless %}
-                {% if not latestResponse %}
-                    Not attempted
+    {% set pStatusText %}
+        {%- spaceless %}
+            {% if not latestResponse %}
+                Not attempted
+            {% else %}
+                {% if latestResponse.submittedAt.isNull %}
+                    Attempt in progress
                 {% else %}
                     {% if multipleResponses %}
                         Reattempted
@@ -109,9 +108,9 @@
                         late
                     {% endif %}
                 {% endif %}
-            {% endspaceless -%}
-        {% endset %}
-    {% endif %}
+            {% endif %}
+        {% endspaceless -%}
+    {% endset %}
 
     {{ parent() }}
 {% endblock %}

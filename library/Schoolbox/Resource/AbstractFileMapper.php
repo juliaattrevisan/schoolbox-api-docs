@@ -9,11 +9,11 @@
 
 namespace Schoolbox\Resource;
 
+use Alaress\Database\Predicate\Builder;
 use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -169,12 +169,12 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
 
 
     /**
-     * @param PredicateBuilder $predicate
-     * @param array            $columnList
-     * @param array            $options
+     * @param Builder $predicate
+     * @param array   $columnList
+     * @param array   $options
      * @return array
      */
-    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    protected function buildWherePart(Builder $predicate, $columnList, $options)
     {
         // if the mime is specified, add a LIKE predicate to the query
         if (isset($options['mime'])) {

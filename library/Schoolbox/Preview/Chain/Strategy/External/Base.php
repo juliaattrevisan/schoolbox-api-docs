@@ -22,62 +22,41 @@ abstract class Base extends StrategyBase {
     protected $url = '';
 
     /**
-     * Header data from get_headers()
+     * Config array containing options passed in to element
      *
      * @var array
      */
-    protected $headers = array();
+    protected $config = array();
 
     /**
      * Constructor
      *
      * @param $url
-     * @param $headers
+     * @param $config
      */
-    public function __construct($url, $headers) {
+    public function __construct($url, $config) {
         $this->setUrl($url);
-        $this->setHeaders($headers);
+        $this->setConfig($config);
     }
 
     /**
-     * Macro method
+     * Set config
      *
-     * @return mixed
+     * @param array $config
      */
-    protected function findContentType() {
-        return $this->findByKey('content-type');
-    }
-
-    /**
-     * Get a header key
-     *
-     * @param $key
-     * @return mixed
-     */
-    protected function findByKey($key) {
-        $headers = $this->getHeaders();
-
-        return $headers[$key];
-    }
-
-    /**
-     * Set headers
-     *
-     * @param array $headers
-     */
-    protected function setHeaders($headers)
+    protected function setConfig($config)
     {
-        $this->headers = $headers;
+        $this->config = $config;
     }
 
     /**
-     * Get headers
+     * Get config
      *
      * @return array
      */
-    protected function getHeaders()
+    protected function getConfig()
     {
-        return $this->headers;
+        return $this->config;
     }
 
     /**

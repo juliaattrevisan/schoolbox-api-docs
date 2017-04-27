@@ -9,8 +9,8 @@
     <p class="meta">
         {% if currentFile.plagscan.isComplete %}
             <a href="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReport', {assessmentId: assessment.id, assessment: assessment, responseId: response.id, plagscanId: currentFile.plagscan.plagscanId }) }}">
-            <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
-            <span title="Plagiarism check completed.">plagiarised</span>
+                <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
+                <span title="Plagiarism check completed.">plagiarised</span>
             </a>
         {% elseif currentFile.plagscan.isProcessing %}
             <span title="Plagiarism check is currently processing - check back again soon.">Calculating plagiarism..</span>

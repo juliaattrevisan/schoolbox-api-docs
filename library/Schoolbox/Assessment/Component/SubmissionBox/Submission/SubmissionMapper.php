@@ -44,15 +44,7 @@ class SubmissionMapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        $this->hasJoin(
-            'file',
-            [
-                'mapper'    => SubmissionFileMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'student_submission_id',
-            ]
-        );
+        $this->joinsReverseMulti('student_submission_id', SubmissionFileMapper::class, 'files', 'files');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
@@ -107,7 +99,7 @@ class SubmissionMapper extends BaseMapper
         }
 
         // Fetch and hydrate files
-        $files = $this->getJoinMapper('file')
+        $files = $this->getJoinMapper('files')
             ->findByColumn('student_submission_id', $ids)
             ->groupByCallback(function($f) {
                 /** @var SingleFile\Model $f */
@@ -145,7 +137,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function persistFiles(Submission $object, Submission $previous = null)
     {
-        $joinMapper = $this->getJoinMapper('file');
+        $joinMapper = $this->getJoinMapper('files');
 
         // Delete files that were attached but aren't now
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
@@ -181,7 +173,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function softDeleteSubmissionFiles(Submission $submission)
     {
-        $submissionFileMapper = $this->getJoinMapper('file');
+        $submissionFileMapper = $this->getJoinMapper('files');
         $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
         $submissionFileMapper->delete($files);
     }
@@ -194,7 +186,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function restoreSubmissionFiles(Submission $submission)
     {
-        $submissionFileMapper = $this->getJoinMapper('file');
+        $submissionFileMapper = $this->getJoinMapper('files');
         $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
         $submissionFileMapper->restoreSoftDeleted($files);
     }

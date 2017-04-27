@@ -67,7 +67,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
         $response = $this->getSelfAssessedResponseMarkedAsComplete();
         $markScheme = new Completion();
 
-        $expected = Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT;
+        $expected = Completion::HUMAN_READABLE_COMPLETE;
         $actual = $markScheme->getHumanReadableMark($normalised, $response);
 
         $this->assertEquals($expected, $actual);
@@ -98,7 +98,7 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
         $response = $this->getTeacherAssessedResponseMarkedAsComplete();
         $markScheme = new Completion();
 
-        $expected = Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER;
+        $expected = Completion::HUMAN_READABLE_COMPLETE;
         $actual = $markScheme->getHumanReadableMark($normalised, $response);
 
         $this->assertEquals($expected, $actual);
@@ -123,7 +123,12 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getNormalised_withResponse($humanReadable, TaskResponse $response = null)
     {
-        $expected = null;
+        if($response && $response->isMarkedComplete()){
+            $expected = Completion::NORMALISED_MARK_MAX;
+        } else {
+            $expected = Completion::NORMALISED_MARK_MIN;
+        }
+
         $markScheme = new Completion();
         $actual = $markScheme->getNormalisedMark($humanReadable, $response);
         $this->assertEquals($expected, $actual);
@@ -180,8 +185,8 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [Completion::HUMAN_READABLE_INCOMPLETE],
-            [Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_STUDENT],
-            [Completion::HUMAN_READABLE_MARKED_COMPLETE_BY_TEACHER],
+            [Completion::HUMAN_READABLE_COMPLETE],
+            [Completion::HUMAN_READABLE_COMPLETE],
         ];
     }
 

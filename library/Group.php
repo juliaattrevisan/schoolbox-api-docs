@@ -209,7 +209,7 @@ class Group extends DeprecatedModel
 
     function getAllUserAccess($uid)
     {
-        $query = "SELECT service, luServices.name, sid, type FROM userAccess JOIN luServices ON service=luServices.id WHERE uid='$uid'";
+        $query = "SELECT service, lu_service.name, sid, type FROM userAccess JOIN lu_service ON service=lu_service.id WHERE uid='$uid'";
         return $this->db->getAll($query);
     }
 

@@ -1075,7 +1075,7 @@ $selector-width: 2.25rem;
     span {
         display: block;
         white-space: nowrap;
-        overflow-x: hidden;
+        overflow: hidden;
         text-overflow: ellipsis;
         font-size: rem-calc(($base-font-size + 8));
         line-height: 2rem;

@@ -84,9 +84,9 @@ class External_Tass_Class implements External_ClassInterface {
 		$query = "SELECT DISTINCT tch_code FROM tchsub WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
 					   AND ( $classQuery )";
 
-		$this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query($query);
         $teachers = [];
-		while($synrow = $this->getDatabase()->getNextArray() ) {
+		while ($synrow = $statement->fetch()) {
 			$teachers[] = $synrow['tch_code'];
 		}
 

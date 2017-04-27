@@ -317,7 +317,7 @@ abstract class Base {
     protected function buildFileOutputFromFilename($filename)
     {
         /** @var Output\File $output */
-        $output = $this->getDi()->get('webOutput:html');
+        $output = $this->getDi()->get('webOutput:file');
         return $output->setFile($filename);
     }
 
@@ -330,7 +330,7 @@ abstract class Base {
     protected function buildFileOutputFromString($fileContents)
     {
         /** @var Output\File $output */
-        $output = $this->getDi()->get('webOutput:html');
+        $output = $this->getDi()->get('webOutput:base');
         return $output->setData($fileContents);
     }
 

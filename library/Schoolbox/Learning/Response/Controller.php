@@ -8,6 +8,8 @@
 namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -163,6 +165,10 @@ class Controller extends Base
                 /* Plagscan status
                  */
                 'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+
+                // A bool that can be used from a twig fragment to determine if it has been called from the inline
+                // grader or quick mark screen
+                'inlineGrader' => true,
             ];
 
             if($assessment instanceof DueWork){
@@ -204,7 +210,7 @@ class Controller extends Base
     public function deleteParticularResponse(Participant $participant, Submission $response)
     {
         $code = 204;
-        $data = null;
+        $data = [];
 
         try {
             $this->getResponseDataSource()->delete($response);
@@ -338,10 +344,39 @@ class Controller extends Base
      */
     public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan)
     {
+        $interactiveAvailable = false;
+
+        /* If there is a known interactive report url, try to
+         * use it - otherwise use the old crappy version
+         *
+         * Find out if plagscan is up
+         */
+        if (strlen($plagscan->getInteractiveUrl())) {
+            $client = new Client([
+                "base_uri"    => '',
+                "timeout"     => 20.0,
+                "http_errors" => false
+            ]);
+
+            try {
+                $client->get($plagscan->getInteractiveUrl());
+                $interactiveAvailable = true;
+            }
+            catch (TransferException $e) {
+
+                /* Could log this as an error?
+                 * Plagscan interactive report url not available
+                 *
+                 * noop
+                 */
+            }
+        }
+
         $data = [
             'plagscan' => $plagscan,
             'assessment' => $assessment,
-            'response' => $response
+            'response' => $response,
+            'interactiveAvailable' => $interactiveAvailable
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));

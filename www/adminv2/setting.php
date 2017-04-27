@@ -4,7 +4,7 @@ if (!$_SESSION['user']->isSuperuser()) {
 	error(19);
 }
 
-$this->setFile(TEMPLATE_content, 'adminv2/settings.html');
+$this->setFile(TEMPLATE_content, 'adminv2/setting.html');
 $this->setTitle('Admin - Settings');
 
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');

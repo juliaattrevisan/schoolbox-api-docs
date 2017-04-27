@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif;
 
 
+use InvalidArgumentException;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -86,6 +87,7 @@ class Notif implements NotifInterface
      * Return an array of handlers based on the current configuration of self, created in ascending order of priority.
      * Spawns handlers on demand.
      *
+     * @throws InvalidArgumentException
      * @return HandlerInterface[]
      */
     protected function getHandlers()
@@ -99,11 +101,7 @@ class Notif implements NotifInterface
         ];
 
         if ($this->isSystemTopic($this->topic)) {
-            if (in_array($this->topic, [self::TOPIC_APPLICATION, self::TOPIC_CMD_REROUTE, self::TOPIC_CMD_DIGEST])) {
-                $stack[] = HandlerFactory::SYS_AMQP;
-            }
-
-            if (in_array($this->topic, [self::TOPIC_AUTH, self::TOPIC_CMS])) {
+            if (in_array($this->topic, [ self::TOPIC_AUTH, self::TOPIC_CMS ], true)) {
                 // this may well come back to bite me
                 $stack[] = $this->topic;
             }
@@ -112,13 +110,9 @@ class Notif implements NotifInterface
             $handlers = $this->factory->getStack($stack);
 
             // append a file logger
-            array_push($handlers, $this->factory->getFileLogHandler($this->topic));
+            $handlers[] = $this->factory->getFileLogHandler($this->topic);
 
         } else {
-            $stack[] = HandlerFactory::USER_INSTANT;
-            $stack[] = HandlerFactory::USER_PUSH;
-            $stack[] = HandlerFactory::USER_MAIL;
-
             // resolve the stack so far
             $handlers = $this->factory->getStack($stack);
         }
@@ -146,7 +140,7 @@ class Notif implements NotifInterface
                 $this->topic_cache[$name] = $value;
             }
         }
-        return in_array($topic, $this->topic_cache);
+        return in_array($topic, $this->topic_cache, true);
     }
 
 
@@ -178,8 +172,13 @@ class Notif implements NotifInterface
         try {
             $log = new Logger($this->topic, $this->getHandlers());
             return $log->addRecord($level, $message, $context);
+
         } catch (Swift_TransportException $e) {
             // rabbit failed... email failed... at least it's logged to file
+            return false;
+
+        } catch (InvalidArgumentException $e) {
+            // failed to load the handler stack
             return false;
         }
     }

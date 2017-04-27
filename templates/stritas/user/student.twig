@@ -2,11 +2,11 @@
 
 {% block extraDetails %}
     {% if isSuperuser or isStaff or isSelf or isParentOfStudent %}
-        <dt class="no-margin small-6 medium-3">Full Days Absent</dt>
-        <dd class="no-margin small-6 medium-9">{{ externalUser.AbsenceFullDaysForYear }}</dd>
-        <dt class="no-margin small-6 medium-3">Late Arrivals</dt>
-        <dd class="no-margin small-6 medium-9">{{ externalUser.LateStartDaysForYear }}</dd>
-        <dt class="no-margin small-6 medium-3">Early Departures</dt>
-        <dd class="no-margin small-6 medium-9">{{ externalUser.EarlyLeaveDaysForYear }}</dd>
+        <dt class="small-12 medium-3">Full Days Absent:</dt>
+        <dd class="small-12 medium-9">{{ externalUser.AbsenceFullDaysForYear }}</dd>
+        <dt class="small-12 medium-3">Late Arrivals:</dt>
+        <dd class="small-12 medium-9">{{ externalUser.LateStartDaysForYear }}</dd>
+        <dt class="small-12 medium-3">Early Departures:</dt>
+        <dd class="small-12 medium-9">{{ externalUser.EarlyLeaveDaysForYear }}</dd>
     {% endif %}
 {% endblock extraDetails %}

@@ -1,0 +1,157 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Realtime;
+
+use Alaress\Async\Queue\QueueInterface;
+use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
+use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\Realtime\Notification\Decorator;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Swift_RfcComplianceException;
+use Swift_SwiftException;
+use Twig_Error_Runtime;
+use UnderflowException;
+
+
+class Mailer
+{
+    /** @var TwigEmailFactory */
+    private $emailFactory;
+
+    /** @var LoggerInterface */
+    private $log;
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var bool */
+    private $useReplyTo;
+
+
+    /**
+     * @param TwigEmailFactory $emailFactory
+     * @param LoggerInterface  $log
+     * @param UserMapper       $userMapper
+     * @param bool             $includeReplyToHeaders
+     */
+    public function __construct(TwigEmailFactory $emailFactory, LoggerInterface $log, UserMapper $userMapper, $includeReplyToHeaders)
+    {
+        $this->emailFactory = $emailFactory;
+        $this->log          = $log;
+        $this->userMapper   = $userMapper;
+        $this->useReplyTo   = $includeReplyToHeaders;
+    }
+
+
+    /**
+     * @param QueueInterface $list
+     * @param User           $recipient
+     * @param string         $template
+     * @param string         $subject
+     * @param int            $sortDir
+     * @throws Swift_RfcComplianceException
+     * @throws UnderflowException
+     * @return bool
+     */
+    public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC)
+    {
+        $address = trim($recipient->getEmail());
+
+        if (empty($address)) {
+            throw new Swift_RfcComplianceException("Empty address for user {$recipient->getId()}");
+        }
+
+        // format rfc2822
+        $address = sprintf('"%s" <%s>', $recipient->formatName(), $address);
+
+        $decorator = new Decorator();
+
+        $list->fetchIntoBundle($decorator, true);
+
+        if (!$decorator->count()) {
+            throw new UnderflowException('No messages to deliver');
+        }
+
+        if (empty($subject)) {
+            // if no subject given, infer from the notifications compiled
+            $subject = $decorator->renderTitleAsPlaintext($decorator->getNotifications(1)[0]);
+        }
+
+        $this->log->debug(sprintf('Compiling %d notification%s for user %s', $decorator->count(), $decorator->count() === 1 ? '' : 's', $recipient->getUsername()));
+
+        $context = $decorator->renderAsTwigContext($this->emailFactory->getCoreContext(), 0, $sortDir);
+        $context['recipient'] = $recipient->getFirstname();
+
+        // build the email object
+        $email = $this->emailFactory->build($template, $subject);
+        $email->setContext($context)->setTo($address);
+
+        // we can only include the reply-to header if there is but one email
+        if ($this->useReplyTo && $decorator->count() === 1) {
+            try {
+                $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getEffectorIds());
+                // do NOT format rcf2822, because swift mailer
+                $email->setReplyTo($this->getReplyTo($effectors));
+
+            } catch (Swift_RfcComplianceException $e) {
+                $this->log->warning('Error applying reply-to: ' . $e->getMessage());
+            }
+        }
+
+        try {
+            // away she goes
+            $sent = $email->send();
+
+            // if email sent successfully, ACK, otherwise NACK
+            if ($sent) {
+                $this->log->notice("Mail sent successfully to $address, draining list");
+                $list->drain();
+
+                return true;
+            }
+
+            $this->log->warning("Failed to email to $address");
+
+        } catch (Swift_SwiftException $e) {
+            $this->log->warning(get_class($e) . ': ' . $e->getMessage(), [$e]);
+
+        } catch (Twig_Error_Runtime $e) {
+            $this->log->error(get_class($e) . ': ' . $e->getMessage(), [$e]);
+
+            if (strpos($e->getMessage(), 'Invalid multibyte sequence in argument') !== false) {
+                // this means the template couldn't render the mail because of bad data, so we have to flush it :/
+                $list->drain();
+                $this->log->warning('Message content could not be rendered; data lost');
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param Collection|User[] $effectors
+     * @return string[]
+     */
+    private function getReplyTo(Collection $effectors)
+    {
+        $replyTo = [];
+
+        foreach ($effectors as $effector) {
+            $replyAddr = trim($effector->getEmail());
+            if ($replyAddr) {
+                $replyTo[$replyAddr] = $effector->formatName();
+            }
+        }
+
+        return $replyTo;
+    }
+}

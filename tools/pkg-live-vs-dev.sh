@@ -43,7 +43,7 @@ fi
 mv -f $fullpath/init/upstart-scheduled.conf $fullpath/init/$1-scheduled.conf;
 mv -f $fullpath/init/upstart-socketd.conf $fullpath/init/$1-socketd.conf;
 mv -f $fullpath/init/upstart-digestd.conf $fullpath/init/$1-digestd.conf;
-mv -f $fullpath/init/upstart-rerouted.conf $fullpath/init/$1-rerouted.conf;
+mv -f $fullpath/init/upstart-routed.conf $fullpath/init/$1-routed.conf;
 # belld only for mggs, please configure manually
 #mv -f $fullpath/init/upstart-belld.conf $fullpath/init/$1-belld.conf;
 mv -f $fullpath/init/upstart-belld.conf $fullpath/$1-belld.conf;

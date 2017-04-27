@@ -140,7 +140,7 @@ class Instance implements JsonSerializable
         $context = null
     ) {
 
-        if (preg_match_all('`:([A-Za-z_][A-Za-z0-9_]*)`', $text, $matches)) {
+        if (preg_match_all('`:([A-Za-z_]\w*)`', $text, $matches)) {
             $this->tokens = $matches[1];
 
         } else {
@@ -394,6 +394,9 @@ class Instance implements JsonSerializable
         }
         foreach ($this->meta as $m) {
             $list[] = $m;
+        }
+        foreach ($this->context as $c) {
+            $list[] = $c;
         }
         return sha1(json_encode($list));
     }

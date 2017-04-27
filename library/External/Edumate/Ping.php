@@ -9,6 +9,9 @@
  * @version     SVN: $Id$
  */
 class External_Edumate_Ping extends External_Edumate_Connection implements External_PingInterface {
+    /**
+     * @inheritdoc
+     */
 	public function isResponsive() {
 		try {
 			parent::__construct();

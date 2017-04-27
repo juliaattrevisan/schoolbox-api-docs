@@ -116,17 +116,13 @@ class MarkMapper extends Mapper
     public function deleteDraftMarks(User $user, IAssessable $dueWork)
     {
         $query = "
-            DELETE FROM rubric_mark WHERE id IN (
-              SELECT * FROM (
-                SELECT rm.id FROM rubric_mark rm
+            DELETE rm FROM rubric_mark rm 
                 JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
                 JOIN rubric_level   rl ON rl.id = rd.level_id
                 JOIN submission_box sb ON sb.id = rl.box_id
                 WHERE rm.student_id = :student_id
                 AND sb.assessment_id = :assessment_id
                 AND rm.published_at IS NULL
-              ) t
-            )
         ";
 
         $statement = $this->database->prepare($query);
@@ -169,5 +165,42 @@ class MarkMapper extends Mapper
         ]);
 
         return $statement->rowCount();
+    }
+
+
+    /**
+     * Get a list of students who have some form of rubric marked for an assessment
+     *
+     * @param int $assessment_id
+     * @return array
+     */
+    public function findMarkedByAssessment($assessment_id)
+    {
+        $query = "
+            SELECT            rubric_mark.student_id,
+                              COUNT(*)
+            FROM              rubric_mark
+            INNER JOIN        rubric_descriptor ON
+                              rubric_descriptor.id = rubric_mark.descriptor_id
+            INNER JOIN        rubric_level ON
+                              rubric_level.id = rubric_descriptor.level_id
+            INNER JOIN        submission_box ON 
+                              submission_box.id = rubric_level.box_id
+            INNER JOIN        assessment ON 
+                              assessment.id = submission_box.assessment_id
+            WHERE             valid = 1
+                              AND assessment.id = :assessmentId
+            GROUP BY          rubric_mark.student_id
+        ";
+        $stmt = $this->database->prepare($query);
+        $stmt->execute([
+            'assessmentId' => $assessment_id
+        ]);
+        $rowset = $stmt->fetchAll();
+        $rubricMarks = [];
+        foreach ($rowset as $row) {
+            $rubricMarks[$row['student_id']] = true;
+        }
+        return $rubricMarks;
     }
 }

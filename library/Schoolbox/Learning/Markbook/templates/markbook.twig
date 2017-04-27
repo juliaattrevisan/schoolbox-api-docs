@@ -100,8 +100,8 @@
                         <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                         Class Average
                     </th>
-                    {% set weightedMean = markbook.markbookStatistics.weightedMean %}
-                    <th class="{{ urgency.marks(markbook.markbookStatistics.normalisedMean) }}-bg">
+                    {% set weightedMean = markbook.weightedMean %}
+                    <th class="{{ urgency.marks(markbook.normalisedMean) }}-bg">
                             {{ weightedMean | default('–') }}
                     </th>
                     {% for assessment in markbook.assessmentsWithProjectContents %}
@@ -157,19 +157,23 @@
                     {% for assessment in markbook.assessmentsWithProjectContents  %}
                         <td class="column-{{ assessment.id }}" data-assessment="{{ assessment.id }}">
                             {% if assessment.isParticipant(student) %}
+                                {% set participant = assessment.getParticipant(student) %}
                                 {% if assessment is task %}
                                     {# An icon that shows if the student has attempted the task or not #}
-                                    {% include '@learningAssessment/task/progressTickForm.twig' with {
-                                        participant: assessment.getParticipant(student),
-                                        disabled: not writable
+                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                        assessment: assessment,
+                                        participant: participant,
+                                        writable: writable
                                     } only %}
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
+                                    {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
+                                        ? (pendingLabel ?: "Pending")
+                                        : assessment.getHumanReadableMark(student, true) | default('–')
+                                    %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
-                                       title="{{ participant.mostRecentFeedback.comment }}">
-                                        {{ assessment.getHumanReadableMark(student, true) | default('–') }}
-                                    </a>
+                                       title="{{ participant.mostRecentFeedback.comment }}">{{ label }}</a>
                                 {% endif %}
                             {% else %}
                                 –

@@ -1,0 +1,296 @@
+<?php
+/**
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Filter;
+
+use Schoolbox\Filter;
+use Schoolbox\Filter\Option;
+use Schoolbox\Filter\Option\Defaults;
+use Schoolbox\Filter\Selection;
+use Schoolbox\Assessment\Term;
+use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
+use Schoolbox\Filter\Filters\Folder as FolderFilter;
+use Schoolbox\Filter\Filters\Term as TermFilter;
+use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
+use Schoolbox\Filter\Filters\WeightingType as WeightingTypeFilter;
+use Schoolbox\GenericCollection;
+use Schoolbox\MapperFactory;
+use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Resource\Folder;
+use Schoolbox\User;
+
+
+/**
+ * The FilterFactoryFactory is responsible for creating filter factories.
+ *
+ * Each filter factory knows how to build a filter for the specified context.
+ */
+class FactoryFactory
+{
+
+    /** @var MapperFactory */
+    private $mapperFactory;
+
+
+    /**
+     * @param MapperFactory $mapperFactory
+     * @throws \InvalidArgumentException
+     */
+    public function __construct(MapperFactory $mapperFactory)
+    {
+        $this->mapperFactory = $mapperFactory;
+    }
+
+
+    /**
+     * A registry of filter factories. Registered by filter definition class name.
+     *
+     * @param string $filterDefinitionClass
+     * @return IFilterFactory
+     * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
+     */
+    public function buildFilterFactoryForFilter($filterDefinitionClass)
+    {
+        if (!class_exists($filterDefinitionClass)) {
+            throw new \InvalidArgumentException('No filter definition found for class: ' . $filterDefinitionClass);
+        }
+
+        // Registry of as filters definitions. Ensures static analysis identifies usages.
+        switch ($filterDefinitionClass) {
+            case AssessmentTypeFilter\Definition::class:
+                return $this->buildAssessmentTypeFilterFactory();
+            case FolderFilter\Definition::class:
+                return $this->buildFolderFilterFactory();
+            case TermFilter\Definition::class:
+                return $this->buildTermFilterFactory();
+            case WorkTypeFilter\Definition::class:
+                return $this->buildWorkTypeFilterFactory();
+            case WeightingTypeFilter\Definition::class:
+                return $this->buildWeightingFilterFactory();
+        }
+        throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
+    }
+
+
+    /**
+     * Build a set of key converters for the specified page
+     *
+     * @param string $page
+     * @return IKeyConverter[]|GenericCollection Indexed by filter.id
+     * @throws \InvalidArgumentException
+     */
+    public function buildKeyConverters($page)
+    {
+        $keyConverters = $this->createKeyConverterCollection();
+
+        foreach ($this->getFilterMapper()->findAll() as $filter) {
+
+            /** @var IFilterDefinition $class */
+            $class = $filter->getClass();
+
+            // Does this filter appear on the specified page?
+            if (in_array($page, $class::getPages(), true)) {
+                $filterFactory = $this->buildFilterFactoryForFilter($class);
+                $keyConverter  = $filterFactory->buildKeyConverter($filter);
+                $keyConverters->offsetSet($filter->getId(), $keyConverter);
+            }
+        }
+        return $keyConverters;
+    }
+
+
+    /**
+     * Get the set of filters that are implemented by the specified page
+     *
+     * @param string $page
+     * @return string[]|IFilterDefinition[]
+     * @throws \InvalidArgumentException
+     */
+    private function getDefinitions($page)
+    {
+        $allFilters        = $this->getFilterMapper()->findAll();
+        $definitionClasses = [];
+        foreach ($allFilters as $filter) {
+            /** @var string|IFilterDefinition $definitionClass */
+            $definitionClass = $filter->getClass();
+
+            // Does this filter appear on the specified page?
+            if (in_array($page, $definitionClass::getPages(), true)) {
+                $definitionClasses[] = $definitionClass;
+            }
+        }
+        return $definitionClasses;
+    }
+
+
+    /**
+     * Builds a filter panel for the specified user and page, which submits selections to the specified route
+     *
+     * @param User   $user
+     * @param string $page
+     * @param string $route
+     * @param array  $runTimeOptions Indexed by filter definition class
+     * @return Panel
+     * @throws \InvalidArgumentException
+     */
+    public function buildPanel(User $user, $page, $route, array $runTimeOptions = [])
+    {
+        $filterComponents = $this->createFilterComponentCollection();
+
+        foreach ($this->getDefinitions($page) as $className) {
+            $filterFactory = $this->buildFilterFactoryForFilter($className);
+            $component     = $filterFactory->buildComponent($user, $page, $runTimeOptions[$className]);
+            $filterComponents->add($component);
+        }
+
+        return new Panel($route, $filterComponents);
+    }
+
+
+    /**
+     * @param null|IFilterComponent[] $contents
+     * @return GenericCollection|IFilterComponent[]
+     */
+    private function createFilterComponentCollection(array $contents = [])
+    {
+        return new GenericCollection(IFilterComponent::class, $contents);
+    }
+
+
+    /**
+     * @param null|IKeyConverter[] $contents
+     * @return GenericCollection|IKeyConverter[]
+     */
+    private function createKeyConverterCollection(array $contents = [])
+    {
+        return new GenericCollection(IKeyConverter::class, $contents);
+    }
+
+
+    /**
+     * @return AssessmentTypeFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    private function buildAssessmentTypeFilterFactory()
+    {
+        return new AssessmentTypeFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper()
+        );
+    }
+
+
+    /**
+     * @return FolderFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    private function buildFolderFilterFactory()
+    {
+        /** @var Folder\Mapper $folderMapper */
+        $folderMapper = $this->mapperFactory->get(Folder\Mapper::class);
+        return new FolderFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper(),
+            $folderMapper
+        );
+    }
+
+
+    /**
+     * @return TermFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    private function buildTermFilterFactory()
+    {
+        /** @var Term\Mapper $termMapper */
+        $termMapper = $this->mapperFactory->get(Term\Mapper::class);
+        return new TermFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper(),
+            $termMapper
+        );
+    }
+
+
+    /**
+     * @return WorkTypeFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    private function buildWorkTypeFilterFactory()
+    {
+        /** @var WorkType\Mapper $workTypeMapper */
+        $workTypeMapper = $this->mapperFactory->get(WorkType\Mapper::class);
+        return new WorkTypeFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper(),
+            $workTypeMapper
+        );
+    }
+
+
+    /**
+     * @return WeightingTypeFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    private function buildWeightingFilterFactory()
+    {
+        return new WeightingTypeFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper()
+        );
+    }
+
+
+    /**
+     * @return \Schoolbox\Mapper|Filter\Mapper
+     * @throws \InvalidArgumentException
+     */
+    private function getFilterMapper()
+    {
+        return $this->mapperFactory->get(Filter\Mapper::class);
+    }
+
+
+    /**
+     * @return \Schoolbox\Mapper|Option\Mapper
+     * @throws \InvalidArgumentException
+     */
+    private function getFilterOptionMapper()
+    {
+        return $this->mapperFactory->get(Option\Mapper::class);
+    }
+
+
+    /**
+     * @return \Schoolbox\Mapper|Defaults\Mapper
+     * @throws \InvalidArgumentException
+     */
+    private function getFilterDefaultsMapper()
+    {
+        return $this->mapperFactory->get(Defaults\Mapper::class);
+    }
+
+
+    /**
+     * @return \Schoolbox\Mapper|Selection\Mapper
+     * @throws \InvalidArgumentException
+     */
+    private function getFilterSelectionMapper()
+    {
+        return $this->mapperFactory->get(Selection\Mapper::class);
+    }
+}

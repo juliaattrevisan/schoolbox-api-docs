@@ -97,13 +97,13 @@ class External_Tass_User implements External_UserInterface
             }
 
             $query .= "
-                INNER JOIN student s ON scr.par_code=s.par_code AND scr.cmpy_code=s.cmpy_code
+                INNER JOIN student s ON scr.stud_code=s.stud_code AND scr.cmpy_code=s.cmpy_code
                 WHERE s.stud_code IN ($idList) AND pa.cmpy_code = {$companyCode} AND pa.add_num IN ($addnum)
             ";
         }
 
-        $this->getDatabase()->query($query);
-        while ($row = $this->getDatabase()->getNextArray()) {
+        $statement = $this->getDatabase()->query($query);
+        while ($row = $statement->fetch()) {
             if(stristr($row['e_mail'],';')) {
                 $i=0;
                 foreach(explode(';',$row['e_mail']) as $email) {
@@ -154,7 +154,8 @@ class External_Tass_User implements External_UserInterface
 				'' AS StudentSpecialNeedsFlag,
 				'' AS StudentStudiesCode,
 				'' AS AlertMessage,
-				boarder AS StudentBoarder
+				boarder AS StudentBoarder,
+				'' AS Comment
 			FROM student AS s
 			LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
 			-- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
@@ -270,9 +271,9 @@ class External_Tass_User implements External_UserInterface
             return [];
         }
 
-        $this->getDatabase()->query($sql);
+        $statement = $this->getDatabase()->query($sql);
         $subjectList = array();
-        while ($subject = $this->getDatabase()->trimRow($this->getDatabase()->getNextArray())) {
+        while ($subject = $this->getDatabase()->trimRow($statement->fetch())) {
             if (Cfg::get('external_tass_year_in_class_code') == '0') {
                 $subject['year_grp'] = '';
             }
@@ -332,6 +333,7 @@ class External_Tass_User implements External_UserInterface
                 LEFT JOIN student as s
                     ON p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
+                    AND (s.dol IS NULL OR s.dol > getdate())
                 WHERE sf.par_code = {$this->getDatabase()->smartQuote($parentCode)}
                 AND   sf.sfa_num  = {$this->getDatabase()->smartQuote($parentNum)}
             ";
@@ -358,7 +360,7 @@ class External_Tass_User implements External_UserInterface
             $result = $this->getDatabase()->getAll($query);
 
             // parse the array, because this data is stored in a funky way
-            if (count($result)) {
+            if (count($result) && is_array($result)) {
                 foreach ($result as $row) {
                     // data is stored in a single field, comma separated
                     $list = explode(',', $row['RelatedID']);
@@ -376,6 +378,7 @@ class External_Tass_User implements External_UserInterface
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
                 WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
+                AND (s.dol IS NULL OR s.dol > getdate())
             ";
             if ($commrules) {
                 $query = $query . "

@@ -8,14 +8,11 @@
 namespace Schoolbox\Learning\Mastery;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Markbook\Markbook;
@@ -30,27 +27,27 @@ class Controller extends Base
     /**
      * @var ErrorMapper
      */
-    protected $errorMapper;
+    private $errorMapper;
 
     /**
      * @var AssessmentMapperProxy
      */
-    protected $assessmentMapperProxy;
+    private $assessmentMapperProxy;
 
     /**
      * @var GradeGroup
      */
-    protected $defaultGradeGroup;
+    private $defaultGradeGroup;
 
     /**
      * @var CourseImplementationMapper
      */
-    protected $courseImplementationMapper;
+    private $courseImplementationMapper;
 
     /**
      * @var TermMapper
      */
-    protected $termMapper;
+    private $termMapper;
 
     /**
      * Constructor
@@ -78,6 +75,7 @@ class Controller extends Base
     /**
      * @api /learning/mastery/{classId}
      * @param Folder $class
+     * @throws ApplicationException
      */
     public function getMastery($class)
     {
@@ -88,6 +86,7 @@ class Controller extends Base
      * @api /learning/mastery/{classId}/term/{termCode}
      * @param Folder $class
      * @param Term $term
+     * @throws ApplicationException
      */
     public function getMasteryForTerm($class, $term)
     {
@@ -97,8 +96,12 @@ class Controller extends Base
         }
 
         // Generate data: assessments and their Participants
+        $options = [
+            'term'  => $term,
+            'order' => ['due_date' => 'ASC'],
+        ];
         /** @var Collection|IAssessable[] $assessments */
-        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview($class->getId(), null, ['term' => $term])
+        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview($class->getId(), null, $options)
                                                         ->filter(function (IAssessable $assessable) {
                                                             return !$assessable instanceof Project;
                                                         });
@@ -113,7 +116,7 @@ class Controller extends Base
         $previousTerm = null;
         $nextTerm     = null;
         foreach ($terms as $i => $termInList) {
-            if ($termInList->getId() == $term->getId()) {
+            if ($termInList->getId() === $term->getId()) {
                 if (isset($terms[$i + 1])) {
                     $previousTerm = $terms[$i + 1];
                 }

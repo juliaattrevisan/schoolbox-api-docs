@@ -4,7 +4,7 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\Event\Event;
 
 require_once('../../library/Bootstrap.php');
 
@@ -86,7 +86,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 
 // if there is an ajax flag, return a json response
 if ($page->detectAjax()) {
-	header($_SERVER['SERVER_PROTOCOL'] . ' 202 Accepted');
+	http_response_code(202);
 	header('Content-Type: application/json');
 	die(json_encode(array('status' => $response)));
 }

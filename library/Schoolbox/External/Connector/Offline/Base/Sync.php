@@ -9,9 +9,10 @@
 
 namespace Schoolbox\External\Connector\Offline\Base;
 
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\Base;
+use Schoolbox\External\Connector\ISync;
 
-class Sync implements SyncInterface
+class Sync extends Base implements ISync
 {
     /**
      * {@inheritdoc}

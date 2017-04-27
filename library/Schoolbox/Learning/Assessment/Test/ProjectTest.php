@@ -14,7 +14,10 @@ namespace Schoolbox\Learning\Assessment\Test;
 use \Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\User;
+use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Storage\Model as Storage;
 
 use \Schoolbox\Learning\Assessment\Participant;
@@ -31,7 +34,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Due
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use \Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
@@ -54,6 +57,42 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Collection::class, $project->getAssessables());
         $this->assertInstanceOf(SummatorAverage::class, $project->getSummator());
+    }
+
+    /**
+     * Test that project is in the specification context, if it's in a unit spec.
+     */
+    public function testInSpecification()
+    {
+        $project = new Project(new SummatorAverage());
+        $project->setContext(new UnitSpecification());
+
+        $this->assertFalse($project->isImplementationContext());
+        $this->assertTrue($project->isSpecificationContext());
+    }
+
+    /**
+     * Test that project is in the implementation context, if it's in a folder.
+     */
+    public function testInFolder()
+    {
+        $project = new Project(new SummatorAverage());
+        $project->setContext(new Folder());
+
+        $this->assertTrue($project->isImplementationContext());
+        $this->assertFalse($project->isSpecificationContext());
+    }
+
+    /**
+     * Test that project is in the implementation context, if it's in a unit impl.
+     */
+    public function testInImplementation()
+    {
+        $project = new Project(new SummatorAverage());
+        $project->setContext(new UnitImplementation());
+
+        $this->assertTrue($project->isImplementationContext());
+        $this->assertFalse($project->isSpecificationContext());
     }
 
     /**
@@ -241,7 +280,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setWorkType((new DueWorkType())
+            ->setWorkType((new WorkType())
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)

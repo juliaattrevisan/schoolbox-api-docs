@@ -18,7 +18,7 @@ use Schoolbox\Learning\Response\Module as ResponseModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 
-class Learning extends ModuleLoader implements ModuleConfigInterface
+class Learning extends ModuleLoader
 {
     /**
      * Run configuration for the given module

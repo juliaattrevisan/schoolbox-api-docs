@@ -17,7 +17,6 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -313,7 +312,7 @@ class ListController extends Web\Controller\Base
      * @param array|Traversable $postData
      * @param IAssessable       $assessment
      * @throws DomainException
-     * @return string
+     * @return array
      */
     protected function persistAssessment(User $user, $postData, IAssessable $assessment = null)
     {

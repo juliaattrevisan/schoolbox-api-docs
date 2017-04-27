@@ -14,8 +14,7 @@ use Alaress\Async\Notification\Notification;
 use Alaress\Async\Test\AbstractTest;
 use Alaress\Redis;
 use OutOfBoundsException;
-use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\UserQueue\InstantUserQueue;
+use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -55,11 +54,11 @@ abstract class AbstractNotificationTest extends AbstractTest
     /** @var \Predis\ClientInterface */
     private $redis;
 
-    /** @var Connector */
-    private $amqp;
-
     /** @var User[] */
     private $userCache;
+
+    /** @var ListFactory */
+    private $listFactory;
 
 
     /**
@@ -72,7 +71,7 @@ abstract class AbstractNotificationTest extends AbstractTest
         parent::__construct($name, $data, $dataName);
 
         $this->redis = Redis::getClientInstance();
-        $this->amqp  = Connector::getInstance();
+        $this->listFactory = new ListFactory(INSTANCE_ID, $this->redis);
     }
 
 
@@ -82,13 +81,12 @@ abstract class AbstractNotificationTest extends AbstractTest
      */
     protected function fetchNotifications($userId)
     {
-        $queue = new InstantUserQueue($this->redis, $this->amqp, $userId);
-
         // load the data into your hat, and pull out a rabbit
         $decorator = new Decorator();
-        $queue->fetchNotificationsIntoBundle($decorator);
 
-        return $queue->fetchNotifications(-1);
+        $this->listFactory->listed($userId)->fetchIntoBundle($decorator);
+
+        return $decorator->getNotifications();
     }
 
 
@@ -116,7 +114,7 @@ abstract class AbstractNotificationTest extends AbstractTest
     {
         $key  = sprintf('msg:%s:m:%s', INSTANCE_ID, $messageId);
 
-        $compressed = Redis::getClientInstance()->get($key);
+        $compressed = $this->redis->get($key);
 
         if (!$compressed) {
             // no data

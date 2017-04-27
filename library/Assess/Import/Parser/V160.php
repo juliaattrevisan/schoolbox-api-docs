@@ -19,6 +19,14 @@ use \Evaluation\Import\Parser\Base as EvaluationParser;
 class V160 extends EvaluationParser implements IParser
 {
     /**
+     * @return string|null
+     */
+    public function getWorkType()
+    {
+        return null;
+    }
+
+    /**
      * @return Alaress_Date_Format
      */
     public function getPublishDate()

@@ -16,8 +16,9 @@ class ResponsesOnly extends Full
 {
     /**
      * We only need Submitted Responses here
+     * @inheritdoc
      */
-    protected function recombine()
+    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
     {
         /** @var Submission $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {

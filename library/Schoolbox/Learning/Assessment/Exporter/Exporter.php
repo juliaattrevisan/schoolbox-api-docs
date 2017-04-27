@@ -10,19 +10,20 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Csv\Writer AS CsvWriter;
+use Alaress\Database\Connector\IConnector;
 
 class Exporter
 {
     /**
-     * @var \Database
+     * @var IConnector
      */
     private $database;
 
     /**
      * Exporter constructor.
-     * @param \Database $database
+     * @param IConnector $database
      */
-    public function __construct(\Database $database)
+    public function __construct(IConnector $database)
     {
         $this->database = $database;
     }
@@ -39,36 +40,37 @@ class Exporter
             SELECT          u.synergy_id,
                             sr.mark,
                             sb.name,
-                            cc.code
+                            folder_code.code,
+                            lu_work_type.name AS type_name
             FROM            submission_return AS sr
             INNER JOIN      submission_box AS sb ON
                             sb.id = sr.box_id
+            INNER JOIN      assessment a ON
+                            sb.assessment_id = a.id
             LEFT JOIN       assessment_folder AS af ON 
-                            af.assessment_id = sb.assessment_id
+                            af.assessment_id = a.id
             LEFT JOIN       assessment_course_unit_implementation AS acui ON 
-                            acui.assessment_id = sb.assessment_id
+                            acui.assessment_id = a.id
             LEFT JOIN       course_unit_implementation AS cui ON 
                             cui.id = acui.course_unit_implementation_id
             LEFT JOIN       course_implementation AS ci ON 
                             ci.id = cui.course_implementation_id
-            INNER JOIN      folder AS c ON 
-                            c.id = af.assessment_id OR c.id = ci.folder_id
-            INNER JOIN      folder_code AS cc ON
-                            cc.folder_id = c.id
+            INNER JOIN      folder ON 
+                            folder.id = af.folder_id OR folder.id = ci.folder_id
+            INNER JOIN      folder_code ON
+                            folder_code.folder_id = folder.id
             INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
+            LEFT JOIN       lu_work_type ON
+                            lu_work_type.id = a.work_type_id
             WHERE           YEAR(sr.created_at) = :currentYear
                             AND sr.deleted_at IS NULL
-                            AND sb.name LIKE '%[%]%'
                             AND sr.mark != ''
                             AND sr.published_at IS NOT NULL
-            ORDER BY        cc.code
+            ORDER BY        folder_code.code
         ";
 
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'currentYear' => date('Y')
-        ]);
+        $resultSet = $this->database->executeQueryIterator($query, ['currentYear' => date('Y')]);
 
         $headings = [
             'student code',
@@ -79,27 +81,36 @@ class Exporter
 
         $data = [];
 
-        foreach ($statement as $result) {
+        foreach ($resultSet as $result) {
 
-            /* Assessment codes will be stored in square brackets in the submission
-             * box name.
+            /*
+             * Check if there are square brackets inside the submission box name, if so - pull the contents from
+             * inside the square brackets and use as assessment code (original way this was built for DLSC).
+             * If square brackets aren't found then use the assessment type (new way that will be standard).
+             * Note: the square bracket check will be phased out when we have moved De La Salle's assessment codes
+             * from inside the title to assessment types.
              */
             $openBracketPos = strpos($result['name'], '[');
-
-            /* Get the assessment code out of the submission box name
-             */
             $closeBracketPos = strrpos($result['name'], ']');
-            $codeLength = $closeBracketPos - $openBracketPos;
-            $assessmentCode = substr($result['name'], $openBracketPos+1, $codeLength-1);
-
-            if (strlen($assessmentCode) > 0) {
-                $data[] = [
-                    $headings[0] => $result['synergy_id'],
-                    $headings[1] => $result['code'],
-                    $headings[2] => $assessmentCode,
-                    $headings[3] => $result['mark']
-                ];
+            if ($openBracketPos !== false && $closeBracketPos !== false) {
+                $codeLength = $closeBracketPos - $openBracketPos;
+                $assessmentCode = substr($result['name'], $openBracketPos + 1, $codeLength - 1);
+            } else {
+                $assessmentCode = trim($result['type_name']);
             }
+
+            // Strip percent sign from mark
+            $mark = str_replace('%', '', $result['mark']);
+
+            // If this is a total mark, only show the actual mark (without '/ [total]')
+            list($mark) = explode(' / ', $mark);
+
+            $data[] = [
+                $headings[0] => $result['synergy_id'],
+                $headings[1] => $result['code'],
+                $headings[2] => $assessmentCode,
+                $headings[3] => $mark
+            ];
         }
 
         $writer = new CsvWriter($file, $data);
