@@ -17,6 +17,7 @@
  *    The URL that the IdP should redirect to once the authorization is complete.
  *    You must provide this, and it should point to the consume.php script or its equivalent.
  */
+use \Alaress\Saml;
 
 require_once __DIR__.'/../../library/Bootstrap.php';
 
@@ -56,14 +57,19 @@ $settings->authncontextComparison = Config::get('saml_auth_comparison');
 * @return array
 */
 function idpMetadata() {
-    $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
+    try {
+        $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
+    } catch (Exception $e) {
+        /*
+         * Unable to use URL provided, ignore IDP metadata
+         */
+        return false;
+    }
     $idpMetadataUrl = $url->toString();
 
-    $cache = new Alaress_Cache_Locker_Abstract();
+    $cache = new Alaress_Saml_Cache();
 
-    $idpMetadata_raw = $cache->setCachedTime(86400)
-                                ->setCacheFilePrefix('samlIdpMetadata')
-                                ->init($idpMetadataUrl)
+    $idpMetadata_raw = $cache->init($idpMetadataUrl)
                                 ->getStreamContents();
 
     $idpMetadata = simplexml_load_string($idpMetadata_raw);
