@@ -36,7 +36,7 @@ if(isset($_POST['SAMLResponse'])) {
             $token_signing_keys[] = $key['X509Cert'];
         }
     }
-    $error_tracker = array();
+    $errorTracker = array();
     foreach ($token_signing_keys as $token_key) {
         $settings->idpPublicCertificate = preg_replace("/\r/m", "", $token_key);
         try {
@@ -55,21 +55,21 @@ if(isset($_POST['SAMLResponse'])) {
 
                 } else {
                     $msg = 'Invalid SAML user.';
-                    $error_tracker[] = $msg;
+                    $errorTracker[] = $msg;
                     SAMLDebugLog($msg);
                 }
             } else {
                 $msg = 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
-                $error_tracker[] = $msg;
+                $errorTracker[] = $msg;
                 SAMLDebugLog($msg);
             }
         } catch (Exception $e) {
             $msg = 'Invalid SAML response: ' . Scrub::text($e->getMessage());
-            $error_tracker[] = $msg;
+            $errorTracker[] = $msg;
             SAMLDebugLog($msg);
         }
     }
-    error(ErrorMapper::ERROR_PROCESSING, implode("\n" . $error_tracker));
+    error(ErrorMapper::ERROR_PROCESSING, implode("\n" . $errorTracker));
 }
 else {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);
