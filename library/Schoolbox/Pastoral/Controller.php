@@ -22,6 +22,7 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
@@ -67,9 +68,12 @@ class Controller extends Base
 
     /** @var PastoralAccessMapper $pastoralAccessMapper */
     protected $pastoralAccessMapper;
-    
+
     /** @var PastoralGroupMapper $pastoralGroupMapper */
     protected $pastoralGroupMapper;
+
+    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
+    protected $pastoralGroupMemberMapper;
 
     /** @var PastoralAttachmentMapper $pastoralAttachmentMapper */
     protected $pastoralAttachmentMapper;
@@ -123,6 +127,7 @@ class Controller extends Base
      * @param PastoralTagMapper $pastoralTagMapper
      * @param PastoralCommentMapper $pastoralCommentMapper
      * @param PastoralGroupMapper $pastoralGroupMapper
+     * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
      * @param PastoralAttachmentMapper $pastoralAttachmentMapper
      * @param RoleMapper $roleMapper
      * @param UserMapper $userMapper
@@ -147,6 +152,7 @@ class Controller extends Base
         UserMapper $userMapper,
         PastoralAccessMapper $pastoralAccessMapper,
         PastoralGroupMapper $pastoralGroupMapper,
+        PastoralGroupMemberMapper $pastoralGroupMemberMapper,
         ErrorMapper $errorMapper
     ) {
         $this->config = $config;
@@ -155,6 +161,7 @@ class Controller extends Base
         $this->pastoralAuditMapper = $pastoralAuditMapper;
         $this->pastoralAccessMapper = $pastoralAccessMapper;
         $this->pastoralGroupMapper = $pastoralGroupMapper;
+        $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
         $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
         $this->pastoralCategoryMapper = $pastoralCategoryMapper;
         $this->pastoralCommentMapper = $pastoralCommentMapper;
@@ -175,10 +182,11 @@ class Controller extends Base
     public function getIndex()
     {
         $this->getResponse()->content->set([
-            'template' => '@pastoral/index.twig',
+                'template' => '@pastoral/index.twig',
             'data' => [
                 'recentStudents'    => $this->pastoralAuditMapper->findRecentStudents(),
                 'recentDashboard'   => $this->pastoralMapper->findRecentDashboard(),
+                'groups'            => $this->pastoralGroupMemberMapper->findByColumn('user_id', $this->getUser()->getId())
             ]
         ]);
     }
