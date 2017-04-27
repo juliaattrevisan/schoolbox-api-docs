@@ -1,6 +1,9 @@
 <?php
 
 /* REST interface for user CRUD operations */
+use Schoolbox\CampusMapper;
+use Schoolbox\RoleMapper;
+
 header("Content-Type: text/xml");
 
 require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
@@ -43,59 +46,55 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             exit($response);
         }
 
-        $user = array(
-            'username'           => $_GET['username'],
-            'title'              => $_GET['title'],
-            'firstname'          => $_GET['firstname'],
-            'lastname'           => $_GET['lastname'],
-            'synergy_id'         => $_GET['database_id']==''?'NULL':$_GET['database_id'],
-            'local_email'        => $_GET['local_email'],
-            'alt_email'          => $_GET['alt_email'],
-            'position_title'     => $_GET['position_title'],
-            'password'           => $_GET['password'],
-            'su'                 => $_GET['su'],
-            'year'               => $_GET['year'] == ''?'NULL':$_GET['year'],
-            'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0,
-            'hide_contacts'      => $_GET["hide_contacts"] == 1?1:0,
-            'hide_timetable'     => $_GET["hide_timetable"] == 1?1:0,
-            'enabled'            => 1,
-        );
+        $user = $userMapper->createModel()
+            ->setUsername($_GET['username'])
+            ->setTitle($_GET['title'])
+            ->setFirstname($_GET['firstname'])
+            ->setLastname($_GET['lastname'])
+            ->setExternalId($_GET['database_id'] == '' ? null : $_GET['database_id'])
+            ->setLocalEmail($_GET['local_email'])
+            ->setAltEmail($_GET['alt_email'])
+            ->setPositionTitle($_GET['position_title'])
+            // Figure out password setting
+            ->setPassword($_GET['password'])
+            ->setSuperuser($_GET['su'])
+            ->setYear($_GET['year'] == '' ? null : $_GET['year'])
+            ->setEportfolioEnable((bool)$_GET['eportfolio_enabled'])
+            ->setHideContacts((bool)$_GET['hide_contacts'])
+            ->setHideTimetable((bool)$_GET['hide_timetable'])
+            ->setEnabled(true)
+            ->setRole(RoleMapper::getInstance()->findById($_GET['group']))
+            ->setDisplayGradeGraph($_GET['display_grade_graph'])
+            ->setCampusCollection(
+                CampusMapper::getInstance()->findByColumn(
+                    'id',
+                    array_map('trim', explode(',', $_GET['campus']))
+                )
+            )
+        ;
 
-        // convert campus names into ids
-        $user['group_id'] = $user_handler->getGroupID($_GET['group']);
-
-        $campus_arr = explode(',', trim($_GET['campus']));
-
-        if (!empty($campus_arr)) {
-            foreach ($campus_arr as &$campus) {
-                $user['campus'][] = $user_handler->getCampusID(trim($campus));
-            }
-
-            $user['defaultCampus'] = $user_handler->getCampusID($_GET['default_campus']);            
-        }
-
-        $id = $user_handler->create($user);
-        
-        if (!is_numeric($id)) {
-            $response = "<?xml version='1.0' standalone='yes'?>
-                         <response>
-                            <code>500</code>
-                            <message>The user could not be created.</message>
-                         </response>";
-
-            echo $response;
-        } else {
+        try {
+            $userMapper->save($user);
             $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
                             <code>201</code>
                             <message>User successfully created.</message>
                             <user>
-                                <user_id>$id</user_id>
+                                <user_id>{$user->getId()}</user_id>
                             </user>
                          </response>";
 
-            echo $response;
+        } catch (\Exception $e) {
+            $message  = Scrub::xml($e->getMessage());
+            $response = "<?xml version='1.0' standalone='yes'?>
+                         <response>
+                            <code>500</code>
+                            <message>The user could not be created. (Message: {$message})</message>
+                         </response>";
         }
+
+        // TODO add response codes
+        echo $response;
     }
 
     /* Update operation */
