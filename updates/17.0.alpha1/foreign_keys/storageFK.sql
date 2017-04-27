@@ -17,6 +17,8 @@ DELETE submission_box_file FROM submission_box_file
 WHERE storage.hash is NULL;
 
 ALTER TABLE `submission_box_file`
+  CHANGE COLUMN `storage_id` `storage_id` VARCHAR(100) CHARACTER SET utf8 NOT NULL ;
+ALTER TABLE `submission_box_file`
   ADD CONSTRAINT `fk_submission_box_file_storage_hash`
 FOREIGN KEY (`storage_id`)
 REFERENCES `storage` (`hash`)
@@ -55,6 +57,8 @@ WHERE `storage`.hash is null;
 
 
 ALTER TABLE `news_items`
+  CHANGE COLUMN `item_image` `item_image` VARCHAR(100) CHARACTER SET utf8 NULL;
+ALTER TABLE `news_items`
   ADD INDEX `fk_news_items_image_hash_idx` (`item_image` ASC);
 ALTER TABLE `news_items`
   ADD CONSTRAINT `fk_news_items_image_hash`
@@ -66,7 +70,7 @@ REFERENCES `storage` (`hash`)
 
 ALTER TABLE `file`
   CHANGE COLUMN `category` `category` INT(5) UNSIGNED NULL DEFAULT NULL,
-  CHANGE COLUMN `hash` `hash` VARCHAR(40) NULL ;
+  CHANGE COLUMN `hash` `hash` VARCHAR(100) CHARACTER SET utf8 NULL ;
 
 
 DELETE file FROM file LEFT JOIN folder ON file.category = folder.id WHERE folder.id is null;
