@@ -234,4 +234,24 @@ class Model extends AbstractUnit
         $this->dueDate = $dueDate;
         return $this;
     }
+
+    /**
+     * This is an implementation context
+     *
+     * @return false
+     */
+    public function isSpecificationContext()
+    {
+        return false;
+    }
+
+    /**
+     * This is an implementation context
+     *
+     * @return true
+     */
+    public function isImplementationContext()
+    {
+        return true;
+    }
 }

@@ -554,4 +554,24 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         $this->assessables->replaceWith($assessables);
         return $this;
     }
+
+    /**
+     * Folders are an implementation context
+     *
+     * @return false
+     */
+    public function isSpecificationContext()
+    {
+        return false;
+    }
+
+    /**
+     * Folders are an implementation context
+     *
+     * @return true
+     */
+    public function isImplementationContext()
+    {
+        return true;
+    }
 }

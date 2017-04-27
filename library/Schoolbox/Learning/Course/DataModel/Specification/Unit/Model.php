@@ -108,4 +108,24 @@ class Model extends AbstractUnit
         $this->unitImplementations = $unitImplementations;
         return $this;
     }
+
+    /**
+     * This is a specification context
+     *
+     * @return true
+     */
+    public function isSpecificationContext()
+    {
+        return true;
+    }
+
+    /**
+     * This is a specification context
+     *
+     * @return false
+     */
+    public function isImplementationContext()
+    {
+        return false;
+    }
 }

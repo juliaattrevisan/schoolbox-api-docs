@@ -9,11 +9,12 @@
  */
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
-$groupHandler = new Group();
 $userHandler = new User();
 
 /**
@@ -45,22 +46,33 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
-if (!$assessment->isParticipant($_SESSION['user']) && $groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE) {
-	error(19);
-}
+$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+$assessmentFolder = $assessment->getBaseContext()->getFolder();
+$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
 
-/* Check if this assessment can be started
- */
-if ($assessHandler->isExpired($assess['assess_id'])) {
-	error(120);
-}
+if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
+        error(19);
+    }
 
-/* Participants should be blocked from attempting if it hasn't started,
- * but authors should be able to test out their content
- */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
-	error(143);
+    // I can't do this if not a participant
+    if (!$assessment->isParticipant($_SESSION['user'])) {
+        error(19);
+    }
+
+    // I can't attempt this if it has expired
+    if ($assessHandler->isExpired($assess['assess_id'])) {
+        error(120);
+    }
+
+    // I can't attempt this if it isn't open
+    if (!$assessHandler->isOpen($assess)) {
+        error(143);
+    }
+
+} else {
+    // I can do whatever I want
 }
 
 /* Check if you have completed an assessment already
@@ -76,13 +88,16 @@ $attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $use
  * Otherwise start a new attempt if there is a limit
  */
 if (!$attempt) {
-	if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
-		/* Clear and exit when you attempt to make more than is allowed
-		 */
-		error(146);
-	}
-	else {
-		$attemptId = $attemptHandler->start($userId, $this->arg[0]);
+    /* Clear and exit when you attempt to make more than is allowed
+     * (Teachers may preview this quiz as many attempts as they want)
+     */
+    if ($accessLevel < UserAccess::ACCESS_WRITE
+        && ($assess['max_attempts'] > 0)
+        && ($numAttempts + 1 > $assess['max_attempts'])
+    ) {
+        error(146);
+    } else {
+        $attemptId = $attemptHandler->start($userId, $this->arg[0]);
         // Assign all questions on quiz init, not starting a section.
         // This ensures that a response is created for all answers,
         // so they contribute to total mark. (SB-7928)

@@ -10,6 +10,9 @@
  */
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -17,7 +20,6 @@ $questionHandler = new Assess_Question();
 $factory = new Assess_Factory();
 $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
-$groupHandler = new Group();
 
 /**
  * @var SitePage $this
@@ -55,22 +57,33 @@ if (!$section) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
-if (!$assessment->isParticipant($_SESSION['user'])) {
-    error(19);
-}
+$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+$assessmentFolder = $assessment->getBaseContext()->getFolder();
+$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
 
-/* Check if this assessment can be started
- */
-if ($assessHandler->isExpired($assess['assess_id'])) {
-    error(120);
-}
+if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
+        error(19);
+    }
 
-/* Participants should be blocked from attempting if it hasn't started,
- * but authors should be able to test out their content
- */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-    error(143);
+    // I can't do this if not a participant
+    if (!$assessment->isParticipant($_SESSION['user'])) {
+        error(19);
+    }
+
+    // I can't attempt this if it has expired
+    if ($assessHandler->isExpired($assess['assess_id'])) {
+        error(120);
+    }
+
+    // I can't attempt this if it isn't open
+    if (!$assessHandler->isOpen($assess)) {
+        error(143);
+    }
+
+} else {
+    // I can do whatever I want
 }
 
 if (!$questionHandler->numQuestions($assess['assess_id'])) {

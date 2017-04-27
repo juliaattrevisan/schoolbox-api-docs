@@ -12,6 +12,7 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -20,7 +21,6 @@ use Schoolbox\Permission\Access\Access;
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
-$groupHandler = new Group();
 $userHandler = new User();
 
 /**
@@ -51,67 +51,71 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
-if (!$assessment->isParticipant($_SESSION['user']) && $groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE) {
-    // Show quiz preview to someone who's none of above, but has read access to the folder
-    $assessmentFolder = $assessment->getBaseContext()->getFolder();
-    if (Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]) == UserAccess::ACCESS_READ) {
-        $readOnly = true;
-    }
-    else {
+$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+$assessmentFolder = $assessment->getBaseContext()->getFolder();
+$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assessmentFolder->getId()]);
+$readOnly         = false;
+
+if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    // I can't attempt a spec assessment
+    if ($assessment->isSpecification()) {
         error(19);
     }
-}
 
-/* Check if this assessment can be started
- */
-if ($assessHandler->isExpired($assess['assess_id'])) {
-    error(120);
-}
-
-/* Participants should be blocked from attempting if it hasn't started,
- * but authors should be able to test out their content
- */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
-    error(143);
-}
-
-/* Check if you have completed an assessment already
- *
- * Set up Attempt vars
- */
-$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
-
-$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
-$attemptStartTime = strtotime($attempt['start']);
-$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
-$attemptEndTime = $attemptStartTime + $assess['duration'];
-
-/* If there is a resumable attempt, resume it.
- * Otherwise start a new attempt if there is a limit
- */
-if (!$attempt) {
-    /* Clear and exit when you attempt to make more than is allowed
-      */
-    if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
-        error(146);
+    // I can't do this if not a participant
+    // However, I can see a preview if I can read this folder
+    if (!$assessment->isParticipant($_SESSION['user'])) {
+        if ($accessLevel == UserAccess::ACCESS_READ) {
+            $readOnly = true;
+        } else {
+            error(19);
+        }
     }
-}
 
-/* Check if Attempt ran out of time
- * If it did, give the student another attempt, if they have one.
- */
-if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
-    // Close off the last attempt first (at the time it would have ended naturally)
-    $closeTime = new Alaress_Date_Format($attemptEndTime, 'U');
-    $attemptHandler->update(array(
-        'attempt_id' => $attempt['attempt_id'],
-        'finish'     => $closeTime->getDatabase(),
-    ));
-    $numAttempts++;
-    if (($assess['max_attempts'] > 0) && ($numAttempts > $assess['max_attempts'])) {
-        error(122);
+    // I can't attempt this if it has expired
+    if ($assessHandler->isExpired($assess['assess_id'])) {
+        error(120);
     }
+
+    // I can't attempt this if it isn't open
+    if (!$assessHandler->isOpen($assess)) {
+        error(143);
+    }
+
+    // I can't start this if I have too many attempts
+    $numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
+    $attempt     = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
+    if ($attempt) {
+        // Check if Attempt ran out of time
+        // If it did, give the student another attempt, if they have one.
+        $attemptStartTime     = strtotime($attempt['start']);
+        $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
+        $attemptEndTime       = $attemptStartTime + $assess['duration'];
+        if (($attemptTimeRemaining < 0)
+            && ($attemptStartTime > 0)
+            && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)
+        ) {
+            // Close off the last attempt first (at the time it would have ended naturally)
+            $closeTime = new Alaress_Date_Format($attemptEndTime, 'U');
+            $attemptHandler->update(array(
+                'attempt_id' => $attempt['attempt_id'],
+                'finish'     => $closeTime->getDatabase(),
+            ));
+
+            // Now am I out of attempts?
+            if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
+                error(122);
+            }
+        }
+    } else {
+        // Am I already out of attempts?
+        if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
+            error(146);
+        }
+    }
+
+} else {
+    // I can do whatever I want
 }
 
 /* Continue once you get past checks
@@ -122,13 +126,11 @@ $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['cat
 $allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
 $allSections = $sectionHandler->getList($assess['assess_id']);
 
-$assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-$assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
-
 $this->setFile(TEMPLATE_content, 'assess/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
 $this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
+$this->setBlock(TEMPLATE_content, 'has_assess_due', 'has_assess_due_block');
 
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
@@ -137,8 +139,8 @@ $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
-    'ASSESS_START' => $assessStartDate->getShort(),
-    'ASSESS_FINISH' => $assessFinishDate->getShort(),
+    'ASSESS_START' => $assessment->getOpenAt()->isNull() ? '' : $assessment->getOpenAt()->getShort(),
+    'ASSESS_FINISH' => $assessment->getCloseAt()->isNull() ? '' : $assessment->getCloseAt()->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
     'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
     'ASSESS_AUTHOR_ID' => $author->getId(),
@@ -149,6 +151,12 @@ $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
     'READ_ONLY' => $readOnly,
 ));
+
+if ($assessment->isImplementation()) {
+    $this->parse('has_assess_due_block', 'has_assess_due');
+} else {
+    $this->setVar('has_assess_due_block', '');
+}
 
 $assess['description'] = trim($assess['description']);
 
