@@ -1,7 +1,8 @@
 <?php
 /**
- * Author: andrewryantech@gmail.com
- * Created: 2/04/17 3:15 PM
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 
 namespace Schoolbox\Filter\Filters\Assessment\Project;

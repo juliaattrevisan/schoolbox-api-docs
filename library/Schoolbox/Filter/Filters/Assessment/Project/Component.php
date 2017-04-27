@@ -79,7 +79,7 @@ class Component extends AbstractFilterComponent
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
 
-        // A project will be available if it matches any abstract key.
+        // A project will be available if it matches any abstract key. (only available projects were injected from factory)
         // A project will be checked if any matching abstract project defaults were checked
 
         foreach ($this->projects as $project) {
