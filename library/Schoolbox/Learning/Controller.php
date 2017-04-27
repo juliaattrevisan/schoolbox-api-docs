@@ -524,7 +524,7 @@ class Controller extends Base
         // * instructors (always)
         // * students (if the config var is on, and their personal grade average setting is on)
         // We no longer show the grade graph at all if there's no comparative grades.
-        $canSeeGraph = $isInstructor || ($viewee->getDisplayGradeAverage() && $this->getConfigLoader()->get('display_grade_graph'));
+        $canSeeGraph = $isInstructor || ($viewee->getDisplayGradeGraph() && $this->getConfigLoader()->get('display_grade_graph'));
 
         // Show the Current Grade Average for instructors and for students if the config var is on
         $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');

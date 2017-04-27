@@ -184,7 +184,7 @@ class Controller extends Base
     public function getInsert()
     {
         $user = $this->userMapper->createModel()
-            ->setDisplayGradeAverage($this->getConfigLoader()->get('display_grade_average'));
+            ->setDisplayGradeGraph($this->getConfigLoader()->get('display_grade_average'));
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
@@ -418,7 +418,7 @@ class Controller extends Base
         $user->setLocalEmail(!empty($post['local_email']));
         $user->setUseInternalMail(!empty($post['mail_handler']));
         $user->setWebmail(!empty($post['webmail']));
-        $user->setDisplayGradeAverage(!empty($post['display_grade_average']));
+        $user->setDisplayGradeGraph(!empty($post['display_grade_average']));
         $user->setSuperuser(isset($post['superuser']));
         $user->setUsername($post['modusername']);
 

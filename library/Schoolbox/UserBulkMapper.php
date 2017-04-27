@@ -396,7 +396,7 @@ class UserBulkMapper extends UserMapper
         /* Update display grade average settings
          */
         if ($displayGradeAverage != $this->getUnchanged()) {
-            $user->setDisplayGradeAverage($displayGradeAverage);
+            $user->setDisplayGradeGraph($displayGradeAverage);
         }
 
         $this->save($user);

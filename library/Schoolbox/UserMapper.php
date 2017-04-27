@@ -69,7 +69,7 @@ class UserMapper extends Mapper
         $this->uses('hide_contacts', self::TYPE_BOOLEAN);
         $this->uses('hide_timetable', self::TYPE_BOOLEAN);
         $this->uses('hide_notifications_tray', self::TYPE_BOOLEAN);
-        $this->uses('display_grade_average', self::TYPE_BOOLEAN);
+        $this->uses('display_grade_graph', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->hasSoftDeleteDateField('deleted_at');
 
@@ -145,8 +145,8 @@ class UserMapper extends Mapper
      */
     public function setDefaultDisplayGradeAverage(User $model)
     {
-        if ($model->getDisplayGradeAverage() === null) {
-            $model->setDisplayGradeAverage((bool)$this->getConfigLoader()->get('display_grade_average'));
+        if ($model->getDisplayGradeGraph() === null) {
+            $model->setDisplayGradeGraph((bool)$this->getConfigLoader()->get('display_grade_average'));
         }
         return true;
     }
