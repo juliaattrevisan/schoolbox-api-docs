@@ -11,14 +11,13 @@ namespace Schoolbox\Picker\DateTime;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \External_Timetable;
 use \Config;
 use Alaress_Date_Format;
 use Schoolbox\Role;
@@ -34,8 +33,11 @@ class Controller extends Base
 
     /**
      * Controller constructor.
-     * @param UserMapper $userMapper
-     * @param TermMapper $termMapper
+     *
+     * @param UserMapper            $userMapper
+     * @param TermMapper            $termMapper
+     * @param FolderMapper          $folderMapper
+     * @param UserAccessMapper      $userAccessMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
      */
     public function __construct(
@@ -56,8 +58,12 @@ class Controller extends Base
 
     /**
      * Return the HTML picker for injecting into modal
-     * @param int $id The ID number of the javascript picker
-     * @param string $value Default date to display
+     *
+     * @param string $type    event or duework
+     * @param string $element input field that calls a datepicker
+     * @param int    $id      The ID number of the javascript picker
+     * @param string $value   Default date to display
+     * @throws \Exception
      */
     public function getPicker($type, $element, $id, $value) {
         $timetable = $this->getUserTimetable();
@@ -66,7 +72,7 @@ class Controller extends Base
             $date = new Alaress_Date_Format($value, array('Y-m-d g:ia', 'Y-m-d'));
         }
         catch (\Exception $e) {
-            var_dump($e->getMessage());
+            throw $e;
         }
 
         // Don't bother calculating if the timetable is offline, we'll only display the calendar
@@ -94,12 +100,12 @@ class Controller extends Base
                 $timetableCycles = ceil(($term->getDuration()+$termStartDay-1)/$timetableDay);
                 $selectedCycle = ceil(($term->getDuration($date)+$termStartDay-1)/$timetableDay);
 
-                $timetableVars['byCampus'][$campus->getId()]['id'] = $campus->getId();
-                $timetableVars['byCampus'][$campus->getId()]['termStartDay'] = $termStartDay;
-                $timetableVars['byCampus'][$campus->getId()]['termLastDay'] = $termLastDay;
-                $timetableVars['byCampus'][$campus->getId()]['selectedDay'] = $selectedDay;
+                $timetableVars['byCampus'][$campus->getId()]['id']              = $campus->getId();
+                $timetableVars['byCampus'][$campus->getId()]['termStartDay']    = $termStartDay;
+                $timetableVars['byCampus'][$campus->getId()]['termLastDay']     = $termLastDay;
+                $timetableVars['byCampus'][$campus->getId()]['selectedDay']     = $selectedDay;
                 $timetableVars['byCampus'][$campus->getId()]['timetableCycles'] = $timetableCycles;
-                $timetableVars['byCampus'][$campus->getId()]['selectedCycle'] = $selectedCycle;
+                $timetableVars['byCampus'][$campus->getId()]['selectedCycle']   = $selectedCycle;
             }
         }
 
@@ -130,7 +136,9 @@ class Controller extends Base
 
     /**
      * Converts schoolbox config date and time formats info flatpickr friendly
-     * @param $format
+     *
+     * @param string $format
+     * @return string
      */
     public function convertFormat($format){
         $formatMap = array(
@@ -147,6 +155,8 @@ class Controller extends Base
 
     /**
      * Return an array of all timetables and campus data
+     *
+     * @return array
      */
     public function getUserTimetable() {
         $user = $this->getUser();
@@ -176,6 +186,8 @@ class Controller extends Base
 
     /**
      * Return all terms
+     *
+     * @return Collection
      */
     public function getTerms() {
         $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
@@ -184,6 +196,7 @@ class Controller extends Base
 
     /**
      * Return a first timetable day for the first monday of a term
+     *
      * @param $campus
      * @param $term
      * @return array
@@ -212,6 +225,12 @@ class Controller extends Base
 
     /**
      * Call getByTimetableDay to return events for timetable day
+     *
+     * @param int $campusId
+     * @param int $termId
+     * @param int $cycle timetable cycle or week (calculated from the beginning of the term)
+     * @param int $day timetable day number
+     * @return Collection
      */
     public function getEventsByTimetableDay ($campusId, $termId, $cycle, $day) {
         return $this->getByTimetableDay($campusId, $termId, $cycle, $day);
@@ -219,6 +238,14 @@ class Controller extends Base
 
     /**
      * Return a list of events or assessments due for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
+     *
+     * @param int $campusId
+     * @param int $termId
+     * @param int $cycle timetable cycle or week (calculated from the beginning of the term)
+     * @param int $day timetable day number
+     * @param string $folder class code
+     * @param boolean $dateonly just returns date
+     * @return Collection|json
      */
     public function getByTimetableDay($campusId, $termId, $cycle, $day, $folder = 0, $dateOnly = false) {
         $user = $this->getUser();
@@ -249,6 +276,17 @@ class Controller extends Base
 
     }
 
+
+    /**
+     * Get a date for a timetable day
+     *
+     * @param $campusId
+     * @param $termId
+     * @param $cycle
+     * @param $day
+     *
+     * @return Collection|json
+     */
     public function getTimetableDate($campusId, $termId, $cycle, $day) {
 
         return $this->getByTimetableDay($campusId, $termId, $cycle, $day, '', true);
@@ -256,6 +294,11 @@ class Controller extends Base
 
     /**
      * Converting timetable cycle and day into a calendar date
+     *
+     * @param object $campus
+     * @param object $term
+     * @param int $cycle
+     * @param int $day
      * @return Alaress_Date_Format
      */
     public function getDateForTimetableDay($campus, $term, $cycle, $day) {
@@ -273,6 +316,7 @@ class Controller extends Base
 
     /**
      * Return JSON list of all appointments for a given date
+     *
      * @param Alaress_Date_Format $date
      */
     public function getByDate(Alaress_Date_Format $date)
@@ -313,15 +357,12 @@ class Controller extends Base
 
     /**
      * Return JSON list of students and how much due work that have for a given date and class code(s)
+     *
      * @param Alaress_Date_Format $date (Date we are interested in)
      * @param string $classCode (CSV list of class codes)
      */
     public function getDueByDate(Alaress_Date_Format $date, $folder)
     {
-        // Test URL with assignments due:
-        // http://192.168.36.10/picker/datetime/date/01-07-2018/class/CH123
-
-        // This will be our return array
 
         //Don't show other students' due work to anyone but staff
         if(!$this->getUser()->getRole()->isStaff()) {
@@ -360,7 +401,6 @@ class Controller extends Base
         $start = $date->startOfDay();
         $end = clone $start;
         $end = $end->endOfDay();
-
 
         foreach ($studentList as $studentCurrent) {
 
@@ -527,5 +567,4 @@ class Controller extends Base
     public function getTimetableHandler() {
         return $this->timetableHandler;
     }
-
 }
