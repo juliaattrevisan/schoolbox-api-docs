@@ -903,7 +903,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $boxId  = $box->getId();
         $userId = $user->getId();
         $stmt   = $this->database->prepare(
-            "SELECT id FROM `student_submission` WHERE box_id=? AND owner=? AND draft IS FALSE"
+            "SELECT id FROM `student_submission` WHERE box_id=? AND owner=?"
         );
         $stmt->execute(array($boxId, $userId));
         $submitted = ($stmt->rowCount() > 0);

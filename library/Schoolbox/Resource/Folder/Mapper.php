@@ -1131,6 +1131,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if (!isset($collection[$id])) {
                 $collection[$id] = $this->hydrate($row, 'c');
             }
+
             $folder = $collection[$id];
 
             // Does this folder have a homepage, and we've not attached it yet?

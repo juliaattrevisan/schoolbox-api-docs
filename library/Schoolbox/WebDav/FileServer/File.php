@@ -1,38 +1,57 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: jleckie
- * Date: 3/21/12
- * Time: 9:27 PM
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Permission\Access\UserAccess;
+namespace Schoolbox\WebDav\FileServer;
+
+use Sabre\DAV;
+use Schoolbox\File\Exception as FileException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\User;
+use Schoolbox\WebDav\HasUserSource;
 
-class DAV_File extends Sabre\DAV\File
+/**
+ * A WebDAV node that represents a file within the Schoolbox file system.
+ */
+class File extends DAV\File
 {
+    use HasUserSource;
 
-    /** @var Schoolbox\Resource\File\Model */
+    /** @var FileModel */
     private $file;
 
     /**
-     * @var Schoolbox\Resource\File\Mapper
+     * @var FileMapper
      */
     private $fileMapper;
 
     /**
      * A folder mapper
      *
-     * @var Schoolbox\Resource\Folder\Mapper
+     * @var FolderMapper
      */
     private $folderMapper;
 
     /**
+     * A storage mapper
+     *
+     * @var StorageMapper
+     */
+    private $storageMapper;
+
+    /**
      * Folder where file is located
      *
-     * @var Schoolbox\Resource\Folder\Model
+     * @var FolderModel
      */
     private $folder;
 
@@ -44,14 +63,28 @@ class DAV_File extends Sabre\DAV\File
     private $accessor;
 
     /**
-     * @param string $path
+     * Constructor
+     *
+     * @param               $path
+     * @param callable      $userSource
+     * @param FolderMapper  $folderMapper
+     * @param FileMapper    $fileMapper
+     * @param StorageMapper $storageMapper
+     * @param Access        $accessor
      */
-    public function __construct($path)
-    {
-        $this->setFileMapper(FileMapper::getInstance());
-        $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setAccessor(Access::getInstance());
-
+    public function __construct(
+        $path,
+        callable $userSource,
+        FolderMapper $folderMapper,
+        FileMapper $fileMapper,
+        StorageMapper $storageMapper,
+        Access $accessor
+    ) {
+        $this->setFolderMapper($folderMapper);
+        $this->setFileMapper($fileMapper);
+        $this->setStorageMapper($storageMapper);
+        $this->setAccessor($accessor);
+        $this->setUserSource($userSource);
         $this->setFileFromPath($path);
     }
 
@@ -69,16 +102,16 @@ class DAV_File extends Sabre\DAV\File
      * Rename file
      *
      * @param string $newName
-     * @throws Sabre\DAV\Exception\Forbidden
+     * @throws DAV\Exception\Forbidden
      */
     public function setName($newName)
     {
-        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
             $this->getFile()->setFilename(pathinfo($newName, PATHINFO_FILENAME));
             $this->getFileMapper()->save($this->getFile());
         }
         else {
-            throw new Sabre\DAV\Exception\Forbidden('Permission denied to modify file');
+            throw new DAV\Exception\Forbidden('Permission denied to modify file');
         }
     }
 
@@ -95,29 +128,30 @@ class DAV_File extends Sabre\DAV\File
     /**
      * Modify file
      * @param resource $data
-     * @throws Sabre\DAV\Exception\Forbidden
+     * @throws DAV\Exception\Forbidden
      */
     public function put($data)
     {
-        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
 
             try {
                 // accept the data as a new storage
-                $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream(
-                    $this->getFile()->getBasename(), $data, false
+                $storage = $this->getStorageMapper()->acceptStream(
+                    $this->getFile()->getBasename(),
+                    $data,
+                    false
                 );
 
                 // point this file to the new content
-
                 $this->getFile()->setStorage($storage);
                 $this->getFileMapper()->save($this->getFile());
 
-            } catch (Schoolbox\File\Exception $e) {
+            } catch (FileException $e) {
                 // ...? noop? throw?
             }
         }
         else {
-            throw new Sabre\DAV\Exception\Forbidden('Permission denied to modify file');
+            throw new DAV\Exception\Forbidden('Permission denied to modify file');
         }
     }
 
@@ -142,15 +176,15 @@ class DAV_File extends Sabre\DAV\File
 
     /**
      * @return void
-     * @throws Sabre\DAV\Exception\Forbidden
+     * @throws DAV\Exception\Forbidden
      */
     public function delete()
     {
-        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
+        if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
             $this->getFileMapper()->delete($this->getFile());
         }
         else {
-            throw new Sabre\DAV\Exception\Forbidden('Permission denied to delete file');
+            throw new DAV\Exception\Forbidden('Permission denied to delete file');
         }
     }
 
@@ -212,7 +246,7 @@ class DAV_File extends Sabre\DAV\File
 
 
     /**
-     * @return \Schoolbox\Resource\File\Model
+     * @return FileModel
      */
     private function getFile()
     {
@@ -221,7 +255,7 @@ class DAV_File extends Sabre\DAV\File
 
 
     /**
-     * @param Schoolbox\Resource\File\Mapper $fileMapper
+     * @param FileMapper $fileMapper
      * @return $this
      */
     private function setFileMapper($fileMapper)
@@ -232,7 +266,7 @@ class DAV_File extends Sabre\DAV\File
 
 
     /**
-     * @return Schoolbox\Resource\File\Mapper
+     * @return FileMapper
      */
     private function getFileMapper()
     {
@@ -243,7 +277,7 @@ class DAV_File extends Sabre\DAV\File
     /**
      * Set folder mapper
      *
-     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param FolderMapper $folderMapper
      */
     private function setFolderMapper($folderMapper)
     {
@@ -254,7 +288,7 @@ class DAV_File extends Sabre\DAV\File
     /**
      * Get folder mapper
      *
-     * @return \Schoolbox\Resource\Folder\Mapper
+     * @return FolderMapper
      */
     private function getFolderMapper()
     {
@@ -262,7 +296,7 @@ class DAV_File extends Sabre\DAV\File
     }
 
     /**
-     * @return \Schoolbox\Resource\Folder\Model
+     * @return FolderModel
      */
     private function getFolder()
     {
@@ -270,7 +304,7 @@ class DAV_File extends Sabre\DAV\File
     }
 
     /**
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param FolderModel $folder
      */
     private function setFolder($folder)
     {
@@ -278,7 +312,7 @@ class DAV_File extends Sabre\DAV\File
     }
 
     /**
-     * @return \Schoolbox\Permission\Access\Access
+     * @return Access
      */
     private function getAccessor()
     {
@@ -286,12 +320,28 @@ class DAV_File extends Sabre\DAV\File
     }
 
     /**
-     * @param \Schoolbox\Permission\Access\Access $accessor
+     * @param Access $accessor
      */
     private function setAccessor($accessor)
     {
         $this->accessor = $accessor;
     }
 
+    /**
+     * @return StorageMapper
+     */
+    private function getStorageMapper()
+    {
+        return $this->storageMapper;
+    }
 
+    /**
+     * @param StorageMapper $storageMapper
+     * @return static
+     */
+    private function setStorageMapper($storageMapper)
+    {
+        $this->storageMapper = $storageMapper;
+        return $this;
+    }
 }

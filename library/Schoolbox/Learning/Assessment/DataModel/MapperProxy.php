@@ -474,25 +474,31 @@ class MapperProxy
      * This method loads participation for $student only, and does not load the
      * rubric grid.
      *
-     * @param User $student
-     * @param Term $term    Restrict results to this term
+     * @param User  $student
+     * @param Term  $term    Restrict results to this term
+     * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByStudent(User $student, Term $term)
+    public function findAllByStudent(User $student, Term $term, $options = [])
     {
-        return $this->findAllByStudentBetweenDates($student, $term->getStart(), $term->getActualFinish());
+        return $this->findAllByStudentBetweenDates($student, $term->getStart(), $term->getActualFinish(), $options);
     }
 
     /**
      * Finds all assessables that this student is participating in, between the given dates.
      *
      * @param User                $student
-     * @param Alaress_Date_Format $from If provided, fetch only assessables due on or after this date
-     * @param Alaress_Date_Format $to   If provided, fetch only assessables due on or before this date
+     * @param Alaress_Date_Format $from    If provided, fetch only assessables due on or after this date
+     * @param Alaress_Date_Format $to      If provided, fetch only assessables due on or before this date
+     * @param array               $options Any other query options
      * @return Collection|IAssessable[]
      */
-    public function findAllByStudentBetweenDates(User $student, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
-    {
+    public function findAllByStudentBetweenDates(
+        User $student,
+        Alaress_Date_Format $from = null,
+        Alaress_Date_Format $to = null,
+        $options = []
+    ) {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
@@ -506,7 +512,9 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $builder = $this->convertOptionsToPredicateBuilder(['due_after' => $from, 'due_before' => $to]);
+        $options['due_after']  = $from;
+        $options['due_before'] = $to;
+        $builder = $this->convertOptionsToPredicateBuilder($options);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.

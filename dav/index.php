@@ -6,11 +6,40 @@
  * time: 9:56 pm
  */
 
-require_once dirname(__FILE__) . '/../library/Bootstrap.php';
+use Alaress\Application\Kernel;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\MapperFactory;
+use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
+use Schoolbox\WebDav\NameGenerator as WebDavNameGenerator;
+use Schoolbox\WebDav\SubjectServer\Server as WebDavSubjectList;
 
-include dirname(__FILE__) . '/../library/Session.php';
+/** @var Kernel $kernel */
+$kernel = require_once __DIR__ . '/../library/Bootstrap.php';
 
-$publicdir = new DAV_Folder('');
+/** @var WebDavFolder $publicdir */
+/** @var MapperFactory $mapperFactory */
+$mapperFactory = $kernel->get('mapperFactory');
+$userSource    = $kernel->getDependencyInjector()->lazyGet('user');
+$publicdir = (new WebDavFolder(
+    '',
+    $userSource,
+    $mapperFactory->get(\Schoolbox\Resource\Folder\Mapper::class),
+    $mapperFactory->get(\Schoolbox\Resource\File\Mapper::class),
+    $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
+    $mapperFactory->get(\Schoolbox\Permission\Access\Access::class)
+))->addSubjectList(
+    new WebDavSubjectList(
+        'My Subjects',
+        $userSource,
+        $kernel->get('assessmentDataSource'),
+        $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
+        $kernel->get('submissionDataSource'),
+        $mapperFactory->get(ErrorMapper::class),
+        $mapperFactory->get(TermMapper::class)->findForToday(),
+        new WebDavNameGenerator()
+    )
+);
 
 $server = new Sabre\DAV\Server($publicdir);
 $plugin = new Sabre\DAV\Browser\Plugin();
