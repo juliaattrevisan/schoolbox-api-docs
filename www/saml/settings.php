@@ -59,13 +59,13 @@ $settings->authncontextComparison = Config::get('saml_auth_comparison');
 function idpMetadata() {
     try {
         $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
+        $idpMetadataUrl = $url->toString();
     } catch (Exception $e) {
         /*
          * Unable to use URL provided, ignore IDP metadata
          */
         return false;
     }
-    $idpMetadataUrl = $url->toString();
 
     $cache = new Alaress_Saml_Cache();
 
