@@ -33,9 +33,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
 
     /* Create operation */
     if ($action == 'create') {
-        $duplicate = $user_handler->getByUsername($_GET['username']);
-
-        if (!empty($duplicate)) {
+        if ($userMapper->countByColumn('username', $_GET['username']) > 0) {
             $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
                             <code>409</code>
@@ -46,21 +44,21 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
         }
 
         $user = array(
-            'username'			 => $_GET['username'],
-            'title'				 => $_GET['title'],
-            'firstname'			 => $_GET['firstname'],
-            'lastname'			 => $_GET['lastname'],
-            'synergy_id'		 => $_GET['database_id']==''?'NULL':$_GET['database_id'],
-            'local_email'		 => $_GET['local_email'],
-            'alt_email'			 => $_GET['alt_email'],
-            'position_title'	 => $_GET['position_title'],
-            'password'			 => $_GET['password'],
-            'su'			 	 => $_GET['su'],
-            'year'		 		 => $_GET['year'] == ''?'NULL':$_GET['year'],
+            'username'           => $_GET['username'],
+            'title'              => $_GET['title'],
+            'firstname'          => $_GET['firstname'],
+            'lastname'           => $_GET['lastname'],
+            'synergy_id'         => $_GET['database_id']==''?'NULL':$_GET['database_id'],
+            'local_email'        => $_GET['local_email'],
+            'alt_email'          => $_GET['alt_email'],
+            'position_title'     => $_GET['position_title'],
+            'password'           => $_GET['password'],
+            'su'                 => $_GET['su'],
+            'year'               => $_GET['year'] == ''?'NULL':$_GET['year'],
             'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0,
             'hide_contacts'      => $_GET["hide_contacts"] == 1?1:0,
             'hide_timetable'     => $_GET["hide_timetable"] == 1?1:0,
-			'enabled'			 => 1
+            'enabled'            => 1,
         );
 
         // convert campus names into ids
@@ -183,9 +181,9 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             }
         }
 
-		if (is_numeric($_GET['enabled'])) {
-			$user['enabled'] = $_GET['enabled'] == 1 ? 1 : 0;
-		}
+        if (is_numeric($_GET['enabled'])) {
+            $user['enabled'] = $_GET['enabled'] == 1 ? 1 : 0;
+        }
 
         /* Update user and return result */
         if ($user_handler->update($user) === false) {
