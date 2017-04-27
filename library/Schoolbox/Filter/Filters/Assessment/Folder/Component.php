@@ -32,15 +32,6 @@ class Component extends AbstractFilterComponent
      */
     private $groups;
 
-    /**
-     * If non-null, override user's saved selections.
-     *
-     * This enables us to jump to page with filters and select filter options
-     *
-     * @var GenericCollection|Folder\Model[]|null
-     */
-    private $selectedFolders;
-
 
     /**
      * @param IFilterDefinition                           $definition
@@ -108,30 +99,6 @@ class Component extends AbstractFilterComponent
                 throw new \InvalidArgumentException("Unknown option key: {$option->getKey()}");
             }
         }
-        return $availableSelections;
-    }
-
-
-    /**
-     * If a specific folder is specified, select just that folder.
-     * Otherwise, fall back to user's saved settings.
-     *
-     * @param GenericCollection|Selection\Model[] $availableSelections
-     * @return GenericCollection|Selection\Model[]
-     */
-    protected function overlayUserSelections(GenericCollection $availableSelections)
-    {
-        // Use user's saved settings
-        if (null === $this->selectedFolders) {
-            return parent::overlayUserSelections($availableSelections);
-        }
-
-        // Just select the specified folder
-        $selectedKey = (string)$this->selectedFolder->getId();
-        foreach ($availableSelections as $key => $availableSelection) {
-            $availableSelection->setSelected($key === $selectedKey);
-        }
-
         return $availableSelections;
     }
 

@@ -48,7 +48,7 @@ class Definition extends AbstractFilterDefinition
      */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
-        // Nothing is selected, meaning filter is not applied
+        // No options checked
         return false;
     }
 
