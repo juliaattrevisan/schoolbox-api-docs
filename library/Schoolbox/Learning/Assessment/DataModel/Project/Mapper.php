@@ -20,6 +20,7 @@ use Schoolbox\UserMapper;
  * @method Model createModel($id=null)
  * @method Model findById($identifierValue)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection createCollection($contents = [])
  */
 class Mapper extends BaseMapper
 {
