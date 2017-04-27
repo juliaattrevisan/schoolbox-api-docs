@@ -8,26 +8,28 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Assessment\Course\Task\Completion;
-use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use \Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Schoolbox\Filter\Filters\WeightingType;
 
 /**
  * Optimised DB queries to build graph of Assessments a user needs to mark or chase
@@ -84,6 +86,12 @@ class PendingFactory
      * @var Folder[] $foldersCache
      */
     private $foldersCache = [];
+
+    /**
+     * Folders that the user has requested and we have confirmed they teach
+     * @var GenericCollection|Folder[]
+     */
+    private $selectedFolders;
 
     /**
      * Each Project requires an ID and Title. Indexed by assessment.id
@@ -162,9 +170,27 @@ class PendingFactory
     private $teacherCache;
 
     /**
-     * @var Term $term
+     * Not authenticated!! TODO - consider authenticating before inserting into this factory to avoid re-lookup
+     * @var Collection|int[]
      */
-    private $term;
+    private $selectedFolderIds;
+
+    /**
+     * Intentionally not a GenericCollection so we can insert NULL items
+     * @var Collection|WorkType\Model[]
+     */
+    private $workTypes;
+
+    /**
+     * Intentionally not a GenericCollection as it contains strings
+     * @var Collection|string[]
+     */
+    private $weightingTypes;
+
+    /**
+     * @var Collection|Term\Model[] $terms
+     */
+    private $terms;
 
     /**
      * Which User the Assessments produced by this factory relate to
@@ -202,11 +228,11 @@ class PendingFactory
     private $nullDate;
 
     /**
-     * Should we include Tasks in the results ? As opposed to just Quiz + DueWork ?
+     * The assessment types to include in the report
      *
-     * @var int
+     * @var Collection|string[]
      */
-    private $includeTasks;
+    private $assessmentTypes;
 
     /**
      * @var FolderMapper
@@ -222,33 +248,43 @@ class PendingFactory
 
 
     /**
-     * @param User                         $viewee
-     * @param IConnector                   $database
-     * @param \External_ClassInterface     $externalClass
-     * @param Term                         $term
-     * @param \Alaress_Date_Format         $toChaseLimit
-     * @param bool                         $includeTasks
-     * @param FolderMapper                 $folderMapper
+     * @param User                           $viewee
+     * @param IConnector                     $database
+     * @param \External_ClassInterface       $externalClass
+     * @param Collection|Term\Model[]        $terms             Only display assessments that are due in these terms
+     * @param Collection|WorkType\Model[]    $selectedWorkTypes
+     * @param Collection|string[]            $selectedWeightings
+     * @param Collection                     $selectedFolderIds Not yet authorised, need to confirm user has permission
+     * @param \Alaress_Date_Format           $toChaseLimit
+     * @param Collection|string[]            $selectedAssessmentTypes
+     * @param FolderMapper                   $folderMapper
      */
     public function __construct(
         User $viewee,
         IConnector $database,
         \External_ClassInterface $externalClass,
-        Term $term,
+        Collection $terms,
+        Collection $selectedWorkTypes,
+        Collection $selectedWeightings,
+        Collection $selectedFolderIds,
         \Alaress_Date_Format $toChaseLimit,
-        $includeTasks,
+        Collection $selectedAssessmentTypes,
         FolderMapper $folderMapper
 
     ) {
-        $this->viewee           = $viewee;
-        $this->database         = $database;
-        $this->externalClass    = $externalClass;
-        $this->assessmentsCache = new GenericCollection(IAssessable::class);  // TODO SA-2631
-        $this->term             = $term;
-        $this->toChaseLimit     = $toChaseLimit;
-        $this->nullDate         = new \Alaress_Date_NullDate();
-        $this->includeTasks     = $includeTasks;
-        $this->folderMapper     = $folderMapper;
+        $this->viewee            = $viewee;
+        $this->database          = $database;
+        $this->externalClass     = $externalClass;
+        $this->assessmentsCache  = new GenericCollection(IAssessable::class);  // TODO SA-2631
+        $this->terms             = $terms;
+        $this->workTypes         = $selectedWorkTypes;
+        $this->weightingTypes    = $selectedWeightings;
+        $this->selectedFolderIds = $selectedFolderIds;
+        $this->toChaseLimit      = $toChaseLimit;
+        $this->nullDate          = new \Alaress_Date_NullDate();
+        $this->assessmentTypes   = $selectedAssessmentTypes;
+        $this->folderMapper      = $folderMapper;
+        $this->selectedFolders   = $folderMapper->createCollection();
     }
 
 
@@ -403,6 +439,152 @@ class PendingFactory
 
 
     /**
+     * Build an assessment dueDate clause to inject into assessment-retrieval query
+     *
+     * @return string
+     */
+    private function buildDueDateClause()
+    {
+        // Is this filter being applied ?
+        if(0 === $this->terms->count()){
+            return ' TRUE ';
+        }
+
+        // Generate the dueDate filtering
+        $orParts = [];
+        foreach($this->terms as $term){
+            $andPart = " (a.due_date >= '{$term->getStart()->getDatabaseDate()}' ";
+            if(!$term->getActualFinish()->isNull()){
+                $andPart .= " AND a.due_date <= '{$term->getActualFinish()->getDatabaseDate()}' ";
+            }
+            $andPart .= ')';
+            $orParts[] = $andPart;
+        }
+        return implode(' OR ', $orParts);
+    }
+
+
+
+    /**
+     * Build an assessment type clause to inject into assessment-retrieval query
+     *
+     * @return string[]
+     * @throws \InvalidArgumentException If AssessmentType filter does not include one of Quiz|DueWork|Task
+     */
+    private function buildAssessmentTypeClause()
+    {
+        $selectClause = '';
+        $joinClause = '';
+        $idClauseArray = [];
+
+        // Task
+        if ($this->assessmentTypes->contains(AssessmentType::TYPE_TASK)) {
+            $selectClause .= ",
+                 tk.id                    AS 'tk.id',
+                 tk.requires_confirmation AS 'tk.requires_confirmation'
+            ";
+            $joinClause .= '
+                LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL
+            ';
+            $idClauseArray[] = 'tk.id IS NOT NULL';
+        }
+
+        // Quiz
+        if ($this->assessmentTypes->contains(AssessmentType::TYPE_QUIZ)) {
+            $selectClause .= ",
+                 qz.assess_id AS 'qz.id'
+            ";
+            $joinClause .= '
+                LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
+            ';
+            $idClauseArray[] = 'qz.assess_id IS NOT NULL';
+        }
+
+        // DueWork
+        if ($this->assessmentTypes->contains(AssessmentType::TYPE_DUE_WORK)) {
+            $selectClause .= ",
+                 dw.id        AS 'dw.id'
+            ";
+            $joinClause .= '
+                LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
+            ';
+            $idClauseArray[] = 'dw.id IS NOT NULL';
+        }
+
+        if(0 === count($idClauseArray)){
+            throw new \InvalidArgumentException('AssessmentType filter must include at least one from Quiz, DueWork or Task. None found');
+        }
+
+        return [$selectClause, $joinClause, implode(' OR ', $idClauseArray)];
+    }
+
+
+    /**
+     * Build the assessment.workType filter
+     * @return string
+     */
+    private function buildWorkTypeClause()
+    {
+        // If no workTypes selected, don't filter
+        $select = '';
+        $join   = '';
+        $where  = ' TRUE ';
+        if(0 === $this->workTypes->count()){
+            return [$select, $join, $where];
+        }
+
+
+        // A subset of workTypes is in play, apply filter
+        $select = ",
+                 wt.id                    AS 'wt.id'
+            ";
+        $join = '
+                LEFT JOIN lu_work_type wt         ON wt.id = a.work_type_id
+            ';
+        $where = [];
+
+        foreach($this->workTypes as $workType){
+            if(null === $workType){
+                $where[] = ' wt.id IS NULL ';
+            } else {
+                $where[] = " wt.id = {$workType->getId()} ";
+            }
+        }
+        return [$select, $join, implode(' OR ', $where)];
+    }
+
+    /**
+     * Build the assessment.weighting filter
+     * @return string
+     */
+    private function buildWeightingClause()
+    {
+        // If no weighting types are selected, don't filter
+        $select = '';
+        $where  = ' TRUE ';
+        if(0 === $this->weightingTypes->count()){
+            return [$select, $where];
+        }
+
+        // A subset of weightings is in play, apply filter
+        $select = ",
+                 a.weight                    AS 'a.weight'
+            ";
+        $where = [];
+
+        foreach($this->weightingTypes as $weightingType){
+            if(WeightingType\Definition::KEY_WEIGHTED === $weightingType){
+                $where[] = ' a.weight != 0 ';
+            } else {
+                $where[] = ' a.weight  = 0 ';
+            }
+        }
+        return [$select, implode(' OR ', $where)];
+    }
+
+
+
+    /**
      * Get Assessments associated with Classes taught, or Groups administered, by User.
      *
      * Required Data:
@@ -422,18 +604,17 @@ class PendingFactory
     private function getAssessments()
     {
         // Is user not teaching or administering any classes or groups?
-        if(!count($this->foldersCache)){
+        if(!count($this->selectedFolders)){
             return;
         }
 
-        $folderIds = array_keys($this->foldersCache);
+        $dueDateClause                                        = $this->buildDueDateClause();
+        list($aTypeSelect, $aTypeJoin, $aTypeClause)          = $this->buildAssessmentTypeClause();
+        list($workTypeSelect, $workTypeJoin, $workTypeClause) = $this->buildWorkTypeClause();
+        list($weightingSelect, $weightingClause)              = $this->buildWeightingClause();
 
-        $taskSelect = $this->includeTasks ? ",
-             tk.id                    AS 'tk.id',
-             tk.requires_confirmation AS 'tk.requires_confirmation'
-        " : '';
-        $taskJoin   = $this->includeTasks ? 'LEFT JOIN task tk           ON tk.assessment_id = a.id AND tk.deleted_at IS NULL' : '';
-        $taskId     = $this->includeTasks ? 'OR tk.id IS NOT NULL' : '';
+        $folderIds = $this->selectedFolders->keys();
+
 
         $query1       = "
         SELECT 
@@ -454,22 +635,23 @@ class PendingFactory
                 
                 a.id         AS 'a.id',
                 a.title      AS 'a.title',
-                a.due_date   AS 'a.due_date',
+                a.due_date   AS 'a.due_date'
                 
-                qz.assess_id AS 'qz.id',
-                dw.id        AS 'dw.id'
-                $taskSelect
+                $aTypeSelect
+                $workTypeSelect
+                $weightingSelect
             FROM assessment a 
-            LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
-            LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
-            $taskJoin
+            $aTypeJoin
+            $workTypeJoin
             
             JOIN assessment_folder af   ON af.assessment_id = a.id 
             JOIN folder f               ON f.id = af.folder_id AND f.deleted_at IS NULL
             
             WHERE f.id IN (" . implode(',', $folderIds) . ")
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
+            AND ($aTypeClause)
+            AND ($dueDateClause)
+            AND ($workTypeClause)
+            AND ($weightingClause)
         ";
 
         $query2       = "
@@ -491,16 +673,14 @@ class PendingFactory
                 
                 a.id         AS 'a.id',
                 a.title      AS 'a.title',
-                a.due_date   AS 'a.due_date',
+                a.due_date   AS 'a.due_date'
                 
-                qz.assess_id AS 'qz.id',
-                dw.id        AS 'dw.id'
-                $taskSelect
-           
+                $aTypeSelect
+                $workTypeSelect
+                $weightingSelect
             FROM assessment a 
-            LEFT JOIN assess qz         ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
-            LEFT JOIN submission_box dw ON dw.assessment_id = a.id AND dw.deleted = 0
-            $taskJoin
+            $aTypeJoin
+            $workTypeJoin
             
             JOIN project_assessment pra ON pra.assessment_id = a.id
             JOIN project p              ON pra.project_id = p.id
@@ -509,8 +689,10 @@ class PendingFactory
             JOIN folder pf              ON pf.id = paf.folder_id AND pf.deleted_at IS NULL
             
             WHERE pf.id IN (" . implode(',', $folderIds) . ")
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
+            AND ($aTypeClause)
+            AND ($dueDateClause)
+            AND ($workTypeClause)
+            AND ($weightingClause)
         ";
 
         $query3       = "
@@ -532,15 +714,15 @@ class PendingFactory
                 
                 a.id         AS 'a.id',
                 a.title      AS 'a.title',
-                a.due_date   AS 'a.due_date',
+                a.due_date   AS 'a.due_date'
                 
-                qz.assess_id AS 'qz.id',
-                dw.id        AS 'dw.id'
-                $taskSelect
+                $aTypeSelect
+                $workTypeSelect
+                $weightingSelect
             FROM assessment a 
-            LEFT JOIN assess qz                            ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
-            LEFT JOIN submission_box dw                    ON dw.assessment_id = a.id AND dw.deleted = 0
-            $taskJoin
+
+            $aTypeJoin
+            $workTypeJoin
             
             JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
             JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id
@@ -552,8 +734,10 @@ class PendingFactory
             JOIN folder csf                                ON csf.id = cs.folder_id AND csf.deleted_at IS NULL
             
             WHERE cif.id IN (" . implode(',', $folderIds) . ")
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
+            AND ($aTypeClause)
+            AND ($dueDateClause)
+            AND ($workTypeClause)
+            AND ($weightingClause)
         ";
 
         // Assessment in Project in UnitImpl imported on Folder
@@ -576,15 +760,15 @@ class PendingFactory
                 
                 a.id         AS 'a.id',
                 a.title      AS 'a.title',
-                a.due_date   AS 'a.due_date',
+                a.due_date   AS 'a.due_date'
                 
-                qz.assess_id AS 'qz.id',
-                dw.id        AS 'dw.id'
-                $taskSelect
+                $aTypeSelect
+                $workTypeSelect
+                $weightingSelect
             FROM assessment a 
-            LEFT JOIN assess qz                            ON qz.assessment_id = a.id AND qz.deleted_at IS NULL
-            LEFT JOIN submission_box dw                    ON dw.assessment_id = a.id AND dw.deleted = 0
-            $taskJoin
+            
+            $aTypeJoin
+            $workTypeJoin
             
             JOIN project_assessment pa                     ON pa.assessment_id = a.id
             JOIN project p                                 ON p.id = pa.project_id
@@ -600,8 +784,10 @@ class PendingFactory
             
             WHERE a.deleted_at IS NULL
             AND cif.id IN (" . implode(',', $folderIds) . ")
-            AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL $taskId)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
+            AND ($aTypeClause)
+            AND ($dueDateClause)
+            AND ($workTypeClause)
+            AND ($weightingClause)
         ";
 
         $this->parseAssessments(
@@ -1448,6 +1634,9 @@ class PendingFactory
 
         foreach($folders as $folder){
             $this->foldersCache[$folder->getId()] = $folder;
+            if($this->selectedFolderIds->offsetExists($folder->getId())){
+                $this->selectedFolders->setOffset($folder->getId(), $folder);
+            }
         }
     }
 }

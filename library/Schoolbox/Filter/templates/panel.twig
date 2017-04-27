@@ -1,0 +1,513 @@
+{#
+A panel that displays various filters.
+
+Usage:
+    contentId string      - the ID of the HTML element where we will replace with AJAX content
+    panel     Filterpanel
+
+    ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
+#}
+
+<script type="text/javascript">
+
+    $(function() {
+        {#TODO - move this to plugin called 'multi-checkbox-select' or similar#}
+        // Track the most recently changed checkbox per component
+        var mostRecentChangePerComponent = [];
+
+        $(document).on('click', '[data-component] label', function (e) {
+
+            var $component           = $(this).closest('[data-component]');
+            var $componentId         = $component.data('component');
+            var $componentLabels     = $component.find('label');
+            var $componentCheckboxes = $component.find('input[type=checkbox]');
+            var labelIndex           = $componentLabels.index(this);
+
+            // Is this not the first checkbox changed for this component ?
+            var mostRecentChangedIndex = mostRecentChangePerComponent[$componentId];
+
+            // Was this a shiftClick on a different checkbox ?
+            if(e.shiftKey && typeof mostRecentChangedIndex === 'number' && mostRecentChangedIndex !== labelIndex){
+
+                // Change all intervening checkboxes to the new value
+                var changedCheckbox  = $componentCheckboxes.get(labelIndex);
+                var newState         = !$(changedCheckbox).prop('checked');
+                var increment = labelIndex > mostRecentChangedIndex ? +1 : -1;
+                for(var i = mostRecentChangedIndex; i !== labelIndex; i += increment){
+                    var $checkbox = $($componentCheckboxes.get(i));
+
+                    $checkbox.prop('checked', newState);
+
+                    // Ensure 'change' listeners get triggered
+                    $checkbox.trigger('change');
+                }
+                clearSelection();
+            }
+            mostRecentChangePerComponent[$componentId] = labelIndex;
+
+        });
+
+        /**
+         * Clears any text selection that occurred when shift+clicking a selection of text-boxes
+         */
+        function clearSelection() {
+            if ( document.selection ) {
+                document.selection.empty();
+            } else if ( window.getSelection ) {
+                window.getSelection().removeAllRanges();
+            }
+        }
+    });
+
+
+    $(function() {
+
+        // ============== Plugins
+
+        $('[data-collapser]').collapsable();
+
+        // ============== Vars
+
+        var $reportContent       = $('#{{ contentId }}');
+        var $filterPanel         = $('#filter_panel');
+        var $panelComponents     = $filterPanel.find('[data-component]');
+        var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
+        var $submitButton        = $('#submit_button');
+        var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden]');
+        var $toast               = $('[data-relation="submit-label"]');
+        var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
+        var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
+        var $resetToDefaultsBtn  = $filterPanel.find('#defaults_reset');
+        var $cancelChangesBtn    = $filterPanel.find('#cancel_changes');
+
+        //  Error messages to display for different server errors
+        var $alertOutOfMemory       = null;
+        var $alertTimeout           = null;
+        var $alertUncaughtException = null;
+        var $alertErrorUnknown      = null;
+
+        // A tab to insert in filter summary - illustrating what filters are being used
+        var $tabAppliedFilter  = null;
+
+        // ============== Event Handlers
+
+        // Listen for clicks on the submit button
+        $submitButton.on('click', function(event){
+            event.preventDefault();
+            updateOriginalSelections();
+            fetchReport();
+            return false; // don't bubble
+        });
+
+        // Listen for user checking filter options
+        $optionCheckboxes.on('change', function(){
+            updateFiltersInUseLabel();
+        });
+
+        // Listen for user removing an applied filter
+        $appliedFilters.on('click', '[data-close]', function(){
+            var $filterTab = $(this).closest('[data-applied-filter-tab]');
+            clearFilter($filterTab.find('[data-filter]').data('filter'));
+            $filterTab.remove();
+            return false; // don't bubble
+        });
+
+        // Cancel changes since last selection submit
+        $cancelChangesBtn.on('click', function (){
+            $filterPanel.find('input[type=checkbox][data-value-original]').each(function(idx, elem){
+                var $checkbox = $(elem);
+                $checkbox.prop('checked', $checkbox.data('value-original'));
+            });
+            updateFiltersInUseLabel();
+        });
+
+        // Reset to role-specific default selections
+        $resetToDefaultsBtn.on('click', function (){
+            $filterPanel.find('input[type=checkbox][data-value-default]').each(function(idx, elem){
+                var $checkbox = $(elem);
+                $checkbox.prop('checked', $checkbox.data('value-default'));
+            });
+            updateFiltersInUseLabel();
+        });
+
+        // ============== Helpers
+
+        /**
+         * To ensure each checkbox's original value data attribute is synchronised with the DB, we need to
+         * update their values each time we submit a set of filter selections to the server
+         */
+        function updateOriginalSelections(){
+            $filterPanel.find('input[type=checkbox][data-value-original]').each(function(idx, elem){
+                var $checkbox = $(elem);
+                var checkedState = $checkbox.prop('checked') ? 1 : 0;
+                $checkbox.data('value-original', checkedState);
+                $checkbox.attr('data-value-original', checkedState);
+            });
+            updateFiltersInUseLabel();
+        }
+
+        /**
+         * Clears checkboxes for the specified filter
+         *
+         * @param {int} filterId
+         */
+        function clearFilter(filterId) {
+            $panelComponents.filter('[data-component='+filterId+']').find('input[type=checkbox]').prop('checked', false);
+            updateFiltersInUseLabel();
+        }
+
+        /**
+         * Requests a filtered report via AJAX
+         */
+        function fetchReport() {
+            $toast.toastActivate({text: 'Requesting report...'});
+            showFilterLoader();
+            var href = $submitButton.data('href');
+            var data = $optionCheckboxes.serialize();
+            $submitButton.val($submitButton.data('working'));
+
+            disableInputs();
+            hidePanel();
+
+            $.post(href, data)
+                .success(function(response){
+
+                    // Did we get not get JSON ?
+                    if('object' !== typeof response){
+                        processServerError(response);
+                        return;
+                    }
+
+                    // Was an exception thrown?
+                    if(200 !== response.status){
+                        renderExceptionThrown(response.code, response.message, response.line, response.file);
+                        return;
+                    }
+
+                    processServerSuccess(response.content);
+                })
+                .fail(function(response){
+                    processServerError(response.responseText);
+                })
+                .always(function() {
+                    $submitButton.val($submitButton.data('value'));
+                    hideFilterLoader();
+                    enableInputs();
+                });
+        }
+
+        /**
+         * Handle a successful AJAX call
+         *
+         * @param {string} html
+         */
+        function processServerSuccess(html) {
+            $serverErrorFeedback.hide();
+            $reportContent.html(html);
+            $toast.toastTimeout({text: 'Success!', css: 'success'});
+        }
+
+        /**
+         * Try to figure out why the server failed to return a report
+         *
+         * @param {string} responseText
+         */
+        function processServerError(responseText) {
+
+            // Was this an OOM error ?
+            var oomErrorIndex = responseText.indexOf('Fatal error: Allowed memory size of');
+            if(-1 !== oomErrorIndex && oomErrorIndex < 400) {
+                displayAlert($alertOutOfMemory);
+                showPanel();
+                return;
+            }
+
+            // Was this a Timeout ?
+            var timeoutIndex = responseText.indexOf('Fatal error: Maximum execution time');
+            if(-1 !== timeoutIndex && timeoutIndex < 400) {
+                displayAlert($alertTimeout);
+                showPanel();
+                return;
+            }
+
+            // Not sure what went wrong - show generic error alert messge
+            displayAlert($alertErrorUnknown);
+        }
+
+
+        /**
+         * Render a helpful HTML error alert when the server indicates an uncaught exception has occurred
+         *
+         * @param {int}    code
+         * @param {string} message
+         * @param {int}    line
+         * @param {string} file
+         **/
+        function renderExceptionThrown(code, message, line, file)
+        {
+            $alertUncaughtException.find('[data-code]').html(code);
+            $alertUncaughtException.find('[data-message]').html(message);
+            $alertUncaughtException.find('[data-line]').html(line);
+            $alertUncaughtException.find('[data-file]').html(file);
+            displayAlert($alertUncaughtException);
+        }
+
+
+        /**
+         * Disable panel inputs
+         */
+        function enableInputs() {
+            $submitButton.attr('disabled', false);
+            $cancelChangesBtn.attr('disabled', false);
+            $resetToDefaultsBtn.attr('disabled', false);
+            $optionCheckboxes.attr('disabled', false);
+        }
+
+        /**
+         * Disable panel inputs
+         */
+        function disableInputs() {
+            $submitButton.attr('disabled', true);
+            $cancelChangesBtn.attr('disabled', true);
+            $resetToDefaultsBtn.attr('disabled', true);
+            $optionCheckboxes.attr('disabled', true);
+        }
+
+        /**
+         * Hide the filter panel components
+         */
+        function hidePanel() {
+            if('uncollapsed' === $filterPanel.find('[data-collapsable]').attr('data-collapse-state')){
+                $filterPanel.find('[data-collapser]').trigger('click');
+            }
+        }
+
+        /**
+         * Show the filter panel components
+         */
+        function showPanel() {
+            if('collapsed' === $filterPanel.find('[data-collapsable]').attr('data-collapse-state')){
+                $filterPanel.find('[data-collapser]').trigger('click');
+            }
+        }
+
+        /**
+         * Fetch the HTML we will render by JS into an alert. Then remove the template from the DOM.
+         */
+        function cacheErrorAlerts() {
+            // Cache error messages
+            $alertOutOfMemory       = $serverErrorFeedback.find('[data-reason="out-of-memory"]');
+            $alertTimeout           = $serverErrorFeedback.find('[data-reason="timeout"]');
+            $alertUncaughtException = $serverErrorFeedback.find('[data-reason="uncaught-exception"]');
+            $alertErrorUnknown      = $serverErrorFeedback.find('[data-reason="unknown"]');
+
+            // Remove from DOM
+            $serverErrorFeedback.find('[data-reason]').detach();
+        }
+
+        /**
+         * Grab the applied filter template so we can insert as required
+         */
+        function cacheAppliedFilterTab() {
+            $tabAppliedFilter = $('[data-applied-filter-tab]').remove().removeClass('hide');
+        }
+
+        /**
+         * Show an alert in the server feedback panel
+         *
+         * @param {jQuery} $alert
+         */
+        function displayAlert($alert) {
+            // Remove previous alerts
+            $serverErrorFeedback.children().remove();
+
+            $toast.toastTimeout({text: 'Failure!', css: 'alert'});
+            $alert.removeClass('alert-close');
+            $serverErrorFeedback.append($alert);
+            $serverErrorFeedback.show();
+        }
+
+        /**
+         * Update the 'in-use' filter label according to current filter option selections
+         *
+         * A filter is not selected if either:
+         * * all options are selected, or
+         * * no options are selected.
+         */
+        function updateFiltersInUseLabel() {
+            var componentsInUse = {};
+            $panelComponents.each(function (idx, component) {
+                var $component = $(component);
+                var filterId   = $component.data('component');
+                var countAvailable = $component.find('input[type=checkbox]').length;
+                var countSelected = $component.find('input:checked[type=checkbox]').length;
+
+                // Are a subset of available options selected ?
+                if(countSelected !== 0 && countSelected !== countAvailable){
+                    // Filter is being applied
+                    componentsInUse[filterId] = $component.find('[data-filter-name]').html();
+                }
+            });
+
+            // Are any filters being used?
+            if(Object.keys(componentsInUse).length){
+                $appliedFilters.html('');
+                for (var property in componentsInUse) {
+                    if (componentsInUse.hasOwnProperty(property)) {
+                        var $newTab = $tabAppliedFilter.clone();
+                        $newTab.find('[data-filter]').attr('data-filter', property).html(componentsInUse[property]);
+                        $appliedFilters.append($newTab);
+                    }
+                }
+            } else {
+                $appliedFilters.html('None');
+            }
+
+        }
+
+        /**
+         * Indicate a request is in progress
+         */
+        function showFilterLoader() {
+            $filterLoaderIcon.prop('disabled', false);
+            $filterLoaderIcon.css('opacity', 1);
+        }
+
+        /**
+         * Indicated a request is not in progress
+         */
+        function hideFilterLoader() {
+            $filterLoaderIcon.prop('disabled', true);
+            $filterLoaderIcon.css('opacity', 0);
+        }
+
+        /**
+         * Populates the 'in-use' filter label and fetches the report
+         */
+        function init() {
+            cacheErrorAlerts();
+            cacheAppliedFilterTab();
+            updateFiltersInUseLabel();
+            fetchReport();
+        }
+
+        init();
+    });
+
+</script>
+
+{# Rip outta DOM on load, and remove 'hide' #}
+<span data-applied-filter-tab class="label highlight hide"><span data-filter></span> <a href="#" data-close class="close" title="Remove filter" style="font-size: 24px;line-height: 14px; vertical-align: text-bottom;" >×</a></span>
+
+<style>
+    .flex-container{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    #filter_panel .label{
+        cursor: default;
+        margin-bottom: 8px;
+    }
+
+    #filter_panel .label .close:hover{
+        color: red;
+    }
+
+    #submit_button{
+        width: auto;
+        min-width: 150px;
+        right: 1rem;
+        top: -3px;
+        float: right;
+        margin: 0 -1rem 0 0;
+    }
+    #applied_filters{
+        display: inline-block;
+    }
+
+    #panel-summary{
+        margin: 0;
+    }
+
+</style>
+
+<div class="toast" data-alert data-relation="submit-label"></div>
+
+<div class="row">
+    <div class="small-12 island" id="filter_panel">
+        <section>
+            <fieldset class="content">
+                <legend id="panel-summary" data-collapser="panel-components" class="icon-down-arrow columns">
+                    {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
+                    <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ...">
+
+                    <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Filters: <span id="applied_filters" data-applied-filters></span>
+                </legend>
+            </fieldset>
+
+            <fieldset class="content" data-collapsable="panel-components" data-collapse-state="collapsed" style="display: none;">
+                <div style="text-align: right; padding-right: 1rem;">
+                    <a id="defaults_reset" class="button" title="Revert to default selections" style="width: auto; min-width: 150px;">Reset to Defaults</a>
+                    <a id="cancel_changes" class="button" title="Revert to your most recently applied filter" style="width: auto; min-width: 150px;">Cancel Changes</a>
+                </div>
+
+                <div class="flex-container" style="margin: 0;">
+                    {% set countComponents = 0 %}
+                    {% for component in panel.components %}
+                        {% set template = component.template %}
+                        {% set data = component.toContext() %}
+                        {% if data.isAvailable %}
+                            {% set countComponents = countComponents + 1 %}
+                            {% include component.template with component.toContext() %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if not countComponents %}
+                        <div class="empty-state" style="flex-grow: 1; margin: 16px 20px 0;">
+                            <i class="icon-info"></i>
+                            <p>No filters are configured for this page.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </fieldset>
+
+        </section>
+
+        {# Will contain error message HTML, as defined in template below #}
+        <div id="server_error_feedback" style="display: none;" >
+            <div data-reason="out-of-memory" data-alert="" class="alert-box alert">
+                The server has run out of memory while attempting to build the requested report.<br><br>
+                This is usually due to filters being too liberal, which generates too much data to process.
+                Please try setting your filters to be more restrictive to return a smaller data set.
+                <a href="" class="close">×</a>
+            </div>
+            <div data-reason="timeout" data-alert="" class="alert-box alert">
+                Maximum server execution time exceeded.<br><br>
+                This is usually due to filters being too liberal, which generates too much data to process.
+                Please try setting your filters to be more restrictive to return a smaller data set.
+                <a href="" class="close">×</a>
+            </div>
+
+            <div data-reason="uncaught-exception" data-alert="" class="alert-box alert">
+                An exception was thrown during report generation. Please report this to Schoolbox support.<br>
+                <pre><br>
+                    {#- dessicate -#}Code:    <span data-code></span><br>
+                    {#- dessicate -#}Message: <span data-message></span><br>
+                    {#- dessicate -#}File:    <span data-file></span><br>
+                    {#- dessicate -#}Line:    <span data-line></span>
+                </pre>
+                <a href="" class="close">×</a>
+            </div>
+
+            <div data-reason="unknown" data-alert="" class="alert-box alert">
+                The server failed to generate the report. Please try setting your filters to be more restrictive to generate a smaller data set.
+                If the issue continues, please report this to Schoolbox support.
+                <a href="" class="close">×</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+

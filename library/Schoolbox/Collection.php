@@ -78,6 +78,27 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         return $this->getStack();
     }
 
+
+    /**
+     * Order(N) traversal to return whether the collection contains
+     * the specified item using strict comparison.
+     *
+     * If the collection contains primitives, then they must be same value + type
+     * If the collection contains objects, they must be the same object
+     *
+     * @param mixed $item
+     * @return bool
+     */
+    public function contains($item)
+    {
+        foreach ($this->stack as $stackItem) {
+            if ($stackItem === $item) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Sets key value in collection
      *
@@ -732,7 +753,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      * Groups all results by a field value.
      *
      * @param  string $field The field to search by.
-     * @return static|static[] @see $this->groupByCallback()
+     * @return Collection|static[] @see $this->groupByCallback()
      */
     public function groupBy($field)
     {
@@ -885,4 +906,23 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         }
         return $clone;
     }
+
+
+    /**
+     * Creates a shallow clone of this collection.
+     *
+     * Enables preservation of indexing and sort order, but does
+     * not duplicate/clone objects in collection
+     *
+     * @return static
+     */
+    public function shallowClone()
+    {
+        $newCollection = $this->emptyClone();
+        foreach($this->stack as $idx => $item){
+            $newCollection->stack[$idx] = $item;
+        }
+        return $newCollection;
+    }
+
 }

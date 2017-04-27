@@ -1,0 +1,19 @@
+<div class="row">
+    {{ renderAdminNavigation(pageCurrent) }}
+</div>
+
+<table>
+
+    <tr>
+        <th>Filter</th>
+        <th>Option Availability</th>
+        <th>Default Selections</th>
+    </tr>
+    {% for filter in filters %}
+    <tr>
+        <td>{{ filter.name }}</td>
+        <td><a href="{{ routeLookup('filters.getAvailableOptions', { filter: filter.id }) }}">Options</a></td>
+        <td><a href="{{ routeLookup('filters.getDefaultsSelections', { filter: filter.id }) }}">Defaults</a></td>
+    </tr>
+    {% endfor %}
+</table>

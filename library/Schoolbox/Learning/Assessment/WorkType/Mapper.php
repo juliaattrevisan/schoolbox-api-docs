@@ -12,6 +12,7 @@ use Schoolbox;
 
 /**
  * @method Model findById($identifierValue)
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends Schoolbox\Mapper
 {

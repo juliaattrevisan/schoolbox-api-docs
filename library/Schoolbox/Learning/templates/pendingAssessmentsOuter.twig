@@ -1,0 +1,28 @@
+{# TODO rename this to better name. 'pendingAssessments.twig' + 'pendingAssessmentsContent.twig' ?
+
+Usage:
+    filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
+
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+['Learning', routeLookup('learning.getClasses')],
+['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { viewee: viewee })]
+) }}
+
+<div class="row">
+    <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
+</div>
+
+
+{% include filterPanel.template with {
+    contentId: 'report_content',
+    panel: filterPanel
+} only %}
+
+
+<div id="report_content"></div>
+
+
