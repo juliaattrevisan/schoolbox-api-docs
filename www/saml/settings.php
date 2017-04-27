@@ -84,14 +84,14 @@ function idpMetadata() {
                     $cert = "-----BEGIN CERTIFICATE-----\n";
                     $cert .= implode("\n",str_split((string)$key->KeyInfo->X509Data->X509Certificate, 64));
                     $cert .= "\n-----END CERTIFICATE-----";
-                    $output = array();
-                    $status = '1';
-                    exec('echo "' . $cert . '" | openssl x509 -noout -dates', $output, $status);
-                    if ($status == 0) {
+                    $certData = openssl_x509_parse($cert);
+                    if (is_array($certData)) {
                         $idp['SigningKeys'][$x]['X509Cert'] = $cert;
-                        foreach ($output as $certdate) {
-                            $thiscertdate = explode('=', $certdate);
-                            $idp['SigningKeys'][$x]['Dates'][$thiscertdate[0]] = $thiscertdate[1];
+                        if (array_key_exists('validFrom', $certData)) {
+                            $idp['SigningKeys'][$x]['Dates']['validFrom'] = (new \Alaress_Date_Format($certData['validFrom'],'ymdHise'))->getDatabase();
+                        }
+                        if (array_key_exists('validTo', $certData)) {
+                            $idp['SigningKeys'][$x]['Dates']['validTo'] = (new \Alaress_Date_Format($certData['validTo'],'ymdHise'))->getDatabase();
                         }
                 }
                 $x++;
