@@ -5,15 +5,16 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\WeightingType;
+namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFilterFactory;
+use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\User;
 use Schoolbox\Filter;
 
 /**
- * A factory for building 'WeightingType' filter objects
+ * A factory for building 'AssessmentType' filter objects
  */
 class Factory extends AbstractFilterFactory
 {
@@ -24,7 +25,7 @@ class Factory extends AbstractFilterFactory
     protected function buildDefinitionArgs(Filter\Model $filter)
     {
         return array_merge(parent::buildDefinitionArgs($filter), [
-            'weightingTypes' => $this->getWeightingTypes(),
+            'assessmentTypes' => $this->getAssessmentTypes(),
         ]);
     }
 
@@ -32,7 +33,7 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, Filter\IFilterDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
     {
         return [];
     }
@@ -44,7 +45,7 @@ class Factory extends AbstractFilterFactory
     protected function buildKeyConverterArgs(Filter\Model $filter)
     {
         return array_merge(parent::buildKeyConverterArgs($filter), [
-            'weightingTypes' => $this->getWeightingTypes(),
+            'assessmentTypes' => $this->getAssessmentTypes(),
         ]);
     }
 
@@ -52,12 +53,15 @@ class Factory extends AbstractFilterFactory
     /**
      * @return Collection|string[]
      */
-    private function getWeightingTypes()
+    private function getAssessmentTypes()
     {
         return new Collection([
-            Definition::KEY_UNWEIGHTED,
-            Definition::KEY_WEIGHTED,
+            Definition::KEY_PROJECT,
+            Definition::KEY_QUIZ,
+            Definition::KEY_DUE_WORK,
+            Definition::KEY_TASK,
         ]);
     }
+
 
 }

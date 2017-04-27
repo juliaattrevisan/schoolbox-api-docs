@@ -4,7 +4,7 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Folder;
+namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -14,7 +14,7 @@ use Schoolbox\Resource\Folder;
 
 /**
  * No conversion. A int is converted to the same int (representing a folder.id)
- * @method Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
+ * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {

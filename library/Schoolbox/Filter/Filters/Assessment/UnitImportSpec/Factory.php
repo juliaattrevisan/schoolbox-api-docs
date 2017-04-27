@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Unit;
+namespace Schoolbox\Filter\Filters\Assessment\UnitImportSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;

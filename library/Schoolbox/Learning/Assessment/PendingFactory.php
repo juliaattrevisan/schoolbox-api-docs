@@ -29,8 +29,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use Schoolbox\Filter\Filters\WeightingType;
-use Schoolbox\Filter\Filters\Unit as UnitFilter;
+use Schoolbox\Filter\Filters\Assessment\WeightingType;
 
 /**
  * Optimised DB queries to build graph of Assessments a user needs to mark or chase
@@ -255,45 +254,51 @@ class PendingFactory
 
 
     /**
-     * @param User                           $viewee
-     * @param IConnector                     $database
-     * @param \External_ClassInterface       $externalClass
-     * @param Collection|Term\Model[]        $terms             Only display assessments that are due in these terms
-     * @param Collection|WorkType\Model[]    $selectedWorkTypes
-     * @param Collection|string[]            $selectedWeightings
-     * @param Collection                     $selectedFolderIds Not yet authorised, need to confirm user has permission
-     * @param Collection|string[]|int[]      $selectedUnitIds
-     * @param \Alaress_Date_Format           $toChaseLimit
-     * @param Collection|string[]            $selectedAssessmentTypes
-     * @param FolderMapper                   $folderMapper
+     * @param User                        $viewee
+     * @param IConnector                  $database
+     * @param \External_ClassInterface    $externalClass
+     * @param \Alaress_Date_Format        $toChaseLimit
+     * @param FolderMapper                $folderMapper
+     * @param Collection|string[]         $selectedAssessmentTypes
+     * @param Collection                  $selectedFolderIds         Not yet authorised, need to confirm user has permission
+     * @param Collection|Term\Model[]     $terms                     Only display assessments that are due in these terms
+     * @param Collection|string[]|int[]   $selectedUnitIds
+     * @param Collection|string[]         $selectedWeightings
+     * @param Collection|WorkType\Model[] $selectedWorkTypes
      */
     public function __construct(
         User $viewee,
         IConnector $database,
         \External_ClassInterface $externalClass,
-        Collection $terms,
-        Collection $selectedWorkTypes,
-        Collection $selectedWeightings,
-        Collection $selectedFolderIds,
-        Collection $selectedUnitIds,
         \Alaress_Date_Format $toChaseLimit,
-        Collection $selectedAssessmentTypes,
-        FolderMapper $folderMapper
+        FolderMapper $folderMapper,
+
+        Collection $selectedAssessmentTypes = null,
+        Collection $selectedFolderIds = null,
+        Collection $terms = null,
+        Collection $selectedUnitIds = null,
+        Collection $selectedWeightings = null,
+        Collection $selectedWorkTypes = null
 
     ) {
+        // Injected dependencies
         $this->viewee              = $viewee;
         $this->database            = $database;
         $this->externalClass       = $externalClass;
-        $this->assessmentsCache    = new GenericCollection(IAssessable::class);  // TODO SA-2631
+        $this->toChaseLimit        = $toChaseLimit;
+        $this->folderMapper        = $folderMapper;
+
+        // Filters
+        $this->assessmentTypes     = $selectedAssessmentTypes;
+        $this->selectedFolderIds   = $selectedFolderIds;
         $this->terms               = $terms;
+        $this->selectedUnitSpecIds = $selectedUnitIds;
         $this->workTypes           = $selectedWorkTypes;
         $this->weightingTypes      = $selectedWeightings;
-        $this->selectedFolderIds   = $selectedFolderIds;
-        $this->selectedUnitSpecIds = $selectedUnitIds;
-        $this->toChaseLimit        = $toChaseLimit;
+
+        // Setup
         $this->nullDate            = new \Alaress_Date_NullDate();
-        $this->assessmentTypes     = $selectedAssessmentTypes;
-        $this->folderMapper        = $folderMapper;
+        $this->assessmentsCache    = new GenericCollection(IAssessable::class);  // TODO SA-2631
         $this->selectedFolders     = $folderMapper->createCollection();
     }
 
@@ -456,7 +461,7 @@ class PendingFactory
     private function buildDueDateClause()
     {
         // Is this filter being applied ?
-        if(0 === $this->terms->count()){
+        if(NULL === $this->terms){
             return ' TRUE ';
         }
 
@@ -488,7 +493,7 @@ class PendingFactory
         $idClauseArray = [];
 
         // Task
-        if ($this->assessmentTypes->contains(AssessmentType::TYPE_TASK)) {
+        if (NULL === $this->assessmentTypes || $this->assessmentTypes->contains(AssessmentType::TYPE_TASK)) {
             $selectClause .= ",
                  tk.id                    AS 'tk.id',
                  tk.requires_confirmation AS 'tk.requires_confirmation'
@@ -500,7 +505,7 @@ class PendingFactory
         }
 
         // Quiz
-        if ($this->assessmentTypes->contains(AssessmentType::TYPE_QUIZ)) {
+        if (NULL === $this->assessmentTypes || $this->assessmentTypes->contains(AssessmentType::TYPE_QUIZ)) {
             $selectClause .= ",
                  qz.assess_id AS 'qz.id'
             ";
@@ -511,7 +516,7 @@ class PendingFactory
         }
 
         // DueWork
-        if ($this->assessmentTypes->contains(AssessmentType::TYPE_DUE_WORK)) {
+        if (NULL === $this->assessmentTypes || $this->assessmentTypes->contains(AssessmentType::TYPE_DUE_WORK)) {
             $selectClause .= ",
                  dw.id        AS 'dw.id'
             ";
@@ -521,7 +526,7 @@ class PendingFactory
             $idClauseArray[] = 'dw.id IS NOT NULL';
         }
 
-        if(0 === count($idClauseArray)){
+        if(NULL !== $this->assessmentTypes && 0 === count($idClauseArray)){
             throw new \InvalidArgumentException('AssessmentType filter must include at least one from Quiz, DueWork or Task. None found');
         }
 
@@ -539,7 +544,7 @@ class PendingFactory
         $select = '';
         $join   = '';
         $where  = ' TRUE ';
-        if(0 === $this->workTypes->count()){
+        if(NULL === $this->workTypes){
             return [$select, $join, $where];
         }
 
@@ -572,7 +577,7 @@ class PendingFactory
         // If no weighting types are selected, don't filter
         $select = '';
         $where  = ' TRUE ';
-        if(0 === $this->weightingTypes->count()){
+        if(NULL === $this->weightingTypes){
             return [$select, $where];
         }
 
@@ -601,7 +606,7 @@ class PendingFactory
     private function buildUnitClause()
     {
         // Is this filter not being used ? (either because nothing is selected or everything is selected)
-        if (0 === $this->selectedUnitSpecIds->count()) {
+        if (NULL === $this->selectedUnitSpecIds) {
             $onFolder       = true;
             $inUnit         = true;
             $unitSpecClause = ' TRUE ';

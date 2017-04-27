@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\AssessmentType;
+namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;

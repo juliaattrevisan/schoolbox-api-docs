@@ -284,17 +284,20 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
      * Return the templates directory for the concrete filter definition's twig templates
      *
      * @return string
+     * @throws \ReflectionException if this class does not exist. (kinda impossible... !)
      */
     protected function getTemplatesDir()
     {
-        $class_info          = new \ReflectionClass($this);
-        $filterDefinitionDir = basename(dirname($class_info->getFileName())) . DIRECTORY_SEPARATOR;
-        return '@filterDefinitions' . DIRECTORY_SEPARATOR . $filterDefinitionDir . DIRECTORY_SEPARATOR . 'templates';
+        $class_info = new \ReflectionClass($this);
+        $dir        = basename(dirname($class_info->getFileName(), 2)) . DIRECTORY_SEPARATOR;
+        $subDir     = basename(dirname($class_info->getFileName(), 1)) . DIRECTORY_SEPARATOR;
+        return '@filterDefinitions' . DIRECTORY_SEPARATOR . $dir . $subDir . 'templates';
     }
 
 
     /**
      * @inheritdoc
+     * @throws \ReflectionException if this class does not exist. (kinda impossible... !)
      */
     public function getOptionsTemplate()
     {

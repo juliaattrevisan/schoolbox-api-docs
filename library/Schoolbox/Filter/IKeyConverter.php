@@ -43,14 +43,15 @@ interface IKeyConverter
      * For the user's posted selections, generate a collection of items they represent.
      *
      * If the set of selections is the logical full set of that item type, and either all are
-     * selected or none are selected, then return an empty collection to inform the DB query generator
+     * selected or none are selected, then return NULL to inform the DB query generator
      * that it can skip this filter entirely.
      *
-     * If $availableSelections is null, then the filter is not being uses, so return all possible items
+     * If $availableSelections is null, then the filter is not being uses, so return NULL
+     * to indicate not to apply this filter
      *
      *
      * @param null|GenericCollection|Selection\Model[] $availableSelections Indexed by setting.key
-     * @return Collection (intentionally not GenericCollection)
+     * @return null|Collection (intentionally not GenericCollection)
      * @throws \InvalidArgumentException
      */
     public function getSelectedItems(GenericCollection $availableSelections = null);

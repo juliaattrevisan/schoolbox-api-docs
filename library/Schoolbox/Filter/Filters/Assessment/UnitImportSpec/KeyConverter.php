@@ -4,7 +4,7 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Unit;
+namespace Schoolbox\Filter\Filters\Assessment\UnitImportSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -13,7 +13,7 @@ use Schoolbox\GenericCollection;
 
 /**
  * No conversion. A int is converted to the same int (representing a unitSpec.id)
- * @method Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
+ * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {

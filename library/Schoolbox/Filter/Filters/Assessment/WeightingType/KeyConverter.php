@@ -4,7 +4,7 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\AssessmentType;
+namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -13,28 +13,30 @@ use Schoolbox\GenericCollection;
 
 
 /**
- * Converts between AssessmentType concrete keys and AssessmentType strings
- * @method Collection|string[] getSelectedItems(GenericCollection $availableSelections = null)
+ * Converts between Weighting concrete keys and Weighting strings
+ * @method null|Collection|string[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {
 
     /**
-     * All AssessmentTypes known to the system (regardless of whether they are available)
+     * All 'hasWeighting' values known to the system (regardless of whether they are available)
+     *
+     * Simply the set ['weighted','unweighted']
      *
      * @var Collection|string[]
      */
-    private $assessmentTypes;
+    private $weightingTypes;
 
 
     /**
      * @param Filter\Model        $filter
-     * @param Collection|string[] $assessmentTypes
+     * @param Collection|string[] $weightingTypes
      */
-    public function __construct(Filter\Model $filter, Collection $assessmentTypes)
+    public function __construct(Filter\Model $filter, Collection $weightingTypes)
     {
         parent::__construct($filter);
-        $this->assessmentTypes = $assessmentTypes;
+        $this->weightingTypes = $weightingTypes;
     }
 
 
@@ -54,7 +56,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getAllPossibleItems()
     {
-        return $this->assessmentTypes->shallowClone();
+        return $this->weightingTypes->shallowClone();
     }
 
 
@@ -73,8 +75,8 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
-        if (!in_array($key, $this->assessmentTypes->getAll(), true)) {
-            throw new \InvalidArgumentException('AssessmentType Key is invalid: ' . $key);
+        if (!in_array($key, $this->weightingTypes->getAll(), true)) {
+            throw new \InvalidArgumentException('WeightingType Key is invalid: ' . $key);
         }
     }
 

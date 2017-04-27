@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\WeightingType;
+namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
 use Schoolbox\Filter\AbstractFilterComponent;
 

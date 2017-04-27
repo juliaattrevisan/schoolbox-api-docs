@@ -4,7 +4,7 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\WorkType;
+namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -14,7 +14,7 @@ use Schoolbox\Learning\Assessment\WorkType;
 
 /**
  * Converts between concrete keys (workType.ids) and WorkType models
- * @method GenericCollection|WorkType\Model[] getSelectedItems(GenericCollection $availableSelections = null)
+ * @method null|GenericCollection|WorkType\Model[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {

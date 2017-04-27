@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\WorkType;
+namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -13,63 +13,56 @@ use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\WorkType;
 
 
 /**
  * Available options:
- * * None
- * * One per configured workType
+ * * Weighted
+ * * Unweighted
+ *
  */
 class Definition extends AbstractFilterDefinition
 {
+    const KEY_WEIGHTED    = 'weighted';
+    const KEY_UNWEIGHTED  = 'unweighted';
 
-    // If assessment does not have a WorkType at all
-    const KEY_NONE = ' none';
 
-    /**
-     * Intentionally not a GenericCollection so we can include null (ie assessment does not have a workType at all)
-     *
-     * @var Collection|WorkType\Model[]
-     */
-    private $workTypes;
+    /** @var Collection|string[] */
+    private $weightingTypes;
 
 
     /**
      * @param Filter\Model    $filter
      * @param Option\Mapper   $filterOptionMapper
      * @param Defaults\Mapper $filterDefaultMapper
-     * @param Collection      $workTypes
+     * @param Collection      $weightingTypes
      */
     public function __construct(
         Filter\Model $filter,
         Option\Mapper $filterOptionMapper,
         Defaults\Mapper $filterDefaultMapper,
-        Collection $workTypes
+        Collection $weightingTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
-        $this->workTypes = $workTypes;
+        $this->weightingTypes = $weightingTypes->shallowClone();
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getCustomKeys()
-    {
-        return [
-            self::KEY_NONE,
-        ];
-    }
-
 
     /**
      * @inheritdoc
      */
     public static function getQueryKey()
     {
-        return 'wk';
+        return 'wt';
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getCustomKeys()
+    {
+        return $this->weightingTypes->getAll();
+    }
+
 
     /**
      * @inheritdoc
@@ -91,18 +84,14 @@ class Definition extends AbstractFilterDefinition
      */
     protected function sortFilterOptions(GenericCollection $options)
     {
-        // Keys represent WorkType IDs
-
         return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
             $leftKey  = $left->getKey();
             $rightKey = $right->getKey();
-            if ($leftKey === self::KEY_NONE) {
+            if (self::KEY_UNWEIGHTED === $leftKey) {
                 return -1;
             }
-            if ($leftKey === $right) {
-                return 0;
-            }
-            return $leftKey < $rightKey ? -1 : +1;
+            // left key must be WEIGHTED, which should be placed after other keys
+            return self::KEY_WEIGHTED === $rightKey ? 0 : +1;
         });
     }
 
@@ -114,7 +103,7 @@ class Definition extends AbstractFilterDefinition
      */
     public function getAbstractKeys()
     {
-        return array_merge($this->getCustomKeys(), $this->workTypes->keys());
+        return $this->getCustomKeys();
     }
 
 
@@ -123,10 +112,13 @@ class Definition extends AbstractFilterDefinition
      */
     public function getLabel($key)
     {
-        if (self::KEY_NONE === $key) {
-            return '(none)';
+        if (self::KEY_UNWEIGHTED === $key) {
+            return 'Unweighted';
         }
-        return $this->workTypes[$key]->getName();
+        if (self::KEY_WEIGHTED === $key) {
+            return 'Weighted';
+        }
+        throw new \InvalidArgumentException("Unknown Weighting key: $key");
     }
 
 
@@ -135,37 +127,16 @@ class Definition extends AbstractFilterDefinition
      */
     protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
     {
-        // Ensure it contains all WorkTypes
-        foreach ($this->workTypes as $workType) {
-
-            $abstractKey = null === $workType ? self::KEY_NONE : (string)$workType->getId();
-
-            if (!$pageOptions->offsetExists($abstractKey)) {
-                $option = $this->getFilterOptionMapper()->createModel();
-                $option
-                    ->setFilter($this->getFilter())
-                    ->setKey($abstractKey)
-                    ->setPage($page)
-                    ->setAvailable($this->getInitialAvailability($abstractKey, $page));
-                $pageOptions->setOffset($option->getKey(), $option);
-            }
-        }
+        // noop - WeightingTypes are purely hard-coded.
         return $pageOptions;
     }
-
 
     /**
      * @inheritdoc
      */
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
-        foreach ($pageOptions as $filterOption) {
-            $abstractKey = $filterOption->getKey();
-            // Does option refer to a non-existent workType ? (eg if deleted)
-            if ($abstractKey !== self::KEY_NONE && !$this->workTypes->offsetExists($abstractKey)) {
-                $pageOptions->offsetUnset($filterOption->getKey());
-            }
-        }
+        // noop - WeightingTypes are purely hard-coded.
         return $pageOptions;
     }
 
@@ -185,7 +156,7 @@ class Definition extends AbstractFilterDefinition
      */
     public function getInitialAvailability($customAbstractKey, $page)
     {
-        // by default, all WorkTypes are available
+        // by default, all WeightingTypes are available
         return true;
     }
 }

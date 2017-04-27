@@ -46,12 +46,12 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
-use Schoolbox\Filter\Filters\Folder as FolderFilter;
-use Schoolbox\Filter\Filters\Unit as UnitFilter;
-use Schoolbox\Filter\Filters\Term as TermFilter;
-use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
-use Schoolbox\Filter\Filters\WeightingType as WeightingFilter;
-use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
+use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
+use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitImportSpecFilter;
+use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
+use Schoolbox\Filter\Filters\Assessment\AssessmentType as AssessmentTypeFilter;
+use Schoolbox\Filter\Filters\Assessment\WeightingType as WeightingFilter;
+use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
 
 class Controller extends Base
 {
@@ -300,7 +300,7 @@ class Controller extends Base
         $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentTypeFilter\Definition::class);
         $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderFilter\Definition::class);
         $selectedWeightings      = $selectionTransformer->getSelectedItems(WeightingFilter\Definition::class);
-        $selectedUnitIds         = $selectionTransformer->getSelectedItems(UnitFilter\Definition::class);
+        $selectedUnitIds         = $selectionTransformer->getSelectedItems(UnitImportSpecFilter\Definition::class);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
@@ -314,14 +314,14 @@ class Controller extends Base
             $viewee,
             $this->database,
             $this->externalClass,
-            $selectedTerms,
-            $selectedWorkTypes,
-            $selectedWeightings,
-            $selectedFolderIds,
-            $selectedUnitIds,
             $toChaseLimit,
+            $this->folderMapper,
             $selectedAssessmentTypes,
-            $this->folderMapper
+            $selectedFolderIds,
+            $selectedTerms,
+            $selectedUnitIds,
+            $selectedWeightings,
+            $selectedWorkTypes
         );
         $assessments = $factory->getPendingAssessments();
 
