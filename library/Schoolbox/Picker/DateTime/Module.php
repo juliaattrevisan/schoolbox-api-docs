@@ -83,7 +83,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this->addRoutePreload($matcher,
-            '(?:getByDate|getDueByDate)',
+            '(getByDate|getDueByDate)',
             function ($params) {
                 if (array_key_exists('date', $params)) {
                     $args['date'] = new \Alaress_Date_Format($params['date'], 'Y-m-d');
