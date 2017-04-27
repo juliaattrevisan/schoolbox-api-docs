@@ -295,8 +295,8 @@
                                 {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
                                     <li>
                                         <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
-                                           class="icon-modify"
-                                           target="_blank">Pastoral Care</a>
+                                           class="icon-synergetic"
+                                           target="_blank">Synweb</a>
                                     </li>
                                 {% endif %}
                             {% endblock buttons_pastoralCare %}
