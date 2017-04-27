@@ -155,8 +155,8 @@
                         <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
                         <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
 
-                        <input id="display_grade_average" type="checkbox" name="display_grade_average" value="1" {% if user.displayGradeAverage %}checked{% endif %} />
-                        <label for="display_grade_average" class="checkbox-label">Display Class Average on Student Grade Graph</label>
+                        <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
+                        <label for="display_grade_graph" class="checkbox-label">Display Graph on Student Grade Card</label>
 
                         <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
                         <label for="superuser" class="checkbox-label">Superuser</label>

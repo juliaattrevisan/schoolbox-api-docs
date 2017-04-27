@@ -301,7 +301,7 @@ class UserBulkMapper extends UserMapper
      * @param $hideContacts
      * @param $hideTimetable
      * @param $positionTitle
-     * @param $displayGradeAverage
+     * @param $displayGradeGraph
      */
     public function bulkModifyUpdate(
         User $user,
@@ -317,7 +317,7 @@ class UserBulkMapper extends UserMapper
         $hideContacts,
         $hideTimetable,
         $positionTitle,
-        $displayGradeAverage
+        $displayGradeGraph
     ) {
 
         /* Update group settings
@@ -395,8 +395,8 @@ class UserBulkMapper extends UserMapper
 
         /* Update display grade average settings
          */
-        if ($displayGradeAverage != $this->getUnchanged()) {
-            $user->setDisplayGradeGraph($displayGradeAverage);
+        if ($displayGradeGraph != $this->getUnchanged()) {
+            $user->setDisplayGradeGraph($displayGradeGraph);
         }
 
         $this->save($user);

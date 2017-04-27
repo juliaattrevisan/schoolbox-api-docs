@@ -69,7 +69,7 @@ class Factory {
         'eportfolioEnable' => 'E-Portfolio Enabled',
         'hideContacts' => 'Hide Contact Details',
         'hideTimetable' => 'Hide Timetable',
-        'displayGradeAverage' => 'Display Class Average on Student Grade Graph',
+        'displayGradeGraph' => 'Display Graph on Student Grade Card',
     ];
 
     /**

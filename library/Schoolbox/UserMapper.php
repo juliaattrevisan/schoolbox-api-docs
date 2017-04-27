@@ -106,7 +106,7 @@ class UserMapper extends Mapper
 
         // Setup callbacks
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setDefaultDisplayGradeAverage']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setDefaultDisplayGradeGraph']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidRole']);
@@ -143,10 +143,10 @@ class UserMapper extends Mapper
      * @param User $model
      * @return bool Always true
      */
-    public function setDefaultDisplayGradeAverage(User $model)
+    public function setDefaultDisplayGradeGraph(User $model)
     {
         if ($model->getDisplayGradeGraph() === null) {
-            $model->setDisplayGradeGraph((bool)$this->getConfigLoader()->get('display_grade_average'));
+            $model->setDisplayGradeGraph((bool)$this->getConfigLoader()->get('display_grade_graph'));
         }
         return true;
     }
