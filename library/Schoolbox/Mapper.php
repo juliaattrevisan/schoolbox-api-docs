@@ -712,7 +712,11 @@ abstract class Mapper implements IMapper, Serializable
         // Get parent ID of each $object
         $parentIds = [];
         foreach ($collection as $node) {
-            $parentId = $node->$getParent()->$getId();
+            $parent = $node->$getParent();
+            if (!is_object($parent)) {
+                break;
+            }
+            $parentId = $parent->$getId();
             if ($parentId) {
                 $parentIds[] = $parentId;
             }
