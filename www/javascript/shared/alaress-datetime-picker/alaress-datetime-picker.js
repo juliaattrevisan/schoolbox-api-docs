@@ -170,14 +170,14 @@ function setValue(element, options, state, trigger, date) {
             v = value.startOf('day').format(convertFormat(pickerFormats.convertTo));
         }
         if (window.pickerInstance[pId] !== undefined) {
-            window.pickerInstance[pId].setDate(v.toISOString, true);
+            window.pickerInstance[pId].setDate(v.toISOString);
         }
         element.val(v);
     }
     else {
         v = moment(value).format(convertFormat(pickerFormats.convertTo));
         if (window.pickerInstance[pId] !== undefined) {
-            window.pickerInstance[pId].setDate(v.toISOString, true);
+            window.pickerInstance[pId].setDate(v.toISOString);
         }
         element.val(v);
     }
@@ -235,7 +235,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     element.change(function () {
         if (window.pickerInstance[pickerId] !== undefined) {
-            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
+            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
         }
     });
 
@@ -344,7 +344,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         } else if (picker.data('status') == 'loaded') {
 
             // Update picker values, in case element field value has changed
-            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
+            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
 
             picker.foundation('reveal', 'open');
 

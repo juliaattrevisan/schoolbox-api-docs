@@ -25,7 +25,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     };
 
     function hasTime(value) {
-        var v = moment(value, convertFormat(twigVars.displayFormat));
+        var v = moment(value);
         if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
             return false;
         }
@@ -84,7 +84,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         element.attr('data-selected', 1);
         $('.day-' + day).addClass('period-selected');
         $('.description-' + period).addClass('period-selected');
-        var periodClicked = 'period' + day + '_' + period;
 
         var campus = $timetable.campus.val(),
             term = $timetable.term.val(),
@@ -136,9 +135,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     // Show loader
     function loadingResponse(target) {
-        var pickerResponse = $('#' + target + 'Response' + twigVars.id);
-        pickerResponse.html('');
-        pickerResponse.append('<div class="loader"></div>');
+        var $pickerResponse = $('#' + target + 'Response' + twigVars.id);
+        $pickerResponse.html('');
+        $pickerResponse.append('<div class="loader"></div>');
 
         if (target == 'timetable') {
             $timetable.submit.addClass('disabled');
@@ -148,10 +147,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     // Prepare and append response HTML
     function appendResponse(data, template, target) {
 
-        var pickerResponse = $('#' + target + 'Response' + twigVars.id);
+        var $pickerResponse = $('#' + target + 'Response' + twigVars.id);
 
         // Clear out any old response display
-        pickerResponse.html('');
+        $pickerResponse.html('');
         var html = '';
 
         // Ajax returned date
@@ -187,11 +186,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             }
             else if (data.students.length == 0) {
                 html += 'Nothing due on ' + displayDate + '';
-                pickerResponse.addClass('meta');
+                $pickerResponse.addClass('meta');
             }
             else {
-
-                pickerResponse.removeClass('meta');
+                $pickerResponse.removeClass('meta');
 
                 // Populate with results for the selected date
 
@@ -237,10 +235,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             }
             else if (data.appointments.length == 0) {
                 html += 'No events found for ' + displayDate;
-                pickerResponse.addClass('meta');
+                $pickerResponse.addClass('meta');
             }
             else {
-                pickerResponse.removeClass('meta');
+                $pickerResponse.removeClass('meta');
 
                 html += '<div class="row">';
                 html += '<div class="small-12 medium-12 columns">';
@@ -262,7 +260,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             html = '';
         }
 
-        pickerResponse.append(html);
+        $pickerResponse.append(html);
         if (template == 'duework' && data.students.length > 0) {
             $('#picker'+twigVars.id).find('[data-collapser]').collapsable();
         }
@@ -449,8 +447,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     // Setup calendar
     var newDate, latestDate;
 
-    function renderAllDaySwitch(instance) {
-        var timeDiv = $('#pickerCalendar' + twigVars.id).closest('#picker' + twigVars.id).find('.flatpickr-time');
+    function renderAllDaySwitch() {
+        var $timeDiv = $('#pickerCalendar' + twigVars.id).closest('#picker' + twigVars.id).find('.flatpickr-time');
 
         var html = '';
 
@@ -461,7 +459,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 '</div>';
         }
 
-        timeDiv.after(html);
+        $timeDiv.after(html);
     }
 
     // Accommodating the "start of the week" SB config
@@ -470,8 +468,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, {
         defaultDate: twigVars.date,
-        // dateFormat: 'U',
-        // dateFormat: pickerOptions.enableTime ? twigVars.displayFormat : twigVars.displayFormatDate,
         inline: true,
         altInput: false,
         allowInput: true,
@@ -480,7 +476,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         enableTime: pickerOptions.enableTime,
 
         onReady: function (selectedDates, dateStr, instance) {
-            renderAllDaySwitch(instance);
+            renderAllDaySwitch();
 
             // Hide time picker if allday hidden field is set to 1
             if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 1) {
