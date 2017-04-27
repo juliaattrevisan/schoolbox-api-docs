@@ -305,7 +305,7 @@ class Controller extends Base
                 'format' => 'json',
                 'data' => [
                     'appointments' => $appointments,
-                    'date' => $date
+                    'date' => $date->toIso8601String()
                 ]
             )
         );

@@ -149,36 +149,35 @@ function setValue(element, options, state, trigger, date) {
     var value;
 
     if (date !== undefined) {
-        value = date;
+        value = moment(date);
     }
     else if (window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
-        value = window.pickerInstance[pId].input.value;
+        value = moment(window.pickerInstance[pId].input.value);
     }
     else if (element.val() !== undefined && element.val()) {
-        value = element.val();
+        value = moment(element.val(), convertFormat(pickerFormats.convertFrom));
     }
     else {
         value = moment();
     }
-
     // All Day is on
     var v;
     if (state === true) {
         if (options.endDay) {
-            v = moment(value, convertFormat(pickerFormats.convertFrom)).endOf('day').format(convertFormat(pickerFormats.convertTo));
+            v = value.endOf('day').format(convertFormat(pickerFormats.convertTo));
         }
         else {
-            v = moment(value, convertFormat(pickerFormats.convertFrom)).startOf('day').format(convertFormat(pickerFormats.convertTo));
+            v = value.startOf('day').format(convertFormat(pickerFormats.convertTo));
         }
         if (window.pickerInstance[pId] !== undefined) {
-            window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
+            window.pickerInstance[pId].setDate(v.toISOString, true);
         }
         element.val(v);
     }
     else {
-        v = moment(value, convertFormat(pickerFormats.convertFrom)).format(convertFormat(pickerFormats.convertTo));
+        v = moment(value).format(convertFormat(pickerFormats.convertTo));
         if (window.pickerInstance[pId] !== undefined) {
-            window.pickerInstance[pId].setDate(moment(v, convertFormat(pickerFormats.convertTo)).format(convertFormat(options.databaseFormat)), true, options.databaseFormat);
+            window.pickerInstance[pId].setDate(v.toISOString, true);
         }
         element.val(v);
     }
@@ -327,7 +326,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     var periodSelected = $('table').find('[data-selected=1]').attr('data-period'),
                         periodTime = ($('[name*="periodTime' + pickerId + '"]:checked').val()),
                         newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma'),
-                        newDate = moment($(this).attr('data-timetable-value'), convertFormat(options.displayFormatDate)).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+                        newDate = moment($(this).attr('data-timetable-value')).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
 
                     setValue(element, options, false, true, newDate);
 
