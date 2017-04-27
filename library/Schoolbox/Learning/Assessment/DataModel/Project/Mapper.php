@@ -35,7 +35,7 @@ class Mapper extends BaseMapper
         $this->uses('summator', self::TYPE_STRING);
         $this->joins('owner_id', UserMapper::class);
         $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');
-        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel', 'assessment');
+        $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'assessment');
         $this->joins('grade_group_id', GradeGroupMapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
         $this->uses('deleted_at', self::TYPE_TIMESTAMP, self::COLUMN_SOFTDELETE);
 
