@@ -25,7 +25,7 @@
 
             </div>
             {# Hide second column if showing just a calendar #}
-            {% if width == 6 %}
+            {% if type == 'event' or type =='duework' %}
                 <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for appointments to be rendered in #}
@@ -94,7 +94,7 @@
                     </div>
                 </div>
 
-                {% if width == 6 %}
+                {% if type == 'event' or type =='duework' %}
                     <div class="small-12 medium-{{ width }} columns">
 
                         {# Placeholder for appointments to be rendered in #}
@@ -119,11 +119,7 @@
         displayFormat: '{{ displayFormat }}',
         displayFormatDate: '{{ displayFormatDate }}',
         type: '{{ type }}',
-        {% if timetable %}
-            timetable: true,
-        {% else %}
-            timetable: false,
-        {% endif %}
+        timetable: {{ timetable ? true : false }},
         {% if timetableVars %}
             timetableVars: {
                 daysUntilDate: {{ timetableVars.daysUntilDate }},
