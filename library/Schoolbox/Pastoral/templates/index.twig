@@ -53,16 +53,32 @@
 
 {% include '@pastoral/fragments/search.twig' %}
 
+{% set count = 0 %}
+
+{% if recentDashboard is not empty %}
+    {% set count = count + 1 %}
+{% endif %}
+
+{% if recentStudents is not empty %}
+    {% set count = count + 1 %}
+{% endif %}
+
+{% if groups is not empty %}
+    {% set count = count + 1 %}
+{% endif %}
+
 <div class="row">
     <div class="list-item">
 
         {# Display recently searched student records #}
 
-        <div class="small-{% if recentDashboard is not empty %}6{% else %}12{% endif %} island">
+        <div class="small-{{ 12 / count }} island">
 
             {% if recentStudents is not empty %}
 
-            <h2 class="subheader">Recently Viewed Students</h2>
+                <h2 class="subheader">Recently Viewed Students</h2>
+                <p class="meta">You recently viewed these students records.</p>
+
                 <section>
                     <ul class="action-list">
                         {% for student in recentStudents %}
@@ -87,8 +103,9 @@
 
         {% if recentDashboard is not empty %}
 
-            <div class="small-6 island">
+            <div class="small-{{ 12 / count }} island">
                 <h2 class="subheader">Important Records</h2>
+                <p class="meta">The following records have been marked as important.</p>
 
                 <section>
                     <ul class="action-list">
@@ -101,6 +118,29 @@
                                             <h3>{{ record.student.fullName }}</h3>
                                         </a>
                                         <p class="meta">{{ record.heading }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
+
+        {% endif %}
+
+        {% if groups | length %}
+            <div class="small-{{ 12 / count }} island">
+                <h2 class="subheader">Pastoral Group Memberships</h2>
+                <p class="meta">You are a member of the following pastoral groups.</p>
+                <section>
+                    <ul class="action-list">
+                        {% for membership in groups %}
+                            <li>
+                                <div class="list-item">
+                                    <div class="card small-12">
+                                        {{ profile.imageSquare64(membership.group.user) }}
+                                        <h3>{{ membership.group.name }}</h3>
+                                        <p class="meta">Group managed by {{ membership.group.user.fullName }}</p>
                                     </div>
                                 </div>
                             </li>

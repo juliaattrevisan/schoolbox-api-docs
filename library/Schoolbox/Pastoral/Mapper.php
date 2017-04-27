@@ -400,6 +400,11 @@ class Mapper extends BaseMapper
 
         /** @var Model$record */
         foreach ($records as $record) {
+            if ($record->getOwner()->getId() == $this->getSessionUser()->getId()) {
+                $displayed->add($record);;
+                continue;
+            }
+
             /** @var Access $access */
             foreach ($record->getAccess() as $access) {
                 if ($access->hasAccess($this->getSessionUser())) {

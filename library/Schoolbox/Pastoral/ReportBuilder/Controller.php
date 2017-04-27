@@ -105,8 +105,8 @@ class Controller extends Base
             array(
                 'template' => '@pastoralReportBuilder/index.twig',
                 'data' => array(
-                    'session' => $_SESSION,
-                    'reports' => $this->pastoralReportMapper->findByColumn('owner_id', $this->getUser()->getId())
+                    'user' => $this->getUser(),
+                    'reports' => $this->pastoralReportMapper->findForUser($this->getUser())
                 ),
             )
         );
@@ -198,6 +198,7 @@ class Controller extends Base
                     'types'                 => $this->pastoralTypeMapper->findAll()->sortBy('name', 'asc'),
                     'severities'            => $severities,
                     'tags'                  => $this->pastoralTagMapper->findAll(),
+                    'groups'                => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
                     'studentsSelected'      => $studentsSelected,
                     'authorsSelected'       => $authorsSelected,
                     'tagsSelected'          => $tagsSelected,
@@ -367,6 +368,18 @@ class Controller extends Base
         if (is_array($post['years'])) {
             $pastoralReport->setYearsCsv(implode(',', $post['years']));
         }
+
+        // Save groups the report is shared with
+
+        $groupsCollection = new Collection();
+
+        foreach ($post['group'] as $groupId => $checked) {
+            if ($checked) {
+                $groupsCollection->add($this->pastoralGroupMapper->createModel($groupId));
+            }
+        }
+
+        $pastoralReport->setGroups($groupsCollection);
 
         $this->pastoralReportMapper->save($pastoralReport);
 

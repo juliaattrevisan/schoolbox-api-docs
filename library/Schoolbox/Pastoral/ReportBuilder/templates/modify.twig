@@ -397,6 +397,37 @@
                     {% endfor %}
                 </ul>
             </section>
+
+            {% if groups | length %}
+                <h2 class="subheader">Shared Report</h2>
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>
+                                Pastoral Groups
+                                <span class="hint has-tip tip-top" data-tooltip
+                                      title="Select the pastoral groups you would like to share this report with.">?</span>
+                                {% for group in groups %}
+                                    <input type="hidden" name="group[{{ group.id }}]" value="0"/>
+                                    <input type="checkbox" name="group[{{ group.id }}]"
+                                           {% for reportGroup in report.groups if reportGroup.id == group.id %}checked{% endfor %}
+                                           id="group[{{ group.id }}]" value="1"
+                                            {% if record.id != '' %}
+                                                {% for access in record.access if access.group.id != '' %}
+                                                    {% if access.group.id == group.id %}
+                                                        checked
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                    />
+                                    <label for="group[{{ group.id }}]" class="checkbox-label">{{ group.name }}</label>
+                                {% endfor %}
+                            </label>
+                        </div>
+                    </fieldset>
+                </section>
+            {% endif %}
+
             <a href="#" data-report class="submit expand">Save Report</a>
         </form>
     </div>

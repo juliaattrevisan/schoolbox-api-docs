@@ -85,6 +85,9 @@ class Model implements ISoftDeletable
     /** @var PastoralSeverity $severity */
     protected $severity;
 
+    /** @var Collection $groups */
+    protected $groups;
+
     /**
      * Model constructor
      */
@@ -94,6 +97,10 @@ class Model implements ISoftDeletable
         $this->authors = new Collection();
         $this->order = new Collection();
         $this->tags = new Collection();
+        
+        // This is a collection of groups that have access to this report
+        
+        $this->groups = new Collection();
     }
 
     /**
@@ -423,4 +430,22 @@ class Model implements ISoftDeletable
     {
         return $this->years;
     }
+
+    /**
+     * @param Collection $groups
+     * @return self
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }    
 }

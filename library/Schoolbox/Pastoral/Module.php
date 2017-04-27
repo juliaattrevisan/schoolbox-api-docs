@@ -35,6 +35,8 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
+use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 
 class Module extends BaseModule
 {
@@ -88,6 +90,8 @@ class Module extends BaseModule
             'pastoralAccessMapper'      => PastoralAccessMapper::getInstance(),
             'pastoralAttachmentMapper'  => PastoralAttachmentMapper::getInstance(),
             'pastoralCategoryMapper'    => PastoralCategoryMapper::getInstance(),
+            'pastoralGroupMapper'       => PastoralGroupMapper::getInstance(),
+            'pastoralGroupMemberMapper' => PastoralGroupMemberMapper::getInstance(),
             'pastoralCommentMapper'     => PastoralCommentMapper::getInstance(),
             'pastoralSeverityMapper'    => PastoralSeverityMapper::getInstance(),
             'pastoralTagMapper'         => PastoralTagMapper::getInstance(),
