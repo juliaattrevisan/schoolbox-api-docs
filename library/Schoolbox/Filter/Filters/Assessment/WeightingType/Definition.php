@@ -146,7 +146,7 @@ class Definition extends AbstractFilterDefinition
      */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
-        // by default, all are not selected (ie the filter is not applied)
+        // No options checked
         return false;
     }
 
