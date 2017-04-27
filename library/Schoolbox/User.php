@@ -381,7 +381,7 @@ class User implements JsonSerializable, ISoftDeletable
 
     /**
      * @param string $positionTitle
-     * @return string
+     * @return self
      */
     public function setPositionTitle($positionTitle)
     {
