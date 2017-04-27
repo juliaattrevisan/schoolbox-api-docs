@@ -427,4 +427,18 @@ class Base implements Serializable, IConnector
     {
         return new Builder($this->broker, $table);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function quoteIdentifier($string) {
+        return $this->broker->quoteIdentifier($string);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function escapeForLike($string) {
+        return $this->broker->escapeForLike($string);
+    }
 }
