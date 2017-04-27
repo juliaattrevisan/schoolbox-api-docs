@@ -94,15 +94,19 @@
             {% if not latestResponse %}
                 Not attempted
             {% else %}
-                {% if multipleResponses %}
-                    Reattempted
+                {% if latestResponse.submittedAt.isNull %}
+                    Attempt in progress
                 {% else %}
-                    Attempted
-                {% endif %}
-                {% if latestResponse.submittedOnTime %}
-                    on time
-                {% else %}
-                    late
+                    {% if multipleResponses %}
+                        Reattempted
+                    {% else %}
+                        Attempted
+                    {% endif %}
+                    {% if latestResponse.submittedOnTime %}
+                        on time
+                    {% else %}
+                        late
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endspaceless -%}
