@@ -47,7 +47,7 @@ class Image extends Base {
     /**
      * Get content types
      *
-     * @return array
+     * @return string
      */
     private function getExtensions()
     {
