@@ -357,12 +357,15 @@ class Controller extends Base
         $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
         // Iterate each student in the class
 
+        $start = $date->startOfDay();
+        $end = clone $start;
+        $end = $end->endOfDay();
+
 
         foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
-            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $date->startOfDay(), $date->endOfDay());
-
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $start, $end);
             // Count how many assessments are due on the specified date
             $assessmentsDue = count($assessments);
             $assessmentList = Array();
