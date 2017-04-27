@@ -25,9 +25,9 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        /* Default index page
+        /* Testing page page
          */
-        $this->addGetRoute($router, 'index', $basePath, '');
+        //$this->addGetRoute($router, 'index', $basePath, '');
 
         /* Render html fragment, or redirect
          */
