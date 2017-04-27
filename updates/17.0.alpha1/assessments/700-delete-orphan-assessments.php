@@ -71,12 +71,16 @@ class DeleteOrphanAssessments
      */
     public function run()
     {
+        $this->dropDeprecatedTables();
+
         $this->fetchOrphanAssessmentIds();
+
         $this->deleteTasks($this->orphanTaskIds);
         $this->deleteQuizzes($this->orphanQuizIds);
         $this->deleteDueWork($this->orphanDueWorkIds);
+
         $this->deleteAssessments($this->orphanAssessmentIds);
-        $this->dropDeprecatedTables();
+
         $this->printSummary();
         exit(0);
     }
