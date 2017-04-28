@@ -67,8 +67,8 @@ function getOptions(element) {
 
     // Build datepicker options form the element data attributes
     var elementOptions = {
-        displayFormat: 'd/m/Y h:iK', //Default display format
-        displayFormatDate: 'd/m/Y',
+        displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
+        displayFormatDate: dateDisplayFormats.localDate, //Default display date format
         databaseFormat: 'Y-m-d H:i:s',
         enableTime: getValue(element, 'data-datepicker-time'),
         allDaySwitch: getValue(element, 'data-datepicker-alldayswitch'), //Show All Day switch
@@ -140,7 +140,6 @@ function getLinkedElements(element, options) {
 }
 
 function setValue(element, options, state, trigger, date) {
-
     // Get their pickerIds
     var pId = element.attr('data-datepicker-id');
 
@@ -271,7 +270,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD')), function () {
+            picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD HH:mm:ss')), function () {
 
                 // Capture open of modal
                 $(document).on('opened.fndtn.reveal', '#picker' + pickerId, function () {
@@ -302,7 +301,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 // Initialise tabs
                 picker.foundation('reflow', 'tab');
 
-                $('#byDate-' + pickerId).find('.picker-submit').click(function () {
+                var $datePicker = $('#byDate-' + pickerId),
+                    $timetablePicker = $('#byTimetable-' + pickerId);
+
+                $datePicker.find('.picker-submit').click(function () {
                     if ($('#hideTime' + pickerId).is(':checked')) {
                         setValue(element, options, true, true);
                     }
@@ -321,12 +323,16 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                 });
 
-                $('#byTimetable-' + pickerId).find('.timetable-submit').click(function () {
+                $timetablePicker.find('.timetable-submit').click(function () {
+                    var newDate = moment($(this).attr('data-timetable-value'));
 
-                    var periodSelected = $('table').find('[data-selected=1]').attr('data-period'),
-                        periodTime = ($('[name*="periodTime' + pickerId + '"]:checked').val()),
-                        newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma'),
-                        newDate = moment($(this).attr('data-timetable-value')).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+                    if(options.enableTime === true) {
+                        var periodSelected = $timetablePicker.find('table').find('[data-selected=1]').attr('data-period'),
+                            periodTime = $timetablePicker.find('[name*="periodTime' + pickerId + '"]:checked').val(),
+                            newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma');
+
+                        newDate = newDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+                    }
 
                     setValue(element, options, false, true, newDate);
 

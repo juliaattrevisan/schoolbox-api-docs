@@ -21,9 +21,32 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Config;
 use Alaress_Date_Format;
 use Schoolbox\Role;
+use \Schoolbox\Config\Loader as ConfigLoader;
 
 class Controller extends Base
 {
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var TermMapper */
+    private $termMapper;
+
+    /** @var FolderMapper */
+    private $folderMapper;
+
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
+    /** @var AssessmentMapperProxy */
+    private $assessmentMapperProxy;
+
+    /** @var ConfigLoader */
+    private $configLoader;
+
+    /** @var  External_Timetable */
+    private $timetableHandler;
+
     /**
      * Test URLS:
      * http://192.168.36.10/picker/datetime                                         <-- HTML for injecting into modal
@@ -52,8 +75,8 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
         $this->setUserAccessMapper($userAccessMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setTimetableHandler();
-
+        $this->setTimetableHandler(new \External_Timetable());
+        $this->setConfigLoader(new ConfigLoader());
     }
 
     /**
@@ -69,10 +92,10 @@ class Controller extends Base
         $timetable = $this->getUserTimetable();
         $terms = $this->getTerms();
         try {
-            $date = new Alaress_Date_Format($value, array('Y-m-d g:ia', 'Y-m-d'));
+            $date = new Alaress_Date_Format($value, 'Y-m-d H:i:s');
         }
         catch (\Exception $e) {
-            throw $e;
+            // TODO handle the error properly
         }
 
         // Don't bother calculating if the timetable is offline, we'll only display the calendar
@@ -109,8 +132,8 @@ class Controller extends Base
             }
         }
 
-        $displayFormatDate = strlen(Config::get('date_local')) > 0 ? Config::get('date_local'): 'd/m/Y';
-        $displayFormatTime = strlen(Config::get('date_time')) > 0 ? Config::get('date_time'): 'h:iK';
+        $displayFormatDate = $this->getConfigLoader()->get('date_local');
+        $displayFormatTime = $displayFormatDate.' '.$this->getConfigLoader()->get('date_time');
 
         $this->getResponse()->content->set(
             array(
@@ -124,7 +147,7 @@ class Controller extends Base
                     'type' => $type,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
                     'displayFormatDate' => $this->convertFormat($displayFormatDate),
-                    'weekStartDay' => Config::get('calendar_start_day'),
+                    'weekStartDay' => $this->getConfigLoader()->get('calendar_start_day'),
                     'terms' => $terms,
                     // If the connector is offline, pass FALSE
                     'timetable' => $timetable,
@@ -140,17 +163,28 @@ class Controller extends Base
      * @param string $format
      * @return string
      */
-    public function convertFormat($format){
-        $formatMap = array(
-            '/S/' => '', // not supported
-            '/h/' => 'h', // 01-12 not supported, use 1-12 hours
-            '/g/' => 'h', // 1-12 hours
-            '/a/' => 'K', // no lowercase am/pm supported unfortunately
-            '/A/' => 'K', // AM/PM
-            '/G/' => 'H', // 00 - 23 hours
-            '/s/' => 'S', // 00 - 59 seconds
+    public function convertFormat($format) {
+        return strtr(
+            $format,
+            array(
+                'd' => 'd', // day of month
+                'S' => '', // not supported
+                'D' => 'D', // Suffix for day of month
+                'l' => 'l', // Day name in full
+                'M' => 'M', // Month number with leading zero
+                'n' => 'n', // Month number no leading zero
+                'y' => 'y', // Year two digits
+                'Y' => 'Y', // Year four digits
+                'h' => 'h', // 01-12 not supported, use 1-12 hours
+                'g' => 'h', // 1-12 hours
+                'a' => 'K', // no lowercase am/pm supported unfortunately
+                'A' => 'K', // AM/PM
+                'H' => 'H', // 00 - 23 hours
+                'G' => 'H', // 00 - 23 hours, no support for hour with no leading zero
+                'i' => 'i', // minutes leading zero
+                's' => 'S', // 00 - 59 seconds
+            )
         );
-        return preg_replace(array_keys($formatMap), array_values($formatMap), trim($format));
     }
 
     /**
@@ -457,9 +491,6 @@ class Controller extends Base
      * Getters/setters below here
      */
 
-    /** @var UserMapper */
-    private $userMapper;
-
     /**
      * @param UserMapper $mapper
      * @return mixed $this
@@ -475,9 +506,6 @@ class Controller extends Base
     public function getUserMapper() {
         return $this->userMapper;
     }
-
-    /** @var TermMapper */
-    private $termMapper;
 
     /**
      * @param TermMapper $mapper
@@ -495,8 +523,6 @@ class Controller extends Base
         return $this->termMapper;
     }
 
-    /** @var FolderMapper */
-    private $folderMapper;
 
     /**
      * @param FolderMapper $mapper
@@ -515,9 +541,6 @@ class Controller extends Base
 
     }
 
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
-
     /**
      * @param UserAccessMapper $mapper
      * @return mixed $this
@@ -533,9 +556,6 @@ class Controller extends Base
     public function getUserAccessMapper() {
         return $this->userAccessMapper;
     }
-
-        /** @var AssessmentMapperProxy */
-    private $assessmentMapperProxy;
 
     /**
      * @param AssessmentMapperProxy $mapper
@@ -553,18 +573,42 @@ class Controller extends Base
         return $this->assessmentMapperProxy;
     }
 
+
     /**
-     * @return mixed $this
+     * @return External_Timetable
      */
-    public function setTimetableHandler() {
-        $this->timetableHandler = new \External_Timetable;
+    public function getTimetableHandler()
+    {
+        return $this->timetableHandler;
+    }
+
+
+    /**
+     * @param External_Timetable $timetableHandler
+     * @return $this
+     */
+    public function setTimetableHandler($timetableHandler)
+    {
+        $this->timetableHandler = $timetableHandler;
         return $this;
     }
 
     /**
-     * @return TimetableHandler
+     * @return ConfigLoader
      */
-    public function getTimetableHandler() {
-        return $this->timetableHandler;
+    public function getConfigLoader()
+    {
+        return $this->configLoader;
+    }
+
+
+    /**
+     * @param ConfigLoader $configLoader
+     * @return $this
+     */
+    public function setConfigLoader($configLoader)
+    {
+        $this->configLoader = $configLoader;
+        return $this;
     }
 }

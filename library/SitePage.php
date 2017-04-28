@@ -358,6 +358,7 @@ class SitePage extends Page
             $this->user = new User();
         }
         $dateFormat = $this->config->get('date_local');
+        $dateTimeFormat = $this->config->get('date_local').' '.$this->config->get('date_time');
         $templateVar = array(
             'TEMPLATE_YEAR' => date('Y'),
             'SITE_NAME' => $this->config->get('school_name'),
@@ -384,6 +385,8 @@ class SitePage extends Page
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true',
             'DATEPICKER_FORMAT' => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
             'MOMENTJS_FORMAT' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
+            'LOCAL_DATE_FORMAT' => $dateFormat,
+            'LOCAL_DATETIME_FORMAT' => $dateTimeFormat,
             'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
             'FEEDBACK_TEXT' => Scrub::text($this->config->get('feedback_text')),
             'FEEDBACK_URL' => Scrub::text($this->config->get('feedback_url')),
