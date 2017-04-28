@@ -1,354 +1,537 @@
-// To keep the date format string the same between the flatpickr format string, and MomentJS need to create a mapping function
+/*
+ * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
-convertFormat = function (format) {
-    var formatMap = {
-            d: 'DD',
-            D: 'ddd',
-            j: 'D',
-            J: 'Do',
-            l: 'dddd',
-            N: 'E',
-            K: 'A',
-            S: 'SS',
-            w: 'd',
-            W: 'W',
-            F: 'MMMM',
-            m: 'MM',
-            M: 'MMM',
-            n: 'M',
-            o: 'GGGG',
-            Y: 'YYYY',
-            y: 'YY',
-            a: 'a',
-            A: 'A',
-            g: 'h',
-            G: 'H',
-            h: 'hh',
-            H: 'HH',
-            i: 'mm',
-            s: 'ss',
-            O: 'ZZ',
-            P: 'Z'
-        },
+// Picker settings
 
-        formatEx = /[dDjJlNKSwWFmMnoYyaAgGhHisOP]/g;
+// Build datepicker options here... again...
+$.fn.alaressDateTimeModal = function (twigVars) {
 
-    // Just return the converted format
-    return format.replace(formatEx, function (format) {
-        return formatMap[format];
-    });
-};
+    var $picker = $('#' + twigVars.element),
+        pickerOptions = {
+        // Flatpickr related
+        enableTime: getValue($picker, 'data-datepicker-time'),
 
-//Use global counter in case multiple alaressDateTimePicker() have been called from one page
+        // All the rest
+        altFormat: getValue($picker, 'data-datepicker-format'), // false|date|datetime
+        allDaySwitch: getValue($picker, 'data-datepicker-alldayswitch'), // Show All Day switch
+        allDayInput: getValue($picker, 'data-datepicker-alldayinput'),
+        type: getValue($picker, 'data-datepicker-call'), // Ajax call type: events, duework or nothing
+        endDay: getValue($picker, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
+        endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
 
-var pickerCounter = 0;
-countPickers = function () {
-    pickerCounter++;
-    return pickerCounter;
-};
+    };
 
-function getValue(input, attribute) {
-    var value = input.attr(attribute);
-    // There is no such attribute, return false
-    if (value === undefined) {
-        return false;
-    }
-    // The attribute is there and has a value, return it
-    else if (value.length > 0) {
-        return value;
-    }
-    // The attribute is there, but no value is set, return true
-    else {
+    function hasTime(value) {
+        var v = moment(value);
+        if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
+            return false;
+        }
+        if (v.hours() == 0 && v.minutes() == 0 && v.seconds() == 0) {
+            return false;
+        }
         return true;
     }
-}
 
-function getOptions(element) {
+    function requestDataByDate(date, target) {
+        if (twigVars.type == 'duework') {
 
-    // Build datepicker options form the element data attributes
-    var elementOptions = {
-        displayFormat: 'd/m/Y h:iK', //Default display format
-        displayFormatDate: 'd/m/Y',
-        databaseFormat: 'Y-m-d H:i:s',
-        enableTime: getValue(element, 'data-datepicker-time'),
-        allDaySwitch: getValue(element, 'data-datepicker-alldayswitch'), //Show All Day switch
-        allDayInput: getValue(element, 'data-datepicker-alldayinput'), //Sync with external AllDay input hidden field
-        altFormat: getValue(element, 'data-datepicker-format'), // false|date|datetime
-        type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
-        endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
-        endPeriod: getValue(element, 'data-datepicker-endofperiod')// It will use end of the period to set time through timetable picker
-    };
-    return elementOptions;
-}
+            loadingResponse(target);
 
-function getPickerFormats(allDayState, options) {
-    // Getting element date/datetime format settings
-    var from, to;
-    // Format is always date or datetime
-    if (options.altFormat !== false) {
-        if (options.altFormat == 'date') {
-            from = options.displayFormatDate;
-            to = options.displayFormatDate;
+            var folder = $('*[name = "folderId"]').val();
+
+            $.get((twigVars.routeLookup.getDueByDate).replace(/{folder}/g, folder).replace(/{date}/g, date))
+
+                .done(function (data) {
+
+                    appendResponse(data, 'duework', target);
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified date');
+                });
         }
-        else if (options.altFormat == 'datetime') {
-            from = options.displayFormat;
-            to = options.displayFormat;
-        }
-    }
-    else {
-        // If no time, format is date
-        if (options.enableTime === false) {
-            from = options.displayFormatDate;
-            to = options.displayFormatDate;
+        else if (twigVars.type == 'event') {
+
+            // AJAX in appointments for the selected date
+
+            loadingResponse(target);
+            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
+                .done(function (data) {
+
+                    appendResponse(data, 'events', target);
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified date');
+                });
         }
         else {
-            // Or... looking at the allDaySwitch option
-            if (options.allDaySwitch === true) {
-                // Ok, the allDaySwitch changed, changing the format accordingly
-                if (allDayState) {
-                    from = options.displayFormat;
-                    to = options.displayFormatDate;
+            // Do nothing
+        }
+    }
+
+    function requestDataByDay(element) {
+
+        var day = element.attr('data-day');
+        var period = element.attr('data-period');
+
+        $('.period-selected').removeClass('period-selected');
+        $('table').find('[data-selected=1]').attr('data-selected', 0);
+        element.addClass('period-selected');
+        element.attr('data-selected', 1);
+        $('.day-' + day).addClass('period-selected');
+        $('.description-' + period).addClass('period-selected');
+
+        var campus = $timetable.campus.val(),
+            term = $timetable.term.val(),
+            cycle = $timetable.cycle.val();
+
+        if (twigVars.type == 'duework') {
+
+            // Can the assessment form have dates and be called outside the class page?
+            var folder = $('*[name = "folderId"]').val();
+
+            loadingResponse('timetable');
+
+            $.get((twigVars.routeLookup.getByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day).replace(/{folder}/g, folder))
+                .done(function (data) {
+
+                    appendResponse(data, 'duework', 'timetable');
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified period');
+                });
+        }
+        else if (twigVars.type == 'event') {
+            // Or fetch events
+
+            loadingResponse('timetable');
+            $.get((twigVars.routeLookup.getEventsByTimetableDay).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                .done(function (data) {
+
+                    appendResponse(data, 'events', 'timetable');
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified period');
+                });
+        }
+        else {
+            // Fetch a timetable day date
+            loadingResponse('timetable');
+            $.get((twigVars.routeLookup.getTimetableDate).replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                .done(function (data) {
+                    appendResponse(data, '', 'timetable');
+                })
+                .fail(function () {
+                    console.log('Timetable day to date conversion failed');
+                });
+        }
+    }
+
+    // Show loader
+    function loadingResponse(target) {
+        var $pickerResponse = $('#' + target + 'Response' + twigVars.id);
+        $pickerResponse.html('');
+        $pickerResponse.append('<div class="loader"></div>');
+
+        if (target == 'timetable') {
+            $timetable.submit.addClass('disabled');
+        }
+    }
+
+    // Prepare and append response HTML
+    function appendResponse(data, template, target) {
+
+        var $pickerResponse = $('#' + target + 'Response' + twigVars.id);
+
+        // Clear out any old response display
+        $pickerResponse.html('');
+        var html = '';
+
+        // Ajax returned date
+        displayDate = moment(data.date).format('MMMM DD, YYYY');
+
+        if (target == 'timetable') {
+            $timetable.submit.removeClass('disabled');
+            $timetable.submit.attr('data-timetable-value', data.date);
+
+            var $byTimetable = $('#byTimetable-' + twigVars.id),
+                periodSelected = $byTimetable.find('table').find('[data-selected=1]').attr('data-period');
+
+            $('.timetableDate' + twigVars.id)
+                .css('display', 'block')
+                .find('.displayDate').empty().append(displayDate);
+
+            if (periodSelected && pickerOptions.enableTime) {
+                var periodStart = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-start'),
+                    periodEnd = $byTimetable.find('[data-period-number=' + periodSelected + ']').attr('data-period-end');
+
+                $((pickerOptions.endPeriod ? '#periodEnd' : '#periodStart') + twigVars.id).prop('checked', true);
+
+                $('label[for="periodStart' + twigVars.id + '"]').empty().append(periodStart);
+                $('label[for="periodEnd' + twigVars.id + '"]').empty().append(periodEnd);
+                $('#periodStart' + twigVars.id).closest('div').removeClass('hide');
+            }
+        }
+
+        if (template == 'duework') {
+
+            if (data.students === undefined) {
+                html = 'Error loading data';
+            }
+            else if (data.students.length == 0) {
+                html += 'Nothing due on ' + displayDate + '';
+                $pickerResponse.addClass('meta');
+            }
+            else {
+                $pickerResponse.removeClass('meta');
+
+                // Populate with results for the selected date
+
+                html += '<div class="row">';
+                html += '<div class="small-12 medium-12 columns">';
+                html += '<h2>Work due on ' + displayDate + '</h2>';
+                html += '<ul class="small-12 information-list expandable-card">';
+                for (var i = 0; i < data.students.length; i++) {
+                    html += '<li>';
+                    html += '<div>';
+                    html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
+                    html += '<div class="card small-12">';
+                    html += '<a href="/search/user/' + data.students[i].id + '">';
+                    html += '<img src="/portrait.php?userId=' + data.students[i].externalId + '&amp;size=square80">';
+                    html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
+                    html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
+                    html += '</a>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '<div class="small-12 column" data-collapse-state="collapsed" data-collapsable="collap-' + i + '" style="display: none;">';
+                    html += '<table class="assessment-list">';
+                    for (var k = 0; k < data.students[i].assessmentList.length; k++) {
+                        html += '<tr><td>';
+                        if (data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
+                            html += data.students[i].assessmentList[k]['duetime'];
+                        }
+                        html += '</td><td>' + data.students[i].assessmentList[k]['context'] + ': ' + data.students[i].assessmentList[k]['title'] + '</td>' +
+                            '</tr>';
+                    }
+                    html += '</table>';
+                    html += '</div>';
+                    html += '</li>';
                 }
+                html += '</ul>';
+                html += '</div>';
+                html += '</div>';
+
+            }
+        }
+        else if (template == 'events') {
+            if (data.appointments === undefined) {
+                html = 'Error loading data';
+            }
+            else if (data.appointments.length == 0) {
+                html += 'No events found for ' + displayDate;
+                $pickerResponse.addClass('meta');
+            }
+            else {
+                $pickerResponse.removeClass('meta');
+
+                html += '<div class="row">';
+                html += '<div class="small-12 medium-12 columns">';
+                html += '<h2>Events on ' + displayDate + '</h2>';
+                html += '<ul class="small-12 information-list card">';
+                // Populate with appointments for the selected date
+                for (var i = 0; i < data.appointments.length; i++) {
+                    html += '<li>';
+                    html += '<h3>' + data.appointments[i].title + '</h3>';
+                    html += '<p class="meta">' + data.appointments[i].displayDateTime + '</p>';
+                }
+                html += '</ul>';
+                html += '</div>';
+                html += '</div>';
+            }
+        }
+        else {
+            // nope
+            html = '';
+        }
+
+        $pickerResponse.append(html);
+        if (template == 'duework' && data.students.length > 0) {
+            $('#picker'+twigVars.id).find('[data-collapser]').collapsable();
+        }
+    }
+
+    function setPickerSize(reset) {
+        var addClass;
+
+        if (reset || twigVars.timetable === false) {
+            addClass = 'pickerNarrow'
+        }
+        else {
+            var daysInCycle = $timetable.campus.find(':selected').attr('data-days');
+            addClass = daysInCycle > 7 ? 'pickerWide' : 'pickerNarrow';
+        }
+
+        $('#picker' + twigVars.id)
+            .removeClass(addClass == 'pickerNarrow' ? 'pickerWide' : 'pickerNarrow')
+            .addClass(addClass);
+
+    }
+
+    // Timetable picker
+    if (twigVars.timetable) {
+
+        // Timetable elements
+        var $byTimetable = $('#byTimetable-' + twigVars.id),
+            $timetable = {
+                campus: $byTimetable.find('select[name*="campus"]'),
+                term: $byTimetable.find('select[name*="term"]'),
+                cycle: $byTimetable.find('select[name*="cycle"]'),
+                submit: $byTimetable.find('.timetable-submit')
+            };
+
+        // Build cycles dynamically
+        function buildCycles() {
+
+            var selectedCampus = 'campus_'+$timetable.campus.find(':selected').val(),
+                daysInCycle = $timetable.campus.find(':selected').attr('data-days'),
+                termDuration = $timetable.term.find(':selected').attr('data-duration');
+
+            // Don't try to divide by zero
+            if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
+                var optionsHtml = '';
+
+                //Select cycle number on first load
+                var cycleSelected = twigVars.timetableVars[selectedCampus].selectedCycle;
+                for (var i = 1; i <= twigVars.timetableVars[selectedCampus].timetableCycles; i++) {
+                    var selected = '';
+
+                    if (cycleSelected == i) {
+                        selected = 'selected';
+                    }
+                    optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
+                }
+                $timetable.cycle.empty().append(optionsHtml);
+
+                // Increase space to accommodate a table
+                if (daysInCycle > 7) {
+                    setPickerSize(false);
+                    $byTimetable.find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-7');
+                    $byTimetable.find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-6').addClass('medium-5');
+                }
+                // Back to normal
                 else {
-                    from = options.displayFormat;
-                    to = options.displayFormat;
+                    setPickerSize(true);
+                    $byTimetable.find('#timetable' + twigVars.id).closest('.columns').removeClass('medium-7').addClass('medium-6');
+                    $byTimetable.find('#timetableResponse' + twigVars.id).closest('.columns').removeClass('medium-5').addClass('medium-6');
                 }
             }
             else {
-                from = options.displayFormat;
-                to = options.displayFormat;
+                noTimetableData();
             }
         }
-    }
-    var formats = {
-        convertFrom: from,
-        convertTo: to
-    };
-    return formats;
-}
 
-function getLinkedElements(element, options) {
-    // Get all linked inputs, e.g. startDate, endDate
-    var elements = $('[data-datepicker-alldayinput = ' + options.allDayInput + ']');
-    var linkedElements = [];
-    elements.each(function () {
-        if ($(this)[0] !== element[0]) {
-            linkedElements.push($(this));
-        }
-    });
-    return linkedElements;
-}
+        // Highlight day and period
+        function showPeriod() {
+            var campusId = $timetable.campus.find(':selected').val(),
+                selectedCampus = 'campus_'+campusId,
+                daysInCycle = $timetable.campus.find(':selected').attr('data-days');
+            if (daysInCycle !== undefined && daysInCycle > 0) {
+                var isWeekend = twigVars.timetableVars.isWeekend;
+                // Highlight day if it doesn't fall on a weekend
+                if (isWeekend === 0) {
+                    var period = 0;
+                    // Get day of the cycle
+                    var cycleDay = twigVars.timetableVars[selectedCampus].selectedDay;
+                    $byTimetable.find('.day-' + cycleDay).addClass('period-selected');
+                    $('#timetable'+twigVars.id+'-'+campusId).find('.period-description').each(function () {
 
-function setValue(element, options, state, trigger, date) {
+                        var periodStart = moment($(this).attr('data-period-start'), 'h:mma').format('HHmm'),
+                            periodEnd = moment($(this).attr('data-period-end'), 'h:mma').format('HHmm'),
+                            time = moment(twigVars.date).format('HHmm');
 
-    // Get their pickerIds
-    var pId = element.attr('data-datepicker-id');
+                        if ((time >= periodStart) && (time < periodEnd)) {
+                            $(this).addClass('period-selected');
+                            period = $(this).attr('data-period-number');
+                            if ((cycleDay > 0) && (period > 0)) {
+                                $byTimetable.find('.period-' + cycleDay + '-' + period).addClass('period-selected');
+                            }
+                        }
 
-    // Get the format
-    var pickerFormats = getPickerFormats(state, options);
-    var value;
-
-    if (date !== undefined) {
-        value = moment(date);
-    }
-    else if (window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
-        value = moment(window.pickerInstance[pId].input.value);
-    }
-    else if (element.val() !== undefined && element.val()) {
-        value = moment(element.val(), convertFormat(pickerFormats.convertFrom));
-    }
-    else {
-        value = moment();
-    }
-    // All Day is on
-    var v;
-    if (state === true) {
-        if (options.endDay) {
-            v = value.endOf('day').format(convertFormat(pickerFormats.convertTo));
-        }
-        else {
-            v = value.startOf('day').format(convertFormat(pickerFormats.convertTo));
-        }
-        if (window.pickerInstance[pId] !== undefined) {
-            window.pickerInstance[pId].setDate(v.toISOString);
-        }
-        element.val(v);
-    }
-    else {
-        v = moment(value).format(convertFormat(pickerFormats.convertTo));
-        if (window.pickerInstance[pId] !== undefined) {
-            window.pickerInstance[pId].setDate(v.toISOString);
-        }
-        element.val(v);
-    }
-    if (trigger === true) {
-        element.trigger('change');
-    }
-    if (options.allDayInput !== false) {
-        $('#' + options.allDayInput).val(state ? 1 : 0);
-    }
-}
-
-function checkAllDaySwitch (state, pickerId) {
-
-    var $timeDiv = $('#pickerCalendar' + pickerId).closest('#picker' + pickerId).find('.flatpickr-time');
-
-    // All Day is on
-    if (state === true) {
-        $timeDiv.css('display', 'none');
-        $('#hideTime' + pickerId).prop('checked', true);
-
-    }
-    else {
-        $timeDiv.css('display', 'block');
-        $('#hideTime' + pickerId).prop('checked', false);
-    }
-
-}
-
-// Extend jQuery with our datepicker function
-
-$.fn.alaressDateTimePicker = function (optionsOverride) {
-
-    var element = this;
-
-    // Build datepicker options form the element data attributes
-    var options = getOptions(element);
-
-    // Override with user any options --- should this stay? Todo
-    for (var attribute in optionsOverride) {
-        options[attribute] = optionsOverride[attribute];
-    }
-
-    window.pickerInstance = [];
-
-    // Count this picker in
-    var pickerId = countPickers();
-
-    // Set pickerID to the element attr
-    element.attr('data-datepicker-id', pickerId);
-
-    var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
-    element.after('<div data-reveal id="picker' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '"></div>');
-
-    // Create click event to open the modal for the element
-
-    element.change(function () {
-        if (window.pickerInstance[pickerId] !== undefined) {
-            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
-        }
-    });
-
-    element.click(function () {
-
-        var originalValue;
-
-        if (element.val().length > 0) {
-            originalValue = moment( element.val(), convertFormat(options.displayFormat));
-        }
-        // if no value has been passed, use today
-        else {
-            originalValue = moment();
-        }
-        if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
-            originalValue = moment(originalValue, convertFormat(options.displayFormatDate));
+                    });
+                }
+            }
+            else {
+                noTimetableData();
+            }
         }
 
-        var picker = $('#picker' + pickerId);
+        // Reveal Timetable
+        function revealTimetable() {
+            var campus = $timetable.campus.find(':selected').val();
+            $('.timetablePicker' + twigVars.id).css('display', 'none');
+            $('#timetable' + twigVars.id + '-' + campus).css('display', 'table');
+        }
 
-        // Only AJAX in the picker if we haven't already
+        function noTimetableData() {
+            var html = '<div data-alert class="alert-box alert">Not enough data to build a timetable <br /> for the selected campus and term.<a href="#" class="close">×</a></div>';
 
-        if (picker.data('status') === undefined) {
+            $timetable.cycle.empty().css('display', 'none');
+            $('.timetablePicker' + twigVars.id).empty().css('display', 'none');
+            $timetable.submit.css('display', 'none');
 
-            // Update picker status
-            picker.data('status', 'loading');
+            $byTimetable.append(html);
+        }
 
-            //Check if the form is inside another modal
-            var reveal = element.parents('*[data-reveal]');
-            if (reveal.length > 0) {
-                picker.data('reveal', reveal.attr('id'));
+        function resetTimetable() {
+
+            $byTimetable.find('.period-selected').removeClass('period-selected');
+            $byTimetable.find('table').find('[data-selected=1]').attr('data-selected', 0);
+
+            $('.timetableDate' + twigVars.id).css('display', 'none');
+            $timetable.submit.addClass('disabled');
+        }
+
+        buildCycles();
+        showPeriod();
+        revealTimetable();
+        // On first load request data by date for the timetable
+        requestDataByDate(encodeURIComponent( twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate() ), 'timetable');
+
+        // Update cycles on Campus or Term change
+        $timetable.campus.change(function () {
+            buildCycles();
+            resetTimetable();
+            showPeriod();
+            revealTimetable();
+        });
+
+        $timetable.term.change(function () {
+            buildCycles();
+            resetTimetable();
+        });
+
+        $timetable.cycle.change(function () {
+            resetTimetable();
+        });
+
+        var timetableAppointments = $('#timetableAppointments' + twigVars.id);
+
+        // Timetable picker behaviour
+        $('table.timetablePicker').mouseout(function () {
+            $('.period-hover').removeClass('period-hover');
+        });
+
+        $('.has-period').hover(function () {
+
+            $('.period-hover').removeClass('period-hover');
+            var day = $(this).attr('data-day');
+            var period = $(this).attr('data-period');
+            $('.day-' + day).addClass('period-hover');
+            $('.description-' + period).addClass('period-hover');
+
+        });
+
+        // Loading events on timetable picker click
+        var displayDate = moment().format(convertFormat(twigVars.displayFormat)); //today
+        $('.has-period').click(function () {
+            requestDataByDay($(this));
+        });
+    }
+
+    // Setup calendar
+    var newDate, latestDate;
+
+    function renderAllDaySwitch() {
+        var $timeDiv = $('#pickerCalendar' + twigVars.id).closest('#picker' + twigVars.id).find('.flatpickr-time');
+
+        var html = '';
+
+        // Build an All Day switch if it's been set in the options
+        if (pickerOptions.allDaySwitch === true) {
+            html += '<div class="time-switch"><input id="hideTime' + twigVars.id + '" type="checkbox" value="1" checked>' +
+                '<label for="hideTime' + twigVars.id + '" class="checkbox-label">All Day</label></div>' +
+                '</div>';
+        }
+
+        $timeDiv.after(html);
+    }
+
+    // Accommodating the "start of the week" SB config
+    Flatpickr.localize(Flatpickr.l10ns.default);
+    Flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
+
+    window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, {
+        defaultDate: twigVars.date,
+        inline: true,
+        altInput: false,
+        allowInput: true,
+        disableMobile: true,
+        minuteIncrement: 1,
+        enableTime: pickerOptions.enableTime,
+
+        onReady: function (selectedDates, dateStr, instance) {
+            renderAllDaySwitch();
+
+            // Hide time picker if allday hidden field is set to 1
+            if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 1) {
+                checkAllDaySwitch(true, twigVars.id);
+            }
+            else if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 0) {
+                checkAllDaySwitch(false, twigVars.id);
+            }
+            else if (hasTime(instance.input.value) === false) {
+                checkAllDaySwitch(true, twigVars.id);
+            }
+            else {
+                checkAllDaySwitch(false, twigVars.id);
             }
 
-            // if datetime, pass date only
-            // AJAX in the modal contents if they haven't already been loaded
-            picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD')), function () {
-
-                // Capture open of modal
-                $(document).on('opened.fndtn.reveal', '#picker' + pickerId, function () {
-
-                    // Check and refresh visibility of time and allDaySwitch state
-                    // Hide time picker if allday hidden field is set to 1
-                    if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
-                        checkAllDaySwitch(true, pickerId);
-                    }
-                    else if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 0) {
-                        checkAllDaySwitch(false, pickerId);
-                    }
-
-                });
-
-                // Capture closure of modal
-                $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
-                    // Open back the parent modal, if any
-                    if ((picker.data('reveal').length > 0)) {
-                        $('#' + picker.data('reveal')).foundation('reveal', 'open');
-                    }
-                });
-                // Update picker status
-                picker.data('status', 'loaded');
-
-                // Display the datetime picker modal
-                picker.foundation('reveal', 'open');
-                // Initialise tabs
-                picker.foundation('reflow', 'tab');
-
-                $('#byDate-' + pickerId).find('.picker-submit').click(function () {
-                    if ($('#hideTime' + pickerId).is(':checked')) {
-                        setValue(element, options, true, true);
+            if (pickerOptions.allDaySwitch === true) {
+                $('#hideTime' + twigVars.id).click(function () {
+                    if ($('#hideTime' + twigVars.id).is(':checked')) {
+                        checkAllDaySwitch(true, twigVars.id);
                     }
                     else {
-                        setValue(element, options, false, true);
+                        checkAllDaySwitch(false, twigVars.id);
                     }
-
-                    if (options.allDayInput !== false) {
-                        var linkedElements = getLinkedElements(element, options);
-                        linkedElements.forEach(function (item) {
-                            setValue(item, getOptions(item), $('#hideTime' + pickerId).is(':checked'), true);
-                        });
-                    }
-
-                    picker.foundation('reveal', 'close');
-
                 });
+            }
 
-                $('#byTimetable-' + pickerId).find('.timetable-submit').click(function () {
+            requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
+        },
+        onChange: function (selectedDates, dateStr, instance) {
 
-                    var periodSelected = $('table').find('[data-selected=1]').attr('data-period'),
-                        periodTime = ($('[name*="periodTime' + pickerId + '"]:checked').val()),
-                        newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma'),
-                        newDate = moment($(this).attr('data-timetable-value')).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+            // Put the display date onto the calendar div so we can capture it when the modal is closed
+            if(dateStr.length > 0) {
+                var dateSplit = dateStr.split(' ');
+                $('#pickerCalendar' + twigVars.id)
+                    .attr('data-date', dateSplit[0])
+                    .attr('data-time', dateSplit[1]);
 
-                    setValue(element, options, false, true, newDate);
-
-                    if (options.allDayInput !== false) {
-                        var linkedElements = getLinkedElements(element, options);
-                        linkedElements.forEach(function (item) {
-                            setValue(item, getOptions(item), false, true);
-                        });
-                    }
-                    picker.foundation('reveal', 'close');
-                });
-
-            });
-
-        } else if (picker.data('status') == 'loaded') {
-
-            // Update picker values, in case element field value has changed
-            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
-
-            picker.foundation('reveal', 'open');
-
+                // Check if selected date has changed and don't send an ajax on time change
+                var selectedObj = new Date(selectedDates);
+                newDate = selectedObj.getFullYear() + '-' + (selectedObj.getMonth() + 1) + '-' + selectedObj.getDate();
+                if (newDate !== latestDate) {
+                    alert(dateStr);
+                    requestDataByDate(encodeURIComponent(dateSplit[0]), 'calendar');
+                }
+                latestDate = newDate;
+            }
         }
+
     });
 
+    // Resize modal on changing tabs
+    $('a[href="#byDate-' + twigVars.id + '"]').click(function () {
+        setPickerSize(true);
+    });
+    $('a[href="#byTimetable-' + twigVars.id + '"]').click(function () {
+        setPickerSize(false);
+    });
 };
