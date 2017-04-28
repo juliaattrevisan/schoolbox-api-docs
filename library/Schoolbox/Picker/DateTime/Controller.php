@@ -132,8 +132,8 @@ class Controller extends Base
             }
         }
 
-        $displayFormatDate = strlen(Config::get('date_local')) > 0 ? Config::get('date_local'): 'd/m/Y';
-        $displayFormatTime = strlen(Config::get('date_time')) > 0 ? Config::get('date_time'): 'h:iK';
+        $displayFormatDate = $this->getConfigLoader()->get('date_local');
+        $displayFormatTime = $displayFormatDate.' '.$this->getConfigLoader()->get('date_time');
 
         $this->getResponse()->content->set(
             array(
