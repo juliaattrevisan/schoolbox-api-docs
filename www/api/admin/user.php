@@ -130,7 +130,10 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
         }
 
         // Enable new user by default
-        $user = $setUserFields($userMapper->createModel(), $_GET)->setEnabled(true);
+        $user = $setUserFields($userMapper->createModel(), $_GET)
+            ->setWebmail(false)
+            ->setUseInternalMail(false)
+            ->setEnabled(true);
 
         try {
             $userMapper->save($user);
