@@ -23,6 +23,13 @@ use Schoolbox\Mapper\Exception;
 interface IMapper 
 {
     /**
+     * Retrieve the singleton instance of this class.
+     *
+     * @return static
+     */
+    public static function getInstance();
+
+    /**
      * @return IDatabase
      */
     public function getDatabase();
@@ -185,4 +192,4 @@ interface IMapper
      * @return bool
      */
     public function delete($object);
-} 
+}
