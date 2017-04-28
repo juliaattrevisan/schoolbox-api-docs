@@ -80,8 +80,11 @@ abstract class Evaluation_Answer extends DeprecatedModel
 
 	/**
 	 * Output configuration settings in modify
+     *
+     * @param $page
+     * @param $config
 	 */
-	public function configure() {
+	public function configure($page, $config) {
 	}
 
     /**
