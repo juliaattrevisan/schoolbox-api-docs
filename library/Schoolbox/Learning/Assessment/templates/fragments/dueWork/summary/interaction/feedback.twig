@@ -60,9 +60,18 @@
             </div>
         </div>
     </div>
-    {% if showLineActions %}
+    {% set deleteRoute = routeLookupIfAuthorized(
+        'learningFeedback.deleteAssessmentFeedback',
+        {
+            assessmentId: participant.assessable.id,
+            assessment: participant.assessable,
+            feedbackId: currentFeedback.id,
+            feedback: currentFeedback,
+        }
+    ) %}
+    {% if deleteRoute %}
     <nav>
-        <a class="icon-delete" data-delete="{{ routeLookup('learningFeedback.deleteAssessmentFeedback', { assessmentId: participant.assessable.id, feedbackId: currentFeedback.id, feedback: currentFeedback }) }}"></a>
+        <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
     </nav>
     {% endif %}
 

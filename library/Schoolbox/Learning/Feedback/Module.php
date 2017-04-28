@@ -42,12 +42,7 @@ class Module extends BaseModule
             throw new Forbidden();
         }, Access::getInstance());
 
-        $canGiveFeedbackFromFeedback    = new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
-            if ($params['feedback'] instanceof Assessment\IFeedback) {
-                return $params['feedback']->getAssessable()->getContext()->getFolder()->getId();
-            }
-            throw new Forbidden();
-        }, Access::getInstance());
+        $canDeleteFeedback = new Rule\IsSuperuser();
 
         // preloads
         $preloadParticipant = function ($params) {
@@ -75,7 +70,7 @@ class Module extends BaseModule
 
         $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback',  $canGiveFeedbackFromParticipant, $preloadParticipant); // p
         $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback',     $canGiveFeedbackFromParticipant, $preloadParticipantAndResponse); // p
-        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canGiveFeedbackFromFeedback,    $preloadFeedback); // f
+        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canDeleteFeedback,              $preloadFeedback); // f
     }
 
 
