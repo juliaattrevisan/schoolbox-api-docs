@@ -5,11 +5,12 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 card ui-sortable-handle" data-component-handle>
-                            <h2 title="{{ config.componentname }}"><a href="#">{{ config.componentname }}</a></h2>
+                            <h2 title="{{ config.componentname }}">
+                                <a href="#">{{ config.componentname }}</a>
+                            </h2>
                         </div>
                     </div>
                     <nav>
-                        <a href="/survey/intro/{{ survey.id }}" class="icon-surveys" title="Re-Attempt Survey"></a>
                     </nav>
                 </li>
             </ul>
@@ -72,6 +73,16 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        {% if survey.attempts | length < survey.maxAttempts %}
+            <div class="component-action">
+                <section>
+                    <a href="/survey/intro/{{ survey.id }}" class="button">
+                        Reattempt Survey
+                    </a>
+                </section>
+            </div>
+        {% endif %}
 
     {% endif %}
 

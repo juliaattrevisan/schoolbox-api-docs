@@ -95,33 +95,36 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
                 $answersArray = [];
 
-                foreach ($answers as $answer) {
-                    $answersArray[$answer->value] = $answer->description;
-                }
+                if (is_array($answers)) {
 
-                // Add each question for the section to the array
-
-                // The number of questions is restricted by the components configuration
-
-                if (count($answersRenderArray[$sectionTitle]) < $this->config['size']) {
-
-                    // Unserialize the persons selected answer(s) and store them with the question for rendering
-
-                    $selectedAnswers = unserialize($response['selectedAnswers']);
-
-                    $answers = [];
-
-                    if (is_array($selectedAnswers)) {
-                        foreach ($selectedAnswers as $answer) {
-                            $answers[] = $answersArray[Scrub::html2text($answer)];
-                        }
+                    foreach ($answers as $answer) {
+                        $answersArray[$answer->value] = $answer->description;
                     }
 
-                    $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = $answers;
-                }
+                    // Add each question for the section to the array
 
-                if (count($answersRenderArray[$sectionTitle]) > $maximumQuestions) {
-                    $maximumQuestions = count($answersRenderArray[$sectionTitle]);
+                    // The number of questions is restricted by the components configuration
+
+                    if (count($answersRenderArray[$sectionTitle]) < $this->config['size']) {
+
+                        // Unserialize the persons selected answer(s) and store them with the question for rendering
+
+                        $selectedAnswers = unserialize($response['selectedAnswers']);
+
+                        $answers = [];
+
+                        if (is_array($selectedAnswers)) {
+                            foreach ($selectedAnswers as $answer) {
+                                $answers[] = $answersArray[Scrub::html2text($answer)];
+                            }
+                        }
+
+                        $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = $answers;
+                    }
+
+                    if (count($answersRenderArray[$sectionTitle]) > $maximumQuestions) {
+                        $maximumQuestions = count($answersRenderArray[$sectionTitle]);
+                    }
                 }
             }
         }

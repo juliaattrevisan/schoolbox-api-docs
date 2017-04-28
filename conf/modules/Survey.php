@@ -9,6 +9,7 @@ namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
+use Schoolbox\Survey\Module as SurveyModule;
 use Schoolbox\Survey\Component\Eportfolio\Module as EportfolioModule;
 
 class Survey extends ModuleLoader implements ModuleConfigInterface
@@ -23,6 +24,7 @@ class Survey extends ModuleLoader implements ModuleConfigInterface
     {
         $namespace = 'survey';
 
+        $this->loadModule($kernel, SurveyModule::class, "/{$namespace}");
         $this->loadModule($kernel, EportfolioModule::class, "/{$namespace}");
     }
 }

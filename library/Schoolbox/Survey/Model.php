@@ -37,6 +37,9 @@ class Model
 
     /** @var Collection $attempts */
     protected $attempts;
+    
+    /** @var int $maxAttempts */
+    protected $maxAttempts;
 
     /**
      * @param string $availability
@@ -73,6 +76,24 @@ class Model
     {
         return $this->title;
     }
+
+    /**
+     * @param int $maxAttempts
+     * @return self
+     */
+    public function setMaxAttempts($maxAttempts)
+    {
+        $this->maxAttempts = $maxAttempts;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxAttempts()
+    {
+        return $this->maxAttempts;
+    }    
 
     /**
      * @param Folder $folder

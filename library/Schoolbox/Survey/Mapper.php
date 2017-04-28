@@ -13,8 +13,13 @@ namespace Schoolbox\Survey;
 
 use PDO;
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
+use Schoolbox\Survey\Mapper as SurveyMapper;
+use Schoolbox\Survey\Attempt\Model as SurveyAttempt;
 
 class Mapper extends BaseMapper
 {
@@ -28,10 +33,33 @@ class Mapper extends BaseMapper
         $this->uses('assess_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses('availability', self::TYPE_STRING);
         $this->uses('title', self::TYPE_STRING);
+        $this->uses('max_attempts', self::TYPE_INTEGER);
         $this->joins('category_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('deleted_at');
+
+        $this->hasJoin(
+            'assess_attempts',
+            array(
+                'mapper' => SurveyAttemptMapper::class,
+                'other_key' => 'assess_id',
+                'this_key' => 'assess_id',
+                'multiple' => true,
+            )
+        );
+    }
+
+    protected function getSelectString()
+    {
+        return "
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('folder', 'f')},
+                        {$this->getJoinColumnString('assess_attempts', 'aa')}
+            FROM        {$this->getTable()}
+            INNER JOIN  {$this->getJoinSql('folder', '', 'f')}
+            LEFT JOIN   {$this->getJoinSql('assess_attempts', '', 'aa')}
+        ";
     }
 
     /**
@@ -46,6 +74,18 @@ class Mapper extends BaseMapper
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             if ($row['availability'] == 'survey') {
                 $results[] = $row;
+
+                /** @var Model $model */
+                $model = $this->hydrate($row, '');
+
+                /** @var Folder $folder */
+                $folder = $this->hydrateJoin($row, 'folder', 'f');
+                $model->setFolder($folder);
+
+
+                /** @var Collection $attempts */
+                $attempts = $this->getJoinMapper('assess_attempts')->findByColumn('assess_id', $model->getId());
+                $model->setAttempts($attempts);
             }
         }
 
@@ -108,5 +148,56 @@ class Mapper extends BaseMapper
         ]);
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retrieve all accessible surveys by search keyword
+     *
+     * @param $search
+     * @return mixed
+     */
+    public function findByKeyword($search)
+    {
+        $search = trim($search);
+
+        if (strlen($search) < 3) {
+            return [];
+        }
+
+        $results = [];
+
+        $folderMapper = FolderMapper::getInstance();
+        $surveyMapper = SurveyMapper::getInstance();
+
+        $predicateBuilder = $this->getPredicateBuilder();
+
+        // If the logged in user isn't a superuser, restrict search to folders they have access to
+
+        if (!$this->getSessionUser()->isSuperuser()) {
+
+            $folderIds = $folderMapper->findForUser($this->getSessionUser(), true)->getColumnValues('id');
+
+            // Find all the surveys on these pages
+
+            foreach ($folderIds as $folderId) {
+                $predicateBuilder->equals('category_id', $folderId);
+            }
+        }
+
+        // And filter the name of the survey
+
+        $predicateBuilder->like('title', "%{$search}%");
+
+        $surveys = $surveyMapper->findByPredicates($predicateBuilder);
+
+        /** @var Model $survey */
+        foreach ($surveys as $survey) {
+            $results[] = [
+                'id' => $survey->getId(),
+                'name' => $survey->getFolder()->getName() . " - " . $survey->getTitle()
+            ];
+        }
+
+        return $results;
     }
 }

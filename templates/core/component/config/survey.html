@@ -1,6 +1,18 @@
-<select name="survey">
-    <option value="">Select Survey To Display</option>
-    <!-- BEGIN surveys -->
-    <option value="{COMPONENT_CONFIG_VALUE}"{COMPONENT_CONFIG_SELECTED}>{COMPONENT_CONFIG_NAME}</option>
-    <!-- END surveys -->
-</select>
+<input id="component-survey-{COMPONENT_CONFIG_ID}" name="survey" value="{COMPONENT_CONFIG_VALUE}">
+
+<script>
+    $(function() {
+        $('#component-survey-{COMPONENT_CONFIG_ID}').selectizeSelector({
+            ajax: {
+                url: '/survey/ajax',
+                type: 'GET',
+                dataType: 'json'
+            },
+            multiple: false,
+            value: [{
+                'id': '{COMPONENT_CONFIG_ID}',
+                'name': '{COMPONENT_CONFIG_NAME}'
+            }]
+        });
+    });
+</script>
