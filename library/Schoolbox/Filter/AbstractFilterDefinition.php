@@ -275,6 +275,17 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
 
     /**
+     * @inheritdoc
+     */
+    public function getAbstractKeys()
+    {
+        // Default. You MUST override if the set of options displayed in admin includes dynamic options (eg Terms, WorkTypes etc).
+        // Dynamic options depend on database contents, but do not change per viewee.
+        return $this->getCustomKeys();
+    }
+
+
+    /**
      * Each filter definition must know how to sort options
      *
      * By default, sort them as defined in $this->getCustomKeys()

@@ -102,6 +102,7 @@ class Definition extends AbstractFilterDefinition
             if ($leftKey === $right) {
                 return 0;
             }
+            // Sort concrete items by workType.id
             return $leftKey < $rightKey ? -1 : +1;
         });
     }

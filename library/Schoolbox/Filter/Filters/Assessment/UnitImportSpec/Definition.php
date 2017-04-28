@@ -130,15 +130,6 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    public function getAbstractKeys()
-    {
-        return $this->getCustomKeys();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getLabel($key)
     {
         switch ($key) {

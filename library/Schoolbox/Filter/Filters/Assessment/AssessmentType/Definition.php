@@ -79,17 +79,6 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * Return the set of possible keys for this filter's options
-     *
-     * @return string[]
-     */
-    public function getAbstractKeys()
-    {
-        return $this->getCustomKeys();
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function getLabel($key)
