@@ -52,6 +52,7 @@ abstract class AbstractFilterFactory implements IFilterFactory
      *
      * @param Filter\Model $filter
      * @return IFilterDefinition|object
+     * @throws \ReflectionException If unable to create an instance of the reflected class
      */
     public function buildDefinition(Filter\Model $filter)
     {
@@ -61,20 +62,22 @@ abstract class AbstractFilterFactory implements IFilterFactory
 
 
     /**
-     * Build a filter component, ready to inject into a filter panel
-     *
-     * @param string               $definitionClass  They type of filter we are building
-     * @param User                 $user
-     * @param string               $page
-     * @param null|User            $viewee
-     * @param null|string[]        $selectionOverrides
-     * @return IFilterComponent|object
-     * @throws Mapper\Exception
+     * @inheritdoc
+     * @throws \ReflectionException If unable to create an instance of the reflected class
+     * @throws Mapper\Exception If invalid columns names are used
      */
     public function buildComponent($definitionClass, User $user, $page, User $viewee = null, array $selectionOverrides = null)
     {
         $filter     = $this->filterMapper->findByClass($definitionClass);
         $definition = $this->buildDefinition($filter);
+
+        // Don't bother building a component if it will be empty
+        $availableOptions = $definition->getOptions($page)->filter(function(GenericCollection $options) use ($page){
+            return $options[$page] && $options[$page]->getAvailable();
+        });
+        if(0 === $availableOptions->count()){
+            return null;
+        }
 
         $overrideUserSelections = null !== $selectionOverrides;
 
@@ -164,7 +167,7 @@ abstract class AbstractFilterFactory implements IFilterFactory
      * @param User         $user
      * @param string       $page
      * @return GenericCollection|Selection\Model[]
-     * @throws Mapper\Exception
+     * @throws Mapper\Exception If invalid columns names are used
      */
     private function getSavedSelections(Filter\Model $filter, User $user, $page)
     {

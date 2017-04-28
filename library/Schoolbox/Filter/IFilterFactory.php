@@ -33,12 +33,14 @@ interface IFilterFactory
     /**
      * Build a filter component, ready to inject into a filter panel
      *
+     * Returns NULL if no options would be available
+     *
      * @param string               $definitionClass  They type of filter we are building
      * @param User                 $user
      * @param string               $page
      * @param null|User            $viewee
      * @param null|string[]        $selectionOverrides
-     * @return IFilterComponent
+     * @return IFilterComponent|null
      */
     public function buildComponent($definitionClass, User $user, $page, User $viewee = null, array $selectionOverrides = null);
 

@@ -151,7 +151,12 @@ class FactoryFactory
             $queryKey      = $className::getQueryKey();
             $overrides     = array_key_exists($queryKey, $query) ? explode(',', $query[$queryKey]) : null;
             $component     = $filterFactory->buildComponent($className, $user, $page, $viewee, $overrides);
-            $filterComponents->setOffset($className, $component);
+
+            // Don't bother inserting component if it wasn't build (because no options would be available anyway)
+            if($component){
+                $filterComponents->setOffset($className, $component);
+            }
+
         }
 
         return new Panel($route, $filterComponents);
