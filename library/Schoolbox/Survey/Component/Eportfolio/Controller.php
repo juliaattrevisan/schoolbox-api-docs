@@ -111,8 +111,10 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
                     $answers = [];
 
-                    foreach ($selectedAnswers as $answer) {
-                        $answers[] = $answersArray[Scrub::html2text($answer)];
+                    if (is_array($selectedAnswers)) {
+                        foreach ($selectedAnswers as $answer) {
+                            $answers[] = $answersArray[Scrub::html2text($answer)];
+                        }
                     }
 
                     $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = $answers;
