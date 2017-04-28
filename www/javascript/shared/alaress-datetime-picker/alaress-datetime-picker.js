@@ -140,7 +140,6 @@ function getLinkedElements(element, options) {
 }
 
 function setValue(element, options, state, trigger, date) {
-
     // Get their pickerIds
     var pId = element.attr('data-datepicker-id');
 
@@ -322,11 +321,15 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 });
 
                 $('#byTimetable-' + pickerId).find('.timetable-submit').click(function () {
+                    var newDate = moment($(this).attr('data-timetable-value'));
 
-                    var periodSelected = $('table').find('[data-selected=1]').attr('data-period'),
-                        periodTime = ($('[name*="periodTime' + pickerId + '"]:checked').val()),
-                        newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma'),
-                        newDate = moment($(this).attr('data-timetable-value')).hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+                    if(options.enableTime === true) {
+                        var periodSelected = $('table').find('[data-selected=1]').attr('data-period'),
+                            periodTime = ($('[name*="periodTime' + pickerId + '"]:checked').val()),
+                            newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma');
+
+                        newDate = newDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+                    }
 
                     setValue(element, options, false, true, newDate);
 
