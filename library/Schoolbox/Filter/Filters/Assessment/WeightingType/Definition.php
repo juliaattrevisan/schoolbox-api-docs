@@ -79,24 +79,6 @@ class Definition extends AbstractFilterDefinition
 
 
     /**
-     * @param GenericCollection|Option\Model[] $options
-     * @return GenericCollection
-     */
-    protected function sortFilterOptions(GenericCollection $options)
-    {
-        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
-            $leftKey  = $left->getKey();
-            $rightKey = $right->getKey();
-            if (self::KEY_UNWEIGHTED === $leftKey) {
-                return -1;
-            }
-            // left key must be WEIGHTED, which should be placed after other keys
-            return self::KEY_WEIGHTED === $rightKey ? 0 : +1;
-        });
-    }
-
-
-    /**
      * Return the set of possible keys for this filter's options
      *
      * @return string[]

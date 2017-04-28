@@ -107,25 +107,6 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    protected function sortFilterOptions(GenericCollection $options)
-    {
-        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
-            $leftKey  = $left->getKey();
-            $rightKey = $right->getKey();
-            if ($leftKey === $rightKey) {
-                return 0;
-            }
-            if(self::KEY_ON_FOLDER === $leftKey){
-                return -1;
-            }
-            return self::KEY_IMPORTED_TO_CLASS === $leftKey ? -1 : +1;
-        });
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getInitialAvailability($customAbstractKey, $page)
     {
         // Initial config is both classes and groups are available for all pages

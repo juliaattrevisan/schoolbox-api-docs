@@ -277,10 +277,21 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
     /**
      * Each filter definition must know how to sort options
      *
+     * By default, sort them as defined in $this->getCustomKeys()
+     *
      * @param GenericCollection|Option\Model[] $options
      * @return GenericCollection
      */
-    abstract protected function sortFilterOptions(GenericCollection $options);
+    protected function sortFilterOptions(GenericCollection $options)
+    {
+        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
+
+            $leftPos  = array_search($left->getKey(), $this->getAbstractKeys(), true);
+            $rightPos = array_search($right->getKey(), $this->getAbstractKeys(), true);
+
+            return $rightPos - $leftPos;
+        });
+    }
 
 
     /**

@@ -73,34 +73,6 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    protected function sortFilterOptions(GenericCollection $options)
-    {
-        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
-            $leftKey  = $left->getKey();
-            $rightKey = $right->getKey();
-            if ($leftKey === $rightKey) {
-                return 0;
-            }
-            if(self::KEY_ON_CLASS_FOLDER === $leftKey && !in_array($rightKey, [], true)){
-                return -1;
-            }
-            if(self::KEY_ON_GROUP_FOLDER === $leftKey && $rightKey !== self::KEY_ON_CLASS_FOLDER){
-                return -1;
-            }
-            if(self::KEY_ON_CLASS_UNIT_IMPL === $leftKey && !in_array($rightKey, [self::KEY_ON_CLASS_FOLDER, self::KEY_ON_GROUP_FOLDER], true)){
-                return -1;
-            }
-            if(self::KEY_ON_GROUP_UNIT_IMPL === $leftKey && !in_array($rightKey, [self::KEY_ON_CLASS_FOLDER, self::KEY_ON_GROUP_FOLDER, self::KEY_ON_CLASS_UNIT_IMPL], true)){
-                return -1;
-            }
-            return +1;
-        });
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getInitialAvailability($customAbstractKey, $page)
     {
         // Don't render on any page by default
