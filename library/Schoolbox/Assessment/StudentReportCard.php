@@ -162,7 +162,7 @@ class StudentReportCard
     protected function establishPermissions()
     {
         // is the class average graph line displayed?
-        $displayClassAverage = \Cfg::get('display_grade_average') ? true : false;
+        $displayClassAverage = $this->getTargetUser()->getDisplayGradeGraph();
         // are parents barred from this page?
         $restrictStudentSubmissions = \Cfg::get('restrict_parent_grades') ? true : false;
         // is the grade average allowed to be shown?

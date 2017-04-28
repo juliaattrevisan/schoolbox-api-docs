@@ -136,6 +136,13 @@ class User implements JsonSerializable, ISoftDeletable
     private $hideNotificationsTray;
 
     /**
+     * Is the grade graph displayed for this user?
+     *
+     * @var bool
+     */
+    private $displayGradeGraph;
+
+    /**
      * @var SubjectCollection|Subject[]
      */
     protected $subject_collection;
@@ -374,7 +381,7 @@ class User implements JsonSerializable, ISoftDeletable
 
     /**
      * @param string $positionTitle
-     * @return string
+     * @return self
      */
     public function setPositionTitle($positionTitle)
     {
@@ -1203,6 +1210,24 @@ class User implements JsonSerializable, ISoftDeletable
     public function showNotificationsTray()
     {
         $this->setHideNotificationsTray(false);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisplayGradeGraph()
+    {
+        return $this->displayGradeGraph;
+    }
+
+    /**
+     * @param bool $displayGradeGraph
+     * @return static
+     */
+    public function setDisplayGradeGraph($displayGradeGraph)
+    {
+        $this->displayGradeGraph = $displayGradeGraph;
+        return $this;
     }
 
     /* Getters/Setters

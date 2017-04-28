@@ -183,10 +183,13 @@ class Controller extends Base
      */
     public function getInsert()
     {
+        $user = $this->userMapper->createModel()
+            ->setDisplayGradeGraph($this->getConfigLoader()->get('display_grade_graph'));
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'pageCurrent' => 'user',
+                'user' => $user,
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
@@ -415,6 +418,7 @@ class Controller extends Base
         $user->setLocalEmail(!empty($post['local_email']));
         $user->setUseInternalMail(!empty($post['mail_handler']));
         $user->setWebmail(!empty($post['webmail']));
+        $user->setDisplayGradeGraph(!empty($post['display_grade_graph']));
         $user->setSuperuser(isset($post['superuser']));
         $user->setUsername($post['modusername']);
 

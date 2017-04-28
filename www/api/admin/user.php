@@ -1,12 +1,98 @@
 <?php
 
 /* REST interface for user CRUD operations */
+use Alaress\Password\Service as PasswordService;
+use Schoolbox\CampusMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
 header("Content-Type: text/xml");
 
 require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
 
-$user_handler = new User();
-$userMapper = \Schoolbox\UserMapper::getInstance();
+$userMapper = UserMapper::getInstance();
+$campusMapper = CampusMapper::getInstance();
+$roleMapper = RoleMapper::getInstance();
+$passwordService = new PasswordService();
+
+/**
+ * Setter for user fields.
+ *
+ * @param User  $user
+ * @param array $getValues
+ * @return User
+ */
+$setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMapper, $passwordService) {
+    // Update only included fields
+    if (!empty($getValues['username'])) {
+        $user = $user->setUsername($getValues['username']);
+    }
+    if (!empty($getValues['title'])) {
+        $user = $user->setTitle($getValues['title']);
+    }
+    if (!empty($getValues['firstname'])) {
+        $user = $user->setFirstname($getValues['firstname']);
+    }
+    if (!empty($getValues['lastname'])) {
+        $user = $user->setLastname($getValues['lastname']);
+    }
+    if (!empty($getValues['local_email'])) {
+        $user = $user->setLocalEmail($getValues['local_email']);
+    }
+    if (!empty($getValues['alt_email'])) {
+        $user = $user->setAltEmail($getValues['alt_email']);
+    }
+    if (!empty($getValues['position_title'])) {
+        $user = $user->setPositionTitle($getValues['position_title']);
+    }
+    if (!empty($getValues['su'])) {
+        $user = $user->setSuperuser($getValues['su']);
+    }
+    if (is_numeric($getValues['database_id'])) {
+        $user = $user->setExternalId($getValues['database_id']=='' ? null : $getValues['database_id']);
+    }
+    if (is_numeric($getValues['year'])) {
+        $user = $user->setYear($getValues['year'] == '' ? null : $getValues['year']);
+    }
+    if (is_numeric($getValues['eportfolio_enabled'])) {
+        $user = $user->setEportfolioEnable((bool)$getValues['eportfolio_enabled']);
+    }
+    if (is_numeric($getValues['hide_contacts'])) {
+        $user = $user->setHideContacts((bool)$getValues['hide_contacts']);
+    }
+    if (is_numeric($getValues['hide_timetable'])) {
+        $user = $user->setHideTimetable((bool)$getValues['hide_timetable']);
+    }
+    if (!empty($getValues['password'])) {
+        $user = $user
+            ->setRetrievablePassword($getValues['password'])
+            ->setPassword($passwordService->hash($getValues['password']));
+    }
+
+    /* Convert campus names into ids */
+    if (!empty($getValues['group'])) {
+        $user = $user->setRole($roleMapper->findById($getValues['group']));
+    }
+
+    if (!empty($getValues['campus'])) {
+        $user = $user->setCampusCollection(
+            $campusMapper->findByColumn(
+                'id',
+                array_map('trim', explode(',', $getValues['campus']))
+            )
+        );
+    }
+
+    if (is_numeric($getValues['display_grade_graph'])) {
+        $user = $user->setDisplayGradeGraph((bool)$getValues['display_grade_graph']);
+    }
+    if (is_numeric($getValues['enabled'])) {
+        $user = $user->setEnabled((bool)$getValues['enabled']);
+    }
+
+    return $user;
+};
 
 if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
     $response = "<?xml version='1.0' standalone='yes'?>
@@ -33,9 +119,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
 
     /* Create operation */
     if ($action == 'create') {
-        $duplicate = $user_handler->getByUsername($_GET['username']);
-
-        if (!empty($duplicate)) {
+        if ($userMapper->countByColumn('username', $_GET['username']) > 0) {
             $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
                             <code>409</code>
@@ -45,67 +129,39 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             exit($response);
         }
 
-        $user = array(
-            'username'			 => $_GET['username'],
-            'title'				 => $_GET['title'],
-            'firstname'			 => $_GET['firstname'],
-            'lastname'			 => $_GET['lastname'],
-            'synergy_id'		 => $_GET['database_id']==''?'NULL':$_GET['database_id'],
-            'local_email'		 => $_GET['local_email'],
-            'alt_email'			 => $_GET['alt_email'],
-            'position_title'	 => $_GET['position_title'],
-            'password'			 => $_GET['password'],
-            'su'			 	 => $_GET['su'],
-            'year'		 		 => $_GET['year'] == ''?'NULL':$_GET['year'],
-            'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0,
-            'hide_contacts'      => $_GET["hide_contacts"] == 1?1:0,
-            'hide_timetable'     => $_GET["hide_timetable"] == 1?1:0,
-			'enabled'			 => 1
-        );
+        // Enable new user by default
+        $user = $setUserFields($userMapper->createModel(), $_GET)->setEnabled(true);
 
-        // convert campus names into ids
-        $user['group_id'] = $user_handler->getGroupID($_GET['group']);
-
-        $campus_arr = explode(',', trim($_GET['campus']));
-
-        if (!empty($campus_arr)) {
-            foreach ($campus_arr as &$campus) {
-                $user['campus'][] = $user_handler->getCampusID(trim($campus));
-            }
-
-            $user['defaultCampus'] = $user_handler->getCampusID($_GET['default_campus']);            
-        }
-
-        $id = $user_handler->create($user);
-        
-        if (!is_numeric($id)) {
-            $response = "<?xml version='1.0' standalone='yes'?>
-                         <response>
-                            <code>500</code>
-                            <message>The user could not be created.</message>
-                         </response>";
-
-            echo $response;
-        } else {
+        try {
+            $userMapper->save($user);
             $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
                             <code>201</code>
                             <message>User successfully created.</message>
                             <user>
-                                <user_id>$id</user_id>
+                                <user_id>{$user->getId()}</user_id>
                             </user>
                          </response>";
 
-            echo $response;
+        } catch (\Exception $e) {
+            $message  = Scrub::xml($e->getMessage());
+            $response = "<?xml version='1.0' standalone='yes'?>
+                         <response>
+                            <code>500</code>
+                            <message>The user could not be created. (Message: {$message})</message>
+                         </response>";
         }
+
+        // TODO add response codes
+        echo $response;
     }
 
     /* Update operation */
     elseif ($action == 'update') {
 
-        $user = $user_handler->getByID($_GET['user_id']);
-
-        if (empty($user)) {
+        try {
+            $user = $userMapper->findById($_GET['user_id']);
+        } catch (\Exception $e) {
             $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
                             <code>404</code>
@@ -115,97 +171,24 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             exit($response);
         }
 
-        $user = array('id' => $_GET['user_id']);
+        $user = $setUserFields($user, $_GET);
 
-        foreach (array('title', 'firstname', 'lastname', 'local_email', 'alt_email', 'position_title', 'su') as $field) {
-
-            if (!empty($_GET[$field])) {
-                $user[$field] = $_GET[$field];
-            }
-
-        }
-
-        /* Update only included fields */
-        if (!empty($_GET['username'])){
-            $duplicate = $user_handler->getByUsername($_GET['username']);
-
-            if (!empty($duplicates) && $duplicate['id'] != $user['uid']) {
-                $response = "<?xml version='1.0' standalone='yes'?>
-                             <response>
-                                <code>409</code>
-                                <message>A user already exists with the same username.</message>
-                             </response>";
-
-                exit($response);
-            }
-
-            $user['username'] = $_GET['username'];
-        }
-
-        if (is_numeric($_GET['database_id'])){
-            $user['synergy_id'] = $_GET['database_id']==''?'NULL':$_GET['database_id'];
-        }
-
-        if (is_numeric($_GET['year'])) {
-            $user['year'] = $_GET['year'] == '' ? 'NULL' : $_GET['year'];
-        }
-
-        if (is_numeric($_GET['eportfolio_enabled'])) {
-            $user['eportfolio_enabled'] = $_GET['eportfolio_enabled'] == 1?1:0;
-        }
-
-        if (is_numeric($_GET['hide_contacts'])) {
-            $user['hide_contacts'] = $_GET['hide_contacts'] == 1?1:0;
-        }
-
-        if (is_numeric($_GET['hide_timetable'])) {
-            $user['hide_timetable'] = $_GET['hide_timetable'] == 1?1:0;
-        }
-
-        if (!empty($_GET['password'])) {
-            $user['password'] = $_GET['password'];
-        }
-
-        /* Convert campus names into ids */
-        if (!empty($_GET['group'])) {
-            $user['group_id'] = $user_handler->getGroupID($_GET['group']);
-        }
-
-        if (!empty($_GET['campus'])) {
-            $campus_arr = explode(',', trim($_GET['campus']));
-
-            if (!empty($campus_arr)) {
-                foreach ($campus_arr as &$campus) {
-                    $user['campus'][] = $user_handler->getCampusID(trim($campus));
-                }
-
-                $user['defaultCampus'] = $user_handler->getCampusID($_GET['default_campus']);
-            }
-        }
-
-		if (is_numeric($_GET['enabled'])) {
-			$user['enabled'] = $_GET['enabled'] == 1 ? 1 : 0;
-		}
-
-        /* Update user and return result */
-        if ($user_handler->update($user) === false) {
-            $response = "<?xml version='1.0' standalone='yes'?>
-                         <response>
-                            <code>500</code>
-                            <message>The user could not be updated.</message>
-                         </response>";
-
-            echo $response;
-        } else {
+        try {
+            $userMapper->save($user);
             $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
                             <code>201</code>
                             <message>User successfully updated.</message>
                          </response>";
 
-            echo $response;
+        } catch (\Exception $e) {
+            $message  = Scrub::xml($e->getMessage());
+            $response = "<?xml version='1.0' standalone='yes'?>
+                         <response>
+                            <code>500</code>
+                            <message>The user could not be updated. (Message: {$message})</message>
+                         </response>";
         }
-        
     }
 
     /* Delete operation */

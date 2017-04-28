@@ -70,6 +70,7 @@ class UserMapper extends Mapper
         $this->uses('hide_contacts', self::TYPE_BOOLEAN);
         $this->uses('hide_timetable', self::TYPE_BOOLEAN);
         $this->uses('hide_notifications_tray', self::TYPE_BOOLEAN);
+        $this->uses('display_grade_graph', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->hasSoftDeleteDateField('deleted_at');
 
@@ -106,6 +107,7 @@ class UserMapper extends Mapper
 
         // Setup callbacks
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setDefaultDisplayGradeGraph']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidRole']);
@@ -134,6 +136,20 @@ class UserMapper extends Mapper
         );
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
+    }
+
+    /**
+     * Pre-save callback: if the user's display grade average flag isn't set, set it to its default value.
+     *
+     * @param User $model
+     * @return bool Always true
+     */
+    public function setDefaultDisplayGradeGraph(User $model)
+    {
+        if ($model->getDisplayGradeGraph() === null) {
+            $model->setDisplayGradeGraph((bool)$this->getConfigLoader()->get('display_grade_graph'));
+        }
+        return true;
     }
 
     /**

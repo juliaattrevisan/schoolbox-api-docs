@@ -138,29 +138,30 @@ class User extends AbstractImporter
     public static function getFormat()
     {
         $format = [
-            "Delete?"                      => 'Is this user to be deleted?',
-            "Schoolbox User ID"            => 'The user\'s internal Schoolbox ID number',
-            "Username"                     => 'The unique name the user uses to log in',
-            "External ID"                  => 'The user\'s ID number in your external system',
-            "Title"                        => '',
-            "First Name"                   => '',
-            "Surname"                      => '',
-            "Position Title"               => 'The user\'s position title (e.g. Admissions Manager)',
-            "Role"                         => 'The Schoolbox role for this user',
-            "Campus"                       => 'A comma-separated list of campus names for this user.',
-            "Password"                     => 'The user\'s password. If left blank, it will not be updated',
-            "Alt Email"                    => '',
-            "Year"                         => '',
-            "House"                        => '',
-            "Residential House"            => '',
-            "E-Portfolio?"                 => '',
-            "Hide Contact Details?"        => '',
-            "Hide Timetable?"              => '',
-            "Email Address From Username?" => '',
-            "Use External Mail Client?"    => '',
-            "Enable Webmail Tab?"          => '',
-            "Superuser?"                   => '',
-            "Account Enabled?"             => '',
+            "Delete?"                                       => 'Is this user to be deleted?',
+            "Schoolbox User ID"                             => 'The user\'s internal Schoolbox ID number',
+            "Username"                                      => 'The unique name the user uses to log in',
+            "External ID"                                   => 'The user\'s ID number in your external system',
+            "Title"                                         => '',
+            "First Name"                                    => '',
+            "Surname"                                       => '',
+            "Position Title"                                => 'The user\'s position title (e.g. Admissions Manager)',
+            "Role"                                          => 'The Schoolbox role for this user',
+            "Campus"                                        => 'A comma-separated list of campus names for this user.',
+            "Password"                                      => 'The user\'s password. If left blank, it will not be updated',
+            "Alt Email"                                     => '',
+            "Year"                                          => '',
+            "House"                                         => '',
+            "Residential House"                             => '',
+            "E-Portfolio?"                                  => '',
+            "Hide Contact Details?"                         => '',
+            "Hide Timetable?"                               => '',
+            "Email Address From Username?"                  => '',
+            "Use External Mail Client?"                     => '',
+            "Enable Webmail Tab?"                           => '',
+            'Display Class Average on Student Grade Graph?' => '',
+            "Superuser?"                                    => '',
+            "Account Enabled?"                              => '',
         ];
         if (!self::hasExternalDb()) {
             $format += [
@@ -243,6 +244,7 @@ class User extends AbstractImporter
         // This one might have to be inverted
         $this->userHydrators[] = new User\Hydrator\ToggleField('Use External Mail Client?', 'setUseInternalMail');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Enable Webmail Tab?', 'setWebmail');
+        $this->userHydrators[] = new User\Hydrator\ToggleField('Display Graph on Student Grade Card?', 'setDisplayGradeGraph');
         // Not sure if superuser should be settable
         $this->userHydrators[] = new User\Hydrator\ToggleField('Superuser?', 'setSuperuser');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Account Enabled?', 'setEnabled');
