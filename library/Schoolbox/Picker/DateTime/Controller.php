@@ -70,7 +70,7 @@ class Controller extends Base
         $timetable = $this->getUserTimetable();
         $terms = $this->getTerms();
         try {
-            $date = new Alaress_Date_Format($value, array('Y-m-d H:i:s'));
+            $date = new Alaress_Date_Format($value, 'Y-m-d H:i:s');
         }
         catch (\Exception $e) {
             throw $e;
