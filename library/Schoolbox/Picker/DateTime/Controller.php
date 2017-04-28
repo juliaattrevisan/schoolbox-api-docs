@@ -73,7 +73,7 @@ class Controller extends Base
             $date = new Alaress_Date_Format($value, 'Y-m-d H:i:s');
         }
         catch (\Exception $e) {
-            throw $e;
+            // TODO handle the error properly
         }
 
         // Don't bother calculating if the timetable is offline, we'll only display the calendar
