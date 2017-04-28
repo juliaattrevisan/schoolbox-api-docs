@@ -3,16 +3,93 @@
 /* REST interface for user CRUD operations */
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 header("Content-Type: text/xml");
 
 require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
 
-$user_handler = new User();
 $userMapper = UserMapper::getInstance();
 $campusMapper = CampusMapper::getInstance();
 $roleMapper = RoleMapper::getInstance();
+
+/**
+ * Setter for user fields.
+ *
+ * @param User  $user
+ * @param array $getValues
+ * @return User
+ */
+$setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMapper) {
+    // Update only included fields
+    if (!empty($getValues['username'])) {
+        $user = $user->setUsername($getValues['username']);
+    }
+    if (!empty($getValues['title'])) {
+        $user = $user->setTitle($getValues['title']);
+    }
+    if (!empty($getValues['firstname'])) {
+        $user = $user->setFirstname($getValues['firstname']);
+    }
+    if (!empty($getValues['lastname'])) {
+        $user = $user->setLastname($getValues['lastname']);
+    }
+    if (!empty($getValues['local_email'])) {
+        $user = $user->setLocalEmail($getValues['local_email']);
+    }
+    if (!empty($getValues['alt_email'])) {
+        $user = $user->setAltEmail($getValues['alt_email']);
+    }
+    if (!empty($getValues['position_title'])) {
+        $user = $user->setPositionTitle($getValues['position_title']);
+    }
+    if (!empty($getValues['su'])) {
+        $user = $user->setSuperuser($getValues['su']);
+    }
+    if (is_numeric($getValues['database_id'])) {
+        $user = $user->setExternalId($getValues['database_id']=='' ? null : $getValues['database_id']);
+    }
+    if (is_numeric($getValues['year'])) {
+        $user = $user->setYear($getValues['year'] == '' ? null : $getValues['year']);
+    }
+    if (is_numeric($getValues['eportfolio_enabled'])) {
+        $user = $user->setEportfolioEnable((bool)$getValues['eportfolio_enabled']);
+    }
+    if (is_numeric($getValues['hide_contacts'])) {
+        $user = $user->setHideContacts((bool)$getValues['hide_contacts']);
+    }
+    if (is_numeric($getValues['hide_timetable'])) {
+        $user = $user->setHideTimetable((bool)$getValues['hide_timetable']);
+    }
+    if (!empty($getValues['password'])) {
+        // Figure out password setting
+        $user = $user->setPassword($getValues['password']);
+    }
+
+    /* Convert campus names into ids */
+    if (!empty($getValues['group'])) {
+        $user = $user->setRole($roleMapper->findById($getValues['group']));
+    }
+
+    if (!empty($getValues['campus'])) {
+        $user = $user->setCampusCollection(
+            $campusMapper->findByColumn(
+                'id',
+                array_map('trim', explode(',', $getValues['campus']))
+            )
+        );
+    }
+
+    if (is_numeric($getValues['display_grade_graph'])) {
+        $user = $user->setDisplayGradeGraph((bool)$getValues['display_grade_graph']);
+    }
+    if (is_numeric($getValues['enabled'])) {
+        $user = $user->setEnabled((bool)$getValues['enabled']);
+    }
+
+    return $user;
+};
 
 if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
     $response = "<?xml version='1.0' standalone='yes'?>
@@ -49,32 +126,8 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             exit($response);
         }
 
-        $user = $userMapper->createModel()
-            ->setUsername($_GET['username'])
-            ->setTitle($_GET['title'])
-            ->setFirstname($_GET['firstname'])
-            ->setLastname($_GET['lastname'])
-            ->setExternalId($_GET['database_id'] == '' ? null : $_GET['database_id'])
-            ->setLocalEmail($_GET['local_email'])
-            ->setAltEmail($_GET['alt_email'])
-            ->setPositionTitle($_GET['position_title'])
-            // Figure out password setting
-            ->setPassword($_GET['password'])
-            ->setSuperuser($_GET['su'])
-            ->setYear($_GET['year'] == '' ? null : $_GET['year'])
-            ->setEportfolioEnable((bool)$_GET['eportfolio_enabled'])
-            ->setHideContacts((bool)$_GET['hide_contacts'])
-            ->setHideTimetable((bool)$_GET['hide_timetable'])
-            ->setEnabled(true)
-            ->setRole($roleMapper->findById($_GET['group']))
-            ->setDisplayGradeGraph($_GET['display_grade_graph'])
-            ->setCampusCollection(
-                $roleMapper->findByColumn(
-                    'id',
-                    array_map('trim', explode(',', $_GET['campus']))
-                )
-            )
-        ;
+        // Enable new user by default
+        $user = $setUserFields($userMapper->createModel(), $_GET)->setEnabled(true);
 
         try {
             $userMapper->save($user);
@@ -115,72 +168,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             exit($response);
         }
 
-        /* Update only included fields */
-        if (!empty($_GET['title'])) {
-            $user = $user->setTitle($_GET['title']);
-        }
-        if (!empty($_GET['firstname'])) {
-            $user = $user->setFirstname($_GET['firstname']);
-        }
-        if (!empty($_GET['lastname'])) {
-            $user = $user->setLastname($_GET['lastname']);
-        }
-        if (!empty($_GET['local_email'])) {
-            $user = $user->setLocalEmail($_GET['local_email']);
-        }
-        if (!empty($_GET['alt_email'])) {
-            $user = $user->setAltEmail($_GET['alt_email']);
-        }
-        if (!empty($_GET['position_title'])) {
-            $user = $user->setPositionTitle($_GET['position_title']);
-        }
-        if (!empty($_GET['su'])) {
-            $user = $user->setSuperuser($_GET['su']);
-        }
-        if (!empty($_GET['username'])) {
-            $user = $user->setUsername($_GET['username']);
-            // Username duplicate handling should be done in mapper presave
-        }
-        if (is_numeric($_GET['database_id'])) {
-            $user = $user->setExternalId($_GET['database_id']=='' ? null : $_GET['database_id']);
-        }
-        if (is_numeric($_GET['year'])) {
-            $user = $user->setYear($_GET['year'] == '' ? null : $_GET['year']);
-        }
-        if (is_numeric($_GET['eportfolio_enabled'])) {
-            $user = $user->setEportfolioEnable((bool)$_GET['eportfolio_enabled']);
-        }
-        if (is_numeric($_GET['hide_contacts'])) {
-            $user = $user->setHideContacts((bool)$_GET['hide_contacts']);
-        }
-        if (is_numeric($_GET['hide_timetable'])) {
-            $user = $user->setHideTimetable((bool)$_GET['hide_timetable']);
-        }
-        if (!empty($_GET['password'])) {
-            // Figure out password setting
-            $user = $user->setPassword($_GET['password']);
-        }
-
-        /* Convert campus names into ids */
-        if (!empty($_GET['group'])) {
-            $user = $user->setRole($roleMapper->findById($_GET['group']));
-        }
-
-        if (!empty($_GET['campus'])) {
-            $user = $user->setCampusCollection(
-                $roleMapper->findByColumn(
-                    'id',
-                    array_map('trim', explode(',', $_GET['campus']))
-                )
-            );
-        }
-
-        if (is_numeric($_GET['display_grade_graph'])) {
-            $user = $user->setDisplayGradeGraph((bool)$_GET['display_grade_graph']);
-        }
-        if (is_numeric($_GET['enabled'])) {
-            $user = $user->setEnabled((bool)$_GET['enabled']);
-        }
+        $user = $setUserFields($user, $_GET);
 
         try {
             $userMapper->save($user);
