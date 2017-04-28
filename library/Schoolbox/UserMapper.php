@@ -19,6 +19,7 @@ use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Class UserMapper
@@ -335,6 +336,37 @@ class UserMapper extends Mapper
         }
 
         return $user;
+    }
+
+    /**
+     * Find a user by their external id and come with roles, campus, etc
+     *
+     * @param array $ids
+     * @return array
+     * @throws Mapper\Exception
+     */
+    public function findCheaplyByExternalIds($ids) {
+
+        $inQuery = implode(',', array_fill(0, count($ids), '?'));
+
+        $query = "
+            SELECT u.id, u.synergy_id
+            FROM `user` u
+            WHERE u.synergy_id IN ({$inQuery}) AND u.deleted_at is null
+        ";
+        $statement = $this->database->prepare($query);
+
+        foreach ($ids as $k => $id)
+            $statement->bindValue(($k+1), $id);
+
+        $statement->execute();
+
+        /** @var User $user */
+        foreach ($statement as $row) {
+            $externals[$row['synergy_id']] = $row['id'];
+        }
+
+        return $externals;
     }
 
     /**

@@ -1,0 +1,151 @@
+{% if type == 'event' or type =='duework' %}
+    {% set width = 6 %}
+{% else %}
+    {% set width = 12 %}
+{% endif %}
+
+{% if timetable %}
+<div class="row">
+    <dl class="tabs-material center" data-tab role="tablist">
+        <dd class="active" role="presentation"><a href="#byDate-{{ id }}">View By Date</a></dd>
+        <dd role="presentation"><a href="#byTimetable-{{ id }}">View By Timetable</a></dd>
+    </dl>
+</div>
+{% endif %}
+
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+<div class="row" style="padding:0.875rem;">
+    <div class="tabs-content">
+        <div class="content active" id="byDate-{{ id }}" role="tabpanel" aria-hidden="false">
+            <div class="small-12 medium-{{ width }} columns">
+
+                {# Placeholder for calendar ot be rendered in #}
+                <div id="pickerCalendar{{ id }}"></div>
+
+            </div>
+            {# Hide second column if showing just a calendar #}
+            {% if type == 'event' or type =='duework' %}
+                <div class="small-12 medium-{{ width }} columns">
+
+                    {# Placeholder for appointments to be rendered in #}
+                    <div id="calendarResponse{{ id }}" class="adtp-response"></div>
+
+                </div>
+            {% endif %}
+            <div class="small-12 medium-12 columns">
+                <a class="button submit picker-submit" data-reveal-id="stacked-3">Update</a>
+            </div>
+        </div>
+        {% if timetable %}
+        <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
+            <div class="row">
+                <div class="small-12 medium-{{ width }} columns">
+
+                    {# Placeholder for timetable ot be rendered in #}
+                    <div id="timetable{{ id }}">
+                        <select name="campus">
+                            {% for campus in timetable %}
+                                <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="term">
+                            {% for term in terms %}
+                                <option value="{{ term.id }}" data-duration="{{ term.duration }}" {% if term.id == timetableVars.term %} selected {% endif %}>{{ term.title }} </option>
+                            {% endfor %}
+                        </select>
+                        <select name="cycle">
+                            {# Options will be appended here #}
+                        </select>
+                        {# Build all, hide, reveal one later #}
+                        {% for campus in timetable %}
+                            <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
+                                <tr>
+                                    <th>Day</th>
+                                {% for i in 1..timetable[campus.campusId].dayCount %}
+                                    <th class="day-{{ i }}">{{ i }}</th>
+                                {% endfor %}
+                                </tr>
+                                {% set k=0 %}
+                                {% for description in timetable[campus.campusId].desc %}
+                                    <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k] }}">{{ description }}</td>
+                                        {% for i in 1..timetable[campus.campusId].dayCount %}
+                                            <td><div class="has-period period-{{ i }}-{{ k }}" title="{{ timetable[campus.campusId].start[k] }} - {{ timetable[campus.campusId].end[k] }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
+                                        {% endfor %}
+                                        {% set k=k+1 %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endfor %}
+                        <div class="timetableDate{{ id }}" style="display:none">
+                            <div class="card small-12">
+                                <p class="meta">Selected date</p>
+                                <span class="displayDate"></span>
+                            </div>
+
+                            <div class="card small-12 hide">
+                                <p class="meta">Select start or end time of the period</p>
+                                <input type="radio" name="periodTime{{ id }}" id="periodStart{{ id }}" value="start">
+                                <label class="input-toggle" for="periodStart{{ id }}"></label>
+                                <input type="radio" name="periodTime{{ id }}" id="periodEnd{{ id }}" value="end">
+                                <label class="input-toggle" for="periodEnd{{ id }}"></label>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if type == 'event' or type =='duework' %}
+                    <div class="small-12 medium-{{ width }} columns">
+
+                        {# Placeholder for appointments to be rendered in #}
+                        <div id="timetableResponse{{ id }}" class="adtp-response"></div>
+
+                    </div>
+                {% endif %}
+            </div>
+            <div class="small-12 medium-12 columns">
+                <a class="button submit timetable-submit" data-timetable-value="{{ value }}">Update</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    var twigVars = {
+        date: new Date('{{ value }}'),
+        element: '{{ element }}',
+        id: '{{ id }}',
+        displayFormat: '{{ displayFormat }}',
+        displayFormatDate: '{{ displayFormatDate }}',
+        type: '{{ type }}',
+        timetable: {{ timetable ? true : false }},
+        {% if timetableVars %}
+            timetableVars: {
+                daysUntilDate: {{ timetableVars.daysUntilDate }},
+                isWeekend: {{ timetableVars.isWeekend }},
+                {% for campus in timetableVars.byCampus %}
+                campus_{{ campus.id }}: {
+                    termStartDay: {{ campus.termStartDay }},
+                    termLastDay: {{ campus.termLastDay }},
+                    selectedDay: {{ campus.selectedDay }},
+                    timetableCycles: {{ campus.timetableCycles }},
+                    selectedCycle: {{ campus.selectedCycle }}
+                },
+                {% endfor %}
+            },
+        {% endif %}
+        routeLookup: {
+            {% if timetable %}
+                getByTimetableDay: '{{ routeLookup('pickerDatetime.getByTimetableDay') }}',
+                getEventsByTimetableDay: '{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}',
+                getTimetableDate: '{{ routeLookup('pickerDatetime.getTimetableDate') }}',
+            {% endif %}
+            getDueByDate: '{{ routeLookup('pickerDatetime.getDueByDate') }}',
+            getByDate: '{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'
+        },
+        weekStartDay: {{ weekStartDay }}
+    };
+    $.fn.alaressDateTimeModal(twigVars);
+
+</script>

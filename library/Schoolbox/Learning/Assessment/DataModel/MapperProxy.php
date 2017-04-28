@@ -800,7 +800,6 @@ class MapperProxy
     protected function convertOptionsToPredicateBuilder($options)
     {
         $builder = $this->baseMapper->getPredicateBuilder();
-
         // Term filter (overrides due before/after)
         if ($options['term'] instanceof Term) {
             $term = $options['term'];
@@ -818,7 +817,6 @@ class MapperProxy
         if(array_key_exists('due_after', $options) && array_key_exists('closed_after', $options) ){
             throw new \InvalidArgumentException('Cannot filter to after both due and close dates.');
         }
-
         // Due before / after filter (an ADF)
         if ($options['due_after'] instanceof \Alaress_Date_Format && !$options['due_after']->isNull()) {
             $builder->notLessThan('due_date', $options['due_after']->getDatabase());
@@ -857,7 +855,6 @@ class MapperProxy
             default:
                 break;
         }
-
         return $builder;
     }
 

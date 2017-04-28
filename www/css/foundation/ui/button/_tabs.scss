@@ -32,3 +32,46 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
         }
     }
 }
+
+.tabs-material {
+    width: 100%;
+    border-bottom: 1px solid #eee;
+    padding: 0 0.5rem;
+    margin-bottom: 0;
+    font-size: 0; // This is to remove the spacing between centered inline-block'ed elements
+
+    :focus {
+        outline: none;
+    }
+
+    &.center {
+        text-align: center;
+    }
+
+    dd, li.tab-title {
+        display: inline-block;
+        vertical-align: bottom;
+        list-style: none;
+        position: relative;
+        text-transform: uppercase;
+        font-weight: $font-weight-semibold;
+        margin: 0 0 -1px;
+        font-size: rem-calc($base-font-size - 2);
+
+        a {
+            min-height: 2.5rem;
+            padding: 0.75rem 1rem;
+            position: relative;
+            overflow: hidden;
+            vertical-align: middle;
+            display: block;
+            color: $body-font-color;
+            border-bottom: 2px solid transparent;
+        }
+
+        &.active a {
+            border-bottom: 2px solid $accent-foreground;
+            color: $accent-foreground;
+        }
+    }
+}

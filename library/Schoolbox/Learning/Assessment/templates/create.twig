@@ -34,7 +34,7 @@
 
         {% else %}
 
-            /**
+             /**
              * Update new form action url
              *
              * Inject common details
@@ -64,16 +64,16 @@
 
         {% endif %}
     });
-</script>
+ </script>
 
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1>
-        </div>
-    </div>
-    {# TODO - Quiz fragment should extend this template, not be included. This template should not know about Quizzes #}
+ <div class="actions-small-1 row">
+     <div class="list-item">
+         <div class="small-12 column">
+             <h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1>
+         </div>
+     </div>
+     {# TODO - Quiz fragment should extend this template, not be included. This template should not know about Quizzes #}
     {% if assessment is quiz %}
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
@@ -122,6 +122,7 @@
                     {% endif %}
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
                     <input type="hidden" name="contextId" value="{{ context.id }}" />
+                    <input type="hidden" name="folderId" value="{{ context.folder.id }}" />
 
                     {% if assessmentType|length %}
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />

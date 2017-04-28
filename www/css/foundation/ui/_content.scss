@@ -1275,15 +1275,63 @@ tr:hover{
         }
     }
 
-    .checklist {
-        overflow-y: auto;
-    }
+	.checklist {
+		overflow-y: auto;
+	}
+
+	.close-reveal-modal {
+		font-size: 2rem;
+		font-weight: $font-weight-normal;
+		top: 0.4rem;
+	}
 }
 
 // Fix stupid foundation bug
 .reveal-modal-bg{
     position: fixed;
 }
+
+.reveal-action {
+	section {
+		margin: 0;
+		text-align: right;
+	}
+
+	.button, button, input {
+		background-color: transparent;
+		margin: 0;
+		text-transform: uppercase;
+		font-size: rem-calc($base-font-size - 2);
+		vertical-align: top;
+		font-weight: $font-weight-semibold;
+		color: $body-font-color;
+		padding: 0.5rem 0.75rem;
+
+		&:hover {
+			background-color: transparent;
+		}
+
+		&.submit {
+			background-color: transparent;
+			color: $content-ui-submit-background;
+			width: auto;
+		}
+	}
+
+	.close-reveal-modal {
+		top: auto;
+		right: auto;
+		position: relative;
+		line-height: 1.375rem;
+		font-weight: $font-weight-semibold;
+		color: $body-font-color;
+	}
+}
+
+.reveal-modal.no-pad .reveal-action section {
+	padding: 0.75rem 1.25rem;
+}
+
 
 // generic counter
 [data-show-count]:before {

@@ -1,0 +1,236 @@
+$pickr-month-height: 40px;
+$pickr-month-padding: 5px;
+
+.adtp {
+
+    -webkit-transition: width 0.3s; /* Safari */
+    transition: width 0.3s;
+
+    /**
+     * Date picker / Flatpickr
+     */
+    .flatpickr-calendar {
+        border-radius: 0;
+        margin: 0 auto;
+        border: 1px solid #e6e6e6;
+        box-shadow: none;
+
+        &.arrowTop:before,
+        &.arrowTop:after {
+            border: none;
+        }
+    }
+
+    .flatpickr-innerContainer {
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .flatpickr-month {
+        height: $pickr-month-height + $pickr-month-padding;
+        margin-bottom: $pickr-month-padding;
+    }
+
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        top: $pickr-month-padding;
+        height: $pickr-month-height;
+        line-height: $pickr-month-height + $pickr-month-padding;
+        width: $pickr-month-height;
+    }
+
+    .flatpickr-prev-month {
+        left: 0;
+    }
+
+    .flatpickr-next-month {
+        right: 0;
+    }
+
+    .flatpickr-current-month {
+        top: $pickr-month-padding;
+
+        input.cur-year {
+            font-weight: 400;
+        }
+
+        .numInputWrapper {
+            width: 70px;
+        }
+    }
+
+    .flatpickr-day {
+        &.inRange,
+        &.prevMonthDay.inRange,
+        &.nextMonthDay.inRange,
+        &.today.inRange,
+        &.prevMonthDay.today.inRange,
+        &.nextMonthDay.today.inRange,
+        &:hover,
+        &:hover,
+        &.nextMonthDay:hover,
+        &:focus,
+        &.prevMonthDay:focus,
+        &.nextMonthDay:focus {
+            background: #e5f4ff;
+            border-color: #e5f4ff;
+        }
+
+        &.selected,
+        &.selected:focus,
+        &.selected:hover,
+        &.selected.prevMonthDay,
+        &.selected.nextMonthDay {
+            background: #0066b0;
+            border-color: #0066b0;
+        }
+    }
+
+    .dateIsPicked .flatpickr-innerContainer + .flatpickr-time {
+        border-top: none;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {
+        border-top: none;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .flatpickr-time {
+        overflow: visible;
+        border-top: 0;
+
+        input {
+            border: 0;
+            background: transparent;
+        }
+    }
+
+    .time-switch {
+        text-align: left;
+        padding: 0.75rem;
+
+        label {
+            margin-bottom: 0 !important;
+        }
+    }
+
+    // Medium up
+    @media #{$medium-up} {
+
+        .flatpickr-calendar {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        &.pickerSingle.pickerNarrow {
+            width: 375px;
+        }
+        &.pickerSingle.pickerWide {
+            width: 435px;
+        }
+        &.pickerDouble.pickerNarrow {
+            width: 720px;
+        }
+        &.pickerDouble.pickerWide {
+            width: 750px;
+        }
+    }
+
+
+    /**
+     * Timetable picker
+     */
+    table.timetablePicker {
+        padding: 0;
+        margin: 0;
+        border: 1px solid rgb(230, 230, 230);
+
+        td {
+            padding: 0;
+            margin: 0;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        th {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #ededed;
+            text-align: center;
+            background: #c1e5ff;
+        }
+
+        .has-period {
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            border-radius: 150px;
+            border: 3px solid #fff;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .has-period:hover,
+        .period-hover {
+            background: #e5f4ff;
+        }
+
+        .has-period.period-selected {
+            background: #0066b0;
+        }
+
+        .period-selected {
+            background: #0066b0;
+            color: #fff;
+        }
+
+        .period-description {
+            border-right: 1px solid #ededed;
+            font-size: $small-font-size;
+            padding: 0 2px;
+        }
+    }
+
+    input[type=radio]:not(.plain) + label.input-toggle {
+        width: auto;
+        padding: 0 0.75rem;
+    }
+
+    span.displayDate {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: #000;
+    }
+
+
+    /**
+     * Response / event list
+     */
+    .adtp-response {
+        margin-top: 1rem;
+    }
+
+    table.assessment-list td {
+        border: 0;
+        line-height: 1em;
+        padding: 0.325rem;
+    }
+
+    // Medium up
+    @media #{$medium-up} {
+
+        .adtp-response {
+            margin-top: 0;
+        }
+    }
+
+
+    /**
+     * Submit button
+     */
+    a.picker-submit,
+    a.timetable-submit {
+        margin-top: 1.25rem;
+    }
+
+}

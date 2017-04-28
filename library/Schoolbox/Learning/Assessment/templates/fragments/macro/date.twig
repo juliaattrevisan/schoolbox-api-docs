@@ -1,20 +1,11 @@
 {%  macro dateField(dateTitle, dateProperty, dateValue, syncEndDate) %}
 <div class="row" id="{{ dateProperty }}">
 
-    <div class="column small-12 medium-6">
+    <div class="column small-12">
         <label>
             {{ dateTitle }} Date
-            <input name="{{ dateProperty }}Date" type="text" value="{{ dateValue.localShort }}" data-datepicker {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate="{{ syncEndDate }}"{% endif %} />
+            <input id="{{ dateProperty }}Date" name="{{ dateProperty }}Date" type="text" value="{{ dateValue.local }}" data-datepicker data-datepicker-time data-datepicker-format="datetime" data-datepicker-alldayswitch {% if USER.getRole.isStaff %} data-datepicker-call="duework" {% endif %} {% if dateProperty in ['due','late','close'] %} data-datepicker-endofday data-datepicker-endofperiod {% endif %} {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate='{{ syncEndDate }}'{% endif %} />
         </label>
-    </div>
-
-    <div class="column small-12 medium-6">
-        <div class="timepick">
-            <label>
-                {{ dateTitle }} Time
-                <input name="{{ dateProperty }}Time" type="text" value="{{ dateValue.timeOnly }}" data-timepicker />
-            </label>
-        </div>
     </div>
 
 </div>

@@ -523,7 +523,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      *
      * @return Collection
      */
-    public function getDayEvents($user, $startTimestamp, $endTimestamp, $filter = array())
+    public function getDayEvents(\Schoolbox\User $user, $startTimestamp, $endTimestamp, $filter = array())
     {
         $firstCampus = false;
 
@@ -545,7 +545,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         /* get accessible groups
          */
-        $groupList  = array();
+        $groupList = array();
         $groupQuery = '';
 
         $this->groupHandler->setService(HOMEPAGE_SERVICE);
@@ -568,9 +568,9 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
              */
             if (count($groupList)) {
                 $groupQuery = "OR (access = " . self::ACCESS_GROUP . " AND event_category.category_id IN (" . implode(
-                    ',',
-                    $groupList
-                ) . "))";
+                        ',',
+                        $groupList
+                    ) . "))";
             }
         }
 
@@ -605,7 +605,6 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         }
 
         if ($filter['type']) {
-//            $filter_query[] = 'access = ' . self::ACCESS_PERSONAL;
             $filter_query[] = 'type = ' . intval($filter['type']);
         }
 
@@ -623,6 +622,12 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         if (strlen($filter_query) > 0) {
             $filter_query = " AND ($filter_query)";
         }
+
+        $access_query = "AND (
+            (access = " . self::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
+            $groupQuery
+            OR (access = " . self::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
+        )";
 
         // Build the date query
         $dateQuery = '';
@@ -663,11 +668,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 			LEFT JOIN event_campus ON event.id = event_campus.event_id
 			WHERE
 				resource_booking.id IS NULL
-				AND (
-					(access = " . self::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
-					$groupQuery
-					OR (access = " . self::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
-				)
+				$access_query
 				$dateQuery
 				$filter_query
 			GROUP BY id

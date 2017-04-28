@@ -1055,6 +1055,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         return $this->getUsingFormat(self::URL_FORMAT);
     }
 
+
     /**
      * Extract the year of this date
      *
