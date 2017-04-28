@@ -79,7 +79,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
-        if (!$this->projectIds->offsetExists($key)) {
+        if (Definition::KEY_NONE !== $key && !$this->projectIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No Project ID found for key: $key");
         }
     }

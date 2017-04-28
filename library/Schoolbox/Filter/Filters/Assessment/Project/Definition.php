@@ -24,6 +24,7 @@ use Schoolbox\GenericCollection;
 class Definition extends AbstractFilterDefinition
 {
     // Where does the project reside?
+    const KEY_NONE               = 'none';                // assessment is not inside a project
     const KEY_ON_CLASS_FOLDER    = 'on_class_folder';     // created directly on a class folder
     const KEY_ON_GROUP_FOLDER    = 'on_group_folder';     // created directly on a group folder
     const KEY_ON_CLASS_UNIT_IMPL = 'on_class_unit_impl';  // imported onto class folder
@@ -61,6 +62,7 @@ class Definition extends AbstractFilterDefinition
     protected function getCustomKeys()
     {
         return [
+            self::KEY_NONE,
             self::KEY_ON_CLASS_FOLDER,
             self::KEY_ON_GROUP_FOLDER,
             self::KEY_ON_CLASS_UNIT_IMPL,
@@ -120,6 +122,8 @@ class Definition extends AbstractFilterDefinition
     public function getLabel($key)
     {
         switch ($key) {
+            case self::KEY_NONE:
+                return 'Not inside a project';
             case self::KEY_ON_CLASS_FOLDER:
                 return 'Created on class';
             case self::KEY_ON_GROUP_FOLDER:

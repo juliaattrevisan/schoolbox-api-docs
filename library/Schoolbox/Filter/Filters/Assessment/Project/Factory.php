@@ -270,7 +270,6 @@ class Factory extends AbstractFilterFactory
                 }
             }
         }
-
         return $projects;
     }
 

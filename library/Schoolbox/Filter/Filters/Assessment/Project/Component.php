@@ -61,6 +61,7 @@ class Component extends AbstractFilterComponent
     {
         return array_merge(parent::toContext(), [
             'projects' => $this->projects,
+            'keyNone'  => Definition::KEY_NONE,
         ]);
     }
 
@@ -78,6 +79,13 @@ class Component extends AbstractFilterComponent
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
+
+        // Insert the (none) option
+        $key = Definition::KEY_NONE;
+        if($optionDefaults->offsetExists($key)){
+            $isSelected = $optionDefaults[$key]->getDefaults()[$roleType]->isSelected();
+            $availableSelections[$key] = $this->createSelection($key, $isSelected);
+        }
 
         // A project will be available if it matches any abstract key. (only available projects were injected from factory)
         // A project will be checked if any matching abstract project defaults were checked
