@@ -16,9 +16,8 @@
     <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px; min-width: 150px;">
         <h4 data-filter-name>{{ filterName }}</h4>
 
-        {% set selection = userSelections[keyOnFolder] %}
         {% include '@filters/_selectionCheckbox.twig' with {
-            userSelection: selection,
+            userSelection: userSelections[keyOnFolder],
             roleSelection: roleSelections[keyOnFolder],
             label:         'On Folder'
         } only %}
