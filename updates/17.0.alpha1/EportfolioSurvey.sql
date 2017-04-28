@@ -27,8 +27,8 @@ INSERT INTO component_config_definition
 ) VALUES (
   (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
   'collapse',
-  '0',
-  'Collapse Content',
+  '1',
+  'Display Component Heading On Student View',
   null
 );
 
