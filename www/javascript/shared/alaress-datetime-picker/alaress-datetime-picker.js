@@ -301,7 +301,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 // Initialise tabs
                 picker.foundation('reflow', 'tab');
 
-                $('#byDate-' + pickerId).find('.picker-submit').click(function () {
+                var $datePicker = $('#byDate-' + pickerId),
+                    $timetablePicker = $('#byTimetable-' + pickerId);
+
+                $datePicker.find('.picker-submit').click(function () {
                     if ($('#hideTime' + pickerId).is(':checked')) {
                         setValue(element, options, true, true);
                     }
@@ -320,12 +323,12 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                 });
 
-                $('#byTimetable-' + pickerId).find('.timetable-submit').click(function () {
+                $timetablePicker.find('.timetable-submit').click(function () {
                     var newDate = moment($(this).attr('data-timetable-value'));
 
                     if(options.enableTime === true) {
-                        var periodSelected = $('table').find('[data-selected=1]').attr('data-period'),
-                            periodTime = ($('[name*="periodTime' + pickerId + '"]:checked').val()),
+                        var periodSelected = $timetablePicker.find('table').find('[data-selected=1]').attr('data-period'),
+                            periodTime = $timetablePicker.find('[name*="periodTime' + pickerId + '"]:checked').val(),
                             newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma');
 
                         newDate = newDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
