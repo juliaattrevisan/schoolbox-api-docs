@@ -147,7 +147,7 @@ class Controller extends Base
                     'type' => $type,
                     'displayFormat' => $this->convertFormat($displayFormatDate).' '.$this->convertFormat($displayFormatTime),
                     'displayFormatDate' => $this->convertFormat($displayFormatDate),
-                    'weekStartDay' => $this->getConfigureLoader()->get('calendar_start_day'),
+                    'weekStartDay' => $this->getConfigLoader()->get('calendar_start_day'),
                     'terms' => $terms,
                     // If the connector is offline, pass FALSE
                     'timetable' => $timetable,
