@@ -508,19 +508,21 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         onChange: function (selectedDates, dateStr, instance) {
 
             // Put the display date onto the calendar div so we can capture it when the modal is closed
-            var dateSplit = dateStr.split(' ');
-            $('#pickerCalendar' + twigVars.id)
-                .attr('data-date', dateSplit[0])
-                .attr('data-time', dateSplit[1]);
+            if(dateStr.length > 0) {
+                var dateSplit = dateStr.split(' ');
+                $('#pickerCalendar' + twigVars.id)
+                    .attr('data-date', dateSplit[0])
+                    .attr('data-time', dateSplit[1]);
 
-            // Check if selected date has changed and don't send an ajax on time change
-            var selectedObj = new Date(selectedDates);
-            newDate = selectedObj.getFullYear() + '-' + (selectedObj.getMonth() + 1) + '-' + selectedObj.getDate();
-            if (newDate !== latestDate) {
-
-                requestDataByDate(encodeURIComponent(dateSplit[0]), 'calendar');
+                // Check if selected date has changed and don't send an ajax on time change
+                var selectedObj = new Date(selectedDates);
+                newDate = selectedObj.getFullYear() + '-' + (selectedObj.getMonth() + 1) + '-' + selectedObj.getDate();
+                if (newDate !== latestDate) {
+                    alert(dateStr);
+                    requestDataByDate(encodeURIComponent(dateSplit[0]), 'calendar');
+                }
+                latestDate = newDate;
             }
-            latestDate = newDate;
         }
 
     });

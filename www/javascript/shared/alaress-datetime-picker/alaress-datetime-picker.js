@@ -313,7 +313,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
-                            setValue(item, getOptions(item), $('#hideTime' + pickerId).is(':checked'), false);
+                            setValue(item, getOptions(item), $('#hideTime' + pickerId).is(':checked'), true);
                         });
                     }
 
@@ -333,7 +333,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
-                            setValue(item, getOptions(item), false, false);
+                            setValue(item, getOptions(item), false, true);
                         });
                     }
                     picker.foundation('reveal', 'close');
