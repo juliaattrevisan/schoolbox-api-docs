@@ -276,25 +276,6 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     }
 
     /**
-     * Saves a response for this Answer type. This should be customised based on
-     * the format and structure of the answer (e.g. serialize multichoice)
-     *
-     * @param  $data
-     *
-     * @return array
-     */
-    public function saveResponse($data)
-    {
-        if ($data['answer'] == null) {
-            $processedResponse = 'NULL';
-        } else {
-            $processedResponse = serialize($data['answer']);
-        }
-
-        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
-    }
-
-    /**
      * Exports the answer to Moodle XML format. This is a modified version of
      * $this->reviewResponse()
      *

@@ -60,7 +60,13 @@ $data['question_id'] = $this->arg[0];
 
 if($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']->getId(), $data['attempt_id'])) {
 
-    $result = $answerHandler->saveResponse($data);
+    if ($data['answer'] == null) {
+        $processedResponse = 'NULL';
+    } else {
+        $processedResponse = serialize($data['answer']);
+    }
+
+    $result = $answerHandler->saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
 
     /* Find out how many questions were completed in this section already
      */
