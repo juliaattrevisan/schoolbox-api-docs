@@ -70,9 +70,14 @@ class Mapper extends BaseMapper
                         answer.answer AS answers,
                         response.response AS selectedAnswers
             FROM        assess survey
-            JOIN        assess_section section ON section.assess_id = survey.assess_id
-            JOIN        assess_question question ON question.section_id = section.section_id
+            JOIN        assess_section section ON 
+                            section.deleted_at IS NULL AND 
+                            section.assess_id = survey.assess_id
+            JOIN        assess_question question ON
+                            question.deleted_at IS NULL AND
+                            question.section_id = section.section_id
             JOIN        assess_attempt attempt ON
+                            attempt.deleted_at IS NULL AND
                             attempt.assess_id = survey.assess_id AND
                             attempt.user_id = :user_id AND
                             attempt.attempt_id = (
@@ -81,15 +86,17 @@ class Mapper extends BaseMapper
                                 WHERE     last_attempt.assess_id = survey.assess_id
                                 ORDER BY  last_attempt.attempt_id DESC
                                 LIMIT 1
-                            )
+                            ) 
             JOIN        assess_response response ON
+                            response.deleted_at IS NULL AND
                             response.attempt_id = attempt.attempt_id AND
                             response.section_id = section.section_id AND
-                            response.question_id = question.question_id
+                            response.question_id = question.question_id 
             JOIN        assess_answer answer ON answer.question_id = question.question_id                            
-            WHERE       survey.assess_id = :survey_id AND
-                        survey.availability = 'survey'
-            ORDER BY    section.sequence,
+            WHERE       survey.deleted_at IS NULL AND
+                        survey.assess_id = :survey_id AND
+                        survey.availability = 'survey' 
+            ORDER BY    section.sequence, 
                         question.sequence
         ";
 
