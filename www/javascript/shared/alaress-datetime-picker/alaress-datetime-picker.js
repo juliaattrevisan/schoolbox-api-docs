@@ -518,7 +518,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 var selectedObj = new Date(selectedDates);
                 newDate = selectedObj.getFullYear() + '-' + (selectedObj.getMonth() + 1) + '-' + selectedObj.getDate();
                 if (newDate !== latestDate) {
-                    alert(dateStr);
                     requestDataByDate(encodeURIComponent(dateSplit[0]), 'calendar');
                 }
                 latestDate = newDate;
