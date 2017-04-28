@@ -268,9 +268,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
      */
     public function saveResponse($data)
     {
-        $processedResponse = serialize($data['answerRight']);
-
-        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
+        return parent::saveResponseInternal($data['attempt_id'], $data['section_id'], $data['question_id'], serialize($data['answerRight']));
     }
 
     /**

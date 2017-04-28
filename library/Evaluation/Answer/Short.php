@@ -168,9 +168,9 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      *
      * @return array
      */
-    public function saveResponse($data, $sectionId = '', $questionId = '', $processedResponse = '')
+    public function saveResponse($data)
     {
-        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $data['answer']);
+        return parent::saveResponseInternal($data['attempt_id'], $data['section_id'], $data['question_id'], $data['answer']);
     }
 
     /**

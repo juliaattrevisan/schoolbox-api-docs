@@ -162,6 +162,12 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * handler so you can serialize it, store it in native format, or in
      * whatever format is required.
      *
+     * @param $data
+     * @return mixed
+     */
+    public abstract function saveResponse($data);
+
+    /**
      * @param  $attemptId
      * @param  $section_id
      * @param  $question_id
@@ -169,7 +175,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
      *
      * @return array
      */
-    public function saveResponse($attemptId, $section_id, $question_id, $processedResponse)
+    protected function saveResponseInternal($attemptId, $section_id, $question_id, $processedResponse)
     {
         $response = array(
             'attempt_id' => $attemptId,
