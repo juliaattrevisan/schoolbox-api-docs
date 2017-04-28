@@ -25,6 +25,25 @@ use \Schoolbox\Config\Loader as ConfigLoader;
 
 class Controller extends Base
 {
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var TermMapper */
+    private $termMapper;
+
+    /** @var FolderMapper */
+    private $folderMapper;
+
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
+    /** @var AssessmentMapperProxy */
+    private $assessmentMapperProxy;
+
+    /** @var ConfigLoader */
+    private $configLoader;
+
     /**
      * Test URLS:
      * http://192.168.36.10/picker/datetime                                         <-- HTML for injecting into modal
@@ -54,7 +73,7 @@ class Controller extends Base
         $this->setUserAccessMapper($userAccessMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setTimetableHandler();
-        $this->setConfigureLoader();
+        $this->setConfigLoader();
     }
 
     /**
@@ -469,9 +488,6 @@ class Controller extends Base
      * Getters/setters below here
      */
 
-    /** @var UserMapper */
-    private $userMapper;
-
     /**
      * @param UserMapper $mapper
      * @return mixed $this
@@ -487,9 +503,6 @@ class Controller extends Base
     public function getUserMapper() {
         return $this->userMapper;
     }
-
-    /** @var TermMapper */
-    private $termMapper;
 
     /**
      * @param TermMapper $mapper
@@ -507,8 +520,6 @@ class Controller extends Base
         return $this->termMapper;
     }
 
-    /** @var FolderMapper */
-    private $folderMapper;
 
     /**
      * @param FolderMapper $mapper
@@ -527,9 +538,6 @@ class Controller extends Base
 
     }
 
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
-
     /**
      * @param UserAccessMapper $mapper
      * @return mixed $this
@@ -545,9 +553,6 @@ class Controller extends Base
     public function getUserAccessMapper() {
         return $this->userAccessMapper;
     }
-
-        /** @var AssessmentMapperProxy */
-    private $assessmentMapperProxy;
 
     /**
      * @param AssessmentMapperProxy $mapper
@@ -580,22 +585,19 @@ class Controller extends Base
         return $this->timetableHandler;
     }
 
-    /** @var ConfigureLoader */
-    private $configureLoader;
-
     /**
      * @return mixed $this
      */
-    public function setConfigureLoader() {
-        $this->configureLoader = new ConfigLoader();
+    public function setConfigLoader() {
+        $this->configLoader = new ConfigLoader();
         return $this;
     }
 
     /**
-     * @return ConfigureLoader
+     * @return ConfigLoader
      */
-    public function getConfigureLoader() {
-        return $this->configureLoader;
+    public function getConfigLoader() {
+        return $this->configLoader;
     }
 
 }
