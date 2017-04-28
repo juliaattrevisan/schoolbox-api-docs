@@ -44,6 +44,9 @@ class Controller extends Base
     /** @var ConfigLoader */
     private $configLoader;
 
+    /** @var  External_Timetable */
+    private $timetableHandler;
+
     /**
      * Test URLS:
      * http://192.168.36.10/picker/datetime                                         <-- HTML for injecting into modal
@@ -72,8 +75,8 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
         $this->setUserAccessMapper($userAccessMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setTimetableHandler();
-        $this->setConfigLoader();
+        $this->setTimetableHandler(new \External_Timetable());
+        $this->setConfigLoader(new ConfigLoader());
     }
 
     /**
@@ -570,34 +573,42 @@ class Controller extends Base
         return $this->assessmentMapperProxy;
     }
 
-    /**
-     * @return mixed $this
-     */
-    public function setTimetableHandler() {
-        $this->timetableHandler = new \External_Timetable;
-        return $this;
-    }
 
     /**
-     * @return TimetableHandler
+     * @return External_Timetable
      */
-    public function getTimetableHandler() {
+    public function getTimetableHandler()
+    {
         return $this->timetableHandler;
     }
 
+
     /**
-     * @return mixed $this
+     * @param External_Timetable $timetableHandler
+     * @return $this
      */
-    public function setConfigLoader() {
-        $this->configLoader = new ConfigLoader();
+    public function setTimetableHandler($timetableHandler)
+    {
+        $this->timetableHandler = $timetableHandler;
         return $this;
     }
 
     /**
      * @return ConfigLoader
      */
-    public function getConfigLoader() {
+    public function getConfigLoader()
+    {
         return $this->configLoader;
     }
 
+
+    /**
+     * @param ConfigLoader $configLoader
+     * @return $this
+     */
+    public function setConfigLoader($configLoader)
+    {
+        $this->configLoader = $configLoader;
+        return $this;
+    }
 }
