@@ -72,13 +72,13 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
 
     /* Convert campus names into ids */
     if (!empty($getValues['group'])) {
-        $user = $user->setRole($roleMapper->findById($getValues['group']));
+        $user = $user->setRole($roleMapper->findOneByColumn('name', $getValues['group']));
     }
 
     if (!empty($getValues['campus'])) {
         $user = $user->setCampusCollection(
             $campusMapper->findByColumn(
-                'id',
+                'name',
                 array_map('trim', explode(',', $getValues['campus']))
             )
         );
