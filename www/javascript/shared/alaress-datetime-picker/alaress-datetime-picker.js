@@ -67,8 +67,8 @@ function getOptions(element) {
 
     // Build datepicker options form the element data attributes
     var elementOptions = {
-        displayFormat: 'd/m/Y h:iK', //Default display format
-        displayFormatDate: 'd/m/Y',
+        displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
+        displayFormatDate: dateDisplayFormats.localDate, //Default display date format
         databaseFormat: 'Y-m-d H:i:s',
         enableTime: getValue(element, 'data-datepicker-time'),
         allDaySwitch: getValue(element, 'data-datepicker-alldayswitch'), //Show All Day switch
