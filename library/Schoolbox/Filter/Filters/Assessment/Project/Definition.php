@@ -126,8 +126,9 @@ class Definition extends AbstractFilterDefinition
      */
     public static function getPages()
     {
+        // For now, not available on any pages - purely used for internal query building
         return [
-            Option\Model::PAGE_PENDING_ASSESSMENTS,
+//            Option\Model::PAGE_PENDING_ASSESSMENTS,
         ];
     }
 
