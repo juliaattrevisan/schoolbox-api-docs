@@ -2,13 +2,15 @@
     <div class="row">
         <div class="small-12 columns">
             <ul class="component-titlebar">
-                <li class="actions-small-3">
+                <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 card ui-sortable-handle" data-component-handle>
                             <h2 title="{{ config.componentname }}"><a href="#">{{ config.componentname }}</a></h2>
                         </div>
                     </div>
-                    <nav></nav>
+                    <nav>
+                        <a href="/survey/intro/{{ survey.id }}" class="icon-surveys" title="Re-Attempt Survey"></a>
+                    </nav>
                 </li>
             </ul>
         </div>
