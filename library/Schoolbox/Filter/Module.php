@@ -42,8 +42,12 @@ class Module extends AlaressModule
 
         $loadFilters = function () {
             try {
+
                 return [
-                    'filters' => $this->getFilterMapper()->findAll(),
+                    'visibleFilters' => $this->getFilterMapper()->findAll()->filter(function(Model $filter){
+                        $definitionClass = $filter->getClass();
+                        return count($definitionClass::getPages()) > 0;
+                    }),
                 ];
             } catch (MapperException $e) {
                 throw new NotFound($e->getMessage());
@@ -55,8 +59,12 @@ class Module extends AlaressModule
                 $filterInstance       = $this->getFilterMapper()->findById($params['filter']);
                 $filterFactoryFactory = new FactoryFactory($this->getMapperFactory());
                 $filterFactory        = $filterFactoryFactory->buildFilterFactoryForFilter($filterInstance->getClass());
+                $definition           = $filterFactory->buildDefinition($filterInstance);
+                if(0 === count($definition::getPages())){
+                    throw new NotFound('This filter does not appear in UI.');
+                }
                 return [
-                    'definition' => $filterFactory->buildDefinition($filterInstance),
+                    'definition' => $definition,
                 ];
             } catch (MapperException $e) {
                 throw new NotFound($e->getMessage());

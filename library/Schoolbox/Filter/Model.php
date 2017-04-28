@@ -38,7 +38,7 @@ class Model
      */
 
     /**
-     * @return string
+     * @return string|IFilterDefinition
      */
     public function getClass()
     {
