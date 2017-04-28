@@ -1,6 +1,7 @@
 <?php
 
 /* REST interface for user CRUD operations */
+use Alaress\Password\Service as PasswordService;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -13,6 +14,7 @@ require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
 $userMapper = UserMapper::getInstance();
 $campusMapper = CampusMapper::getInstance();
 $roleMapper = RoleMapper::getInstance();
+$passwordService = new PasswordService();
 
 /**
  * Setter for user fields.
@@ -21,7 +23,7 @@ $roleMapper = RoleMapper::getInstance();
  * @param array $getValues
  * @return User
  */
-$setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMapper) {
+$setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMapper, $passwordService) {
     // Update only included fields
     if (!empty($getValues['username'])) {
         $user = $user->setUsername($getValues['username']);
@@ -63,8 +65,9 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
         $user = $user->setHideTimetable((bool)$getValues['hide_timetable']);
     }
     if (!empty($getValues['password'])) {
-        // Figure out password setting
-        $user = $user->setPassword($getValues['password']);
+        $user = $user
+            ->setRetrievablePassword($getValues['password'])
+            ->setPassword($passwordService->hash($getValues['password']));
     }
 
     /* Convert campus names into ids */
