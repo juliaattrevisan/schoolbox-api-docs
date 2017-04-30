@@ -16,6 +16,7 @@ use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Relation\Campus as RelationCampus;
+use Schoolbox\Calendar\Relation\Category as RelationCategory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
@@ -26,7 +27,7 @@ class Access
      *
      * @param User $user
      * @param Event $event
-     * @param array|Collection $groups
+     * @param RelationCategory[] $groups
      * @param Campus[] $campuses
      *
      * @return bool
@@ -100,7 +101,7 @@ class Access
              */
             foreach ($groups as $group) {
 
-                if (is_object($group)) {
+                if ($group instanceof RelationCategory) {
                     $groupId = $group->getCategoryId();
                 } else {
                     $groupId = $group;
