@@ -11,9 +11,11 @@
 
 namespace Schoolbox\Calendar\Event;
 
+use Schoolbox\Campus;
 use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
@@ -25,7 +27,7 @@ class Access
      * @param User $user
      * @param Event $event
      * @param array|Collection $groups
-     * @param array|Collection $campuses
+     * @param Campus[] $campuses
      *
      * @return bool
      */
@@ -65,9 +67,17 @@ class Access
                      */
                     foreach ($campuses as $campus) {
 
-                        if (is_object($campus)) {
+                        if ($campus instanceof Campus) {
+                            // CampusCollection is a collection of Schoolbox\Campus instances
+                            // when importing events from csv or vcal
+                            $campusId = $campus->getId();
+                        } elseif ($campus instanceof RelationCampus) {
+                            // CampusCollection is a collection of Calendar\Relation\Campus instances
+                            // when modifying a series of events
                             $campusId = $campus->getCampusId();
                         } else {
+                            // CampusCollection is a collection of campus ID's
+                            // when editing a single event
                             $campusId = $campus;
                         }
 
