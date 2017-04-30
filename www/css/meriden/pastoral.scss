@@ -96,6 +96,8 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
 
     /** Change made by Ben Robson to dl dt **/
     dl dt {
+        /* Make them the same color as headings too */
+        color: $header-font-color;
         font-size: .8rem;
         font-weight: bold;
     }
