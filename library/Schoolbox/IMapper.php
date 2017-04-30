@@ -64,6 +64,34 @@ interface IMapper
     public function getIdentifierProperty();
 
     /**
+     * Retrieves identifier column name.
+     *
+     * @return string
+     */
+    public function getIdentifierColumn();
+
+    /**
+     * @return string
+     */
+    public function getTable();
+
+    /**
+     * @return MappingCollection
+     */
+    public function getMap();
+
+    /**
+     * Overridden to use getter and hydrator instead of getting property
+     * directly.
+     *
+     * @param object $model
+     * @param string $property
+     *
+     * @return mixed
+     */
+    public function getModelProperty($model, $property);
+
+    /**
      * Restores one or more models that were soft deleted.
      *
      * @param object|Collection $object Model or collection of models to restore
@@ -125,13 +153,21 @@ interface IMapper
     public function findById($identifierValue);
 
     /**
+     * @see $this->findAll()
+     *
+     * @param  array $options
+     * @return array
+     */
+    public function findAllIds(array $options = []);
+
+    /**
      * Returns a collection with models filtered by column/property
      *
      * @param String $columnName
      * @param String $columnValue
      * @param array  $options @see findByColumnList() $options param
      *
-     * @return Collection
+     * @return GenericCollection
      */
     public function findByColumn($columnName, $columnValue, $options = array());
     /**
