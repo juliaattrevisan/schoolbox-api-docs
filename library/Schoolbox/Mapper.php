@@ -1146,7 +1146,7 @@ abstract class Mapper implements IMapper, Serializable
         // if property is empty, derive it from the column, converting snake_case to camelCase
         if (empty($map['property'])) {
             // if type is model, truncate '_id' suffix if it exists
-            if ($map['type'] == self::TYPE_MODEL && substr($map['column'], -3) == '_id') {
+            if (isset($map['type']) && $map['type'] === self::TYPE_MODEL && substr($map['column'], -3) === '_id') {
                 $property = substr($map['column'], 0, -3);
             } else {
                 $property = $map['column'];
