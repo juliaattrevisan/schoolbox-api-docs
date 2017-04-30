@@ -182,8 +182,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
-                    CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
+                    CONVERT(varchar(15),CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME),100) as StartTime,
+                    CONVERT(varchar(15),CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME),100) as EndTime,
                     r.Code AS Room,
                     a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
@@ -205,8 +205,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
-                    CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
+                    CONVERT(varchar(15),CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME),100) as StartTime,
+                    CONVERT(varchar(15),CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME),100) as EndTime,
                     r.Code AS Room,
                     a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
@@ -233,8 +233,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
-                    CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
+                    CONVERT(varchar(15),CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME),100) as StartTime,
+                    CONVERT(varchar(15),CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME),100) AS TIME) as EndTime,
                     r.Code AS Room,
                     a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
@@ -255,8 +255,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
-                    CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
+                    CONVERT(varchar(15),CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME),100) as StartTime,
+                    CONVERT(varchar(15),CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME),100) as EndTime,
                     r.Code AS Room,
                     a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
@@ -299,14 +299,12 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     if (!isset($timetable[$x]['class'][$classCode])) {
                         // Period start/end isn't always the same as the base class period
                         try {
-                            $startTime = new Alaress_Date_Format($timetabledClass['StartTime'], 'H:i:s+');
-                            $timetable[$x]['periodStart'] = $startTime->getUsingFormat('H:i');
+                            $timetable[$x]['periodStart'] = $timetabledClass['StartTime'];
                         } catch (Exception $e) {
                             // noop
                         }
                         try {
-                            $endTime = new Alaress_Date_Format($timetabledClass['EndTime'], 'H:i:s+');
-                            $timetable[$x]['periodEnd'] = $endTime->getUsingFormat('H:i');
+                            $timetable[$x]['periodEnd'] = $timetabledClass['EndTime'];
                         } catch (Exception $e) {
                             // noop
                         }
