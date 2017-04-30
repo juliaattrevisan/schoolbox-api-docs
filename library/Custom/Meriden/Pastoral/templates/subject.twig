@@ -37,13 +37,13 @@
     {# course grade - derived from grade for this class #}
     {% if report.subjectReport.namedGrades.courseGrade and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role) %}
         <div class="row" id="course-info">
-            <div class="small-6 medium-2 column">
+            <div class="small-6 medium-3 column">
                 <dl>
                     <dt>Course Grade</dt>
                     <dd class="explanation hide-for-print"><a href="/homepage/3403">[Grade Description]</a></dd>
                 </dl>
             </div>
-            <div class="small-6 medium-10 column">
+            <div class="small-6 medium-9 column">
                 <div class="content">
                     <p><strong>{{ report.subjectReport.namedGrades.courseGrade.pretty_mark }}</strong></p>
                 </div>
@@ -51,12 +51,12 @@
         </div>
 
         <div class="row" id="grade-distribution">
-            <div class="small-12 medium-2 column">
+            <div class="small-12 column">
                 <dl class="small-gap">
                     <dt>Grade Distribution</dt>
                 </dl>
             </div>
-            <div class="small-12 medium-10 column">
+            <div class="small-12 column">
                 <table class="width-auto bordered-table">
                     <thead>
                     <tr>
