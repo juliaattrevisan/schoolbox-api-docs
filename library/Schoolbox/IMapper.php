@@ -64,6 +64,15 @@ interface IMapper
     public function getIdentifierProperty();
 
     /**
+     * Restores one or more models that were soft deleted.
+     *
+     * @param object|Collection $object Model or collection of models to restore
+     *
+     * @return bool
+     */
+    public function restoreSoftDeleted($object);
+
+    /**
      * @see $this->findAll()
      *
      * @param  array $options
