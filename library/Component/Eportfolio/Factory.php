@@ -28,8 +28,8 @@ class Component_Eportfolio_Factory extends Component_FactoryAbstract
      * @param string $module
      * @return Component_Instance[]|\Schoolbox\GenericCollection
      */
-    public function getDefinitionList($module)
+    public function getDefinitionList($sortBy = '')
     {
-        return Component_InstanceMapper::getInstance()->findByModule($module);
+        return Component_InstanceMapper::getInstance()->findByModule($this->getModule());
     }
 }
