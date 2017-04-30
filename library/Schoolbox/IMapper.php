@@ -57,6 +57,13 @@ interface IMapper
     public function findAllIds(array $options = []);
 
     /**
+     * Retrieves identifier property name.
+     *
+     * @return string
+     */
+    public function getIdentifierProperty();
+
+    /**
      * @see $this->findAll()
      *
      * @param  array $options
