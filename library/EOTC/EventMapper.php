@@ -18,7 +18,10 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
-
+/**
+ * Class EventMapper
+ * @method Event hydrate(array $row, $alias = '', $callback = null)
+ */
 class EventMapper extends Calendar\EventMapper {
 
 	/**
@@ -99,11 +102,7 @@ class EventMapper extends Calendar\EventMapper {
 
             /* Assemble event pieces
              */
-            if (!isset($allEvents[$row['id']])) {
-                $allEvents[$row['id']] = $this->hydrate($row);
-            }
-
-            $eventItem = $allEvents[$row['id']];
+            $eventItem = $this->hydrate($row);
 
             /* Author
              */
@@ -171,6 +170,7 @@ class EventMapper extends Calendar\EventMapper {
 
                 $eventItem->getMetadata()->setActivityLog($allActivityLogs);
             }
+            $allEvents[] = $eventItem;
         }
 
         return $this->createCollection($allEvents);
