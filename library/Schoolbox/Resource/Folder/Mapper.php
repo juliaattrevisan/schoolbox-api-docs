@@ -193,6 +193,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'hardDeleteCategoryCodes']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCategoryCodes']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteFiles']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLinks']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
@@ -491,6 +493,35 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $codeMapper = $this->getJoinMapper('codes');
         $codeMapper->softDelete($codeMapper->findByColumn('folder_id', $object->getId()));
     }
+
+    /**
+     * Soft deletes all files that belong to this Folder model
+     *
+     * Called as a post soft-delete callback.
+     *
+     * @param Model $model
+     * @throws DefinitionException If specified join mapper not found
+     */
+    public function softDeleteFiles(Model $model)
+    {
+        $mapper = $this->getJoinMapper('files');
+        $mapper->softDelete($mapper->findByColumn('category', $model->getId()));
+    }
+
+    /**
+     * Soft deletes all links that belong to this Folder model
+     *
+     * Called as a post soft-delete callback.
+     *
+     * @param Model $model
+     */
+    public function softDeleteLinks(Model $model)
+    {
+        $mapper = LinkMapper::getInstance();
+        $mapper->softDelete($mapper->findByColumn('category', $model->getId()));
+    }
+
+
 
     /**
      * Get a list of categorys which belong to a particular parent
@@ -1282,25 +1313,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         foreach ($allChildren as $currentChild) {
             $this->recursiveDelete($currentChild);
         }
-
-        /* Soft delete all files
-         */
-        $fileMapper = new File\Mapper();
-        $allFiles = $fileMapper->findByColumn('category', $category->getId());
-
-        foreach ($allFiles as $currentFile) {
-            $fileMapper->delete($currentFile);
-        }
-
-        /* Soft delete all links
-         */
-        $linkMapper = new LinkMapper();
-        $allLinks = $linkMapper->findByColumn('category', $category->getId());
-
-        foreach ($allLinks as $currentLink) {
-            $linkMapper->delete($currentLink);
-        }
-
 
         /* Delete folder
          * This used to be optional, but it was always used in this context
