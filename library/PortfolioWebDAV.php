@@ -8,6 +8,7 @@
  */
 
 use Alaress\File\Remote\FetcherInterface;
+use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource\File\IFile as FileInterface;
@@ -16,6 +17,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
 use Schoolbox\WebDav\Model as WebDav;
@@ -110,6 +112,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         /** @var WebDav $dav */
         foreach ($davs as $dav) {
+
             if (!isset($settings)) {
                 $settings = [
                     'baseUri' => $dav->getUri(),
@@ -120,8 +123,8 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
             // If the user is in the campus and role- or they are empty- this path applies to them
 
-            if ((empty($dav->getRole()) || $dav->getRole()->getId() == $user->getRole()->getId()) &&
-                (empty($dav->getCampus()) || $user->getCampusCollection()->getBy('id', $dav->getCampus()->getId()) != null)
+            if ((!$dav->getRole() instanceof Role || $dav->getRole()->getId() == $user->getRole()->getId()) &&
+                (!$dav->getCampus() instanceof Campus || $user->getCampusCollection()->getBy('id', $dav->getCampus()->getId()) != null)
             ) {
                 // --------------------------------------------------------------------------------------------------------
                 // Replaceable tokens

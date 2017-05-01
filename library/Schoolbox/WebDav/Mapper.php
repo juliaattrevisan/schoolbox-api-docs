@@ -7,24 +7,17 @@
 
 namespace Schoolbox\WebDav;
 
+use PDOStatement;
+use Schoolbox\Campus;
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
 
 class Mapper extends BaseMapper
 {
-    /**
-     * Mapper constructor.
-     */
-    public function __construct()
-    {
-        $this->setRoleMapper(RoleMapper::getInstance());
-        $this->setCampusMapper(CampusMapper::getInstance());
-
-        parent::__construct();
-    }
-
     /**
      * Setup mapper
      */
@@ -41,55 +34,46 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->joins('campus_id', CampusMapper::class, 'id', null, null, 'campus', 'campus_id');
-        $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role_id');
+        $this->joins('campus_id', CampusMapper::class, 'id', null, null, 'campus', 'campus');
+        $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
         $this->hasSoftDeleteDateField('deleted_at');
+    }
 
+    protected function getSelectString()
+    {
+        return "
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('campus', 'c')},
+                        {$this->getJoinColumnString('role', 'r')}
+            FROM        {$this->getTable()}
+            LEFT JOIN   {$this->getJoinSql('campus', '', 'c')}
+            LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
+        ";
     }
 
     /**
-     * Here be the getters/setters
+     * @param PDOStatement $statement
+     * @return Collection
      */
-
-    /**
-     * @var RoleMapper
-     */
-    protected $roleMapper;
-
-    /**
-     * @param $roleMapper
-     */
-    public function setRoleMapper($roleMapper)
+    protected function hydrateSelect(PDOStatement $statement)
     {
-        $this->roleMapper = $roleMapper;
-    }
+        $collection = new Collection();
 
-    /**
-     * @return RoleMapper
-     */
-    public function getRoleMapper()
-    {
-        return $this->roleMapper;
-    }
+        foreach ($statement as $row) {
 
-    /**
-     * @var CampusMapper
-     */
-    protected $campusMapper;
+            $model = $this->hydrate($row);
 
-    /**
-     * @param $campusMapper
-     */
-    public function setCampusMapper($campusMapper)
-    {
-        $this->campusMapper = $campusMapper;
-    }
+            /** @var Campus $campus */
+            $campus = $this->hydrateJoin($row, 'campus', 'c');
+            $model->setCampus($campus);
 
-    /**
-     * @return CampusMapper
-     */
-    public function getCampusMapper()
-    {
-        return $this->campusMapper;
+            /** @var Role $role */
+            $role = $this->hydrateJoin($row, 'role', 'r');
+            $model->setRole($role);
+
+            $collection->add($model);
+        }
+
+        return $collection;
     }
 }
