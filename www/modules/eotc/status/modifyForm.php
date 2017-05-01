@@ -17,6 +17,8 @@ $event = false;
  */
 try {
 	$eventMapper = \EOTC\EventMapper::getInstance();
+
+	/** @var \EOTC\Event $event */
 	$event = $eventMapper->findById($_POST['eventId']);
 }
 catch (\Schoolbox\Mapper\Exception $e) {
@@ -29,7 +31,7 @@ $sessionUser = $_SESSION['user'];
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
  * can view this page
  */
-$authenticator = new \EOTC\Authenticator($this);
+$authenticator = new \EOTC\Authenticator($page);
 
 /* Only EOTC Administrators can view this page and a special case for
  * events where creators can self-promote this status into the next.
@@ -48,7 +50,7 @@ $isCanFinalise = $authenticator->canFinalise($sessionUser, $event);
  * Unless you're an EOTC administrator, then you can still
  * modify it (provided you've the appropriate permissions)
  */
-if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
+if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
 	$page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
 }
 /* EOTC Administrators and event authors can edit this event
