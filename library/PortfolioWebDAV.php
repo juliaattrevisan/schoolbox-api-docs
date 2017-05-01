@@ -94,12 +94,23 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $this->cache[$rootPath]['file'] = array();
     }
 
+    /** @var self $instance */
+    private static $instance = null;
+
     /**
      * @param bool $lite
      * @return PortfolioWebDAV|bool
      */
     public static function factory($lite = false)
     {
+        // For some reason this gets called at least three times in my testing, so I'm just shortcutting it by caching the output
+
+        if (self::$instance instanceof PortfolioWebDAV) {
+            return self::$instance;
+        }
+
+        $paths = [];
+
         $siteLocation = Cfg::get('site_location');
         $fallbackEnabled = Cfg::get('webdav_fallback_enabled');
 
@@ -108,7 +119,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         /** @var User $user */
         $user = $_SESSION["user"];
-        $paths = [];
 
         /** @var WebDav $dav */
         foreach ($davs as $dav) {
@@ -740,7 +750,8 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         $client = new DAV_ExtendedClient($settings);
 
-        return new self($client, $paths, $lite);
+        self::$instance = new self($client, $paths, $lite);
+        return self::$instance;
     }
 
     /**
