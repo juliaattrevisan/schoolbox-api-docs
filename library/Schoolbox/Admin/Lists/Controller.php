@@ -113,7 +113,7 @@ class Controller extends Base
             } else if (substr($field, 0, 6) == "radio-") {
                 $radios[substr($field, 6)] = $value;
             } else if ($field == "id") {
-                $ids = $value;
+                $ids[] = $value;
             }
         }
 
@@ -590,7 +590,11 @@ class Controller extends Base
                             if (!isset($records[$id]))
                                 $records[$id] = [];
 
-                            $records[$id][$prop->getName()] = $row->$getter();
+                            if (method_exists($row->$getter(), 'getId')) {
+                                $records[$id][$prop->getName()] = $row->$getter()->getId();
+                            } else {
+                                $records[$id][$prop->getName()] = $row->$getter();
+                            }
                         }
                     }
                 }

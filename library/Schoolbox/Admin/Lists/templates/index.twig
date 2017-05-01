@@ -197,7 +197,6 @@
 
                                                 <select name="value-{{ field_key }}[]">
                                                     {% for option in field.lookup %}
-
                                                         <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
                                                     {% endfor %}
                                                 </select>
@@ -315,7 +314,7 @@
         {% endfor %}
         {%  if tables[table].delete %}
             <nav class="hide-for-small-down">
-                
+
             </nav>
         {% endif %}
     </li>
