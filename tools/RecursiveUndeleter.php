@@ -50,6 +50,8 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as SubmissionBoxFile;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\LinkMapper;
 
 
 require_once __DIR__ . '/../library/Bootstrap.php';
@@ -115,6 +117,8 @@ class RecursiveUndeleter
             CourseSpec\Mapper::class,
             UnitSpec\Mapper::class,
             CourseImpl\Mapper::class,
+            File\Mapper::class,
+            LinkMapper::class,
         ],
         FolderCode\Mapper::class        => [],
         CourseSpec\Mapper::class        => [
@@ -126,6 +130,8 @@ class RecursiveUndeleter
         CourseImpl\Mapper::class        => [
             UnitImpl\Mapper::class,
         ],
+        File\Mapper::class => [],
+        LinkMapper::class => [],
         Assessment\Mapper::class        => [
             Quiz\Mapper::class,
             SubmissionBoxMapper::class,
