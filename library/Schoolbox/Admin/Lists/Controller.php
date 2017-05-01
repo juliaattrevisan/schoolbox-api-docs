@@ -310,6 +310,10 @@ class Controller extends Base
                         'width'     => 2,
                         'lookup'    => $luRole
                     ],
+                    'enabled' => [
+                        'caption'   => 'Enabled',
+                        'width'     => 2,
+                    ],
                 ]
             ],
             'campus'    => [
