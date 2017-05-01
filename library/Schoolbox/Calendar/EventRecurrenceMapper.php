@@ -149,7 +149,6 @@ class EventRecurrenceMapper
 
             if ($efficacy == self::EFFICACY_SERIES) {
                 $this->persistSeries($event, $eventRelations, $access, $startDate, $endDate);
-
             } elseif ($efficacy == self::EFFICACY_SELF) {
                 $this->persistSingle($event, $eventRelations, $access, $eventRecurrence);
             }
@@ -183,11 +182,11 @@ class EventRecurrenceMapper
      */
     protected function persistSeries(Event $event, EventRelations $eventRelations, $access, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate)
     {
-
         /* Update details of an already-existing set of recurring event incidents
          * (Change details of each instance of a recurring event, for example)
          */
         $series = $this->getEventMapper()->getAllInSeries($event);
+
 
         if ($series->count() == 0) {
             // there's no point continuing if there's nothing to work with
@@ -249,7 +248,14 @@ class EventRecurrenceMapper
         $event->setEndDate($first_date_set['end']);
         $event->setAccess($access);
 
+        $metadata = clone ($event->getMetadata());
+
         $this->getEventMapper()->save($event);
+
+        /* Some weird caching problems occur if you don't do this separately
+         * The staff attendees list doesn't get updated, for example
+         */
+        $this->getEventMapper()->updateMetadata($metadata, $event);
 
         /* Assign relations
          */

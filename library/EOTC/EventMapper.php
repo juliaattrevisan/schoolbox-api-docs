@@ -388,31 +388,53 @@ class EventMapper extends Calendar\EventMapper {
 		return $allEvents;
 	}
 
-	/**
-	 * Postsave hook
-	 *
-	 * @param Event $event
-	 */
-	protected function postSave($event) {
-		$metadataMapper = EventMetadataMapper::getInstance();
-		$metadataMapper->save($event->getMetadata());
-		$metadataMapper->saveRelation($event);
+    /**
+     * Postsave hook
+     *
+     * Override to prevent base postSave from occurring
+     *
+     * @param Calendar\Event $event
+     */
+    protected function postSave($event)
+    {
+        /* Noop
+         */
+    }
 
-		$this->deleteCampusRelations($event);
-		$this->createCampus($event);
+    /**
+     * Some caching issue prevents metadata being correctly formed.
+     *
+     * It contains data from its previous incarnation (something in core mapper's save method
+     * prevents joined objects from containing the correct data)
+     *
+     * Therefore can't rely on postSave correctly assigning people/relations
+     *
+     * @param EventMetadata $metadata
+     * @param Event $event
+     */
+	public function updateMetadata(EventMetadata $metadata, Event $event)
+    {
+        $event->setMetadata($metadata);
 
-		$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
-		$metadataMapper->createStaffAttendees($event->getMetadata());
+        $metadataMapper = EventMetadataMapper::getInstance();
+        $metadataMapper->save($event->getMetadata());
+        $metadataMapper->saveRelation($event);
 
-		$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
-		$metadataMapper->createStudentAttendees($event->getMetadata());
+        $this->deleteCampusRelations($event);
+        $this->createCampus($event);
 
-		$metadataMapper->deleteFilesRelations($event->getMetadata());
-		$metadataMapper->createFiles($event->getMetadata());
+        $metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
+        $metadataMapper->createStaffAttendees($event->getMetadata());
 
-		$metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
-		$metadataMapper->createResourceBookings($event->getMetadata());
-	}
+        $metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
+        $metadataMapper->createStudentAttendees($event->getMetadata());
+
+        $metadataMapper->deleteFilesRelations($event->getMetadata());
+        $metadataMapper->createFiles($event->getMetadata());
+
+        $metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
+        $metadataMapper->createResourceBookings($event->getMetadata());
+    }
 
 	/**
 	 * Find metadata for a particular event
