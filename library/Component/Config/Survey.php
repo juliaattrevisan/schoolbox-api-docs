@@ -23,10 +23,12 @@ class Component_Config_Survey extends Component_Config_Abstract
 
         try {
 
+            /** @var Survey $survey */
             $survey = $surveyMapper->findById($configValue);
+
             $page->setVar('COMPONENT_CONFIG_ID', $survey->getId());
             $page->setVar('COMPONENT_CONFIG_VALUE', $survey->getTitle());
-            $page->setVar('COMPONENT_CONFIG_NAME', $survey->getTitle());
+            $page->setVar('COMPONENT_CONFIG_NAME', $survey->getFolder()->getName() . " - " . $survey->getTitle());
 
         } catch (\Schoolbox\Mapper\Exception $e) {
 
