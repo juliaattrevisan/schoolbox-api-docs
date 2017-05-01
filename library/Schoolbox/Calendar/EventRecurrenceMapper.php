@@ -343,6 +343,7 @@ class EventRecurrenceMapper
                   ->setEndDate($currentDate['end']);
 
             $this->getEventMapper()->create($event);
+            $this->getEventMapper()->updateMetadata($event->getMetadata(), $event);
 
             /* Remember first event id in a series
              */

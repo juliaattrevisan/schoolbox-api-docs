@@ -57,8 +57,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$metadata = $metadataMapper->findByEvent($event);
 			}
 			catch (\Exception $e) {
-				$metadata = new \EOTC\EventMetadata();
-				$metadataStatus = new \EOTC\EventStatus();
+				$metadata = \EOTC\EventMetadataMapper::getInstance()->createModel();
+				$metadataStatus = \EOTC\EventStatusMapper::getInstance()->createModel();
 				$metadataStatus->setId(\EOTC\EventStatusMapper::STATUS_DEFAULT);
 				$metadata->setStatus($metadataStatus);
 			}
