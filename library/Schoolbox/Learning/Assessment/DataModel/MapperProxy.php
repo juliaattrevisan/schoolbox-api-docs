@@ -533,6 +533,51 @@ class MapperProxy
     }
 
     /**
+     * Finds all assessables for this student that overlap a window.
+     *
+     * This is subtly different to `findAllByStudentBetweenDates` - that method
+     * only fetches assessments that end between `$from` and `$to`, this method
+     * fetches all assessments whose publish to end date span overlaps the window.
+     *
+     * @param User                $student
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByStudentWithinWindow(User $student, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
+
+        // Find this user's folders from folder mapper
+        $classFolderIds = $folderMapper->findForUser(
+            $student,
+            // Only actual students have classes
+            $student->getRole()->isStudent(),
+            UserAccess::ACCESS_READ,
+            true
+        )->getColumnValues('id');
+
+        // Build a list of parameters to pass to findAllForFolderId
+        $builder = $this->convertOptionsToPredicateBuilder(['window_open' => $from, 'window_close' => $to]);
+
+        // Find assessments which this student is no longer in the class for,
+        // but has created a response or feedback for.
+        $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to);
+
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection(
+                $this->baseMapper->findAllForFolderId(
+                    $classFolderIds,
+                    $builder,
+                    $uniqueAssessmentIds
+                )
+            ),
+            $student
+        );
+    }
+
+    /**
      * Finds all assessables for a staff member.
      *
      * This method does not loads participation.
@@ -832,6 +877,20 @@ class MapperProxy
 
         if ($options['close_before'] instanceof \Alaress_Date_Format && !$options['close_before']->isNull()) {
             $builder->notGreaterThan('close_date', $options['close_before']->getDatabase());
+        }
+
+        // Window before / after filter (an ADF)
+        if ($options['window_open'] instanceof \Alaress_Date_Format
+            && $options['window_close'] instanceof \Alaress_Date_Format
+            && !$options['window_open']->isNull()
+            && !$options['window_close']->isNull()
+        ) {
+            // NOT (assess.end < window.open OR assess.start >= window.close)
+            $builder->notAny(
+                $this->baseMapper->getPredicateBuilder()
+                    ->lessThan('due_date', $options['window_open'])
+                    ->notLessThan('publish_date', $options['window_close'])
+            );
         }
 
         // Assessment type filter

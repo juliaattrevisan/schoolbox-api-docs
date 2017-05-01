@@ -58,7 +58,7 @@ class Builder implements IBuilder
      */
     public function all(IBuilder $predicate)
     {
-        return $this->addSubPredicate(self::OPERATOR_INTERSECT, $predicate);
+        return $this->addSubPredicate(self::OPERATOR_INTERSECT, $predicate, false);
     }
 
     /**
@@ -69,7 +69,29 @@ class Builder implements IBuilder
      */
     public function any(IBuilder $predicate)
     {
-        return $this->addSubPredicate(self::OPERATOR_UNION, $predicate);
+        return $this->addSubPredicate(self::OPERATOR_UNION, $predicate, false);
+    }
+
+    /**
+     * Query the negated intersection (NAND) of the conditions in the given predicate builder
+     *
+     * @param IBuilder $predicate
+     * @return $this
+     */
+    public function notAll(IBuilder $predicate)
+    {
+        return $this->addSubPredicate(self::OPERATOR_INTERSECT, $predicate, true);
+    }
+
+    /**
+     * Query the negated union (NOR) of the conditions in the given predicate builder
+     *
+     * @param IBuilder $predicate
+     * @return $this
+     */
+    public function notAny(IBuilder $predicate)
+    {
+        return $this->addSubPredicate(self::OPERATOR_UNION, $predicate, true);
     }
 
     /**
@@ -77,15 +99,16 @@ class Builder implements IBuilder
      *
      * @param string   $glue
      * @param IBuilder $predicate
+     * @param bool     $negate
      * @return $this
      */
-    protected function addSubPredicate($glue, IBuilder $predicate)
+    protected function addSubPredicate($glue, IBuilder $predicate, $negate)
     {
         // Extract this object's where and params
         $this->params  = array_merge($this->getParams(), $predicate->getParams());
 
         // Set the new where into action
-        $this->where[] = '('.implode(" $glue ", $predicate->getWhere()).')';
+        $this->where[] = ($negate ? 'NOT ' : '') . '('.implode(" $glue ", $predicate->getWhere()).')';
 
         return $this;
     }
