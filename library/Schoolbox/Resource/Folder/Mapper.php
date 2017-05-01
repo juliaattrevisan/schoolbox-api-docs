@@ -1301,14 +1301,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $linkMapper->delete($currentLink);
         }
 
-        /* Soft delete all category codes
-         */
-        $codeMapper = new Code\Mapper();
-        $allCodes = $codeMapper->findForCategory($category->getId());
-
-        foreach ($allCodes as $currentCode) {
-            $codeMapper->delete($currentCode);
-        }
 
         /* Delete folder
          * This used to be optional, but it was always used in this context
