@@ -190,6 +190,7 @@ class RecursiveUndeleter
             $this->checkRestoreAll();
             $this->findDeletedModels($this->rootMapper, $this->rootIds);
             $this->printResults($this->softDeletedModels);
+            $this->printDeletedAtDates($this->softDeletedModels);
 
             if($this->perform) {
                 $this->restoreSoftDeletedModels();
@@ -612,6 +613,90 @@ class RecursiveUndeleter
 
 
     /**
+     * Print the results with nicely-aligned columns
+     *
+     * @param object[][]|Collection[] $softDeletedModels
+     */
+    private function printDeletedAtDates(array $softDeletedModels)
+    {
+        $deDuplicatedResults = $this->buildDeDuplicatedResults($softDeletedModels);
+
+        /** @var IMapper $mapperClass */
+        $firstLoop = true;
+        foreach($deDuplicatedResults as $mapperClass => $models) {
+            $firstModel = $models->first();
+
+            // No models, or does not have a 'getDeletedAt()' method?
+            if(!$firstModel || !method_exists($firstModel, 'getDeletedAt')){
+                continue;
+            }
+            $mapper = $mapperClass::getInstance();
+
+            if(!$firstLoop){
+                $this->logger->info('');
+            }
+            $this->logger->info(sprintf("Deleted at values for mapper '%s':", $mapperClass));
+
+            // Align ID columns. Right-align numeric, left align textual.
+            $longestId = 0;
+            $rightAlign = true;
+            foreach($models as $model){
+                $id = $this->buildId($mapper, $model);
+                $longestId = max($longestId, strlen($id));
+                if((string)(int) $id !== $id){
+                    $rightAlign = false;
+                }
+            }
+
+            $alignment = $rightAlign ? '' : '-';
+            foreach($models as $model){
+                $id = $this->buildId($mapper, $model);
+                /** @var Alaress_Date_Format $adf */
+                $adf = $model->getDeletedAt();
+                $this->logger->info(sprintf("%{$alignment}{$longestId}s - %s", $id, $adf->getDatabase()));
+            }
+            $firstLoop = false;
+        }
+    }
+
+
+    /**
+     * @param IMapper $mapper
+     * @param         $model
+     * @return string
+     */
+    private function buildId(IMapper $mapper, $model)
+    {
+        // Does this model have an identifier?
+        if($mapper->getIdentifierColumn()) {
+            return (string)$mapper->getModelProperty($model, $mapper->getIdentifierProperty());
+        }
+
+        // No identifier, build our own using all but the 'deletedAt' field.
+        $mapping = $mapper->getMap();
+        $id      = '';
+        $first   = true;
+        foreach($mapping as $map) {
+            if(!isset($map['property'])) {
+                continue;
+            }
+            // Ignore soft-delete fields
+            if(false !== strpos(strtolower($map['property']), 'deleted')) {
+                continue;
+            }
+            $property = $map['property'];
+            if(!$first) {
+                $id .= '_';
+            }
+            $id    .= $mapper->getModelProperty($model, $property);
+            $first = false;
+        }
+        return $id;
+
+    }
+
+
+    /**
      * It's theoretically possible for our graph to be acyclic, meaning the one logical entity may be present as
      * multiple models.
      *
@@ -628,29 +713,7 @@ class RecursiveUndeleter
             $deDuplicatedResults[$mapperClass] = new Collection();
             $mapper                            = $mapperClass::getInstance();
             foreach($models as $model) {
-                if($mapper->getIdentifierColumn()) {
-                    $id = $mapper->getModelProperty($model, $mapper->getIdentifierProperty());
-                }
-                else {
-                    $mapping = $mapper->getMap();
-                    $id      = '';
-                    $first   = true;
-                    foreach($mapping as $map) {
-                        if(!isset($map['property'])) {
-                            continue;
-                        }
-                        // Ignore soft-delete fields
-                        if(false !== strpos(strtolower($map['property']), 'deleted')) {
-                            continue;
-                        }
-                        $property = $map['property'];
-                        if(!$first) {
-                            $id .= '_';
-                        }
-                        $id    .= $mapper->getModelProperty($model, $property);
-                        $first = false;
-                    }
-                }
+                $id = $this->buildId($mapper, $model);
                 $deDuplicatedResults[$mapperClass][$id] = $model;
             }
         }
