@@ -270,7 +270,6 @@ class RecursiveUndeleter
     private function loadRootMapper()
     {
         if(!class_exists($this->rootMapperClass)) {
-            echo "Mapper class does not exist: {$this->rootMapperClass}";
             $this->logger->error("Mapper class does not exist: {$this->rootMapperClass}");
             exit(1);
         }
