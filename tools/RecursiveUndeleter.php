@@ -113,6 +113,7 @@ class RecursiveUndeleter
      */
     private static $softDeleteRegistry = [
         Folder\Mapper::class            => [
+            Folder\Mapper::class => 'parent',   // yes, recursive tables are supported! :)
             FolderCode\Mapper::class,
             CourseSpec\Mapper::class,
             UnitSpec\Mapper::class,
@@ -144,7 +145,6 @@ class RecursiveUndeleter
         Quiz\Mapper::class              => [
             QuizSection\Mapper::class,
             QuizAttempt\Mapper::class,
-
         ],
         SubmissionBoxMapper::class      => [
             SubmissionMapper::class   => 'student_submission.box_id',
