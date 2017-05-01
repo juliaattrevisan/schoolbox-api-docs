@@ -31,10 +31,11 @@ class Authenticator {
 	 */
 	private $allPermissions = [];
 
-	/**
-	 * Constructor
-	 *
-	 */
+    /**
+     * Authenticator constructor.
+     *
+     * @param \SitePage $page
+     */
 	public function __construct(\SitePage $page) {
 
         //Return 404 if EOTC is not enabled
