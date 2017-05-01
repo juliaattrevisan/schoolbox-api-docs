@@ -59,6 +59,31 @@ class EventMapper extends Calendar\EventMapper {
 		));
 	}
 
+    protected function getSelectString()
+    {
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$authorMapper->getColumnString('a')},
+                {$teacherInChargeMapper->getColumnString('c')},
+                {$eventTypeMapper->getColumnString('t')}
+        ";
+    }
+
+    protected function getFromString()
+    {
+        return "
+            FROM `{$this->table}`
+            LEFT JOIN {$this->getJoinSql('author', '', 'a')}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', '', 'c')}
+            LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
+        ";
+    }
+
 	/**
 	 * Custom findById
 	 *
