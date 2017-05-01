@@ -35,8 +35,11 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('uri', self::TYPE_STRING);
         $this->uses('path', self::TYPE_STRING);
+        $this->uses('enabled', self::TYPE_BOOLEAN);
         $this->uses('username_prefix', self::TYPE_STRING);
         $this->uses('username_suffix', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->joins('campus_id', CampusMapper::class, 'id', null, null, 'campus', 'campus_id');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role_id');

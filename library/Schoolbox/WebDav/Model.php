@@ -16,10 +16,10 @@ use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model implements ISoftDeletable
 {
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
-
-    /** @var int */
-    protected $id;
 
     /** @var string */
     protected $uri;
@@ -38,6 +38,9 @@ class Model implements ISoftDeletable
 
     /** @var Campus */
     protected $campus;
+
+    /** @var bool */
+    protected $enabled;
 
     /**
      * @param string $uri
@@ -112,21 +115,21 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param int $id
+     * @param bool $enabled
      * @return self
      */
-    public function setId($id)
+    public function setEnabled($enabled)
     {
-        $this->id = $id;
+        $this->enabled = $enabled;
         return $this;
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function getId()
+    public function getEnabled()
     {
-        return $this->id;
+        return $this->enabled;
     }
 
     /**
