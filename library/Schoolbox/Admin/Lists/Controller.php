@@ -281,6 +281,7 @@ class Controller extends Base
             ],
             'webdav' => [
                 'title'             => 'WebDav',
+                'delete'            => true,
                 'mapper'            => WebDavMapper::class,
                 'fields'            => [
                     'uri'           => [
@@ -301,12 +302,12 @@ class Controller extends Base
                         'width'     => 1,
                     ],
                     'campus'        => [
-                        'caption'   => 'Campus (Optional)',
-                        'width'     => 2,
+                        'caption'   => 'Campus',
+                        'width'     => 1,
                         'lookup'    => $luCampus
                     ],
                     'role'        => [
-                        'caption'   => 'Role (Optional)',
+                        'caption'   => 'Role',
                         'width'     => 2,
                         'lookup'    => $luRole
                     ],
