@@ -57,18 +57,36 @@ interface IMapper
     public function findAllIds(array $options = []);
 
     /**
+     * Override base mapper to always return new collection object
+     *
+     * @param array $contents
+     *
+     * @return GenericCollection
+     */
+    public function createCollection($contents = []);
+
+    /**
+     * Gets a single object as a collection, if it isn't one already.
+     *
+     * Different possible actions based on $object:
+     * * instanceof Collection: returns that object
+     * * instanceof \ICollection: returns that object converted to collection
+     * * array: returns a Collection object wrapping that array
+     * * anything else: returns Collection with $object as only item
+     *
+     * @param mixed $object
+     *
+     * @return Collection
+     */
+    public function getModelAsCollection($object);
+
+    /**
      * Retrieves identifier property name.
      *
      * @return string
      */
     public function getIdentifierProperty();
 
-    /**
-     * Retrieves identifier column name.
-     *
-     * @return string
-     */
-    public function getIdentifierColumn();
 
     /**
      * @return string
@@ -152,19 +170,12 @@ interface IMapper
      */
     public function findById($identifierValue);
 
-    /**
-     * @see $this->findAll()
-     *
-     * @param  array $options
-     * @return array
-     */
-    public function findAllIds(array $options = []);
 
     /**
      * Returns a collection with models filtered by column/property
      *
      * @param String $columnName
-     * @param String $columnValue
+     * @param mixed|mixed[] $columnValue
      * @param array  $options @see findByColumnList() $options param
      *
      * @return GenericCollection

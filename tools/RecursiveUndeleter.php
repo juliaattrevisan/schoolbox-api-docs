@@ -12,13 +12,14 @@
  * * Requires manual update of the soft-delete registry stored in this class (potentially out of sync with code-base)
  * * Restores EVERYTHING below specified IDs. Does NOT examine timestamps to see if the deleted item was part of delete cascade
  *
- * Usage: php ./RecursiveUndeleter.php -m{mapperClass} -i{ids} [-v] [-p]
- *        php ./RecursiveUndeleter.php --mapper {mapperClass} --ids {ids} [--verbose] [--perform]
+ * Usage: php ./RecursiveUndeleter.php -m{mapperClass} -i{ids} [-w{seconds}] [-v] [-p]
+ *        php ./RecursiveUndeleter.php --mapper {mapperClass} --ids {ids} --window {seconds} [--verbose] [--perform]
  *
  *  ShortOpt | LongOpt
- *  -p       | --perform   perform:     *without* this flag, un-delete will only perform a dry-run
- *  -m       | --mapper    mapperClass: which mapper does the root entity belong to?
- *  -i       | --ids       ids:         Comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
+ *  -p       | --perform   *without* this flag, un-delete will only perform a dry-run
+ *  -m       | --mapper    which mapper class does the root entity belong to?
+ *  -i       | --ids       Comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
+ *  -w       | --windows   duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
  *  -v       | --verbose   verbosity:   how much activity will be logged.
  */
 
@@ -62,6 +63,17 @@ $undeleter->run();
 
 class RecursiveUndeleter
 {
+    // To account for legacy non-synchronised deletedAt timestamps, how much allowance should we consider as being
+    // part of same action?
+    const DEFAULT_DELETED_AT_WINDOW = 120 ; // default to 1 minute either side of root object's soft-delete timestamp
+
+    /**
+     * Period in seconds, centered on parent deletedAt timestamp, that child models must be deleted within
+     * to be considered part of the same deletion action.
+     *
+     * @var int
+     */
+    private $deletedAtWindow;
 
     /**
      * If false, identify soft-deleted items and print report, but don't actually restore anything
@@ -192,8 +204,8 @@ class RecursiveUndeleter
             $this->parseCommandLineArgs();
             $this->buildLogger();
             $this->loadRootMapper();
-            $this->database = Database::getInstance();
-            $this->checkRestoreAll();
+            $this->connectToDatabase();
+            $this->checkRestoreAllRequested();
             $this->findDeletedModels($this->rootMapper, $this->rootIds);
             $this->printResults($this->softDeletedModels);
             $this->printDeletedAtDates($this->softDeletedModels);
@@ -231,13 +243,17 @@ class RecursiveUndeleter
         }
     }
 
+    private function connectToDatabase()
+    {
+        $this->database = Database::getInstance();
+    }
 
     /**
      * If the user specified all IDs ('*') on command line, load all ids for the specified mapper.
      *
      * Log error and exit if specified mapper does not have an ID field registered.
      */
-    private function checkRestoreAll()
+    private function checkRestoreAllRequested()
     {
         $this->logger->debug("Examining IDs argument to see if user requested all ('*') root objects");
         if(1 === count($this->rootIds) && '*' === $this->rootIds[0]) {
@@ -302,12 +318,13 @@ class RecursiveUndeleter
      */
     private function parseCommandLineArgs()
     {
-        $opts   = getopt('m:i:vp', ['mapper:', 'id:', 'verbose', 'perform']);
+        $opts   = getopt('m:i:w:vp', ['mapper:', 'id:', 'window:', 'verbose', 'perform']);
         $errors = [];
         $this->getCommandLinePerform($opts);
         $this->getCommandLineThreshold($opts);
         $this->getCommandLineMapperClass($errors, $opts);
         $this->getCommandLineIds($errors, $opts);
+        $this->getCommandLineTimestampWindow($errors, $opts);
 
         if(count($errors)) {
             echo "\nInvalid syntax. You must: \n";
@@ -359,6 +376,38 @@ class RecursiveUndeleter
         }
 
         $this->rootIds = explode(',', $idString);
+    }
+
+    /**
+     * Get the period in time in which to match deleted_at timestamps provided on command line
+     *
+     * @param string[] $errors
+     * @param array    $opts
+     */
+    private function getCommandLineTimestampWindow(&$errors, array $opts)
+    {
+        if(isset($opts['w'], $opts['window'])) {
+            $errors[] = "not specify timestamp window using both the short '-w' and long '--window' option syntax";
+            return;
+        }
+
+        $window = null;
+        if(isset($opts['w'])) {
+            $window = $opts['w'];
+        }
+        elseif(isset($opts['window'])) {
+            $window = $opts['window'];
+        }
+
+        if(null !== $window && preg_match('/\D+/', $window)){
+            $errors[] = 'use only integers (seconds) when specifying the deletedAt timestamp window width, eg \'120\'';
+            return;
+        }
+        if(null === $window){
+            $this->deletedAtWindow = self::DEFAULT_DELETED_AT_WINDOW;
+        } else {
+            $this->deletedAtWindow = (int)$window;
+        }
     }
 
 
@@ -472,21 +521,36 @@ class RecursiveUndeleter
 
 
     /**
-     * @param IMapper $childMapper
-     * @param string  $foreignKey
-     * @param int[]   $parentIds
+     * @param IMapper                  $childMapper
+     * @param string                   $foreignKeyColumn
+     * @param int[]                    $parentIds
+     * @param null|Alaress_Date_Format $deletedAfter
+     * @param null|Alaress_Date_Format $deletedBefore
      * @return GenericCollection|ISoftDeletable[]
      */
-    private function findDeletedChildModels(IMapper $childMapper, $foreignKey, $parentIds)
-    {
-        $deletedChildModels = $childMapper
-            ->findByColumn($foreignKey, $parentIds, ['deleted' => true])
+    private function findDeletedChildModels(
+        IMapper $childMapper,
+        $foreignKeyColumn,
+        array $parentIds,
+        Alaress_Date_Format $deletedAfter = null,
+        Alaress_Date_Format $deletedBefore = null
+    ){
+        $childModels = $childMapper
+            ->findByColumn($foreignKeyColumn, $parentIds, ['deleted' => true])
             ->filter(function (ISoftDeletable $model) {
                 return $model->isDeleted();
             });
-        $this->logger->info(sprintf('%d deleted child models found', $deletedChildModels->count()));
 
-        return $deletedChildModels;
+        // Do the child models have a timestamp (not boolean) soft-delete field, and we have dates to filter?
+        if($deletedAfter && $deletedBefore && $childModels->first() && method_exists($childModels->first(), 'getDeletedAt')){
+            $childModels = $childModels->filter(function($childModel) use ($deletedAfter, $deletedBefore){
+                /** @var Mapper\Traits\Model\DeletedAtDate $childModel */
+                $deletedAt = $childModel->getDeletedAt();
+                return $deletedAt->between($deletedAfter, $deletedBefore);
+            });
+        }
+        $this->logger->info(sprintf('%d deleted child models found', $childModels->count()));
+        return $childModels;
     }
 
 
@@ -514,6 +578,8 @@ class RecursiveUndeleter
     /**
      * Recursive driver
      *
+     * Each root model specified on command line can have different deletedAt timestamps
+     *
      * @param IMapper $mapper
      * @param int[]   $ids
      * @throws Mapper\Exception
@@ -534,14 +600,45 @@ class RecursiveUndeleter
             error(1);
         }
 
+        // Filter to just deleted root models
+        /** @var GenericCollection $deletedRootModels */
         $deletedRootModels = $rootModels->filter(function (ISoftDeletable $model) {
             return $model->isDeleted();
         });
 
+        // Add these to our 'found' set
         $this->registerDeletedModels($mapper, $deletedRootModels);
 
-        // Enter recursive rabbit hole
-        $this->recursiveFindDeletedModels($mapper, $deletedRootModels->getColumnValues($mapper->getIdentifierColumn()));
+        // For each root model, recursively search for deleted children (matching the root's timestamp)
+        foreach($deletedRootModels as $deletedRootModel){
+            // Try to get deletedAt timespan
+            list($deletedAfter, $deletedBefore) = $this->getDeletedBetweenDates($deletedRootModel);
+
+            // Enter recursive rabbit hole
+            $this->recursiveFindDeletedModels($mapper, $mapper->getModelAsCollection($deletedRootModel), $deletedAfter, $deletedBefore);
+        }
+    }
+
+
+    /**
+     * If model has a timestamp (not boolean) soft-delete field, generate a pair of ADFs that child objects must
+     * be deleted between to be considered part of the same delete cascade.
+     *
+     * @param object $model
+     * @return null[]|Alaress_Date_Format[]
+     */
+    private function getDeletedBetweenDates($model)
+    {
+        $deletedAfter = $deletedBefore = null;
+        if(method_exists($model, 'getDeletedAt')){
+            /** @var Mapper\Traits\Model\DeletedAtDate $model */
+            $deletedAt = $model->getDeletedAt();
+            $deletedAfter  = clone $deletedAt;
+            $deletedAfter->addSeconds(-1 * $this->deletedAtWindow / 2);
+            $deletedBefore = clone $deletedAt;
+            $deletedBefore->addSeconds(+1 * $this->deletedAtWindow / 2);
+        }
+        return [$deletedAfter, $deletedBefore];
     }
 
 
@@ -738,24 +835,33 @@ class RecursiveUndeleter
     /**
      * Recursive method to find soft-deleted models
      *
-     * @param IMapper $mapper
-     * @param int[]   $ids
+     * If $after and $before are not null, and child models have timestamp soft-delete field, filter to between dates
+     *
+     * @param IMapper                  $parentMapper
+     * @param Collection               $deletedParentModels
+     * @param null|Alaress_Date_Format $after
+     * @param null|Alaress_Date_Format $before
      */
-    private function recursiveFindDeletedModels(IMapper $mapper, array $ids)
-    {
-        $mapperClass = get_class($mapper);
+    private function recursiveFindDeletedModels(
+        IMapper $parentMapper,
+        Collection $deletedParentModels,
+        Alaress_Date_Format $after = null,
+        Alaress_Date_Format $before = null
+    ){
+        $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);
 
         $childMappers = self::$softDeleteRegistry[$mapperClass];
-        $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdString($ids)));
+        $parentIds    = $deletedParentModels->getColumnValues($parentMapper->getIdentifierColumn());
+        $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdString($parentIds)));
 
-
+        // For each child entity of this parent entity
         foreach($childMappers as $key => $val) {
-            list($childMapper, $foreignKey) = $this->getMapperClassAndForeignKeyFromRegistryPair($mapper, $key, $val);
+            list($childMapper, $foreignKeyColumn) = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
             $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
 
-            $deletedChildModels = $this->findDeletedChildModels($childMapper, $foreignKey, $ids);
+            $deletedChildModels = $this->findDeletedChildModels($childMapper, $foreignKeyColumn, $parentIds, $after, $before);
 
             // Add these models to our results
             $this->registerDeletedModels($childMapper, $deletedChildModels);
@@ -776,8 +882,12 @@ class RecursiveUndeleter
                 continue;
             }
 
+            if(null === $after && null === $before){
+                list($after, $before) = $this->getDeletedBetweenDates($deletedChildModels->first());
+            }
+
             // Recurse!!
-            $this->recursiveFindDeletedModels($childMapper, $childModelIds);
+            $this->recursiveFindDeletedModels($childMapper, $deletedChildModels, $after, $before);
         }
     }
 
