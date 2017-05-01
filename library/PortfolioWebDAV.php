@@ -8,6 +8,9 @@ use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
+use Schoolbox\User;
+use Schoolbox\WebDav\Mapper as WebDavMapper;
+use Schoolbox\WebDav\Model as WebDav;
 
 class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, FetcherInterface
 {
@@ -99,19 +102,25 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         }
 
         $this->cache[$rootPath]['file'] = array();
-
-
     }
 
+    /**
+     * @param bool $lite
+     * @return PortfolioWebDAV|bool
+     */
     public static function factory($lite = false)
     {
-        $davs = \Schoolbox\WebDav\Mapper::getInstance()->findAll();
+        $siteLocation = Cfg::get('site_location');
+        $fallbackEnabled = Cfg::get('webdav_fallback_enabled');
 
-        /** @var \Schoolbox\User $user */
+        /** @var Collection $davs */
+        $davs = WebDavMapper::getInstance()->findByColumn('enabled', 1);
+
+        /** @var User $user */
         $user = $_SESSION["user"];
         $paths = [];
 
-        /** @var \Schoolbox\WebDav\Model $dav */
+        /** @var WebDav $dav */
         foreach ($davs as $dav) {
 
             if (!isset($settings)) {
@@ -157,16 +166,600 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
         }
 
-        // Demo hack
+        // If no paths were found matching the current logged in user, and fallback was enabled in the Admin - Settings - Policy screen, revert to the old
+        // WebDAV setting from prior to V17.0
 
-        if (in_array(Config::get('site_location'), array('core', 'demo'))) {
-            $settings = array(
-                'baseUri' => 'http://webdave.alaress-dev.com.au/',
-                'userName' => 'webdave',
-                'password' => 'e3IRS043UdNis',
-            );
+        if (count($paths) == 0 && $fallbackEnabled) {
 
-            $paths = array('/');
+            // There was no WebDAV configuration applied, fallback to historical method (aka. that big long if-else statement)
+
+            if ($siteLocation == 'wenona') {
+                $settings = array(
+                    'baseUri' => 'http://oxygen/',
+                    'userName' => "wgs/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        '/StaffHome/',
+                        '/StaffData/',
+                    );
+                } else {
+                    $settings['baseUri'] = 'http://mercury/';
+
+                    $paths = array(
+                        '/StudentHome/' . (12 - $_SESSION['year'] + date('y')) . '/' . $_SESSION['username'] . '/',
+                        '/StudentData/',
+                    );
+                }
+            } elseif ($siteLocation == 'jpc') {
+                $settings = array(
+                    'baseUri' => 'https://malastare/',
+                    'userName' => "jpc/" . strtolower($_SESSION['username']),
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        '/Staff/' . strtolower($_SESSION['username']) . '/',
+                        '/doclib/',
+                    );
+                } else {
+                    $paths = array(
+                        '/Students/' . (date('Y') - ($_SESSION['year'] - 7)) . '/' . strtolower($_SESSION['username']) . '/',
+                    );
+                }
+            } elseif ($siteLocation == 'cathedral') {
+                $settings = array(
+                    'baseUri' => 'http://senior-server.school.cathedral.qld.edu.au/',
+                    'userName' => "cathedral/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    if ($_SESSION['campus'][0] == 4 || $_SESSION['campus'][0] == 5) {
+                        $settings['baseUri'] = 'http://junior-server.school.cathedral.qld.edu.au/';
+
+                        $paths = array(
+                            '/staffhome/' . $_SESSION['username'] . '/',
+                            '/ydrive/',
+                        );
+                    } else {
+                        $paths = array(
+                            '/staffhome/' . $_SESSION['username'] . '/',
+                            '/xdrive/',
+                        );
+                    }
+
+                } else {
+                    $paths = array(
+                        '/studenthome/' . $_SESSION['username'] . '/',
+                    );
+
+                    if ($_SESSION['campus'][0] == 4 || $_SESSION['campus'][0] == 5) {
+                        $settings['baseUri'] = 'http://junior-server.school.cathedral.qld.edu.au/';
+                    }
+                }
+
+            } elseif ($siteLocation == 'bialik') {
+                $settings = array(
+                    'baseUri' => 'https://webdav.bialik.vic.edu.au/',
+                    'userName' => "bialik/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    if ($_SESSION['campus'][0] == 2) {
+                        $paths = array(
+                            '/H-DRIVE/USERS/STAFF/TEACHERS/ELC/' . $_SESSION['username'] . '/',
+                        );
+                    } else {
+                        $paths = array(
+                            '/H-DRIVE/USERS/STAFF/TEACHERS/YEAR02-12/' . $_SESSION['username'] . '/',
+                        );
+                    }
+
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        '/H-DRIVE/USERS/STUDENTS/YEAR%20' . str_pad($_SESSION['year'], 2, '0', STR_PAD_LEFT) . '/' . $_SESSION['username'] . '/',
+                    );
+                }
+            } elseif ($siteLocation=='stmichaels') {
+                $settings = array(
+                    'baseUri' => 'https://drives.stmichaels.vic.edu.au/',
+                    'userName' => "smgs/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'staff/' . $_SESSION['username'] . '/',
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'] . $_SESSION['username'] . '/',
+                    );
+                }
+
+            } elseif ($siteLocation=='seymour') {
+                $settings = array(
+                    'baseUri' => 'https://webdav.seymour.sa.edu.au/',
+                    'userName' => "sccampus/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'] . 'staffhome/' . ucwords($_SESSION['username']) . '/',
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'] .'studenthome/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
+                    );
+                } else {
+                    return false;
+                }
+            } elseif ($siteLocation == 'mggs') {
+                $settings = array(
+
+                    'userName' =>  'mggs/'.$_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $settings['baseUri'] = 'http://mggs-webdav/';
+
+                    $paths = array(
+                        '/STAFF/' . $_SESSION['username'] . '/',
+                        '/EXCHANGE/',
+                        '/morrishall/',
+                    );
+
+                } elseif ($user->getRole()->isStudent()) {
+                    $settings['baseUri'] = 'http://mggs-fs02/';
+                    $paths = array(
+                        '/STUDENTS/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
+                    );
+                }
+
+            } elseif ($siteLocation == 'tintern') {
+                $settings = array(
+                    'userName' =>  'tintern/'.$_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                    'baseUri' => 'http://tnvmfs01/',
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        '/Staff/' . $_SESSION['username'] . '/'
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        '/Student/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
+                    );
+                } else {
+                    return false;
+                }
+
+            } elseif ($siteLocation=='oakburn') {
+                $settings = array(
+                    'baseUri' => 'http://davusers.soc.tas.edu.au/',
+                    'userName' => "soc/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    if ($_SESSION['campus'][0] == '1') {
+                        $paths = array(
+                            $settings['baseUri'].'penquitestaff/' . $_SESSION['username'] . '/Documents/',
+                        );
+                    } else {
+                        $paths = array(
+                            $settings['baseUri'].'elphinstaff/' . $_SESSION['username'] . '/Documents/',
+                        );
+                    }
+
+                    $fileShares = array(
+                        'Academic',
+                        'BIT',
+                        'CommunityRelations',
+                        'DramaAndDance',
+                        'EdOutdoors',
+                        'English',
+                        'HPE',
+                        'Humanities',
+                        'LOTE',
+                        'Maths',
+                        'Music',
+                        'PhotoStore',
+                        'Science',
+                        'Technology',
+                        'VisualArts',
+                        'RoundSquare',
+                        'AdminDocs',
+                        'AdminDocument'
+                    );
+
+                    foreach ($fileShares as $share) {
+                        $paths[] = $settings['baseUri'].'/'.$share.'/';
+                    }
+
+                } elseif ($user->getRole()->isStudent()) {
+                    if ($_SESSION['year']>='6') {
+                        $paths = array(
+                            $settings['baseUri'].'penquitestudents/Year12in' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/Documents/',
+                        );
+                    } else {
+                        $paths = array(
+                            $settings['baseUri'].'elphinstudents/Year12in' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/Documents/',
+                        );
+                    }
+
+                }
+
+            } elseif ($siteLocation == 'iggs') {
+                $settings = array(
+                    'userName' =>  $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                    'baseUri' => 'https://myschool1.ivanhoegirls.vic.edu.au',
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'/webdav/staff/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'].'/webdav/shared/'
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'].'/webdav/student/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'].'/webdav/shared/'
+                    );
+                }
+            } elseif ($siteLocation == 'sedc') {
+                $settings = array(
+                    'userName' =>  'SEC/' . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                    'baseUri' => 'http://myschoolfiles',
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'/StaffHome/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'].'/Assets/',
+                        $settings['baseUri'].'/StaffShares/',
+                        $settings['baseUri'].'/Submissions/'
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'].'/StudentHome/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/'
+                    );
+                }
+            } elseif ($siteLocation == 'btac') {
+                $settings = array(
+                    'userName' =>  $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                    'baseUri' => 'https://wd1.btac.nsw.edu.au',
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'/home/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'].'/vol/shared/',
+                    );
+                }
+
+            } elseif ($siteLocation=='fintona') {
+                $settings = array(
+                    'baseUri' => 'https://files.fintona.vic.edu.au/',
+                    'userName' => "fintona/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'staff/',
+                        $settings['baseUri'].'public/',
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'].'public/',
+                    );
+                }
+
+            } elseif ($siteLocation=='loyola') {
+                $settings = array(
+                    'baseUri' => 'http://lcapache.loyola.local:8080/',
+                    'userName' => "loyola/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'Staff%20Home/' . $_SESSION['username'] . '/',
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'].'Student%20Home/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
+                    );
+                }
+            } elseif ($siteLocation=='sheldon') {
+                $settings = array(
+                    'baseUri' => 'http://svwebdav01.sheldoncollege.com/',
+                    'userName' => $_SESSION['username'] . "@sheldoncollege.com",
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'staffhome/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'].'collegeshare/',
+                    );
+                    if ($user->getRole()->getId() != '3' and $user->getRole()->getId() != '4') {
+                        $paths = array_merge($paths, array(
+                            $settings['baseUri'].'academicshare/',
+                            $settings['baseUri'].'collegeshare/',
+                            $settings['baseUri'].'photoshare/',
+                            $settings['baseUri'].'studentshare/',
+                        ));
+                    }
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'].'studenthome/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'].'studentshare/',
+                    );
+                }
+            } elseif ($siteLocation=='ngsl') {
+
+                if ($user->getRole()->isStaff()) {
+                    $settings = array(
+                        'baseUri' => 'http://facultycloud.ngs.nsw.edu.au/',
+                        'userName' => $_SESSION['username'].'@ngs.nsw.edu.au',
+                        'password' => $_SESSION['password'],
+                    );
+                    $paths = array(
+                        $settings['baseUri'] . 'KDrive/',
+                        $settings['baseUri'] . 'staffhome/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'] . 'StudentShare/',
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $settings = array(
+                        'baseUri' => 'http://studentcloud.ngs.nsw.edu.au/',
+                        'userName' => $_SESSION['username'].'@ngs.nsw.edu.au',
+                        'password' => $_SESSION['password'],
+                    );
+                    $paths = array(
+                        $settings['baseUri']. $_SESSION['username'] . '/',
+                    );
+                }
+
+            } elseif ($siteLocation=='meriden') {
+                $settings = array(
+                    'baseUri' => 'http://webdav.meriden.nsw.edu.au/',
+                    'userName' => "meriden/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'staff/' . $_SESSION['username'] .'/',
+                        $settings['baseUri'].'staffgroup/',
+                        $settings['baseUri'].'student/',
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'].(12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
+                    );
+                }
+            }
+            elseif ($siteLocation=='diocesan') {
+                $settings = array(
+                    'baseUri'  => 'http://rdrive.diocesan.school.nz/',
+                    'userName' => 'diont/' . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+                if ($user->getRole()->isStaff()) {
+                    $paths = array($settings['baseUri'] . 'rdrive/',);
+                }
+            } elseif ($siteLocation=='tccll') {
+                $settings = array(
+                    'baseUri' => 'https://files.trinitylismore.nsw.edu.au/',
+                    'userName' => "TRINITY/" . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'].'staffhome/' . $_SESSION['username'] .'/',
+                        $settings['baseUri'].'staffshare/',
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        $settings['baseUri'].'studentshare/',
+                    );
+                }
+
+            } elseif ($siteLocation == 'rlc') {
+                $settings = array(
+                    'baseUri' => 'http://WebDavShareDrive.redeemer.net.au',
+                    'userName' => 'redeemer/'.$_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        'http://WebDavShareDrive.redeemer.net.au/',
+                        'http://WebDavMediaDrive.redeemer.net.au/',
+                        'http://WebDavHomeStaff.redeemer.net.au/'.$_SESSION['username'].'/',
+                        'http://WebDavHomeStudent.redeemer.net.au'
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        'http://WebDavShareDrive.redeemer.net.au',
+                        'http://WebDavMediaDrive.redeemer.net.au',
+                        'http://WebDavHomeStudent.redeemer.net.au/'. $_SESSION['username'] . '/'
+                    );
+                }
+            } elseif ($siteLocation == 'accac') {
+                $settings = array(
+                    'baseUri' => 'http://webdav.aquinas.qld.edu.au:8080',
+                    'userName' => $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        '/'
+                    );
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = array(
+                        '/'
+                    );
+                }
+            } elseif ($siteLocation == 'slmp') {
+                $settings = array(
+                    'baseUri' => 'https://sldm-wdav-01.stlouisaspendale.catholic.edu.au/',
+                    'userName' => 'stlouisdom/'.$_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'] . '/staffshare/',
+                        $settings['baseUri'] . '/reports/',
+                        $settings['baseUri'] . '/thome/' . $_SESSION['username'] . '/',
+                    );
+                }
+                if ($user->getRole()->isParent()) {
+                    $paths = array(
+                        $settings['baseUri'] . '/reports/'. $_SESSION['username'] . '/',
+                    );
+                }
+            } elseif ($siteLocation == 'sicol') {
+                $settings = [
+                    'baseUri'  => 'http://sbox_webdav.siena.vic.edu.au:81/',
+                    'userName' => 'siena/'.$_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                ];
+                if ($user->getRole()->isStaff()) {
+                    $paths = [$settings['baseUri'].'StaffHome/' . $_SESSION['username'] .'/',];
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = [$settings['baseUri'].'StudentHome/CL' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] .'/',];
+                }
+            } elseif ($siteLocation == 'ducv') {
+                $settings = array(
+                    'baseUri'  => 'http://ducvfiles.dulum.vic.edu.au:8461',
+                    'userName' => $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+                if ($user->getRole()->isStaff()) {
+                    $paths = array(
+                        $settings['baseUri'] . '/PublicDrive/',
+                        $settings['baseUri'] . '/StaffHome/' . $_SESSION['username'] . '/',
+                    );
+                }
+            } elseif ($siteLocation == 'stpauls') {
+                $settings = array(
+                    'baseUri'  => 'https://files.stpauls.nsw.edu.au/',
+                    'userName' => $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+                if ($user->getRole()->isStaff()) {
+                    $paths = [
+                        $settings['baseUri'] . 'StaffGroup/',
+                        $settings['baseUri'] . 'StaffPublic/',
+                        $settings['baseUri'] . 'StudentGroup/',
+                        $settings['baseUri'] . 'StudentPublic/',
+                    ];
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = [
+                        $settings['baseUri'] . 'StudentGroup/',
+                        $settings['baseUri'] . 'StudentPublic/',
+                    ];
+                }
+
+            } elseif ($siteLocation == 'alpgs') {
+                $settings = array(
+                    'baseUri'  => 'https://webdav.ags.vic.edu.au/',
+                    'userName' => 'ags\\' . $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+                if ($user->getRole()->isStaff()) {
+                    $paths = [
+                        $settings['baseUri'] . 'TDrive/',
+                        $settings['baseUri'] . 'StaffHome/' . $_SESSION['username'] . '/',
+                    ];
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = [
+                        $settings['baseUri'] . 'StudentHome/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'] . 'StudentCommon/',
+                    ];
+                }
+
+            } elseif ($siteLocation == 'sohcs') {
+                $settings = array(
+                    'baseUri'  => 'http://10.0.0.1/shares/',
+                    'userName' => $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+                if ($user->getRole()->isStaff()) {
+                    $paths = [
+                        $settings['baseUri'] . 'central/',
+                        $settings['baseUri'] . 'staff_data/' . $_SESSION['username'] . '/',
+                    ];
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = [
+                        $settings['baseUri'] . 'student_data/' . $_SESSION['username'] . '/',
+                    ];
+                }
+
+            } elseif ($siteLocation == 'scsb') {
+                $settings = array(
+                    'baseUri'  => 'https://scr-fs02.scr.vic.edu.au/',
+                    'userName' => 'SCR\\'.$_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+                if ($user->getRole()->isStaff()) {
+                    $paths = [
+                        $settings['baseUri'] . 'staff/' . $_SESSION['username'] . '/',
+                    ];
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = [
+                        $settings['baseUri'] . 'students/year_12_of_' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
+                    ];
+                }
+
+            } elseif ($siteLocation == 'agsbot') {
+                $settings = array(
+                    'baseUri' => 'http://webdav.ags.school.nz/',
+                    'userName' => 'AKGRAMMAR/'.$_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                );
+
+                if ($user->getRole()->isStaff()) {
+                    $paths = [
+                        $settings['baseUri'] . 'staff/' . $_SESSION['username'] . '/',
+                        $settings['baseUri'] . 'departments/',
+                        //                    $settings['baseUri'] . 'submission/',
+                        $settings['baseUri'] . 'distribution/',
+                    ];
+                } elseif ($user->getRole()->isStudent()) {
+                    $paths = [
+                        $settings['baseUri'] . 'students/' . $_SESSION['username'] . '/',
+                        //                    $settings['baseUri'] . 'submission/',
+                        $settings['baseUri'] . 'distribution/',
+                    ];
+                }
+
+            } elseif (in_array($siteLocation, array('core', 'demo'))) {
+                $settings = array(
+                    'baseUri' => 'http://webdave.alaress-dev.com.au/',
+                    'userName' => 'webdave',
+                    'password' => 'e3IRS043UdNis',
+                );
+
+                $paths = array('/');
+            }
         }
 
         if (empty($settings) || empty($paths)) {
@@ -181,25 +774,10 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @deprecated
+     * @param string $path
+     * @param string $filter
+     * @return mixed
      */
-    private function fixPath($path)
-    {
-
-        if ($path == '') {
-            return $path;
-        }
-
-        $path = preg_replace("#[\\:*\?\"<>|]#", "", $path);
-        foreach ($this->rootPaths as $root) {
-            if ($root == substr($path, 0, strlen($root))) {
-                return '/' . trim($path, '/');
-            }
-        }
-
-        return $this->rootPaths[0];
-    }
-
     public function getList($path = '', $filter = 'dir')
     {
 
@@ -283,11 +861,19 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         return $this->cache[$md5Path][$filter];
     }
 
+    /**
+     * @param $path
+     * @return mixed
+     */
     public function getDirectoryList($path)
     {
         return $this->getList($path, 'dir');
     }
 
+    /**
+     * @param $path
+     * @return mixed
+     */
     public function getFileList($path)
     {
         return $this->getList($path, 'file');
@@ -295,6 +881,10 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
     /* myfolder interface */
 
+    /**
+     * @param $id
+     * @return bool|mixed|string
+     */
     public function getParent($id)
     {
 
@@ -312,6 +902,10 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         return $this->getIndex($parentPath);
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getFolderNode($id)
     {
 
@@ -345,7 +939,10 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         }
     }
 
-
+    /**
+     * @param $id
+     * @return bool
+     */
     public function hasChildren($id)
     {
 
@@ -354,6 +951,10 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         return is_array($childrenList) && count($childrenList);
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getFolderList($id)
     {
         return $this->getDirectoryList($_SESSION['portfolioIdPathMap'][$id]);
@@ -361,12 +962,19 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
     /* MYFILE INTERFACE */
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getAllInFolder($id)
     {
-
         return $this->getFileList($_SESSION['portfolioIdPathMap'][$id]);
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     public function getFile($id)
     {
         //
@@ -408,6 +1016,10 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         return $temp;
     }
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function getByID($id)
     {
         /* $id of zero is always the shadow root node, which resolves to the base URI
@@ -478,6 +1090,8 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 error(141, $e->getMessage(). " at: ".$_SESSION['portfolioIdPathMap'][$id]);
             }
         }
+
+        return false;
     }
 
     /**
@@ -495,14 +1109,22 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         }
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public function isRoot($id)
     {
         return in_array($_SESSION['portfolioIdPathMap'][$id], $this->rootPaths);
     }
 
+    /**
+     * @param $data
+     * @param bool $file
+     * @return bool
+     */
     public function create($data, $file = false)
     {
-
         if ($data['parent'] == 0) {
             return false;
         }
@@ -519,13 +1141,15 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             $this->client->request('MKCOL', $path);
         }
 
-        //$_SESSION['portfolioIdPathMap'][] = $path;
-
+        return true;
     }
 
+    /**
+     * @param $data
+     * @return bool
+     */
     public function update($data)
     {
-
         if (isset($data['name'])) {
             $data['description'] = $data['name'];
         }
@@ -550,11 +1174,15 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
         }
 
+        return true;
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public function delete($id)
     {
-
         if ($this->isRoot($id) || $id == 0) {
             return false;
         }
@@ -562,14 +1190,23 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $this->client->request('DELETE', $_SESSION['portfolioIdPathMap'][$id]);
 
         unset($_SESSION['portfolioIdPathMap'][$id]);
+        return true;
     }
 
+    /**
+     * @param $path
+     * @return mixed
+     */
     protected function getIndex($path)
     {
         $path = rtrim($path, '/') . '/';
         return array_search($path, $_SESSION['portfolioIdPathMap']);
     }
 
+    /**
+     * @param $index
+     * @return mixed
+     */
     protected function getPath($index)
     {
         return $_SESSION['portfolioIdPathMap'][$index];
@@ -624,7 +1261,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     {
         $file = $this->fileMapper->createModel();
 
-        $owner = new \Schoolbox\User();
+        $owner = new User();
         $owner->setId($data['owner']);
 
         $cat = $this->folderMapper->createModel();

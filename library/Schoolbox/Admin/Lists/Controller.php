@@ -297,8 +297,8 @@ class Controller extends Base
                         'width'     => 2,
                     ],
                     'usernameSuffix' => [
-                        'caption'   => 'Username Suffix',
-                        'width'     => 2,
+                        'caption'   => 'Suffix',
+                        'width'     => 1,
                     ],
                     'campus'        => [
                         'caption'   => 'Campus (Optional)',
@@ -312,7 +312,11 @@ class Controller extends Base
                     ],
                     'enabled' => [
                         'caption'   => 'Enabled',
-                        'width'     => 2,
+                        'width'     => 1,
+                        'lookup'    => [
+                            ['key' => 1, 'value' => 'Yes'],
+                            ['key' => 0, 'value' => 'No'],
+                        ],
                     ],
                 ]
             ],
