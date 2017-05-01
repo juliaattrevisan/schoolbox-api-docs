@@ -237,6 +237,13 @@ class EventRecurrenceMapper
         // rest from scratch.
         $first_date_set = $eventRecurrence->getDateCollection()->first();
 
+        /* Tried to set a recurrence date in the past
+         * You can't repeat events into the past
+         */
+        if ($first_date_set == null) {
+            return;
+        }
+
         $event->setSeriesId($eventRecurrence->getSeriesId());
         $event->setStartDate($first_date_set['start']);
         $event->setEndDate($first_date_set['end']);
