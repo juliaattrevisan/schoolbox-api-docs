@@ -100,7 +100,7 @@ class RecursiveUndeleter
      * I can't rely on restoreSoftDeleted() as at the moment it's not comprehensive enough.
      *
      * If joined via simple FK, and FK is named parentTable_parentIdentifier, then you can just list the Mapper (with implicit numeric key).
-     * If non-standard naming (eg assess_*), or if joined via join table, then list the join column (string) as key
+     * If non-standard naming (eg assess_*), or if joined via join table, then list the join column (string) as value, keyed by mapperClass
      *
      * @var string[]|string[][]|IMapper[]|IMapper[][]
      * @todo Ideally this would be dynamically determined by inspecting the post-soft-delete hooks,
@@ -117,21 +117,21 @@ class RecursiveUndeleter
             CourseSpec\Mapper::class,
             UnitSpec\Mapper::class,
             CourseImpl\Mapper::class,
-            File\Mapper::class,
-            LinkMapper::class,
+            File\Mapper::class => 'category',
+            LinkMapper::class  => 'category',
         ],
         FolderCode\Mapper::class        => [],
         CourseSpec\Mapper::class        => [
             UnitSpec\Mapper::class,
         ],
         UnitSpec\Mapper::class          => [
-            'v_us.course_unit_specification_id' => Assessment\Mapper::class,
+            Assessment\Mapper::class => 'v_us.course_unit_specification_id',
         ],
         CourseImpl\Mapper::class        => [
             UnitImpl\Mapper::class,
         ],
-        File\Mapper::class => [],
-        LinkMapper::class => [],
+        File\Mapper::class              => [],
+        LinkMapper::class               => [],
         Assessment\Mapper::class        => [
             Quiz\Mapper::class,
             SubmissionBoxMapper::class,
@@ -139,7 +139,7 @@ class RecursiveUndeleter
             Project\Mapper::class,
         ],
         UnitImpl\Mapper::class          => [
-            'v_ui.course_unit_implementation_id' => Assessment\Mapper::class,
+            Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
         ],
         Quiz\Mapper::class              => [
             QuizSection\Mapper::class,
@@ -147,21 +147,21 @@ class RecursiveUndeleter
 
         ],
         SubmissionBoxMapper::class      => [
-            'student_submission.box_id' => SubmissionMapper::class,
-            'submission_return.box_id'  => ReturnedWorkMapper::class,
+            SubmissionMapper::class   => 'student_submission.box_id',
+            ReturnedWorkMapper::class => 'submission_return.box_id',
         ],
         TaskMapper::class               => [
             Task\CompletionMapper::class,
         ],
         Task\CompletionMapper::class    => [],
         Project\Mapper::class           => [
-            'v_pa.project_id' => Assessment\Mapper::class,
+            Assessment\Mapper::class => 'v_pa.project_id',
         ],
         QuizSection\Mapper::class       => [
-            'assess_question.section_id' => QuizQuestion\Mapper::class,
+            QuizQuestion\Mapper::class => 'assess_question.section_id',
         ],
         QuizAttempt\Mapper::class       => [
-            'assess_response.attempt_id' => QuizAnswer\Mapper::class,
+            QuizAnswer\Mapper::class => 'assess_response.attempt_id',
         ],
         SubmissionMapper::class         => [
             SubmissionBoxFile\Mapper::class,
@@ -170,7 +170,7 @@ class RecursiveUndeleter
             ReturnedWorkFile\Mapper::class,
         ],
         QuizQuestion\Mapper::class      => [
-            'assess_answer.question_id' => QuizSolution\Mapper::class,
+            QuizSolution\Mapper::class => 'assess_answer.question_id',
         ],
         QuizAnswer\Mapper::class        => [],
         QuizSolution\Mapper::class      => [],
@@ -450,30 +450,38 @@ class RecursiveUndeleter
 
 
     /**
+     * Parse the registered key+val to derive a Mapper instance and foreign key
+     *
+     * @param IMapper $parentMapper
      * @param string  $key
-     * @param IMapper $mapper
-     * @return string
+     * @param string  $val
+     * @return mixed[]
      */
-    private function getJoinColumn($key, IMapper $mapper)
+    private function getMapperClassAndForeignKeyFromRegistryPair(IMapper $parentMapper, $key, $val)
     {
         if(is_string($key)) {
-            return $key;
+            /** @var IMapper $key */
+            $childMapper = $key::getInstance();
+            $foreignKey = $val;
+        } else {
+            /** @var IMapper $val */
+            $childMapper = $val::getInstance();
+            $foreignKey = "{$parentMapper->getTable()}_{$parentMapper->getIdentifierColumn()}";
         }
-
-        return "{$mapper->getTable()}_{$mapper->getIdentifierColumn()}";
+        return [$childMapper, $foreignKey];
     }
 
 
     /**
      * @param IMapper $childMapper
-     * @param string  $joinCol
+     * @param string  $foreignKey
      * @param int[]   $parentIds
      * @return GenericCollection|ISoftDeletable[]
      */
-    private function findDeletedChildModels(IMapper $childMapper, $joinCol, $parentIds)
+    private function findDeletedChildModels(IMapper $childMapper, $foreignKey, $parentIds)
     {
         $deletedChildModels = $childMapper
-            ->findByColumn($joinCol, $parentIds, ['deleted' => true])
+            ->findByColumn($foreignKey, $parentIds, ['deleted' => true])
             ->filter(function (ISoftDeletable $model) {
                 return $model->isDeleted();
             });
@@ -743,11 +751,12 @@ class RecursiveUndeleter
         $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdString($ids)));
 
 
-        foreach($childMappers as $key => $childMapperClass) {
-            $this->logger->info(sprintf("Fetching children from mapper '%s'", $childMapperClass));
-            $childMapper        = $childMapperClass::getInstance();
-            $joinCol            = $this->getJoinColumn($key, $mapper);
-            $deletedChildModels = $this->findDeletedChildModels($childMapper, $joinCol, $ids);
+        foreach($childMappers as $key => $val) {
+            list($childMapper, $foreignKey) = $this->getMapperClassAndForeignKeyFromRegistryPair($mapper, $key, $val);
+            $mapperClass = get_class($childMapper);
+            $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
+
+            $deletedChildModels = $this->findDeletedChildModels($childMapper, $foreignKey, $ids);
 
             // Add these models to our results
             $this->registerDeletedModels($childMapper, $deletedChildModels);
@@ -755,8 +764,8 @@ class RecursiveUndeleter
             // Does child model have primary key identifier? (weak entities like folderCode do not)
             $childModelIdentifier = $childMapper->getIdentifierColumn();
             if(!$childModelIdentifier) {
-                $this->checkNoIdentifier($childMapperClass);
-                $this->logger->info(sprintf("Mapper '%s' does not have an identifier, therefore cannot have children", $childMapperClass));
+                $this->checkNoIdentifier($val);
+                $this->logger->info(sprintf("Mapper '%s' does not have an identifier, therefore cannot have children", $val));
                 continue;
             }
 
