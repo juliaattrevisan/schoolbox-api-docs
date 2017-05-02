@@ -164,9 +164,10 @@ class Mapper extends \Schoolbox\Mapper
      * Save a Plagscan payload into db
      *
      * @param SubmissionFile $file
+     * @param $filename
      * @return array
      */
-    public function saveNewPlagscan(SubmissionFile $file)
+    public function saveNewPlagscan(SubmissionFile $file, $filename)
     {
         /* If gateway never spawned, plagscan not configured
          */
@@ -182,7 +183,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Send it to plag
          */
-        $plagscanId = $this->getConnector()->transmit($file);
+        $plagscanId = $this->getConnector()->transmit($file, $filename);
 
         /* Plagscan death
          */
@@ -224,10 +225,10 @@ class Mapper extends \Schoolbox\Mapper
      * Current scheme is to use
      * <schoolbox user id>_<firstname>_<lastname>_<assessment id>
      *
-     * @param StudentSubmissionFile $submissionFile
+     * @param SubmissionFile $submissionFile
      * @return null|string
      */
-    public function plagscanFilename(StudentSubmissionFile $submissionFile)
+    public function plagscanFilename(SubmissionFile $submissionFile)
     {
         $query = "
             SELECT u.id, u.firstname, u.lastname, sb.assessment_id

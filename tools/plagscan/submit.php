@@ -52,6 +52,7 @@ foreach ($allDocuments as $currentDocument) {
         /* Convert to new format
          */
         $submissionFile = new SubmissionFile();
+        $submissionFile->setId($studentSubmissionFile->getId());
         $submissionFile->setStorage($studentSubmissionFile->getStorage());
 
         /* This returns a plagscan id upon transmission
@@ -60,7 +61,7 @@ foreach ($allDocuments as $currentDocument) {
 
         /* Figure out what the filename will be
          */
-        $filename = $mapper->plagscanFilename($studentSubmissionFile);
+        $filename = $mapper->plagscanFilename($submissionFile);
 
         if ($filename !== null) {
             $plagscanId = $mapper->getConnector()->transmit($submissionFile, $filename);

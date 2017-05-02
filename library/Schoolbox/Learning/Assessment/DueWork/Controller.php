@@ -816,7 +816,9 @@ class Controller extends Assessment\Controller
                 function() use ($plagscanMapper, $isFinal, $response) {
                     if ($isFinal && $response->getId()) {
                         foreach ($response->getAllFiles() as $currentFile) {
-                            $plagscanMapper->saveNewPlagscan($currentFile);
+                            $filename = $plagscanMapper->plagscanFilename($currentFile);
+
+                            $plagscanMapper->saveNewPlagscan($currentFile, $filename);
                         }
                     }
                 }
