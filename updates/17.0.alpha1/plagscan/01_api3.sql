@@ -9,3 +9,6 @@ ALTER TABLE `plagscan_document` CHANGE `deleted` `deleted_at` DATETIME NULL;
 
 -- Add Interactive Url column for Mode 7 Report
 ALTER TABLE `plagscan_document` ADD COLUMN `interactive_url` VARCHAR(255) NULL AFTER `html`;
+
+-- Add option to allow students to see plagscan reports
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('plagscan_allow_students_report_access', '0', 'Allow Students to see plagiarism reports', 'If enabled, students will have access to plagiarism reports', '3', '15', 'true');
