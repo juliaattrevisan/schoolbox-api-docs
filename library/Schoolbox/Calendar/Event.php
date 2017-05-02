@@ -898,4 +898,16 @@ class Event
     {
         return $this->userCollection;
     }
+
+    /**
+     * Stub for event metadata. EOTC uses this, but base event's dont.
+     *
+     * TODO extricate EOTC events from regular events, and remove this
+     *
+     * @return null
+     */
+    public function getMetadata()
+    {
+        return null;
+    }
 }
