@@ -11,6 +11,14 @@ class Model
 {
     /** @var string */
     protected $term;
+    /** @var string */
+    protected $title;
+    /** @var string */
+    protected $singularForm;
+    /** @var string */
+    protected $pluralForm;
+    /** @var bool */
+    protected $capitaliseFirst;
 
     /**
      * @param string $value
@@ -30,8 +38,24 @@ class Model
         return $this->term;
     }
 
-    /** @var string */
-    protected $singularForm;
+    /**
+     * @param string $value
+     * @return self
+     */
+    public function setTitle($value)
+    {
+        $this->title = $value;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
 
     /**
      * @param string $value
@@ -51,8 +75,6 @@ class Model
         return $this->singularForm;
     }
 
-    /** @var string */
-    protected $pluralForm;
 
     /**
      * @param string $value
@@ -71,9 +93,6 @@ class Model
     {
         return $this->pluralForm;
     }
-
-    /** @var bool */
-    protected $capitaliseFirst;
 
     /**
      * @param bool $value

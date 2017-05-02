@@ -21,6 +21,7 @@ class Mapper extends BaseMapper
         $this->hasTable('localisation');
         $this->hasModel(Model::class);
         $this->uses('term', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
+        $this->uses('title', self::TYPE_STRING);
         $this->uses('singular_form', self::TYPE_STRING);
         $this->uses('plural_form', self::TYPE_STRING);
         $this->uses('capitalise_first', self::TYPE_BOOLEAN);
