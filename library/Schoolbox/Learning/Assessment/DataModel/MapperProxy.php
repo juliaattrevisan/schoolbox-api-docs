@@ -773,7 +773,9 @@ class MapperProxy
                     $newCollection->add($this->translateToDomainModel($model));
                 } catch (\UnexpectedValueException $e) {
                     // Broken object from database - not much I can do but...
-                    newrelic_notice_error(null, $e);
+                    if(function_exists('newrelic_notice_error')){
+                        newrelic_notice_error(null, $e);
+                    }
                     continue;
                 }
             }
