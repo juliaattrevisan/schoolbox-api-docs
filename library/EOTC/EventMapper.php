@@ -412,8 +412,11 @@ class EventMapper extends Calendar\EventMapper {
      * @param EventMetadata $metadata
      * @param Event $event
      */
-	public function updateMetadata(EventMetadata $metadata, Event $event)
+    public function updateMetadata($metadata, $event)
     {
+        if (!($metadata instanceof EventMetadata && $event instanceof Event)) {
+            return;
+        }
         $event->setMetadata($metadata);
 
         $metadataMapper = EventMetadataMapper::getInstance();
