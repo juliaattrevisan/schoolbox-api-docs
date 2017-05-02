@@ -1123,7 +1123,6 @@ class External_Pcschools_User implements External_UserInterface
 
         // Field mappings
         $fieldMappings = [
-            // May suffix this field with $type
             'StudentContactID'           => 'FAMKEY',
             'StudentContactTitle'        => $titlePrefix . '_TITLE',
             'StudentContactPreferred'    => $mainPrefix . '_FIRSTNAME',
@@ -1148,6 +1147,10 @@ class External_Pcschools_User implements External_UserInterface
                 $result[$to] = $row[$from];
             }
         }
+
+        // Suffix contact ID with type
+        $result['StudentContactID'] .= '-'.$type;
+
         // Build fullname too if I can
         if (array_key_exists($mainPrefix.'_FIRSTNAME', $row) || array_key_exists($mainPrefix.'_SURNAME', $row)) {
             $result['StudentContactLegalFullName']
