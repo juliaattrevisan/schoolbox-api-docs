@@ -209,11 +209,18 @@ class EventRecurrenceMapper
         foreach ($series as $seriesEvent) {
             $this->setSeriesEventData($seriesEvent, $event);
 
+            $seriesEventMetadata = $seriesEvent->getMetadata();
+            if (is_object($seriesEventMetadata)) {
+                $metadata = clone $seriesEventMetadata;
+            } else {
+                $metadata = $seriesEventMetadata;
+            }
+
             // Adjust each event's start and end individually
             $seriesEvent->getStartDateTime()->getDateTimeObject()->add($startDelta);
             $seriesEvent->getEndDateTime()->getDateTimeObject()->add($endDelta);
             $this->getEventMapper()->save($seriesEvent);
-            $this->getEventMapper()->updateMetadata($seriesEvent->getMetadata(), $seriesEvent);
+            $this->getEventMapper()->updateMetadata($metadata, $seriesEvent);
 
             /* Assign relations
              */
