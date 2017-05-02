@@ -410,6 +410,39 @@ class Connector
         return $response;
     }
 
+    /**
+     * Privatise a document in the plagscan account
+     *
+     * This prevents it being used to compare against future documents
+     * Used when resubmitting one's own file again
+     *
+     * @param $plagscanId
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function privatise($plagscanId)
+    {
+        $postData = [
+            'access_token' => $this->getAccessTokenGenerator()->generate(),
+        ];
+
+        $client = new Client([
+            "base_uri" => $this->getApiUrl(),
+            "timeout" => 20.0,
+            "http_errors" => false
+        ]);
+
+        try {
+            $response = $client->put("documents/{$plagscanId}/private", [
+                'query' => $postData
+            ]);
+        }
+        catch (TransferException $e) {
+            throw new \RuntimeException('Error: Plagscan unavailable. Could not privatise document.');
+        }
+
+        return $response;
+    }
+
     /* Getters/Setters
      */
 
