@@ -1,12 +1,12 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], ['Grades', '#']) }}
+{{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural, '#']) }}
 
 <div class="row">
     <div class="small-12 columns">
         {% if year is not empty %}
-            <h1>{{ year }} Grades Summary</h1>
+            <h1>{{ year }} {{ locale.grades.properPlural }} Summary</h1>
         {% else %}
             <h1>Grades for {{ term.title }}</h1>
         {% endif %}
@@ -62,7 +62,7 @@
                     <div class="small-12 medium-8 columns">
                         <h2 class="subheader no-margin">
                             <a href="{{ routeLookup('learning.getGradesForSubject', {student: student, userId: student.id, term: term, termCode: term.code, subject: subject, subjectId: folder.id}) }}"
-                               title="View Grades">
+                               title="View {{ locale.grades.properPlural }}">
                                 {{ folder.name }}
                             </a>
                         </h2>

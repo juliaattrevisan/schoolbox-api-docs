@@ -13,7 +13,7 @@
                 {% for currentColumn in gradeSummary.columns %}
                 {% if currentColumn == 'availableGrades' %}
                 {
-                    name: 'Available Grades',
+                    name: 'Available {{ locale.grades.properPlural }}',
                     data: [{% for year, values in gradeSummary.data %}{{ values[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
                 }
                 {% else %}
@@ -38,7 +38,7 @@
                     <thead class="generic-heading-highlight">
                     <tr>
                         <th class="numeric">Year</th>
-                        <th class="numeric">Entered Grades</th>
+                        <th class="numeric">Entered {{ locale.grades.properPlural }}</th>
                         <th class="letter">N</th>
                         <th class="letter">A</th>
                         <th class="letter">M</th>

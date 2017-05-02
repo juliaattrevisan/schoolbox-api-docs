@@ -21,7 +21,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Grades for {{ subject.name }}</h1>
+        <h1>{{ locale.grades.properPlural }} for {{ subject.name }}</h1>
     </div>
 </div>
 
@@ -85,7 +85,7 @@
         </div>
         {% if canSeeGradeAverage %}
         <div class="small-12 large-6 island">
-            <h2 class="subheader">Current Grade Average</h2>
+            <h2 class="subheader">Current {{ locale.grades.proper }} Average</h2>
             <section class="content">
                 <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}">
                 <span>
@@ -384,7 +384,7 @@
         <div class="small-12 island">
             <div class="empty-state">
                 <i class="icon-due-work"></i>
-                <p>No grades are available for this subject.</p>
+                <p>No {{ locale.grades.plural }} are available for this subject.</p>
             </div>
         </div>
     </div>

@@ -441,6 +441,7 @@ foreach ($categoryList as $category) {
 //    $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
     $output = array(
+
         'SUBJ_CAT_ID'       => $categoryID,
         'SUBJ_SUBJECT_NAME' => Scrub::text($category['name']),
         'SUBJ_SUBJECT_CODE' => $categoryCode,

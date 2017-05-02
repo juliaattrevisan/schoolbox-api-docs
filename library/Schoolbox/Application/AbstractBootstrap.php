@@ -26,6 +26,7 @@ use Aura\Di;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\ICommunityPortal;
+use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -232,22 +233,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'l10n',
             $di->lazy(
                 function () use ($di) {
-
-                    /** @var IConnector $database */
-                    $database = $di->get('databaseInternal');
-                    $iterator = $database->executeQueryIterator("SELECT term, singular_form, plural_form, capitalise_first FROM localisation");
-
-                    $l10n = [];
-
-                    foreach ($iterator as $term) {
-                        $l10n[$term['term']] = [
-                            'singular'   => $term['singular_form'],
-                            'plural'     => $term['plural_form'],
-                            'capitalise' => (bool)$term['capitalise_first']
-                        ];
-                    }
-
-                    return new RosettaStone($l10n);
+                    return new RosettaStone($di->get('mapperFactory')->get(L10nMapper::class));
                 }
             )
         );

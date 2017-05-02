@@ -19,6 +19,7 @@ class AdminV2_Nav
         'eportfolio/deploy'=> 'ePortfolio Deployment',
         'allowed-file'     => 'Allowed Files',
         'setting'          => 'Settings',
+        'terminology'      => 'Terminology',
         'calendar'         => 'Calendar',
         'bulk-add-folders' => 'Folder',
         'rollover'         => 'Rollover',
