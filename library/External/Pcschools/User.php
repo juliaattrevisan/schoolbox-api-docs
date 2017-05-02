@@ -11,6 +11,11 @@ use Schoolbox\User;
 
 class External_Pcschools_User implements External_UserInterface
 {
+    const CONTACT_TYPE_FATHER    = 'F';
+    const CONTACT_TYPE_MOTHER    = 'M';
+    const CONTACT_TYPE_GUARDIAN  = 'G';
+    const CONTACT_TYPE_CAREGIVER = 'C';
+
     /**
      * @var MSSQL
      */
@@ -487,16 +492,16 @@ class External_Pcschools_User implements External_UserInterface
             $id  = $row['FAMKEY'];
             // For now, I'm going to assume that parent IDs will be suffixed
             if ($row['DAD_DOMICILE'] === 'Y') {
-                $result[$id.'-F'] = $row['DAD_EMAIL'];
+                $result[$id.'-'.self::CONTACT_TYPE_FATHER] = $row['DAD_EMAIL'];
             }
             if ($row['MUM_DOMICILE'] === 'Y') {
-                $result[$id.'-M'] = $row['MUM_EMAIL'];
+                $result[$id.'-'.self::CONTACT_TYPE_MOTHER] = $row['MUM_EMAIL'];
             }
             if ($row['GUARD_DOMICILE'] === 'Y') {
-                $result[$id.'-G'] = $row['GUARD_EMAIL'];
+                $result[$id.'-'.self::CONTACT_TYPE_GUARDIAN] = $row['GUARD_EMAIL'];
             }
             if ($row['CGIVE_DOMICILE'] === 'Y') {
-                $result[$id.'-C'] = $row['CGIVE_EMAIL'];
+                $result[$id.'-'.self::CONTACT_TYPE_CAREGIVER] = $row['CGIVE_EMAIL'];
             }
         }
         return $results;
@@ -1064,10 +1069,10 @@ class External_Pcschools_User implements External_UserInterface
     private function buildParentRecords($base, $row)
     {
         $results = array_filter([
-            $this->buildSingleParentRecord($row, 'F'),
-            $this->buildSingleParentRecord($row, 'M'),
-            $this->buildSingleParentRecord($row, 'G'),
-            $this->buildSingleParentRecord($row, 'C'),
+            $this->buildSingleParentRecord($row, self::CONTACT_TYPE_FATHER),
+            $this->buildSingleParentRecord($row, self::CONTACT_TYPE_MOTHER),
+            $this->buildSingleParentRecord($row, self::CONTACT_TYPE_GUARDIAN),
+            $this->buildSingleParentRecord($row, self::CONTACT_TYPE_CAREGIVER),
         ]);
         foreach ($results as &$result) {
             $result = array_merge($base, $result);
@@ -1087,22 +1092,22 @@ class External_Pcschools_User implements External_UserInterface
     private function buildSingleParentRecord($row, $type)
     {
         switch ($type) {
-            case 'F':
+            case self::CONTACT_TYPE_FATHER:
                 $mainPrefix  = 'DAD';
                 $titlePrefix = 'FATHER';
                 $relation    = 'Father';
                 break;
-            case 'M':
+            case self::CONTACT_TYPE_MOTHER:
                 $mainPrefix  = 'MUM';
                 $titlePrefix = 'MOTHER';
                 $relation    = 'Mother';
                 break;
-            case 'C':
+            case self::CONTACT_TYPE_CAREGIVER:
                 $mainPrefix  = 'CGIVE';
                 $titlePrefix = 'CGIVE';
                 $relation    = 'Caregiver';
                 break;
-            case 'G':
+            case self::CONTACT_TYPE_GUARDIAN:
                 $mainPrefix  = 'GUARD';
                 $titlePrefix = 'GUARDIAN';
                 $relation    = 'Guardian';
