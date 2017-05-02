@@ -259,7 +259,7 @@ class External_Pcschools_User implements External_UserInterface
         foreach ($rowset as $row) {
             $result = array_merge(
                 $result,
-                $this->buildRecords($base, $this->getDatabase()->trimRow($row))
+                $this->buildParentRecords($base, $this->getDatabase()->trimRow($row))
             );
         }
         return $result;
@@ -654,7 +654,7 @@ class External_Pcschools_User implements External_UserInterface
             ];
             $result = array_merge(
                 $result,
-                $this->buildRecords($student, $row)
+                $this->buildParentRecords($student, $row)
             );
         }
         return $result;
@@ -1061,13 +1061,13 @@ class External_Pcschools_User implements External_UserInterface
      *
      * @return array
      */
-    private function buildRecords($base, $row)
+    private function buildParentRecords($base, $row)
     {
         $results = array_filter([
-            $this->buildParentRecord($row, 'F'),
-            $this->buildParentRecord($row, 'M'),
-            $this->buildParentRecord($row, 'G'),
-            $this->buildParentRecord($row, 'C'),
+            $this->buildSingleParentRecord($row, 'F'),
+            $this->buildSingleParentRecord($row, 'M'),
+            $this->buildSingleParentRecord($row, 'G'),
+            $this->buildSingleParentRecord($row, 'C'),
         ]);
         foreach ($results as &$result) {
             $result = array_merge($base, $result);
@@ -1084,7 +1084,7 @@ class External_Pcschools_User implements External_UserInterface
      *
      * @return array
      */
-    private function buildParentRecord($row, $type)
+    private function buildSingleParentRecord($row, $type)
     {
         switch ($type) {
             case 'F':
