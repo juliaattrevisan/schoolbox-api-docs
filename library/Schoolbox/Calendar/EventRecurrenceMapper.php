@@ -213,6 +213,7 @@ class EventRecurrenceMapper
             $seriesEvent->getStartDateTime()->getDateTimeObject()->add($startDelta);
             $seriesEvent->getEndDateTime()->getDateTimeObject()->add($endDelta);
             $this->getEventMapper()->save($seriesEvent);
+            $this->getEventMapper()->updateMetadata($event->getMetadata(), $event);
 
             /* Assign relations
              */
