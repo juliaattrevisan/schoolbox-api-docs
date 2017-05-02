@@ -397,27 +397,18 @@ class Controller extends Base
                 $titlesFound[$title] = true;
 
                 if ($assessment->isParticipant($student)) {
-
-                    $participant        = $assessment->getParticipant($student);
-                    $mostRecentFeedback = $participant->findMostRecentFeedback();
-
-                    $comment = $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
-
-                    if( $assessment->getMarkScheme() instanceof TotalMarkAbstract) {
-                        preg_match('/(\d+) \/ (\d+)/',$assessment->getHumanReadableMark($student, true), $markParts);
-                        $data[$title] = $markParts[1];
-                        $data[$title. ' (Total)'] = $markParts[2];
-                    } else {$data[$title] = $assessment->getHumanReadableMark($student, true);
+                    $data[$title] = $this->retrieveTitleField($assessment, $student);
+                    if ($this->hasTotalMarkColumn($assessment)) {
+                        $data[$title . ' (Total)'] = $this->retrieveTotalMarkField($assessment, $student);
                     }
-                    if( !( $assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion)) {
-                        $data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
-                        if(!$assessment->getMarkScheme() instanceof Completion) {
-                            $data[$title . ' (Comment)'] = $comment;
-
+                    if ($this->hasNormalizedMarkColumn($assessment)) {
+                        $data[$title . ' (Normalized)'] = $this->retrieveNormalizedMarkField($assessment, $student);
                     }
-                }
-               } else
-                {
+                    if ($this->hasCommentColumn($assessment)) {
+                        $data[$title . ' (Comment)'] = $this->retrieveCommentField($assessment, $student);
+                    }
+
+                } else {
                     $data[$title] = '';
                     if( $this->hasTotalMarkColumn( $assessment)) {
                         $data[$title . ' (Total)'] = '';
@@ -486,6 +477,68 @@ class Controller extends Base
     {
         // Comment check is the same as normalized mark check
         return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
+    }
+
+    /**
+     * Retrieves title field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    protected function retrieveTitleField(IAssessable $assessment, User $student)
+    {
+        if ($this->hasTotalMarkColumn($assessment)
+            && preg_match('/(\d+) \/ (\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)
+        ) {
+            return $markParts[1];
+        }
+
+        return $assessment->getHumanReadableMark($student, true);
+    }
+
+    /**
+     * Retrieves total mark field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    protected function retrieveTotalMarkField(IAssessable $assessment, User $student)
+    {
+        if (preg_match('/(\d+) \/ (\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)) {
+            return $markParts[2];
+        }
+        return '';
+    }
+
+    /**
+     * Retrieves normalized field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    protected function retrieveNormalizedMarkField(IAssessable $assessment, User $student)
+    {
+        return $assessment->getNormalisedMark($student, true);
+    }
+
+    /**
+     * Retrieves comment field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    protected function retrieveCommentField(IAssessable $assessment, User $student)
+    {
+        $participant = $assessment->getParticipantIfExtant($student);
+        if (!$participant) {
+            return '';
+        }
+        $mostRecentFeedback = $participant->findMostRecentFeedback();
+        return $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
     }
 
     /* Getters/Setters
