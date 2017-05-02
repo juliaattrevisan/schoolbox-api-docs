@@ -65,15 +65,15 @@ class Sync extends Base implements ISync
 
         $query = "
             SELECT
-                ''              AS student_contact_network_login,
-                F.FAMKEY + '-F' AS student_contact_id,
-                ''              AS student_contact_title,
-                F.DAD_FIRSTNAME AS student_contact_given_name,
-                F.DAD_FIRSTNAME AS student_contact_preferred,
-                F.DAD_SURNAME   AS student_contact_surname,
-                ''              AS student_contact_home_email,
-                F.DAD_EMAIL     AS student_contact_default_email,
-                ''              AS student_contact_work_email,
+                ''                    AS student_contact_network_login,
+                F.IDENTITY_ID# + '-F' AS student_contact_id,
+                ''                    AS student_contact_title,
+                F.DAD_FIRSTNAME       AS student_contact_given_name,
+                F.DAD_FIRSTNAME       AS student_contact_preferred,
+                F.DAD_SURNAME         AS student_contact_surname,
+                ''                    AS student_contact_home_email,
+                F.DAD_EMAIL           AS student_contact_default_email,
+                ''                    AS student_contact_work_email,
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
@@ -83,15 +83,15 @@ class Sync extends Base implements ISync
             UNION ALL
 
             SELECT
-                ''              AS student_contact_network_login,
-                F.FAMKEY + '-M' AS student_contact_id,
-                ''              AS student_contact_title,
-                F.MUM_FIRSTNAME AS student_contact_given_name,
-                F.MUM_FIRSTNAME AS student_contact_preferred,
-                F.MUM_SURNAME   AS student_contact_surname,
-                ''              AS student_contact_home_email,
-                F.MUM_EMAIL     AS student_contact_default_email,
-                ''              AS student_contact_work_email,
+                ''                    AS student_contact_network_login,
+                F.IDENTITY_ID# + '-M' AS student_contact_id,
+                ''                    AS student_contact_title,
+                F.MUM_FIRSTNAME       AS student_contact_given_name,
+                F.MUM_FIRSTNAME       AS student_contact_preferred,
+                F.MUM_SURNAME         AS student_contact_surname,
+                ''                    AS student_contact_home_email,
+                F.MUM_EMAIL           AS student_contact_default_email,
+                ''                    AS student_contact_work_email,
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
@@ -101,15 +101,15 @@ class Sync extends Base implements ISync
             UNION ALL
 
             SELECT
-                ''                AS student_contact_network_login,
-                F.FAMKEY + '-C'   AS student_contact_id,
-                ''                AS student_contact_title,
-                F.CGIVE_FIRSTNAME AS student_contact_given_name,
-                F.CGIVE_FIRSTNAME AS student_contact_preferred,
-                F.CGIVE_SURNAME   AS student_contact_surname,
-                ''                AS student_contact_home_email,
-                F.CGIVE_EMAIL     AS student_contact_default_email,
-                ''                AS student_contact_work_email,
+                ''                    AS student_contact_network_login,
+                F.IDENTITY_ID# + '-C' AS student_contact_id,
+                ''                    AS student_contact_title,
+                F.CGIVE_FIRSTNAME     AS student_contact_given_name,
+                F.CGIVE_FIRSTNAME     AS student_contact_preferred,
+                F.CGIVE_SURNAME       AS student_contact_surname,
+                ''                    AS student_contact_home_email,
+                F.CGIVE_EMAIL         AS student_contact_default_email,
+                ''                    AS student_contact_work_email,
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
@@ -119,15 +119,15 @@ class Sync extends Base implements ISync
             UNION ALL
 
             SELECT
-                ''                AS student_contact_network_login,
-                F.FAMKEY + '-G'   AS student_contact_id,
-                ''                AS student_contact_title,
-                F.GUARD_FIRSTNAME AS student_contact_given_name,
-                F.GUARD_FIRSTNAME AS student_contact_preferred,
-                F.GUARD_SURNAME   AS student_contact_surname,
-                ''                AS student_contact_home_email,
-                F.GUARD_EMAIL     AS student_contact_default_email,
-                ''                AS student_contact_work_email,
+                ''                    AS student_contact_network_login,
+                F.IDENTITY_ID# + '-G' AS student_contact_id,
+                ''                    AS student_contact_title,
+                F.GUARD_FIRSTNAME     AS student_contact_given_name,
+                F.GUARD_FIRSTNAME     AS student_contact_preferred,
+                F.GUARD_SURNAME       AS student_contact_surname,
+                ''                    AS student_contact_home_email,
+                F.GUARD_EMAIL         AS student_contact_default_email,
+                ''                    AS student_contact_work_email,
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE

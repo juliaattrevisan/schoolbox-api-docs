@@ -181,7 +181,7 @@ class External_Pcschools_User implements External_UserInterface
         // (at this stage, all with the same contact ID)
         $rowset = $this->getDatabase()->getAll("
             SELECT
-                F.FAMKEY,
+                F.IDENTITY_ID#,
                 -- Address
                 F.COR_ADDRESS,
                 F.COR_ADDRESS1,
@@ -463,7 +463,7 @@ class External_Pcschools_User implements External_UserInterface
         }
         $query = "
             SELECT
-                F.FAMKEY,
+                F.IDENTITY_ID#,
                 -- Father
                 F.DAD_DOMICILE,
                 F.DAD_EMAIL,
@@ -489,7 +489,7 @@ class External_Pcschools_User implements External_UserInterface
         $results = [];
         foreach ($this->getDatabase()->getAll($query) as $row) {
             $row = $this->getDatabase()->trimRow($row);
-            $id  = $row['FAMKEY'];
+            $id  = $row['IDENTITY_ID#'];
             // For now, I'm going to assume that parent IDs will be suffixed
             if ($row['DAD_DOMICILE'] === 'Y') {
                 $result[$id.'-'.self::CONTACT_TYPE_FATHER] = $row['DAD_EMAIL'];
@@ -615,7 +615,7 @@ class External_Pcschools_User implements External_UserInterface
         $rowset = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
                 SELECT
-                    F.FAMKEY,
+                    F.IDENTITY_ID#,
                     ID.LOGIN,
                     -- Father
                     F.DAD_DOMICILE,
@@ -913,7 +913,7 @@ class External_Pcschools_User implements External_UserInterface
             SELECT S.STUDKEY AS RelatedID
             FROM STUDENT S
             INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
-            WHERE S_FAMILY.FAMKEY = {$this->getDatabase()->smartQuote($familyCode)}
+            WHERE S_FAMILY.IDENTITY_ID# = {$this->getDatabase()->smartQuote($familyCode)}
         ";
         switch ($suffix) {
             case 'F':
@@ -1123,7 +1123,7 @@ class External_Pcschools_User implements External_UserInterface
 
         // Field mappings
         $fieldMappings = [
-            'StudentContactID'           => 'FAMKEY',
+            'StudentContactID'           => 'IDENTITY_ID#',
             'StudentContactTitle'        => $titlePrefix . '_TITLE',
             'StudentContactPreferred'    => $mainPrefix . '_FIRSTNAME',
             'StudentContactSurname'      => $mainPrefix . '_SURNAME',
