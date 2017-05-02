@@ -364,14 +364,14 @@ class Controller extends Base
 
             $titlesFound[$title]            = true;
             $data[$title]                   = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
-            if( $assessment->getMarkScheme() instanceof TotalMarkAbstract) {
+            if ($this->hasTotalMarkColumn($assessment)) {
                 $data[$title . ' (Total)'] = '';
             }
-            if( !( $assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion)) {
+            if ($this->hasNormalizedMarkColumn($assessment)) {
                 $data[$title . ' (Normalized)'] = '';
-                if(!$assessment->getMarkScheme() instanceof Completion) {
-                    $data[$title . ' (Comment)']    = '';
-                }
+            }
+            if ($this->hasCommentColumn($assessment)) {
+                $data[$title . ' (Comment)']    = '';
             }
         }
 
@@ -409,15 +409,24 @@ class Controller extends Base
                         $data[$title. ' (Total)'] = $markParts[2];
                     } else {$data[$title] = $assessment->getHumanReadableMark($student, true);
                     }
-                    if( !( $assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion)) {$data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
-                    if(!$assessment->getMarkScheme() instanceof Completion) {$data[$title . ' (Comment)'] = $comment;
+                    if( !( $assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion)) {
+                        $data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
+                        if(!$assessment->getMarkScheme() instanceof Completion) {
+                            $data[$title . ' (Comment)'] = $comment;
+
+                    }
                 }
-               }
-                } else
+               } else
                 {
                     $data[$title] = '';
-                    if( !( $assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion)) {$data[$title . ' (Normalized)'] = '';
-                    if(!$assessment->getMarkScheme() instanceof Completion) {$data[$title . ' (Comment)'] = '';}
+                    if( $this->hasTotalMarkColumn( $assessment)) {
+                        $data[$title . ' (Total)'] = '';
+                    }
+                    if ($this->hasNormalizedMarkColumn( $assessment)) {
+                        $data[$title . ' (Normalized)'] = '';
+                        }if($this->hasCommentColumn($assessment)) {
+                            $data[$title . ' (Comment)'] = '';
+
                     }
                 }
 
@@ -439,6 +448,44 @@ class Controller extends Base
         echo stream_get_contents($file);
         fclose($file);
         exit;
+    }
+
+    /* Helper methods for building the markbook export.
+     * TODO: It's not ideal these methods are in the controller instead of in a renderer class or something
+     */
+
+    /**
+     * Does this assessment have a total mark column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function hasTotalMarkColumn(IAssessable $assessment)
+    {
+        return $assessment->getMarkScheme() instanceof TotalMarkAbstract;
+    }
+
+    /**
+     * Does this assessment have a normalized mark column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function hasNormalizedMarkColumn(IAssessable $assessment)
+    {
+        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
+    }
+
+    /**
+     * Does this assessment have a comment column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function hasCommentColumn(IAssessable $assessment)
+    {
+        // Comment check is the same as normalized mark check
+        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
     }
 
     /* Getters/Setters
