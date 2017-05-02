@@ -10,6 +10,7 @@ namespace Schoolbox\Survey;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Twig_Loader_Chain;
 use Schoolbox\UserMapper;
@@ -31,6 +32,7 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 '/ajax' => 'getSelectize',
+                '/class/snapshot/{surveyId}' => 'getClassSnapshot',
             ],
             'POST' => [
             ]
@@ -50,6 +52,24 @@ class Module extends BaseModule
     {
 
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
+    }
+
+
+    /**
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload($matcher, '.*', function($params) {
+
+            $preloads = [];
+
+            if (isset($params['surveyId'])) {
+                $preloads['survey'] = $this->getMapperFactory()->get(Mapper::class)->findById($params['surveyId']);
+            }
+
+            return $preloads;
+        });
     }
 
     /**
