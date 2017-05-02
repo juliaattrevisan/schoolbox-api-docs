@@ -176,7 +176,7 @@ class External_Pcschools_User implements External_UserInterface
         // (at this stage, all with the same contact ID)
         $rowset = $this->getDatabase()->getAll("
             SELECT
-                F.IDENTITY_ID#,
+                F.FAMKEY,
                 -- Address
                 F.COR_ADDRESS,
                 F.COR_ADDRESS1,
@@ -458,7 +458,7 @@ class External_Pcschools_User implements External_UserInterface
         }
         $query = "
             SELECT
-                F.IDENTITY_ID#,
+                F.FAMKEY,
                 -- Father
                 F.DAD_DOMICILE,
                 F.DAD_EMAIL,
@@ -484,7 +484,7 @@ class External_Pcschools_User implements External_UserInterface
         $results = [];
         foreach ($this->getDatabase()->getAll($query) as $row) {
             $row = $this->getDatabase()->trimRow($row);
-            $id  = $row['IDENTITY_ID#'];
+            $id  = $row['FAMKEY'];
             // For now, I'm going to assume that parent IDs will be suffixed
             if ($row['DAD_DOMICILE'] === 'Y') {
                 $result[$id.'-F'] = $row['DAD_EMAIL'];
@@ -610,7 +610,7 @@ class External_Pcschools_User implements External_UserInterface
         $rowset = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
                 SELECT
-                    F.IDENTITY_ID#,
+                    F.FAMKEY,
                     ID.LOGIN,
                     -- Father
                     F.DAD_DOMICILE,
@@ -1119,7 +1119,7 @@ class External_Pcschools_User implements External_UserInterface
         // Field mappings
         $fieldMappings = [
             // May suffix this field with $type
-            'StudentContactID'           => 'IDENTITY_ID#',
+            'StudentContactID'           => 'FAMKEY',
             'StudentContactTitle'        => $titlePrefix . '_TITLE',
             'StudentContactPreferred'    => $mainPrefix . '_FIRSTNAME',
             'StudentContactSurname'      => $mainPrefix . '_SURNAME',
