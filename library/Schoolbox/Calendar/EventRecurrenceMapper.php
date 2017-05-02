@@ -249,7 +249,12 @@ class EventRecurrenceMapper
         $event->setEndDate($first_date_set['end']);
         $event->setAccess($access);
 
-        $metadata = clone ($event->getMetadata());
+        $eventMetadata = $event->getMetadata();
+        if (is_object($eventMetadata)) {
+            $metadata = clone $eventMetadata;
+        } else {
+            $metadata = $eventMetadata;
+        }
 
         $this->getEventMapper()->save($event);
 
