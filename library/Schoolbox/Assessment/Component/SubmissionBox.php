@@ -898,7 +898,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @return Assessment ID
+     * @return int the core Assessment ID
      */
     public function getAssessmentId()
     {
