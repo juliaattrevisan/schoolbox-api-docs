@@ -4,7 +4,7 @@
 <li class="actions-small-1">
     <div class="list-item">
         <div class="card wrap-down small-12">
-            <div class="{{ icon.renderClass(assessable) }} size-64" title="{{ assessable.getTypeName }}"></div>
+            <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
             {% if student %}
                 {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, assessment: assessable}) %}
             {% else %}
@@ -21,10 +21,12 @@
 
             <p class="meta">
                 {{ dueDate.dueDate(assessable, student ?: USER) }}
+                {% if student %}
+                    <br>
+                    <a href="{% if route %}{{ route }}{% else %}#{% endif %}" class="meta">{% include '@learningAssessment/fragments/statusLine.twig' with {assessable: assessable} %}</a>
+                {% endif %}
             </p>
-            {% if student %}
-                <p><a href="{% if route %}{{ route }}{% else %}#{% endif %}" class="meta">{% include '@learningAssessment/fragments/statusLine.twig' with {assessable: assessable} %}</a></p>
-            {% endif %}
+
         </div>
     </div>
 </li>
