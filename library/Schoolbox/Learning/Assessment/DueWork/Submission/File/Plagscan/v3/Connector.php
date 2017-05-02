@@ -96,10 +96,10 @@ class Connector
      * Transmit a document to Plagscan
      *
      * @param SubmissionFile $submissionFile
+     * @param string $filename
      * @return int
-     * @throws DomainException
      */
-    public function transmit(SubmissionFile $submissionFile)
+    public function transmit(SubmissionFile $submissionFile, $filename)
     {
         /* Check valid extensions and die early if trying
          * to analyse an illegal file type
@@ -108,7 +108,7 @@ class Connector
             throw new \DomainException('Invalid file type');
         }
 
-        $filepath = $this->makeTempFile($submissionFile);
+        $filepath = $this->makeTempFile($submissionFile, $filename);
 
         if ($filepath === null) {
             throw new \DomainException('Could not create temp file');
@@ -156,15 +156,16 @@ class Connector
      * Move $submissionFile data to a temp location for upload
      *
      * @param SubmissionFile $submissionFile
+     * @param $filename
      * @return null|string
      */
-    private function makeTempFile(SubmissionFile $submissionFile)
+    private function makeTempFile(SubmissionFile $submissionFile, $filename)
     {
         $documentName = $submissionFile->getStorage()->getBasename();
 
         /* Shank the file into a temp dir; the file extension must be included
          */
-        $destination = $this->getConfigLoader()->get('plagscan_upload_tmp_dir') . '/' . $submissionFile->getId() . '_' . $documentName;
+        $destination = $this->getConfigLoader()->get('plagscan_upload_tmp_dir') . '/' . $filename . '_' . $documentName;
 
         // copy the file contents to the temp directory
         if ($submissionFile->getStorage()->exists() && $fp = fopen($destination, 'w')) {
