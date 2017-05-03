@@ -22,14 +22,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel\Project;
-use Schoolbox\Filter\Filters\Assessment\AssessmentType as AssessmentTypeFilter;
-use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
-use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
-use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
-use Schoolbox\Filter\Filters\Assessment\WeightingType as WeightingTypeFilter;
-use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitImportSpecFilter;
-use Schoolbox\Filter\Filters\Assessment\Project as ProjectFilter;
-use Schoolbox\Filter\Filters\Assessment\UnitSpec as UnitSpecFilter;
+use Schoolbox\Filter\Filters;
 
 
 /**
@@ -61,6 +54,7 @@ class FactoryFactory
      * @param string $filterDefinitionClass
      * @return IFilterFactory
      * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
+     * @throws \ReflectionException If the specified class does not exist
      */
     public function buildFilterFactoryForFilter($filterDefinitionClass)
     {
@@ -70,36 +64,36 @@ class FactoryFactory
 
         // Registry of filters definitions, and their extra dependencies
         switch ($filterDefinitionClass) {
-            case AssessmentTypeFilter\Definition::class:
-                return $this->buildFactory(AssessmentTypeFilter\Factory::class);
-            case FolderFilter\Definition::class:
-                return $this->buildFactory(FolderFilter\Factory::class, [
+            case Filters\Assessment\AssessmentType\Definition::class:
+                return $this->buildFactory(Filters\Assessment\AssessmentType\Factory::class);
+            case Filters\Assessment\Folder\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Folder\Factory::class, [
                     'folderMapper' => $this->mapperFactory->get(Folder\Mapper::class),
                 ]);
-            case TermFilter\Definition::class:
-                return $this->buildFactory(TermFilter\Factory::class, [
+            case Filters\Assessment\Term\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Term\Factory::class, [
                     'termMapper' => $this->mapperFactory->get(Term\Mapper::class),
                 ]);
-            case WorkTypeFilter\Definition::class:
-                return $this->buildFactory(WorkTypeFilter\Factory::class, [
+            case Filters\Assessment\WorkType\Definition::class:
+                return $this->buildFactory(Filters\Assessment\WorkType\Factory::class, [
                     'workTypeMapper' => $this->mapperFactory->get(WorkType\Mapper::class),
                 ]);
-            case WeightingTypeFilter\Definition::class:
-                return $this->buildFactory(WeightingTypeFilter\Factory::class);
-            case UnitImportSpecFilter\Definition::class:
-                return $this->buildFactory(UnitImportSpecFilter\Factory::class, [
+            case Filters\Assessment\WeightingType\Definition::class:
+                return $this->buildFactory(Filters\Assessment\WeightingType\Factory::class);
+            case Filters\Assessment\UnitImportSpec\Definition::class:
+                return $this->buildFactory(Filters\Assessment\UnitImportSpec\Factory::class, [
                     'folderMapper'     => $this->mapperFactory->get(Folder\Mapper::class),
                     'courseImplMapper' => $this->mapperFactory->get(CourseImpl\Mapper::class),
                     'unitSpecMapper'   => $this->mapperFactory->get(UnitSpec\Mapper::class),
                 ]);
-            case ProjectFilter\Definition::class:
-                return $this->buildFactory(ProjectFilter\Factory::class, [
+            case Filters\Assessment\Project\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Project\Factory::class, [
                     'folderMapper'          => $this->mapperFactory->get(Folder\Mapper::class),
                     'unitImplMapper'        => $this->mapperFactory->get(UnitImpl\Mapper::class),
                     'projectMapper'         => $this->mapperFactory->get(Project\Mapper::class),
                 ]);
-            case UnitSpecFilter\Definition::class:
-                return $this->buildFactory(UnitSpecFilter\Factory::class, [
+            case Filters\Assessment\UnitSpec\Definition::class:
+                return $this->buildFactory(Filters\Assessment\UnitSpec\Factory::class, [
                     'unitSpecMapper'        => $this->mapperFactory->get(UnitSpec\Mapper::class),
                 ]);
         }
@@ -114,6 +108,7 @@ class FactoryFactory
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
      * @throws \InvalidArgumentException
      * @throws ServiceNotFound
+     * @throws \ReflectionException If the specified class does not exist
      */
     public function buildKeyConverters($page)
     {
@@ -145,6 +140,7 @@ class FactoryFactory
      * @param array     $query
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
+     * @throws \ReflectionException If the specified class does not exist
      */
     public function buildPanel(User $user, $page, $route, User $viewee = null, array $query = [])
     {
@@ -219,6 +215,7 @@ class FactoryFactory
      * @param array|null $extraArgs
      * @return IFilterFactory|object
      * @throws \InvalidArgumentException
+     * @throws \ReflectionException If the specified class does not exist
      */
     private function buildFactory($factoryClass, array $extraArgs = [])
     {
