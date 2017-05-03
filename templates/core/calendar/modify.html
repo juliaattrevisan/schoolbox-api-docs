@@ -57,24 +57,30 @@
             <section>
                 <fieldset class="content">
                     <legend>Overview</legend>
+
                     <div class="small-12 column">
                         <label>
                             Title
                             <input name="title" class="required" type="text" maxlength="100" value="{EVENT_TITLE}" />
                         </label>
                     </div>
-                    <div class="small-6 columns">
-                        <label for="startDate">
+
+                    <div class="small-6 columns input-group" id="startdate-inputgroup" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-sync data-datepicker-sync-enddate="#endDate">
+                        <label>
                             From
+                            <input name="startDate" id="startDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                         </label>
-                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+                        <button type="button" class="button icon-calendar"></button>
                     </div>
-                    <div class="small-6 columns">
+
+                    <div class="small-6 columns input-group" id="end-date-inputgroup" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-endofperiod>
                         <label for="endDate">
                             Until
+                            <input name="endDate" id="endDate" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
                         </label>
-                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-endofperiod type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+                        <button type="button" class="button icon-calendar"></button>
                     </div>
+
                 </fieldset>
 
                 <fieldset class="content" data-collapsable-container>
