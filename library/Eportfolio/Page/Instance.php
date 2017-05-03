@@ -153,8 +153,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 	 */
     private function renderComponents()
     {
-        $instanceCollection = $this->getComponentFactory()->getDefinitionList('eportfolio_template');
+        /* Some kind of change to the FactoryAbstract's getDefinitionList() signature
+         * now causes it to behave differently, using the Module context that was set
+         * when the factory was instantiated. In this case we need to change that context
+         */
+        $this->getComponentFactory()->setModule('eportfolio_template');
 
+        $instanceCollection = $this->getComponentFactory()->getDefinitionList();
 
         foreach ($instanceCollection as $instance) {
             /** @var Component_Instance $instance */
