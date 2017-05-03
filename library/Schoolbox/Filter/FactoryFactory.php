@@ -27,8 +27,9 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
 use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
 use Schoolbox\Filter\Filters\Assessment\WeightingType as WeightingTypeFilter;
-use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitSpecFilter;
+use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitImportSpecFilter;
 use Schoolbox\Filter\Filters\Assessment\Project as ProjectFilter;
+use Schoolbox\Filter\Filters\Assessment\UnitSpec as UnitSpecFilter;
 
 
 /**
@@ -85,8 +86,8 @@ class FactoryFactory
                 ]);
             case WeightingTypeFilter\Definition::class:
                 return $this->buildFactory(WeightingTypeFilter\Factory::class);
-            case UnitSpecFilter\Definition::class:
-                return $this->buildFactory(UnitSpecFilter\Factory::class, [
+            case UnitImportSpecFilter\Definition::class:
+                return $this->buildFactory(UnitImportSpecFilter\Factory::class, [
                     'folderMapper'     => $this->mapperFactory->get(Folder\Mapper::class),
                     'courseImplMapper' => $this->mapperFactory->get(CourseImpl\Mapper::class),
                     'unitSpecMapper'   => $this->mapperFactory->get(UnitSpec\Mapper::class),
@@ -96,6 +97,10 @@ class FactoryFactory
                     'folderMapper'          => $this->mapperFactory->get(Folder\Mapper::class),
                     'unitImplMapper'        => $this->mapperFactory->get(UnitImpl\Mapper::class),
                     'projectMapper'         => $this->mapperFactory->get(Project\Mapper::class),
+                ]);
+            case UnitSpecFilter\Definition::class:
+                return $this->buildFactory(UnitSpecFilter\Factory::class, [
+                    'unitSpecMapper'        => $this->mapperFactory->get(UnitSpec\Mapper::class),
                 ]);
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
