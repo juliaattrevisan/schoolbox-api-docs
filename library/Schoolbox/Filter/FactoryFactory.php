@@ -66,6 +66,10 @@ class FactoryFactory
         switch ($filterDefinitionClass) {
             case Filters\Assessment\AssessmentType\Definition::class:
                 return $this->buildFactory(Filters\Assessment\AssessmentType\Factory::class);
+            case Filters\Assessment\FolderDirect\Definition::class:
+                return $this->buildFactory(Filters\Assessment\FolderDirect\Factory::class, [
+                    'folderMapper' => $this->mapperFactory->get(Folder\Mapper::class),
+                ]);
             case Filters\Assessment\FolderIndirect\Definition::class:
                 return $this->buildFactory(Filters\Assessment\FolderIndirect\Factory::class, [
                     'folderMapper' => $this->mapperFactory->get(Folder\Mapper::class),
