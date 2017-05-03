@@ -153,15 +153,16 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 	 */
     private function renderComponents()
     {
-        $instanceCollection = $this->getComponentFactory()->getDefinitionList('eportfolio_template');
+        /* Some kind of change to the FactoryAbstract's getDefinitionList() signature
+         * now causes it to behave differently, using the Module context that was set
+         * when the factory was instantiated. In this case we need to change that context
+         */
+        $this->getComponentFactory()->setModule('eportfolio_template');
+
+        $instanceCollection = $this->getComponentFactory()->getDefinitionList();
 
         foreach ($instanceCollection as $instance) {
             /** @var Component_Instance $instance */
-
-            $definition = $instance->getDefinition();
-            $definition->setComponentCategory($instance->getIdentifier());
-            $definition->setComponentCategoryName($this->getEportfolioHandler()->getTemplateNameById($instance->getIdentifier()));
-
             foreach ($this->getComponentCollection() as $inst) {
                 /** @var Component_Eportfolio_ControllerAbstract $inst */
                 if ($inst->getInstance()->getDefinitionId() == $instance->getDefinitionId()) {
@@ -174,7 +175,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         if ($total = $instanceCollection->count()) {
             $i = 0;
             $previous = new Component_Instance();
-
             foreach ($instanceCollection as $component) {
                 /** @var Component_Instance $component */
                 ++$i;
@@ -235,10 +235,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     'EPORTFOLIO_COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',
                 ));
 
-                $this_category = $component->getDefinition()->getComponentCategory();
+                $this_category = $component->getIdentifier();
                 $last_category = null;
                 if ($previous->getDefinition() instanceof Component_Definition) {
-                    $last_category = $previous->getDefinition()->getComponentCategory();
+                    $last_category = $previous->getIdentifier();
                 }
                 if ($this_category != $last_category && $i > 1) {
                     $this->getPage()->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
@@ -266,7 +266,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
                 /* >:/
 				 */
-                $this->tabList[$this_category]['name'] = Scrub::text($component->getDefinition()->getComponentCategoryName());
+                $this->tabList[$this_category]['name'] = Scrub::text($this->getEportfolioHandler()->getTemplateNameById($component->getIdentifier()));
                 $this->tabList[$this_category]['count']++;
             }
 
@@ -315,6 +315,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 	 */
     private function renderTabList()
     {
+
         $tabList = $this->getTabList();
 
         if (isset($tabList) && count($tabList)) {
@@ -584,7 +585,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     /**
 	 * Set component collection
 	 *
-	 * @param null $componentCollection
+	 * @param \Schoolbox\Collection $componentCollection
 	 */
     private function setComponentCollection($componentCollection)
     {
@@ -594,7 +595,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     /**
 	 * Get component collection
 	 *
-	 * @return null
+	 * @return \Schoolbox\Collection
 	 */
     private function getComponentCollection()
     {

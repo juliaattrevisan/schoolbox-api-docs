@@ -201,7 +201,7 @@ abstract class Component_FactoryAbstract {
      * @param $module
      * @return static
      */
-    protected function setModule($module)
+    public function setModule($module)
     {
         $this->module = $module;
         return $this;

@@ -25,11 +25,11 @@ class Component_Eportfolio_Factory extends Component_FactoryAbstract
     /**
      * Return a collection of components used in any eportfolio template setup
      *
-     * @param string $module
+     * @param string $sortBy
      * @return Component_Instance[]|\Schoolbox\GenericCollection
      */
-    public function getDefinitionList($module)
+    public function getDefinitionList($sortBy = '')
     {
-        return Component_InstanceMapper::getInstance()->findByModule($module);
+        return Component_InstanceMapper::getInstance()->findByModule($this->getModule());
     }
 }
