@@ -289,7 +289,7 @@ class UserMapper extends Mapper
              * In this case, the campus object will be totally empty but
              * still occupy slots in the user's campus collection stack
              */
-            if ($campus->getId()) {
+            if ($campus) {
                 // Don't double add
                 $users[$userId]->getCampusCollection()->setOffset($campus->getId(), $campus);
 
