@@ -88,13 +88,17 @@ class FactoryFactory
                 ]);
             case Filters\Assessment\Project\Definition::class:
                 return $this->buildFactory(Filters\Assessment\Project\Factory::class, [
-                    'folderMapper'          => $this->mapperFactory->get(Folder\Mapper::class),
-                    'unitImplMapper'        => $this->mapperFactory->get(UnitImpl\Mapper::class),
-                    'projectMapper'         => $this->mapperFactory->get(Project\Mapper::class),
+                    'folderMapper'   => $this->mapperFactory->get(Folder\Mapper::class),
+                    'unitImplMapper' => $this->mapperFactory->get(UnitImpl\Mapper::class),
+                    'projectMapper'  => $this->mapperFactory->get(Project\Mapper::class),
                 ]);
             case Filters\Assessment\UnitSpec\Definition::class:
                 return $this->buildFactory(Filters\Assessment\UnitSpec\Factory::class, [
-                    'unitSpecMapper'        => $this->mapperFactory->get(UnitSpec\Mapper::class),
+                    'unitSpecMapper' => $this->mapperFactory->get(UnitSpec\Mapper::class),
+                ]);
+            case Filters\Assessment\UnitImpl\Definition::class:
+                return $this->buildFactory(Filters\Assessment\UnitImpl\Factory::class, [
+                    'unitImplMapper' => $this->mapperFactory->get(UnitImpl\Mapper::class),
                 ]);
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
